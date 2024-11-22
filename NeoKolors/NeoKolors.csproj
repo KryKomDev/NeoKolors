@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <Version>0.24.47</Version>
+        <Authors>KryKom</Authors>
+        <Company>KryKom</Company>
+        <LangVersion>preview</LangVersion>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="SkiaSharp" Version="2.88.9" />
+    </ItemGroup>
+
+</Project>
