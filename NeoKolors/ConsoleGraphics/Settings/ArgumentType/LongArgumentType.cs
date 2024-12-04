@@ -15,10 +15,13 @@ public sealed class LongArgumentType : IArgumentType {
     private long? value;
     public long Min { get; }
     public long Max { get; }
+    private long defaultValue;
 
-    internal LongArgumentType(long min = Int64.MinValue, long max = Int64.MaxValue) {
+    internal LongArgumentType(long min = Int64.MinValue, long max = Int64.MaxValue, long defaultValue = 0) {
         Min = min;
         Max = max;
+        this.defaultValue = defaultValue;
+        value = defaultValue;
     }
     
     public string GetInputType() {
@@ -53,6 +56,10 @@ public sealed class LongArgumentType : IArgumentType {
         return clone;
     }
 
+    public void Reset() {
+        value = defaultValue;
+    }
+
     public override string ToString() {
         return $"{{\"type\": \"long\", " +
                $"\"min\": {Min}, " +
@@ -70,10 +77,13 @@ public sealed class UnsignedLongArgumentType : IArgumentType {
     private ulong? value;
     public ulong Min { get; }
     public ulong Max { get; }
+    private ulong defaultValue;
 
-    internal UnsignedLongArgumentType(ulong min = ulong.MinValue, ulong max = ulong.MaxValue) {
+    internal UnsignedLongArgumentType(ulong min = ulong.MinValue, ulong max = ulong.MaxValue, ulong defaultValue = 0) {
         Min = min;
         Max = max;
+        this.defaultValue = defaultValue;
+        value = defaultValue;
     }
     
     public string GetInputType() {
@@ -107,7 +117,11 @@ public sealed class UnsignedLongArgumentType : IArgumentType {
         
         return clone;
     }
-    
+
+    public void Reset() {
+        value = defaultValue;
+    }
+
     public override string ToString() {
         return $"{{\"type\": \"ulong\", " +
                $"\"min\": {Min}, " +

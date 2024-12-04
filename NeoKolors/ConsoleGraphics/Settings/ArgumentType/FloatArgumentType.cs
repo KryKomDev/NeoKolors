@@ -17,10 +17,13 @@ public sealed class FloatArgumentType : IArgumentType {
     private float? value;
     public float Min { get; }
     public float Max { get; }
+    private float defaultValue;
 
-    internal FloatArgumentType(float min = float.MinValue, float max = float.MaxValue) {
+    internal FloatArgumentType(float min = float.MinValue, float max = float.MaxValue, float defaultValue = 0) {
         Min = min;
         Max = max;
+        this.defaultValue = defaultValue;
+        value = defaultValue;
     }
     
     public string GetInputType() {
@@ -53,6 +56,10 @@ public sealed class FloatArgumentType : IArgumentType {
         };
         
         return clone;
+    }
+
+    public void Reset() {
+        value = defaultValue;
     }
 
     public override string ToString() {

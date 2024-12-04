@@ -8,13 +8,14 @@ using static System.Console;
 namespace NeoKolors.Console;
 
 public static class ConsoleColors {
-    
     /// <summary>
     /// prints a colored string in the console without newline
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="hex">hexadecimal value of the color</param>
-    public static void PrintColored(string s, int hex) {
+    /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
+    public static void PrintColored(string s, int hex, bool continuousColoring = true) {
+        if (continuousColoring) s = s.Replace("\e[0m", $"\e[38;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m");
         Write($"\e[38;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{s}\e[0m");
     }
 
@@ -47,7 +48,9 @@ public static class ConsoleColors {
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="hex">hexadecimal value of the color</param>
-    public static void PrintlnColored(string s, int hex) {
+    /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
+    public static void PrintlnColored(string s, int hex, bool continuousColoring = true) {
+        if (continuousColoring) s = s.Replace("\e[0m", $"\e[38;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m");
         Write($"\e[38;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{s}\e[0m\n");
     }
     
@@ -60,9 +63,16 @@ public static class ConsoleColors {
     /// with which will the symbol be replaced,
     /// if a color is -1 the colors will be reset
     /// </param>
-    public static void PrintlnComplexColored(string s, params (string replaced, int hex)[] colors) {
+    public static void PrintlnComplexColored(string s, params (string symbol, int hex)[] colors) {
         foreach (var c in colors) {
-            s = s.Replace(c.replaced, $"\e[38;2;{(byte)(c.hex >> 16)};{(byte)(c.hex >> 8)};{(byte)c.hex}m");
+            
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (c.hex == -1) {
+                s = s.Replace(c.symbol, "\e[0m");
+            }
+            else {
+                s = s.Replace(c.symbol, $"\e[38;2;{(byte)(c.hex >> 16)};{(byte)(c.hex >> 8)};{(byte)c.hex}m");
+            }
         }
         
         WriteLine(s);
@@ -75,7 +85,9 @@ public static class ConsoleColors {
     /// <param name="r">red value of the color</param>
     /// <param name="g">green value of the color</param>
     /// <param name="b">blue value of the color</param>
-    public static void PrintColored(string s, byte r, byte g, byte b) {
+    /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
+    public static void PrintColored(string s, byte r, byte g, byte b, bool continuousColoring = true) {
+        if (continuousColoring) s = s.Replace("\e[0m", $"\e[38;2;{r};{g};{b}m");
         Write($"\e[38;2;{r};{g};{b}m{s}\e[0m");
     }
     
@@ -86,7 +98,9 @@ public static class ConsoleColors {
     /// <param name="r">red value of the color</param>
     /// <param name="g">green value of the color</param>
     /// <param name="b">blue value of the color</param>
-    public static void PrintlnColored(string s, byte r, byte g, byte b) {
+    /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
+    public static void PrintlnColored(string s, byte r, byte g, byte b, bool continuousColoring = true) {
+        if (continuousColoring) s = s.Replace("\e[0m", $"\e[38;2;{r};{g};{b}m");
         Write($"\e[38;2;{r};{g};{b}m{s}\e[0m\n");
     }
     
@@ -95,7 +109,9 @@ public static class ConsoleColors {
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="hex">hexadecimal value of the color</param>
-    public static void PrintColoredB(string s, int hex) {
+    /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
+    public static void PrintColoredB(string s, int hex, bool continuousColoring = true) {
+        if (continuousColoring) s = s.Replace("\e[0m", $"\e[48;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m");
         Write($"\e[48;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{s}\e[0m");
     }
     
@@ -104,7 +120,9 @@ public static class ConsoleColors {
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="hex">hexadecimal value of the color</param>
-    public static void PrintlnColoredB(string s, int hex) {
+    /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
+    public static void PrintlnColoredB(string s, int hex, bool continuousColoring = true) {
+        if (continuousColoring) s = s.Replace("\e[0m", $"\e[48;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m");
         Write($"\e[48;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{s}\e[0m\n");
     }
     
@@ -115,7 +133,9 @@ public static class ConsoleColors {
     /// <param name="r">red value of the color</param>
     /// <param name="g">green value of the color</param>
     /// <param name="b">blue value of the color</param>
-    public static void PrintColoredB(string s, byte r, byte g, byte b) {
+    /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
+    public static void PrintColoredB(string s, byte r, byte g, byte b, bool continuousColoring = true) {
+        if (continuousColoring) s = s.Replace("\e[0m", $"\e[48;2;{r};{g};{b}m");
         Write($"\e[48;2;{r};{g};{b}m{s}\e[0m");
     }
     
@@ -126,7 +146,9 @@ public static class ConsoleColors {
     /// <param name="r">red value of the color</param>
     /// <param name="g">green value of the color</param>
     /// <param name="b">blue value of the color</param>
-    public static void PrintlnColoredB(string s, byte r, byte g, byte b) {
+    /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
+    public static void PrintlnColoredB(string s, byte r, byte g, byte b, bool continuousColoring = true) {
+        if (continuousColoring) s = s.Replace("\e[0m", $"\e[48;2;{r};{g};{b}m");
         Write($"\e[48;2;{r};{g};{b}m{s}\e[0m\n");
     }
 }

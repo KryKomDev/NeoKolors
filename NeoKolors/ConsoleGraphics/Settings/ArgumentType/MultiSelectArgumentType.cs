@@ -17,14 +17,16 @@ public class MultiSelectArgumentType : IArgumentType {
     public Type? Type { get; }
     public string[] Values { get; }
     private bool[] selected;
+    private readonly bool[] defaultSelected;
 
     /// <summary>
     /// constructor that sources values from an enum
     /// </summary>
     /// <param name="type">source enum type</param>
+    /// <param name="defaultSelected"></param>
     /// <exception cref="TypeNotEnumException"></exception>
-    public MultiSelectArgumentType(Type type) {
-        this.Type = type;
+    internal MultiSelectArgumentType(Type type, bool[]? defaultSelected = null) {
+        Type = type;
 
         try {
             Values = Enum.GetNames(type);
@@ -33,13 +35,29 @@ public class MultiSelectArgumentType : IArgumentType {
             throw new TypeNotEnumException(type);
         }
         
-        selected = new bool[Values.Length];
+        if (defaultSelected != null) {
+            this.defaultSelected = defaultSelected;
+            selected = (bool[])defaultSelected.Clone();
+        }
+        else {
+            this.defaultSelected = new bool[Values.Length];
+            selected = new bool[Values.Length];
+        }
     }
 
-    public MultiSelectArgumentType(string[] values) {
+    public MultiSelectArgumentType(string[] values, bool[]? defaultSelected = null) {
         Type = null;
-        this.Values = values;
+        Values = values;
         selected = new bool[values.Length];
+        
+        if (defaultSelected != null) {
+            this.defaultSelected = defaultSelected;
+            selected = (bool[])defaultSelected.Clone();
+        }
+        else {
+            this.defaultSelected = new bool[Values.Length];
+            selected = new bool[Values.Length];
+        }
     }
     
     public string GetInputType() {
@@ -192,5 +210,9 @@ public class MultiSelectArgumentType : IArgumentType {
         }
         
         return clone;
+    }
+
+    public void Reset() {
+        selected = (bool[])defaultSelected.Clone();
     }
 }

@@ -12,7 +12,7 @@ namespace NeoKolors.Console;
 /// </summary>
 public static class Debug {
 
-    public static readonly ColorPalette DEFAULT_PALETTE = new("a11d3c-ef476f-ffd166-06d6a0-118ab2-073b4c");
+    public static readonly ColorPalette DEFAULT_PALETTE = new("a11d3c-ef476f-ffd166-06d6a0-0aabe1-9b4f98");
     public static ColorPalette Palette { get; set; } = DEFAULT_PALETTE;
 
     private static int FATAL_COLOR = Palette.Colors[0];

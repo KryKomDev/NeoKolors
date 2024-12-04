@@ -14,13 +14,16 @@ namespace NeoKolors.ConsoleGraphics.Settings.ArgumentType;
 /// </summary>
 public sealed class DoubleArgumentType : IArgumentType {
 
-    private double? value;
+    private double value;
     public double Min { get; }
     public double Max { get; }
+    private double defaultValue;
 
-    internal DoubleArgumentType(double min = double.MinValue, double max = double.MaxValue) {
+    internal DoubleArgumentType(double min = double.MinValue, double max = double.MaxValue, double defaultValue = 0) {
         Min = min;
         Max = max;
+        this.defaultValue = defaultValue;
+        value = defaultValue;
     }
     
     public string GetInputType() {
@@ -28,14 +31,10 @@ public sealed class DoubleArgumentType : IArgumentType {
     }
 
     public string GetStringValue() {
-        if (value == null) throw new SettingsBuilderException("Accessing value that has not been set.");
-
-        return ((double)value).ToString(CultureInfo.InvariantCulture);
+        return value.ToString(CultureInfo.InvariantCulture);
     }
 
     public object GetValue() {
-        if (value == null) throw new SettingsBuilderException("Accessing value that has not been set.");
-
         return value;
     }
 
@@ -56,10 +55,14 @@ public sealed class DoubleArgumentType : IArgumentType {
         return newArg;
     }
 
+    public void Reset() {
+        value = defaultValue;
+    }
+
     public override string ToString() {
         return $"{{\"type\": \"double\", " +
                $"\"min\": {Min}, " +
                $"\"max\": {Max}, " +
-               $"\"value\": {(value == null ? "\"null\"" : ((float)value).ToString(CultureInfo.InvariantCulture))}}}";
+               $"\"value\": {((float)value).ToString(CultureInfo.InvariantCulture)}}}";
     }
 }

@@ -35,4 +35,9 @@ public interface IArgumentType {
     /// clones the argument (all its field including its value)
     /// </summary>
     public IArgumentType Clone();
+
+    /// <summary>
+    /// resets the argument's value to the default
+    /// </summary>
+    public void Reset();
 }

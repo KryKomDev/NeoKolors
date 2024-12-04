@@ -15,10 +15,13 @@ public sealed class IntegerArgumentType : IArgumentType {
     private int? value;
     public int Min { get; }
     public int Max { get; }
+    private int defaultValue;
 
-    internal IntegerArgumentType(int min = int.MinValue, int max = int.MaxValue) {
+    internal IntegerArgumentType(int min = int.MinValue, int max = int.MaxValue, int defaultValue = 0) {
         Min = min;
         Max = max;
+        this.defaultValue = defaultValue;
+        value = defaultValue;
     }
     
     public string GetInputType() {
@@ -49,6 +52,10 @@ public sealed class IntegerArgumentType : IArgumentType {
         return (IArgumentType)MemberwiseClone();
     }
 
+    public void Reset() {
+        value = defaultValue;
+    }
+
     public override string ToString() {
         return $"{{\"type\": \"int\", " +
                $"\"min\": {Min}, " +
@@ -66,10 +73,13 @@ public sealed class UnsignedIntegerArgumentType : IArgumentType {
     private uint? value;
     public uint Min { get; }
     public uint Max { get; }
+    private uint defaultValue;
 
-    internal UnsignedIntegerArgumentType(uint min = uint.MinValue, uint max = uint.MaxValue) {
+    internal UnsignedIntegerArgumentType(uint min = uint.MinValue, uint max = uint.MaxValue, uint defaultValue = 0) {
         Min = min;
         Max = max;
+        this.defaultValue = defaultValue;
+        value = defaultValue;
     }
     
     public string GetInputType() {
@@ -98,6 +108,10 @@ public sealed class UnsignedIntegerArgumentType : IArgumentType {
 
     public IArgumentType Clone() {
         return (IArgumentType)MemberwiseClone();
+    }
+
+    public void Reset() {
+        value = defaultValue;
     }
 
     public override string ToString() {

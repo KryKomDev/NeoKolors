@@ -38,4 +38,6 @@ internal class PlainTextArgumentType : IArgumentType {
     public IArgumentType Clone() {
         return (IArgumentType)MemberwiseClone();
     }
+
+    public void Reset() { }
 }

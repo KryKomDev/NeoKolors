@@ -13,21 +13,23 @@ namespace NeoKolors.ConsoleGraphics.Settings.ArgumentType;
 /// </summary>
 public sealed class BoolArgumentType : IArgumentType {
 
-    private bool? value;
+    private bool value;
+    private bool defaultValue;
+
+    internal BoolArgumentType(bool defaultValue = false) {
+        this.defaultValue = defaultValue;
+        value = defaultValue;
+    }
     
     public string GetInputType() {
         return "Bool";
     }
 
     public string GetStringValue() {
-        if (value == null) throw new SettingsBuilderException("Accessing value that has not been set.");
-        
-        return ((bool)value).ToString();
+        return value.ToString();
     }
 
     public object GetValue() {
-        if (value == null) throw new SettingsBuilderException("Accessing value that has not been set.");
-
         return value;
     }
 
@@ -45,7 +47,11 @@ public sealed class BoolArgumentType : IArgumentType {
         return newArg;
     }
 
+    public void Reset() {
+        value = defaultValue;
+    }
+
     public override string ToString() {
-        return $"{{\"type\": \"bool\", \"value\": \"{(value == null ? "null" : value)}\"}}";
+        return $"{{\"type\": \"bool\", \"value\": \"{value}\"}}";
     }
 }

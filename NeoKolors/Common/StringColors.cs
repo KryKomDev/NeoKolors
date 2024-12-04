@@ -14,7 +14,7 @@ public class StringColors {
     /// <param name="hex">the hexadecimal representation of the color</param>
     /// <returns>string with colored characters</returns>
     public static string AddColor(string text, int hex) {
-        return $"\x1b[38;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{text}\x1b[0m";
+        return $"\e[38;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{text}\e[0m";
     }
 
     /// <summary>
@@ -24,7 +24,7 @@ public class StringColors {
     /// <param name="hex">the hexadecimal representation of the color</param>
     /// <returns>string with colored characters</returns>
     public static string AddColorB(string text, int hex) {
-        return $"\x1b[48;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{text}\x1b[0m";
+        return $"\e[48;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{text}\e[0m";
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ public class StringColors {
     /// <param name="blue">blue value of the color</param>
     /// <returns>string with colored characters</returns>
     public static string AddColor(string text, byte red, byte green, byte blue) {
-        return $"\x1b[38;2;{red};{green};{blue}m{text}\x1b[0m";
+        return $"\e\u005b\u00338;2;{red};{green};{blue}m{text}\e[0m";
     }
     
     /// <summary>
@@ -48,6 +48,6 @@ public class StringColors {
     /// <param name="blue">blue value of the color</param>
     /// <returns>string with colored characters</returns>
     public static string AddColorB(string text, byte red, byte green, byte blue) {
-        return $"\x1b[48;2;{red};{green};{blue}m{text}\x1b[0m";
+        return $"\e[48;2;{red};{green};{blue}m{text}\e[0m";
     }
 }

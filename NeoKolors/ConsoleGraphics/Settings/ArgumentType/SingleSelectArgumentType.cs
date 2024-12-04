@@ -14,19 +14,23 @@ namespace NeoKolors.ConsoleGraphics.Settings.ArgumentType;
 public class SingleSelectArgumentType : IArgumentType {
     public Type? Type { get; }
     public string[] Values { get; }
-    private int? selectedIndex;
+    private int selectedIndex;
+    private int defaultIndex;
 
-    public SingleSelectArgumentType(string[] values) {
+    public SingleSelectArgumentType(string[] values, int defaultIndex = 0) {
         Type = null;
         Values = values;
+        this.defaultIndex = defaultIndex;
+        selectedIndex = defaultIndex;
     }
-    
+
     /// <summary>
     /// constructor that sources values from an enum
     /// </summary>
     /// <param name="type">source enum type</param>
+    /// <param name="defaultIndex"></param>
     /// <exception cref="TypeNotEnumException"></exception>
-    public SingleSelectArgumentType(Type type) {
+    public SingleSelectArgumentType(Type type, int defaultIndex = 0) {
         Type = type;
         try {
             Values = Enum.GetNames(type);
@@ -34,6 +38,9 @@ public class SingleSelectArgumentType : IArgumentType {
         catch (ArgumentException) {
             throw new TypeNotEnumException(type);
         }
+        
+        this.defaultIndex = defaultIndex;
+        selectedIndex = defaultIndex;
     }
 
     public string GetInputType() {
@@ -44,22 +51,15 @@ public class SingleSelectArgumentType : IArgumentType {
         if (Values == null || Values.Length == 0) {
             throw new SettingsBuilderException("No values provided to argument.");
         }
-
-        if (selectedIndex == null) {
-            throw new SettingsBuilderException("No value has been selected.");
-        }
         
-        return Values[(int)selectedIndex];
+        return Values[selectedIndex];
     }
 
     public object GetValue() {
         if (Values == null || Values.Length == 0)
             throw new SettingsBuilderException("No values provided to argument.");
 
-        if (selectedIndex == null)
-            throw new SettingsBuilderException("No value has been selected.");
-
-        return Type == null ? Values[(int)selectedIndex] : Enum.Parse(Type, Values[(int)selectedIndex]);
+        return Type == null ? Values[selectedIndex] : Enum.Parse(Type, Values[selectedIndex]);
     }
 
     private void Set(string value) {
@@ -114,9 +114,13 @@ public class SingleSelectArgumentType : IArgumentType {
         return clone;
     }
 
+    public void Reset() {
+        selectedIndex = defaultIndex;
+    }
+
     public override string ToString() {
         string output = $"{{\"type\": \"single_select\", \"value\": " +
-                        $"{(selectedIndex == null ? "\"null\"" : selectedIndex.ToString())}, \"values\": [";
+                        $"{selectedIndex.ToString()}, \"values\": [";
 
         for (int i = 0; i < Values.Length; i++) {
             output += "\"" + Values[i] + "\"" + (i != Values.Length - 1 ? ", " : "");
