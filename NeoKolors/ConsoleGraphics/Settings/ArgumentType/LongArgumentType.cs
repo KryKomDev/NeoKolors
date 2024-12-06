@@ -12,10 +12,10 @@ namespace NeoKolors.ConsoleGraphics.Settings.ArgumentType;
 /// </summary>
 public sealed class LongArgumentType : IArgumentType {
     
-    private long? value;
+    private long value;
     public long Min { get; }
     public long Max { get; }
-    private long defaultValue;
+    private readonly long defaultValue;
 
     internal LongArgumentType(long min = Int64.MinValue, long max = Int64.MaxValue, long defaultValue = 0) {
         Min = min;
@@ -29,14 +29,10 @@ public sealed class LongArgumentType : IArgumentType {
     }
 
     public string GetStringValue() {
-        if (value == null) throw new SettingsBuilderException("Accessing value that has not been set.");
-
-        return ((int)value).ToString();
+        return value.ToString();
     }
 
     public object GetValue() {
-        if (value == null) throw new SettingsBuilderException("Accessing value that has not been set.");
-
         return value;
     }
 
@@ -64,7 +60,24 @@ public sealed class LongArgumentType : IArgumentType {
         return $"{{\"type\": \"long\", " +
                $"\"min\": {Min}, " +
                $"\"max\": {Max}, " +
-               $"\"value\": {(value == null ? "\"null\"" : value)}}}}}";
+               $"\"value\": {value}}}}}";
+    }
+    
+    public static implicit operator long(LongArgumentType arg) => arg.value;
+    public static long operator +(LongArgumentType a, LongArgumentType b) => a.value + b.value;
+    public static long operator -(LongArgumentType a, LongArgumentType b) => a.value - b.value;
+    public static long operator *(LongArgumentType a, LongArgumentType b) => a.value * b.value;
+    public static long operator /(LongArgumentType a, LongArgumentType b) => a.value / b.value;
+    public static long operator %(LongArgumentType a, LongArgumentType b) => a.value % b.value;
+
+    public static LongArgumentType operator ++(LongArgumentType arg) {
+        arg.value++;
+        return arg;
+    }
+
+    public static LongArgumentType operator --(LongArgumentType arg) {
+        arg.value--;
+        return arg;
     }
 }
 
@@ -74,10 +87,10 @@ public sealed class LongArgumentType : IArgumentType {
 /// </summary>
 public sealed class UnsignedLongArgumentType : IArgumentType {
 
-    private ulong? value;
+    private ulong value;
     public ulong Min { get; }
     public ulong Max { get; }
-    private ulong defaultValue;
+    private readonly ulong defaultValue;
 
     internal UnsignedLongArgumentType(ulong min = ulong.MinValue, ulong max = ulong.MaxValue, ulong defaultValue = 0) {
         Min = min;
@@ -91,14 +104,10 @@ public sealed class UnsignedLongArgumentType : IArgumentType {
     }
 
     public string GetStringValue() {
-        if (value == null) throw new SettingsBuilderException("Accessing value that has not been set.");
-
-        return ((int)value).ToString();
+        return value.ToString();
     }
 
     public object GetValue() {
-        if (value == null) throw new SettingsBuilderException("Accessing value that has not been set.");
-
         return value;
     }
 
@@ -126,6 +135,23 @@ public sealed class UnsignedLongArgumentType : IArgumentType {
         return $"{{\"type\": \"ulong\", " +
                $"\"min\": {Min}, " +
                $"\"max\": {Max}, " +
-               $"\"value\": {(value == null ? "\"null\"" : value)}}}}}";
+               $"\"value\": {value}}}}}";
+    }
+    
+    public static implicit operator ulong(UnsignedLongArgumentType arg) => arg.value;
+    public static ulong operator +(UnsignedLongArgumentType a, UnsignedLongArgumentType b) => a.value + b.value;
+    public static ulong operator -(UnsignedLongArgumentType a, UnsignedLongArgumentType b) => a.value - b.value;
+    public static ulong operator *(UnsignedLongArgumentType a, UnsignedLongArgumentType b) => a.value * b.value;
+    public static ulong operator /(UnsignedLongArgumentType a, UnsignedLongArgumentType b) => a.value / b.value;
+    public static ulong operator %(UnsignedLongArgumentType a, UnsignedLongArgumentType b) => a.value % b.value;
+
+    public static UnsignedLongArgumentType operator ++(UnsignedLongArgumentType arg) {
+        arg.value++;
+        return arg;
+    }
+
+    public static UnsignedLongArgumentType operator --(UnsignedLongArgumentType arg) {
+        arg.value--;
+        return arg;
     }
 }

@@ -65,4 +65,21 @@ public sealed class DoubleArgumentType : IArgumentType {
                $"\"max\": {Max}, " +
                $"\"value\": {((float)value).ToString(CultureInfo.InvariantCulture)}}}";
     }
+
+    public static implicit operator double(DoubleArgumentType arg) => arg.value;
+    public static double operator +(DoubleArgumentType a, DoubleArgumentType b) => a.value + b.value;
+    public static double operator -(DoubleArgumentType a, DoubleArgumentType b) => a.value - b.value;
+    public static double operator *(DoubleArgumentType a, DoubleArgumentType b) => a.value * b.value;
+    public static double operator /(DoubleArgumentType a, DoubleArgumentType b) => a.value / b.value;
+    public static double operator %(DoubleArgumentType a, DoubleArgumentType b) => a.value % b.value;
+
+    public static DoubleArgumentType operator ++(DoubleArgumentType arg) {
+        arg.value++;
+        return arg;
+    }
+
+    public static DoubleArgumentType operator --(DoubleArgumentType arg) {
+        arg.value--;
+        return arg;
+    }
 }

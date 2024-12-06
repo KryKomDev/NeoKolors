@@ -14,7 +14,7 @@ namespace NeoKolors.ConsoleGraphics.Settings.ArgumentType;
 /// </summary>
 public sealed class FloatArgumentType : IArgumentType {
 
-    private float? value;
+    private float value;
     public float Min { get; }
     public float Max { get; }
     private float defaultValue;
@@ -31,14 +31,10 @@ public sealed class FloatArgumentType : IArgumentType {
     }
     
     public string GetStringValue() {
-        if (value == null) throw new SettingsBuilderException("Accessing value that has not been set.");
-
-        return ((float)value).ToString(CultureInfo.InvariantCulture);
+        return value.ToString(CultureInfo.InvariantCulture);
     }
 
     public object GetValue() {
-        if (value == null) throw new SettingsBuilderException("Accessing value that has not been set.");
-
         return value;
     }
     
@@ -66,6 +62,23 @@ public sealed class FloatArgumentType : IArgumentType {
         return $"{{\"type\": \"float\", " +
                $"\"min\": {Min}, " +
                $"\"max\": {Max}, " +
-               $"\"value\": {(value == null ? "\"null\"" : ((float)value).ToString(CultureInfo.InvariantCulture))}}}";
+               $"\"value\": {value.ToString(CultureInfo.InvariantCulture)}}}";
+    }
+    
+    public static implicit operator float(FloatArgumentType arg) => arg.value;
+    public static float operator +(FloatArgumentType a, FloatArgumentType b) => a.value + b.value;
+    public static float operator -(FloatArgumentType a, FloatArgumentType b) => a.value - b.value;
+    public static float operator *(FloatArgumentType a, FloatArgumentType b) => a.value * b.value;
+    public static float operator /(FloatArgumentType a, FloatArgumentType b) => a.value / b.value;
+    public static float operator %(FloatArgumentType a, FloatArgumentType b) => a.value % b.value;
+
+    public static FloatArgumentType operator ++(FloatArgumentType arg) {
+        arg.value++;
+        return arg;
+    }
+
+    public static FloatArgumentType operator --(FloatArgumentType arg) {
+        arg.value--;
+        return arg;
     }
 }

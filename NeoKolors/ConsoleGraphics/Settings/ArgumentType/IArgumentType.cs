@@ -40,4 +40,9 @@ public interface IArgumentType {
     /// resets the argument's value to the default
     /// </summary>
     public void Reset();
+
+    public static IArgumentType operator <<(in IArgumentType argument, object value) {
+        argument.SetValue(value);
+        return argument;
+    }
 }

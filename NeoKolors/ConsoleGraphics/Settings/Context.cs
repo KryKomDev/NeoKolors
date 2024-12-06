@@ -28,7 +28,7 @@ public sealed class Context : ICloneable {
     public ArgumentType.IArgumentType this[int index] => GetAtIndex(index).value;
 
     public Context(params (string name, ArgumentType.IArgumentType argument)[] arguments) {
-        Add(arguments);
+        AddRange(arguments);
     }
     
     public void Add(string name, ArgumentType.IArgumentType argument) {
@@ -36,7 +36,7 @@ public sealed class Context : ICloneable {
             throw new ContextException($"Context value with name '{name}' already exists.");
     }
 
-    public void Add((string name, ArgumentType.IArgumentType argument)[] arguments) {
+    public void AddRange((string name, ArgumentType.IArgumentType argument)[] arguments) {
         foreach ((string name, ArgumentType.IArgumentType argument) a in arguments) {
             Add(a.name, a.argument);
         }

@@ -13,7 +13,7 @@ namespace NeoKolors.ConsoleGraphics.Settings.ArgumentType;
 /// </summary>
 public partial class StringArgumentType : IArgumentType {
 
-    private string? value;
+    private string value;
     public uint MinLength { get; }
     public uint MaxLength { get; }
     public bool AllowSpaces { get; }
@@ -52,14 +52,10 @@ public partial class StringArgumentType : IArgumentType {
     }
 
     public string GetStringValue() {
-        if (value == null) throw new SettingsBuilderException("Accessing value that has not been set.");
-
         return value;
     }
 
     public object GetValue() {
-        if (value == null) throw new SettingsBuilderException("Accessing value that has not been set.");
-
         return value;
     }
 
@@ -116,6 +112,16 @@ public partial class StringArgumentType : IArgumentType {
         return $"{{\"type\": \"string\", " +
                $"\"minLength\": \"{MinLength}\", " +
                $"\"maxLength\": \"{MaxLength}\", " +
-               $"\"value\": {value ?? "\"null\""}}}";
+               $"\"value\": {value}}}";
     }
+    
+    public static implicit operator string(StringArgumentType v) => v.value;
+    public static implicit operator StringArgumentType(string v) {
+        StringArgumentType s = new StringArgumentType { value = v };
+        return s;
+    }
+    
+    public static StringArgumentType operator +(StringArgumentType a, StringArgumentType b) => a.value + b.value;
+    public static StringArgumentType operator +(StringArgumentType a, string b) => a.value + b;
+    public static StringArgumentType operator +(string a, StringArgumentType b) => a + b.value;
 }

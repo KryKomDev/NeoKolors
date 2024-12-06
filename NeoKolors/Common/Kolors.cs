@@ -1,6 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using NeoKolors.Console;
-using NeoKolors.ConsoleGraphics.GUI;
+﻿using NeoKolors.ConsoleGraphics.GUI;
 using NeoKolors.ConsoleGraphics.GUI.Elements;
 using NeoKolors.ConsoleGraphics.Settings;
 using NeoKolors.ConsoleGraphics.Settings.ArgumentType;
@@ -18,15 +16,7 @@ public class Kolors {
         // Debug.Trace("debug")
         
         System.Console.CursorVisible = false;
-        
-        float[] v = [22, 53, 13, 23];
-        v = GuiBuilder.Normalize(v);
 
-        foreach (var vr in v) {
-            System.Console.Write($"{vr}, ");
-        }
-        
-        System.Console.WriteLine(v.Sum());
         
         // string name = "AhoyString";
         // System.Console.Write(name);
@@ -41,8 +31,10 @@ public class Kolors {
         }
         
         Context c = new();
-        c.Add("b", new StringArgumentType(allowSpecial: false, minLength: 5, maxLength: 15));
-     
+        IArgumentType arg = new StringArgumentType(allowSpecial: false, minLength: 5, maxLength: 15);
+        arg <<= "hello";
+        c.Add("b", arg);
+
         var b = new StringGraphicElement(12, 5, "Hello Int", (StringArgumentType?)c["b"]);
         var b2 = new BoolGraphicElement(12, 6, "Bool Elem");
         b.Draw(12, 5);

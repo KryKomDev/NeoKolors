@@ -54,4 +54,9 @@ public sealed class BoolArgumentType : IArgumentType {
     public override string ToString() {
         return $"{{\"type\": \"bool\", \"value\": \"{value}\"}}";
     }
+
+    public static implicit operator bool(BoolArgumentType arg) => arg.value;
+    public static bool operator true(BoolArgumentType arg) => arg.value;
+    public static bool operator false(BoolArgumentType arg) => arg.value == false;
+    public static bool operator !(BoolArgumentType arg) => !arg.value;
 }

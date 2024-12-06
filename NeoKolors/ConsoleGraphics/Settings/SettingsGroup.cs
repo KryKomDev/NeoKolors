@@ -56,7 +56,7 @@ public sealed class SettingsGroup : ICloneable {
             groupContext = new Context()
         };
         
-        sg.groupContext.Add(outputContext);
+        sg.groupContext.AddRange(outputContext);
         
         return sg;
     }

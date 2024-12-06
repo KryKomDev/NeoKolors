@@ -12,10 +12,10 @@ namespace NeoKolors.ConsoleGraphics.Settings.ArgumentType;
 /// </summary>
 public sealed class IntegerArgumentType : IArgumentType {
 
-    private int? value;
+    private int value;
     public int Min { get; }
     public int Max { get; }
-    private int defaultValue;
+    private readonly int defaultValue;
 
     internal IntegerArgumentType(int min = int.MinValue, int max = int.MaxValue, int defaultValue = 0) {
         Min = min;
@@ -29,14 +29,10 @@ public sealed class IntegerArgumentType : IArgumentType {
     }
 
     public string GetStringValue() {
-        if (value == null) throw new SettingsBuilderException("Accessing value that has not been set.");
-
-        return ((int)value).ToString();
+        return value.ToString();
     }
 
     public object GetValue() {
-        if (value == null) throw new SettingsBuilderException("Accessing value that has not been set.");
-
         return value;
     }
 
@@ -60,7 +56,24 @@ public sealed class IntegerArgumentType : IArgumentType {
         return $"{{\"type\": \"int\", " +
                $"\"min\": {Min}, " +
                $"\"max\": {Max}, " +
-               $"\"value\": {(value == null ? "\"null\"" : value)}}}";
+               $"\"value\": {value}}}";
+    }
+    
+    public static implicit operator int(IntegerArgumentType arg) => arg.value;
+    public static int operator +(IntegerArgumentType a, IntegerArgumentType b) => a.value + b.value;
+    public static int operator -(IntegerArgumentType a, IntegerArgumentType b) => a.value - b.value;
+    public static int operator *(IntegerArgumentType a, IntegerArgumentType b) => a.value * b.value;
+    public static int operator /(IntegerArgumentType a, IntegerArgumentType b) => a.value / b.value;
+    public static int operator %(IntegerArgumentType a, IntegerArgumentType b) => a.value % b.value;
+
+    public static IntegerArgumentType operator ++(IntegerArgumentType arg) {
+        arg.value++;
+        return arg;
+    }
+
+    public static IntegerArgumentType operator --(IntegerArgumentType arg) {
+        arg.value--;
+        return arg;
     }
 }
 
@@ -70,10 +83,10 @@ public sealed class IntegerArgumentType : IArgumentType {
 /// </summary>
 public sealed class UnsignedIntegerArgumentType : IArgumentType {
 
-    private uint? value;
+    private uint value;
     public uint Min { get; }
     public uint Max { get; }
-    private uint defaultValue;
+    private readonly uint defaultValue;
 
     internal UnsignedIntegerArgumentType(uint min = uint.MinValue, uint max = uint.MaxValue, uint defaultValue = 0) {
         Min = min;
@@ -87,14 +100,10 @@ public sealed class UnsignedIntegerArgumentType : IArgumentType {
     }
 
     public string GetStringValue() {
-        if (value == null) throw new SettingsBuilderException("Accessing value that has not been set.");
-
         return ((int)value).ToString();
     }
 
     public object GetValue() {
-        if (value == null) throw new SettingsBuilderException("Accessing value that has not been set.");
-
         return value;
     }
 
@@ -118,6 +127,23 @@ public sealed class UnsignedIntegerArgumentType : IArgumentType {
         return $"{{\"type\": \"uint\", " +
                $"\"min\": {Min}, " +
                $"\"max\": {Max}, " +
-               $"\"value\": {(value == null ? "\"null\"" : value)}}}";
+               $"\"value\": {value}}}";
+    }
+    
+    public static implicit operator uint(UnsignedIntegerArgumentType arg) => arg.value;
+    public static uint operator +(UnsignedIntegerArgumentType a, UnsignedIntegerArgumentType b) => a.value + b.value;
+    public static uint operator -(UnsignedIntegerArgumentType a, UnsignedIntegerArgumentType b) => a.value - b.value;
+    public static uint operator *(UnsignedIntegerArgumentType a, UnsignedIntegerArgumentType b) => a.value * b.value;
+    public static uint operator /(UnsignedIntegerArgumentType a, UnsignedIntegerArgumentType b) => a.value / b.value;
+    public static uint operator %(UnsignedIntegerArgumentType a, UnsignedIntegerArgumentType b) => a.value % b.value;
+
+    public static UnsignedIntegerArgumentType operator ++(UnsignedIntegerArgumentType arg) {
+        arg.value++;
+        return arg;
+    }
+
+    public static UnsignedIntegerArgumentType operator --(UnsignedIntegerArgumentType arg) {
+        arg.value--;
+        return arg;
     }
 }
