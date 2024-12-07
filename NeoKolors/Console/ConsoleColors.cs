@@ -151,4 +151,76 @@ public static class ConsoleColors {
         if (continuousColoring) s = s.Replace("\e[0m", $"\e[48;2;{r};{g};{b}m");
         Write($"\e[48;2;{r};{g};{b}m{s}\e[0m\n");
     }
+
+    /// <summary>
+    /// prints a string colored by the <see cref="ConsoleColor"/> value
+    /// </summary>
+    /// <param name="s">string to print</param>
+    /// <param name="c">color</param>
+    public static void PrintColored(string s, ConsoleColor c) {
+        ForegroundColor = c;
+        Write(s);
+        ForegroundColor = ConsoleColor.White;
+    }
+    
+    /// <summary>
+    /// prints a string colored by the <see cref="ConsoleColor"/> value
+    /// </summary>
+    /// <param name="s">string to print</param>
+    /// <param name="c">color</param>
+    public static void PrintlnColored(string s, ConsoleColor c) {
+        ForegroundColor = c;
+        WriteLine(s);
+        ForegroundColor = ConsoleColor.White;
+    }
+    
+    /// <summary>
+    /// prints a string with background colored by the <see cref="ConsoleColor"/> value
+    /// </summary>
+    /// <param name="s">string to print</param>
+    /// <param name="c">color</param>
+    public static void PrintColoredB(string s, ConsoleColor c) {
+        BackgroundColor = c;
+        Write(s);
+        BackgroundColor = ConsoleColor.Black;
+    }
+    
+    /// <summary>
+    /// prints a string with background colored by the <see cref="ConsoleColor"/> value
+    /// </summary>
+    /// <param name="s">string to print</param>
+    /// <param name="c">color</param>
+    public static void PrintlnColoredB(string s, ConsoleColor c) {
+        BackgroundColor = c;
+        WriteLine(s);
+        BackgroundColor = ConsoleColor.Black;
+    }
+
+    /// <summary>
+    /// prints a colored string with colored background
+    /// </summary>
+    /// <param name="s">string to print</param>
+    /// <param name="text">text color</param>
+    /// <param name="background">background color</param>
+    public static void PrintColored(string s, ConsoleColor text, ConsoleColor background) {
+        BackgroundColor = background;
+        ForegroundColor = text;
+        Write(s);
+        ForegroundColor = ConsoleColor.White;
+        BackgroundColor = ConsoleColor.Black;
+    }
+    
+    /// <summary>
+    /// prints a colored string with colored background
+    /// </summary>
+    /// <param name="s">string to print</param>
+    /// <param name="text">text color</param>
+    /// <param name="background">background color</param>
+    public static void PrintlnColored(string s, ConsoleColor text, ConsoleColor background) {
+        BackgroundColor = background;
+        ForegroundColor = text;
+        WriteLine(s);
+        ForegroundColor = ConsoleColor.White;
+        BackgroundColor = ConsoleColor.Black;
+    }
 }
