@@ -2,6 +2,10 @@
 
 NeoKolors is a C# library with a number of color utilities and console graphics classes.
 
+> [!NOTE]
+> This project is the successor of the Kolors project. Consider moving away from the legacy 
+> library.
+
 ## Common
 The NeoKolors.Common namespace contains all the utilities involving color formatting and color palettes.
 
