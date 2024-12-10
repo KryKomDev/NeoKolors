@@ -1,9 +1,9 @@
 ﻿//
 // NeoKolors
-// by KryKom 2024
+// Copyright (c) 2024 KryKom
 //
 
-namespace NeoKolors.ConsoleGraphics.GUI.Elements;
+namespace NeoKolors.ConsoleGraphics.TUI.Elements;
 
 /// <summary>
 /// base class for all NeoKolors console GUI elements

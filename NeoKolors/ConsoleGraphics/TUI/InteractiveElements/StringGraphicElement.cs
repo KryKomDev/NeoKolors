@@ -3,7 +3,7 @@ using NeoKolors.Console;
 using NeoKolors.ConsoleGraphics.Settings;
 using NeoKolors.ConsoleGraphics.Settings.ArgumentType;
 
-namespace NeoKolors.ConsoleGraphics.GUI.Elements;
+namespace NeoKolors.ConsoleGraphics.TUI.Elements;
 
 public class StringGraphicElement : IGraphicElement {
     public int GridX { get; set; }
@@ -110,5 +110,7 @@ public class StringGraphicElement : IGraphicElement {
         this.argument = argument ?? Arguments.String();
         Width = inputWidth + Name.Length + 6;
         this.inputWidth = inputWidth;
+        input = (string)this.argument.GetValue();
+        cursor = input.Length;
     }
 }

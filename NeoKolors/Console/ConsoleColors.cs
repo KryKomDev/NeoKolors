@@ -1,6 +1,6 @@
 //
 // NeoKolors
-// by KryKom 2024
+// Copyright (c) 2024 KryKom
 //
 
 using static System.Console;
@@ -8,6 +8,7 @@ using static System.Console;
 namespace NeoKolors.Console;
 
 public static class ConsoleColors {
+    
     /// <summary>
     /// prints a colored string in the console without newline
     /// </summary>
@@ -160,7 +161,7 @@ public static class ConsoleColors {
     public static void PrintColored(string s, ConsoleColor c) {
         ForegroundColor = c;
         Write(s);
-        ForegroundColor = ConsoleColor.White;
+        ForegroundColor = ConsoleColor.Gray;
     }
     
     /// <summary>
@@ -171,7 +172,7 @@ public static class ConsoleColors {
     public static void PrintlnColored(string s, ConsoleColor c) {
         ForegroundColor = c;
         WriteLine(s);
-        ForegroundColor = ConsoleColor.White;
+        ForegroundColor = ConsoleColor.Gray;
     }
     
     /// <summary>
@@ -206,7 +207,7 @@ public static class ConsoleColors {
         BackgroundColor = background;
         ForegroundColor = text;
         Write(s);
-        ForegroundColor = ConsoleColor.White;
+        ForegroundColor = ConsoleColor.Gray;
         BackgroundColor = ConsoleColor.Black;
     }
     
@@ -220,7 +221,7 @@ public static class ConsoleColors {
         BackgroundColor = background;
         ForegroundColor = text;
         WriteLine(s);
-        ForegroundColor = ConsoleColor.White;
+        ForegroundColor = ConsoleColor.Gray;
         BackgroundColor = ConsoleColor.Black;
     }
 }

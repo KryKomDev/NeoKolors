@@ -3,7 +3,7 @@ using NeoKolors.ConsoleGraphics.Settings;
 using NeoKolors.ConsoleGraphics.Settings.ArgumentType;
 using NeoKolors.ConsoleGraphics.Settings.Exceptions;
 
-namespace NeoKolors.ConsoleGraphics.GUI.Elements;
+namespace NeoKolors.ConsoleGraphics.TUI.Elements;
 
 public class FloatGraphicElement : IGraphicElement {
     public int GridX { get; set; }

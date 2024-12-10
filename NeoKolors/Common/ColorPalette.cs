@@ -1,6 +1,6 @@
 ﻿//
 // NeoKolors
-// by KryKom 2024
+// Copyright (c) 2024 KryKom
 //
 
 using System.Drawing;

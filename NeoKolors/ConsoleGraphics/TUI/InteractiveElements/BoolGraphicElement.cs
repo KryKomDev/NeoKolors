@@ -1,13 +1,13 @@
 ﻿//
 // NeoKolors
-// by KryKom 2024
+// Copyright (c) 2024 KryKom
 //
 
 using NeoKolors.Console;
 using NeoKolors.ConsoleGraphics.Settings;
 using NeoKolors.ConsoleGraphics.Settings.ArgumentType;
 
-namespace NeoKolors.ConsoleGraphics.GUI.Elements;
+namespace NeoKolors.ConsoleGraphics.TUI.Elements;
 
 public class BoolGraphicElement : IGraphicElement {
     public int GridX { get; set; }

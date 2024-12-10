@@ -2,7 +2,7 @@
 using NeoKolors.ConsoleGraphics.Settings;
 using NeoKolors.ConsoleGraphics.Settings.ArgumentType;
 
-namespace NeoKolors.ConsoleGraphics.GUI.Elements;
+namespace NeoKolors.ConsoleGraphics.TUI.Elements;
 
 public class IntegerGraphicElement : IGraphicElement {
     public int GridX { get; set; }
