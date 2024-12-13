@@ -70,7 +70,7 @@ public class ColorPalette {
     /// </summary>
     public void PrintPalette() {
         foreach (int c in colors) {
-            ConsoleColors.PrintColoredB("   ", c);
+            ConsoleColors.PrintColored("● ", c);
         }
         
         Write("\n");

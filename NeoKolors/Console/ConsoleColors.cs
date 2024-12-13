@@ -3,6 +3,7 @@
 // Copyright (c) 2024 KryKom
 //
 
+using NeoKolors.Common;
 using static System.Console;
 
 namespace NeoKolors.Console;
@@ -16,6 +17,7 @@ public static class ConsoleColors {
     /// <param name="hex">hexadecimal value of the color</param>
     /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
     public static void PrintColored(string s, int hex, bool continuousColoring = true) {
+        s = StringEffects.AddTextStyles(s);
         if (continuousColoring) s = s.Replace("\e[0m", $"\e[38;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m");
         Write($"\e[38;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{s}\e[0m");
     }
@@ -30,6 +32,7 @@ public static class ConsoleColors {
     /// if a color is -1 the colors will be reset
     /// </param>
     public static void PrintComplexColored(string s, params (string symbol, int hex)[] colors) {
+        s = StringEffects.AddTextStyles(s);
         foreach (var c in colors) {
             
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
@@ -51,6 +54,7 @@ public static class ConsoleColors {
     /// <param name="hex">hexadecimal value of the color</param>
     /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
     public static void PrintlnColored(string s, int hex, bool continuousColoring = true) {
+        s = StringEffects.AddTextStyles(s);
         if (continuousColoring) s = s.Replace("\e[0m", $"\e[38;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m");
         Write($"\e[38;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{s}\e[0m\n");
     }
@@ -65,6 +69,7 @@ public static class ConsoleColors {
     /// if a color is -1 the colors will be reset
     /// </param>
     public static void PrintlnComplexColored(string s, params (string symbol, int hex)[] colors) {
+        s = StringEffects.AddTextStyles(s);
         foreach (var c in colors) {
             
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
@@ -88,6 +93,7 @@ public static class ConsoleColors {
     /// <param name="b">blue value of the color</param>
     /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
     public static void PrintColored(string s, byte r, byte g, byte b, bool continuousColoring = true) {
+        s = StringEffects.AddTextStyles(s);
         if (continuousColoring) s = s.Replace("\e[0m", $"\e[38;2;{r};{g};{b}m");
         Write($"\e[38;2;{r};{g};{b}m{s}\e[0m");
     }
@@ -101,6 +107,7 @@ public static class ConsoleColors {
     /// <param name="b">blue value of the color</param>
     /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
     public static void PrintlnColored(string s, byte r, byte g, byte b, bool continuousColoring = true) {
+        s = StringEffects.AddTextStyles(s);
         if (continuousColoring) s = s.Replace("\e[0m", $"\e[38;2;{r};{g};{b}m");
         Write($"\e[38;2;{r};{g};{b}m{s}\e[0m\n");
     }
@@ -112,6 +119,7 @@ public static class ConsoleColors {
     /// <param name="hex">hexadecimal value of the color</param>
     /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
     public static void PrintColoredB(string s, int hex, bool continuousColoring = true) {
+        s = StringEffects.AddTextStyles(s);
         if (continuousColoring) s = s.Replace("\e[0m", $"\e[48;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m");
         Write($"\e[48;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{s}\e[0m");
     }
@@ -123,6 +131,7 @@ public static class ConsoleColors {
     /// <param name="hex">hexadecimal value of the color</param>
     /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
     public static void PrintlnColoredB(string s, int hex, bool continuousColoring = true) {
+        s = StringEffects.AddTextStyles(s);
         if (continuousColoring) s = s.Replace("\e[0m", $"\e[48;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m");
         Write($"\e[48;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{s}\e[0m\n");
     }
@@ -136,6 +145,7 @@ public static class ConsoleColors {
     /// <param name="b">blue value of the color</param>
     /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
     public static void PrintColoredB(string s, byte r, byte g, byte b, bool continuousColoring = true) {
+        s = StringEffects.AddTextStyles(s);
         if (continuousColoring) s = s.Replace("\e[0m", $"\e[48;2;{r};{g};{b}m");
         Write($"\e[48;2;{r};{g};{b}m{s}\e[0m");
     }
@@ -149,6 +159,7 @@ public static class ConsoleColors {
     /// <param name="b">blue value of the color</param>
     /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
     public static void PrintlnColoredB(string s, byte r, byte g, byte b, bool continuousColoring = true) {
+        s = StringEffects.AddTextStyles(s);
         if (continuousColoring) s = s.Replace("\e[0m", $"\e[48;2;{r};{g};{b}m");
         Write($"\e[48;2;{r};{g};{b}m{s}\e[0m\n");
     }
@@ -159,6 +170,7 @@ public static class ConsoleColors {
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     public static void PrintColored(string s, ConsoleColor c) {
+        s = StringEffects.AddTextStyles(s);
         ForegroundColor = c;
         Write(s);
         ForegroundColor = ConsoleColor.Gray;
@@ -170,6 +182,7 @@ public static class ConsoleColors {
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     public static void PrintlnColored(string s, ConsoleColor c) {
+        s = StringEffects.AddTextStyles(s);
         ForegroundColor = c;
         WriteLine(s);
         ForegroundColor = ConsoleColor.Gray;
@@ -181,6 +194,7 @@ public static class ConsoleColors {
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     public static void PrintColoredB(string s, ConsoleColor c) {
+        s = StringEffects.AddTextStyles(s);
         BackgroundColor = c;
         Write(s);
         BackgroundColor = ConsoleColor.Black;
@@ -192,6 +206,7 @@ public static class ConsoleColors {
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     public static void PrintlnColoredB(string s, ConsoleColor c) {
+        s = StringEffects.AddTextStyles(s);
         BackgroundColor = c;
         WriteLine(s);
         BackgroundColor = ConsoleColor.Black;
@@ -204,6 +219,7 @@ public static class ConsoleColors {
     /// <param name="text">text color</param>
     /// <param name="background">background color</param>
     public static void PrintColored(string s, ConsoleColor text, ConsoleColor background) {
+        s = StringEffects.AddTextStyles(s);
         BackgroundColor = background;
         ForegroundColor = text;
         Write(s);
@@ -218,6 +234,7 @@ public static class ConsoleColors {
     /// <param name="text">text color</param>
     /// <param name="background">background color</param>
     public static void PrintlnColored(string s, ConsoleColor text, ConsoleColor background) {
+        s = StringEffects.AddTextStyles(s);
         BackgroundColor = background;
         ForegroundColor = text;
         WriteLine(s);
