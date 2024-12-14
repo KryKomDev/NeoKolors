@@ -3,7 +3,6 @@
 // Copyright (c) 2024 KryKom
 //
 
-using System.Drawing;
 using SkiaSharp;
 
 namespace NeoKolors.Common;
@@ -13,8 +12,8 @@ namespace NeoKolors.Common;
 /// </summary>
 public static class ColorFormat {
 
-    public static SKColor ColorToSkia(this Color c) => new(c.R, c.G, c.B);
-    public static Color SkiaToColor(this SKColor c) => Color.FromArgb(c.Alpha, c.Red, c.Green, c.Blue);
+    public static SKColor ColorToSkia(this System.Drawing.Color c) => new(c.R, c.G, c.B);
+    public static System.Drawing.Color SkiaToColor(this SKColor c) => System.Drawing.Color.FromArgb(c.Alpha, c.Red, c.Green, c.Blue);
     
     /// <summary>
     /// converts a color stored in an int to SKColor
@@ -30,14 +29,14 @@ public static class ColorFormat {
     /// </summary>
     /// <param name="c">source int color</param>
     /// <param name="autoAlpha">if true automatically sets alpha to 255</param>
-    public static Color IntToColor(this int c, bool autoAlpha = true) {
-        return Color.FromArgb((byte)(autoAlpha ? 255 : (byte)(c >> 24)), (byte)(c >> 16), (byte)(c >> 8), (byte)c);
+    public static System.Drawing.Color IntToColor(this int c, bool autoAlpha = true) {
+        return System.Drawing.Color.FromArgb((byte)(autoAlpha ? 255 : (byte)(c >> 24)), (byte)(c >> 16), (byte)(c >> 8), (byte)c);
     }
     
     /// <summary>
     /// returns the hue, saturation and value of the supplied color 
     /// </summary>
-    public static void ColorToHsv(Color color, out double hue, out double saturation, out double value) {
+    public static void ColorToHsv(System.Drawing.Color color, out double hue, out double saturation, out double value) {
         int max = Math.Max(color.R, Math.Max(color.G, color.B));
         int min = Math.Min(color.R, Math.Min(color.G, color.B));
 
@@ -49,7 +48,7 @@ public static class ColorFormat {
     /// <summary>
     /// returns the hue, saturation and value of the supplied color 
     /// </summary>
-    public static (double h, double s, double v) ColorToHsv(Color color) {
+    public static (double h, double s, double v) ColorToHsv(System.Drawing.Color color) {
         ColorToHsv(color, out double h, out double s, out double v);
         return (h, s, v);
     }
@@ -80,7 +79,7 @@ public static class ColorFormat {
     /// <summary>
     /// creates an instance of <see cref="Color"/> from the hsv values
     /// </summary>
-    public static Color HsvToColor(double hue, double saturation, double value) {
+    public static System.Drawing.Color HsvToColor(double hue, double saturation, double value) {
         int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
         double f = hue / 60 - Math.Floor(hue / 60);
         
@@ -91,12 +90,12 @@ public static class ColorFormat {
         int t = Convert.ToInt32(value * (1 - (1 - f) * saturation));
 
         return hi switch {
-            0 => Color.FromArgb(v, t, p),
-            1 => Color.FromArgb(q, v, p),
-            2 => Color.FromArgb(p, v, t),
-            3 => Color.FromArgb(p, q, v),
-            4 => Color.FromArgb(t, p, v),
-            _ => Color.FromArgb(v, p, q)
+            0 => System.Drawing.Color.FromArgb(v, t, p),
+            1 => System.Drawing.Color.FromArgb(q, v, p),
+            2 => System.Drawing.Color.FromArgb(p, v, t),
+            3 => System.Drawing.Color.FromArgb(p, q, v),
+            4 => System.Drawing.Color.FromArgb(t, p, v),
+            _ => System.Drawing.Color.FromArgb(v, p, q)
         };
     }
     

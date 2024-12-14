@@ -241,4 +241,88 @@ public static class ConsoleColors {
         ForegroundColor = ConsoleColor.Gray;
         BackgroundColor = ConsoleColor.Black;
     }
+
+    public static void PrintColored(string s, Common.Color c) {
+        if (c.IsPaletteSafe) {
+            PrintColored(s, (ConsoleColor)c.ConsoleColor!);
+        }
+        else {
+            PrintColored(s, (int)c.ConsoleColor!);
+        }
+    }
+    
+    public static void PrintlnColored(string s, Common.Color c) {
+        if (c.IsPaletteSafe) {
+            PrintlnColored(s, (ConsoleColor)c.ConsoleColor!);
+        }
+        else {
+            PrintlnColored(s, (int)c.ConsoleColor!);
+        }
+    }
+    
+    public static void PrintColoredB(string s, Common.Color c) {
+        if (c.IsPaletteSafe) {
+            PrintColoredB(s, (ConsoleColor)c.ConsoleColor!);
+        }
+        else {
+            PrintColoredB(s, (int)c.ConsoleColor!);
+        }
+    }
+    
+    public static void PrintlnColoredB(string s, Common.Color c) {
+        if (c.IsPaletteSafe) {
+            PrintlnColoredB(s, (ConsoleColor)c.ConsoleColor!);
+        }
+        else {
+            PrintlnColoredB(s, (int)c.ConsoleColor!);
+        }
+    }
+
+    public static void PrintColored(string s, ConsoleColor text, int background) {
+        ForegroundColor = text;
+        PrintColoredB(s, background);
+        ForegroundColor = ConsoleColor.Black;
+    }
+
+    public static void PrintlnColored(string s, ConsoleColor text, int background) {
+        PrintColored(s + "\n", text, background);
+    }
+    
+    public static void PrintColored(string s, int text, ConsoleColor background) {
+        BackgroundColor = background;
+        PrintColored(s, text);
+        BackgroundColor = ConsoleColor.Black;
+    }
+
+    public static void PrintlnColored(string s, int text, ConsoleColor background) {
+        PrintColored(s + "\n", text, background);
+    }
+
+    public static void PrintColored(string s, int text, int background) {
+        s = StringEffects.AddTextStyles(s);
+        Write($"\e[38;2;{(byte)(text >> 16)};{(byte)(text >> 8)};{(byte)text}m\e[48;2;{(byte)(background >> 16)};{(byte)(background >> 8)};{(byte)background}m{s}\e[0m");
+    }
+    
+    public static void PrintColored(string s, Common.Color text, Common.Color background) {
+        if (text.IsPaletteSafe) {
+            if (background.IsPaletteSafe) {
+                PrintColored(s, (ConsoleColor)text.ConsoleColor!, (ConsoleColor)background.ConsoleColor!);
+            }
+            else {
+                PrintColored(s, (ConsoleColor)text.ConsoleColor!, (int)background.ConsoleColor!);
+            }
+        }
+        else {
+            if (background.IsPaletteSafe) {
+                PrintColored(s, (int)text.ConsoleColor!, (ConsoleColor)background.ConsoleColor!);
+            }
+            else {
+                PrintColored(s, (int)text.ConsoleColor!, (int)background.ConsoleColor!);
+            }
+        }
+    }
+    
+    public static void PrintlnColored(string s, Common.Color text, Common.Color background) {
+        PrintColored(s + "\n", text, background);
+    }
 }

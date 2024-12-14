@@ -1,9 +1,10 @@
 ﻿# NeoKolors.Common
 
-The NeoKolors.Common namespace includes 3 library classes:
-* ColorFormat
-* ColorPalette
-* StringEffects
+The NeoKolors.Common namespace includes these classes:
+* [ColorFormat](#colorformat)
+* [ColorPalette](#colorpalette)
+* [StringEffects](#stringeffects)
+* [Color](#color)
 
 ---
 
@@ -28,7 +29,7 @@ Stores color palettes. You can also generate new ones with the ```GeneratePalett
 Example use:
 
 ```csharp
-ColorPalette cp = ColorPalette.GeneratePalette(5, 7);
+ColorPalette cp = ColorPalette.GeneratePalette(seed: 5, colorCount: 7);
 cp.PrintPalette();
 ```
 
@@ -58,3 +59,17 @@ string s = StringEffects.AddTextStyles(
 // the following will add a color to the string:
 string s = StringEffects.AddColor("this text will be colored!", 0x5D66F1);
 ```
+
+This class also includes the `VisibleLength()` method that returns the length of actually visible
+characters.
+
+```csharp
+string s = StringEffects.AddTextStyles("<b>bold</b>");
+
+s.Length; // returns 13
+s.VisibleLength(); // returns 4
+```
+
+## Color
+
+A class that can store both the `ConsoleColor` and custom color as an `Int32` 

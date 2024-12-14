@@ -3,7 +3,7 @@
 // Copyright (c) 2024 KryKom
 //
 
-using System.Drawing;
+
 using static System.Console;
 using NeoKolors.Console;
 
@@ -22,7 +22,7 @@ public class ColorPalette {
     /// <summary>
     /// returns the stored color palette
     /// </summary>
-    public Color[] GetColors => colors.Select(c => Color.FromArgb(c + (0xff << 24))).ToArray();
+    public System.Drawing.Color[] GetColors => colors.Select(c => System.Drawing.Color.FromArgb(c + (0xff << 24))).ToArray();
 
     /// <summary>
     /// creates a new ordered color palette from a set of integers, where the bytes mean AARRGGBB
@@ -42,7 +42,7 @@ public class ColorPalette {
     /// <summary>
     /// creates a new ordered color palette from a set of colors
     /// </summary>
-    public ColorPalette(Color[] colors) {
+    public ColorPalette(System.Drawing.Color[] colors) {
         this.colors = new int[colors.Length];
 
         for (int i = 0; i < colors.Length; i++) {
@@ -104,7 +104,7 @@ public class ColorPalette {
         var d = (rnd.NextSingle(), rnd.NextSingle(), rnd.NextSingle());
 
         for (int i = 0; i < colorCount; i++) {
-            Color color = GenerateColorAtX(a, b, c, d, (float)i / colorCount);
+            System.Drawing.Color color = GenerateColorAtX(a, b, c, d, (float)i / colorCount);
             palette.colors[i] = color.R << 16 | color.G << 8 | color.B;
         }
         
@@ -115,10 +115,13 @@ public class ColorPalette {
     /// returns the color located at X in a graph of <c>color = A + B * Cos(2 * PI * (Cx + D))</c>
     /// where A, B, C and D are 3d vectors representing a color (all their values should be between 1 and 0)
     /// </summary>
-    public static Color GenerateColorAtX((double R, double G, double B) A, (double R, double G, double B) B,
-        (double R, double G, double B) C, (double R, double G, double B) D, double x) 
+    public static System.Drawing.Color GenerateColorAtX(
+        (double R, double G, double B) A, 
+        (double R, double G, double B) B,
+        (double R, double G, double B) C, 
+        (double R, double G, double B) D, double x) 
     {
-        Color result = Color.FromArgb(
+        System.Drawing.Color result = System.Drawing.Color.FromArgb(
             (byte)((A.R + B.R * Math.Cos(2 * Math.PI * (C.R * x + D.R))) * 255),
             (byte)((A.G + B.G * Math.Cos(2 * Math.PI * (C.G * x + D.G))) * 255),
             (byte)((A.B + B.B * Math.Cos(2 * Math.PI * (C.B * x + D.B))) * 255));
