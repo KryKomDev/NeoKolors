@@ -9,6 +9,7 @@ using NeoKolors.ConsoleGraphics.Settings.ArgumentType;
 using NeoKolors.ConsoleGraphics.TUI;
 using NeoKolors.ConsoleGraphics.TUI.Elements;
 using NeoKolors.ConsoleGraphics.TUI.GridSystem;
+using NeoKolors.ConsoleGraphics.TUI.Style;
 
 namespace NeoKolors.Common;
 
@@ -22,13 +23,51 @@ public class Kolors {
         Debug.Info("info");
         Debug.Msg("debug");
 
-        Rectangle r = new Rectangle(10, 10, 0, 20);
-        
-        System.Console.CursorVisible = false;
-        
-        for (int y = 0; y < System.Console.WindowHeight + 10; y++) {
+        for (int i = 0; i < System.Console.WindowHeight; i++) {
             System.Console.WriteLine(new string(' ', System.Console.WindowWidth));
         }
+
+        Rectangle r = new Rectangle(2, 2, 50, 17);
+        BorderProperty.Border border = new BorderProperty.Border(new Color(ConsoleColor.White), BorderProperty.BorderStyle.ROUNDED);
+        
+        // Color color = new Color(ConsoleColor.Green);
+        // BorderProperty.WriteBorder(r, border, color);
+
+        StyleBlock s = new StyleBlock("sd",
+            new ColorProperty(ConsoleColor.Gray),
+            new BorderProperty(border),
+            // new BackgroundColorProperty(new Color(ConsoleColor.White)),
+            new HorizontalAlignItemsProperty(HorizontalAlignDirection.CENTER),
+            new VerticalAlignItemsProperty(VerticalAlignDirection.CENTER),
+            new PaddingProperty(new PaddingProperty.PaddingData(
+                new SizeValue(3, SizeValue.UnitType.CHAR),
+                new SizeValue(0, SizeValue.UnitType.CHAR),
+                new SizeValue(3, SizeValue.UnitType.CHAR),
+                new SizeValue(0, SizeValue.UnitType.CHAR))));
+        
+        System.Console.CursorVisible = false;
+
+        string str = StringEffects.AddTextStyles(
+            "<b>Lorem</b> <i>ipsum</i> <u>dolor</u> <s>sit</s> <f>amet</f>, <n>consectetur</n> adipisici elit, sed eiusmod tempor incidunt ut labore et" +
+            " dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat.");
+        
+        
+        Text t = new Text(str, ["sd"], s);
+        
+        for (int i = 0; i < 1000; i++) {
+            t.Draw(r);
+            Thread.Sleep(50);
+        }
+        
+        System.Console.SetCursorPosition(System.Console.WindowWidth - 1, System.Console.WindowHeight - 1);
+        // System.Console.WriteLine(r.Width);
+        
+        // for (int y = 0; y < System.Console.WindowHeight - 10; y++) {
+        //     ConsoleColors.PrintlnColored(new string(' ', System.Console.WindowWidth - 80), ConsoleColor.DarkBlue, ConsoleColor.Red);
+        // }
+        
+        // System.Console.SetCursorPosition(10, 10);
+        // System.Console.Write("asdsaddsasad");
         
         Context c = new();
         IArgumentType arg = new StringArgumentType(allowSpecial: false, minLength: 5, maxLength: 15);
@@ -40,15 +79,6 @@ public class Kolors {
         // b.Draw(12, 5);
         // b2.Draw(12, 6);
         // b.Selected = true;
-        
-        // GridSection g = GridSection.New("Section", 0, 0, (0, 0), (1, 4), b);
-        // GridSection g2 = GridSection.New("Section", 0, 0, (1, 0), (4, 1), b);
-        // GridSection g3 = GridSection.New("Section", 0, 0, (1, 2), (4, 4), b);
-        GridBuilder builder = new GridBuilder(4, 4);
-        // builder.Build(g, g2, g3);
-        // GridRenderer.Render(builder);
-        
-        GridRenderer.RenderGrid(builder);
         
         // ConsoleKeyInfo key;
         //
