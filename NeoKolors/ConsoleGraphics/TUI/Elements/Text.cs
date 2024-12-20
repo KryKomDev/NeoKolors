@@ -8,6 +8,11 @@ public class Text : IElement {
     public string Content { get; }
     public string[] Selectors { get; }
     public StyleBlock Style { get; set; }
+
+    private static readonly StyleBlock DEFAULT_STYLES = new("*", 
+        new ColorProperty(ConsoleColor.Gray), 
+        new BackgroundColorProperty(ConsoleColor.Black),
+        new BorderProperty(BorderProperty.BorderStyle.NONE));
     
     public void UpdateStyle(StyleBlock style) {
         throw new NotImplementedException();
@@ -15,134 +20,83 @@ public class Text : IElement {
 
     public void Draw(Rectangle rect) {
         
-        Rectangle cRect = rect;
+        // style gathering
         var bgColor = (Color)Style.GetProperty<BackgroundColorProperty>();
+        var margin = (MarginProperty.MarginData)Style.GetProperty<MarginProperty>();
+        var padding = (PaddingProperty.PaddingData)Style.GetProperty<PaddingProperty>();
+        var border = (BorderProperty.Border)Style.GetProperty<BorderProperty>();
+        var textColor = (Color)Style.GetProperty<ColorProperty>();
+        var horizontalAlign = (HorizontalAlignData)Style.GetProperty<HorizontalAlignItemsProperty>();
+        var verticalAlign = (VerticalAlignData)Style.GetProperty<VerticalAlignItemsProperty>();
+        var display = (DisplayProperty.DisplayData)Style.GetProperty<DisplayProperty>();
         
-        BorderProperty.WriteBorder(rect, new BorderProperty.Border(new Color(ConsoleColor.Black), BorderProperty.BorderStyle.NONE), bgColor);
+        // if "display: none" do not do anything
+        if (display.Type == DisplayProperty.DisplayType.NONE) return;
+
+        // compute content area
+        Rectangle cRect = Div.ComputeBorderRectangle(rect, margin);
         
-        int mr = 0, ml = 0, mt = 0, mb = 0;
-        
-        Div.SetMargin(this, ref ml, ref mt, ref mr, ref mb, rect);
-
-        cRect.LowerX += ml;
-        cRect.LowerY += mt;
-        cRect.HigherX -= mr;
-        cRect.HigherY -= mb;
-        
-        string[] words = ProcessWords();
-
-        List<string> lines = [];
-        string line = "";
-
-        // padding and border style
-        var p = (PaddingProperty.PaddingData)Style.GetProperty<PaddingProperty>();
-        var b = (BorderProperty.Border)Style.GetProperty<BorderProperty>();
-
         // border thickness
-        int br = b.Style != BorderProperty.BorderStyle.NONE ? 1 : 0;
+        int br = border.Style != BorderProperty.BorderStyle.NONE ? 1 : 0;
+        
+        // render border
+        Div.RenderBorder(border, bgColor, cRect);
 
-        // calculate right padding
-        int pr = p.Right.Unit switch {
-            SizeValue.UnitType.CHAR => p.Right.Value,
-            SizeValue.UnitType.PIXEL => p.Right.Value * 3,
-            SizeValue.UnitType.PERCENT => p.Right.Value * (cRect.Width - br * 2) / 100,
-            _ => throw new ArgumentOutOfRangeException()
-        };
-        
-        // calculate left padding
-        int pl = p.Right.Unit switch {
-            SizeValue.UnitType.CHAR => p.Right.Value,
-            SizeValue.UnitType.PIXEL => p.Right.Value * 3,
-            SizeValue.UnitType.PERCENT => p.Right.Value * (cRect.Width - br * 2) / 100,
-            _ => throw new ArgumentOutOfRangeException()
-        };
-        
+        Div.SetPadding(padding, out var pr, out var pt, out var pl, out var pb, cRect);
+
         // calculate max text width
         int textWidth = cRect.Width - pr - pl - br;
-        
+
         // split text into lines
-        foreach (var w in words) {
-            if (w == "<br>") {
-                lines.Add(line);
-                line = "";
-            }
-            else if (w.VisibleLength() > textWidth) {
-                var l = SplitWord(w, textWidth);
-                lines.AddRange(l.lines);
-                line = l.remainder;
-            }
-            else if ((line + (line != "" ? " " + w : w)).VisibleLength() > textWidth) {
-                lines.Add(line);
-                line = w;
-            }
-            else {
-                line += (line != "" ? " " + w : w);
-            }
-        }
-
-        if (line != "") {
-            lines.Add(line);
-        }
-
-        Div.RenderBorder(this, cRect);
-
-        int pt = p.Top.Unit switch {
-            SizeValue.UnitType.CHAR => p.Top.Value,
-            SizeValue.UnitType.PIXEL => p.Top.Value,
-            SizeValue.UnitType.PERCENT => p.Top.Value * (cRect.Height - br * 2) / 100,
-            _ => throw new ArgumentOutOfRangeException()
-        };
+        string[] lines = ComputeLines(textWidth);
         
-        int pb = p.Top.Unit switch {
-            SizeValue.UnitType.CHAR => p.Bottom.Value,
-            SizeValue.UnitType.PIXEL => p.Bottom.Value,
-            SizeValue.UnitType.PERCENT => p.Bottom.Value * (cRect.Height - br * 2) / 100,
-            _ => throw new ArgumentOutOfRangeException()
-        };
-        
-        var textColor = (Color)Style.GetProperty<ColorProperty>();
-
-        var hai = (HorizontalAlignData)Style.GetProperty<HorizontalAlignItemsProperty>();
-        var vai = (VerticalAlignData)Style.GetProperty<VerticalAlignItemsProperty>();
-
         int lineCounter = 0;
 
         int vo = 0;
 
-        switch (vai.Data) {
+        switch (verticalAlign.Data) {
             case VerticalAlignDirection.TOP:
                 vo = 0;
                 break;
             case VerticalAlignDirection.BOTTOM:
-                if (lines.Count > cRect.Height - br * 2) {
+                if (lines.Length > cRect.Height - br * 2) {
                     vo = 0;
                     break;
                 }
                 
-                vo = cRect.Height - br * 2 - lines.Count + 1;
+                vo = cRect.Height - br * 2 - lines.Length + 1;
                 break;
             case VerticalAlignDirection.CENTER:
-                if (lines.Count > cRect.Height - br * 2) {
+                if (lines.Length > cRect.Height - br * 2) {
                     vo = 0;
                     break;
                 }
 
-                vo = (cRect.Height - br * 2 - lines.Count) / 2 + 1;
+                vo = (cRect.Height - br * 2 - lines.Length) / 2;
                 break;
         }
+
+        int endY;
+
+        if (lines.Length > (cRect.HigherY - pb - br) - (cRect.LowerY + pt + br + vo)) {
+            endY = cRect.HigherY - br;
+        }
+        else {
+            endY = cRect.HigherY - pb - br;
+        }
         
-        for (int i = cRect.LowerY + pt + br + vo; i <= cRect.HigherY - pb - br; i++) {
-            if (lineCounter >= lines.Count) break;
+        for (int i = cRect.LowerY + pt + br + vo; i <= endY; i++) {
+            if (lineCounter >= lines.Length) break;
             
-            switch (hai.Data) {
+            switch (horizontalAlign.Data) {
                 case HorizontalAlignDirection.LEFT:
-                    System.Console.SetCursorPosition(rect.LowerX + pl + br, i);
+                    System.Console.SetCursorPosition(cRect.LowerX + pl + br, i);
                     break;
                 case HorizontalAlignDirection.CENTER:
-                    System.Console.SetCursorPosition(rect.LowerX + pr + br + (textWidth - lines[lineCounter].VisibleLength()) / 2, i);
+                    System.Console.SetCursorPosition(cRect.LowerX + pr + br + (textWidth - lines[lineCounter].VisibleLength()) / 2, i);
                     break;
                 case HorizontalAlignDirection.RIGHT:
-                    System.Console.SetCursorPosition(rect.LowerX + pr + br + textWidth - lines[lineCounter].VisibleLength(), i);
+                    System.Console.SetCursorPosition(cRect.LowerX + pr + br + textWidth - lines[lineCounter].VisibleLength(), i);
                     break;
             }
             
@@ -151,12 +105,33 @@ public class Text : IElement {
         }
     }
 
-    public static string GetTag() => "text";
+    public int ComputeHeight(int width) {
+        var margin = (MarginProperty.MarginData)Style.GetProperty<MarginProperty>();
+        var padding = (PaddingProperty.PaddingData)Style.GetProperty<PaddingProperty>();
+        var border = (BorderProperty.Border)Style.GetProperty<BorderProperty>();
+
+        Div.SetMargin(margin, out int ml, out int mt, out int mr, out int mb, new Rectangle());
+        Div.SetPadding(padding, out int pl, out int pt, out int pr, out int pb, new Rectangle());
+
+        int b = border.Style switch {
+            BorderProperty.BorderStyle.NONE => 0,
+            _ => 2
+        };
+        
+        return ComputeLines(width - ml - mr - pl - pr - b).Length + mb + mt + pb + pt + b;
+    }
+
+    public int ComputeWidth(int height) {
+        throw new NotImplementedException();
+    }
+
+    public static string GetTag() => "p";
 
     public Text(string content, string[] selectors, StyleBlock style) {
         Content = content.Replace('\n', ' ');
         Selectors = selectors;
         Style = style;
+        Style.Merge(DEFAULT_STYLES);
     }
 
     private string[] ProcessWords() {
@@ -191,5 +166,36 @@ public class Text : IElement {
         }
         
         return (lines.ToArray(), remainder);
+    }
+
+    private string[] ComputeLines(int textWidth) {
+        string[] words = ProcessWords();
+        List<string> lines = new List<string>();
+        string line = "";
+        
+        foreach (var w in words) {
+            if (w == "<br>") {
+                lines.Add(line);
+                line = "";
+            }
+            else if (w.VisibleLength() > textWidth) {
+                var l = SplitWord(w, textWidth);
+                lines.AddRange(l.lines);
+                line = l.remainder;
+            }
+            else if ((line + (line != "" ? " " + w : w)).VisibleLength() > textWidth) {
+                lines.Add(line);
+                line = w;
+            }
+            else {
+                line += (line != "" ? " " + w : w);
+            }
+        }
+
+        if (line != "") {
+            lines.Add(line);
+        }
+        
+        return lines.ToArray();
     }
 }

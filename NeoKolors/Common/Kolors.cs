@@ -8,7 +8,6 @@ using NeoKolors.ConsoleGraphics.Settings;
 using NeoKolors.ConsoleGraphics.Settings.ArgumentType;
 using NeoKolors.ConsoleGraphics.TUI;
 using NeoKolors.ConsoleGraphics.TUI.Elements;
-using NeoKolors.ConsoleGraphics.TUI.GridSystem;
 using NeoKolors.ConsoleGraphics.TUI.Style;
 
 namespace NeoKolors.Common;
@@ -24,26 +23,32 @@ public class Kolors {
         Debug.Msg("debug");
 
         for (int i = 0; i < System.Console.WindowHeight; i++) {
-            System.Console.WriteLine(new string(' ', System.Console.WindowWidth));
+            System.Console.WriteLine($"{i}{new string(' ', System.Console.WindowWidth - i.ToString().Length)}");
         }
 
-        Rectangle r = new Rectangle(2, 2, 50, 17);
-        BorderProperty.Border border = new BorderProperty.Border(new Color(ConsoleColor.White), BorderProperty.BorderStyle.ROUNDED);
+        Rectangle r = new Rectangle(2, 2, 80, 31);
+        BorderProperty.Border border = new BorderProperty.Border(new Color(ConsoleColor.Green), BorderProperty.BorderStyle.NORMAL);
         
         // Color color = new Color(ConsoleColor.Green);
         // BorderProperty.WriteBorder(r, border, color);
 
         StyleBlock s = new StyleBlock("sd",
-            new ColorProperty(ConsoleColor.Gray),
+            new ColorProperty(ConsoleColor.White),
             new BorderProperty(border),
-            // new BackgroundColorProperty(new Color(ConsoleColor.White)),
-            new HorizontalAlignItemsProperty(HorizontalAlignDirection.CENTER),
-            new VerticalAlignItemsProperty(VerticalAlignDirection.CENTER),
-            new PaddingProperty(new PaddingProperty.PaddingData(
-                new SizeValue(3, SizeValue.UnitType.CHAR),
+            new BackgroundColorProperty(new Color(ConsoleColor.Black)),
+            // new HorizontalAlignItemsProperty(HorizontalAlignDirection.CENTER),
+            new VerticalAlignItemsProperty(VerticalAlignDirection.TOP),
+            new MarginProperty(new MarginProperty.MarginData(
                 new SizeValue(0, SizeValue.UnitType.CHAR),
-                new SizeValue(3, SizeValue.UnitType.CHAR),
-                new SizeValue(0, SizeValue.UnitType.CHAR))));
+                new SizeValue(0, SizeValue.UnitType.CHAR),
+                new SizeValue(0, SizeValue.UnitType.CHAR),
+                new SizeValue(0, SizeValue.UnitType.CHAR))),
+            new PaddingProperty(new PaddingProperty.PaddingData(
+                new SizeValue(1, SizeValue.UnitType.CHAR),
+                new SizeValue(0, SizeValue.UnitType.CHAR),
+                new SizeValue(1, SizeValue.UnitType.CHAR),
+                new SizeValue(0, SizeValue.UnitType.CHAR)))
+            );
         
         System.Console.CursorVisible = false;
 
@@ -52,12 +57,27 @@ public class Kolors {
             " dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat.");
         
         
-        Text t = new Text(str, ["sd"], s);
+        Text t1 = new Text(str, ["sd"], s);
+        Text t2 = new Text(str, ["sd"], s);
         
-        for (int i = 0; i < 1000; i++) {
-            t.Draw(r);
-            Thread.Sleep(50);
-        }
+        // t1.Draw(r);
+
+        Div d = new Div([t1, t2, t1, t2], ["s"], "Divinator");
+
+
+        d.UpdateStyle(new StyleBlock("sd",
+            new DisplayProperty(DisplayProperty.DisplayType.FLEX),
+            new FlexFlowProperty(FlexFlowProperty.FlexDirection.ROW_REVERSE, false),
+            // new BackgroundColorProperty(ConsoleColor.White),
+            new ListStyleProperty(ListStyleProperty.ListStyle.SQUARE, ConsoleColor.Magenta),
+            new PaddingProperty(new PaddingProperty.PaddingData(
+                new SizeValue(1, SizeValue.UnitType.CHAR),
+                new SizeValue(1, SizeValue.UnitType.CHAR),
+                new SizeValue(1, SizeValue.UnitType.CHAR),
+                new SizeValue(1, SizeValue.UnitType.CHAR)))
+        ));
+        
+        d.Draw(r);
         
         System.Console.SetCursorPosition(System.Console.WindowWidth - 1, System.Console.WindowHeight - 1);
         // System.Console.WriteLine(r.Width);

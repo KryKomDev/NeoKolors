@@ -25,8 +25,8 @@ public class BorderProperty : IStyleProperty<BorderProperty.Border> {
         Value = value;
     }
 
-    public BorderProperty(Color color, BorderStyle style) {
-        Value = new(color, style);
+    public BorderProperty(BorderStyle style, Color? color = null) {
+        Value = new Border(color ?? ConsoleColor.Gray, style);
     }
     
     public enum BorderStyle {
@@ -190,11 +190,11 @@ public class BorderProperty : IStyleProperty<BorderProperty.Border> {
 
     public static void WriteBorder(Rectangle r, Border border, Color? backgroundColor = null) {
         backgroundColor ??= new Color(ConsoleColor.Black);
-
-        System.Console.SetCursorPosition(r.LowerX, r.LowerY);
-        WriteTopLeftCorner(border, backgroundColor);
+        
+        System.Console.SetCursorPosition(r.LowerX, r.HigherY);
+        WriteBottomLeftCorner(border, backgroundColor);
         WriteHorizontal(border, backgroundColor, r.Width - 1);
-        WriteTopRightCorner(border, backgroundColor);
+        WriteBottomRightCorner(border, backgroundColor);
 
         for (int i = 1; i < r.Height; i++) {
             System.Console.SetCursorPosition(r.LowerX, r.LowerY + i);
@@ -203,9 +203,9 @@ public class BorderProperty : IStyleProperty<BorderProperty.Border> {
             WriteVertical(border, backgroundColor);
         }
         
-        System.Console.SetCursorPosition(r.LowerX, r.HigherY);
-        WriteBottomLeftCorner(border, backgroundColor);
+        System.Console.SetCursorPosition(r.LowerX, r.LowerY);
+        WriteTopLeftCorner(border, backgroundColor);
         WriteHorizontal(border, backgroundColor, r.Width - 1);
-        WriteBottomRightCorner(border, backgroundColor);
+        WriteTopRightCorner(border, backgroundColor);
     }
 }

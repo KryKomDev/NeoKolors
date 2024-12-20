@@ -3,7 +3,7 @@
 public class StyleBlock {
     public string Selector { get; }
     public SelectorType Type { get; }
-    public IStyleProperty<object>[] Properties { get; }
+    public IStyleProperty<object>[] Properties { get; private set; }
 
     public StyleBlock(string selector, params IStyleProperty<object>[] properties) {
         if (selector.Length > 0 && selector[0] == '.') {
@@ -43,5 +43,30 @@ public class StyleBlock {
         }
         
         return T.GetStaticDefault();
+    }
+
+    public void Merge(StyleBlock block) {
+        foreach (var outer in block.Properties) {
+            bool found = false;
+            
+            foreach (var inner in Properties) {
+                if (outer.GetName() == inner.GetName()) {
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (found) continue;
+
+            IStyleProperty<object>[] props = new IStyleProperty<object>[Properties.Length + 1];
+
+            for (int i = 0; i < Properties.Length; i++) {
+                props[i] = Properties[i];
+            }
+            
+            props[Properties.Length] = outer;
+            
+            Properties = props;
+        }
     }
 }

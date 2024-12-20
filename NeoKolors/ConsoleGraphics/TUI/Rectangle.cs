@@ -62,4 +62,6 @@ public struct Rectangle {
     
     public int Width => HigherX - LowerX;
     public int Height => HigherY - LowerY;
+
+    public bool IsInside(int x, int y) => x >= lowerX && x <= higherX && y >= lowerY && y <= higherY;
 }

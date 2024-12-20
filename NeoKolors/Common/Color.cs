@@ -16,4 +16,7 @@ public class Color {
         CustomColor = null;
         ConsoleColor = consoleColor;
     }
+    
+    public static implicit operator Color(ConsoleColor color) => new(color);
+    public static implicit operator Color(int color) => new(color);
 }

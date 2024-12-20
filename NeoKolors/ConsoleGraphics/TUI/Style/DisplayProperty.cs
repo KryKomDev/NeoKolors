@@ -5,8 +5,12 @@ public class DisplayProperty : IStyleProperty<DisplayProperty.DisplayData> {
     public DisplayType Type => Value.Type;
     public static string GetStaticName() => "display";
     public string GetName() => GetStaticName();
-    public static DisplayData GetStaticDefault() => new(DisplayType.INLINE);
+    public static DisplayData GetStaticDefault() => new(DisplayType.BLOCK);
     public DisplayData GetDefault() => GetStaticDefault();
+
+    public DisplayProperty(DisplayData value) {
+        Value = value;
+    }
 
     public class DisplayData {
         public DisplayType Type { get; }
@@ -21,10 +25,9 @@ public class DisplayProperty : IStyleProperty<DisplayProperty.DisplayData> {
 
     public enum DisplayType {
         NONE,
-        INLINE,
         BLOCK,
         FLEX,
         GRID,
-        TABLE
+        LIST
     }
 }

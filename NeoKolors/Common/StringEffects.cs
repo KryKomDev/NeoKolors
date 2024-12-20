@@ -15,7 +15,7 @@ public static partial class StringEffects {
     /// <param name="text">input string</param>
     /// <param name="hex">the hexadecimal representation of the color</param>
     /// <returns>string with colored characters</returns>
-    public static string AddColor(string text, int hex) {
+    public static string AddColor(this string text, int hex) {
         text = AddTextStyles(text);
         return $"\e[38;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{text}\e[0m";
     }
@@ -26,7 +26,7 @@ public static partial class StringEffects {
     /// <param name="text">input string</param>
     /// <param name="hex">the hexadecimal representation of the color</param>
     /// <returns>string with colored characters</returns>
-    public static string AddColorB(string text, int hex) {
+    public static string AddColorB(this string text, int hex) {
         text = AddTextStyles(text);
         return $"\e[48;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{text}\e[0m";
     }
@@ -39,7 +39,7 @@ public static partial class StringEffects {
     /// <param name="green">green value of the color</param>
     /// <param name="blue">blue value of the color</param>
     /// <returns>string with colored characters</returns>
-    public static string AddColor(string text, byte red, byte green, byte blue) {
+    public static string AddColor(this string text, byte red, byte green, byte blue) {
         text = AddTextStyles(text);
         return $"\e\u005b\u00338;2;{red};{green};{blue}m{text}\e[0m";
     }
@@ -52,7 +52,7 @@ public static partial class StringEffects {
     /// <param name="green">green value of the color</param>
     /// <param name="blue">blue value of the color</param>
     /// <returns>string with colored characters</returns>
-    public static string AddColorB(string text, byte red, byte green, byte blue) {
+    public static string AddColorB(this string text, byte red, byte green, byte blue) {
         text = AddTextStyles(text);
         return $"\e[48;2;{red};{green};{blue}m{text}\e[0m";
     }
@@ -62,7 +62,7 @@ public static partial class StringEffects {
     /// </summary>
     /// <param name="text">input text with tags</param>
     /// <returns>text that when printed to console has styles</returns>
-    public static string AddTextStyles(string text) {
+    public static string AddTextStyles(this string text) {
         text = text.Replace("<b>", "\x1b[1m");
         text = text.Replace("</b>", "\e[22m");
         text = text.Replace("<i>", "\e[3m");
@@ -82,7 +82,7 @@ public static partial class StringEffects {
     /// adds a color of the terminal palette to the text
     /// </summary>
     /// <returns>text with colors</returns>
-    public static string AddColor(string text, ConsoleColor color) {
+    public static string AddColor(this string text, ConsoleColor color) {
         text = AddTextStyles(text);
         return color switch {
             ConsoleColor.Black => $"\e[38;5;0m{text}\e[38;5;7m",
@@ -109,7 +109,7 @@ public static partial class StringEffects {
     /// adds a color of the terminal palette to the text's background
     /// </summary>
     /// <returns>text with colored background</returns>
-    public static string AddColorB(string text, ConsoleColor color) {
+    public static string AddColorB(this string text, ConsoleColor color) {
         text = AddTextStyles(text);
         return color switch {
             ConsoleColor.Black => $"\e[48;5;0m{text}\e[48;5;7m",
@@ -136,7 +136,7 @@ public static partial class StringEffects {
     /// adds a color to the text
     /// </summary>
     /// <returns>colored text</returns>
-    public static string AddColor(string text, Color color) {
+    public static string AddColor(this string text, Color color) {
         return color.IsPaletteSafe 
             ? AddColor(text, (ConsoleColor)color.ConsoleColor!) 
             : AddColor(text, (int)color.CustomColor!);
@@ -146,7 +146,7 @@ public static partial class StringEffects {
     /// adds a colored background to the text
     /// </summary>
     /// <returns>text with colored background</returns>
-    public static string AddColorB(string text, Color color) {
+    public static string AddColorB(this string text, Color color) {
         return color.IsPaletteSafe 
             ? AddColorB(text, (ConsoleColor)color.ConsoleColor!) 
             : AddColorB(text, (int)color.CustomColor!);

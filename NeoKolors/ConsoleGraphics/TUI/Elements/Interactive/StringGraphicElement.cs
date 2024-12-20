@@ -22,11 +22,11 @@ public class StringGraphicElement : IGraphicElement {
     public void Draw(int x, int y) {
         // ▏▎
         System.Console.SetCursorPosition(x, y);
-        System.Console.Write($"{Name}: {StringColors.AddColor("[", 0x777777)} {new string(' ', inputWidth)} {StringColors.AddColor("]", 0x777777)}");
+        System.Console.Write($"{Name}: {StringEffects.AddColor("[", 0x777777)} {new string(' ', inputWidth)} {StringEffects.AddColor("]", 0x777777)}");
         
-        string drawn = cursor < input.Length ? input.Insert(cursor - drawCursor, StringColors.AddColor(@"▎", 0xffffff)) : input + StringColors.AddColor(@"▎", 0xffffff);
-        drawn = drawn.Replace("\n", StringColors.AddColor("\\n", Debug.Palette[5]));
-        drawn = drawn.Replace(" ", StringColors.AddColor("·", Debug.Palette[5]));
+        string drawn = cursor < input.Length ? input.Insert(cursor - drawCursor, StringEffects.AddColor(@"▎", 0xffffff)) : input + StringEffects.AddColor(@"▎", 0xffffff);
+        drawn = drawn.Replace("\n", StringEffects.AddColor("\\n", Debug.Palette[5]));
+        drawn = drawn.Replace(" ", StringEffects.AddColor("·", Debug.Palette[5]));
         
         System.Console.SetCursorPosition(x + Name.Length + 4, y);
         
