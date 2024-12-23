@@ -33,13 +33,5 @@ public class List : Div {
         RenderList(cRect);
     }
 
-    public new int ComputeHeight(int width) {
-        throw new NotImplementedException();
-    }
-
-    public new int ComputeWidth(int height) {
-        throw new NotImplementedException();
-    }
-
     public new static string GetTag() => "list";
 }

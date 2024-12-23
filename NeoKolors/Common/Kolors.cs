@@ -16,16 +16,18 @@ public class Kolors {
     public static void Main() {
         System.Console.OutputEncoding = System.Text.Encoding.UTF8;
         Debug.Level = Debug.DebugLevel.ALL;
-        Debug.Fatal("fatal");
-        Debug.Error("error");
-        Debug.Warn("warn");
-        Debug.Info("info");
-        Debug.Msg("debug");
+        // Debug.Fatal("fatal");
+        // Debug.Error("error");
+        // Debug.Warn("warn");
+        // Debug.Info("info");
+        // Debug.Msg("debug");
 
-        for (int i = 0; i < System.Console.WindowHeight; i++) {
-            System.Console.WriteLine($"{i}{new string(' ', System.Console.WindowWidth - i.ToString().Length)}");
-        }
+        // for (int i = 0; i < System.Console.WindowHeight; i++) {
+        //     System.Console.WriteLine($"{i}{new string(' ', System.Console.WindowWidth - i.ToString().Length)}");
+        // }
 
+        System.Console.Clear();
+        
         Rectangle r = new Rectangle(2, 2, 80, 31);
         BorderProperty.Border border = new BorderProperty.Border(new Color(ConsoleColor.Green), BorderProperty.BorderStyle.NORMAL);
         
@@ -40,7 +42,7 @@ public class Kolors {
             new VerticalAlignItemsProperty(VerticalAlignDirection.TOP),
             new MarginProperty(new MarginProperty.MarginData(
                 new SizeValue(0, SizeValue.UnitType.CHAR),
-                new SizeValue(0, SizeValue.UnitType.CHAR),
+                new SizeValue(0, SizeValue.UnitType.PERCENT),
                 new SizeValue(0, SizeValue.UnitType.CHAR),
                 new SizeValue(0, SizeValue.UnitType.CHAR))),
             new PaddingProperty(new PaddingProperty.PaddingData(
@@ -62,13 +64,13 @@ public class Kolors {
         
         // t1.Draw(r);
 
-        Div d = new Div([t1, t2, t1, t2], ["s"], "Divinator");
+        Div d = new Div([t1, t2, t1], ["s"], "Divinator");
 
 
         d.UpdateStyle(new StyleBlock("sd",
             new DisplayProperty(DisplayProperty.DisplayType.FLEX),
             new FlexFlowProperty(FlexFlowProperty.FlexDirection.ROW_REVERSE, false),
-            // new BackgroundColorProperty(ConsoleColor.White),
+            new BackgroundColorProperty(ConsoleColor.Black),
             new ListStyleProperty(ListStyleProperty.ListStyle.SQUARE, ConsoleColor.Magenta),
             new PaddingProperty(new PaddingProperty.PaddingData(
                 new SizeValue(1, SizeValue.UnitType.CHAR),
@@ -109,5 +111,7 @@ public class Kolors {
         //     b.Draw(b.GridX, b.GridY);
         // } 
         // while (key.Key != ConsoleKey.Escape);
+        
+        System.Console.CursorVisible = true;
     }
 }
