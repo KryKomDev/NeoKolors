@@ -21,7 +21,7 @@ public class List : Div {
         var display = (DisplayProperty.DisplayData)Style.GetProperty<DisplayProperty>();
         var margin = (MarginProperty.MarginData)Style.GetProperty<MarginProperty>();
         var padding = (PaddingProperty.PaddingData)Style.GetProperty<PaddingProperty>();
-        var border = (BorderProperty.Border)Style.GetProperty<BorderProperty>();
+        var border = (BorderProperty.BorderData)Style.GetProperty<BorderProperty>();
         var bgColor = (Color)Style.GetProperty<BackgroundColorProperty>();
 
         if (display.Type == DisplayProperty.DisplayType.NONE) return;

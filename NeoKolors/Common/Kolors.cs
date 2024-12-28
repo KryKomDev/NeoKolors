@@ -8,6 +8,7 @@ using NeoKolors.ConsoleGraphics.Settings;
 using NeoKolors.ConsoleGraphics.Settings.ArgumentType;
 using NeoKolors.ConsoleGraphics.TUI;
 using NeoKolors.ConsoleGraphics.TUI.Elements;
+using NeoKolors.ConsoleGraphics.TUI.Elements.Interactive;
 using NeoKolors.ConsoleGraphics.TUI.Style;
 
 namespace NeoKolors.Common;
@@ -22,61 +23,58 @@ public class Kolors {
         // Debug.Info("info");
         // Debug.Msg("debug");
 
-        // for (int i = 0; i < System.Console.WindowHeight; i++) {
-        //     System.Console.WriteLine($"{i}{new string(' ', System.Console.WindowWidth - i.ToString().Length)}");
-        // }
-
         System.Console.Clear();
         
         Rectangle r = new Rectangle(2, 2, 80, 31);
-        BorderProperty.Border border = new BorderProperty.Border(new Color(ConsoleColor.Green), BorderProperty.BorderStyle.NORMAL);
+        BorderProperty.BorderData borderData = new BorderProperty.BorderData(new Color(ConsoleColor.Green), BorderProperty.BorderStyle.NORMAL);
         
         // Color color = new Color(ConsoleColor.Green);
         // BorderProperty.WriteBorder(r, border, color);
 
         StyleBlock s = new StyleBlock("sd",
             new ColorProperty(ConsoleColor.White),
-            new BorderProperty(border),
+            new BorderProperty(borderData),
             new BackgroundColorProperty(new Color(ConsoleColor.Black)),
-            // new HorizontalAlignItemsProperty(HorizontalAlignDirection.CENTER),
+            // new HorizontalAlignItemsProperty(HorizontalAlignDirection.CENTER),w
             new VerticalAlignItemsProperty(VerticalAlignDirection.TOP),
             new MarginProperty(new MarginProperty.MarginData(
-                new SizeValue(0, SizeValue.UnitType.CHAR),
-                new SizeValue(0, SizeValue.UnitType.PERCENT),
-                new SizeValue(0, SizeValue.UnitType.CHAR),
-                new SizeValue(0, SizeValue.UnitType.CHAR))),
+                new SizeValue(0, SizeValue.SizeOptions.UNIT_CHAR),
+                new SizeValue(0, SizeValue.SizeOptions.UNIT_PERCENT),
+                new SizeValue(0, SizeValue.SizeOptions.UNIT_CHAR),
+                new SizeValue(0, SizeValue.SizeOptions.UNIT_CHAR))),
             new PaddingProperty(new PaddingProperty.PaddingData(
-                new SizeValue(1, SizeValue.UnitType.CHAR),
-                new SizeValue(0, SizeValue.UnitType.CHAR),
-                new SizeValue(1, SizeValue.UnitType.CHAR),
-                new SizeValue(0, SizeValue.UnitType.CHAR)))
+                new SizeValue(1, SizeValue.SizeOptions.UNIT_CHAR),
+                new SizeValue(0, SizeValue.SizeOptions.UNIT_CHAR),
+                new SizeValue(1, SizeValue.SizeOptions.UNIT_CHAR),
+                new SizeValue(0, SizeValue.SizeOptions.UNIT_CHAR)))
             );
         
         System.Console.CursorVisible = false;
 
-        string str = StringEffects.AddTextStyles(
-            "<b>Lorem</b> <i>ipsum</i> <u>dolor</u> <s>sit</s> <f>amet</f>, <n>consectetur</n> adipisici elit, sed eiusmod tempor incidunt ut labore et" +
-            " dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat.");
+        var str = ("<b>Lorem</b> <i>ipsum</i> <u>dolor</u> <s>sit</s> <f>amet</f>, <n>consectetur</n> adipisici elit, " +
+                   "sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud " +
+                   "exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat.").AddTextStyles();
         
+        var t1 = new Text(str, ["sd"], s);
+        var t2 = new Text(str, ["sd"], s);
         
-        Text t1 = new Text(str, ["sd"], s);
-        Text t2 = new Text(str, ["sd"], s);
-        
+        var bie = new BoolInteractiveElement("cus", [], new BoolArgumentType(), s);
+
         // t1.Draw(r);
 
-        Div d = new Div([t1, t2, t1], ["s"], "Divinator");
-
+        var d = new Div([bie, bie, bie, bie], ["s"], "Divinator");
 
         d.UpdateStyle(new StyleBlock("sd",
-            new DisplayProperty(DisplayProperty.DisplayType.FLEX),
-            new FlexFlowProperty(FlexFlowProperty.FlexDirection.ROW_REVERSE, false),
+            new BorderProperty(BorderProperty.BorderStyle.NORMAL),
+            // new DisplayProperty(DisplayProperty.DisplayType.FLEX),
+            // new FlexFlowProperty(FlexFlowProperty.FlexDirection.ROW_REVERSE, false),
             new BackgroundColorProperty(ConsoleColor.Black),
             new ListStyleProperty(ListStyleProperty.ListStyle.SQUARE, ConsoleColor.Magenta),
             new PaddingProperty(new PaddingProperty.PaddingData(
-                new SizeValue(1, SizeValue.UnitType.CHAR),
-                new SizeValue(1, SizeValue.UnitType.CHAR),
-                new SizeValue(1, SizeValue.UnitType.CHAR),
-                new SizeValue(1, SizeValue.UnitType.CHAR)))
+                new SizeValue(1, SizeValue.SizeOptions.UNIT_CHAR),
+                new SizeValue(1, SizeValue.SizeOptions.UNIT_CHAR),
+                new SizeValue(1, SizeValue.SizeOptions.UNIT_CHAR),
+                new SizeValue(1, SizeValue.SizeOptions.UNIT_CHAR)))
         ));
         
         d.Draw(r);

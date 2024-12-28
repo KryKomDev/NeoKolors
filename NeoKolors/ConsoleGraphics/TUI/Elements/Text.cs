@@ -1,4 +1,4 @@
-﻿using NeoKolors.Common;
+using NeoKolors.Common;
 using NeoKolors.Console;
 using NeoKolors.ConsoleGraphics.TUI.Style;
 
@@ -8,14 +8,16 @@ public class Text : IElement {
     public string Content { get; }
     public string[] Selectors { get; }
     public StyleBlock Style { get; set; }
+    private readonly string[] words;
 
     private static readonly StyleBlock DEFAULT_STYLES = new("*", 
         new ColorProperty(ConsoleColor.Gray), 
         new BackgroundColorProperty(ConsoleColor.Black),
-        new BorderProperty(BorderProperty.BorderStyle.NONE));
+        new BorderProperty(BorderProperty.BorderStyle.NONE)
+    );
     
     public void UpdateStyle(StyleBlock style) {
-        throw new NotImplementedException();
+        Style = style;
     }
 
     public void Draw(Rectangle rect) {
@@ -24,7 +26,7 @@ public class Text : IElement {
         var bgColor = (Color)Style.GetProperty<BackgroundColorProperty>();
         var margin = (MarginProperty.MarginData)Style.GetProperty<MarginProperty>();
         var padding = (PaddingProperty.PaddingData)Style.GetProperty<PaddingProperty>();
-        var border = (BorderProperty.Border)Style.GetProperty<BorderProperty>();
+        var border = (BorderProperty.BorderData)Style.GetProperty<BorderProperty>();
         var textColor = (Color)Style.GetProperty<ColorProperty>();
         var horizontalAlign = (HorizontalAlignData)Style.GetProperty<HorizontalAlignItemsProperty>();
         var verticalAlign = (VerticalAlignData)Style.GetProperty<VerticalAlignItemsProperty>();
@@ -54,7 +56,7 @@ public class Text : IElement {
 
         int vo = 0;
 
-        switch (verticalAlign.Data) {
+        switch (verticalAlign.Value) {
             case VerticalAlignDirection.TOP:
                 vo = 0;
                 break;
@@ -78,7 +80,7 @@ public class Text : IElement {
 
         int endY;
 
-        if (lines.Length > (cRect.HigherY - pb - br) - (cRect.LowerY + pt + br + vo)) {
+        if (lines.Length > cRect.HigherY - pb - br - (cRect.LowerY + pt + br + vo)) {
             endY = cRect.HigherY - br;
         }
         else {
@@ -88,7 +90,7 @@ public class Text : IElement {
         for (int i = cRect.LowerY + pt + br + vo; i <= endY; i++) {
             if (lineCounter >= lines.Length) break;
             
-            switch (horizontalAlign.Data) {
+            switch (horizontalAlign.Value) {
                 case HorizontalAlignDirection.LEFT:
                     System.Console.SetCursorPosition(cRect.LowerX + pl + br, i);
                     break;
@@ -106,9 +108,33 @@ public class Text : IElement {
     }
 
     public int ComputeHeight(int width) {
+        var height = (HeightProperty.SizeData)Style.GetProperty<HeightProperty>();
+
+        // height: num
+        if (height.Value.IsStatic) return height.Value.ToChars(width);
+
+        var widthData = (WidthProperty.SizeData)Style.GetProperty<WidthProperty>();
+
+        // width: min-content
+        if (widthData.Option == SizeValue.SizeOptions.MIN_CONTENT) {
+            int max = 0;
+
+            foreach (var w in ProcessWords()) {
+                max = Math.Max(w.Length, max);
+            }
+
+            return ComputeLines(max).Length;
+        }
+
+        // width: max-content
+        if (widthData.Option == SizeValue.SizeOptions.MAX_CONTENT) {
+            return Int32.MaxValue;
+        }
+
+        // height: auto
         var margin = (MarginProperty.MarginData)Style.GetProperty<MarginProperty>();
         var padding = (PaddingProperty.PaddingData)Style.GetProperty<PaddingProperty>();
-        var border = (BorderProperty.Border)Style.GetProperty<BorderProperty>();
+        var border = (BorderProperty.BorderData)Style.GetProperty<BorderProperty>();
 
         Div.SetMargin(margin, out int ml, out int mt, out int mr, out int mb, new Rectangle());
         Div.SetPadding(padding, out int pl, out int pt, out int pr, out int pb, new Rectangle());
@@ -122,6 +148,12 @@ public class Text : IElement {
     }
 
     public int ComputeWidth(int height) {
+        var size = (WidthProperty.SizeData)Style.GetProperty<WidthProperty>();
+
+        if (size.Value.Option == SizeValue.SizeOptions.AUTO)
+            return size.Value.ToChars(height);
+
+
         throw new NotImplementedException();
     }
 
@@ -132,18 +164,19 @@ public class Text : IElement {
         Selectors = selectors;
         Style = style;
         Style.Merge(DEFAULT_STYLES);
+        words = ProcessWords();
     }
 
     private string[] ProcessWords() {
-        string[] words = Content.Split(' ');
+        string[] newWords = Content.Split(' ');
         
-        for (int i = 0; i < words.Length; i++) {
-            words[i] = words[i].Trim();
+        for (int i = 0; i < newWords.Length; i++) {
+            newWords[i] = newWords[i].Trim();
         }
         
         List<string> noEmpty = [];
 
-        foreach (var w in words) {
+        foreach (var w in newWords) {
             if (w.Length != 0) {
                 noEmpty.Add(w);
             }
@@ -169,7 +202,6 @@ public class Text : IElement {
     }
 
     private string[] ComputeLines(int textWidth) {
-        string[] words = ProcessWords();
         List<string> lines = new List<string>();
         string line = "";
         

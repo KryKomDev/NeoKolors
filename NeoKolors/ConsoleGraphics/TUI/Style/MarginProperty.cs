@@ -29,10 +29,10 @@ public class MarginProperty : IStyleProperty<MarginProperty.MarginData> {
         public SizeValue Right { get; set; }
 
         public static MarginData Default() =>
-            new((1, SizeValue.UnitType.CHAR), 
-                (0, SizeValue.UnitType.CHAR), 
-                (1, SizeValue.UnitType.CHAR), 
-                (0, SizeValue.UnitType.CHAR));
+            new((1, SizeValue.SizeOptions.UNIT_CHAR), 
+                (0, SizeValue.SizeOptions.UNIT_CHAR), 
+                (1, SizeValue.SizeOptions.UNIT_CHAR), 
+                (0, SizeValue.SizeOptions.UNIT_CHAR));
 
         public MarginData(SizeValue left, SizeValue top, SizeValue right, SizeValue bottom) {
             Left = left;

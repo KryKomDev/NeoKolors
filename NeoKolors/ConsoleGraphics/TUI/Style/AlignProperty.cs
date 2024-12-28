@@ -37,17 +37,17 @@ public class HorizontalAlignItemsProperty : IStyleProperty<HorizontalAlignData> 
 }
 
 public class HorizontalAlignData {
-    public HorizontalAlignDirection Data { get; }
-    public HorizontalAlignData(HorizontalAlignDirection data) => Data = data;
+    public HorizontalAlignDirection Value { get; }
+    public HorizontalAlignData(HorizontalAlignDirection data) => Value = data;
     public static implicit operator HorizontalAlignData(HorizontalAlignDirection value) => new(value);
-    public static implicit operator HorizontalAlignDirection(HorizontalAlignData value) => value.Data;
+    public static implicit operator HorizontalAlignDirection(HorizontalAlignData value) => value.Value;
 }
 
 public class VerticalAlignData {
-    public VerticalAlignDirection Data { get; }
-    public VerticalAlignData(VerticalAlignDirection data) => Data = data;
+    public VerticalAlignDirection Value { get; }
+    public VerticalAlignData(VerticalAlignDirection data) => Value = data;
     public static implicit operator VerticalAlignData(VerticalAlignDirection value) => new(value);
-    public static implicit operator VerticalAlignDirection(VerticalAlignData value) => value.Data;
+    public static implicit operator VerticalAlignDirection(VerticalAlignData value) => value.Value;
 }
 
 public enum HorizontalAlignDirection {

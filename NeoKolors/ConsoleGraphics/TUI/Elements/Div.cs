@@ -28,7 +28,7 @@ public class Div : IElement {
         var display = (DisplayProperty.DisplayData)Style.GetProperty<DisplayProperty>();
         var margin = (MarginProperty.MarginData)Style.GetProperty<MarginProperty>();
         var padding = (PaddingProperty.PaddingData)Style.GetProperty<PaddingProperty>();
-        var border = (BorderProperty.Border)Style.GetProperty<BorderProperty>();
+        var border = (BorderProperty.BorderData)Style.GetProperty<BorderProperty>();
         var bgColor = (Color)Style.GetProperty<BackgroundColorProperty>();
 
         if (display.Type == DisplayProperty.DisplayType.NONE) return;
@@ -87,7 +87,7 @@ public class Div : IElement {
             
             int height = e.ComputeHeight(rect.Width - contentOffset);
 
-            int b = ((BorderProperty.Border)e.Style.GetProperty<BorderProperty>()).Style ==
+            int b = ((BorderProperty.BorderData)e.Style.GetProperty<BorderProperty>()).Style ==
                     BorderProperty.BorderStyle.NONE
                 ? 0
                 : 1;
@@ -212,34 +212,13 @@ public class Div : IElement {
     /// <summary>
     /// see <see cref="BorderProperty.WriteBorder"/>
     /// </summary>
-    internal static void RenderBorder(BorderProperty.Border border, Color backgroundColor, Rectangle rect) => BorderProperty.WriteBorder(rect, border, backgroundColor);
+    internal static void RenderBorder(BorderProperty.BorderData borderData, Color backgroundColor, Rectangle rect) => BorderProperty.WriteBorder(rect, borderData, backgroundColor);
 
     internal static void SetMargin(MarginProperty.MarginData m, out int left, out int top, out int right, out int bottom, Rectangle rect) {
-        left = m.Left.Unit switch {
-            SizeValue.UnitType.CHAR => m.Left.Value,
-            SizeValue.UnitType.PIXEL => m.Left.Value * 3,
-            SizeValue.UnitType.PERCENT => m.Left.Value * rect.Width / 100,
-            _ => 0
-        };
-
-        right = m.Right.Unit switch {
-            SizeValue.UnitType.CHAR => m.Right.Value,
-            SizeValue.UnitType.PIXEL => m.Right.Value * 3,
-            SizeValue.UnitType.PERCENT => m.Right.Value * rect.Width / 100,
-            _ => 0
-        };
-
-        top = m.Top.Unit switch {
-            SizeValue.UnitType.CHAR or SizeValue.UnitType.PIXEL => m.Top.Value,
-            SizeValue.UnitType.PERCENT => m.Top.Value * rect.Width / 100,
-            _ => 0
-        };
-
-        bottom = m.Bottom.Unit switch {
-            SizeValue.UnitType.CHAR or SizeValue.UnitType.PIXEL => m.Bottom.Value,
-            SizeValue.UnitType.PERCENT => m.Bottom.Value * rect.Width / 100,
-            _ => 0
-        };
+        left = m.Left.ToChars(rect.Width);
+        right = m.Right.ToChars(rect.Width);
+        top = m.Top.ToChars(rect.Height);
+        bottom = m.Bottom.ToChars(rect.Height);
     }
 
     internal static Rectangle ComputeBorderRectangle(Rectangle rect, MarginProperty.MarginData margin) {
@@ -256,37 +235,16 @@ public class Div : IElement {
     }
     
     internal static void SetPadding(PaddingProperty.PaddingData m, out int left, out int top, out int right, out int bottom, Rectangle rect) {
-        left = m.Left.Unit switch {
-            SizeValue.UnitType.CHAR => m.Left.Value,
-            SizeValue.UnitType.PIXEL => m.Left.Value * 3,
-            SizeValue.UnitType.PERCENT => m.Left.Value * rect.Width / 100,
-            _ => 0
-        };
-
-        right = m.Right.Unit switch {
-            SizeValue.UnitType.CHAR => m.Right.Value,
-            SizeValue.UnitType.PIXEL => m.Right.Value * 3,
-            SizeValue.UnitType.PERCENT => m.Right.Value * rect.Width / 100,
-            _ => 0
-        };
-
-        top = m.Top.Unit switch {
-            SizeValue.UnitType.CHAR or SizeValue.UnitType.PIXEL => m.Top.Value,
-            SizeValue.UnitType.PERCENT => m.Top.Value * rect.Height / 100,
-            _ => 0
-        };
-
-        bottom = m.Bottom.Unit switch {
-            SizeValue.UnitType.CHAR or SizeValue.UnitType.PIXEL => m.Bottom.Value,
-            SizeValue.UnitType.PERCENT => m.Bottom.Value * rect.Height / 100,
-            _ => 0
-        };
+        left = m.Left.ToChars(rect.Width);
+        right = m.Right.ToChars(rect.Width);
+        top = m.Top.ToChars(rect.Height);
+        bottom = m.Bottom.ToChars(rect.Height);
     }
 
-    internal static Rectangle ComputeContentRectangle(Rectangle rect, PaddingProperty.PaddingData padding, BorderProperty.Border border) {
+    internal static Rectangle ComputeContentRectangle(Rectangle rect, PaddingProperty.PaddingData padding, BorderProperty.BorderData borderData) {
         Rectangle r = rect;
 
-        int b = border.Style switch {
+        int b = borderData.Style switch {
             BorderProperty.BorderStyle.NONE => 0,
             _ => 1
         };
