@@ -1,18 +1,18 @@
 ﻿using NeoKolors.Common;
 using NeoKolors.Console;
-using NeoKolors.ConsoleGraphics.Settings.ArgumentType;
 using NeoKolors.ConsoleGraphics.TUI.Style;
+using NeoKolors.Settings.Argument;
 
 namespace NeoKolors.ConsoleGraphics.TUI.Elements.Interactive;
 
-public class BoolInteractiveElement : IInteractiveElement<BoolArgumentType> {
+public class BoolInteractiveElement : IInteractiveElement<BoolArgument> {
 
-    public BoolArgumentType Argument { get; }
+    public BoolArgument Argument { get; }
     public string[] Selectors { get; }
     public StyleBlock Style { get; set; }
     public string Title { get; }
 
-    public BoolInteractiveElement(string title, string[] selectors, BoolArgumentType argument, StyleBlock style) {
+    public BoolInteractiveElement(string title, string[] selectors, BoolArgument argument, StyleBlock style) {
         Title = title;
         Selectors = selectors;
         Argument = argument;
@@ -22,10 +22,10 @@ public class BoolInteractiveElement : IInteractiveElement<BoolArgumentType> {
     public void Interact(ConsoleKeyInfo keyInfo) {
         switch (keyInfo.Key) {
             case ConsoleKey.N or ConsoleKey.RightArrow:
-                Argument.SetValue(true);
+                Argument.Set(true);
                 break;
             case ConsoleKey.Y or ConsoleKey.LeftArrow:
-                Argument.SetValue(false);
+                Argument.Set(false);
                 break;
         }
     }
@@ -86,7 +86,7 @@ public class BoolInteractiveElement : IInteractiveElement<BoolArgumentType> {
         // else
         // System.Console.Write($"{Title}: ");
 
-        if ((bool)Argument.GetValue())
+        if ((bool)Argument.Get())
             ConsoleColors.PrintComplexColored("[*yy*r] *nn*r ", ("*y", Debug.InfoColor), ("*n", Debug.ErrorColor),
                 ("*r", -1));
         else

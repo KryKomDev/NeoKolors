@@ -1,9 +1,10 @@
-﻿using NeoKolors.Console;
-using NeoKolors.ConsoleGraphics.Settings;
-using NeoKolors.ConsoleGraphics.Settings.ArgumentType;
-using NeoKolors.ConsoleGraphics.Settings.Exceptions;
+﻿using System.Globalization;
+using NeoKolors.Console;
+using NeoKolors.Settings;
+using NeoKolors.Settings.Argument;
+using NeoKolors.Settings.Exceptions;
 
-namespace NeoKolors.ConsoleGraphics.TUI.Elements;
+namespace NeoKolors.ConsoleGraphics.TUI.Elements.InteractiveOld;
 
 public class FloatGraphicElement : IGraphicElement {
     public int GridX { get; set; }
@@ -12,7 +13,7 @@ public class FloatGraphicElement : IGraphicElement {
     public int Height { get; init; } = 1;
     public string Name { get; init; }
     public bool Selected { get; set; }
-    private readonly FloatArgumentType argument;
+    private readonly FloatArgument argument;
     private string input = "";
     private bool overflow;
     
@@ -41,12 +42,12 @@ public class FloatGraphicElement : IGraphicElement {
     public void Interact(ConsoleKeyInfo keyInfo) {
         switch (keyInfo.Key) {
             case ConsoleKey.UpArrow:
-                argument.SetValue((float)argument.GetValue() + 1);
-                input = argument.GetStringValue();
+                argument.Set(argument.Get() + 1);
+                input = argument.Get().ToString(CultureInfo.InvariantCulture);
                 break;
             case ConsoleKey.DownArrow:
-                argument.SetValue((float)argument.GetValue() - 1);
-                input = argument.GetStringValue();
+                argument.Set(argument.Get() - 1);
+                input = argument.Get().ToString(CultureInfo.InvariantCulture);
                 break;
             case ConsoleKey.D0 or ConsoleKey.NumPad0:
                 input += "0";
@@ -120,7 +121,7 @@ public class FloatGraphicElement : IGraphicElement {
         try {
             var i = float.Parse(input);
             overflow = false;
-            argument.SetValue(i);
+            argument.Set(i);
         }
         catch (OverflowException) {
             overflow = true;
@@ -128,7 +129,7 @@ public class FloatGraphicElement : IGraphicElement {
                 input = input.Remove(input.Length - 1, 1);
             }
         }
-        catch (SettingsArgumentException) {
+        catch (InvalidArgumentInputException) {
             overflow = true;
             if (input.Length != 0) {
                 input = input.Remove(input.Length - 1, 1);
@@ -139,11 +140,11 @@ public class FloatGraphicElement : IGraphicElement {
         }
     }
 
-    public object GetValue() {
-        return argument.GetValue();
+    public object Get() {
+        return argument.Get();
     }
 
-    public FloatGraphicElement(int x, int y, string name, FloatArgumentType? argument = null) {
+    public FloatGraphicElement(int x, int y, string name, FloatArgument? argument = null) {
         GridX = x;
         GridY = y;
         Name = name;

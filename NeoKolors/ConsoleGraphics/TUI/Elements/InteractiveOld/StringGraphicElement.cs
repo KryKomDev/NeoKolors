@@ -1,9 +1,9 @@
 ﻿using NeoKolors.Common;
 using NeoKolors.Console;
-using NeoKolors.ConsoleGraphics.Settings;
-using NeoKolors.ConsoleGraphics.Settings.ArgumentType;
+using NeoKolors.Settings;
+using NeoKolors.Settings.Argument;
 
-namespace NeoKolors.ConsoleGraphics.TUI.Elements;
+namespace NeoKolors.ConsoleGraphics.TUI.Elements.InteractiveOld;
 
 public class StringGraphicElement : IGraphicElement {
     public int GridX { get; set; }
@@ -12,7 +12,7 @@ public class StringGraphicElement : IGraphicElement {
     public int Height { get; init; } = 1;
     public string Name { get; init; }
     public bool Selected { get; set; }
-    private readonly StringArgumentType argument;
+    private readonly StringArgument argument;
     private string input = "";
     private int cursor = 0;
     private int drawCursor = 0;
@@ -22,11 +22,11 @@ public class StringGraphicElement : IGraphicElement {
     public void Draw(int x, int y) {
         // ▏▎
         System.Console.SetCursorPosition(x, y);
-        System.Console.Write($"{Name}: {StringEffects.AddColor("[", 0x777777)} {new string(' ', inputWidth)} {StringEffects.AddColor("]", 0x777777)}");
+        System.Console.Write($"{Name}: {"[".AddColor(0x777777)} {new string(' ', inputWidth)} {"]".AddColor(0x777777)}");
         
-        string drawn = cursor < input.Length ? input.Insert(cursor - drawCursor, StringEffects.AddColor(@"▎", 0xffffff)) : input + StringEffects.AddColor(@"▎", 0xffffff);
-        drawn = drawn.Replace("\n", StringEffects.AddColor("\\n", Debug.Palette[5]));
-        drawn = drawn.Replace(" ", StringEffects.AddColor("·", Debug.Palette[5]));
+        string drawn = cursor < input.Length ? input.Insert(cursor - drawCursor, @"▎".AddColor(0xffffff)) : input + @"▎".AddColor(0xffffff);
+        drawn = drawn.Replace("\n", "\\n".AddColor(Debug.Palette[5]));
+        drawn = drawn.Replace(" ", "·".AddColor(Debug.Palette[5]));
         
         System.Console.SetCursorPosition(x + Name.Length + 4, y);
         
@@ -95,22 +95,22 @@ public class StringGraphicElement : IGraphicElement {
         }
         else {
             error = false;
-            argument.SetValue(input);
+            argument.Set(input);
         }
     }
 
-    public object GetValue() {
+    public object Get() {
         return input;
     }
 
-    public StringGraphicElement(int x, int y, string name, StringArgumentType? argument = null, int inputWidth = 40) {
+    public StringGraphicElement(int x, int y, string name, StringArgument? argument = null, int inputWidth = 40) {
         GridX = x;
         GridY = y;
         Name = name;
         this.argument = argument ?? Arguments.String();
         Width = inputWidth + Name.Length + 6;
         this.inputWidth = inputWidth;
-        input = (string)this.argument.GetValue();
+        input = (string)this.argument.Get();
         cursor = input.Length;
     }
 }

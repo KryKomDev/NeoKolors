@@ -1,8 +1,8 @@
 ﻿using NeoKolors.Console;
-using NeoKolors.ConsoleGraphics.Settings;
-using NeoKolors.ConsoleGraphics.Settings.ArgumentType;
+using NeoKolors.Settings;
+using NeoKolors.Settings.Argument;
 
-namespace NeoKolors.ConsoleGraphics.TUI.Elements;
+namespace NeoKolors.ConsoleGraphics.TUI.Elements.InteractiveOld;
 
 public class IntegerGraphicElement : IGraphicElement {
     public int GridX { get; set; }
@@ -12,7 +12,7 @@ public class IntegerGraphicElement : IGraphicElement {
     public string Name { get; init; }
     public bool Selected { get; set; }
     
-    private readonly IntegerArgumentType argument;
+    private readonly IntegerArgument argument;
     private string input = "";
     private bool overflow;
     
@@ -41,12 +41,12 @@ public class IntegerGraphicElement : IGraphicElement {
     public void Interact(ConsoleKeyInfo keyInfo) {
         switch (keyInfo.Key) {
             case ConsoleKey.UpArrow:
-                argument.SetValue((int)argument.GetValue() + 1);
-                input = argument.GetStringValue();
+                argument.Set(argument.Get() + 1);
+                input = argument.Get().ToString();
                 break;
             case ConsoleKey.DownArrow:
-                argument.SetValue((int)argument.GetValue() - 1);
-                input = argument.GetStringValue();
+                argument.Set(argument.Get() - 1);
+                input = argument.Get().ToString();
                 break;
             case ConsoleKey.D0 or ConsoleKey.NumPad0:
                 input += "0";
@@ -97,7 +97,7 @@ public class IntegerGraphicElement : IGraphicElement {
         try {
             var i = int.Parse(input);
             overflow = false;
-            argument.SetValue(i);
+            argument.Set(i);
         }
         catch (OverflowException) {
             overflow = true;
@@ -110,16 +110,16 @@ public class IntegerGraphicElement : IGraphicElement {
         }
     }
 
-    public object GetValue() {
-        return argument.GetValue();
+    public object Get() {
+        return argument.Get();
     }
 
-    public IntegerGraphicElement(int x, int y, string name, IntegerArgumentType? argument = null) {
+    public IntegerGraphicElement(int x, int y, string name, IntegerArgument? argument = null) {
         GridX = x;
         GridY = y;
         Name = name;
         this.argument = argument ?? Arguments.Integer();
-        this.argument.SetValue(0);
+        this.argument.Set(0);
         Width = Name.Length + 13;
     }
 }
@@ -132,7 +132,7 @@ public class UnsignedIntegerElement : IGraphicElement {
     public string Name { get; init; }
     public bool Selected { get; set; }
     
-    private readonly UnsignedIntegerArgumentType argument;
+    private readonly UIntegerArgument argument;
     private string input = "";
     private bool overflow;
     
@@ -161,12 +161,12 @@ public class UnsignedIntegerElement : IGraphicElement {
     public void Interact(ConsoleKeyInfo keyInfo) {
         switch (keyInfo.Key) {
             case ConsoleKey.UpArrow:
-                argument.SetValue((uint)argument.GetValue() + 1);
-                input = argument.GetStringValue();
+                argument.Set(argument.Get() + 1);
+                input = argument.Get().ToString();
                 break;
             case ConsoleKey.DownArrow:
-                argument.SetValue((uint)argument.GetValue() - 1);
-                input = argument.GetStringValue();
+                argument.Set(argument.Get() - 1);
+                input = argument.Get().ToString();
                 break;
             case ConsoleKey.D0 or ConsoleKey.NumPad0:
                 input += "0";
@@ -212,7 +212,7 @@ public class UnsignedIntegerElement : IGraphicElement {
         try {
             var i = int.Parse(input);
             overflow = false;
-            argument.SetValue(i);
+            argument.Set(i);
         }
         catch (OverflowException) {
             overflow = true;
@@ -225,16 +225,16 @@ public class UnsignedIntegerElement : IGraphicElement {
         }
     }
 
-    public object GetValue() {
-        return argument.GetValue();
+    public object Get() {
+        return argument.Get();
     }
 
-    public UnsignedIntegerElement(int x, int y, string name, UnsignedIntegerArgumentType? argument = null) {
+    public UnsignedIntegerElement(int x, int y, string name, UIntegerArgument? argument = null) {
         GridX = x;
         GridY = y;
         Name = name;
         this.argument = argument ?? Arguments.UInteger();
-        this.argument.SetValue(0);
+        this.argument.Set(0);
         Width = Name.Length + 12;
     }
 }

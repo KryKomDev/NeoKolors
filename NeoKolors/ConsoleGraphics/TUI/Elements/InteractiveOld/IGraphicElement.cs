@@ -54,5 +54,5 @@ public interface IGraphicElement {
     /// <summary>
     /// returns the value of the argument represented by the element
     /// </summary>
-    public object GetValue();
+    public object Get();
 }

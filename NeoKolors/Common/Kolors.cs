@@ -4,12 +4,12 @@
 //
 
 using NeoKolors.Console;
-using NeoKolors.ConsoleGraphics.Settings;
-using NeoKolors.ConsoleGraphics.Settings.ArgumentType;
 using NeoKolors.ConsoleGraphics.TUI;
 using NeoKolors.ConsoleGraphics.TUI.Elements;
 using NeoKolors.ConsoleGraphics.TUI.Elements.Interactive;
 using NeoKolors.ConsoleGraphics.TUI.Style;
+using NeoKolors.Settings;
+using NeoKolors.Settings.Argument;
 
 namespace NeoKolors.Common;
 
@@ -23,11 +23,28 @@ public class Kolors {
         // Debug.Info("info");
         // Debug.Msg("debug");
 
-        System.Console.Clear();
+        SettingsBuilder<IntegerArgument> builder = SettingsBuilder<IntegerArgument>.Build("int", 
+            SettingsNode<IntegerArgument>.New("idk", context => Arguments.Integer((int)context["min"].Get(), (int)context["max"].Get()))
+                                         .Argument("min", Arguments.Integer())
+                                         .Argument("max", Arguments.Integer())
+                                         .Argument("default", Arguments.Integer())
+            );
         
+        var i = builder.GetResult();
+        System.Console.WriteLine(i);
+
+        // SettingsBuilder<Kolors> builder = SettingsBuilder<Kolors>.Build("builder", 
+        //     SettingsNode<Kolors>.New<Kolors>("")
+        //                         .Argument("idk", (IArgument)new IntegerArgument())
+        // ); 
+
+        /*
+
+        System.Console.Clear();
+
         Rectangle r = new Rectangle(2, 2, 80, 31);
         BorderProperty.BorderData borderData = new BorderProperty.BorderData(new Color(ConsoleColor.Green), BorderProperty.BorderStyle.NORMAL);
-        
+
         // Color color = new Color(ConsoleColor.Green);
         // BorderProperty.WriteBorder(r, border, color);
 
@@ -48,17 +65,17 @@ public class Kolors {
                 new SizeValue(1, SizeValue.SizeOptions.UNIT_CHAR),
                 new SizeValue(0, SizeValue.SizeOptions.UNIT_CHAR)))
             );
-        
+
         System.Console.CursorVisible = false;
 
         var str = ("<b>Lorem</b> <i>ipsum</i> <u>dolor</u> <s>sit</s> <f>amet</f>, <n>consectetur</n> adipisici elit, " +
                    "sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud " +
                    "exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat.").AddTextStyles();
-        
+
         var t1 = new Text(str, ["sd"], s);
         var t2 = new Text(str, ["sd"], s);
-        
-        var bie = new BoolInteractiveElement("cus", [], new BoolArgumentType(), s);
+
+        var bie = new BoolInteractiveElement("cus", [], new BoolArgument(), s);
 
         // t1.Draw(r);
 
@@ -76,30 +93,30 @@ public class Kolors {
                 new SizeValue(1, SizeValue.SizeOptions.UNIT_CHAR),
                 new SizeValue(1, SizeValue.SizeOptions.UNIT_CHAR)))
         ));
-        
+
         d.Draw(r);
-        
+
         System.Console.SetCursorPosition(System.Console.WindowWidth - 1, System.Console.WindowHeight - 1);
         // System.Console.WriteLine(r.Width);
-        
+
         // for (int y = 0; y < System.Console.WindowHeight - 10; y++) {
         //     ConsoleColors.PrintlnColored(new string(' ', System.Console.WindowWidth - 80), ConsoleColor.DarkBlue, ConsoleColor.Red);
         // }
-        
+
         // System.Console.SetCursorPosition(10, 10);
         // System.Console.Write("asdsaddsasad");
-        
+
         Context c = new();
-        IArgumentType arg = new StringArgumentType(allowSpecial: false, minLength: 5, maxLength: 15);
+        IArgument arg = new StringArgument(allowSpecial: false, minLength: 5, maxLength: 15);
         arg <<= "hello";
         c.Add("b", arg);
 
-        var b = new StringGraphicElement(12, 5, "Hello Int", (StringArgumentType?)c["b"]);
+        var b = new StringGraphicElement(12, 5, "Hello Int", (StringArgument?)c["b"]);
         // var b2 = new BoolGraphicElement(12, 6, "Bool Elem");
         // b.Draw(12, 5);
         // b2.Draw(12, 6);
         // b.Selected = true;
-        
+
         // ConsoleKeyInfo key;
         //
         // do {
@@ -107,9 +124,9 @@ public class Kolors {
         //     key = System.Console.ReadKey();
         //     b.Interact(key);
         //     b.Draw(b.GridX, b.GridY);
-        // } 
+        // }
         // while (key.Key != ConsoleKey.Escape);
-        
-        System.Console.CursorVisible = true;
+
+        System.Console.CursorVisible = true;*/
     }
 }

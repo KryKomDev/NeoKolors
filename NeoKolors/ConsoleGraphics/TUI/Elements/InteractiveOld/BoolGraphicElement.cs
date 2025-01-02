@@ -4,10 +4,10 @@
 //
 
 using NeoKolors.Console;
-using NeoKolors.ConsoleGraphics.Settings;
-using NeoKolors.ConsoleGraphics.Settings.ArgumentType;
+using NeoKolors.Settings;
+using NeoKolors.Settings.Argument;
 
-namespace NeoKolors.ConsoleGraphics.TUI.Elements;
+namespace NeoKolors.ConsoleGraphics.TUI.Elements.InteractiveOld;
 
 public class BoolGraphicElement : IGraphicElement {
     public int GridX { get; set; }
@@ -17,7 +17,7 @@ public class BoolGraphicElement : IGraphicElement {
     public string Name { get; init; }
     public bool Selected { get; set; } = false;
 
-    private readonly BoolArgumentType argument = Arguments.Bool();
+    private readonly BoolArgument argument = Arguments.Bool();
 
     public void Draw(int x, int y) {
         System.Console.SetCursorPosition(x, y);
@@ -27,7 +27,7 @@ public class BoolGraphicElement : IGraphicElement {
         else
             System.Console.Write($"{Name}: ");
 
-        if ((bool)argument.GetValue())
+        if (argument.Value)
             ConsoleColors.PrintComplexColored("[*yy*r] *nn*r ", ("*y", Debug.InfoColor), ("*n", Debug.ErrorColor),
                 ("*r", -1));
         else
@@ -39,23 +39,23 @@ public class BoolGraphicElement : IGraphicElement {
         
         switch (keyInfo.Key) {
             case ConsoleKey.J or ConsoleKey.Y:
-                argument.SetValue(true);
+                argument.Set(true);
                 break;
             case ConsoleKey.K or ConsoleKey.N:
-                argument.SetValue(false);
+                argument.Set(false);
                 break;
         }
     }
 
-    public object GetValue() {
-        return argument.GetValue();
+    public object Get() {
+        return argument.Get();
     }
 
     public BoolGraphicElement(int x, int y, string name) {
         Name = name;
         GridX = x;
         GridY = y;
-        argument.SetValue(false);
+        argument.Set(false);
         Width = Name.Length + 8;
         Height = 1;
     }
