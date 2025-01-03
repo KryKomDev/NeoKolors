@@ -3,10 +3,6 @@
 // Copyright (c) 2024 KryKom
 //
 
-
-using static System.Console;
-using NeoKolors.Console;
-
 namespace NeoKolors.Common;
 
 public class ColorPalette {
@@ -70,10 +66,10 @@ public class ColorPalette {
     /// </summary>
     public void PrintPalette() {
         foreach (int c in colors) {
-            ConsoleColors.PrintColored("● ", c);
+            System.Console.Write("● ".AddColor(c));
         }
         
-        Write("\n");
+        System.Console.Write("\n");
     }
 
     /// <summary>
@@ -85,7 +81,7 @@ public class ColorPalette {
             print(c);
         }
         
-        Write("\n");
+        System.Console.Write("\n");
     }
 
     /// <summary>
@@ -97,12 +93,24 @@ public class ColorPalette {
         ColorPalette palette = new ColorPalette(new int[colorCount]);
 
         Random rnd = new Random(seed);
-        
+
+#if NETSTANDARD2_0
+        var a = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
+        var b = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
+        var c = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
+        var d = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
+#elif NET5_0
+        var a = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
+        var b = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
+        var c = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
+        var d = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
+#else
         var a = (rnd.NextSingle(), rnd.NextSingle(), rnd.NextSingle());
         var b = (rnd.NextSingle(), rnd.NextSingle(), rnd.NextSingle());
         var c = (rnd.NextSingle(), rnd.NextSingle(), rnd.NextSingle());
         var d = (rnd.NextSingle(), rnd.NextSingle(), rnd.NextSingle());
-
+#endif
+        
         for (int i = 0; i < colorCount; i++) {
             System.Drawing.Color color = GenerateColorAtX(a, b, c, d, (float)i / colorCount);
             palette.colors[i] = color.R << 16 | color.G << 8 | color.B;

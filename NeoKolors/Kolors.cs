@@ -3,15 +3,17 @@
 // Copyright (c) 2024 KryKom
 //
 
+using NeoKolors.Common;
 using NeoKolors.Console;
 using NeoKolors.ConsoleGraphics.TUI;
 using NeoKolors.ConsoleGraphics.TUI.Elements;
 using NeoKolors.ConsoleGraphics.TUI.Elements.Interactive;
+using NeoKolors.ConsoleGraphics.TUI.Elements.InteractiveOld;
 using NeoKolors.ConsoleGraphics.TUI.Style;
 using NeoKolors.Settings;
 using NeoKolors.Settings.ArgumentTypes;
 
-namespace NeoKolors.Common;
+namespace NeoKolors;
 
 public class Kolors {
     public static void Main() {
@@ -23,58 +25,16 @@ public class Kolors {
         // Debug.Info("info");
         // Debug.Msg("debug");
 
-        SettingsBuilder<IntegerArgument> builder = SettingsBuilder<IntegerArgument>.Build("int", 
-            SettingsNode<IntegerArgument>
-                .New("idk")
-                .Group(SettingsGroup
-                    .New("idk", 
-                        ("min", Arguments.Integer()), 
-                        ("max", Arguments.Integer()), 
-                        ("default", Arguments.Integer()))
-                    .Option(SettingsGroupOption
-                        .New("a")
-                        .Argument("min", Arguments.Integer(defaultValue: -123))
-                        .Argument("max", Arguments.Integer(defaultValue: 123))
-                        .Argument("default", Arguments.Integer(defaultValue: 5))
-                        .EnableAutoMerge()
-                    )
-                    .Option(SettingsGroupOption
-                        .New("b")
-                        .Merges((cin, cout) => {
-                            cout["min"] <<= -123;
-                            cout["max"] <<= 123;
-                            cout["default"] <<= -5;
-                        })
-                    )
-                    .EnableAutoMerge()
-                )
-                .Constructs(context => 
-                    Arguments.Integer(defaultValue: (int)context["default"].Get(), min: (int)context["min"].Get(), max: (int)
-                        context["max"].Get())
-                )
-        );
-
-        var a = Arguments.Integer();
-        a <<= 123;
-
-        builder["idk"]["idk"]["a"].Context["min"] <<= -1234;
-        
-        builder["idk"]["idk"].Select(1);
-        
-        // System.Console.WriteLine(builder.Nodes[0].Context["default"].Get());
-        
-        var i = builder.GetResult();
-        System.Console.WriteLine(i);
-
-        // SettingsBuilder<Kolors> builder = SettingsBuilder<Kolors>.Build("builder", 
-        //     SettingsNode<Kolors>.New<Kolors>("")
-        //                         .Argument("idk", (IArgument)new IntegerArgument())
-        // ); 
-        
-
-        /*
-
         System.Console.Clear();
+        
+        // System.Console.WriteLine("\e[48;2;255;255;0m<u>Ahasdsadas \e[38;1;m assadd\e[0masdasd oj</u>");
+        
+        
+        var k = System.Console.ReadKey();
+
+        System.Console.WriteLine($"{(int)k.KeyChar:x8}");
+        
+        // System.Console.Clear();
 
         Rectangle r = new Rectangle(2, 2, 80, 31);
         BorderProperty.BorderData borderData = new BorderProperty.BorderData(new Color(ConsoleColor.Green), BorderProperty.BorderStyle.NORMAL);
@@ -85,6 +45,7 @@ public class Kolors {
         StyleBlock s = new StyleBlock("sd",
             new ColorProperty(ConsoleColor.White),
             new BorderProperty(borderData),
+            new CheckboxProperty(CheckboxProperty.CheckboxStyle.SWITCH),
             new BackgroundColorProperty(new Color(ConsoleColor.Black)),
             // new HorizontalAlignItemsProperty(HorizontalAlignDirection.CENTER),w
             new VerticalAlignItemsProperty(VerticalAlignDirection.TOP),
@@ -109,11 +70,13 @@ public class Kolors {
         var t1 = new Text(str, ["sd"], s);
         var t2 = new Text(str, ["sd"], s);
 
-        var bie = new BoolInteractiveElement("cus", [], new BoolArgument(), s);
+        var bief = new BoolInteractiveElement("cus", [], new BoolArgument(), s);
+        var biet = new BoolInteractiveElement("cus", [], new BoolArgument(), s);
+        biet.Argument.Set(true);
 
         // t1.Draw(r);
 
-        var d = new Div([bie, bie, bie, bie], ["s"], "Divinator");
+        var d = new Div([bief, biet, biet, bief, bief], ["s"], "Divinator");
 
         d.UpdateStyle(new StyleBlock("sd",
             new BorderProperty(BorderProperty.BorderStyle.NORMAL),
@@ -161,6 +124,6 @@ public class Kolors {
         // }
         // while (key.Key != ConsoleKey.Escape);
 
-        System.Console.CursorVisible = true;*/
+        System.Console.CursorVisible = true;
     }
 }

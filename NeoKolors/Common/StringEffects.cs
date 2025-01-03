@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace NeoKolors.Common;
 
-public static partial class StringEffects {
+public static class StringEffects {
     
     /// <summary>
     /// adds a color to the characters of a string
@@ -17,7 +17,7 @@ public static partial class StringEffects {
     /// <returns>string with colored characters</returns>
     public static string AddColor(this string text, int hex) {
         text = AddTextStyles(text);
-        return $"\e[38;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{text}\e[0m";
+        return $"{hex.ControlChar()}{text}{CUSTOM_CONTROL_END}";
     }
 
     /// <summary>
@@ -28,7 +28,7 @@ public static partial class StringEffects {
     /// <returns>string with colored characters</returns>
     public static string AddColorB(this string text, int hex) {
         text = AddTextStyles(text);
-        return $"\e[48;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{text}\e[0m";
+        return $"{hex.ControlCharB()}{text}{CUSTOM_CONTROL_BACKGROUND_END}";
     }
 
     /// <summary>
@@ -41,7 +41,7 @@ public static partial class StringEffects {
     /// <returns>string with colored characters</returns>
     public static string AddColor(this string text, byte red, byte green, byte blue) {
         text = AddTextStyles(text);
-        return $"\e\u005b\u00338;2;{red};{green};{blue}m{text}\e[0m";
+        return $"\e[38;2;{red};{green};{blue}m{text}{CUSTOM_CONTROL_END}";
     }
     
     /// <summary>
@@ -54,7 +54,7 @@ public static partial class StringEffects {
     /// <returns>string with colored characters</returns>
     public static string AddColorB(this string text, byte red, byte green, byte blue) {
         text = AddTextStyles(text);
-        return $"\e[48;2;{red};{green};{blue}m{text}\e[0m";
+        return $"\e[48;2;{red};{green};{blue}m{text}{CUSTOM_CONTROL_BACKGROUND_END}";
     }
 
     /// <summary>
@@ -84,25 +84,7 @@ public static partial class StringEffects {
     /// <returns>text with colors</returns>
     public static string AddColor(this string text, ConsoleColor color) {
         text = AddTextStyles(text);
-        return color switch {
-            ConsoleColor.Black => $"\e[38;5;0m{text}\e[38;5;7m",
-            ConsoleColor.DarkRed => $"\e[38;5;1m{text}\e[38;5;7m",
-            ConsoleColor.DarkGreen => $"\e[38;5;2m{text}\e[38;5;7m",
-            ConsoleColor.DarkYellow => $"\e[38;5;3m{text}\e[38;5;7m",
-            ConsoleColor.DarkBlue => $"\e[38;5;4m{text}\e[38;5;7m",
-            ConsoleColor.DarkMagenta => $"\e[38;5;5m{text}\e[38;5;7m",
-            ConsoleColor.DarkCyan => $"\e[38;5;6m{text}\e[38;5;7m",
-            ConsoleColor.Gray => $"\e[38;5;7m{text}\e[38;5;7m",
-            ConsoleColor.DarkGray => $"\e[38;5;8m{text}\e[38;5;7m",
-            ConsoleColor.Red => $"\e[38;5;9m{text}\e[38;5;7m",
-            ConsoleColor.Green => $"\e[38;5;10m{text}\e[38;5;7m",
-            ConsoleColor.Yellow => $"\e[38;5;11m{text}\e[38;5;7m",
-            ConsoleColor.Blue => $"\e[38;5;12m{text}\e[38;5;7m",
-            ConsoleColor.Magenta => $"\e[38;5;13m{text}\e[38;5;7m",
-            ConsoleColor.Cyan => $"\e[38;5;14m{text}\e[38;5;7m",
-            ConsoleColor.White => $"\e[38;5;15m{text}\e[38;5;7m",
-            _ => throw new ArgumentOutOfRangeException(nameof(color), color, null)
-        };
+        return $"{color.ControlChar()}{text}{PALETTE_CONTROL_END}";
     }
     
     /// <summary>
@@ -111,25 +93,7 @@ public static partial class StringEffects {
     /// <returns>text with colored background</returns>
     public static string AddColorB(this string text, ConsoleColor color) {
         text = AddTextStyles(text);
-        return color switch {
-            ConsoleColor.Black => $"\e[48;5;0m{text}\e[48;5;7m",
-            ConsoleColor.DarkRed => $"\e[48;5;1m{text}\e[48;5;7m",
-            ConsoleColor.DarkGreen => $"\e[48;5;2m{text}\e[48;5;7m",
-            ConsoleColor.DarkYellow => $"\e[48;5;3m{text}\e[48;5;7m",
-            ConsoleColor.DarkBlue => $"\e[48;5;4m{text}\e[48;5;7m",
-            ConsoleColor.DarkMagenta => $"\e[48;5;5m{text}\e[48;5;7m",
-            ConsoleColor.DarkCyan => $"\e[48;5;6m{text}\e[48;5;7m",
-            ConsoleColor.Gray => $"\e[48;5;7m{text}\e[48;5;7m",
-            ConsoleColor.DarkGray => $"\e[48;5;8m{text}\e[48;5;7m",
-            ConsoleColor.Red => $"\e[48;5;9m{text}\e[48;5;7m",
-            ConsoleColor.Green => $"\e[48;5;10m{text}\e[48;5;7m",
-            ConsoleColor.Yellow => $"\e[48;5;11m{text}\e[48;5;7m",
-            ConsoleColor.Blue => $"\e[48;5;12m{text}\e[48;5;7m",
-            ConsoleColor.Magenta => $"\e[48;5;13m{text}\e[48;5;7m",
-            ConsoleColor.Cyan => $"\e[48;5;14m{text}\e[48;5;7m",
-            ConsoleColor.White => $"\e[48;5;15m{text}\e[48;5;7m",
-            _ => throw new ArgumentOutOfRangeException(nameof(color), color, null)
-        };
+        return $"{color.ControlCharB()}{text}{PALETTE_CONTROL_BACKGROUND_END}";
     }
 
     /// <summary>
@@ -137,9 +101,8 @@ public static partial class StringEffects {
     /// </summary>
     /// <returns>colored text</returns>
     public static string AddColor(this string text, Color color) {
-        return color.IsPaletteSafe 
-            ? AddColor(text, (ConsoleColor)color.ConsoleColor!) 
-            : AddColor(text, (int)color.CustomColor!);
+        text = AddTextStyles(text);
+        return $"{color.ControlChar}{text}{color.ControlCharEnd}";
     }
     
     /// <summary>
@@ -147,17 +110,98 @@ public static partial class StringEffects {
     /// </summary>
     /// <returns>text with colored background</returns>
     public static string AddColorB(this string text, Color color) {
-        return color.IsPaletteSafe 
-            ? AddColorB(text, (ConsoleColor)color.ConsoleColor!) 
-            : AddColorB(text, (int)color.CustomColor!);
+        text = AddTextStyles(text);
+        return $"{color.ControlCharB}{text}{color.ControlCharEndB}";
     }
 
     public static int VisibleLength(this string text) {
-        text = CONTROL_FINDER_REGEX().Replace(text, "");
+        text = Regex.Replace(text, @"\e([^m]*)m", "");
         
         return text.Length;
     }
 
-    [GeneratedRegex(@"\e([^m]*)m")]
-    private static partial Regex CONTROL_FINDER_REGEX();
+    public static string AddColor(this string text, params (string symbol, Color color)[] colors) {
+        return colors.Aggregate(text, (current, c) => current.Replace(c.symbol, c.color.ControlChar));
+    }
+
+    /// <summary>
+    /// returns string containing ansi escape sequence coloring the text
+    /// </summary>    
+    public static string ControlChar(this ConsoleColor color) {
+        return color switch {
+            ConsoleColor.Black => "\e[38;5;0m",
+            ConsoleColor.DarkRed => "\e[38;5;1m",
+            ConsoleColor.DarkGreen => "\e[38;5;2m",
+            ConsoleColor.DarkYellow => "\e[38;5;3m",
+            ConsoleColor.DarkBlue => "\e[38;5;4m",
+            ConsoleColor.DarkMagenta => "\e[38;5;5m",
+            ConsoleColor.DarkCyan => "\e[38;5;6m",
+            ConsoleColor.Gray => "\e[38;5;7m",
+            ConsoleColor.DarkGray => "\e[38;5;8m",
+            ConsoleColor.Red => "\e[38;5;9m",
+            ConsoleColor.Green => "\e[38;5;10m",
+            ConsoleColor.Yellow => "\e[38;5;11m",
+            ConsoleColor.Blue => "\e[38;5;12m",
+            ConsoleColor.Magenta => "\e[38;5;13m",
+            ConsoleColor.Cyan => "\e[38;5;14m",
+            ConsoleColor.White => "\e[38;5;15m",
+            _ => throw new ArgumentOutOfRangeException(nameof(ConsoleColor), color, null)
+        };
+    }
+
+    /// <summary>
+    /// returns string containing ansi escape sequence coloring background
+    /// </summary>
+    public static string ControlCharB(this ConsoleColor color) {
+        return color switch {
+            ConsoleColor.Black => "\e[48;5;0m",
+            ConsoleColor.DarkRed => "\e[48;5;1m",
+            ConsoleColor.DarkGreen => "\e[48;5;2m",
+            ConsoleColor.DarkYellow => "\e[48;5;3m",
+            ConsoleColor.DarkBlue => "\e[48;5;4m",
+            ConsoleColor.DarkMagenta => "\e[48;5;5m",
+            ConsoleColor.DarkCyan => "\e[48;5;6m",
+            ConsoleColor.Gray => "\e[48;5;7m",
+            ConsoleColor.DarkGray => "\e[48;5;8m",
+            ConsoleColor.Red => "\e[48;5;9m",
+            ConsoleColor.Green => "\e[48;5;10m",
+            ConsoleColor.Yellow => "\e[48;5;11m",
+            ConsoleColor.Blue => "\e[48;5;12m",
+            ConsoleColor.Magenta => "\e[48;5;13m",
+            ConsoleColor.Cyan => "\e[48;5;14m",
+            ConsoleColor.White => "\e[48;5;15m",
+            _ => throw new ArgumentOutOfRangeException(nameof(ConsoleColor), color, null)
+        };
+    }
+
+    /// <summary>
+    /// returns string containing ansi escape sequence coloring the text
+    /// </summary>
+    public static string ControlChar(this int color) =>
+        $"\e[38;2;{(byte)(color >> 16)};{(byte)(color >> 8)};{(byte)color}m";
+
+    /// <summary>
+    /// returns string containing ansi escape sequence coloring background
+    /// </summary>
+    public static string ControlCharB(this int color) =>
+        $"\e[48;2;{(byte)(color >> 16)};{(byte)(color >> 8)};{(byte)color}m";
+    
+    public const string CUSTOM_CONTROL_END = "[38;1;m";
+    public const string CUSTOM_CONTROL_BACKGROUND_END = "[48;1;m";
+    public const string PALETTE_CONTROL_END = "\e[38;5;7m";
+    public const string PALETTE_CONTROL_BACKGROUND_END = "\e[48;5;7m";
+
+    // ReSharper disable once InconsistentNaming
+    public const string CustomControlEnd = CUSTOM_CONTROL_END;
+    // ReSharper disable once InconsistentNaming
+    public const string CustomControlBackgroundEnd = CUSTOM_CONTROL_BACKGROUND_END;
+    // ReSharper disable once InconsistentNaming
+    public const string PaletteControlEnd = PALETTE_CONTROL_END;
+    // ReSharper disable once InconsistentNaming
+    public const string PaletteControlBackgroundEnd = PALETTE_CONTROL_BACKGROUND_END;
+
+    /// <summary>
+    /// switches colors of background and text
+    /// </summary>
+    public const string SWITCH_COLORS = "\e[38;1;7m";
 }
