@@ -9,7 +9,7 @@ using NeoKolors.ConsoleGraphics.TUI.Elements;
 using NeoKolors.ConsoleGraphics.TUI.Elements.Interactive;
 using NeoKolors.ConsoleGraphics.TUI.Style;
 using NeoKolors.Settings;
-using NeoKolors.Settings.Argument;
+using NeoKolors.Settings.ArgumentTypes;
 
 namespace NeoKolors.Common;
 
@@ -24,11 +24,44 @@ public class Kolors {
         // Debug.Msg("debug");
 
         SettingsBuilder<IntegerArgument> builder = SettingsBuilder<IntegerArgument>.Build("int", 
-            SettingsNode<IntegerArgument>.New("idk", context => Arguments.Integer((int)context["min"].Get(), (int)context["max"].Get()))
-                                         .Argument("min", Arguments.Integer())
-                                         .Argument("max", Arguments.Integer())
-                                         .Argument("default", Arguments.Integer())
-            );
+            SettingsNode<IntegerArgument>
+                .New("idk")
+                .Group(SettingsGroup
+                    .New("idk", 
+                        ("min", Arguments.Integer()), 
+                        ("max", Arguments.Integer()), 
+                        ("default", Arguments.Integer()))
+                    .Option(SettingsGroupOption
+                        .New("a")
+                        .Argument("min", Arguments.Integer(defaultValue: -123))
+                        .Argument("max", Arguments.Integer(defaultValue: 123))
+                        .Argument("default", Arguments.Integer(defaultValue: 5))
+                        .EnableAutoMerge()
+                    )
+                    .Option(SettingsGroupOption
+                        .New("b")
+                        .Merges((cin, cout) => {
+                            cout["min"] <<= -123;
+                            cout["max"] <<= 123;
+                            cout["default"] <<= -5;
+                        })
+                    )
+                    .EnableAutoMerge()
+                )
+                .Constructs(context => 
+                    Arguments.Integer(defaultValue: (int)context["default"].Get(), min: (int)context["min"].Get(), max: (int)
+                        context["max"].Get())
+                )
+        );
+
+        var a = Arguments.Integer();
+        a <<= 123;
+
+        builder["idk"]["idk"]["a"].Context["min"] <<= -1234;
+        
+        builder["idk"]["idk"].Select(1);
+        
+        // System.Console.WriteLine(builder.Nodes[0].Context["default"].Get());
         
         var i = builder.GetResult();
         System.Console.WriteLine(i);
@@ -37,6 +70,7 @@ public class Kolors {
         //     SettingsNode<Kolors>.New<Kolors>("")
         //                         .Argument("idk", (IArgument)new IntegerArgument())
         // ); 
+        
 
         /*
 

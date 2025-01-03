@@ -1,4 +1,10 @@
-using NeoKolors.Settings.Argument;
+//
+// NeoKolors
+// Copyright (c) 2025 KryKom
+//
+
+using NeoKolors.Settings.ArgumentTypes;
+using StringArgument = NeoKolors.Settings.ArgumentTypes.StringArgument;
 
 namespace NeoKolors.Settings;
 

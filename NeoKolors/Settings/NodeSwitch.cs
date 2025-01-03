@@ -1,6 +1,6 @@
 //
 // NeoKolors
-// Copyright (c) 2024 KryKom
+// Copyright (c) 2025 KryKom
 //
 
 using NeoKolors.Settings.Exceptions;
@@ -8,11 +8,11 @@ using NeoKolors.Settings.Exceptions;
 namespace NeoKolors.Settings;
 
 public struct NodeSwitch {
-    public string[] Names { get; }
+    public List<string> Names { get; }
     public int Index { get; private set; }
 
-    public NodeSwitch(ISettingsNode<object>[] nodes) {
-        Names = new string[nodes.Length];
+    public NodeSwitch(ISettingsNode[] nodes) {
+        Names = new string[nodes.Length].ToList();
 
         for (int i = 0; i < nodes.Length; i++) {
             Names[i] = nodes[i].Name;
@@ -20,19 +20,19 @@ public struct NodeSwitch {
     }
 
     public void Select(string name) {
-        for (int i = 0; i < Names.Length; i++) {
+        for (int i = 0; i < Names.Count; i++) {
             if (Names[i] == name) {
                 Index = i;
                 return;
             }
         }
         
-        throw SettingsBuilderException.InvalidNodeName(name);
+        throw SettingsBuilderException.SwitchInvalidNodeName(name);
     }
 
     public void Select(int index) {
-        if (index >= 0 && index < Names.Length) Index = index;
+        if (index >= 0 && index < Names.Count) Index = index;
         
-        throw SettingsBuilderException.NodeIndexOutOfRange(index, Names.Length);
+        throw SettingsBuilderException.SwitchNodeIndexOutOfRange(index, Names.Count);
     }
 }

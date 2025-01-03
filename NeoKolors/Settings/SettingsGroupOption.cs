@@ -3,7 +3,7 @@
 // Copyright (c) 2024 KryKom
 //
 
-using NeoKolors.Settings.Argument;
+using NeoKolors.Settings.ArgumentTypes;
 using NeoKolors.Settings.Exceptions;
 
 namespace NeoKolors.Settings;
@@ -21,7 +21,7 @@ public class SettingsGroupOption {
     /// an argument from <see cref="optionContext"/> does not exist in the <see cref="groupContext"/>
     /// </exception>
     /// <seealso cref="NeoKolors.Settings.Context.Set(string,IArgument,bool)"/>
-    private void AutoParse(Context optionContext, Context groupContext) {
+    private void AutoMerge(Context optionContext, Context groupContext) {
         try {
             groupContext.Set(optionContext);
         }
@@ -57,7 +57,7 @@ public class SettingsGroupOption {
     /// first argument represents this option's context,
     /// second is the parent group's context
     /// </param>
-    public SettingsGroupOption OnParse(Action<Context, Context> parseContext) {
+    public SettingsGroupOption Merges(Action<Context, Context> parseContext) {
         CustomParseContext = parseContext;
         AutoParseContext = false;
         return this;
@@ -66,8 +66,8 @@ public class SettingsGroupOption {
     /// <summary>
     /// enables context auto-parsing
     /// </summary>
-    /// <seealso cref="AutoParse"/>
-    public SettingsGroupOption EnableAutoParse() {
+    /// <seealso cref="AutoMerge"/>
+    public SettingsGroupOption EnableAutoMerge() {
         AutoParseContext = true;
         return this;
     }
@@ -77,7 +77,7 @@ public class SettingsGroupOption {
     /// </summary>
     public void MergeContext(in Context groupContext) {
         if (AutoParseContext) {
-            AutoParse(Context, groupContext);
+            AutoMerge(Context, groupContext);
         }
         else {
             if (CustomParseContext is null) throw SettingsGroupOptionException.ParseContextNotSet(Name);

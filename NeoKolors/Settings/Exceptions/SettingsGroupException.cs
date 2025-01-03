@@ -19,7 +19,7 @@ public class SettingsGroupException : Exception {
     /// </summary>
     public static SettingsGroupException SwitchOptionIndexOutOfRange(int index, int length) =>
         new($"Could not switch to node of index {index}. Index out of range. " +
-            $"Index must be between 0 inclusive and {length}.");
+            $"Index must be greater than or equal to 0 and less than {length}.");
 
     /// <summary>
     /// no options were set in a group
@@ -49,6 +49,12 @@ public class SettingsGroupException : Exception {
     /// <see cref="SettingsGroup.CustomParseContext"/> was not set while <see cref="SettingsGroup.AutoParseContext"/> was disabled
     /// </summary>
     public static SettingsGroupException ParseDelegateNotSet(string groupName) =>
-        new($"Could not parse delegate for group '{groupName}'. Parse delegate must be set when AutoParseContext is enabled. " +
-            $"To set the delegate call OnParse(Action<Context, Context>) on the group.");
+        new($"Could not parse delegate for group '{groupName}'. Parse delegate must be set when AutoParseContext is disabled. " +
+            $"To set the delegate call Merges(Action<Context, Context>) on the group.");
+    
+    /// <summary>
+    /// auto-parsing of group context failed, for more see <see cref="Context.Add(Context)"/>
+    /// </summary>
+    public static SettingsGroupException AutoParseContextException(string groupName, string contextMessage) => 
+        new($"Could not auto-parse context of group '{groupName}'. {contextMessage}");
 }

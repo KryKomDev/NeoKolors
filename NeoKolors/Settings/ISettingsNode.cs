@@ -3,14 +3,25 @@
 // Copyright (c) 2024 KryKom
 //
 
-using NeoKolors.Settings.Argument;
+using NeoKolors.Settings.ArgumentTypes;
 
 namespace NeoKolors.Settings;
 
-public interface ISettingsNode<out TResult> : ICloneable where TResult : class {
+public interface ISettingsNode<TResult> : ISettingsNode where TResult : class {
+    public new TResult GetResult();
+    public new ISettingsNode<TResult> Argument(string name, IArgument argument);
+    public new ISettingsNode<TResult> Group(SettingsGroup group);
+    public ISettingsNode<TResult> Constructs(Func<Context, TResult> resultConstructor);
+}
+
+public interface ISettingsNode : ICloneable {
     public string Name { get; }
-    public Func<Context, TResult>? ResultConstructor { get; }
-    public TResult GetResult();
-    public ISettingsNode<TResult> Argument(string name, IArgument argument);
-    public ISettingsNode<TResult> Group(SettingsGroup group);
+    public Context Context { get; }
+    public List<SettingsGroup> Groups { get; }
+    public object GetResult();
+    public ISettingsNode Argument(string name, IArgument argument);
+    public ISettingsNode Group(SettingsGroup group);
+    public ISettingsNode Constructs(Func<Context, object> resultConstructor);
+    
+    public SettingsGroup this[string name] { get; }
 }

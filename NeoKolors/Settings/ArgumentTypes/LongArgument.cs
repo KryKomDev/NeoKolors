@@ -5,57 +5,58 @@
 
 using NeoKolors.Settings.Exceptions;
 
-namespace NeoKolors.Settings.Argument;
+namespace NeoKolors.Settings.ArgumentTypes;
 
-public class IntegerArgument : IArgument<Int32> {
-    public readonly int DefaultValue;
-    public readonly int MinValue; 
-    public readonly int MaxValue;
+public class LongArgument : IArgument<Int64> {
+    public readonly long DefaultValue;
+    public readonly long MinValue; 
+    public readonly long MaxValue;
     
     /// <summary>
     /// custom validation function <br/>
     /// validates the value and if invalid returns the cause message, else null
     /// </summary>
-    public readonly Func<int, string?>? CustomValidate;
+    public readonly Func<long, string?>? CustomValidate;
     
-    public int Value { get; private set; }
+    public long Value { get; private set; }
 
-    public IntegerArgument(int min = Int32.MinValue, int max = Int32.MaxValue, int defaultValue = 0, Func<int, string?>? customValidate = null) {
+    public LongArgument(long min = Int64.MinValue, long max = Int64.MaxValue, long defaultValue = 0, Func<long, string?>? customValidate = null) {
         MinValue = Math.Min(min, max);
         MaxValue = Math.Max(min, max);
         DefaultValue = Math.Min(Math.Max(defaultValue, MinValue), MaxValue);
         CustomValidate = customValidate;
+        Value = DefaultValue;
     }
     
     public void Set(object value) {
-        if (value is Int32 i) {
+        if (value is Int64 i) {
             Validate(i);
             Value = i;
         }
         else if (value is string s) {
-            int v;
+            long v;
             try {
-                v = Int32.Parse(s);
+                v = Int64.Parse(s);
             }
             catch (FormatException e) {
-                throw new ArgumentInputFormatException(typeof(Int32), s, e.Message);
+                throw new ArgumentInputFormatException(typeof(Int64), s, e.Message);
             }
             catch (OverflowException e) {
-                throw new ArgumentInputFormatException(typeof(Int32), s, e.Message);
+                throw new ArgumentInputFormatException(typeof(Int64), s, e.Message);
             }
             
             Validate(v);
             Value = v;
         }
         else {
-            throw new InvalidArgumentInputTypeException(typeof(Int32), value.GetType());
+            throw new InvalidArgumentInputTypeException(typeof(Int64), value.GetType());
         }
     }
     
-    public int Get() => Value;
+    public long Get() => Value;
     object IArgument.Get() => Get();
     public void Reset() => Value = DefaultValue;
-    public IArgument<int> Clone() => (IArgument<int>)MemberwiseClone();
+    public IArgument<long> Clone() => (IArgument<long>)MemberwiseClone();
     IArgument IArgument.Clone() => Clone();
 
     /// <summary>
@@ -67,131 +68,134 @@ public class IntegerArgument : IArgument<Int32> {
     /// // argument.Value is now 123
     /// </code>
     /// </example>
-    public static IntegerArgument operator <<(IntegerArgument argument, int value) {
+    public static LongArgument operator <<(LongArgument argument, long value) {
         argument.Set(value);
         return argument;
     }
     
-    public static IntegerArgument operator +(IntegerArgument argument, int value) {
+    public static LongArgument operator +(LongArgument argument, long value) {
         argument.Set(argument.Value + value);
         return argument;
     }
     
-    public static IntegerArgument operator +(int value, IntegerArgument argument) {
+    public static LongArgument operator +(long value, LongArgument argument) {
         argument.Set(value + argument.Value);
         return argument;
     }
 
-    public static IntegerArgument operator -(IntegerArgument argument, int value) {
+    public static LongArgument operator -(LongArgument argument, long value) {
         argument.Set(argument.Value - value);
         return argument;
     }
     
-    public static IntegerArgument operator -(int value, IntegerArgument argument) {
+    public static LongArgument operator -(long value, LongArgument argument) {
         argument.Set(value - argument.Value);
         return argument;
     }
     
-    public static IntegerArgument operator *(IntegerArgument argument, int value) {
+    public static LongArgument operator *(LongArgument argument, long value) {
         argument.Set(argument.Value * value);
         return argument;
     }
     
-    public static IntegerArgument operator *(int value, IntegerArgument argument) {
+    public static LongArgument operator *(long value, LongArgument argument) {
         argument.Set(value * argument.Value);
         return argument;
     }
 
-    public static IntegerArgument operator /(IntegerArgument argument, int value) {
+    public static LongArgument operator /(LongArgument argument, long value) {
         argument.Set(argument.Value / value);
         return argument;
     }
     
-    public static IntegerArgument operator /(int value, IntegerArgument argument) {
+    public static LongArgument operator /(long value, LongArgument argument) {
         argument.Set(value / argument.Value);
         return argument;
     }
     
-    public static IntegerArgument operator %(IntegerArgument argument, int value) {
+    public static LongArgument operator %(LongArgument argument, long value) {
         argument.Set(argument.Value % value);
         return argument;
     }
     
-    public static IntegerArgument operator %(int value, IntegerArgument argument) {
+    public static LongArgument operator %(long value, LongArgument argument) {
         argument.Set(value % argument.Value);
         return argument;
     }
 
-    public static IntegerArgument operator ++(IntegerArgument argument) {
+    public static LongArgument operator ++(LongArgument argument) {
         argument.Set(argument.Value + 1);
         return argument;
     }
 
-    public static IntegerArgument operator --(IntegerArgument argument) {
+    public static LongArgument operator --(LongArgument argument) {
         argument.Set(argument.Value - 1);
         return argument;
     }
     
-    public static implicit operator int(IntegerArgument argument) => argument.Value;
-    public static implicit operator IntegerArgument(int value) => new() { Value = value };
-
-    private void Validate(int value) {
+    public static implicit operator long(LongArgument argument) => argument.Value;
+    public static implicit operator LongArgument(long value) => new() { Value = value };
+    
+    private void Validate(long value) {
         if (value < MinValue) throw new InvalidArgumentInputException($"Value was less then the smallest allowed value ({MinValue}).");
         if (value > MaxValue) throw new InvalidArgumentInputException($"Value was greater then the greatest allowed value ({MaxValue}).");
         string? res = CustomValidate?.Invoke(value);
         if (res != null) throw new InvalidArgumentInputException(res);
     }
+    
+    public override string ToString() => $"{{\"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
 }
 
-public class UIntegerArgument : IArgument<UInt32> {
-    public readonly uint DefaultValue;
-    public readonly uint MinValue; 
-    public readonly uint MaxValue;
+public class ULongArgument : IArgument<UInt64> {
+    public readonly ulong DefaultValue;
+    public readonly ulong MinValue; 
+    public readonly ulong MaxValue;
     
     /// <summary>
     /// custom validation function <br/>
     /// validates the value and if invalid returns the cause message, else null
     /// </summary>
-    public readonly Func<uint, string?>? CustomValidate;
+    public readonly Func<ulong, string?>? CustomValidate;
     
-    public uint Value { get; private set; }
+    public ulong Value { get; private set; }
 
-    public UIntegerArgument(uint min = UInt32.MinValue, uint max = UInt32.MaxValue, uint defaultValue = 0, Func<uint, string?>? customValidate = null) {
+    public ULongArgument(ulong min = UInt64.MinValue, ulong max = UInt64.MaxValue, ulong defaultValue = 0, Func<ulong, string?>? customValidate = null) {
         MinValue = Math.Min(min, max);
         MaxValue = Math.Max(min, max);
         DefaultValue = Math.Min(Math.Max(defaultValue, MinValue), MaxValue);
         CustomValidate = customValidate;
+        Value = DefaultValue;
     }
     
     public void Set(object value) {
-        if (value is UInt32 i) {
+        if (value is UInt64 i) {
             Validate(i);
             Value = i;
         }
         else if (value is string s) {
-            uint v;
+            ulong v;
             try {
-                v = UInt32.Parse(s);
+                v = UInt64.Parse(s);
             }
             catch (FormatException e) {
-                throw new ArgumentInputFormatException(typeof(UInt32), s, e.Message);
+                throw new ArgumentInputFormatException(typeof(UInt64), s, e.Message);
             }
             catch (OverflowException e) {
-                throw new ArgumentInputFormatException(typeof(UInt32), s, e.Message);
+                throw new ArgumentInputFormatException(typeof(UInt64), s, e.Message);
             }
             
             Validate(v);
             Value = v;
         }
         else {
-            throw new InvalidArgumentInputTypeException(typeof(UInt32), value.GetType());
+            throw new InvalidArgumentInputTypeException(typeof(UInt64), value.GetType());
         }
     }
-
-    public uint Get() => Value;
+    
+    public ulong Get() => Value;
     object IArgument.Get() => Get();
     public void Reset() => Value = DefaultValue;
-    public IArgument<uint> Clone() => (IArgument<uint>)MemberwiseClone();
+    public IArgument<ulong> Clone() => (IArgument<ulong>)MemberwiseClone();
     IArgument IArgument.Clone() => Clone();
 
     /// <summary>
@@ -203,78 +207,80 @@ public class UIntegerArgument : IArgument<UInt32> {
     /// // argument.Value is now 123
     /// </code>
     /// </example>
-    public static UIntegerArgument operator <<(UIntegerArgument argument, uint value) {
+    public static ULongArgument operator <<(ULongArgument argument, ulong value) {
         argument.Set(value);
         return argument;
     }
-
-    public static UIntegerArgument operator +(UIntegerArgument argument, uint value) {
+    
+    public static ULongArgument operator +(ULongArgument argument, ulong value) {
         argument.Set(argument.Value + value);
         return argument;
     }
     
-    public static UIntegerArgument operator +(uint value, UIntegerArgument argument) {
+    public static ULongArgument operator +(ulong value, ULongArgument argument) {
         argument.Set(value + argument.Value);
         return argument;
     }
 
-    public static UIntegerArgument operator -(UIntegerArgument argument, uint value) {
+    public static ULongArgument operator -(ULongArgument argument, ulong value) {
         argument.Set(argument.Value - value);
         return argument;
     }
     
-    public static UIntegerArgument operator -(uint value, UIntegerArgument argument) {
+    public static ULongArgument operator -(ulong value, ULongArgument argument) {
         argument.Set(value - argument.Value);
         return argument;
     }
     
-    public static UIntegerArgument operator *(UIntegerArgument argument, uint value) {
+    public static ULongArgument operator *(ULongArgument argument, ulong value) {
         argument.Set(argument.Value * value);
         return argument;
     }
     
-    public static UIntegerArgument operator *(uint value, UIntegerArgument argument) {
+    public static ULongArgument operator *(ulong value, ULongArgument argument) {
         argument.Set(value * argument.Value);
         return argument;
     }
 
-    public static UIntegerArgument operator /(UIntegerArgument argument, uint value) {
+    public static ULongArgument operator /(ULongArgument argument, ulong value) {
         argument.Set(argument.Value / value);
         return argument;
     }
     
-    public static UIntegerArgument operator /(uint value, UIntegerArgument argument) {
+    public static ULongArgument operator /(ulong value, ULongArgument argument) {
         argument.Set(value / argument.Value);
         return argument;
     }
     
-    public static UIntegerArgument operator %(UIntegerArgument argument, uint value) {
+    public static ULongArgument operator %(ULongArgument argument, ulong value) {
         argument.Set(argument.Value % value);
         return argument;
     }
     
-    public static UIntegerArgument operator %(uint value, UIntegerArgument argument) {
+    public static ULongArgument operator %(ulong value, ULongArgument argument) {
         argument.Set(value % argument.Value);
         return argument;
     }
 
-    public static UIntegerArgument operator ++(UIntegerArgument argument) {
+    public static ULongArgument operator ++(ULongArgument argument) {
         argument.Set(argument.Value + 1);
         return argument;
     }
 
-    public static UIntegerArgument operator --(UIntegerArgument argument) {
+    public static ULongArgument operator --(ULongArgument argument) {
         argument.Set(argument.Value - 1);
         return argument;
     }
     
-    public static implicit operator uint(UIntegerArgument argument) => argument.Value;
-    public static implicit operator UIntegerArgument(uint value) => new() { Value = value };
+    public static implicit operator ulong(ULongArgument argument) => argument.Value;
+    public static implicit operator ULongArgument(ulong value) => new() { Value = value };
     
-    private void Validate(uint value) {
+    private void Validate(ulong value) {
         if (value < MinValue) throw new InvalidArgumentInputException($"Value was less then the smallest allowed value ({MinValue}).");
         if (value > MaxValue) throw new InvalidArgumentInputException($"Value was greater then the greatest allowed value ({MaxValue}).");
         string? res = CustomValidate?.Invoke(value);
         if (res != null) throw new InvalidArgumentInputException(res);
     }
+    
+    public override string ToString() => $"{{\"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
 }

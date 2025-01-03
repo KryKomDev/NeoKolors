@@ -3,7 +3,7 @@
 // Copyright (c) 2024 KryKom
 //
 
-using NeoKolors.Settings.Argument;
+using NeoKolors.Settings.ArgumentTypes;
 using ContextException = NeoKolors.Settings.Exceptions.ContextException;
 
 namespace NeoKolors.Settings;
@@ -24,6 +24,14 @@ public sealed class Context : ICloneable {
         get {
             try {
                 return arguments[key];
+            }
+            catch (KeyNotFoundException) {
+                throw ContextException.KeyNotFound(key);
+            }
+        }
+        set {
+            try {
+                arguments[key] = value;
             }
             catch (KeyNotFoundException) {
                 throw ContextException.KeyNotFound(key);
@@ -73,17 +81,17 @@ public sealed class Context : ICloneable {
     /// adds an argument to the context
     /// </summary>
     /// <exception cref="ContextException">an argument with the same name already exists</exception>
-    public void Add(string name, IArgument argument) {
-        if (!arguments.TryAdd(name, argument)) throw ContextException.KeyDuplicate(name);
+    public void Add(string name, IArgument argument, bool clone = true) {
+        if (!arguments.TryAdd(name, clone ? argument.Clone() : argument)) throw ContextException.KeyDuplicate(name);
     }
     
     /// <summary>
     /// adds arguments from another context to the context
     /// </summary>
     /// <exception cref="ContextException">an argument with the same name already exists</exception>
-    public void Add(Context context) {
+    public void Add(Context context, bool clone = true) {
         foreach ((string key, IArgument value) in context.arguments) {
-            Add(key, value);
+            Add(key, value, clone);
         }
     }
 
@@ -96,14 +104,17 @@ public sealed class Context : ICloneable {
     /// if enabled allows automatically creating a new argument if it doesn't already exist,
     /// else throws <see cref="ContextException"/> if an argument with the same name doesn't exist
     /// </param>
+    /// <param name="clone">
+    /// if true clones the argument and then saves the copy to the context instead of saving the reference directly
+    /// </param>
     /// <exception cref="ContextException">one of the set arguments doesn't exist</exception>
-    public void Set(string name, IArgument argument, bool allowAddNew = false) {
+    public void Set(string name, IArgument argument, bool allowAddNew = false, bool clone = true) {
         if (!allowAddNew) {
-            if (arguments.ContainsKey(name)) arguments[name] = argument;
+            if (arguments.ContainsKey(name)) arguments[name] = clone ? argument.Clone() : argument;
             else throw ContextException.KeyNotFound(name);
         }
         else {
-            arguments[name] = argument;
+            arguments[name] = clone ? argument.Clone() : argument;
         }
     }
 
@@ -120,6 +131,15 @@ public sealed class Context : ICloneable {
         foreach (var c in context.arguments) {
             Set(c.Key, c.Value, allowAddNew);
         }
+    }
+
+    /// <summary>
+    /// sets the value of an argument
+    /// </summary>
+    /// <exception cref="ContextException">no argument with the specified name exists</exception>
+    public void Set(string name, object value) {
+        if (!arguments.TryGetValue(name, out var argument)) throw ContextException.KeyNotFound(name);
+        argument.Set(value);
     }
     
     /// <summary>

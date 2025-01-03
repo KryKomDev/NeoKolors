@@ -5,7 +5,7 @@
 
 using NeoKolors.Settings.Exceptions;
 
-namespace NeoKolors.Settings.Argument;
+namespace NeoKolors.Settings.ArgumentTypes;
 
 public class FloatArgument : IArgument<Single> {
     public float MinValue { get; }
@@ -20,6 +20,7 @@ public class FloatArgument : IArgument<Single> {
         MaxValue = maxValue;
         DefaultValue = defaultValue;
         CustomValidate = customValidate;
+        Value = DefaultValue;
     }
     
     public void Set(object value) {
@@ -137,4 +138,6 @@ public class FloatArgument : IArgument<Single> {
         string? res = CustomValidate?.Invoke(value);
         if (res != null) throw new InvalidArgumentInputException(res);
     }
+    
+    public override string ToString() => $"{{\"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
 }

@@ -1,7 +1,7 @@
 ﻿using NeoKolors.Common;
 using NeoKolors.Console;
 using NeoKolors.ConsoleGraphics.TUI.Style;
-using NeoKolors.Settings.Argument;
+using NeoKolors.Settings.ArgumentTypes;
 
 namespace NeoKolors.ConsoleGraphics.TUI.Elements.Interactive;
 

@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using NeoKolors.Console;
 using NeoKolors.Settings;
-using NeoKolors.Settings.Argument;
+using NeoKolors.Settings.ArgumentTypes;
 using NeoKolors.Settings.Exceptions;
 
 namespace NeoKolors.ConsoleGraphics.TUI.Elements.InteractiveOld;

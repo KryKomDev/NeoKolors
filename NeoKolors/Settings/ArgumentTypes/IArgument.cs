@@ -3,7 +3,7 @@
 // Copyright (c) 2024 KryKom
 //
 
-namespace NeoKolors.Settings.Argument;
+namespace NeoKolors.Settings.ArgumentTypes;
 
 public interface IArgument<out T> : IArgument {
     

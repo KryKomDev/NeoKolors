@@ -1,7 +1,7 @@
 ﻿using NeoKolors.Common;
 using NeoKolors.Console;
 using NeoKolors.Settings;
-using NeoKolors.Settings.Argument;
+using StringArgument = NeoKolors.Settings.ArgumentTypes.StringArgument;
 
 namespace NeoKolors.ConsoleGraphics.TUI.Elements.InteractiveOld;
 

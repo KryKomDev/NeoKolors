@@ -5,7 +5,7 @@
 
 using NeoKolors.Settings.Exceptions;
 
-namespace NeoKolors.Settings.Argument;
+namespace NeoKolors.Settings.ArgumentTypes;
 
 public class BoolArgument : IArgument<bool> {
     public bool Value { get; private set; }
@@ -13,6 +13,7 @@ public class BoolArgument : IArgument<bool> {
 
     public BoolArgument(bool defaultValue = false) {
         DefaultValue = defaultValue;
+        Value = DefaultValue;
     }
     
     public void Set(object value) {
@@ -61,4 +62,8 @@ public class BoolArgument : IArgument<bool> {
     
     public static implicit operator bool(BoolArgument argument) => argument.Value;
     public static implicit operator BoolArgument(bool value) => new() { Value = value };
+
+    public override string ToString() {
+        return $"{{\"value\": {Value}, \"default-value\": {DefaultValue}}}";
+    }
 }

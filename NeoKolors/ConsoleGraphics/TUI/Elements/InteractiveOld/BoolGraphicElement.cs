@@ -5,7 +5,7 @@
 
 using NeoKolors.Console;
 using NeoKolors.Settings;
-using NeoKolors.Settings.Argument;
+using NeoKolors.Settings.ArgumentTypes;
 
 namespace NeoKolors.ConsoleGraphics.TUI.Elements.InteractiveOld;
 

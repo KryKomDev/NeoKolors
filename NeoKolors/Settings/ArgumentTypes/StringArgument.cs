@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 using NeoKolors.Common;
 using NeoKolors.Settings.Exceptions;
 
-namespace NeoKolors.Settings.Argument;
+namespace NeoKolors.Settings.ArgumentTypes;
 
 public partial class StringArgument : IArgument<string> {
     public readonly uint MinLength;
@@ -47,6 +47,7 @@ public partial class StringArgument : IArgument<string> {
         AllowLower = allowLower;
         CountVisibleOnly = countVisibleOnly;
         CustomValidate = customValidate;
+        Value = DefaultValue;
     }
     
     public string Value { get; private set; }
@@ -164,4 +165,16 @@ public partial class StringArgument : IArgument<string> {
         argument.Set(value);
         return argument;
     }
+    
+    public override string ToString() => $"{{\"value\": {Value}, " +
+                                         $"\"default-value\": {DefaultValue}, " +
+                                         $"\"min-length\": {MinLength}, " +
+                                         $"\"max-length\": {MaxLength}, " +
+                                         $"\"allow-spaces\": {AllowSpaces}, " +
+                                         $"\"allow-newlines\": {AllowNewlines}, " +
+                                         $"\"allow-special\": {AllowSpecial}, " +
+                                         $"\"allow-numbers\": {AllowNumbers}, " +
+                                         $"\"allow-upper\": {AllowUpper}, " +
+                                         $"\"allow-lower\": {AllowLower}, " +
+                                         $"\"count-visible-only\": {CountVisibleOnly}}}";
 }

@@ -3,7 +3,7 @@
 // Copyright (c) 2024 KryKom
 //
 
-using NeoKolors.Settings.Argument;
+using NeoKolors.Settings.ArgumentTypes;
 using NeoKolors.Settings.Exceptions;
 
 namespace NeoKolors.Settings;
@@ -11,21 +11,29 @@ namespace NeoKolors.Settings;
 public class SettingsGroup {
     public string Name { get; }
     public Context GroupContext { get; }
-    public List<SettingsGroupOption> Options { get { if (field.Count < 1) throw SettingsGroupException.NoOptionsAvailable(Name); return field; } }
+    private readonly List<SettingsGroupOption> options;
+    public List<SettingsGroupOption> Options {
+        get {
+            if (options.Count < 1) throw SettingsGroupException.NoOptionsAvailable(Name);
+            return options;
+        }
+    }
     public Action<Context, Context>? CustomParseContext { get; private set; }
-    public bool AutoParseContext { get; private set; }
+    public bool AutoParseContext { get; private set; } = true;
     public OptionSwitch OptionSwitch { get; private set; }
     
+
     /// <summary>
     /// automatically adds group context arguments to node context arguments
     /// </summary>
-    private static readonly Action<Context, Context> AUTO_PARSE = (cin, cout) => {
-        for (int i = 0; i < cin.Length; i++) {
-            var v = cin.GetAtIndex(i);
-            cout.Set(v.name, v.value, true);
+    private void AutoMerge(in Context nodeContext) {
+        try {
+            nodeContext.Add(GroupContext);
         }
-    };
-    
+        catch (ContextException e) {
+            throw SettingsGroupException.AutoParseContextException(Name, e.Message);
+        }
+    }
     
     public SettingsGroupOption this[string name] {
         get {
@@ -70,7 +78,8 @@ public class SettingsGroup {
     private SettingsGroup(string name, Context groupContext) {
         Name = name;
         GroupContext = groupContext;
-        Options = new List<SettingsGroupOption>();
+        options = new List<SettingsGroupOption>();
+        OptionSwitch = new OptionSwitch();
     }
 
     
@@ -81,13 +90,14 @@ public class SettingsGroup {
     /// <returns></returns>
     /// <exception cref="SettingsGroupException"></exception>
     public SettingsGroup Option(SettingsGroupOption option) {
-        foreach (var o in Options) {
+        foreach (var o in options) {
             if (o.Name == option.Name) {
                 throw SettingsGroupException.DuplicateOption(option.Name);
             }
         }
         
-        Options.Add(option);
+        options.Add(option);
+        OptionSwitch.Add(option);
 
         return this;
     }
@@ -96,7 +106,7 @@ public class SettingsGroup {
     /// <summary>
     /// sets a custom context parsing delegate
     /// </summary>
-    public SettingsGroup OnParse(Action<Context, Context> parse) {
+    public SettingsGroup Merges(Action<Context, Context> parse) {
         AutoParseContext = false;
         CustomParseContext = parse;
         return this;
@@ -104,25 +114,24 @@ public class SettingsGroup {
 
     
     /// <summary>
-    /// enables auto parsing of the group context, <seealso cref="AUTO_PARSE"/>
+    /// enables auto parsing of the group context <seealso cref="AutoMerge"/>
     /// </summary>
-    public SettingsGroup EnableAutoParse() {
+    public SettingsGroup EnableAutoMerge() {
         AutoParseContext = true;
         return this;
     }
 
     /// <summary>
-    /// 
+    /// merges context of this group to context of its parent node
     /// </summary>
-    /// <param name="nodeContext"></param>
-    /// <exception cref="SettingsGroupException"></exception>
+    /// <exception cref="SettingsGroupException">parsing delegate is not set and auto-parsing is disabled</exception>
     public void MergeContext(in Context nodeContext) {
 
         SettingsGroupOption o = Options[OptionSwitch.Index];
         o.MergeContext(GroupContext);
         
         if (AutoParseContext) {
-            AUTO_PARSE(GroupContext, nodeContext);
+            AutoMerge(nodeContext);
         }
         else {
             if (CustomParseContext is null) throw SettingsGroupException.ParseDelegateNotSet(Name);
@@ -130,4 +139,14 @@ public class SettingsGroup {
             CustomParseContext(GroupContext, nodeContext);
         }
     }
+
+    /// <summary>
+    /// selects an input option using index
+    /// </summary>
+    public void Select(int index) => OptionSwitch = OptionSwitch.Select(index);
+
+    /// <summary>
+    /// selects an input option using the name of the option
+    /// </summary>
+    public void Select(string name) => OptionSwitch = OptionSwitch.Select(name);
 }
