@@ -5,11 +5,14 @@
 
 using NeoKolors.Common;
 using NeoKolors.Console;
-using NeoKolors.ConsoleGraphics.TUI;
-using NeoKolors.ConsoleGraphics.TUI.Elements;
-using NeoKolors.ConsoleGraphics.TUI.Elements.Interactive;
-using NeoKolors.ConsoleGraphics.TUI.Elements.InteractiveOld;
-using NeoKolors.ConsoleGraphics.TUI.Style;
+using NeoKolors.ConsoleGraphics;
+using NeoKolors.ConsoleGraphics.Elements.Interactive;
+using NeoKolors.ConsoleGraphics.Style;
+using NeoKolors.ConsoleGraphics;
+using NeoKolors.ConsoleGraphics.Elements;
+using NeoKolors.ConsoleGraphics.Elements.Interactive;
+using NeoKolors.ConsoleGraphics.Elements.InteractiveOld;
+using NeoKolors.ConsoleGraphics.Style;
 using NeoKolors.Settings;
 using NeoKolors.Settings.ArgumentTypes;
 
@@ -26,15 +29,6 @@ public class Kolors {
         // Debug.Msg("debug");
 
         System.Console.Clear();
-        
-        // System.Console.WriteLine("\e[48;2;255;255;0m<u>Ahasdsadas \e[38;1;m assadd\e[0masdasd oj</u>");
-        
-        
-        var k = System.Console.ReadKey();
-
-        System.Console.WriteLine($"{(int)k.KeyChar:x8}");
-        
-        // System.Console.Clear();
 
         Rectangle r = new Rectangle(2, 2, 80, 31);
         BorderProperty.BorderData borderData = new BorderProperty.BorderData(new Color(ConsoleColor.Green), BorderProperty.BorderStyle.NORMAL);

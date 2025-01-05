@@ -242,7 +242,7 @@ public static class ConsoleColors {
         BackgroundColor = ConsoleColor.Black;
     }
 
-    public static void PrintColored(string s, Common.Color c) {
+    public static void PrintColored(string s, Color c) {
         if (c.IsPaletteSafe) {
             PrintColored(s, (ConsoleColor)c.ConsoleColor!);
         }
@@ -251,7 +251,7 @@ public static class ConsoleColors {
         }
     }
     
-    public static void PrintlnColored(string s, Common.Color c) {
+    public static void PrintlnColored(string s, Color c) {
         if (c.IsPaletteSafe) {
             PrintlnColored(s, (ConsoleColor)c.ConsoleColor!);
         }
@@ -260,7 +260,7 @@ public static class ConsoleColors {
         }
     }
     
-    public static void PrintColoredB(string s, Common.Color c) {
+    public static void PrintColoredB(string s, Color c) {
         if (c.IsPaletteSafe) {
             PrintColoredB(s, (ConsoleColor)c.ConsoleColor!);
         }
@@ -269,7 +269,7 @@ public static class ConsoleColors {
         }
     }
     
-    public static void PrintlnColoredB(string s, Common.Color c) {
+    public static void PrintlnColoredB(string s, Color c) {
         if (c.IsPaletteSafe) {
             PrintlnColoredB(s, (ConsoleColor)c.ConsoleColor!);
         }
@@ -299,11 +299,11 @@ public static class ConsoleColors {
     }
 
     public static void PrintColored(string s, int text, int background) {
-        s = StringEffects.AddTextStyles(s);
+        s = s.AddTextStyles();
         Write($"\e[38;2;{(byte)(text >> 16)};{(byte)(text >> 8)};{(byte)text}m\e[48;2;{(byte)(background >> 16)};{(byte)(background >> 8)};{(byte)background}m{s}\e[0m");
     }
     
-    public static void PrintColored(string s, Common.Color text, Common.Color background) {
+    public static void PrintColored(string s, Color text, Color background) {
         if (text.IsPaletteSafe) {
             if (background.IsPaletteSafe) {
                 PrintColored(s, (ConsoleColor)text.ConsoleColor!, (ConsoleColor)background.ConsoleColor!);
@@ -322,7 +322,7 @@ public static class ConsoleColors {
         }
     }
     
-    public static void PrintlnColored(string s, Common.Color text, Common.Color background) {
+    public static void PrintlnColored(string s, Color text, Color background) {
         PrintColored(s + "\n", text, background);
     }
 }

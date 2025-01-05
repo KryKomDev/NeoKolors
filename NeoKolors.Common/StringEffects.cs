@@ -175,6 +175,16 @@ public static class StringEffects {
     }
 
     /// <summary>
+    /// adds color to both the text and the background
+    /// </summary>
+    public static string AddColor(this string s, Color text, Color background) {
+        s = AddTextStyles(s);
+        s = AddColor(s, text);
+        s = AddColorB(s, background);
+        return s;
+    }
+
+    /// <summary>
     /// returns string containing ansi escape sequence coloring the text
     /// </summary>
     public static string ControlChar(this int color) =>

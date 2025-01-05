@@ -19,7 +19,7 @@ public static class Debug {
     public static readonly ColorPalette DEFAULT_PALETTE = new("a11d3c-ef476f-ffd166-06d6a0-0aabe1-9b4f98");
     public static ColorPalette Palette { get; set; } = DEFAULT_PALETTE;
 
-    public static bool TERMINAL_PALETTE_SAFE_MODE { get; set; } = true;
+    public static bool TerminalPaletteSafeMode { get; set; } = true;
 
     private static int FATAL_COLOR = Palette.Colors[0];
     public static int FatalColor {
@@ -116,7 +116,7 @@ public static class Debug {
     public static void Fatal(string s, bool hideTime = false) {
         if (DEBUG_LEVEL <= DebugLevel.NOTHING) return;
 
-        if (TERMINAL_PALETTE_SAFE_MODE) {
+        if (TerminalPaletteSafeMode) {
             ConsoleColors.PrintColored(hideTime ? "" : $"\e[1m[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] ", ConsoleColor.DarkRed);
             ConsoleColors.PrintColoredB("\e[1m\e[38;2;36;36;36m[ FATAL ]", ConsoleColor.DarkRed);
             ConsoleColors.PrintColored($"\e[1m : {s}\n", ConsoleColor.DarkRed);
@@ -136,7 +136,7 @@ public static class Debug {
     public static void Error(string s, bool hideTime = false) {
         if (DEBUG_LEVEL <= DebugLevel.NOTHING) return;
 
-        if (TERMINAL_PALETTE_SAFE_MODE) {
+        if (TerminalPaletteSafeMode) {
             ConsoleColors.PrintColored(hideTime ? "" : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] ", ConsoleColor.Red);
             ConsoleColors.PrintColoredB("\e[1m\e[38;2;36;36;36m[ ERROR ]", ConsoleColor.Red);
             ConsoleColors.PrintColored($" : {s}\n", ConsoleColor.Red);
@@ -156,7 +156,7 @@ public static class Debug {
     public static void Warn(string s, bool hideTime = false) {
         if (DEBUG_LEVEL < DebugLevel.ERRORS_WARNS) return;
         
-        if (TERMINAL_PALETTE_SAFE_MODE) 
+        if (TerminalPaletteSafeMode) 
             ConsoleColors.PrintColored(
                 hideTime 
                     ? $"[ WARN ] : {s}\n" 
@@ -176,7 +176,7 @@ public static class Debug {
     public static void Info(string s, bool hideTime = false) {
         if (DEBUG_LEVEL < DebugLevel.ALL) return;
 
-        if (TERMINAL_PALETTE_SAFE_MODE) {
+        if (TerminalPaletteSafeMode) {
             ConsoleColors.PrintColored(
                 hideTime 
                     ? $"[ INFO ] : {s}\n" 
@@ -199,7 +199,7 @@ public static class Debug {
     public static void Msg(string s, bool hideTime = false) {
         if (DEBUG_LEVEL == DebugLevel.NOTHING) return;
 
-        if (TERMINAL_PALETTE_SAFE_MODE) {
+        if (TerminalPaletteSafeMode) {
             ConsoleColors.PrintColored(
                 hideTime 
                     ? $"[ DEBUG ] : {s}\n" 
