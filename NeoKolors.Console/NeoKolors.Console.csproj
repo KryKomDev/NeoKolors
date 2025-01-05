@@ -7,13 +7,14 @@
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
         <LangVersion>preview</LangVersion>
-        <TargetFrameworks>net8.0;net9.0;net5.0;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>net5.0;net8.0;net9.0;netstandard2.0</TargetFrameworks>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
     
     <ItemGroup>
-        <PackageReference Include="NeoKolors.Common" Version="0.25.1.1"/>
+        <ProjectReference Include="..\NeoKolors.Common\NeoKolors.Common.csproj"/>
     </ItemGroup>
 </Project>

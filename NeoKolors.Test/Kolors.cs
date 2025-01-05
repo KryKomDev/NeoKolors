@@ -13,7 +13,7 @@ using NeoKolors.ConsoleGraphics.TUI.Style;
 using NeoKolors.Settings;
 using NeoKolors.Settings.ArgumentTypes;
 
-namespace NeoKolors;
+namespace NeoKolors.Test;
 
 public class Kolors {
     public static void Main() {
@@ -108,7 +108,7 @@ public class Kolors {
         arg <<= "hello";
         c.Add("b", arg);
 
-        var b = new StringGraphicElement(12, 5, "Hello Int", (StringArgument?)c["b"]);
+        var b = new StringGraphicElement(12, 5, "Hello Int", (StringArgument)c["b"]);
         // var b2 = new BoolGraphicElement(12, 6, "Bool Elem");
         // b.Draw(12, 5);
         // b2.Draw(12, 6);

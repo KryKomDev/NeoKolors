@@ -3,21 +3,20 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>0.24.47</Version>
+        <Version>0.25.1</Version>
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
         <LangVersion>preview</LangVersion>
-        <TargetFrameworks>net7.0;net8.0;net9.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
-        <RepositoryType>console</RepositoryType>
-        <PackageIcon>NeoKolors.png</PackageIcon>
-        <OutputType>Exe</OutputType>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     </PropertyGroup>
-
+    
     <ItemGroup>
-      <PackageReference Include="SkiaSharp" Version="2.88.9" />
+        <ProjectReference Include="..\NeoKolors.Console\NeoKolors.Console.csproj"/>
+        <ProjectReference Include="..\NeoKolors.Common\NeoKolors.Common.csproj"/>
+        <ProjectReference Include="..\NeoKolors.Settings\NeoKolors.Settings.csproj"/>
     </ItemGroup>
-
 </Project>

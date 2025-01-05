@@ -28,6 +28,9 @@ public class BoolInteractiveElement : IInteractiveElement<BoolArgument> {
                 Argument.Set(false);
                 break;
         }
+        
+        // Ctrl + R
+        if (keyInfo.KeyChar == 0x00000012) Argument.Reset();
     }
 
     public void UpdateStyle(StyleBlock style) => Style = style;
@@ -86,12 +89,9 @@ public class BoolInteractiveElement : IInteractiveElement<BoolArgument> {
         // else
         // System.Console.Write($"{Title}: ");
 
-        if ((bool)Argument.Get())
-            ConsoleColors.PrintComplexColored("[*yy*r] *nn*r ", ("*y", Debug.InfoColor), ("*n", Debug.ErrorColor),
-                ("*r", -1));
-        else
-            ConsoleColors.PrintComplexColored(" *yy*r [*nn*r]", ("*y", Debug.InfoColor), ("*n", Debug.ErrorColor),
-                ("*r", -1));
+        var checkbox = (CheckboxProperty.CheckboxData)Style.GetProperty<CheckboxProperty>();
+        
+        ConsoleColors.PrintComplexColored(checkbox.GetString(Argument.Get()));
     }
 
     public int ComputeHeight(int width) {
