@@ -90,8 +90,8 @@ public sealed class Context : ICloneable {
     /// </summary>
     /// <exception cref="ContextException">an argument with the same name already exists</exception>
     public void Add(Context context, bool clone = true) {
-        foreach ((string key, IArgument value) in context.arguments) {
-            Add(key, value, clone);
+        foreach (var v in context.arguments) {
+            Add(v.Key, v.Value, clone);
         }
     }
 
@@ -159,8 +159,8 @@ public sealed class Context : ICloneable {
     public object Clone() {
         Context context = new Context();
         
-        foreach ((string key, IArgument value) in arguments) {
-            context.Add(key, value);
+        foreach (var v in arguments) {
+            context.Add(v.Key, v.Value);
         }
         
         return context;
@@ -182,3 +182,17 @@ public sealed class Context : ICloneable {
 
     public static implicit operator Dictionary<string, IArgument>(Context context) => context.arguments;
 }
+
+
+#if NETSTANDARD2_0
+internal static class DictionaryExtensions {
+    public static bool TryAdd(this Dictionary<string, IArgument> arguments, string key, IArgument argument) {
+        if (arguments.ContainsKey(key)) {
+            return false;
+        }
+
+        arguments.Add(key, argument);
+        return true;
+    }
+}
+#endif

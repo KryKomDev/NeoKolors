@@ -39,10 +39,13 @@ public interface IArgument {
     public void Set(object value);
     public object Get();
     public void Reset();
-    public IArgument Clone(); 
-    
+    public IArgument Clone();
+
+#if NETSTANDARD2_0
+#else 
     public static IArgument operator <<(IArgument argument, object value) {
         argument.Set(value);
         return argument;
     }
+#endif 
 }

@@ -70,18 +70,6 @@ public partial class StringArgument : IArgument<string> {
     public void Reset() => Value = DefaultValue;
     public IArgument<string> Clone() => (IArgument<string>)MemberwiseClone();
     IArgument IArgument.Clone() => Clone();
-
-    [GeneratedRegex("[0-9]")]
-    private static partial Regex NUMERIC_REGEX();
-    
-    [GeneratedRegex("[^a-zA-Z0-9 \n]")]
-    private static partial Regex SPECIAL_REGEX();
-
-    [GeneratedRegex("[A-Z]")]
-    private static partial Regex UPPER_REGEX();
-    
-    [GeneratedRegex("[a-z]")]
-    private static partial Regex LOWER_REGEX();
     
     private void Validate(string value) {
         if (CountVisibleOnly) {
@@ -93,10 +81,10 @@ public partial class StringArgument : IArgument<string> {
             if (value.Length > MaxLength) throw new InvalidArgumentInputException($"Input value length is too big (must be at most {MaxLength}).");
         }
         
-        if (!AllowUpper && UPPER_REGEX().IsMatch(value)) throw new InvalidArgumentInputException("Input value contains uppercase characters.");
-        if (!AllowLower && LOWER_REGEX().IsMatch(value)) throw new InvalidArgumentInputException("Input value contains lower case characters.");
-        if (!AllowNumbers && NUMERIC_REGEX().IsMatch(value)) throw new InvalidArgumentInputException("Input value contains number characters.");
-        if (!AllowSpecial && SPECIAL_REGEX().IsMatch(value)) throw new InvalidArgumentInputException("Input value contains special characters.");
+        if (!AllowUpper && Regex.IsMatch(value, "[A-Z]")) throw new InvalidArgumentInputException("Input value contains uppercase characters.");
+        if (!AllowLower && Regex.IsMatch(value, "[a-z]")) throw new InvalidArgumentInputException("Input value contains lower case characters.");
+        if (!AllowNumbers && Regex.IsMatch(value, "[0-9]")) throw new InvalidArgumentInputException("Input value contains number characters.");
+        if (!AllowSpecial && Regex.IsMatch(value, "[^a-zA-Z0-9 \n]")) throw new InvalidArgumentInputException("Input value contains special characters.");
         if (!AllowNewlines && value.Contains('\n')) throw new InvalidArgumentInputException("Input value contains newline characters.");
         if (!AllowSpaces && value.Contains(' ')) throw new InvalidArgumentInputException("Input value contains spaces.");
     }
@@ -122,10 +110,10 @@ public partial class StringArgument : IArgument<string> {
             if (value.Length > MaxLength) return false;
         }
         
-        if (!AllowUpper && UPPER_REGEX().IsMatch(value)) return false;
-        if (!AllowLower && LOWER_REGEX().IsMatch(value)) return false;
-        if (!AllowNumbers && NUMERIC_REGEX().IsMatch(value)) return false;
-        if (!AllowSpecial && SPECIAL_REGEX().IsMatch(value)) return false;
+        if (!AllowUpper && Regex.IsMatch(value, "[A-Z]")) return false;
+        if (!AllowLower && Regex.IsMatch(value, "[a-z]")) return false;
+        if (!AllowNumbers && Regex.IsMatch(value, "[0-9]")) return false;
+        if (!AllowSpecial && Regex.IsMatch(value, "[^a-zA-Z0-9 \n]")) return false;
         if (!AllowNewlines && value.Contains('\n')) return false;
         if (!AllowSpaces && value.Contains(' ')) return false;
         

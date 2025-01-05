@@ -3,7 +3,6 @@
 // Copyright (c) 2024 KryKom
 //
 
-using NeoKolors.Console;
 using NeoKolors.Settings.Exceptions;
 
 namespace NeoKolors.Settings;
