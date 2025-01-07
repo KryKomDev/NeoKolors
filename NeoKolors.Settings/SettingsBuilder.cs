@@ -65,4 +65,7 @@ public class SettingsBuilder<TResult> : ISettingsBuilder<TResult> where TResult 
         
         return new SettingsBuilder<TResult>(Name, newNodes) { Switch = Switch };
     }
+    
+    public void Select(string nodeName) => Switch = Switch.Select(nodeName);
+    public void Select(int nodeIndex) => Switch = Switch.Select(nodeIndex);
 }

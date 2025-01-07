@@ -19,20 +19,21 @@ public struct NodeSwitch {
         }
     }
 
-    public void Select(string name) {
+    public NodeSwitch Select(string name) {
         for (int i = 0; i < Names.Count; i++) {
             if (Names[i] == name) {
                 Index = i;
-                return;
+                return this;
             }
         }
         
         throw SettingsBuilderException.SwitchInvalidNodeName(name);
     }
 
-    public void Select(int index) {
-        if (index >= 0 && index < Names.Count) Index = index;
+    public NodeSwitch Select(int index) {
+        if (index < 0 || index >= Names.Count) throw SettingsBuilderException.SwitchNodeIndexOutOfRange(index, Names.Count);
         
-        throw SettingsBuilderException.SwitchNodeIndexOutOfRange(index, Names.Count);
+        Index = index;
+        return this;
     }
 }
