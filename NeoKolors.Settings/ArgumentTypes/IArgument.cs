@@ -41,8 +41,7 @@ public interface IArgument {
     public void Reset();
     public IArgument Clone();
 
-#if NETSTANDARD2_0
-#else 
+#if !NETSTANDARD2_0
     public static IArgument operator <<(IArgument argument, object value) {
         argument.Set(value);
         return argument;
