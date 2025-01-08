@@ -11,7 +11,7 @@ public class Color : ICloneable {
         ConsoleColor = null;
     }
 
-    public Color(ConsoleColor consoleColor) {
+    public Color(ConsoleColor consoleColor = System.ConsoleColor.Gray) {
         IsPaletteSafe = true;
         CustomColor = null;
         ConsoleColor = consoleColor;
