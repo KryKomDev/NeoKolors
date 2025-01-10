@@ -1,9 +1,13 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Buffers.Binary;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace NeoKolors.Common;
 
 using System.Numerics;
+    
 
 #if NET5_0_OR_GREATER && !NET5_0
 
@@ -14,13 +18,23 @@ public readonly struct UInt24 :
     IMinMaxValue<UInt24>,
     IBinaryInteger<UInt24>
 #else 
-
 public readonly struct UInt24 :
     IComparable, 
     IComparable<UInt24>,
     IEquatable<UInt24>
 #endif
 {
+    public override bool Equals(object? obj) => obj is UInt24 other && Equals(other);
+
+    public override int GetHashCode() {
+        unchecked {
+            var hashCode = b0.GetHashCode();
+            hashCode = (hashCode * 397) ^ b1.GetHashCode();
+            hashCode = (hashCode * 397) ^ b2.GetHashCode();
+            return hashCode;
+        }
+    }
+
     private readonly byte b0, b1, b2;
 
     public UInt24(UInt32 value) {
@@ -67,32 +81,44 @@ public readonly struct UInt24 :
     public static implicit operator UInt24(UInt16 value) => new(value);
     public static implicit operator UInt64(UInt24 value) => (UInt64)((value.b2 << 16) | (value.b1 << 8) | value.b0);
     public static implicit operator Int64(UInt24 value) => (value.b2 << 16) | (value.b1 << 8) | value.b0;
+    
+    #if NET5_0_OR_GREATER && !NET5_0
     public static implicit operator UInt128(UInt24 value) => (UInt128)((value.b2 << 16) | (value.b1 << 8) | value.b0);
     public static implicit operator Int128(UInt24 value) => (value.b2 << 16) | (value.b1 << 8) | value.b0;
-
+    
+    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider) {
+        return destination.TryWrite(provider, $"{(uint)this}", out charsWritten);
+    }
+    #endif
+    
     public string ToString(string? format, IFormatProvider? formatProvider) {
-        FormattableString formattable = $"{nameof(b0)}: {b0}, {nameof(b1)}: {b1}, {nameof(b2)}: {b2}";
+        FormattableString formattable = $"{(uint)this}";
         return formattable.ToString(formatProvider);
     }
-
-    public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider) =>
-        destination.TryWrite(provider, $"{nameof(b0)}: {b0}, {nameof(b1)}: {b1}, {nameof(b2)}: {b2}", out charsWritten);
 
     public static UInt24 operator %(UInt24 left, UInt24 right) => (int)left % (int)right;
     public static UInt24 operator +(UInt24 value) => value;
     public override string ToString() => $"{(uint)this}";
     
-    public static UInt24 Parse(string s, IFormatProvider? provider) => Parse((ReadOnlySpan<char>)s, provider);
-
-    public static UInt24 Parse(ReadOnlySpan<char> s, IFormatProvider? provider) {
-        uint value = uint.Parse(s, provider);
+    public static UInt24 Parse(string s, IFormatProvider? provider) {
+        uint value = uint.Parse(s, NumberStyles.Any, provider);
         if (value < MinValue || value > MaxValue) {
             throw new OverflowException($"Value {value} is less than {MinValue} or greater than {MaxValue}.");
         }
         
         return new UInt24(value);
     }
-    
+
+    public static UInt24 Parse(ReadOnlySpan<char> s, IFormatProvider? provider) {
+        uint value = uint.Parse(new string(s.ToArray()), NumberStyles.Any, provider);
+        if (value < MinValue || value > MaxValue) {
+            throw new OverflowException($"Value {value} is less than {MinValue} or greater than {MaxValue}.");
+        }
+        
+        return new UInt24(value);
+    }
+
+    #if NET5_0_OR_GREATER
     public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out UInt24 result) {
         try {
             result = Parse(s ?? throw new ArgumentNullException(nameof(s)), provider);
@@ -103,8 +129,20 @@ public readonly struct UInt24 :
             return false;
         }
     }
-    
-    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out UInt24 result) => TryParse(new string(s), provider, out result);
+    #else
+    public static bool TryParse(string? s, IFormatProvider? provider, out UInt24 result) {
+        try {
+            result = Parse(s ?? throw new ArgumentNullException(nameof(s)), provider);
+            return true;
+        }
+        catch (Exception) {
+            result = default;
+            return false;
+        }
+    }
+    #endif
+
+    public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out UInt24 result) => TryParse(new string(s.ToArray()), provider, out result);
     public static UInt24 operator +(UInt24 left, UInt24 right) => (uint)left + (uint)right;
     public static UInt24 AdditiveIdentity => 0;
     public static UInt24 operator &(UInt24 left, UInt24 right) => ((left.b2 & right.b2) << 16) | ((left.b1 & right.b1) << 8) | (left.b0 & right.b0);
@@ -148,7 +186,7 @@ public readonly struct UInt24 :
     public static UInt24 MinMagnitudeNumber(UInt24 x, UInt24 y) => Math.Min(x, y);
     
     public static UInt24 Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider) {
-        uint value = uint.Parse(s, style, provider);
+        uint value = uint.Parse(new string(s.ToArray()), style, provider);
         if (value < MinValue || value > MaxValue) {
             throw new OverflowException($"Value {value} is less than {MinValue} or greater than {MaxValue}.");
         }
@@ -156,8 +194,16 @@ public readonly struct UInt24 :
         return new UInt24(value);
     }
     
-    public static UInt24 Parse(string s, NumberStyles style, IFormatProvider? provider) => Parse((ReadOnlySpan<char>)s, style, provider);
+    public static UInt24 Parse(string s, NumberStyles style, IFormatProvider? provider) {
+        uint value = uint.Parse(s, style, provider);
+        if (value < MinValue || value > MaxValue) {
+            throw new OverflowException($"Value {value} is less than {MinValue} or greater than {MaxValue}.");
+        }
+        
+        return new UInt24(value);
+    }
 
+    #if NET5_0_OR_GREATER && !NET5_0
     public static bool TryConvertFromChecked<TOther>(TOther value, out UInt24 result) where TOther : INumberBase<TOther> {
         
         // stolen from System.UInt32
@@ -451,74 +497,65 @@ public readonly struct UInt24 :
     
     public static bool TryConvertToTruncating<TOther>(UInt24 value, [MaybeNullWhen(false)] out TOther result) where TOther : INumberBase<TOther> {
         // stolen from System.UInt32
-        // In order to reduce overall code duplication and improve the inlinabilty of these
-            // methods for the corelib types we have `ConvertFrom` handle the same sign and
-            // `ConvertTo` handle the opposite sign. However, since there is an uneven split
-            // between signed and unsigned types, the one that handles unsigned will also
-            // handle `Decimal`.
-            //
-            // That is, `ConvertFrom` for `uint` will handle the other unsigned types and
-            // `ConvertTo` will handle the signed types
-
-            if (typeof(TOther) == typeof(double))
-            {
-                double actualResult = (int)value;
-                result = (TOther)(object)actualResult;
-                return true;
-            }
-            else if (typeof(TOther) == typeof(Half))
-            {
-                Half actualResult = (Half)(uint)value;
-                result = (TOther)(object)actualResult;
-                return true;
-            }
-            else if (typeof(TOther) == typeof(short))
-            {
-                short actualResult = (short)value;
-                result = (TOther)(object)actualResult;
-                return true;
-            }
-            else if (typeof(TOther) == typeof(int))
-            {
-                int actualResult = (int)value;
-                result = (TOther)(object)actualResult;
-                return true;
-            }
-            else if (typeof(TOther) == typeof(long))
-            {
-                long actualResult = value;
-                result = (TOther)(object)actualResult;
-                return true;
-            }
-            else if (typeof(TOther) == typeof(Int128))
-            {
-                Int128 actualResult = value;
-                result = (TOther)(object)actualResult;
-                return true;
-            }
-            else if (typeof(TOther) == typeof(nint))
-            {
-                nint actualResult = (nint)value;
-                result = (TOther)(object)actualResult;
-                return true;
-            }
-            else if (typeof(TOther) == typeof(sbyte))
-            {
-                sbyte actualResult = (sbyte)value;
-                result = (TOther)(object)actualResult;
-                return true;
-            }
-            else if (typeof(TOther) == typeof(float))
-            {
-                float actualResult = (int)value;
-                result = (TOther)(object)actualResult;
-                return true;
-            }
-            else
-            {
-                result = default;
-                return false;
-            }
+        if (typeof(TOther) == typeof(double))
+        {
+            double actualResult = (int)value;
+            result = (TOther)(object)actualResult;
+            return true;
+        }
+        else if (typeof(TOther) == typeof(Half))
+        {
+            Half actualResult = (Half)(uint)value;
+            result = (TOther)(object)actualResult;
+            return true;
+        }
+        else if (typeof(TOther) == typeof(short))
+        {
+            short actualResult = (short)value;
+            result = (TOther)(object)actualResult;
+            return true;
+        }
+        else if (typeof(TOther) == typeof(int))
+        {
+            int actualResult = (int)value;
+            result = (TOther)(object)actualResult;
+            return true;
+        }
+        else if (typeof(TOther) == typeof(long))
+        {
+            long actualResult = value;
+            result = (TOther)(object)actualResult;
+            return true;
+        }
+        else if (typeof(TOther) == typeof(Int128))
+        {
+            Int128 actualResult = value;
+            result = (TOther)(object)actualResult;
+            return true;
+        }
+        else if (typeof(TOther) == typeof(nint))
+        {
+            nint actualResult = (nint)value;
+            result = (TOther)(object)actualResult;
+            return true;
+        }
+        else if (typeof(TOther) == typeof(sbyte))
+        {
+            sbyte actualResult = (sbyte)value;
+            result = (TOther)(object)actualResult;
+            return true;
+        }
+        else if (typeof(TOther) == typeof(float))
+        {
+            float actualResult = (int)value;
+            result = (TOther)(object)actualResult;
+            return true;
+        }
+        else
+        {
+            result = default;
+            return false;
+        }
     }
     
     public static bool TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, out UInt24 result) {
@@ -546,43 +583,161 @@ public readonly struct UInt24 :
     public static UInt24 One => 1;
     public static int Radix => 2;
     public static UInt24 Zero => 0;
-    public static bool IsPow2(UInt24 value) {
-        throw new NotImplementedException();
-    }
-    public static UInt24 Log2(UInt24 value) {
-        throw new NotImplementedException();
-    }
-    public static UInt24 operator <<(UInt24 value, int shiftAmount) {
-        throw new NotImplementedException();
-    }
-    public static UInt24 operator >> (UInt24 value, int shiftAmount) {
-        throw new NotImplementedException();
-    }
-    public static UInt24 operator >>> (UInt24 value, int shiftAmount) {
-        throw new NotImplementedException();
-    }
-    public int GetByteCount() {
-        throw new NotImplementedException();
-    }
-    public int GetShortestBitLength() {
-        throw new NotImplementedException();
-    }
-    public static UInt24 PopCount(UInt24 value) {
-        throw new NotImplementedException();
-    }
-    public static UInt24 TrailingZeroCount(UInt24 value) {
-        throw new NotImplementedException();
-    }
+    public static bool IsPow2(UInt24 value) => uint.IsPow2(value);
+    public static UInt24 Log2(UInt24 value) => uint.Log2(value);
+    public static UInt24 operator <<(UInt24 value, int shiftAmount) => new((uint)value << shiftAmount);
+    public static UInt24 operator >> (UInt24 value, int shiftAmount) => new((uint)value >> shiftAmount);
+    public static UInt24 operator >>> (UInt24 value, int shiftAmount) => new((uint)value >> shiftAmount);
+    public int GetByteCount() => 3;
+    public int GetShortestBitLength() => (GetByteCount() * 8) - BitOperations.LeadingZeroCount(this);
+    public static UInt24 PopCount(UInt24 value) => (uint)BitOperations.PopCount(value);
+    public static UInt24 TrailingZeroCount(UInt24 value) => (uint)BitOperations.TrailingZeroCount(value);
     public static bool TryReadBigEndian(ReadOnlySpan<byte> source, bool isUnsigned, out UInt24 value) {
-        throw new NotImplementedException();
+        
+        // stolen from System.UInt32
+        uint result = default;
+
+        if (source.Length != 0)
+        {
+            if (!isUnsigned && sbyte.IsNegative((sbyte)source[0]))
+            {
+                // When we are signed and the sign bit is set, we are negative and therefore
+                // definitely out of range
+
+                value = result;
+                return false;
+            }
+
+            if ((source.Length > sizeof(uint)) && (source[..^sizeof(uint)].ContainsAnyExcept((byte)0x00)))
+            {
+                // When we have any non-zero leading data, we are a large positive and therefore
+                // definitely out of range
+
+                value = result;
+                return false;
+            }
+
+            ref byte sourceRef = ref MemoryMarshal.GetReference(source);
+
+            if (source.Length >= sizeof(uint))
+            {
+                sourceRef = ref Unsafe.Add(ref sourceRef, source.Length - sizeof(uint));
+
+                // We have at least 4 bytes, so just read the ones we need directly
+                result = Unsafe.ReadUnaligned<uint>(ref sourceRef);
+
+                if (BitConverter.IsLittleEndian)
+                {
+                    result = BinaryPrimitives.ReverseEndianness(result);
+                }
+            }
+            else
+            {
+                // We have between 1 and 3 bytes, so construct the relevant value directly
+                // since the data is in Big Endian format, we can just read the bytes and
+                // shift left by 8-bits for each subsequent part
+
+                for (int i = 0; i < source.Length; i++)
+                {
+                    result <<= 8;
+                    result |= Unsafe.Add(ref sourceRef, i);
+                }
+            }
+        }
+
+        value = result;
+        return true;
     }
     public static bool TryReadLittleEndian(ReadOnlySpan<byte> source, bool isUnsigned, out UInt24 value) {
-        throw new NotImplementedException();
+        
+        // stolen from System.UInt32
+        uint result = default;
+
+        if (source.Length != 0)
+        {
+            if (!isUnsigned && sbyte.IsNegative((sbyte)source[^1]))
+            {
+                // When we are signed and the sign bit is set, we are negative and therefore
+                // definitely out of range
+
+                value = result;
+                return false;
+            }
+
+            if ((source.Length > sizeof(uint)) && (source[sizeof(uint)..].ContainsAnyExcept((byte)0x00)))
+            {
+                // When we have any non-zero leading data, we are a large positive and therefore
+                // definitely out of range
+
+                value = result;
+                return false;
+            }
+
+            ref byte sourceRef = ref MemoryMarshal.GetReference(source);
+
+            if (source.Length >= sizeof(uint))
+            {
+                // We have at least 4 bytes, so just read the ones we need directly
+                result = Unsafe.ReadUnaligned<uint>(ref sourceRef);
+
+                if (!BitConverter.IsLittleEndian)
+                {
+                    result = BinaryPrimitives.ReverseEndianness(result);
+                }
+            }
+            else
+            {
+                // We have between 1 and 3 bytes, so construct the relevant value directly
+                // since the data is in Little Endian format, we can just read the bytes and
+                // shift left by 8-bits for each subsequent part, then reverse endianness to
+                // ensure the order is correct. This is more efficient than iterating in reverse
+                // due to current JIT limitations
+
+                for (int i = 0; i < source.Length; i++)
+                {
+                    uint part = Unsafe.Add(ref sourceRef, i);
+                    part <<= (i * 8);
+                    result |= part;
+                }
+            }
+        }
+
+        value = result;
+        return true;
     }
     public bool TryWriteBigEndian(Span<byte> destination, out int bytesWritten) {
-        throw new NotImplementedException();
+        
+        // stolen from System.UInt32
+        if (destination.Length >= sizeof(uint))
+        {
+            uint value = BitConverter.IsLittleEndian ? BinaryPrimitives.ReverseEndianness((uint)this) : this;
+            Unsafe.WriteUnaligned(ref MemoryMarshal.GetReference(destination), value);
+
+            bytesWritten = sizeof(uint);
+            return true;
+        }
+        else
+        {
+            bytesWritten = 0;
+            return false;
+        }
     }
     public bool TryWriteLittleEndian(Span<byte> destination, out int bytesWritten) {
-        throw new NotImplementedException();
+        
+        // stolen from System.UInt32
+        if (destination.Length >= sizeof(uint))
+        {
+            uint value = BitConverter.IsLittleEndian ? this : BinaryPrimitives.ReverseEndianness((uint)this);
+            Unsafe.WriteUnaligned(ref MemoryMarshal.GetReference(destination), value);
+
+            bytesWritten = sizeof(uint);
+            return true;
+        }
+        else
+        {
+            bytesWritten = 0;
+            return false;
+        }
     }
+    #endif
 }
