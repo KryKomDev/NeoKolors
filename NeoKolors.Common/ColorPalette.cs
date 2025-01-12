@@ -1,6 +1,6 @@
 ﻿//
 // NeoKolors
-// Copyright (c) 2024 KryKom
+// Copyright (c) 2025 KryKom
 //
 
 namespace NeoKolors.Common;
@@ -66,10 +66,10 @@ public class ColorPalette {
     /// </summary>
     public void PrintPalette() {
         foreach (int c in colors) {
-            System.Console.Write("● ".AddColor(c));
+            Console.Write("● ".AddColor(c));
         }
         
-        System.Console.Write("\n");
+        Console.Write("\n");
     }
 
     /// <summary>
@@ -81,7 +81,7 @@ public class ColorPalette {
             print(c);
         }
         
-        System.Console.Write("\n");
+        Console.Write("\n");
     }
 
     /// <summary>
@@ -94,22 +94,10 @@ public class ColorPalette {
 
         Random rnd = new Random(seed);
 
-#if NETSTANDARD2_0
         var a = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
         var b = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
         var c = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
         var d = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
-#elif NET5_0
-        var a = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
-        var b = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
-        var c = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
-        var d = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
-#else
-        var a = (rnd.NextSingle(), rnd.NextSingle(), rnd.NextSingle());
-        var b = (rnd.NextSingle(), rnd.NextSingle(), rnd.NextSingle());
-        var c = (rnd.NextSingle(), rnd.NextSingle(), rnd.NextSingle());
-        var d = (rnd.NextSingle(), rnd.NextSingle(), rnd.NextSingle());
-#endif
         
         for (int i = 0; i < colorCount; i++) {
             System.Drawing.Color color = GenerateColorAtX(a, b, c, d, (float)i / colorCount);
@@ -124,15 +112,15 @@ public class ColorPalette {
     /// where A, B, C and D are 3d vectors representing a color (all their values should be between 1 and 0)
     /// </summary>
     public static System.Drawing.Color GenerateColorAtX(
-        (double R, double G, double B) A, 
-        (double R, double G, double B) B,
-        (double R, double G, double B) C, 
-        (double R, double G, double B) D, double x) 
+        (double R, double G, double B) a, 
+        (double R, double G, double B) b,
+        (double R, double G, double B) c, 
+        (double R, double G, double B) d, double x) 
     {
         System.Drawing.Color result = System.Drawing.Color.FromArgb(
-            (byte)((A.R + B.R * Math.Cos(2 * Math.PI * (C.R * x + D.R))) * 255),
-            (byte)((A.G + B.G * Math.Cos(2 * Math.PI * (C.G * x + D.G))) * 255),
-            (byte)((A.B + B.B * Math.Cos(2 * Math.PI * (C.B * x + D.B))) * 255));
+            (byte)((a.R + b.R * Math.Cos(2 * Math.PI * (c.R * x + d.R))) * 255),
+            (byte)((a.G + b.G * Math.Cos(2 * Math.PI * (c.G * x + d.G))) * 255),
+            (byte)((a.B + b.B * Math.Cos(2 * Math.PI * (c.B * x + d.B))) * 255));
         
         return result;
     }

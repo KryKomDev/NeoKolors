@@ -1,20 +1,26 @@
-﻿using System.Buffers.Binary;
-using System.Diagnostics.CodeAnalysis;
+﻿//
+// NeoKolors
+// Copyright (c) 2025 KryKom
+//
+
 using System.Globalization;
+
+#if NET5_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+
+#if !NET5_0
+using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Numerics;
+#endif
+#endif
 
 namespace NeoKolors.Common;
 
-using System.Numerics;
-    
-
 #if NET5_0_OR_GREATER && !NET5_0
 
-public readonly struct UInt24 :
-    IComparable, 
-    IComparable<UInt24>,
-    IEquatable<UInt24>,
+public readonly struct UInt24 : 
     IMinMaxValue<UInt24>,
     IBinaryInteger<UInt24>
 #else 
@@ -371,59 +377,65 @@ public readonly struct UInt24 :
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(Half))
+
+        if (typeof(TOther) == typeof(Half))
         {
             Half actualResult = (Half)(uint)value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(short))
+
+        if (typeof(TOther) == typeof(short))
         {
             short actualResult = checked((short)value);
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(int))
+
+        if (typeof(TOther) == typeof(int))
         {
-            int actualResult = checked((int)value);
+            int actualResult = value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(long))
+
+        if (typeof(TOther) == typeof(long))
         {
             long actualResult = value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(Int128))
+
+        if (typeof(TOther) == typeof(Int128))
         {
             Int128 actualResult = value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(nint))
+
+        if (typeof(TOther) == typeof(nint))
         {
-            nint actualResult = checked((nint)value);
+            nint actualResult = value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(sbyte))
+
+        if (typeof(TOther) == typeof(sbyte))
         {
             sbyte actualResult = checked((sbyte)value);
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(float))
+
+        if (typeof(TOther) == typeof(float))
         {
             float actualResult = (int)value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else
-        {
-            result = default;
-            return false;
-        }
+
+        result = default;
+        return false;
     }
     
     public static bool TryConvertToSaturating<TOther>(UInt24 value, [MaybeNullWhen(false)] out TOther result) where TOther : INumberBase<TOther> {
@@ -434,65 +446,71 @@ public readonly struct UInt24 :
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(Half))
+
+        if (typeof(TOther) == typeof(Half))
         {
             Half actualResult = (Half)(uint)value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(short))
+
+        if (typeof(TOther) == typeof(short))
         {
             short actualResult = (value >= (uint)short.MaxValue) ? short.MaxValue : (short)value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(int))
+
+        if (typeof(TOther) == typeof(int))
         {
-            int actualResult = (value >= int.MaxValue) ? int.MaxValue : (int)value;
+            int actualResult = (value >= int.MaxValue) ? int.MaxValue : value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(long))
+
+        if (typeof(TOther) == typeof(long))
         {
             long actualResult = value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(Int128))
+
+        if (typeof(TOther) == typeof(Int128))
         {
             Int128 actualResult = value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(nint))
+
+        if (typeof(TOther) == typeof(nint))
         {
 #if TARGET_32BIT
                 nint actualResult = (value >= int.MaxValue) ? int.MaxValue : (nint)value;
                 result = (TOther)(object)actualResult;
                 return true;
 #else
-            nint actualResult = (nint)value;
+            nint actualResult = value;
             result = (TOther)(object)actualResult;
             return true;
 #endif
         }
-        else if (typeof(TOther) == typeof(sbyte))
+
+        if (typeof(TOther) == typeof(sbyte))
         {
             sbyte actualResult = (value >= (uint)sbyte.MaxValue) ? sbyte.MaxValue : (sbyte)value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(float))
+
+        if (typeof(TOther) == typeof(float))
         {
             float actualResult = (int)value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else
-        {
-            result = default;
-            return false;
-        }
+
+        result = default;
+        return false;
     }
     
     public static bool TryConvertToTruncating<TOther>(UInt24 value, [MaybeNullWhen(false)] out TOther result) where TOther : INumberBase<TOther> {
@@ -503,59 +521,65 @@ public readonly struct UInt24 :
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(Half))
+
+        if (typeof(TOther) == typeof(Half))
         {
             Half actualResult = (Half)(uint)value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(short))
+
+        if (typeof(TOther) == typeof(short))
         {
             short actualResult = (short)value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(int))
+
+        if (typeof(TOther) == typeof(int))
         {
-            int actualResult = (int)value;
+            int actualResult = value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(long))
+
+        if (typeof(TOther) == typeof(long))
         {
             long actualResult = value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(Int128))
+
+        if (typeof(TOther) == typeof(Int128))
         {
             Int128 actualResult = value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(nint))
+
+        if (typeof(TOther) == typeof(nint))
         {
-            nint actualResult = (nint)value;
+            nint actualResult = value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(sbyte))
+
+        if (typeof(TOther) == typeof(sbyte))
         {
             sbyte actualResult = (sbyte)value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else if (typeof(TOther) == typeof(float))
+
+        if (typeof(TOther) == typeof(float))
         {
             float actualResult = (int)value;
             result = (TOther)(object)actualResult;
             return true;
         }
-        else
-        {
-            result = default;
-            return false;
-        }
+
+        result = default;
+        return false;
     }
     
     public static bool TryParse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider, out UInt24 result) {
@@ -595,7 +619,7 @@ public readonly struct UInt24 :
     public static bool TryReadBigEndian(ReadOnlySpan<byte> source, bool isUnsigned, out UInt24 value) {
         
         // stolen from System.UInt32
-        uint result = default;
+        uint result = 0;
 
         if (source.Length != 0)
         {
@@ -651,7 +675,7 @@ public readonly struct UInt24 :
     public static bool TryReadLittleEndian(ReadOnlySpan<byte> source, bool isUnsigned, out UInt24 value) {
         
         // stolen from System.UInt32
-        uint result = default;
+        uint result = 0;
 
         if (source.Length != 0)
         {

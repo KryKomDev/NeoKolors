@@ -1,6 +1,6 @@
 //
 // NeoKolors
-// Copyright (c) 2024 KryKom
+// Copyright (c) 2025 KryKom
 //
 
 using System.Text.RegularExpressions;
