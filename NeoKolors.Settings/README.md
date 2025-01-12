@@ -44,14 +44,16 @@ As of now NeoKolors.Settings contains 8 argument types all stored in [ArgumentTy
 directory.
 
 The types contain:
-* `bool`
-* `double`
-* `float`
-* `int`
-* `uint`
-* `long`
-* `ulong`
-* `string`
+* `bool` → [BoolArgument](ArgumentTypes/BoolArgument.cs)
+* `double` → [DoubleArgument](ArgumentTypes/DoubleArgument.cs)
+* `float` → [FloatArgument](ArgumentTypes/FloatArgument.cs)
+* `int` → [IntegerArgument](ArgumentTypes/IntegerArgument.cs)
+* `uint` → [UIntegerArgument](ArgumentTypes/IntegerArgument.cs)
+* `long` → [LongArgument](ArgumentTypes/LongArgument.cs)
+* `ulong` → [ULongArgument](ArgumentTypes/LongArgument.cs)
+* `string` → [StringArgument](ArgumentTypes/StringArgument.cs)
+* single selection from enum types → [SingleSelectEnumArgument](ArgumentTypes/SingleSelectEnumArgument.cs)
+* single selection from string array → [SingleSelectArgument](ArgumentTypes/SingleSelectArgument.cs)
 
 All the basic arguments can be created using factory methods from [Arguments.cs](Arguments.cs)
 

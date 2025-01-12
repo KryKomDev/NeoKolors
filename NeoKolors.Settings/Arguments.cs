@@ -91,4 +91,7 @@ public static class Arguments {
             max,
             defaultValue,
             customValidate);
+    
+    public static SingleSelectArgument SingleSelect(int defaultIndex = 0, params string[] options) => new(options, defaultIndex); 
+    public static SingleSelectEnumArgument<T> SingleSelect<T>(T defaultValue) where T : Enum => new(defaultValue);
 }
