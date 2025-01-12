@@ -1,6 +1,6 @@
 //
 // NeoKolors
-// Copyright (c) 2024 KryKom
+// Copyright (c) 2025 KryKom
 //
 
 using NeoKolors.Settings.Exceptions;
@@ -33,6 +33,9 @@ public class BoolArgument : IArgument<bool> {
             }
             
             Value = v;
+        }
+        else if (value is BoolArgument b) {
+            Value = b.Value;
         }
         else {
             throw new InvalidArgumentInputTypeException(typeof(Boolean), value.GetType());

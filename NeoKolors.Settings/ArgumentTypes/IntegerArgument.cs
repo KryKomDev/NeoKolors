@@ -1,6 +1,6 @@
 //
 // NeoKolors
-// Copyright (c) 2024 KryKom
+// Copyright (c) 2025 KryKom
 //
 
 using NeoKolors.Settings.Exceptions;
@@ -48,11 +48,18 @@ public class IntegerArgument : IArgument<Int32> {
             Validate(v);
             Value = v;
         }
+        else if (value is IntegerArgument d) {
+            Set(d.Value);
+        }
         else {
             throw new InvalidArgumentInputTypeException(typeof(Int32), value.GetType());
         }
     }
-    
+
+    public void Set(int value) {
+        Validate(value);
+        Value = value;
+    }
     public int Get() => Value;
     object IArgument.Get() => Get();
     public void Reset() => Value = DefaultValue;
@@ -187,11 +194,18 @@ public class UIntegerArgument : IArgument<UInt32> {
             Validate(v);
             Value = v;
         }
+        else if (value is UIntegerArgument d) {
+            Set(d.Value);
+        }
         else {
             throw new InvalidArgumentInputTypeException(typeof(UInt32), value.GetType());
         }
     }
 
+    public void Set(uint value) {
+        Validate(value);
+        Value = value;
+    }
     public uint Get() => Value;
     object IArgument.Get() => Get();
     public void Reset() => Value = DefaultValue;

@@ -1,6 +1,6 @@
 //
 // NeoKolors
-// Copyright (c) 2024 KryKom
+// Copyright (c) 2025 KryKom
 //
 
 using System.Text.RegularExpressions;
@@ -57,6 +57,9 @@ public partial class StringArgument : IArgument<string> {
             Validate(s);
             Value = s;
         }
+        else if (value is StringArgument a) {
+            Set(a.Value);
+        } 
         else {
             string? str = value.ToString();
             if (str is null) throw new InvalidArgumentInputException("ToString method of input value returned null.");
@@ -65,6 +68,10 @@ public partial class StringArgument : IArgument<string> {
         }
     }
 
+    public void Set(string value) {
+        Validate(value);
+        Value = value;
+    }
     public string Get() => Value;
     object IArgument.Get() => Get();
     public void Reset() => Value = DefaultValue;

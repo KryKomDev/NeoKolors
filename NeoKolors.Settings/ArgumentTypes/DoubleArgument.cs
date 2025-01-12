@@ -1,6 +1,6 @@
 //
 // NeoKolors
-// Copyright (c) 2024 KryKom
+// Copyright (c) 2025 KryKom
 //
 
 using NeoKolors.Settings.Exceptions;
@@ -43,12 +43,18 @@ public class DoubleArgument : IArgument<Double> {
             Validate(v);
             Value = v;
         }
+        else if (value is DoubleArgument d) {
+            Set(d.Value);
+        }
         else {
             throw new InvalidArgumentInputTypeException(typeof(Double), value.GetType());
         }
     }
 
-    public void Set(double value) => Value = value;
+    public void Set(double value) {
+        Validate(value);
+        Value = value;
+    }
     public double Get() => Value;
     object IArgument.Get() => Get();
     public void Reset() => Value = DefaultValue;

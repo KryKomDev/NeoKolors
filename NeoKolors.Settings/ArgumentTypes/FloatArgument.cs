@@ -1,6 +1,6 @@
 //
 // NeoKolors
-// Copyright (c) 2024 KryKom
+// Copyright (c) 2025 KryKom
 //
 
 using NeoKolors.Settings.Exceptions;
@@ -43,12 +43,18 @@ public class FloatArgument : IArgument<Single> {
             Validate(v);
             Value = v;
         }
+        else if (value is FloatArgument d) {
+            Set(d.Value);
+        }
         else {
             throw new InvalidArgumentInputTypeException(typeof(Single), value.GetType());
         }
     }
 
-
+    public void Set(float value) {
+        Validate(value);
+        Value = value;
+    }
     public float Get() => Value;
     object IArgument.Get() => Get();
     public void Reset() => Value = DefaultValue;

@@ -1,6 +1,6 @@
 //
 // NeoKolors
-// Copyright (c) 2024 KryKom
+// Copyright (c) 2025 KryKom
 //
 
 using NeoKolors.Settings.Exceptions;
@@ -48,11 +48,18 @@ public class LongArgument : IArgument<Int64> {
             Validate(v);
             Value = v;
         }
+        else if (value is LongArgument d) {
+            Set(d.Value);
+        }
         else {
             throw new InvalidArgumentInputTypeException(typeof(Int64), value.GetType());
         }
     }
-    
+
+    public void Set(long value) {
+        Validate(value);
+        Value = value;
+    }
     public long Get() => Value;
     object IArgument.Get() => Get();
     public void Reset() => Value = DefaultValue;
@@ -187,11 +194,18 @@ public class ULongArgument : IArgument<UInt64> {
             Validate(v);
             Value = v;
         }
+        else if (value is ULongArgument d) {
+            Set(d.Value);
+        }
         else {
             throw new InvalidArgumentInputTypeException(typeof(UInt64), value.GetType());
         }
     }
-    
+
+    public void Set(ulong value) {
+        Validate(value);
+        Value = value;
+    }
     public ulong Get() => Value;
     object IArgument.Get() => Get();
     public void Reset() => Value = DefaultValue;
