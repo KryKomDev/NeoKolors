@@ -30,6 +30,13 @@ public class SettingsNode<TResult> : ISettingsNode<TResult> where TResult : clas
         Groups = new List<SettingsGroup>();
         Context = new Context();
     }
+    
+    private SettingsNode(string name, Context context, List<SettingsGroup> groups, Func<Context, TResult>? resultConstructor) {
+        Name = name;
+        Context = (Context)context.Clone();
+        Groups = groups.Select(g => (SettingsGroup)g.Clone()).ToList();
+        ResultConstructor = resultConstructor;
+    }
 
     /// <summary>
     /// creates a new instance of <see cref="SettingsNode{TResut}"/>
@@ -83,7 +90,7 @@ public class SettingsNode<TResult> : ISettingsNode<TResult> where TResult : clas
     /// returns a clone of the node
     /// </summary>
     public object Clone() {
-        throw new NotImplementedException();
+        return new SettingsNode<TResult>(Name, Context, Groups, ResultConstructor);
     }
     
     /// <seealso cref="Argument"/>

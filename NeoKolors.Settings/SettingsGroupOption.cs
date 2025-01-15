@@ -8,7 +8,7 @@ using NeoKolors.Settings.Exceptions;
 
 namespace NeoKolors.Settings;
 
-public class SettingsGroupOption {
+public class SettingsGroupOption : ICloneable {
     public string Name { get; }
     public Context Context { get; }
     public Action<Context, Context>? CustomParseContext { get; private set; }
@@ -34,6 +34,14 @@ public class SettingsGroupOption {
         Name = name;
         Context = new Context();
     }
+
+    private SettingsGroupOption(string name, Context context, Action<Context, Context>? customParseContext, bool autoParseContext) {
+        Name = name;
+        Context = (Context)context.Clone();
+        CustomParseContext = customParseContext;
+        AutoParseContext = autoParseContext;
+    }
+        
 
     /// <summary>
     /// creates a new settings group option
@@ -84,4 +92,6 @@ public class SettingsGroupOption {
             CustomParseContext(Context, groupContext);
         }
     }
+
+    public object Clone() => new SettingsGroupOption(Name, Context, CustomParseContext, AutoParseContext);
 }

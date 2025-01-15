@@ -8,7 +8,7 @@ using NeoKolors.Settings.Exceptions;
 
 namespace NeoKolors.Settings;
 
-public class SettingsGroup {
+public class SettingsGroup : ICloneable {
     public string Name { get; }
     public Context GroupContext { get; }
     private readonly List<SettingsGroupOption> options;
@@ -40,6 +40,22 @@ public class SettingsGroup {
             foreach (var o in Options) if (o.Name == name) return o;
             throw SettingsGroupException.InvalidOptionName(name);
         }
+    }
+    
+    
+    private SettingsGroup(string name,
+        Context groupContext,
+        List<SettingsGroupOption> options,
+        OptionSwitch optionSwitch,
+        Action<Context, Context>? customParseContext, 
+        bool autoParseContext) 
+    {
+        Name = name;
+        GroupContext = (Context)groupContext.Clone();
+        this.options = options.Select(o => (SettingsGroupOption)o.Clone()).ToList();
+        OptionSwitch = optionSwitch;
+        CustomParseContext = customParseContext;
+        AutoParseContext = autoParseContext;
     }
     
     
@@ -149,4 +165,8 @@ public class SettingsGroup {
     /// selects an input option using the name of the option
     /// </summary>
     public void Select(string name) => OptionSwitch = OptionSwitch.Select(name);
+
+    public object Clone() {
+        return new SettingsGroup(Name, GroupContext, Options, OptionSwitch, CustomParseContext, AutoParseContext);
+    }
 }
