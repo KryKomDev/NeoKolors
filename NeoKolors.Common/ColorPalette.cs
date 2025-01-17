@@ -14,6 +14,7 @@ public class ColorPalette {
     /// returns the stored color palette as a set of integers, where the bytes mean AARRGGBB
     /// </summary>
     public int[] Colors => colors;
+    public int Length => colors.Length;
 
     /// <summary>
     /// returns the stored color palette
@@ -70,6 +71,26 @@ public class ColorPalette {
         }
         
         Console.Write("\n");
+        
+        // foreach (int c in colors) {
+        //     Console.Write($"{(byte)(c >> 16):X2} ".AddColor((byte)(c >> 16) << 16));
+        // }
+        //
+        // Console.Write("\n");
+        //
+        // foreach (int c in colors) {
+        //     Console.Write($"{(byte)(c >> 8):X2} ".AddColor((byte)(c >> 8) << 8));
+        //
+        // }
+        //
+        // Console.Write("\n");
+        //
+        // foreach (int c in colors) {
+        //     Console.Write($"{(byte)(c >> 0):X2} ".AddColor((byte)(c >> 0) << 0));
+        //
+        // }
+        //
+        // Console.Write("\n");
     }
 
     /// <summary>
@@ -99,8 +120,13 @@ public class ColorPalette {
         var c = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
         var d = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
         
+        // Console.WriteLine($"{a.Item1}, {a.Item2}, {a.Item3}");
+        // Console.WriteLine($"{b.Item1}, {b.Item2}, {b.Item3}");
+        // Console.WriteLine($"{c.Item1}, {c.Item2}, {c.Item3}");
+        // Console.WriteLine($"{d.Item1}, {d.Item2}, {d.Item3}");
+        
         for (int i = 0; i < colorCount; i++) {
-            System.Drawing.Color color = GenerateColorAtX(a, b, c, d, (float)i / colorCount);
+            System.Drawing.Color color = GenerateColorAtX(a, b, c, d, (float)i / colorCount * 3);
             palette.colors[i] = color.R << 16 | color.G << 8 | color.B;
         }
         
@@ -112,16 +138,21 @@ public class ColorPalette {
     /// where A, B, C and D are 3d vectors representing a color (all their values should be between 1 and 0)
     /// </summary>
     public static System.Drawing.Color GenerateColorAtX(
-        (double R, double G, double B) a, 
+        (double R, double G, double B) a,
         (double R, double G, double B) b,
-        (double R, double G, double B) c, 
+        (double R, double G, double B) c,
         (double R, double G, double B) d, double x) 
     {
-        System.Drawing.Color result = System.Drawing.Color.FromArgb(
-            (byte)((a.R + b.R * Math.Cos(2 * Math.PI * (c.R * x + d.R))) * 255),
-            (byte)((a.G + b.G * Math.Cos(2 * Math.PI * (c.G * x + d.G))) * 255),
-            (byte)((a.B + b.B * Math.Cos(2 * Math.PI * (c.B * x + d.B))) * 255));
+        double re = Math.Cos(2 * Math.PI * (c.R * x + d.R)) / 2 + 0.5;
+        double gr = Math.Cos(2 * Math.PI * (c.G * x + d.G)) / 2 + 0.5;
+        double bl = Math.Cos(2 * Math.PI * (c.B * x + d.B)) / 2 + 0.5;
         
-        return result;
+        
+        return System.Drawing.Color.FromArgb(
+            Normalize(a.R + b.R * re),
+            Normalize(a.G + b.G * gr),
+            Normalize(a.B + b.B * bl));
     }
+
+    private static byte Normalize(double d) => (byte)((d / 3 + 1f/3f) * 255);
 }

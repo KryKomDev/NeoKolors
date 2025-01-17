@@ -1,4 +1,6 @@
-﻿namespace NeoKolors.Common;
+﻿using NeoKolors.Common.Exceptions;
+
+namespace NeoKolors.Common;
 
 public class Color : ICloneable {
     public bool IsPaletteSafe { get; }
@@ -19,6 +21,28 @@ public class Color : ICloneable {
     
     public static implicit operator Color(ConsoleColor color) => new(color);
     public static implicit operator Color(int color) => new(color);
+    public static implicit operator Color(UInt24 color) => new(color);
+
+    public static implicit operator ConsoleColor(Color color) {
+        if (color.IsPaletteSafe) return color.ConsoleColor!.Value;
+        throw InvalidColorCastException.CustomToConsoleColor();
+    }
+    
+    public static implicit operator int(Color color) {
+        if (!color.IsPaletteSafe) return color.CustomColor!.Value;
+        throw InvalidColorCastException.ConsoleColorToCustom();
+    }
+    
+    public static implicit operator UInt24(Color color) {
+        if (!color.IsPaletteSafe) return color.CustomColor!.Value;
+        throw InvalidColorCastException.ConsoleColorToCustom();
+    }
+    
+    public static implicit operator System.Drawing.Color(Color color) {
+        if (!color.IsPaletteSafe) return System.Drawing.Color.FromArgb(color.CustomColor!.Value);
+        throw InvalidColorCastException.ConsoleColorToCustom();
+    }
+    
     public object Clone() => MemberwiseClone();
 
     public string ControlChar =>
