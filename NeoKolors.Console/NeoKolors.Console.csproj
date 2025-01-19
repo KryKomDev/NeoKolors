@@ -3,16 +3,17 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>0.25.3</Version>
+        <Version>0.25.3.1</Version>
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
         <LangVersion>preview</LangVersion>
         <TargetFrameworks>net5.0;net8.0;net9.0;netstandard2.0</TargetFrameworks>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
-        <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
+        <PackageLicense>LICENSE</PackageLicense>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>Console.png</PackageIcon>
     </PropertyGroup>
     
     <ItemGroup>
@@ -21,6 +22,8 @@
 
     <ItemGroup>
         <None Include="README.md" Pack="true" PackagePath="\"/>
+        <None Include="../LICENSE" Pack="true" PackagePath="\"/>
+        <None Include="Console.png" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
     <ItemGroup>
