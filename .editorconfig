@@ -1,6 +1,6 @@
-[root = true]
 [*]
-charset = utf-8-bom
+
+charset = utf-8
 end_of_line = crlf
 trim_trailing_whitespace = false
 insert_final_newline = false
@@ -11,7 +11,6 @@ indent_size = 4
 csharp_new_line_before_members_in_object_initializers = false
 csharp_new_line_before_open_brace = none
 csharp_preferred_modifier_order = public, private, protected, internal, file, new, static, abstract, virtual, sealed, readonly, override, extern, unsafe, volatile, async, required:suggestion
-csharp_style_prefer_utf8_string_literals = true:suggestion
 csharp_style_var_elsewhere = true:suggestion
 csharp_style_var_when_type_is_apparent = true:suggestion
 dotnet_naming_rule.constants_rule.import_to_resharper = True
@@ -128,7 +127,7 @@ dotnet_style_require_accessibility_modifiers = for_non_interface_members:suggest
 # ReSharper properties
 resharper_autodetect_indent_settings = true
 resharper_csharp_empty_block_style = together
-resharper_csharp_max_line_length = 160
+resharper_csharp_max_line_length = 120
 resharper_csharp_wrap_lines = false
 resharper_formatter_off_tag = @formatter:off
 resharper_formatter_on_tag = @formatter:on

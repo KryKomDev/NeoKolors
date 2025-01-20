@@ -16,7 +16,7 @@ public static class StringEffects {
     /// <param name="hex">the hexadecimal representation of the color</param>
     /// <returns>string with colored characters</returns>
     public static string AddColor(this string text, int hex) {
-        text = AddTextStyles(text);
+        text = ApplyStyles(text);
         return $"{hex.ControlChar()}{text}{CUSTOM_CONTROL_END}";
     }
 
@@ -27,7 +27,7 @@ public static class StringEffects {
     /// <param name="hex">the hexadecimal representation of the color</param>
     /// <returns>string with colored characters</returns>
     public static string AddColorB(this string text, int hex) {
-        text = AddTextStyles(text);
+        text = ApplyStyles(text);
         return $"{hex.ControlCharB()}{text}{CUSTOM_CONTROL_BACKGROUND_END}";
     }
 
@@ -40,7 +40,7 @@ public static class StringEffects {
     /// <param name="blue">blue value of the color</param>
     /// <returns>string with colored characters</returns>
     public static string AddColor(this string text, byte red, byte green, byte blue) {
-        text = AddTextStyles(text);
+        text = ApplyStyles(text);
         return $"\e[38;2;{red};{green};{blue}m{text}{CUSTOM_CONTROL_END}";
     }
     
@@ -53,7 +53,7 @@ public static class StringEffects {
     /// <param name="blue">blue value of the color</param>
     /// <returns>string with colored characters</returns>
     public static string AddColorB(this string text, byte red, byte green, byte blue) {
-        text = AddTextStyles(text);
+        text = ApplyStyles(text);
         return $"\e[48;2;{red};{green};{blue}m{text}{CUSTOM_CONTROL_BACKGROUND_END}";
     }
 
@@ -62,7 +62,7 @@ public static class StringEffects {
     /// </summary>
     /// <param name="text">input text with tags</param>
     /// <returns>text that when printed to console has styles</returns>
-    public static string AddTextStyles(this string text) {
+    public static string ApplyStyles(this string text) {
         text = text.Replace("<b>", "\x1b[1m");
         text = text.Replace("</b>", "\e[22m");
         text = text.Replace("<i>", "\e[3m");
@@ -79,11 +79,45 @@ public static class StringEffects {
     }
 
     /// <summary>
+    /// adds text styles to the input string
+    /// </summary>
+    /// <param name="text">input string</param>
+    /// <param name="styles">styles applied to the text</param>
+    /// <returns>string with the styles applied</returns>
+    /// <exception cref="ArgumentOutOfRangeException">an invalid style was inputted</exception>
+    public static string AddStyles(this string text, params TextStyle[] styles) {
+        foreach (var s in styles) {
+            text = text.AddStyle(s);
+        }
+        
+        return text;
+    }
+
+    /// <summary>
+    /// adds a single text style to the input string
+    /// </summary>
+    /// <param name="text">input string</param>
+    /// <param name="style">style applied to the text</param>
+    /// <returns>string with the style applied</returns>
+    /// <exception cref="ArgumentOutOfRangeException">an invalid style was inputted</exception>
+    public static string AddStyle(this string text, TextStyle style) {
+        return style switch {
+            TextStyle.BOLD => $"\x1b[1m{text}\x1b[22m",
+            TextStyle.ITALIC => $"\x1b[3m{text}\x1b[23m",
+            TextStyle.UNDERLINE => $"\x1b[4m{text}\x1b[24m",
+            TextStyle.FAINT => $"\x1b[2m{text}\x1b[22m",
+            TextStyle.NEGATIVE => $"\x1b[7m{text}\x1b[27m",
+            TextStyle.STRIKETHROUGH => $"\x1b[9m{text}\x1b[29m",
+            _ => throw new ArgumentOutOfRangeException(nameof(style), style, null)
+        };
+    }
+    
+    /// <summary>
     /// adds a color of the terminal palette to the text
     /// </summary>
     /// <returns>text with colors</returns>
     public static string AddColor(this string text, ConsoleColor color) {
-        text = AddTextStyles(text);
+        text = ApplyStyles(text);
         return $"{color.ControlChar()}{text}{PALETTE_CONTROL_END}";
     }
     
@@ -92,7 +126,7 @@ public static class StringEffects {
     /// </summary>
     /// <returns>text with colored background</returns>
     public static string AddColorB(this string text, ConsoleColor color) {
-        text = AddTextStyles(text);
+        text = ApplyStyles(text);
         return $"{color.ControlCharB()}{text}{PALETTE_CONTROL_BACKGROUND_END}";
     }
 
@@ -101,7 +135,7 @@ public static class StringEffects {
     /// </summary>
     /// <returns>colored text</returns>
     public static string AddColor(this string text, Color color) {
-        text = AddTextStyles(text);
+        text = ApplyStyles(text);
         return $"{color.ControlChar}{text}{color.ControlCharEnd}";
     }
     
@@ -110,7 +144,7 @@ public static class StringEffects {
     /// </summary>
     /// <returns>text with colored background</returns>
     public static string AddColorB(this string text, Color color) {
-        text = AddTextStyles(text);
+        text = ApplyStyles(text);
         return $"{color.ControlCharB}{text}{color.ControlCharEndB}";
     }
 
@@ -178,7 +212,7 @@ public static class StringEffects {
     /// adds color to both the text and the background
     /// </summary>
     public static string AddColor(this string s, Color text, Color background) {
-        s = AddTextStyles(s);
+        s = ApplyStyles(s);
         s = AddColor(s, text);
         s = AddColorB(s, background);
         return s;
@@ -214,4 +248,16 @@ public static class StringEffects {
     /// switches colors of background and text
     /// </summary>
     public const string SWITCH_COLORS = "\e[38;1;7m";
+    
+    /// <summary>
+    /// style types
+    /// </summary>
+    public enum TextStyle {
+        BOLD = 1,
+        ITALIC = 3,
+        UNDERLINE = 4,
+        FAINT = 2,
+        NEGATIVE = 7,
+        STRIKETHROUGH = 9
+    }
 }

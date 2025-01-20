@@ -14,27 +14,59 @@ Example:
 string test = "Lorem ipsum dolor sit amet...";
 ConsoleColors.PrintlnColored(test, 0xff0000);
 ```
-
 This code will print red text.
 
 ## Debug
-Contains 5 functions for sending colored debug messages to console.
+Contains 5 functions for sending colored debug messages to console and a function for 
+printing fancy exception messages to console.
 
-### Methods:
+### Debug message methods:
 * Fatal - fatal error. Program should end after calling this.
 * Error - non-fatal error. 
 * Warn - warning. Something wrong can happen.
 * Info - info. Something happened.
-* Msg - for debugging.
+* Msg - for debugging. Does not work when debug build mode is off.
+
+### Exception methods:
+* Throw - for throwing exceptions with fancy styles.
+* PrintException - for printing exceptions with fancy styles.
+
+Example of throwing a fancy exception:
+```csharp
+try 
+{
+    int i = 1 / 0; // this would throw a DivideByZeroException
+}
+catch (Exception e) 
+{
+    Debug.Throw(e);
+}
+```
+
+Example of catching a fancy exception:
+```csharp
+try 
+{
+    // some code that throws a fancy exception (for example DivideByZeroException)
+}
+catch (FancyException<DivideByZeroException> e) 
+{
+    // some things to do when the exception is caught
+}
+```
+
+> [!NOTE] A lot of things in this class can be customized. For example, you can change the colors
+> of the debug messages or the exception messages. Go to [Debug.Settings](Debug.Settings.cs) for more information.
 
 ## ConsoleProgressBar
-Prints an interactive progress bar to the console, that updates as the task is being completed.
+Prints an interactive progress bar to the console, that updates as a task is being completed.
 
 ### Usage:
 ```csharp
 public static event EventHandler Event;
 
-public static void Main() {
+public static void Main() 
+{
     int start = 0;
     int end = 4000;
     
@@ -42,7 +74,8 @@ public static void Main() {
         
     Event += bar.OnProgressUpdate;
         
-    for (int i = start; i < end; i++) {
+    for (int i = start; i < end; i++) 
+    {
         var g = new ImageGenerator(400, 400, i);
         var bmp = g.GenerateImage();
         bmp.Save($@".\{SeedFormat.WordFromSeed(i)}.png", ImageFormat.Png);

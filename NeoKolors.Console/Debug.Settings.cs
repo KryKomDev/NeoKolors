@@ -129,4 +129,61 @@ public static partial class Debug {
         /// </summary>
         ALL = 3,
     }
+    
+    /// <summary>
+    /// whether to show the highlight when throwing a fancy exception
+    /// </summary>
+    public static bool ShowHighlight { get; set; } = true;
+    
+    /// <summary>
+    /// the highlight color of a fancy exception
+    /// </summary>
+    public static Color HighlightColor { get; set; } = new(ConsoleColor.DarkRed);
+    
+    /// <summary>
+    /// the color of the exception type shown when a fancy exception is thrown
+    /// </summary>
+    public static Color NameColor { get; set; } = new(ConsoleColor.Yellow);
+    
+    /// <summary>
+    /// the color of the exception message shown when a fancy exception is thrown
+    /// </summary>
+    public static Color MessageColor { get; set; } = new(ConsoleColor.Red);
+    
+    /// <summary>
+    /// the color of the filename printed as a part of the stack trace shown when a fancy exception is thrown
+    /// </summary>
+    public static Color FileNameColor { get; set; } = new(ConsoleColor.Blue);
+    
+    /// <summary>
+    /// the color of the path to a source file printed as a part of the stack trace shown when a fancy exception is
+    /// thrown
+    /// </summary>
+    public static Color PathColor { get; set; } = new(ConsoleColor.Gray);
+    
+    /// <summary>
+    /// whether the path to a source file printed as a part of the stack trace shown when a fancy exception is thrown
+    /// should be faint
+    /// </summary>
+    public static bool FaintPath { get; set; } = false;
+    
+    /// <summary>
+    /// the color of the method name printed as a part of the stack trace shown when a fancy exception is thrown
+    /// </summary>
+    public static Color MethodColor { get; set; } = new(ConsoleColor.Blue);
+    
+    /// <summary>
+    /// the color of the namespace printed as a part of the stack trace shown when a fancy exception is thrown
+    /// </summary>
+    public static Color NamespaceColor { get; set; } = new(ConsoleColor.Gray);
+    
+    /// <summary>
+    /// whether the namespace printed as a part of the stack trace shown when
+    /// </summary>
+    public static bool FaintNamespace { get; set; } = false;
+    
+    /// <summary>
+    /// the color of the line number printed as a part of the stack trace shown when a fancy exception is thrown
+    /// </summary>
+    public static Color LineNumberColor { get; set; } = new(ConsoleColor.Green);
 }

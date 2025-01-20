@@ -17,7 +17,7 @@ public static class ConsoleColors {
     /// <param name="hex">hexadecimal value of the color</param>
     /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
     public static void PrintColored(string s, int hex, bool continuousColoring = true) {
-        s = s.AddTextStyles();
+        s = s.ApplyStyles();
         if (continuousColoring) s = s.Replace("\e[0m", $"\e[38;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m");
         Write($"\e[38;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{s}\e[0m");
     }
@@ -32,7 +32,7 @@ public static class ConsoleColors {
     /// if a color is -1 the colors will be reset
     /// </param>
     public static void PrintComplexColored(string s, params (string symbol, int hex)[] colors) {
-        s = s.AddTextStyles();
+        s = s.ApplyStyles();
         foreach (var c in colors) {
             
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
@@ -54,7 +54,7 @@ public static class ConsoleColors {
     /// <param name="hex">hexadecimal value of the color</param>
     /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
     public static void PrintlnColored(string s, int hex, bool continuousColoring = true) {
-        s = s.AddTextStyles();
+        s = s.ApplyStyles();
         if (continuousColoring) s = s.Replace("\e[0m", $"\e[38;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m");
         Write($"\e[38;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{s}\e[0m\n");
     }
@@ -69,7 +69,7 @@ public static class ConsoleColors {
     /// if a color is -1 the colors will be reset
     /// </param>
     public static void PrintlnComplexColored(string s, params (string symbol, int hex)[] colors) {
-        s = s.AddTextStyles();
+        s = s.ApplyStyles();
         foreach (var c in colors) {
             
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
@@ -93,7 +93,7 @@ public static class ConsoleColors {
     /// <param name="b">blue value of the color</param>
     /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
     public static void PrintColored(string s, byte r, byte g, byte b, bool continuousColoring = true) {
-        s = s.AddTextStyles();
+        s = s.ApplyStyles();
         if (continuousColoring) s = s.Replace("\e[0m", $"\e[38;2;{r};{g};{b}m");
         Write($"\e[38;2;{r};{g};{b}m{s}\e[0m");
     }
@@ -107,7 +107,7 @@ public static class ConsoleColors {
     /// <param name="b">blue value of the color</param>
     /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
     public static void PrintlnColored(string s, byte r, byte g, byte b, bool continuousColoring = true) {
-        s = s.AddTextStyles();
+        s = s.ApplyStyles();
         if (continuousColoring) s = s.Replace("\e[0m", $"\e[38;2;{r};{g};{b}m");
         Write($"\e[38;2;{r};{g};{b}m{s}\e[0m\n");
     }
@@ -119,7 +119,7 @@ public static class ConsoleColors {
     /// <param name="hex">hexadecimal value of the color</param>
     /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
     public static void PrintColoredB(string s, int hex, bool continuousColoring = true) {
-        s = s.AddTextStyles();
+        s = s.ApplyStyles();
         if (continuousColoring) s = s.Replace("\e[0m", $"\e[48;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m");
         Write($"\e[48;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{s}\e[0m");
     }
@@ -131,7 +131,7 @@ public static class ConsoleColors {
     /// <param name="hex">hexadecimal value of the color</param>
     /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
     public static void PrintlnColoredB(string s, int hex, bool continuousColoring = true) {
-        s = s.AddTextStyles();
+        s = s.ApplyStyles();
         if (continuousColoring) s = s.Replace("\e[0m", $"\e[48;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m");
         Write($"\e[48;2;{(byte)(hex >> 16)};{(byte)(hex >> 8)};{(byte)hex}m{s}\e[0m\n");
     }
@@ -145,7 +145,7 @@ public static class ConsoleColors {
     /// <param name="b">blue value of the color</param>
     /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
     public static void PrintColoredB(string s, byte r, byte g, byte b, bool continuousColoring = true) {
-        s = s.AddTextStyles();
+        s = s.ApplyStyles();
         if (continuousColoring) s = s.Replace("\e[0m", $"\e[48;2;{r};{g};{b}m");
         Write($"\e[48;2;{r};{g};{b}m{s}\e[0m");
     }
@@ -159,7 +159,7 @@ public static class ConsoleColors {
     /// <param name="b">blue value of the color</param>
     /// <param name="continuousColoring">replaces <c>\e[0m</c> characters with the <c>hex</c> color</param>
     public static void PrintlnColoredB(string s, byte r, byte g, byte b, bool continuousColoring = true) {
-        s = s.AddTextStyles();
+        s = s.ApplyStyles();
         if (continuousColoring) s = s.Replace("\e[0m", $"\e[48;2;{r};{g};{b}m");
         Write($"\e[48;2;{r};{g};{b}m{s}\e[0m\n");
     }
@@ -170,7 +170,7 @@ public static class ConsoleColors {
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     public static void PrintColored(string s, ConsoleColor c) {
-        s = s.AddTextStyles();
+        s = s.ApplyStyles();
         ForegroundColor = c;
         Write(s);
         ForegroundColor = ConsoleColor.Gray;
@@ -182,7 +182,7 @@ public static class ConsoleColors {
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     public static void PrintlnColored(string s, ConsoleColor c) {
-        s = s.AddTextStyles();
+        s = s.ApplyStyles();
         ForegroundColor = c;
         WriteLine(s);
         ForegroundColor = ConsoleColor.Gray;
@@ -194,7 +194,7 @@ public static class ConsoleColors {
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     public static void PrintColoredB(string s, ConsoleColor c) {
-        s = s.AddTextStyles();
+        s = s.ApplyStyles();
         BackgroundColor = c;
         Write(s);
         BackgroundColor = ConsoleColor.Black;
@@ -206,7 +206,7 @@ public static class ConsoleColors {
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     public static void PrintlnColoredB(string s, ConsoleColor c) {
-        s = s.AddTextStyles();
+        s = s.ApplyStyles();
         BackgroundColor = c;
         WriteLine(s);
         BackgroundColor = ConsoleColor.Black;
@@ -219,7 +219,7 @@ public static class ConsoleColors {
     /// <param name="text">text color</param>
     /// <param name="background">background color</param>
     public static void PrintColored(string s, ConsoleColor text, ConsoleColor background) {
-        s = s.AddTextStyles();
+        s = s.ApplyStyles();
         BackgroundColor = background;
         ForegroundColor = text;
         Write(s);
@@ -234,7 +234,7 @@ public static class ConsoleColors {
     /// <param name="text">text color</param>
     /// <param name="background">background color</param>
     public static void PrintlnColored(string s, ConsoleColor text, ConsoleColor background) {
-        s = s.AddTextStyles();
+        s = s.ApplyStyles();
         BackgroundColor = background;
         ForegroundColor = text;
         WriteLine(s);
@@ -299,7 +299,7 @@ public static class ConsoleColors {
     }
 
     public static void PrintColored(string s, int text, int background) {
-        s = s.AddTextStyles();
+        s = s.ApplyStyles();
         Write($"\e[38;2;{(byte)(text >> 16)};{(byte)(text >> 8)};{(byte)text}m\e[48;2;{(byte)(background >> 16)};{(byte)(background >> 8)};{(byte)background}m{s}\e[0m");
     }
     
