@@ -31,6 +31,11 @@ public static partial class Debug {
     }
     
     /// <summary>
+    /// prints red fatal error text using the ToString method of the object o and <see cref="Fatal(string,bool)"/>
+    /// </summary>
+    public static void Fatal(object o, bool hideTime = false) => Fatal(o.ToString(), hideTime);
+
+    /// <summary>
     /// prints red error text
     /// </summary>
     /// <param name="s">desired string message</param>
@@ -49,6 +54,11 @@ public static partial class Debug {
             ConsoleColors.PrintColored($" : {s}\n", ERROR_COLOR);
         }
     }
+    
+    /// <summary>
+    /// prints red error text using the ToString method of the object o and <see cref="Error(string,bool)"/>
+    /// </summary>
+    public static void Error(object o, bool hideTime = false) => Error(o.ToString(), hideTime);
 
     /// <summary>
     /// prints yellow warning text
@@ -69,6 +79,11 @@ public static partial class Debug {
                     ? $"[ WARN ] : {s}\n"
                     : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] [ WARN ] : {s}\n", WARN_COLOR);
     }
+    
+    /// <summary>
+    /// prints yellow warning text using the ToString method of the object o and <see cref="Warn(string,bool)"/>
+    /// </summary>
+    public static void Warn(object o, bool hideTime = false) => Warn(o.ToString(), hideTime);
     
     /// <summary>
     /// prints green info text
@@ -94,6 +109,11 @@ public static partial class Debug {
     }
     
     /// <summary>
+    /// prints green info text using the ToString method of the object o and <see cref="Info(string,bool)"/>
+    /// </summary>
+    public static void Info(object o, bool hideTime = false) => Info(o.ToString(), hideTime);
+    
+    /// <summary>
     /// prints a debug message, does not work when built in release mode
     /// </summary>
     /// <param name="s">desired string message</param>
@@ -116,4 +136,9 @@ public static partial class Debug {
         }
         #endif
     }
+    
+    /// <summary>
+    /// prints debug text using the ToString method of the object o and <see cref="Msg(string,bool)"/>
+    /// </summary>
+    public static void Msg(object o, bool hideTime = false) => Msg(o.ToString(), hideTime);
 }

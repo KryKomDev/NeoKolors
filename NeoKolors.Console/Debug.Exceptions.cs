@@ -1,0 +1,132 @@
+﻿//
+// NeoKolors
+// Copyright (c) 2025 KryKom
+//
+
+using System.Text.RegularExpressions;
+using NeoKolors.Common;
+
+namespace NeoKolors.Console;
+
+/// <summary>
+/// custom exception throwing
+/// </summary>
+public static partial class Debug {
+    
+    /// <summary>
+    /// throws an exception
+    /// </summary>
+    public static void PrintException(Exception e) {
+        string output = $"\e[0m{e.GetType().Namespace!.AddColor(NamespaceColor)}." +
+                        $"{e.GetType().Name.AddColor(NameColor)}: " +
+                        $"{("<b>" + e.Message.AddColor(MessageColor) + "</b>").ApplyStyles()}\n";
+        
+        output += SplitStackTrace(e.StackTrace ?? "");
+        
+        PrintException(output);
+    }
+    
+    /// <summary>
+    /// throws an exception with fancy formatting
+    /// </summary>
+    /// <param name="e">exception to be thrown</param>
+    /// <remarks>
+    /// note that this method will not throw the exception itself but rather an instance of
+    /// <see cref="FancyException{TInner}"/>
+    /// with the exception as the inner exception
+    /// </remarks>
+    public static void Throw(Exception e) {
+        throw (Exception)FancyException<Exception>.Create(e);
+    }
+    
+    /// <summary>
+    /// stringifies an exception to a fancy one
+    /// </summary>
+    /// <param name="e">exception that will be thrown</param>
+    internal static string ToString(Exception e) {
+        string stringified = $"\e[0m{e.GetType().Namespace!.AddColor(NamespaceColor)}." +
+                             $"{e.GetType().Name.AddColor(NameColor)}: " +
+                             $"{("<b>" + e.Message.AddColor(MessageColor) + "</b>").ApplyStyles()}\n";
+        
+        stringified += SplitStackTrace(e.StackTrace ?? "");
+
+        if (!ShowHighlight) return $"{new string('\b', 21)}" + stringified + "\e[0m";
+        
+        string[] lines = stringified.Split('\n');
+        string highlighted = $"{new string('\b', 21)}";
+        
+        foreach (var l in lines) {
+            highlighted += "▍ ".AddColor(HighlightColor) + l + "\n";
+        }
+
+        return highlighted + "\e[0m";
+    }
+    
+    private static void PrintException(string output) {
+        string[] lines = output.Split('\n');
+        
+        foreach (var l in lines) {
+            ConsoleColors.PrintColored("▍ ", HighlightColor);
+            System.Console.WriteLine(l);
+        }
+    }
+
+    private static string SplitStackTrace(string stackTrace) {
+        string[] stack = stackTrace.Split('\n');
+        string output = "";
+        
+        foreach (var s in stack) {
+            var m = Regex.Match(s, @"(?<=\.)[^.]*?(?=\()");
+            
+            string before = s.Substring(0, m.Index);
+            before = before.Substring(0, 5).AddColor(ConsoleColor.DarkGray) +
+                     before.Substring(5).AddColor(NamespaceColor)
+                         .AddStyles(FaintNamespace ? [StringEffects.TextStyle.FAINT] : []);
+            
+            string middle = m.Value.AddColor(MethodColor).AddStyle(StringEffects.TextStyle.BOLD);
+
+            string end = s.Substring(m.Index + m.Length) + "\n";
+            int separate = end.IndexOf(") in", StringComparison.InvariantCulture);
+            
+            string end1 = end.Substring(0, separate + 4);
+            string end2 = end.Substring(separate + 4);
+
+            end1 = end1.Replace(") in", $") {"in".AddColor(ConsoleColor.DarkGray)}\n     ");
+            end2 = end2.Trim();
+            end2 = ColorFileName(end2);
+            
+            output += before + middle + end1 + " " + end2 + "\n";
+        }
+        
+        return output.Trim();
+    }
+    
+    private static string ColorFileName(string line) {
+        string s = line.Replace(".cs:line", ".cs]:line");
+        int endIndex = 0;
+        int startIndex = 0;
+
+        for (int i = 0; i < s.Length; i++) {
+            if (s[i] == ']') {
+                endIndex = i;
+                break;
+            }
+        }
+
+        for (int i = endIndex - 1; i >= 0; i--) {
+            if (s[i] == '\\') {
+                startIndex = i;
+                break;
+            }
+        }
+
+        string s1 = s.Substring(0, startIndex + 1).AddColor(PathColor)
+            .AddStyles(FaintPath ? [StringEffects.TextStyle.FAINT] : []);
+        string s2 = s.Substring(startIndex + 1, endIndex - startIndex - 1).AddColor(FileNameColor)
+            .AddStyle(StringEffects.TextStyle.BOLD);
+        string s3 = " at line <b>".AddColor(ConsoleColor.DarkGray) +
+                    s.Substring(endIndex + 7).AddColor(LineNumberColor) + "</b>";
+
+        return s1 + s2 + s3.ApplyStyles();
+    }
+}
