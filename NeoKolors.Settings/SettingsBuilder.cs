@@ -69,5 +69,7 @@ public class SettingsBuilder<TResult> : ISettingsBuilder<TResult> where TResult 
     public void Select(string nodeName) => Switch = Switch.Select(nodeName);
     public void Select(int nodeIndex) => Switch = Switch.Select(nodeIndex);
     public override string ToString() =>
-        $$"""{"name": "{{Name}}", "switch": {{Switch}}, "nodes": [{{string.Join(", ", Nodes.ToString())}}]""";
+        $"{{\"name\": \"{Name}\", " +
+        $"\"switch\": {Switch}, " +
+        $"\"nodes\": [{string.Join(", ", Nodes.Select(n => n.ToString()))}]}}";
 }

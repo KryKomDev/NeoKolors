@@ -124,7 +124,9 @@ public class SettingsNode<TResult> : ISettingsNode<TResult> where TResult : clas
     /// <seealso cref="GetResult"/>
     object ISettingsNode.GetResult() => GetResult();
 
-    public override string ToString() { 
-        return $"{{\"name\": \"{Name}\", \"context\": {Context}, \"groups\": [{Groups}], \"result-constructor\": {ResultConstructor}}}";
-    }
+    public override string ToString() => 
+        $"{{\"name\": \"{Name}\", " +
+        $"\"context\": {Context}, " +
+        $"\"groups\": [{string.Join(", ", Groups.Select(g => g.ToString()))}], " +
+        $"\"result-constructor\": {ResultConstructor}}}";
 }
