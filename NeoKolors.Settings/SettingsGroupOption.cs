@@ -94,4 +94,9 @@ public class SettingsGroupOption : ICloneable {
     }
 
     public object Clone() => new SettingsGroupOption(Name, Context, CustomParseContext, AutoParseContext);
+    
+    public override string ToString() => 
+        $"{{\"name\": \"{Name}\", " +
+        $"\"context\": {Context}," +
+        $"\"auto-merge\": {AutoParseContext}}}";
 }

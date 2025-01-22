@@ -18,7 +18,7 @@ public sealed class FancyException<TInner> : Exception, IFancyException<TInner> 
     /// </summary>
     internal static IFancyException<Exception> Create(Exception e) {
         var type = typeof(FancyException<>).MakeGenericType(e.GetType());
-        return (IFancyException<Exception>)Activator.CreateInstance(type, e);
+        return (IFancyException<Exception>)Activator.CreateInstance(type, e)!;
     }
     
     public static implicit operator TInner(FancyException<TInner> e) => e.InnerException;

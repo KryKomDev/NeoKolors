@@ -1,20 +1,11 @@
 ﻿//
 // NeoKolors
-// Copyright (c) 2024 KryKom
+// Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Common;
+using NeoKolors.Common.Exceptions;
 using NeoKolors.Console;
-using NeoKolors.ConsoleGraphics;
-using NeoKolors.ConsoleGraphics.Elements.Interactive;
-using NeoKolors.ConsoleGraphics.Style;
-using NeoKolors.ConsoleGraphics;
-using NeoKolors.ConsoleGraphics.Elements;
-using NeoKolors.ConsoleGraphics.Elements.Interactive;
-using NeoKolors.ConsoleGraphics.Elements.InteractiveOld;
-using NeoKolors.ConsoleGraphics.Style;
-using NeoKolors.Settings;
-using NeoKolors.Settings.ArgumentTypes;
+using Color = NeoKolors.Common.Color;
 
 namespace NeoKolors.Test;
 
@@ -28,7 +19,40 @@ public class Kolors {
         // Debug.Info("info");
         // Debug.Msg("debug");
 
+        // System.Console.Clear();
+
+        // for (int i = 0; i < 100; i++) {
+        //     var p = ColorPalette.GeneratePalette(i, 10);
+        //     p.PrintPalette();
+        // }
+
+        var c = new Color(0xff0000);
+        
         System.Console.Clear();
+
+        try {
+            try {
+                var a = (ConsoleColor)c;
+                var z = 0;
+                int i = 1 / z;
+            }
+            catch (Exception e) {
+                throw e;
+                Debug.Throw(e);
+            }
+        }
+        catch (FancyException<InvalidColorCastException> e) {
+            Debug.Info("caught fancy");
+            throw;
+        }
+        catch (FancyException<DivideByZeroException> e) {
+            Debug.Info("caught divide by zero");
+            throw;
+        }
+
+        // -532,462,766
+        
+        /*
 
         Rectangle r = new Rectangle(2, 2, 80, 31);
         BorderProperty.BorderData borderData = new BorderProperty.BorderData(new Color(ConsoleColor.Green), BorderProperty.BorderStyle.NORMAL);
@@ -59,7 +83,7 @@ public class Kolors {
 
         var str = ("<b>Lorem</b> <i>ipsum</i> <u>dolor</u> <s>sit</s> <f>amet</f>, <n>consectetur</n> adipisici elit, " +
                    "sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud " +
-                   "exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat.").AddTextStyles();
+                   "exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat.").AddStyles();
 
         var t1 = new Text(str, ["sd"], s);
         var t2 = new Text(str, ["sd"], s);
@@ -88,36 +112,22 @@ public class Kolors {
         d.Draw(r);
 
         System.Console.SetCursorPosition(System.Console.WindowWidth - 1, System.Console.WindowHeight - 1);
-        // System.Console.WriteLine(r.Width);
-
-        // for (int y = 0; y < System.Console.WindowHeight - 10; y++) {
-        //     ConsoleColors.PrintlnColored(new string(' ', System.Console.WindowWidth - 80), ConsoleColor.DarkBlue, ConsoleColor.Red);
-        // }
-
-        // System.Console.SetCursorPosition(10, 10);
-        // System.Console.Write("asdsaddsasad");
 
         Context c = new();
         IArgument arg = new StringArgument(allowSpecial: false, minLength: 5, maxLength: 15);
         arg <<= "hello";
         c.Add("b", arg);
 
-        var b = new StringGraphicElement(12, 5, "Hello Int", (StringArgument)c["b"]);
-        // var b2 = new BoolGraphicElement(12, 6, "Bool Elem");
-        // b.Draw(12, 5);
-        // b2.Draw(12, 6);
-        // b.Selected = true;
+        var b = new StringInteractiveElement();
 
-        // ConsoleKeyInfo key;
-        //
-        // do {
-        //     System.Console.SetCursorPosition(0, System.Console.WindowHeight - 1);
-        //     key = System.Console.ReadKey();
-        //     b.Interact(key);
-        //     b.Draw(b.GridX, b.GridY);
-        // }
-        // while (key.Key != ConsoleKey.Escape);
-
-        System.Console.CursorVisible = true;
+        System.Console.CursorVisible = true;*/
     }
+}
+
+public enum Test {
+    T1,
+    T2,
+    T3,
+    T4,
+    T5,
 }

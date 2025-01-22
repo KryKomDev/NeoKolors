@@ -52,4 +52,10 @@ public class SingleSelectArgument : IArgument {
     public int GetIndex() => Index;
     public void Reset() => Index = DefaultIndex;
     public IArgument Clone() => (IArgument)MemberwiseClone();
+    public override string ToString() =>
+        $"{{\"type\": \"single-select\", " +
+        $"\"value\": \"{Options[Index]}\", " +
+        $"\"index\": {Index}, " +
+        $"\"default-index\": {DefaultIndex}, " +
+        $"\"options\": [{string.Join(", ", Options.Select(o => $"\"{o}\""))}]}}";
 }

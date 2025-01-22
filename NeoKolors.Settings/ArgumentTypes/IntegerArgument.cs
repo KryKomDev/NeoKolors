@@ -150,7 +150,7 @@ public class IntegerArgument : IArgument<Int32> {
         if (res != null) throw new InvalidArgumentInputException(res);
     }
     
-    public override string ToString() => $"{{\"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
+    public override string ToString() => $"{{\"type\": \"int\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
 }
 
 public class UIntegerArgument : IArgument<UInt32> {
@@ -296,5 +296,5 @@ public class UIntegerArgument : IArgument<UInt32> {
         if (res != null) throw new InvalidArgumentInputException(res);
     }
     
-    public override string ToString() => $"{{\"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
+    public override string ToString() => $"{{\"type\": \"uint\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
 }

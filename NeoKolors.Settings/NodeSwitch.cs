@@ -36,4 +36,7 @@ public struct NodeSwitch {
         Index = index;
         return this;
     }
+
+    public override string ToString() => $"{{\"index\": {Index}, \"names\": [{string.Join(", ", Names)}]}}";
+
 }

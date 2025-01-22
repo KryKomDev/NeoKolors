@@ -53,4 +53,6 @@ public struct OptionSwitch {
         Index = index;
         return this;
     }
+
+    public override string ToString() => $"{{\"index\": {Index}, \"names\": [{string.Join(", ", Names)}]}}";
 }

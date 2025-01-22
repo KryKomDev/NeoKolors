@@ -150,7 +150,7 @@ public class LongArgument : IArgument<Int64> {
         if (res != null) throw new InvalidArgumentInputException(res);
     }
     
-    public override string ToString() => $"{{\"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
+    public override string ToString() => $"{{\"type\": \"long\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
 }
 
 public class ULongArgument : IArgument<UInt64> {
@@ -296,5 +296,5 @@ public class ULongArgument : IArgument<UInt64> {
         if (res != null) throw new InvalidArgumentInputException(res);
     }
     
-    public override string ToString() => $"{{\"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
+    public override string ToString() => $"{{\"type\": \"ulong\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
 }

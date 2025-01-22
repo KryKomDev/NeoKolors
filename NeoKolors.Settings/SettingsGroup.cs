@@ -166,7 +166,12 @@ public class SettingsGroup : ICloneable {
     /// </summary>
     public void Select(string name) => OptionSwitch = OptionSwitch.Select(name);
 
-    public object Clone() {
-        return new SettingsGroup(Name, GroupContext, Options, OptionSwitch, CustomParseContext, AutoParseContext);
-    }
+    public object Clone() => new SettingsGroup(Name, GroupContext, Options, OptionSwitch, CustomParseContext, AutoParseContext);
+    
+    public override string ToString() =>
+        $"{{\"name\": \"{Name}\", " +
+        $"\"options\": [{string.Join(", ", Options.Select(o => o.ToString()))}], " +
+        $"\"context\": {GroupContext}, " +
+        $"\"auto-merge\": {AutoParseContext}, " +
+        $"\"option-switch\": {OptionSwitch}}}";
 }

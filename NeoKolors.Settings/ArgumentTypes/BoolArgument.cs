@@ -67,6 +67,6 @@ public class BoolArgument : IArgument<bool> {
     public static implicit operator BoolArgument(bool value) => new() { Value = value };
 
     public override string ToString() {
-        return $"{{\"value\": {Value}, \"default-value\": {DefaultValue}}}";
+        return $"{{\"type\": \"bool\", \"value\": {Value}, \"default-value\": {DefaultValue}}}";
     }
 }

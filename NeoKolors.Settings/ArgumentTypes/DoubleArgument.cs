@@ -145,5 +145,5 @@ public class DoubleArgument : IArgument<Double> {
         if (res != null) throw new InvalidArgumentInputException(res);
     }
 
-    public override string ToString() => $"{{\"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
+    public override string ToString() => $"{{\"type\": \"double\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
 }
