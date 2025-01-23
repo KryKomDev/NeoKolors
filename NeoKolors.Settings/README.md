@@ -52,10 +52,11 @@ The types contain:
 * `long` → [LongArgument](ArgumentTypes/LongArgument.cs)
 * `ulong` → [ULongArgument](ArgumentTypes/LongArgument.cs)
 * `string` → [StringArgument](ArgumentTypes/StringArgument.cs)
-* single selection from enum types → [SingleSelectEnumArgument](ArgumentTypes/SingleSelectEnumArgument.cs)
-* single selection from string array → [SingleSelectArgument](ArgumentTypes/SingleSelectArgument.cs)
+* single selection → [SingleSelectArgument](ArgumentTypes/SingleSelectArgument.cs)
+* multiple selection → [MultiSelectArgument](ArgumentTypes/MultiSelectArgument.cs)
+* path -> [PathArgument](ArgumentTypes/PathArgument.cs)
 
-All the basic arguments can be created using factory methods from [Arguments.cs](Arguments.cs)
+All these basic arguments can be created using factory methods from [Arguments.cs](Arguments.cs)
 
 ---
 

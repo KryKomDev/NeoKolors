@@ -3,7 +3,7 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>0.25.4.1</Version>
+        <Version>0.25.4.2</Version>
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
         <LangVersion>preview</LangVersion>
@@ -14,6 +14,7 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <Title>NeoKolors.Settings</Title>
         <PackageIcon>Settings.png</PackageIcon>
+        <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
     </PropertyGroup>
     
     <ItemGroup>
@@ -24,5 +25,9 @@
         <None Include="README.md" Pack="true" PackagePath="\"/>
         <None Include="Settings.png" Pack="true" PackagePath="\"/>
         <None Include="../LICENSE" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="NeoKolors.Console" Version="0.25.4" />
     </ItemGroup>
 </Project>

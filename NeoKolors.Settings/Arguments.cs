@@ -13,8 +13,27 @@ namespace NeoKolors.Settings;
 /// </summary>
 public static class Arguments {
     
+    /// <summary>
+    /// creates a new boolean argument
+    /// </summary>
     public static BoolArgument Bool() => new();
-    
+
+    /// <summary>
+    /// creates a new string argument
+    /// </summary>
+    /// <param name="minLength">minimal length of the string to be allowed as a valid input</param>
+    /// <param name="maxLength">maximal length of the string to be allowed as a valid input</param>
+    /// <param name="defaultValue">default value of the argument</param>
+    /// <param name="allowSpaces">whether spaces are allowed in the input string</param>
+    /// <param name="allowNewlines">whether newlines are allowed in the input string</param>
+    /// <param name="allowSpecial">
+    /// whether special characters (every character except a-z A-Z 0-9 space and \n) are allowed in the input string
+    /// </param>
+    /// <param name="allowNumbers">whether numbers are allowed in the input string</param>
+    /// <param name="allowUpper">whether upper characters are allowed in the input string</param>
+    /// <param name="allowLower">whether lower characters are allowed in the input string</param>
+    /// <param name="countVisibleOnly">whether to count only visible characters in the string to the total length</param>
+    /// <param name="customValidate">custom string validation function, if value is valid returns null else string with the cause</param>
     public static StringArgument String(uint minLength = 0,
         uint maxLength = UInt32.MaxValue,
         string defaultValue = "",
@@ -37,7 +56,14 @@ public static class Arguments {
             allowLower,
             countVisibleOnly,
             customValidate);
-    
+
+    /// <summary>
+    /// creates a new integer argument
+    /// </summary>
+    /// <param name="min">minimal allowed value</param>
+    /// <param name="max">maximal allowed value</param>
+    /// <param name="defaultValue">default value</param>
+    /// <param name="customValidate">custom validation function, if value is valid returns null else string with the cause</param>
     public static IntegerArgument Integer(int min = int.MinValue,
         int max = int.MaxValue,
         int defaultValue = 0,
@@ -47,6 +73,13 @@ public static class Arguments {
             defaultValue,
             customValidate);
     
+    /// <summary>
+    /// creates a new unsigned integer argument
+    /// </summary>
+    /// <param name="min">minimal allowed value</param>
+    /// <param name="max">maximal allowed value</param>
+    /// <param name="defaultValue">default value</param>
+    /// <param name="customValidate">custom validation function, if value is valid returns null else string with the cause</param>
     public static UIntegerArgument UInteger(uint min = uint.MinValue,
         uint max = uint.MaxValue,
         uint defaultValue = 0,
@@ -56,6 +89,13 @@ public static class Arguments {
             defaultValue, 
             customValidate);
     
+    /// <summary>
+    /// creates a new long argument
+    /// </summary>
+    /// <param name="min">minimal allowed value</param>
+    /// <param name="max">maximal allowed value</param>
+    /// <param name="defaultValue">default value</param>
+    /// <param name="customValidate">custom validation function, if value is valid returns null else string with the cause</param>
     public static LongArgument Long(long min = long.MinValue,
         long max = long.MaxValue,
         long defaultValue = 0,
@@ -65,6 +105,13 @@ public static class Arguments {
             defaultValue,
             customValidate);
 
+    /// <summary>
+    /// creates a new unsigned long argument
+    /// </summary>
+    /// <param name="min">minimal allowed value</param>
+    /// <param name="max">maximal allowed value</param>
+    /// <param name="defaultValue">default value</param>
+    /// <param name="customValidate">custom validation function, if value is valid returns null else string with the cause</param>
     public static ULongArgument ULong(ulong min = ulong.MinValue,
         ulong max = ulong.MaxValue,
         ulong defaultValue = 0,
@@ -74,6 +121,13 @@ public static class Arguments {
             defaultValue,
             customValidate);
     
+    /// <summary>
+    /// creates a new float argument
+    /// </summary>
+    /// <param name="min">minimal allowed value</param>
+    /// <param name="max">maximal allowed value</param>
+    /// <param name="defaultValue">default value</param>
+    /// <param name="customValidate">custom validation function, if value is valid returns null else string with the cause</param>
     public static FloatArgument Float(float min = float.MinValue,
         float max = float.MaxValue,
         float defaultValue = 0,
@@ -83,6 +137,13 @@ public static class Arguments {
             defaultValue,
             customValidate);
     
+    /// <summary>
+    /// creates a new double argument
+    /// </summary>
+    /// <param name="min">minimal allowed value</param>
+    /// <param name="max">maximal allowed value</param>
+    /// <param name="defaultValue">default value</param>
+    /// <param name="customValidate">custom validation function, if value is valid returns null else string with the cause</param>
     public static DoubleArgument Double(double min = double.MinValue,
         double max = double.MaxValue,
         double defaultValue = 0,
@@ -92,6 +153,58 @@ public static class Arguments {
             defaultValue,
             customValidate);
     
-    public static SingleSelectArgument SingleSelect(int defaultIndex = 0, params string[] options) => new(options, defaultIndex); 
-    public static SingleSelectEnumArgument<T> SingleSelect<T>(T defaultValue) where T : Enum => new(defaultValue);
+    /// <summary>
+    /// creates a new single selection (radio selection) argument
+    /// </summary>
+    /// <param name="defaultIndex">index of the default selected value</param>
+    /// <param name="options">selectable options</param>
+    public static SingleSelectArgument<T> SingleSelect<T>(int defaultIndex = 0, params T[] options) where T : notnull =>
+        new(options, defaultIndex); 
+    
+    /// <summary>
+    /// creates a new single selection (radio selection) argument
+    /// </summary>
+    /// <param name="options">selectable options</param>
+    /// <param name="defaultValue">value that will be selected by default</param>
+    public static SingleSelectArgument<T> SingleSelect<T>(T[] options, T defaultValue) where T : notnull =>
+        new(options, defaultValue);
+    
+    /// <summary>
+    /// creates a new single selection (radio selection) argument from all members of an enum
+    /// </summary>
+    /// <param name="defaultValue">value that will be selected by default</param>
+    /// <typeparam name="T">type of the enum</typeparam>
+    public static SingleSelectArgument<T> SingleSelectEnum<T>(T? defaultValue = default) where T : Enum =>
+        SingleSelectArgument<T>.FromEnum(defaultValue);
+
+    /// <summary>
+    /// creates a new multiple selection (checkbox selection) argument
+    /// </summary>
+    /// <param name="options">selectable options</param>
+    /// <param name="defaultValues">values that are selected by default</param>
+    public static MultiSelectArgument<T> MultiSelect<T>(T[] options, params T[] defaultValues) where T : notnull =>
+        new(options, defaultValues);
+    
+    /// <summary>
+    /// creates a new multiple selection (checkbox selection) argument from all members of an enum
+    /// </summary>
+    /// <param name="defaultValues">values that are selected by default</param>
+    public static MultiSelectArgument<T> MultiSelectEnum<T>(params T[] defaultValues) where T : Enum => 
+        MultiSelectArgument<T>.FromEnum(defaultValues);
+    
+    /// <summary>
+    /// creates a new path argument
+    /// </summary>
+    /// <param name="defaultValue">the default path</param>
+    /// <param name="mustExist">whether the supplied path must exist</param>
+    /// <param name="allowAny">whether the argument allows both file and directory paths</param>
+    /// <param name="pointsToFile">
+    /// if <see cref="allowAny"/> is true and this is true then the argument will allow only paths pointing to a file
+    /// </param>
+    public static PathArgument Path(
+        string defaultValue = ".", 
+        bool mustExist = true, 
+        bool allowAny = true,
+        bool pointsToFile = true) => 
+        new(defaultValue, mustExist, allowAny, pointsToFile);
 }
