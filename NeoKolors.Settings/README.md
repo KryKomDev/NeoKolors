@@ -56,7 +56,8 @@ The types contain:
 * multiple selection → [MultiSelectArgument](ArgumentTypes/MultiSelectArgument.cs)
 * path -> [PathArgument](ArgumentTypes/PathArgument.cs)
 
-All these basic arguments can be created using factory methods from [Arguments.cs](Arguments.cs)
+> [!NOTE]
+> All these basic arguments can be created using factory methods from [Arguments.cs](Arguments.cs)
 
 ---
 
