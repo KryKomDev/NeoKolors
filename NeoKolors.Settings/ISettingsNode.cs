@@ -3,7 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Settings.ArgumentTypes;
+using NeoKolors.Settings.Argument;
 
 namespace NeoKolors.Settings;
 

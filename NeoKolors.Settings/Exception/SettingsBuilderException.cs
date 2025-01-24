@@ -3,9 +3,9 @@
 // Copyright (c) 2025 KryKom
 //
 
-namespace NeoKolors.Settings.Exceptions;
+namespace NeoKolors.Settings.Exception;
 
-public class SettingsBuilderException : Exception {
+public class SettingsBuilderException : System.Exception {
     private SettingsBuilderException(string message) : base(message) { }
 
     public static SettingsBuilderException SwitchInvalidNodeName(string name) => new($"Could not switch to node of name '{name}', because it doesn't exist.");

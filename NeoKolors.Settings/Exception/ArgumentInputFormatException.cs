@@ -3,7 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
-namespace NeoKolors.Settings.Exceptions;
+namespace NeoKolors.Settings.Exception;
 
 public class ArgumentInputFormatException : FormatException {
     public ArgumentInputFormatException(Type targetType, string sourceValue, string message) 

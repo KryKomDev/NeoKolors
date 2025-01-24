@@ -17,6 +17,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="SkiaSharp" Version="3.116.1" />
         <PackageReference Include="Xunit" Version="2.9.3" />
 <!--        <PackageReference Include="NeoKolors.Common" Version="0.25.1.1" />-->

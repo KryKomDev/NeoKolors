@@ -55,7 +55,7 @@ catch (FancyException<DivideByZeroException> e)
 }
 ```
 
-> [!NOTE] 
+> [!TIP] 
 > A lot of things in this class can be customized. For example, you can change the colors
 > of the debug messages or the exception messages. Go to [Debug.Settings](Debug.Settings.cs) for more information.
 

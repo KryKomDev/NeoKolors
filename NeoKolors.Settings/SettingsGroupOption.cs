@@ -3,8 +3,8 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Settings.ArgumentTypes;
-using NeoKolors.Settings.Exceptions;
+using NeoKolors.Settings.Argument;
+using NeoKolors.Settings.Exception;
 
 namespace NeoKolors.Settings;
 

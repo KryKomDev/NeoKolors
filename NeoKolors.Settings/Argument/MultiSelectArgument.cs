@@ -3,10 +3,11 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Settings.Exceptions;
+using NeoKolors.Settings.Argument;
+using NeoKolors.Settings.Exception;
 using static NeoKolors.Console.Debug;
 
-namespace NeoKolors.Settings.ArgumentTypes;
+namespace NeoKolors.Settings.Argument;
 
 /// <summary>
 /// multiple choice argument

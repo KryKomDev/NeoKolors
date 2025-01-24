@@ -3,9 +3,9 @@
 // Copyright (c) 2025 KryKom
 //
 
-namespace NeoKolors.Settings.Exceptions;
+namespace NeoKolors.Settings.Exception;
 
-public class SettingsGroupOptionException : Exception {
+public class SettingsGroupOptionException : System.Exception {
     private SettingsGroupOptionException(string message) : base(message) {}
 
     public static SettingsGroupOptionException ParseContextNotSet(string optionName) => 

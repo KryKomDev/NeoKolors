@@ -40,23 +40,24 @@ section).
 ---
 
 ### Arguments
-As of now NeoKolors.Settings contains 8 argument types all stored in [ArgumentTypes](ArgumentTypes) 
+As of now NeoKolors.Settings contains 8 argument types all stored in [Argument](Argument) 
 directory.
 
 The types contain:
-* `bool` → [BoolArgument](ArgumentTypes/BoolArgument.cs)
-* `double` → [DoubleArgument](ArgumentTypes/DoubleArgument.cs)
-* `float` → [FloatArgument](ArgumentTypes/FloatArgument.cs)
-* `int` → [IntegerArgument](ArgumentTypes/IntegerArgument.cs)
-* `uint` → [UIntegerArgument](ArgumentTypes/IntegerArgument.cs)
-* `long` → [LongArgument](ArgumentTypes/LongArgument.cs)
-* `ulong` → [ULongArgument](ArgumentTypes/LongArgument.cs)
-* `string` → [StringArgument](ArgumentTypes/StringArgument.cs)
-* single selection → [SingleSelectArgument](ArgumentTypes/SingleSelectArgument.cs)
-* multiple selection → [MultiSelectArgument](ArgumentTypes/MultiSelectArgument.cs)
-* path -> [PathArgument](ArgumentTypes/PathArgument.cs)
+* `bool` → [BoolArgument](Argument/BoolArgument.cs)
+* `double` → [DoubleArgument](Argument/DoubleArgument.cs)
+* `float` → [FloatArgument](Argument/FloatArgument.cs)
+* `int` → [IntegerArgument](Argument/IntegerArgument.cs)
+* `uint` → [UIntegerArgument](Argument/IntegerArgument.cs)
+* `long` → [LongArgument](Argument/LongArgument.cs)
+* `ulong` → [ULongArgument](Argument/LongArgument.cs)
+* `string` → [StringArgument](Argument/StringArgument.cs)
+* single selection → [SingleSelectArgument](Argument/SingleSelectArgument.cs)
+* multiple selection → [MultiSelectArgument](Argument/MultiSelectArgument.cs)
+* list of values → [SelectionListArgument](Argument/SelectionListArgument.cs)
+* path -> [PathArgument](Argument/PathArgument.cs)
 
-> [!NOTE]
+> [!TIP]
 > All these basic arguments can be created using factory methods from [Arguments.cs](Arguments.cs)
 
 ---
@@ -111,3 +112,7 @@ var builder = SettingsBuilder<Auth>.Build("auth",
 
 As you can see we created a group named passcode that contains two options, pin and password, 
 that are then merged to the group context from where it is automatically merged to the node's context. 
+
+> [!TIP]
+> When creating custom arguments or any other structure you can use the inner exceptions using the 
+> [Exceptions](Exceptions.cs) class containing factory methods for those exceptions 

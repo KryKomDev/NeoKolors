@@ -5,9 +5,9 @@
 
 using System.Text.RegularExpressions;
 using NeoKolors.Common;
-using NeoKolors.Settings.Exceptions;
+using NeoKolors.Settings.Exception;
 
-namespace NeoKolors.Settings.ArgumentTypes;
+namespace NeoKolors.Settings.Argument;
 
 public partial class StringArgument : IArgument<string> {
     public readonly uint MinLength;

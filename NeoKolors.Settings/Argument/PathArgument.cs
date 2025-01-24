@@ -3,9 +3,9 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Settings.Exceptions;
+using NeoKolors.Settings.Exception;
 
-namespace NeoKolors.Settings.ArgumentTypes;
+namespace NeoKolors.Settings.Argument;
 
 /// <summary>
 /// argument for a path to a file or directory

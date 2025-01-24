@@ -3,9 +3,9 @@
 // Copyright (c) 2025 KryKom
 //
 
-namespace NeoKolors.Settings.Exceptions;
+namespace NeoKolors.Settings.Exception;
 
-public class SettingsNodeException : Exception {
+public class SettingsNodeException : System.Exception {
     private SettingsNodeException(string message) : base(message) { }
 
     public static SettingsNodeException NoResultConstructor(string nodeName) => 

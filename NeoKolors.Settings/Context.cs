@@ -3,8 +3,8 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Settings.ArgumentTypes;
-using ContextException = NeoKolors.Settings.Exceptions.ContextException;
+using NeoKolors.Settings.Argument;
+using ContextException = NeoKolors.Settings.Exception.ContextException;
 
 namespace NeoKolors.Settings;
 

@@ -3,9 +3,9 @@
 // Copyright (c) 2025 KryKom
 //
 
-namespace NeoKolors.Settings.Exceptions;
+namespace NeoKolors.Settings.Exception;
 
-public class SettingsGroupException : Exception {
+public class SettingsGroupException : System.Exception {
     private SettingsGroupException(string message) : base(message) { }
 
     /// <summary>

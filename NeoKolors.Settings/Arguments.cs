@@ -3,8 +3,9 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Settings.ArgumentTypes;
-using StringArgument = NeoKolors.Settings.ArgumentTypes.StringArgument;
+using NeoKolors.Settings.Argument;
+using NeoKolors.Settings.Argument;
+using StringArgument = NeoKolors.Settings.Argument.StringArgument;
 
 namespace NeoKolors.Settings;
 
@@ -207,4 +208,21 @@ public static class Arguments {
         bool allowAny = true,
         bool pointsToFile = true) => 
         new(defaultValue, mustExist, allowAny, pointsToFile);
+    
+    /// <summary>
+    /// creates a new selection list argument, 
+    /// </summary>
+    /// <param name="values">choice values that can be added to the list</param>
+    /// <param name="defaultValues">values that are selected by default</param>
+    /// <typeparam name="T">element type</typeparam>
+    public static SelectionListArgument<T> SelectionList<T>(T[] values, params T[] defaultValues) where T : notnull =>
+        new(values, defaultValues);
+
+    /// <summary>
+    /// creates a new selection list argument from all members of an enum
+    /// </summary>
+    /// <param name="defaultValues">values that are selected by default</param>
+    /// <typeparam name="T">enum type</typeparam>
+    public static SelectionListArgument<T> SelectionListEnum<T>(params T[] defaultValues) where T : Enum =>
+        SelectionListArgument<T>.FromEnum(defaultValues);
 }

@@ -3,9 +3,9 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Settings.Exceptions;
+using NeoKolors.Settings.Exception;
 
-namespace NeoKolors.Settings.ArgumentTypes;
+namespace NeoKolors.Settings.Argument;
 
 public class FloatArgument : IArgument<Single> {
     public float MinValue { get; }

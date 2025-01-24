@@ -3,9 +3,9 @@
 // Copyright (c) 2025 KryKom
 //
 
-namespace NeoKolors.Settings.Exceptions;
+namespace NeoKolors.Settings.Exception;
 
-public class ContextException : Exception {
+public class ContextException : System.Exception {
 
     private ContextException(string message) : base(message) { }
 
