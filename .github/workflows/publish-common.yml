@@ -1,7 +1,7 @@
-name: Publish NeoKolors.Common to NuGet
+name: Publish NeoKolors.Common
 
 on: 
-  workflow_call:
+  workflow_dispatch:
 
 permissions:
   packages: write
@@ -16,7 +16,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: '6.0.x'  # Or your desired version
+          dotnet-version: 'netstandard2.0.x'  # Or your desired version
 
       - name: Restore dependencies
         run: dotnet restore
