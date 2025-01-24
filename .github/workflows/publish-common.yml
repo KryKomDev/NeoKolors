@@ -11,12 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps: 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 'netstandard2.0.x'  # Or your desired version
 
       - name: Restore dependencies
         run: dotnet restore
