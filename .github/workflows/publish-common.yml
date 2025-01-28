@@ -1,7 +1,7 @@
-name: Publish NeoKolors.Common to NuGet
+name: Publish NeoKolors.Common
 
 on: 
-  workflow_call:
+  workflow_dispatch:
 
 permissions:
   packages: write
@@ -11,22 +11,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps: 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v3
+        uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '6.0.x'  # Or your desired version
+          dotnet-version: '9.0.x'
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: cd ./NeoKolors.Common/ | dotnet restore | cd ..
 
       - name: Build
-        run: dotnet build --configuration Release
+        run: cd ./NeoKolors.Common/ | dotnet build --configuration Release | cd ..
 
       - name: Pack
-        run: dotnet pack --configuration Release --output ./artifacts
+        run: cd ./NeoKolors.Common/ | dotnet pack --configuration Release --output ./artifacts | cd ..
 
       - name: Push to GitHub Packages
         run: |
-          dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/KryKomDev/index.json
+          cd ./NeoKolors.Common/ | dotnet nuget push ./artifacts/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source https://nuget.pkg.github.com/KryKomDev/index.json | cd ..
