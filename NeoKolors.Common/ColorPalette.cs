@@ -143,9 +143,9 @@ public class ColorPalette {
         (double R, double G, double B) c,
         (double R, double G, double B) d, double x) 
     {
-        double re = Math.Cos(2 * Math.PI * (c.R * x + d.R)) / 2 + 0.5;
-        double gr = Math.Cos(2 * Math.PI * (c.G * x + d.G)) / 2 + 0.5;
-        double bl = Math.Cos(2 * Math.PI * (c.B * x + d.B)) / 2 + 0.5;
+        double re = Math.Cos(2 * Math.PI * (c.R + d.R * 2 * x));
+        double gr = Math.Cos(2 * Math.PI * (c.G + d.G * 2 * x));
+        double bl = Math.Cos(2 * Math.PI * (c.B + d.B * 2 * x));
         
         
         return System.Drawing.Color.FromArgb(
