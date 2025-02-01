@@ -1,10 +1,16 @@
 ﻿# NeoKolors.Console
+
+![.NET Standard](https://img.shields.io/badge/.NET-Standard2.0-512bd4)
+![.NET 5](https://img.shields.io/badge/.NET-5.0-682a7b)
+[![NuGet](https://img.shields.io/nuget/v/NeoKolors.Console?color=a53c7a)](https://www.nuget.org/packages/NeoKolors.Console)
+![Downloads](https://img.shields.io/nuget/dt/NeoKolors.Console?color=a31c35)
+
 This package has basic console utilities like colored text writing and fancy debugging functions.
 
 ## Contents
-* ConsoleColors
-* Debug
-* ConsoleProgressBar
+* [ConsoleColors](#consolecolors)
+* [Debug](#debug)
+* [ConsoleProgressBar](#consoleprogressbar)
 
 ## ConsoleColors
 This class contains functions for writing colored text to console.
@@ -42,6 +48,10 @@ catch (Exception e)
     Debug.Throw(e);
 }
 ```
+
+> [!IMPORTANT]
+> When an exception is thrown using `Debug.Throw`, the exception itself is not thrown, the actual type is 
+> `FancyException<TException>` where the `TException` is the actual type of the exception.
 
 Example of catching a fancy exception:
 ```csharp

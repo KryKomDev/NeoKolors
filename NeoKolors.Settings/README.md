@@ -1,8 +1,15 @@
 ﻿# NeoKolors.Settings
-this package includes a settings building system for easier automation of instance building
+
+![.NET Standard](https://img.shields.io/badge/.NET-Standard2.0-512bd4)
+![.NET 5](https://img.shields.io/badge/.NET-5.0-682a7b)
+[![NuGet](https://img.shields.io/nuget/v/NeoKolors.Settings?color=a53c7a)](https://www.nuget.org/packages/NeoKolors.Settings)
+![Downloads](https://img.shields.io/nuget/dt/NeoKolors.Settings?color=a31c35)
+
+This package includes a settings building system for easier automation of instance building and settings communication
+between different parts of applications.
 
 ## Usage
-this section will explain on an example how the system works step by step
+This section will explain on an example how the system works step by step.
 
 ---
 
@@ -55,7 +62,7 @@ The types contain:
 * single selection → [SingleSelectArgument](Argument/SingleSelectArgument.cs)
 * multiple selection → [MultiSelectArgument](Argument/MultiSelectArgument.cs)
 * list of values → [SelectionListArgument](Argument/SelectionListArgument.cs)
-* path -> [PathArgument](Argument/PathArgument.cs)
+* path to a directory or file → [PathArgument](Argument/PathArgument.cs)
 
 > [!TIP]
 > All these basic arguments can be created using factory methods from [Arguments.cs](Arguments.cs)

@@ -1,10 +1,16 @@
 ﻿# NeoKolors.Common
 
+![.NET Standard](https://img.shields.io/badge/.NET-Standard2.0-512bd4)
+![.NET 5](https://img.shields.io/badge/.NET-5.0-682a7b)
+[![NuGet](https://img.shields.io/nuget/v/NeoKolors.Common?color=a53c7a)](https://www.nuget.org/packages/NeoKolors.Common)
+![Downloads](https://img.shields.io/nuget/dt/NeoKolors.Common?color=a31c35)
+
 The NeoKolors.Common namespace includes these classes:
 * [ColorFormat](#colorformat)
 * [ColorPalette](#colorpalette)
 * [StringEffects](#stringeffects)
 * [Color](#color)
+* [UInt24](UInt24.cs)
 
 ---
 
