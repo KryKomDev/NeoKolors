@@ -4,6 +4,7 @@
 //
 
 using System.Text.RegularExpressions;
+using static NeoKolors.Common.EscapeCodes;
 
 namespace NeoKolors.Common;
 
@@ -17,7 +18,7 @@ public static class StringEffects {
     /// <returns>string with colored characters</returns>
     public static string AddColor(this string text, int hex) {
         text = ApplyStyles(text);
-        return $"{hex.ControlChar()}{text}{CUSTOM_CONTROL_END}";
+        return $"{hex.ControlChar()}{text}{CUSTOM_COLOR_END}";
     }
 
     /// <summary>
@@ -28,7 +29,7 @@ public static class StringEffects {
     /// <returns>string with colored characters</returns>
     public static string AddColorB(this string text, int hex) {
         text = ApplyStyles(text);
-        return $"{hex.ControlCharB()}{text}{CUSTOM_CONTROL_BACKGROUND_END}";
+        return $"{hex.ControlCharB()}{text}{CUSTOM_BACKGROUND_COLOR_END}";
     }
 
     /// <summary>
@@ -41,7 +42,7 @@ public static class StringEffects {
     /// <returns>string with colored characters</returns>
     public static string AddColor(this string text, byte red, byte green, byte blue) {
         text = ApplyStyles(text);
-        return $"\e[38;2;{red};{green};{blue}m{text}{CUSTOM_CONTROL_END}";
+        return $"{CUSTOM_COLOR_START}{red};{green};{blue}m{text}{CUSTOM_COLOR_END}";
     }
     
     /// <summary>
@@ -54,7 +55,7 @@ public static class StringEffects {
     /// <returns>string with colored characters</returns>
     public static string AddColorB(this string text, byte red, byte green, byte blue) {
         text = ApplyStyles(text);
-        return $"\e[48;2;{red};{green};{blue}m{text}{CUSTOM_CONTROL_BACKGROUND_END}";
+        return $"{CUSTOM_BACKGROUND_COLOR_START}{red};{green};{blue}m{text}{CUSTOM_BACKGROUND_COLOR_END}";
     }
 
     /// <summary>
@@ -63,18 +64,18 @@ public static class StringEffects {
     /// <param name="text">input text with tags</param>
     /// <returns>text that when printed to console has styles</returns>
     public static string ApplyStyles(this string text) {
-        text = text.Replace("<b>", "\x1b[1m");
-        text = text.Replace("</b>", "\e[22m");
-        text = text.Replace("<i>", "\e[3m");
-        text = text.Replace("</i>", "\e[23m");
-        text = text.Replace("<u>", "\e[4m");
-        text = text.Replace("</u>", "\e[24m");
-        text = text.Replace("<f>", "\e[2m");
-        text = text.Replace("</f>", "\e[22m");
-        text = text.Replace("<n>", "\e[7m");
-        text = text.Replace("</n>", "\e[27m");
-        text = text.Replace("<s>", "\e[9m");
-        text = text.Replace("</s>", "\e[29m");
+        text = text.Replace("<b>", BOLD_START);
+        text = text.Replace("</b>", BOLD_END);
+        text = text.Replace("<i>", ITALIC_START);
+        text = text.Replace("</i>", ITALIC_END);
+        text = text.Replace("<u>", UNDERLINE_START);
+        text = text.Replace("</u>", UNDERLINE_END);
+        text = text.Replace("<f>", FAINT_START);
+        text = text.Replace("</f>", FAINT_END);
+        text = text.Replace("<n>", NEGATIVE_START);
+        text = text.Replace("</n>", NEGATIVE_END);
+        text = text.Replace("<s>", STRIKETHROUGH_START);
+        text = text.Replace("</s>", STRIKETHROUGH_END);
         return text;
     }
 
@@ -102,12 +103,12 @@ public static class StringEffects {
     /// <exception cref="ArgumentOutOfRangeException">an invalid style was inputted</exception>
     public static string AddStyle(this string text, TextStyle style) {
         return style switch {
-            TextStyle.BOLD => $"\x1b[1m{text}\x1b[22m",
-            TextStyle.ITALIC => $"\x1b[3m{text}\x1b[23m",
-            TextStyle.UNDERLINE => $"\x1b[4m{text}\x1b[24m",
-            TextStyle.FAINT => $"\x1b[2m{text}\x1b[22m",
-            TextStyle.NEGATIVE => $"\x1b[7m{text}\x1b[27m",
-            TextStyle.STRIKETHROUGH => $"\x1b[9m{text}\x1b[29m",
+            TextStyle.BOLD => $"{BOLD_START}{text}{BOLD_END}",
+            TextStyle.ITALIC => $"{ITALIC_START}{text}{ITALIC_END}",
+            TextStyle.UNDERLINE => $"{UNDERLINE_START}{text}{UNDERLINE_END}",
+            TextStyle.FAINT => $"{FAINT_START}{text}{FAINT_END}",
+            TextStyle.NEGATIVE => $"{NEGATIVE_START}{text}{NEGATIVE_END}",
+            TextStyle.STRIKETHROUGH => $"{STRIKETHROUGH_START}{text}{STRIKETHROUGH_END}",
             _ => throw new ArgumentOutOfRangeException(nameof(style), style, null)
         };
     }
@@ -118,7 +119,7 @@ public static class StringEffects {
     /// <returns>text with colors</returns>
     public static string AddColor(this string text, ConsoleColor color) {
         text = ApplyStyles(text);
-        return $"{color.ControlChar()}{text}{PALETTE_CONTROL_END}";
+        return $"{color.ControlChar()}{text}{PALETTE_COLOR_END}";
     }
     
     /// <summary>
@@ -127,7 +128,7 @@ public static class StringEffects {
     /// <returns>text with colored background</returns>
     public static string AddColorB(this string text, ConsoleColor color) {
         text = ApplyStyles(text);
-        return $"{color.ControlCharB()}{text}{PALETTE_CONTROL_BACKGROUND_END}";
+        return $"{color.ControlCharB()}{text}{PALETTE_BACKGROUND_COLOR_END}";
     }
 
     /// <summary>
@@ -147,6 +148,22 @@ public static class StringEffects {
         text = ApplyStyles(text);
         return $"{color.ControlCharB}{text}{color.ControlCharEndB}";
     }
+    
+    /// <summary>
+    /// adds a color to the text
+    /// </summary>
+    /// <returns>colored text</returns>
+    public static string AddColor(this string text, System.Drawing.Color color) {
+        return text.AddColor(color.R, color.G, color.B);
+    }
+    
+    /// <summary>
+    /// adds a colored background to the text
+    /// </summary>
+    /// <returns>text with colored background</returns>
+    public static string AddColorB(this string text, System.Drawing.Color color) {
+        return text.AddColorB(color.R, color.G, color.B);
+    }
 
     public static int VisibleLength(this string text) {
         text = Regex.Replace(text, @"\e([^m]*)m", "");
@@ -163,22 +180,22 @@ public static class StringEffects {
     /// </summary>    
     public static string ControlChar(this ConsoleColor color) {
         return color switch {
-            ConsoleColor.Black => "\e[38;5;0m",
-            ConsoleColor.DarkRed => "\e[38;5;1m",
-            ConsoleColor.DarkGreen => "\e[38;5;2m",
-            ConsoleColor.DarkYellow => "\e[38;5;3m",
-            ConsoleColor.DarkBlue => "\e[38;5;4m",
-            ConsoleColor.DarkMagenta => "\e[38;5;5m",
-            ConsoleColor.DarkCyan => "\e[38;5;6m",
-            ConsoleColor.Gray => "\e[38;5;7m",
-            ConsoleColor.DarkGray => "\e[38;5;8m",
-            ConsoleColor.Red => "\e[38;5;9m",
-            ConsoleColor.Green => "\e[38;5;10m",
-            ConsoleColor.Yellow => "\e[38;5;11m",
-            ConsoleColor.Blue => "\e[38;5;12m",
-            ConsoleColor.Magenta => "\e[38;5;13m",
-            ConsoleColor.Cyan => "\e[38;5;14m",
-            ConsoleColor.White => "\e[38;5;15m",
+            ConsoleColor.Black => PALETTE_COLOR_BLACK,
+            ConsoleColor.DarkRed => PALETTE_COLOR_DARK_RED,
+            ConsoleColor.DarkGreen => PALETTE_COLOR_DARK_GREEN,
+            ConsoleColor.DarkYellow => PALETTE_COLOR_DARK_YELLOW,
+            ConsoleColor.DarkBlue => PALETTE_COLOR_DARK_BLUE,
+            ConsoleColor.DarkMagenta => PALETTE_COLOR_DARK_MAGENTA,
+            ConsoleColor.DarkCyan => PALETTE_COLOR_DARK_CYAN,
+            ConsoleColor.Gray => PALETTE_COLOR_GRAY,
+            ConsoleColor.DarkGray => PALETTE_COLOR_DARK_GRAY,
+            ConsoleColor.Red => PALETTE_COLOR_RED,
+            ConsoleColor.Green => PALETTE_COLOR_GREEN,
+            ConsoleColor.Yellow => PALETTE_COLOR_YELLOW,
+            ConsoleColor.Blue => PALETTE_COLOR_BLUE,
+            ConsoleColor.Magenta => PALETTE_COLOR_MAGENTA,
+            ConsoleColor.Cyan => PALETTE_COLOR_CYAN,
+            ConsoleColor.White => PALETTE_COLOR_WHITE,
             _ => throw new ArgumentOutOfRangeException(nameof(ConsoleColor), color, null)
         };
     }
@@ -188,22 +205,22 @@ public static class StringEffects {
     /// </summary>
     public static string ControlCharB(this ConsoleColor color) {
         return color switch {
-            ConsoleColor.Black => "\e[48;5;0m",
-            ConsoleColor.DarkRed => "\e[48;5;1m",
-            ConsoleColor.DarkGreen => "\e[48;5;2m",
-            ConsoleColor.DarkYellow => "\e[48;5;3m",
-            ConsoleColor.DarkBlue => "\e[48;5;4m",
-            ConsoleColor.DarkMagenta => "\e[48;5;5m",
-            ConsoleColor.DarkCyan => "\e[48;5;6m",
-            ConsoleColor.Gray => "\e[48;5;7m",
-            ConsoleColor.DarkGray => "\e[48;5;8m",
-            ConsoleColor.Red => "\e[48;5;9m",
-            ConsoleColor.Green => "\e[48;5;10m",
-            ConsoleColor.Yellow => "\e[48;5;11m",
-            ConsoleColor.Blue => "\e[48;5;12m",
-            ConsoleColor.Magenta => "\e[48;5;13m",
-            ConsoleColor.Cyan => "\e[48;5;14m",
-            ConsoleColor.White => "\e[48;5;15m",
+            ConsoleColor.Black => PALETTE_BACKGROUND_COLOR_BLACK,
+            ConsoleColor.DarkRed => PALETTE_BACKGROUND_COLOR_DARK_RED,
+            ConsoleColor.DarkGreen => PALETTE_BACKGROUND_COLOR_DARK_GREEN,
+            ConsoleColor.DarkYellow => PALETTE_BACKGROUND_COLOR_DARK_YELLOW,
+            ConsoleColor.DarkBlue => PALETTE_BACKGROUND_COLOR_DARK_BLUE,
+            ConsoleColor.DarkMagenta => PALETTE_BACKGROUND_COLOR_DARK_MAGENTA,
+            ConsoleColor.DarkCyan => PALETTE_BACKGROUND_COLOR_DARK_CYAN,
+            ConsoleColor.Gray => PALETTE_BACKGROUND_COLOR_GRAY,
+            ConsoleColor.DarkGray => PALETTE_BACKGROUND_COLOR_DARK_GRAY,
+            ConsoleColor.Red => PALETTE_BACKGROUND_COLOR_RED,
+            ConsoleColor.Green => PALETTE_BACKGROUND_COLOR_GREEN,
+            ConsoleColor.Yellow => PALETTE_BACKGROUND_COLOR_YELLOW,
+            ConsoleColor.Blue => PALETTE_BACKGROUND_COLOR_BLUE,
+            ConsoleColor.Magenta => PALETTE_BACKGROUND_COLOR_MAGENTA,
+            ConsoleColor.Cyan => PALETTE_BACKGROUND_COLOR_CYAN,
+            ConsoleColor.White => PALETTE_BACKGROUND_COLOR_WHITE,
             _ => throw new ArgumentOutOfRangeException(nameof(ConsoleColor), color, null)
         };
     }
@@ -222,32 +239,13 @@ public static class StringEffects {
     /// returns string containing ansi escape sequence coloring the text
     /// </summary>
     public static string ControlChar(this int color) =>
-        $"\e[38;2;{(byte)(color >> 16)};{(byte)(color >> 8)};{(byte)color}m";
+        $"{CUSTOM_COLOR_START}{(byte)(color >> 16)};{(byte)(color >> 8)};{(byte)color}m";
 
     /// <summary>
     /// returns string containing ansi escape sequence coloring background
     /// </summary>
     public static string ControlCharB(this int color) =>
-        $"\e[48;2;{(byte)(color >> 16)};{(byte)(color >> 8)};{(byte)color}m";
-    
-    public const string CUSTOM_CONTROL_END = "[38;1;m";
-    public const string CUSTOM_CONTROL_BACKGROUND_END = "[48;1;m";
-    public const string PALETTE_CONTROL_END = "\e[38;5;7m";
-    public const string PALETTE_CONTROL_BACKGROUND_END = "\e[48;5;7m";
-
-    // ReSharper disable once InconsistentNaming
-    public const string CustomControlEnd = CUSTOM_CONTROL_END;
-    // ReSharper disable once InconsistentNaming
-    public const string CustomControlBackgroundEnd = CUSTOM_CONTROL_BACKGROUND_END;
-    // ReSharper disable once InconsistentNaming
-    public const string PaletteControlEnd = PALETTE_CONTROL_END;
-    // ReSharper disable once InconsistentNaming
-    public const string PaletteControlBackgroundEnd = PALETTE_CONTROL_BACKGROUND_END;
-
-    /// <summary>
-    /// switches colors of background and text
-    /// </summary>
-    public const string SWITCH_COLORS = "\e[38;1;7m";
+        $"{CUSTOM_BACKGROUND_COLOR_START}{(byte)(color >> 16)};{(byte)(color >> 8)};{(byte)color}m";
     
     /// <summary>
     /// style types

@@ -3,15 +3,25 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
+using System.Text;
+using NeoKolors.Common;
 using NeoKolors.Common.Exceptions;
 using NeoKolors.Console;
+using NeoKolors.Tui;
+using NeoKolors.Tui.Library;
+using NeoKolors.Tui.Library.Windows;
+using NeoKolors.Settings;
+using NeoKolors.Settings.Argument;
 using Color = NeoKolors.Common.Color;
 
 namespace NeoKolors.Test;
 
 public class Kolors {
-    public static void Main() {
-        System.Console.OutputEncoding = System.Text.Encoding.UTF8;
+    
+    public static void Manual() {
+        System.Console.OutputEncoding = Encoding.UTF8;
         Debug.Level = Debug.DebugLevel.ALL;
         // Debug.Fatal("fatal");
         // Debug.Error("error");
@@ -19,39 +29,6 @@ public class Kolors {
         // Debug.Info("info");
         // Debug.Msg("debug");
 
-        // System.Console.Clear();
-
-        // for (int i = 0; i < 100; i++) {
-        //     var p = ColorPalette.GeneratePalette(i, 10);
-        //     p.PrintPalette();
-        // }
-
-        var c = new Color(0xff0000);
-        
-        System.Console.Clear();
-
-        try {
-            try {
-                var a = (ConsoleColor)c;
-                var z = 0;
-                int i = 1 / z;
-            }
-            catch (Exception e) {
-                throw e;
-                Debug.Throw(e);
-            }
-        }
-        catch (FancyException<InvalidColorCastException> e) {
-            Debug.Info("caught fancy");
-            throw;
-        }
-        catch (FancyException<DivideByZeroException> e) {
-            Debug.Info("caught divide by zero");
-            throw;
-        }
-
-        // -532,462,766
-        
         /*
 
         Rectangle r = new Rectangle(2, 2, 80, 31);
@@ -65,7 +42,7 @@ public class Kolors {
             new BorderProperty(borderData),
             new CheckboxProperty(CheckboxProperty.CheckboxStyle.SWITCH),
             new BackgroundColorProperty(new Color(ConsoleColor.Black)),
-            // new HorizontalAlignItemsProperty(HorizontalAlignDirection.CENTER),w
+            // new HorizontalAlignItemsProperty(HorizontalAlignDirection.CENTER),
             new VerticalAlignItemsProperty(VerticalAlignDirection.TOP),
             new MarginProperty(new MarginProperty.MarginData(
                 new SizeValue(0, SizeValue.SizeOptions.UNIT_CHAR),

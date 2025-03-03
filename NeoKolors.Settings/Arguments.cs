@@ -4,7 +4,6 @@
 //
 
 using NeoKolors.Settings.Argument;
-using NeoKolors.Settings.Argument;
 using StringArgument = NeoKolors.Settings.Argument.StringArgument;
 
 namespace NeoKolors.Settings;

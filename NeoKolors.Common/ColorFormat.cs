@@ -21,7 +21,7 @@ public static class ColorFormat {
     /// <param name="c">source int color</param>
     /// <param name="autoAlpha">if true automatically sets alpha to 255</param>
     public static SKColor IntToSkia(this int c, bool autoAlpha = true) =>
-        new((byte)(autoAlpha ? 255 : (byte)(c >> 24)), (byte)(c >> 16), (byte)(c >> 8), (byte)c);
+        new((byte)(c >> 16), (byte)(c >> 8), (byte)c, (byte)(autoAlpha ? 255 : (byte)(c >> 24)));
 
     public static int IntToSkia(this SKColor c) => c.Alpha << 24 | c.Red << 16 | c.Green << 8 | c.Blue;
     

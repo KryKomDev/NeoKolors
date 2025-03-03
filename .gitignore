@@ -1,6 +1,16 @@
+# c# stuff
 bin/
 obj/
 /packages/
-riderModule.iml
+
+# github shit
+/.github/
+
+# some ide stuff
+/.idea/
+/.vs/
+/.vscode/
+
+# resharper and rider shit
 /_ReSharper.Caches/
-.idea/
+riderModule.iml

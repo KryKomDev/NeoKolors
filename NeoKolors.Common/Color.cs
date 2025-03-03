@@ -1,4 +1,10 @@
-﻿using NeoKolors.Common.Exceptions;
+﻿//
+// NeoKolors
+// Copyright (c) 2025 KryKom
+//
+
+using NeoKolors.Common.Exceptions;
+using static NeoKolors.Common.EscapeCodes;
 
 namespace NeoKolors.Common;
 
@@ -48,20 +54,20 @@ public class Color : ICloneable {
     public string ControlChar =>
         IsPaletteSafe
             ? ((ConsoleColor)ConsoleColor!).ControlChar()
-            : ((int)ConsoleColor!).ControlChar();
+            : ((int)CustomColor!).ControlChar();
     
     public string ControlCharB => 
         IsPaletteSafe
             ? ((ConsoleColor)ConsoleColor!).ControlCharB()
-            : ((int)ConsoleColor!).ControlCharB();
+            : ((int)CustomColor!).ControlCharB();
     
     public string ControlCharEnd =>
         IsPaletteSafe
-            ? StringEffects.PALETTE_CONTROL_END
-            : StringEffects.CUSTOM_CONTROL_END;
+            ? PALETTE_COLOR_END
+            : CUSTOM_COLOR_END;
 
     public string ControlCharEndB => 
         IsPaletteSafe
-            ? StringEffects.PALETTE_CONTROL_BACKGROUND_END
-            : StringEffects.CUSTOM_CONTROL_BACKGROUND_END;
+            ? PALETTE_BACKGROUND_COLOR_END
+            : CUSTOM_BACKGROUND_COLOR_END;
 }
