@@ -35,10 +35,19 @@ public static partial class Debug {
     /// <see cref="FancyException{TInner}"/>
     /// with the exception as the inner exception
     /// </remarks>
-    public static void Throw(Exception e) {
-        throw (Exception)FancyException<Exception>.Create(e);
-    }
-    
+    public static void Throw(Exception e) => throw ((Exception)FancyException<Exception>.Create(e));
+
+    /// <summary>
+    /// creates a new fancy exception
+    /// </summary>
+    /// <param name="e">exception to be made fancy</param>
+    /// <remarks>
+    /// note that this method will not return the exception itself but rather an instance of
+    /// <see cref="FancyException{TInner}"/>
+    /// with the exception as the inner exception
+    /// </remarks>
+    public static Exception Fancy(Exception e) => (Exception)FancyException<Exception>.Create(e);
+
     /// <summary>
     /// stringifies an exception to a fancy one
     /// </summary>

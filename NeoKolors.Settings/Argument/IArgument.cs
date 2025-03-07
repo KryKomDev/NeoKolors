@@ -35,16 +35,18 @@ public interface IArgument<out T> : IArgument {
     public new IArgument<T> Clone();
 }
 
-public interface IArgument {
+public interface IArgument : IEquatable<IArgument> {
     public void Set(object value);
     public object Get();
     public void Reset();
     public IArgument Clone();
 
-#if !NETSTANDARD2_0
+    #if !NETSTANDARD2_0
+    
     public static IArgument operator <<(IArgument argument, object value) {
         argument.Set(value);
         return argument;
     }
-#endif 
+    
+    #endif 
 }
