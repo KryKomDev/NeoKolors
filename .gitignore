@@ -8,6 +8,7 @@ obj/
 
 # some ide stuff
 /.idea/
+.idea/
 /.vs/
 /.vscode/
 

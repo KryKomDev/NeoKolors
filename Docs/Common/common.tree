@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE instance-profile
+        SYSTEM "https://resources.jetbrains.com/writerside/1.0/product-profile.dtd">
+
+<instance-profile id="common"
+                 name="NeoKolors.Common Documentation"
+                 start-page="starter.md">
+
+    <toc-element topic="starter.md"/>
+    <toc-element topic="Common.md">
+        <toc-element topic="Color.md"/>
+    </toc-element>
+    <toc-element topic="Debug.md"/>
+    <toc-element topic="ConsoleColors.md"/>
+</instance-profile>
