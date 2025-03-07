@@ -66,6 +66,10 @@ public class BoolArgument : IArgument<bool> {
     public static implicit operator bool(BoolArgument argument) => argument.Value;
     public static implicit operator BoolArgument(bool value) => new() { Value = value };
 
+    public bool Equals(IArgument? other) {
+        return other is BoolArgument b && Get() == b.Get() && DefaultValue == b.DefaultValue;
+    }
+
     public override string ToString() {
         return $"{{\"type\": \"bool\", \"value\": {Value}, \"default-value\": {DefaultValue}}}";
     }

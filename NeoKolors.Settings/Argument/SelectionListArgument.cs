@@ -130,4 +130,10 @@ public class SelectionListArgument<T> : IArgument<T[]> where T : notnull {
     object IArgument.Get() => Get();
     void IArgument.Reset() => Reset();
     IArgument IArgument.Clone() => Clone();
+    public bool Equals(IArgument? other) {
+        return other is SelectionListArgument<T> s &&
+               Values == s.Values &&
+               Selected == s.Selected &&
+               DefaultValues == s.DefaultValues;
+    }
 }

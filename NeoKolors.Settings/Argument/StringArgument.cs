@@ -9,7 +9,7 @@ using NeoKolors.Settings.Exception;
 
 namespace NeoKolors.Settings.Argument;
 
-public partial class StringArgument : IArgument<string> {
+public class StringArgument : IArgument<string> {
     public readonly uint MinLength;
     public readonly uint MaxLength;
     public readonly bool AllowSpaces;
@@ -160,7 +160,22 @@ public partial class StringArgument : IArgument<string> {
         argument.Set(value);
         return argument;
     }
-    
+
+    public bool Equals(IArgument? other) {
+        return other is StringArgument s &&
+               Value == s.Value &&
+               DefaultValue == s.DefaultValue &&
+               MinLength == s.MinLength &&
+               MaxLength == s.MaxLength &&
+               AllowSpaces == s.AllowSpaces &&
+               AllowNewlines == s.AllowNewlines &&
+               AllowSpecial == s.AllowSpecial &&
+               AllowNumbers == s.AllowNumbers &&
+               AllowUpper == s.AllowUpper &&
+               AllowLower == s.AllowLower &&
+               CountVisibleOnly == s.CountVisibleOnly;
+    }
+
     public override string ToString() => $"{{\"value\": {Value}, " +
                                          $"\"default-value\": {DefaultValue}, " +
                                          $"\"min-length\": {MinLength}, " +

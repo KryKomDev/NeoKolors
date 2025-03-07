@@ -150,6 +150,15 @@ public class LongArgument : IArgument<Int64> {
         if (res != null) throw new InvalidArgumentInputException(res);
     }
     
+    public bool Equals(IArgument? other) {
+        return other is LongArgument i &&
+               Get() == i.Get() &&
+               DefaultValue == i.DefaultValue &&
+               MinValue == i.MinValue &&
+               MaxValue == i.MaxValue &&
+               CustomValidate == i.CustomValidate;
+    }
+    
     public override string ToString() => $"{{\"type\": \"long\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
 }
 
@@ -294,6 +303,15 @@ public class ULongArgument : IArgument<UInt64> {
         if (value > MaxValue) throw new InvalidArgumentInputException($"Value was greater then the greatest allowed value ({MaxValue}).");
         string? res = CustomValidate?.Invoke(value);
         if (res != null) throw new InvalidArgumentInputException(res);
+    }
+    
+    public bool Equals(IArgument? other) {
+        return other is ULongArgument i &&
+               Get() == i.Get() &&
+               DefaultValue == i.DefaultValue &&
+               MinValue == i.MinValue &&
+               MaxValue == i.MaxValue &&
+               CustomValidate == i.CustomValidate;
     }
     
     public override string ToString() => $"{{\"type\": \"ulong\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";

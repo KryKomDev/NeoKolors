@@ -9,9 +9,9 @@ namespace NeoKolors.Console;
 /// a wrapper exception for fancy formatting
 /// </summary>
 public sealed class FancyException<TInner> : Exception, IFancyException<TInner> where TInner : Exception {
-    public new TInner InnerException { get; }
-    public override string ToString() => Debug.ToString(InnerException);
-    public FancyException(TInner e) => InnerException = e;
+    public TInner OriginalException { get; }
+    public override string ToString() => Debug.ToString(OriginalException);
+    public FancyException(TInner e) => OriginalException = e;
 
     /// <summary>
     /// creates a new fancy exception from an exception
@@ -21,7 +21,7 @@ public sealed class FancyException<TInner> : Exception, IFancyException<TInner> 
         return (IFancyException<Exception>)Activator.CreateInstance(type, e)!;
     }
     
-    public static implicit operator TInner(FancyException<TInner> e) => e.InnerException;
+    public static implicit operator TInner(FancyException<TInner> e) => e.OriginalException;
 }
 
 /// <summary>
@@ -29,5 +29,5 @@ public sealed class FancyException<TInner> : Exception, IFancyException<TInner> 
 /// </summary>
 /// <typeparam name="TInner">the wrapped exception type</typeparam>
 public interface IFancyException<out TInner> where TInner : Exception {
-    public TInner InnerException { get; }
+    public TInner OriginalException { get; }
 }

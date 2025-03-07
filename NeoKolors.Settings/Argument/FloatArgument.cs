@@ -144,6 +144,16 @@ public class FloatArgument : IArgument<Single> {
         string? res = CustomValidate?.Invoke(value);
         if (res != null) throw new InvalidArgumentInputException(res);
     }
+
+    public bool Equals(IArgument? other) {
+        const float tolerance = 0.00000001f;
+        return other is FloatArgument f && 
+               Math.Abs(Get() - f.Get()) < tolerance && 
+               Math.Abs(DefaultValue - f.DefaultValue) < tolerance &&
+               Math.Abs(MinValue - f.MinValue) < tolerance &&
+               Math.Abs(MaxValue - f.MaxValue) < tolerance &&
+               CustomValidate == f.CustomValidate;
+    }
     
     public override string ToString() => $"{{\"type\": \"float\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
 }

@@ -60,4 +60,13 @@ public class PathArgument : IArgument<string> {
     object IArgument.Get() => Get();
     void IArgument.Reset() => Reset();
     IArgument IArgument.Clone() => Clone();
+    public bool Equals(IArgument? other) {
+        return other is PathArgument p &&
+               Value == p.Value &&
+               DefaultValue == p.DefaultValue &&
+               AllowAny == p.AllowAny &&
+               MustExist == p.MustExist &&
+               PointsToDirectory == p.PointsToDirectory &&
+               PointsToFile == p.PointsToFile;
+    }
 }

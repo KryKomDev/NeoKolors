@@ -149,7 +149,15 @@ public class IntegerArgument : IArgument<Int32> {
         string? res = CustomValidate?.Invoke(value);
         if (res != null) throw new InvalidArgumentInputException(res);
     }
-    
+
+    public bool Equals(IArgument? other) {
+        return other is IntegerArgument i &&
+               Get() == i.Get() &&
+               DefaultValue == i.DefaultValue &&
+               MinValue == i.MinValue &&
+               MaxValue == i.MaxValue &&
+               CustomValidate == i.CustomValidate;
+    }
     public override string ToString() => $"{{\"type\": \"int\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
 }
 
@@ -294,6 +302,15 @@ public class UIntegerArgument : IArgument<UInt32> {
         if (value > MaxValue) throw new InvalidArgumentInputException($"Value was greater then the greatest allowed value ({MaxValue}).");
         string? res = CustomValidate?.Invoke(value);
         if (res != null) throw new InvalidArgumentInputException(res);
+    }
+    
+    public bool Equals(IArgument? other) {
+        return other is UIntegerArgument i &&
+               Get() == i.Get() &&
+               DefaultValue == i.DefaultValue &&
+               MinValue == i.MinValue &&
+               MaxValue == i.MaxValue &&
+               CustomValidate == i.CustomValidate;
     }
     
     public override string ToString() => $"{{\"type\": \"uint\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";

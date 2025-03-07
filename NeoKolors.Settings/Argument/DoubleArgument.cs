@@ -145,5 +145,15 @@ public class DoubleArgument : IArgument<Double> {
         if (res != null) throw new InvalidArgumentInputException(res);
     }
 
+    public bool Equals(IArgument? other) {
+        const double tolerance = 0.00000000000001;
+        return other is DoubleArgument d && 
+               Math.Abs(Get() - d.Get()) < tolerance && 
+               Math.Abs(DefaultValue - d.DefaultValue) < tolerance &&
+               Math.Abs(MinValue - d.MinValue) < tolerance &&
+               Math.Abs(MaxValue - d.MaxValue) < tolerance &&
+               CustomValidate == d.CustomValidate;
+    }
+    
     public override string ToString() => $"{{\"type\": \"double\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
 }

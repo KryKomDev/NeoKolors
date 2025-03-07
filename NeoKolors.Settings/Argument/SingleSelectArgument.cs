@@ -75,7 +75,14 @@ public class SingleSelectArgument<T> : IArgument<T> where T : notnull {
         else
             throw new InvalidArgumentInputException($"Option index is out of range. Must be between 0 and {Options.Length - 1} inclusive.");
     }
-    
+
+    public bool Equals(IArgument? other) {
+        return other is SingleSelectArgument<T> s &&
+               Options == s.Options &&
+               Index == s.Index &&
+               DefaultIndex == s.DefaultIndex;
+    }
+
     public override string ToString() =>
         $"{{\"type\": \"single-select\", " +
         $"\"value\": \"{Options[Index]}\", " +
