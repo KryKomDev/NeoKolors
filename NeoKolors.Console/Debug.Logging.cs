@@ -16,6 +16,7 @@ public static partial class Debug {
     /// <param name="s">desired string message</param>
     /// <param name="hideTime">hides time if true</param>
     public static void Fatal(string s, bool hideTime = false) {
+        if (s == null) throw new ArgumentNullException(nameof(s));
         if (Level <= DebugLevel.NOTHING) return;
 
         if (IsTerminalPaletteSafe) {
@@ -33,7 +34,7 @@ public static partial class Debug {
     /// <summary>
     /// prints red fatal error text using the ToString method of the object o and <see cref="Fatal(string,bool)"/>
     /// </summary>
-    public static void Fatal(object o, bool hideTime = false) => Fatal(o.ToString(), hideTime);
+    public static void Fatal(object o, bool hideTime = false) => Fatal(o.ToString()!, hideTime);
 
     /// <summary>
     /// prints red error text
@@ -41,6 +42,7 @@ public static partial class Debug {
     /// <param name="s">desired string message</param>
     /// <param name="hideTime">hides time if true</param>
     public static void Error(string s, bool hideTime = false) {
+        if (s == null) throw new ArgumentNullException(nameof(s));
         if (Level <= DebugLevel.NOTHING) return;
 
         if (IsTerminalPaletteSafe) {
@@ -58,7 +60,7 @@ public static partial class Debug {
     /// <summary>
     /// prints red error text using the ToString method of the object o and <see cref="Error(string,bool)"/>
     /// </summary>
-    public static void Error(object o, bool hideTime = false) => Error(o.ToString(), hideTime);
+    public static void Error(object o, bool hideTime = false) => Error(o.ToString()!, hideTime);
 
     /// <summary>
     /// prints yellow warning text
@@ -66,6 +68,7 @@ public static partial class Debug {
     /// <param name="s">desired string message</param>
     /// <param name="hideTime">hides time if true</param>
     public static void Warn(string s, bool hideTime = false) {
+        if (s == null) throw new ArgumentNullException(nameof(s));
         if (Level < DebugLevel.ERRORS_WARNS) return;
         
         if (IsTerminalPaletteSafe) 
@@ -83,7 +86,7 @@ public static partial class Debug {
     /// <summary>
     /// prints yellow warning text using the ToString method of the object o and <see cref="Warn(string,bool)"/>
     /// </summary>
-    public static void Warn(object o, bool hideTime = false) => Warn(o.ToString(), hideTime);
+    public static void Warn(object o, bool hideTime = false) => Warn(o.ToString()!, hideTime);
     
     /// <summary>
     /// prints green info text
@@ -91,6 +94,7 @@ public static partial class Debug {
     /// <param name="s">desired string message</param>
     /// <param name="hideTime">hides time if true</param>
     public static void Info(string s, bool hideTime = false) {
+        if (s == null) throw new ArgumentNullException(nameof(s));
         if (Level < DebugLevel.ALL) return;
 
         if (IsTerminalPaletteSafe) {
@@ -111,14 +115,15 @@ public static partial class Debug {
     /// <summary>
     /// prints green info text using the ToString method of the object o and <see cref="Info(string,bool)"/>
     /// </summary>
-    public static void Info(object o, bool hideTime = false) => Info(o.ToString(), hideTime);
+    public static void Info(object o, bool hideTime = false) => Info(o.ToString()!, hideTime);
     
     /// <summary>
     /// prints a debug message, does not work when built in release mode
     /// </summary>
     /// <param name="s">desired string message</param>
     /// <param name="hideTime">hides time if true</param>
-    public static void Msg(string s, bool hideTime = false) {
+    public static void Log(string s, bool hideTime = false) {
+        if (s == null) throw new ArgumentNullException(nameof(s));
         #if !DEBUG
         if (Level == DebugLevel.NOTHING) return;
 
@@ -138,7 +143,7 @@ public static partial class Debug {
     }
     
     /// <summary>
-    /// prints debug text using the ToString method of the object o and <see cref="Msg(string,bool)"/>
+    /// prints debug text using the ToString method of the object o and <see cref="Log"/>
     /// </summary>
-    public static void Msg(object o, bool hideTime = false) => Msg(o.ToString(), hideTime);
+    public static void Log(object o, bool hideTime = false) => Log(o.ToString()!, hideTime);
 }
