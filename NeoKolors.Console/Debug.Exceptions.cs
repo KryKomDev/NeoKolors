@@ -16,16 +16,8 @@ public static partial class Debug {
     /// <summary>
     /// throws an exception
     /// </summary>
-    public static void PrintException(Exception e) {
-        string output = $"\e[0m{e.GetType().Namespace!.AddColor(NamespaceColor)}." +
-                        $"{e.GetType().Name.AddColor(NameColor)}: " +
-                        $"{("<b>" + e.Message.AddColor(MessageColor) + "</b>").ApplyStyles()}\n";
-        
-        output += SplitStackTrace(e.StackTrace ?? "");
-        
-        PrintException(output);
-    }
-    
+    public static void PrintException(Exception e) => System.Console.Write(ToString(e));
+
     /// <summary>
     /// throws an exception with fancy formatting
     /// </summary>
@@ -49,17 +41,31 @@ public static partial class Debug {
     public static Exception Fancy(Exception e) => (Exception)FancyException<Exception>.Create(e);
 
     /// <summary>
+    /// if added to <c>AppDomain.CurrentDomain.UnhandledException</c>, makes all exceptions fancy
+    /// </summary>
+    private static void WriteUnhandled(object? sender, UnhandledExceptionEventArgs args) {
+        if (args.ExceptionObject is Exception e) {
+            System.Console.Write(ToString(e));
+        }
+
+        Environment.Exit(1);
+    }
+    
+    /// <summary>
     /// stringifies an exception to a fancy one
     /// </summary>
     /// <param name="e">exception that will be thrown</param>
-    internal static string ToString(Exception e) {
-        string stringified = $"\e[0m{e.GetType().Namespace!.AddColor(NamespaceColor)}." +
-                             $"{e.GetType().Name.AddColor(NameColor)}: " +
-                             $"{("<b>" + e.Message.AddColor(MessageColor) + "</b>").ApplyStyles()}\n";
+    public static string ToString(Exception e) {
+        System.Console.Write("\e[0m");
+        string stringified = $"{e.GetType().Namespace!.AddColor(NamespaceColor)}." +
+                             $"{e.GetType().Name.AddStyle(StringEffects.TextStyles.ITALIC).AddColor(ExceptionNameColor)}: " +
+                             $"{e.Message.AddColor(MessageColor).AddStyle(StringEffects.TextStyles.BOLD)}\n";
         
         stringified += SplitStackTrace(e.StackTrace ?? "");
 
         if (!ShowHighlight) return $"{new string('\b', 21)}" + stringified + "\e[0m";
+
+        stringified = stringified.Trim();
         
         string[] lines = stringified.Split('\n');
         string highlighted = $"{new string('\b', 21)}";
@@ -70,17 +76,13 @@ public static partial class Debug {
 
         return highlighted + "\e[0m";
     }
-    
-    private static void PrintException(string output) {
-        string[] lines = output.Split('\n');
-        
-        foreach (var l in lines) {
-            ConsoleColors.PrintColored("▍ ", HighlightColor);
-            System.Console.WriteLine(l);
-        }
-    }
 
+    /// <summary>
+    /// probably colors the exception stack trace, no idea how it does that 
+    /// </summary>
     private static string SplitStackTrace(string stackTrace) {
+        if (stackTrace == "") return "";
+        
         string[] stack = stackTrace.Split('\n');
         string output = "";
         
@@ -90,9 +92,10 @@ public static partial class Debug {
             string before = s.Substring(0, m.Index);
             before = before.Substring(0, 5).AddColor(ConsoleColor.DarkGray) +
                      before.Substring(5).AddColor(NamespaceColor)
-                         .AddStyles(FaintNamespace ? [StringEffects.TextStyle.FAINT] : []);
+                         .AddStyle((byte)(FaintNamespace ? StringEffects.TextStyles.FAINT : 0));
             
-            string middle = m.Value.AddColor(MethodColor).AddStyle(StringEffects.TextStyle.BOLD);
+            string middle = m.Value.AddColor(MethodColor).AddStyle(StringEffects.TextStyles.BOLD);
+            if (ItalicMethodName) middle = middle.AddStyle(StringEffects.TextStyles.ITALIC);
 
             string end = s.Substring(m.Index + m.Length) + "\n";
             int separate = end.IndexOf(") in", StringComparison.InvariantCulture);
@@ -130,9 +133,9 @@ public static partial class Debug {
         }
 
         string s1 = s.Substring(0, startIndex + 1).AddColor(PathColor)
-            .AddStyles(FaintPath ? [StringEffects.TextStyle.FAINT] : []);
+            .AddStyle((byte)(FaintPath ? StringEffects.TextStyles.FAINT : 0));
         string s2 = s.Substring(startIndex + 1, endIndex - startIndex - 1).AddColor(FileNameColor)
-            .AddStyle(StringEffects.TextStyle.BOLD);
+            .AddStyle(StringEffects.TextStyles.BOLD);
         string s3 = " at line <b>".AddColor(ConsoleColor.DarkGray) +
                     s.Substring(endIndex + 7).AddColor(LineNumberColor) + "</b>";
 

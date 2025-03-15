@@ -143,7 +143,7 @@ public static partial class Debug {
     /// <summary>
     /// the color of the exception type shown when a fancy exception is thrown
     /// </summary>
-    public static Color NameColor { get; set; } = new(ConsoleColor.Yellow);
+    public static Color ExceptionNameColor { get; set; } = new(ConsoleColor.Yellow);
     
     /// <summary>
     /// the color of the exception message shown when a fancy exception is thrown
@@ -186,4 +186,29 @@ public static partial class Debug {
     /// the color of the line number printed as a part of the stack trace shown when a fancy exception is thrown
     /// </summary>
     public static Color LineNumberColor { get; set; } = new(ConsoleColor.Green);
+
+    /// <summary>
+    /// if true makes the exception name italic
+    /// </summary>
+    public static bool ItalicExceptionName { get; set; } = true;
+
+    /// <summary>
+    /// if true makes the method names in exception stack trace italic
+    /// </summary>
+    public static bool ItalicMethodName { get; set; } = true;
+
+    /// <summary>
+    /// if true makes all unhandled exceptions look fancy
+    /// </summary>
+    public static bool EnableAutoFancy { 
+        get;
+        set {
+            if (value)
+                AppDomain.CurrentDomain.UnhandledException += WriteUnhandled;
+            else
+                AppDomain.CurrentDomain.UnhandledException -= WriteUnhandled;
+
+            field = value;
+        } 
+    } = true;
 }

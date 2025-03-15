@@ -143,7 +143,7 @@ public static partial class Debug {
     }
     
     /// <summary>
-    /// prints debug text using the ToString method of the object o and <see cref="Log"/>
+    /// prints debug text using the ToString method of the object o and <see cref="Log(string,bool)"/>
     /// </summary>
     public static void Log(object o, bool hideTime = false) => Log(o.ToString()!, hideTime);
 }
