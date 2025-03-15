@@ -70,4 +70,9 @@ public class Color : ICloneable {
         IsPaletteSafe
             ? PALETTE_BACKGROUND_COLOR_END
             : CUSTOM_BACKGROUND_COLOR_END;
+
+    public void PrintColor() =>
+        Console.WriteLine(IsPaletteSafe
+            ? $"{CustomColor:x8} {"●".AddColor(CustomColor!)}"
+            : $"{Enum.GetName(typeof(ConsoleColor), ConsoleColor!)} {"●".AddColor(ConsoleColor!)}");
 }

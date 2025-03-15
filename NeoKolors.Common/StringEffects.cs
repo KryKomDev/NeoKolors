@@ -86,10 +86,13 @@ public static class StringEffects {
     /// <param name="styles">styles applied to the text</param>
     /// <returns>string with the styles applied</returns>
     /// <exception cref="ArgumentOutOfRangeException">an invalid style was inputted</exception>
-    public static string AddStyles(this string text, params TextStyle[] styles) {
-        foreach (var s in styles) {
-            text = text.AddStyle(s);
-        }
+    public static string AddStyle(this string text, int styles) {
+        if ((styles & 0b000001) == 0b000001) text = text.AddStyle(TextStyles.BOLD);
+        if ((styles & 0b000010) == 0b000010) text = text.AddStyle(TextStyles.ITALIC);
+        if ((styles & 0b000100) == 0b000100) text = text.AddStyle(TextStyles.UNDERLINE);
+        if ((styles & 0b001000) == 0b001000) text = text.AddStyle(TextStyles.FAINT);
+        if ((styles & 0b010000) == 0b010000) text = text.AddStyle(TextStyles.NEGATIVE);
+        if ((styles & 0b100000) == 0b100000) text = text.AddStyle(TextStyles.STRIKETHROUGH);
         
         return text;
     }
@@ -101,14 +104,14 @@ public static class StringEffects {
     /// <param name="style">style applied to the text</param>
     /// <returns>string with the style applied</returns>
     /// <exception cref="ArgumentOutOfRangeException">an invalid style was inputted</exception>
-    public static string AddStyle(this string text, TextStyle style) {
+    public static string AddStyle(this string text, TextStyles style) {
         return style switch {
-            TextStyle.BOLD => $"{BOLD_START}{text}{BOLD_END}",
-            TextStyle.ITALIC => $"{ITALIC_START}{text}{ITALIC_END}",
-            TextStyle.UNDERLINE => $"{UNDERLINE_START}{text}{UNDERLINE_END}",
-            TextStyle.FAINT => $"{FAINT_START}{text}{FAINT_END}",
-            TextStyle.NEGATIVE => $"{NEGATIVE_START}{text}{NEGATIVE_END}",
-            TextStyle.STRIKETHROUGH => $"{STRIKETHROUGH_START}{text}{STRIKETHROUGH_END}",
+            TextStyles.BOLD => $"{BOLD_START}{text}{BOLD_END}",
+            TextStyles.ITALIC => $"{ITALIC_START}{text}{ITALIC_END}",
+            TextStyles.UNDERLINE => $"{UNDERLINE_START}{text}{UNDERLINE_END}",
+            TextStyles.FAINT => $"{FAINT_START}{text}{FAINT_END}",
+            TextStyles.NEGATIVE => $"{NEGATIVE_START}{text}{NEGATIVE_END}",
+            TextStyles.STRIKETHROUGH => $"{STRIKETHROUGH_START}{text}{STRIKETHROUGH_END}",
             _ => throw new ArgumentOutOfRangeException(nameof(style), style, null)
         };
     }
@@ -250,12 +253,13 @@ public static class StringEffects {
     /// <summary>
     /// style types
     /// </summary>
-    public enum TextStyle {
+    [Flags]
+    public enum TextStyles {
         BOLD = 1,
-        ITALIC = 3,
+        ITALIC = 2,
         UNDERLINE = 4,
-        FAINT = 2,
-        NEGATIVE = 7,
-        STRIKETHROUGH = 9
+        FAINT = 8,
+        NEGATIVE = 16,
+        STRIKETHROUGH = 32
     }
 }
