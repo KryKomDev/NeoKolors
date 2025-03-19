@@ -13,6 +13,27 @@ public class Color : ICloneable {
     public ConsoleColor? ConsoleColor { get; }
     public int? CustomColor { get; }
 
+    public byte R {
+        get {
+            if (IsPaletteSafe) throw InvalidColorCastException.ConsoleColorToCustom();
+            return (byte)(CustomColor >> 16)!;
+        }
+    }
+    
+    public byte G {
+        get {
+            if (IsPaletteSafe) throw InvalidColorCastException.ConsoleColorToCustom();
+            return (byte)(CustomColor >> 8)!;
+        }
+    }
+    
+    public byte B {
+        get {
+            if (IsPaletteSafe) throw InvalidColorCastException.ConsoleColorToCustom();
+            return (byte)CustomColor!;
+        }
+    }
+
     public Color(int customColor) {
         IsPaletteSafe = false;
         CustomColor = customColor;
@@ -24,6 +45,7 @@ public class Color : ICloneable {
         CustomColor = null;
         ConsoleColor = consoleColor;
     }
+    
     
     public static implicit operator Color(ConsoleColor color) => new(color);
     public static implicit operator Color(int color) => new(color);

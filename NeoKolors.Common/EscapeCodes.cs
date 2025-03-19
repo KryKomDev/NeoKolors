@@ -42,7 +42,7 @@ public static class EscapeCodes {
     public const string PALETTE_COLOR_CYAN = "\e[38;5;14m";
     public const string PALETTE_COLOR_WHITE = "\e[38;5;15m";
     
-    public const string PALETTE_COLOR_END = "\e[38;5;7m";
+    public const string PALETTE_COLOR_END = "\e[39m";
     
     public const string PALETTE_BACKGROUND_COLOR_BLACK = "\e[48;5;0m";
     public const string PALETTE_BACKGROUND_COLOR_DARK_RED = "\e[48;5;1m";
@@ -61,7 +61,7 @@ public static class EscapeCodes {
     public const string PALETTE_BACKGROUND_COLOR_CYAN = "\e[48;5;14m";
     public const string PALETTE_BACKGROUND_COLOR_WHITE = "\e[48;5;15m";
     
-    public const string PALETTE_BACKGROUND_COLOR_END = "\e[48;5;7m";
+    public const string PALETTE_BACKGROUND_COLOR_END = "\e[49m";
 
     /// <summary>
     /// disables all styles
