@@ -136,7 +136,7 @@ public class ConsoleProgressBar {
     }
 
     private void PrintBarPart(bool state) {
-        ConsoleColors.PrintColored("" + barChar, state ? Debug.InfoColor : Debug.ErrorColor);
+        ConsoleColors.Write("" + barChar, state ? Debug.InfoColor : Debug.ErrorColor);
     }
 
     private void PrintBarStart() {

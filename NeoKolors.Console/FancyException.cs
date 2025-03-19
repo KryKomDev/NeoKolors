@@ -10,7 +10,7 @@ namespace NeoKolors.Console;
 /// </summary>
 public sealed class FancyException<TInner> : Exception, IFancyException<TInner> where TInner : Exception {
     public TInner OriginalException { get; }
-    public override string ToString() => Debug.ToString(OriginalException);
+    public override string ToString() => Debug.ToFancyString(OriginalException);
     public FancyException(TInner e) => OriginalException = e;
 
     /// <summary>

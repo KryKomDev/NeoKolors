@@ -3,6 +3,9 @@
 // Copyright (c) 2025 KryKom
 //
 
+using NeoKolors.Common;
+using static NeoKolors.Common.EscapeCodes;
+
 namespace NeoKolors.Console;
 
 /// <summary>
@@ -14,136 +17,165 @@ public static partial class Debug {
     /// prints red error text
     /// </summary>
     /// <param name="s">desired string message</param>
-    /// <param name="hideTime">hides time if true</param>
-    public static void Fatal(string s, bool hideTime = false) {
+    public static void Fatal(string s) {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        if (Level <= DebugLevel.NOTHING) return;
+        if (!Level.HasFlag(DebugLevel.FATAL)) return;
 
-        if (IsTerminalPaletteSafe) {
-            ConsoleColors.PrintColored(hideTime ? "" : $"\e[1m[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] ", ConsoleColor.DarkRed);
-            ConsoleColors.PrintColoredB("\e[1m\e[38;2;36;36;36m[ FATAL ]", ConsoleColor.DarkRed);
-            ConsoleColors.PrintColored($"\e[1m : {s}\n", ConsoleColor.DarkRed);
+        if (SimpleMessages) {
+            Output.WriteLine(HideTime
+                ? $"[ FATAL ] : {s}"
+                : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] [ FATAL ] : {s}");
         }
         else {
-            ConsoleColors.PrintColored(hideTime ? "" : $"\e[1m[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] ", FATAL_COLOR);
-            ConsoleColors.PrintColoredB("\e[1m\e[38;2;36;36;36m[ FATAL ]", FATAL_COLOR);
-            ConsoleColors.PrintColored($"\e[1m : {s}\n", FATAL_COLOR);
+            if (IsTerminalPaletteSafe) {
+                Output.WriteLine(HideTime
+                    ?  $"<f-dark-red><b><f-black><b-dark-red> FATAL <f-dark-red></b-color></b> : {s}</f-color>"
+                        .ApplyStyles().ApplyColors()
+                    : ($"<f-dark-red>[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] " +
+                       $"<b><f-black><b-dark-red> FATAL <f-dark-red></b-color></b> : {s}</f-color>")
+                        .ApplyStyles().ApplyColors());
+            }
+            else {
+                Output.WriteLine(HideTime
+                    ? ($"{FATAL_COLOR.ControlChar}<b><f-black>{FATAL_COLOR.ControlCharB} FATAL {FATAL_COLOR.ControlChar}" +
+                       $"{CUSTOM_BACKGROUND_COLOR_END}</b> : {s}").ApplyStyles().ApplyColors()
+                    : ($"{FATAL_COLOR.ControlChar}[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] " +
+                       $"{CUSTOM_BACKGROUND_COLOR_END}{FATAL_COLOR.ControlCharB} FATAL {FATAL_COLOR.ControlChar}" +
+                       $"{CUSTOM_BACKGROUND_COLOR_END}</b> : {s}").ApplyStyles().ApplyColors());
+            }
         }
+        
+        Output.Flush();
     }
     
     /// <summary>
-    /// prints red fatal error text using the ToString method of the object o and <see cref="Fatal(string,bool)"/>
+    /// prints red fatal error text using the ToString method of the object o and <see cref="Fatal(string)"/>
     /// </summary>
-    public static void Fatal(object o, bool hideTime = false) => Fatal(o.ToString()!, hideTime);
+    public static void Fatal(object o) => Fatal(o.ToString()!);
 
     /// <summary>
     /// prints red error text
     /// </summary>
     /// <param name="s">desired string message</param>
-    /// <param name="hideTime">hides time if true</param>
-    public static void Error(string s, bool hideTime = false) {
+    public static void Error(string s) {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        if (Level <= DebugLevel.NOTHING) return;
+        if (!Level.HasFlag(DebugLevel.ERROR)) return;
 
-        if (IsTerminalPaletteSafe) {
-            ConsoleColors.PrintColored(hideTime ? "" : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] ", ConsoleColor.Red);
-            ConsoleColors.PrintColoredB("\e[1m\e[38;2;36;36;36m[ ERROR ]", ConsoleColor.Red);
-            ConsoleColors.PrintColored($" : {s}\n", ConsoleColor.Red);
+        if (SimpleMessages) {
+            Output.WriteLine(HideTime
+                ? $"[ ERROR ] : {s}"
+                : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] [ ERROR ] : {s}");
         }
         else {
-            ConsoleColors.PrintColored(hideTime ? "" : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] ", ERROR_COLOR);
-            ConsoleColors.PrintColoredB("\e[1m\e[38;2;36;36;36m[ ERROR ]", ERROR_COLOR);
-            ConsoleColors.PrintColored($" : {s}\n", ERROR_COLOR);
+            if (IsTerminalPaletteSafe) {
+                Output.WriteLine(HideTime
+                    ?  $"<f-red><f-black><b-red> ERROR <f-red></b-color> : {s}</f-color>".ApplyColors()
+                    : ($"<f-red>[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}]" +
+                       $" <f-black><b-red> ERROR <f-red></b-color> : {s}</f-color>").ApplyColors());
+            }
+            else {
+                Output.WriteLine(HideTime
+                    ? ($"{ERROR_COLOR.ControlChar}<f-black>{ERROR_COLOR.ControlCharB} ERROR {ERROR_COLOR.ControlChar}" +
+                       $"{CUSTOM_BACKGROUND_COLOR_END} : {s}</f-color>").ApplyColors()
+                    : ($"{ERROR_COLOR.ControlChar}[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] " +
+                       $"{CUSTOM_BACKGROUND_COLOR_END}{ERROR_COLOR.ControlCharB} ERROR {ERROR_COLOR.ControlChar}" +
+                       $"{CUSTOM_BACKGROUND_COLOR_END} : {s}</f-color>").ApplyColors());
+            }
         }
+        
+        Output.Flush();
     }
     
     /// <summary>
-    /// prints red error text using the ToString method of the object o and <see cref="Error(string,bool)"/>
+    /// prints red error text using the ToString method of the object o and <see cref="Error(string)"/>
     /// </summary>
-    public static void Error(object o, bool hideTime = false) => Error(o.ToString()!, hideTime);
+    public static void Error(object o) => Error(o.ToString()!);
 
     /// <summary>
     /// prints yellow warning text
     /// </summary>
     /// <param name="s">desired string message</param>
-    /// <param name="hideTime">hides time if true</param>
-    public static void Warn(string s, bool hideTime = false) {
+    public static void Warn(string s) {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        if (Level < DebugLevel.ERRORS_WARNS) return;
+        if (!Level.HasFlag(DebugLevel.WARN)) return;
         
-        if (IsTerminalPaletteSafe) 
-            ConsoleColors.PrintColored(
-                hideTime 
-                    ? $"[ WARN ] : {s}\n" 
-                    : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] [ WARN ] : {s}\n", ConsoleColor.Yellow);
-        else
-            ConsoleColors.PrintColored(
-                hideTime
-                    ? $"[ WARN ] : {s}\n"
-                    : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] [ WARN ] : {s}\n", WARN_COLOR);
+        if (SimpleMessages) {
+            Output.WriteLine(HideTime
+                ? $"[ WARN ] : {s}"
+                : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] [ WARN ] : {s}");
+        }
+        else {
+            Output.WriteLine((HideTime
+                    ? $"[ WARN ] : {s}"
+                    : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] [ WARN ] : {s}")
+                .AddColor((Color)(IsTerminalPaletteSafe ? ConsoleColor.Yellow : WARN_COLOR)));
+        }
+        
+        Output.Flush();
     }
     
     /// <summary>
-    /// prints yellow warning text using the ToString method of the object o and <see cref="Warn(string,bool)"/>
+    /// prints yellow warning text using the ToString method of the object o and <see cref="Warn(string)"/>
     /// </summary>
-    public static void Warn(object o, bool hideTime = false) => Warn(o.ToString()!, hideTime);
+    public static void Warn(object o) => Warn(o.ToString()!);
     
     /// <summary>
     /// prints green info text
     /// </summary>
     /// <param name="s">desired string message</param>
-    /// <param name="hideTime">hides time if true</param>
-    public static void Info(string s, bool hideTime = false) {
+    public static void Info(string s) {
         if (s == null) throw new ArgumentNullException(nameof(s));
-        if (Level < DebugLevel.ALL) return;
+        if (!Level.HasFlag(DebugLevel.INFO)) return;
 
-        if (IsTerminalPaletteSafe) {
-            ConsoleColors.PrintColored(
-                hideTime 
-                    ? $"[ INFO ] : {s}\n" 
-                    : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] [ INFO ] : {s}\n", ConsoleColor.Green);
+        if (SimpleMessages) {
+            Output.WriteLine(HideTime
+                ? $"[ INFO ] : {s}"
+                : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] [ INFO ] : {s}");
         }
         else {
-            ConsoleColors.PrintColored(
-                hideTime 
-                    ? $"[ INFO ] : {s}\n" 
-                    : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] [ INFO ] : {s}\n", INFO_COLOR);
-
+            Output.WriteLine((HideTime
+                    ? $"[ INFO ] : {s}"
+                    : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] [ INFO ] : {s}")
+                .AddColor((Color)(IsTerminalPaletteSafe ? ConsoleColor.Green : INFO_COLOR)));
         }
+        
+        Output.Flush();
     }
-    
+
     /// <summary>
-    /// prints green info text using the ToString method of the object o and <see cref="Info(string,bool)"/>
+    /// prints green info text using the ToString method of the object o and <see cref="Info(string)"/>
     /// </summary>
-    public static void Info(object o, bool hideTime = false) => Info(o.ToString()!, hideTime);
-    
+    public static void Info(object o) => Info(o.ToString()!);
+
     /// <summary>
     /// prints a debug message, does not work when built in release mode
     /// </summary>
     /// <param name="s">desired string message</param>
-    /// <param name="hideTime">hides time if true</param>
-    public static void Log(string s, bool hideTime = false) {
+    public static void Log(string s) {
+        #if DEBUG
+        
+        if (!Level.HasFlag(DebugLevel.DEBUG)) return;
         if (s == null) throw new ArgumentNullException(nameof(s));
-        #if !DEBUG
-        if (Level == DebugLevel.NOTHING) return;
 
-        if (IsTerminalPaletteSafe) {
-            ConsoleColors.PrintColored(
-                hideTime 
-                    ? $"[ DEBUG ] : {s}\n" 
-                    : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] [ DEBUG ] : {s}\n", ConsoleColor.Blue);
+        if (SimpleMessages) {
+            Output.WriteLine(HideTime
+                ? $"[ DEBUG ] : {s}"
+                : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] [ DEBUG ] : {s}");
         }
         else {
-            ConsoleColors.PrintColored(
-                hideTime 
-                    ? $"[ DEBUG ] : {s}\n" 
-                    : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] [ DEBUG ] : {s}\n", DEBUG_COLOR);
+            Output.WriteLine((HideTime
+                    ? $"[ DEBUG ] : {s}"
+                    : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] [ DEBUG ] : {s}")
+                .AddColor((Color)(IsTerminalPaletteSafe ? ConsoleColor.Blue : DEBUG_COLOR)));
         }
+        
+        Output.Flush();
+        
         #endif
     }
-    
+
     /// <summary>
-    /// prints debug text using the ToString method of the object o and <see cref="Log(string,bool)"/>
+    /// prints debug text using the ToString method of the object o and <see cref="Log(string)"/>
     /// </summary>
-    public static void Log(object o, bool hideTime = false) => Log(o.ToString()!, hideTime);
+    public static void Log(object o) => Log(o.ToString()!);
 }
