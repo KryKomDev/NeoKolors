@@ -64,6 +64,11 @@ public static class EscapeCodes {
     public const string PALETTE_BACKGROUND_COLOR_END = "\e[48;5;7m";
 
     /// <summary>
+    /// disables all styles
+    /// </summary>
+    public const string STYLE_END = "\e[0m";
+    
+    /// <summary>
     /// switches colors of background and text
     /// </summary>
     public const string SWITCH_COLORS = "\e[38;1;7m";

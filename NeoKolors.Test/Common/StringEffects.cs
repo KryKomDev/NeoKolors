@@ -1,4 +1,9 @@
-﻿using NeoKolors.Common;
+﻿//
+// NeoKolors
+// Copyright (c) 2025 KryKom
+//
+
+using NeoKolors.Common;
 
 namespace NeoKolors.Test.Common;
 

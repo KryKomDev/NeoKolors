@@ -51,6 +51,23 @@ public class Color : ICloneable {
     
     public object Clone() => MemberwiseClone();
 
+    public override bool Equals(object? obj) {
+        if (obj is Color c) return Equals(c);
+        return false;
+    }
+
+    private bool Equals(Color other) => 
+        IsPaletteSafe == other.IsPaletteSafe && ConsoleColor == other.ConsoleColor && CustomColor == other.CustomColor;
+
+    public override int GetHashCode() {
+        unchecked {
+            var hashCode = IsPaletteSafe.GetHashCode();
+            hashCode = (hashCode * 397) ^ ConsoleColor.GetHashCode();
+            hashCode = (hashCode * 397) ^ CustomColor.GetHashCode();
+            return hashCode;
+        }
+    }
+
     public string ControlChar =>
         IsPaletteSafe
             ? ((ConsoleColor)ConsoleColor!).ControlChar()

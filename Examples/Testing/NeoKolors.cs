@@ -1,33 +1,40 @@
-﻿//
-// NeoKolors
-// Copyright (c) 2025 KryKom
-//
-
-using System.Runtime.InteropServices;
-using System.Runtime.Versioning;
-using System.Text;
+﻿using System.Text;
 using NeoKolors.Common;
-using NeoKolors.Common.Exceptions;
 using NeoKolors.Console;
 using NeoKolors.Tui;
-using NeoKolors.Tui.Library;
-using NeoKolors.Tui.Library.Windows;
-using NeoKolors.Settings;
-using NeoKolors.Settings.Argument;
-using Color = NeoKolors.Common.Color;
 
-namespace NeoKolors.Test;
+namespace Testing;
 
-public class Kolors {
-    
-    public static void Manual() {
-        System.Console.OutputEncoding = Encoding.UTF8;
+public static class NeoKolors {
+    public static void Main() {
+        Console.OutputEncoding = Encoding.UTF8;
         Debug.Level = Debug.DebugLevel.ALL;
+        Debug.EnableAutoFancy = true;
         // Debug.Fatal("fatal");
         // Debug.Error("error");
         // Debug.Warn("warn");
         // Debug.Info("info");
         // Debug.Msg("debug");
+
+        var s = new Style(0xab_cd_ef_00_00_00_00_02);
+        var d = s.GetFColor();
+        
+        var c = new AppConfig(false, new ConsoleKeyInfo('q', ConsoleKey.Q, false, false, true), true, 
+            toggleDebugLogCombination: new ConsoleKeyInfo('d', ConsoleKey.D, false, true, true));
+        //
+        // var a = new Application(c);
+        // var v = new View();
+        // a.AddView(v);
+        // a.Start();
+
+        // VirtualConsole.Init();
+        // VirtualConsole.SetFColor(0, 0, 0xabcdef);
+        // // System.Console.WriteLine($"{VirtualConsole.Styles[0, 0]:x16}");
+
+        // Console.SetOut(new ConsoleScreen());
+
+        Application a = new Application(c);
+        a.Start();
 
         /*
 
@@ -98,7 +105,7 @@ public class Kolors {
         var b = new StringInteractiveElement();
 
         System.Console.CursorVisible = true;*/
-    }
+    } 
 }
 
 public enum Test {

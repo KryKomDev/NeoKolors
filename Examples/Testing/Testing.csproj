@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net9.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\..\NeoKolors.Common\NeoKolors.Common.csproj" />
+        <ProjectReference Include="..\..\NeoKolors.Console\NeoKolors.Console.csproj" />
+        <ProjectReference Include="..\..\NeoKolors.Settings\NeoKolors.Settings.csproj" />
+        <ProjectReference Include="..\..\NeoKolors.Tui\NeoKolors.Tui.csproj" />
+    </ItemGroup>
+
+</Project>
