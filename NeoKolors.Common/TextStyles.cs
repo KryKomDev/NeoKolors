@@ -10,6 +10,7 @@ namespace NeoKolors.Common;
 /// </summary>
 [Flags]
 public enum TextStyles {
+    NONE = 0,
     BOLD = 1,
     ITALIC = 2,
     UNDERLINE = 4,

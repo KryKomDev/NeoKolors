@@ -3,12 +3,15 @@
 // Copyright (c) 2025 KryKom
 //
 
+using NeoKolors.Common.Exceptions;
 using SkiaSharp;
+using static System.ConsoleColor;
+using static NeoKolors.Common.NKConsoleColor;
 
 namespace NeoKolors.Common;
 
 /// <summary>
-/// contains methods that convert between color formats (<see cref="SKColor"/>, <see cref="Color"/>, ARGB, HSV, IntArgb)
+/// contains methods that convert between color formats (<see cref="SKColor"/>, <see cref="NKColor"/>, ARGB, HSV, IntArgb)
 /// </summary>
 public static class ColorFormat {
     
@@ -23,7 +26,7 @@ public static class ColorFormat {
     public static SKColor IntToSkia(this int c, bool autoAlpha = true) =>
         new((byte)(c >> 16), (byte)(c >> 8), (byte)c, (byte)(autoAlpha ? 255 : (byte)(c >> 24)));
 
-    public static int IntToSkia(this SKColor c) => c.Alpha << 24 | c.Red << 16 | c.Green << 8 | c.Blue;
+    public static int SkiaToInt(this SKColor c) => c.Alpha << 24 | c.Red << 16 | c.Green << 8 | c.Blue;
     
     public static SKColor HsvToSkia(double hue, double saturation, double value) {
         int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
@@ -85,7 +88,7 @@ public static class ColorFormat {
     }
     
     /// <summary>
-    /// creates an instance of <see cref="Color"/> from the hsv values
+    /// creates an instance of <see cref="NKColor"/> from the hsv values
     /// </summary>
     public static System.Drawing.Color HsvToColor(double hue, double saturation, double value) {
         int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
@@ -117,4 +120,46 @@ public static class ColorFormat {
 
     public static void IntToHsv(this int c, out double h, out double s, out double v) => IntToColor(c).ColorToHsv(out h, out s, out v);
     public static (double h, double s, double v) IntToHsv(this int c) => IntToColor(c).ColorToHsv();
+
+    /// <summary>
+    /// converts the basic <see cref="ConsoleColor"/> to the extended <see cref="NKConsoleColor"/>
+    /// </summary>
+    /// <param name="color">the color to converts</param>
+    public static NKConsoleColor SystemToNK(ConsoleColor color) {
+        return color switch {
+            Black or DarkGreen or DarkMagenta or Gray or DarkGray or Green or Magenta or White => (NKConsoleColor)color,
+            DarkBlue => DARK_BLUE,
+            DarkCyan => DARK_CYAN,
+            DarkRed => DARK_RED,
+            DarkYellow => DARK_YELLOW,
+            Blue => BLUE,
+            Cyan => CYAN,
+            Red => RED,
+            Yellow => YELLOW,
+            _ => WHITE
+        };
+    }
+
+    /// <summary>
+    /// converts the extended <see cref="NKConsoleColor"/> to the basic <see cref="ConsoleColor"/>
+    /// </summary>
+    /// <param name="color">the color to convert</param>
+    /// <exception cref="InvalidColorCastException">
+    /// the passed color is not included in the standard set of colors
+    /// </exception>
+    public static ConsoleColor NKToSystem(NKConsoleColor color) {
+        if ((byte)color >= 16) throw InvalidColorCastException.NKToSystem(color);
+        return color switch {
+            BLACK or DARK_GREEN or DARK_MAGENTA or GRAY or DARK_GRAY or GREEN or MAGENTA or WHITE => (ConsoleColor)color,
+            DARK_BLUE => DarkBlue,
+            DARK_CYAN => DarkCyan,
+            DARK_RED => DarkRed,
+            DARK_YELLOW => DarkYellow,
+            BLUE => Blue,
+            CYAN => Cyan,
+            RED => Red,
+            YELLOW => Yellow,
+            _ => White
+        };
+    }
 }

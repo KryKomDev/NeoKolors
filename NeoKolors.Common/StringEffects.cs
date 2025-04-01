@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using static NeoKolors.Common.EscapeCodes;
+using static NeoKolors.Common.TextStyles;
 
 namespace NeoKolors.Common;
 
@@ -20,7 +21,7 @@ public static class StringEffects {
     /// <returns>string with colored characters</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, int hex) => 
-        $"{hex.ControlChar()}{s}{CUSTOM_COLOR_END}";
+        $"{hex.ControlChar()}{s}{TEXT_COLOR_END}";
 
     
     /// <summary>
@@ -31,7 +32,7 @@ public static class StringEffects {
     /// <returns>string with colored characters</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColorB(this string text, int hex) => 
-        $"{hex.ControlCharB()}{text}{CUSTOM_BACKGROUND_COLOR_END}";
+        $"{hex.ControlCharB()}{text}{BACKGROUND_COLOR_END}";
 
     
     /// <summary>
@@ -44,7 +45,7 @@ public static class StringEffects {
     /// <returns>string with colored characters</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, byte red, byte green, byte blue) => 
-        $"{CUSTOM_COLOR_START}{red};{green};{blue}m{s}{CUSTOM_COLOR_END}";
+        $"{CUSTOM_COLOR_START}{red};{green};{blue}m{s}{TEXT_COLOR_END}";
 
     
     /// <summary>
@@ -57,7 +58,7 @@ public static class StringEffects {
     /// <returns>string with colored characters</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColorB(this string text, byte red, byte green, byte blue) => 
-        $"{CUSTOM_BACKGROUND_COLOR_START}{red};{green};{blue}m{text}{CUSTOM_BACKGROUND_COLOR_END}";
+        $"{CUSTOM_BACKGROUND_COLOR_START}{red};{green};{blue}m{text}{BACKGROUND_COLOR_END}";
     
     
     /// <summary>
@@ -65,8 +66,26 @@ public static class StringEffects {
     /// </summary>
     /// <returns>text with colors</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string AddColor(this string s, NKConsoleColor color) => 
+        $"{color.ControlChar()}{s}{TEXT_COLOR_END}";
+
+    
+    /// <summary>
+    /// adds a color of the terminal palette to the text's background
+    /// </summary>
+    /// <returns>text with colored background</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string AddColorB(this string text, NKConsoleColor color) => 
+        $"{color.ControlCharB()}{text}{BACKGROUND_COLOR_END}";
+
+    
+    /// <summary>
+    /// adds a color of the terminal palette to the text
+    /// </summary>
+    /// <returns>text with colors</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, ConsoleColor color) => 
-        $"{color.ControlChar()}{s}{PALETTE_COLOR_END}";
+        $"{color.ControlChar()}{s}{TEXT_COLOR_END}";
 
     
     /// <summary>
@@ -75,16 +94,15 @@ public static class StringEffects {
     /// <returns>text with colored background</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColorB(this string text, ConsoleColor color) => 
-        $"{color.ControlCharB()}{text}{PALETTE_BACKGROUND_COLOR_END}";
-
+        $"{color.ControlCharB()}{text}{BACKGROUND_COLOR_END}";
     
     /// <summary>
     /// adds a color to the text
     /// </summary>
     /// <returns>colored text</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string AddColor(this string s, Color color) => 
-        $"{color.ControlChar}{s}{color.ControlCharEnd}";
+    public static string AddColor(this string s, NKColor color) => 
+        $"{color.ControlChar}{s}{TEXT_COLOR_END}";
 
     
     /// <summary>
@@ -92,8 +110,8 @@ public static class StringEffects {
     /// </summary>
     /// <returns>text with colored background</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string AddColorB(this string text, Color color) => 
-        $"{color.ControlCharB}{text}{color.ControlCharEndB}";
+    public static string AddColorB(this string text, NKColor color) => 
+        $"{color.ControlCharB}{text}{BACKGROUND_COLOR_END}";
 
     
     /// <summary>
@@ -121,7 +139,7 @@ public static class StringEffects {
     /// <param name="s">the string to be colored</param>
     /// <param name="colors">array of tuples containing the symbol and the color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string AddColor(this string s, params (string symbol, Color color)[] colors) => 
+    public static string AddColor(this string s, params (string symbol, NKColor color)[] colors) => 
         colors.Aggregate(s, (current, c) => current.Replace(c.symbol, c.color.ControlChar));
     
     
@@ -129,7 +147,7 @@ public static class StringEffects {
     /// adds color to both the text and the background
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string AddColor(this string s, Color text, Color background) => 
+    public static string AddColor(this string s, NKColor text, NKColor background) => 
         s.AddColor(text).AddColorB(background);
 
     
@@ -195,7 +213,7 @@ public static class StringEffects {
         s = s.Replace("<f-magenta>", PALETTE_COLOR_MAGENTA);
         s = s.Replace("<f-cyan>", PALETTE_COLOR_CYAN);
         s = s.Replace("<f-white>", PALETTE_COLOR_WHITE);
-        s = s.Replace("</f-color>", PALETTE_COLOR_END);
+        s = s.Replace("</f-color>", TEXT_COLOR_END);
         
         s = s.Replace("<b-black>", PALETTE_BACKGROUND_COLOR_BLACK);
         s = s.Replace("<b-dark-red>", PALETTE_BACKGROUND_COLOR_DARK_RED);
@@ -213,7 +231,7 @@ public static class StringEffects {
         s = s.Replace("<b-magenta>", PALETTE_BACKGROUND_COLOR_MAGENTA);
         s = s.Replace("<b-cyan>", PALETTE_BACKGROUND_COLOR_CYAN);
         s = s.Replace("<b-white>", PALETTE_BACKGROUND_COLOR_WHITE);
-        s = s.Replace("</b-color>", PALETTE_BACKGROUND_COLOR_END);
+        s = s.Replace("</b-color>", BACKGROUND_COLOR_END);
         
         return s;
     }
@@ -227,12 +245,12 @@ public static class StringEffects {
     /// <returns>string with the styles applied</returns>
     /// <exception cref="ArgumentOutOfRangeException">an invalid style was inputted</exception>
     public static string AddStyle(this string s, int styles) {
-        if ((styles & 0b000001) == 0b000001) s = s.AddStyle(TextStyles.BOLD);
-        if ((styles & 0b000010) == 0b000010) s = s.AddStyle(TextStyles.ITALIC);
-        if ((styles & 0b000100) == 0b000100) s = s.AddStyle(TextStyles.UNDERLINE);
-        if ((styles & 0b001000) == 0b001000) s = s.AddStyle(TextStyles.FAINT);
-        if ((styles & 0b010000) == 0b010000) s = s.AddStyle(TextStyles.NEGATIVE);
-        if ((styles & 0b100000) == 0b100000) s = s.AddStyle(TextStyles.STRIKETHROUGH);
+        if ((styles & 0b000001) == 0b000001) s = s.AddStyle(BOLD);
+        if ((styles & 0b000010) == 0b000010) s = s.AddStyle(ITALIC);
+        if ((styles & 0b000100) == 0b000100) s = s.AddStyle(UNDERLINE);
+        if ((styles & 0b001000) == 0b001000) s = s.AddStyle(FAINT);
+        if ((styles & 0b010000) == 0b010000) s = s.AddStyle(NEGATIVE);
+        if ((styles & 0b100000) == 0b100000) s = s.AddStyle(STRIKETHROUGH);
         
         return s;
     }
@@ -247,15 +265,13 @@ public static class StringEffects {
     /// <exception cref="ArgumentOutOfRangeException">an invalid style was inputted</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddStyle(this string s, TextStyles style) {
-        return style switch {
-            TextStyles.BOLD => $"{BOLD_START}{s}{BOLD_END}",
-            TextStyles.ITALIC => $"{ITALIC_START}{s}{ITALIC_END}",
-            TextStyles.UNDERLINE => $"{UNDERLINE_START}{s}{UNDERLINE_END}",
-            TextStyles.FAINT => $"{FAINT_START}{s}{FAINT_END}",
-            TextStyles.NEGATIVE => $"{NEGATIVE_START}{s}{NEGATIVE_END}",
-            TextStyles.STRIKETHROUGH => $"{STRIKETHROUGH_START}{s}{STRIKETHROUGH_END}",
-            _ => throw new ArgumentOutOfRangeException(nameof(style), style, null)
-        };
+        if (style.HasFlag(BOLD)) s = $"{BOLD_START}{s}{BOLD_END}";
+        if (style.HasFlag(ITALIC)) s = $"{ITALIC_START}{s}{ITALIC_END}";
+        if (style.HasFlag(UNDERLINE)) s = $"{UNDERLINE_START}{s}{UNDERLINE_END}";
+        if (style.HasFlag(FAINT)) s = $"{FAINT_START}{s}{FAINT_END}";
+        if (style.HasFlag(NEGATIVE)) s = $"{NEGATIVE_START}{s}{NEGATIVE_END}";
+        if (style.HasFlag(STRIKETHROUGH)) s = $"{STRIKETHROUGH_START}{s}{STRIKETHROUGH_END}";
+        return s;
     }
 
 
@@ -266,61 +282,35 @@ public static class StringEffects {
     /// <param name="styles">styles applied to text</param>
     /// <returns>styled string</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string AddStyle(this char c, int styles) => (c + "").AddStyle(styles);
+    public static string AddStyle(this char c, TextStyles styles) => (c + "").AddStyle(styles);
+
+
+    /// <summary>
+    /// returns string containing ansi escape sequence coloring the text
+    /// </summary>    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ControlChar(this NKConsoleColor color) => GetPaletteFColor((byte)color);
     
+    /// <summary>
+    /// returns string containing ansi escape sequence coloring background
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ControlCharB(this NKConsoleColor color) => GetPaletteBColor((byte)color);
     
     /// <summary>
     /// returns string containing ansi escape sequence coloring the text
     /// </summary>    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string ControlChar(this ConsoleColor color) {
-        return color switch {
-            ConsoleColor.Black => PALETTE_COLOR_BLACK,
-            ConsoleColor.DarkRed => PALETTE_COLOR_DARK_RED,
-            ConsoleColor.DarkGreen => PALETTE_COLOR_DARK_GREEN,
-            ConsoleColor.DarkYellow => PALETTE_COLOR_DARK_YELLOW,
-            ConsoleColor.DarkBlue => PALETTE_COLOR_DARK_BLUE,
-            ConsoleColor.DarkMagenta => PALETTE_COLOR_DARK_MAGENTA,
-            ConsoleColor.DarkCyan => PALETTE_COLOR_DARK_CYAN,
-            ConsoleColor.Gray => PALETTE_COLOR_GRAY,
-            ConsoleColor.DarkGray => PALETTE_COLOR_DARK_GRAY,
-            ConsoleColor.Red => PALETTE_COLOR_RED,
-            ConsoleColor.Green => PALETTE_COLOR_GREEN,
-            ConsoleColor.Yellow => PALETTE_COLOR_YELLOW,
-            ConsoleColor.Blue => PALETTE_COLOR_BLUE,
-            ConsoleColor.Magenta => PALETTE_COLOR_MAGENTA,
-            ConsoleColor.Cyan => PALETTE_COLOR_CYAN,
-            ConsoleColor.White => PALETTE_COLOR_WHITE,
-            _ => throw new ArgumentOutOfRangeException(nameof(ConsoleColor), color, null)
-        };
-    }
+    public static string ControlChar(this ConsoleColor color) => 
+        GetPaletteFColor((byte)ColorFormat.SystemToNK(color));
 
     
     /// <summary>
     /// returns string containing ansi escape sequence coloring background
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string ControlCharB(this ConsoleColor color) {
-        return color switch {
-            ConsoleColor.Black => PALETTE_BACKGROUND_COLOR_BLACK,
-            ConsoleColor.DarkRed => PALETTE_BACKGROUND_COLOR_DARK_RED,
-            ConsoleColor.DarkGreen => PALETTE_BACKGROUND_COLOR_DARK_GREEN,
-            ConsoleColor.DarkYellow => PALETTE_BACKGROUND_COLOR_DARK_YELLOW,
-            ConsoleColor.DarkBlue => PALETTE_BACKGROUND_COLOR_DARK_BLUE,
-            ConsoleColor.DarkMagenta => PALETTE_BACKGROUND_COLOR_DARK_MAGENTA,
-            ConsoleColor.DarkCyan => PALETTE_BACKGROUND_COLOR_DARK_CYAN,
-            ConsoleColor.Gray => PALETTE_BACKGROUND_COLOR_GRAY,
-            ConsoleColor.DarkGray => PALETTE_BACKGROUND_COLOR_DARK_GRAY,
-            ConsoleColor.Red => PALETTE_BACKGROUND_COLOR_RED,
-            ConsoleColor.Green => PALETTE_BACKGROUND_COLOR_GREEN,
-            ConsoleColor.Yellow => PALETTE_BACKGROUND_COLOR_YELLOW,
-            ConsoleColor.Blue => PALETTE_BACKGROUND_COLOR_BLUE,
-            ConsoleColor.Magenta => PALETTE_BACKGROUND_COLOR_MAGENTA,
-            ConsoleColor.Cyan => PALETTE_BACKGROUND_COLOR_CYAN,
-            ConsoleColor.White => PALETTE_BACKGROUND_COLOR_WHITE,
-            _ => throw new ArgumentOutOfRangeException(nameof(ConsoleColor), color, null)
-        };
-    }
+    public static string ControlCharB(this ConsoleColor color) => 
+        GetPaletteBColor((byte)ColorFormat.SystemToNK(color));
 
     
     /// <summary>
@@ -340,18 +330,18 @@ public static class StringEffects {
 
     
     /// <summary>
-    /// adds styles to a string using the <see cref="Style"/> structure
+    /// adds styles to a string using the <see cref="NKStyle"/> structure
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string AddStyle(this string s, Style style) => 
+    public static string AddStyle(this string s, NKStyle style) => 
         s.AddStyle(style.Styles).AddColor(style.FColor, style.BColor);
     
     
     /// <summary>
-    /// adds styles to a string using the <see cref="Style"/> structure
+    /// adds styles to a string using the <see cref="NKStyle"/> structure
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string AddStyle(this char s, Style style) => 
+    public static string AddStyle(this char s, NKStyle style) => 
         s.AddStyle(style.Styles).AddColor(style.FColor, style.BColor);
 
 

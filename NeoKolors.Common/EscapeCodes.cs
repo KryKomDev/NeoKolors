@@ -24,7 +24,10 @@ public static class EscapeCodes {
     
     public const string CUSTOM_BACKGROUND_COLOR_START = "\e[48;2;";
     public const string CUSTOM_BACKGROUND_COLOR_END = "\e[48;1;m";
-
+    
+    public static string GetPaletteFColor(byte color) => $"\e[38;5;{color}m";
+    public static string GetPaletteBColor(byte color) => $"\e[48;5;{color}m";
+    
     public const string PALETTE_COLOR_BLACK = "\e[38;5;0m";
     public const string PALETTE_COLOR_DARK_RED = "\e[38;5;1m";
     public const string PALETTE_COLOR_DARK_GREEN = "\e[38;5;2m";
@@ -42,7 +45,7 @@ public static class EscapeCodes {
     public const string PALETTE_COLOR_CYAN = "\e[38;5;14m";
     public const string PALETTE_COLOR_WHITE = "\e[38;5;15m";
     
-    public const string PALETTE_COLOR_END = "\e[39m";
+    public const string TEXT_COLOR_END = "\e[39m";
     
     public const string PALETTE_BACKGROUND_COLOR_BLACK = "\e[48;5;0m";
     public const string PALETTE_BACKGROUND_COLOR_DARK_RED = "\e[48;5;1m";
@@ -61,7 +64,7 @@ public static class EscapeCodes {
     public const string PALETTE_BACKGROUND_COLOR_CYAN = "\e[48;5;14m";
     public const string PALETTE_BACKGROUND_COLOR_WHITE = "\e[48;5;15m";
     
-    public const string PALETTE_BACKGROUND_COLOR_END = "\e[49m";
+    public const string BACKGROUND_COLOR_END = "\e[49m";
 
     /// <summary>
     /// disables all styles
@@ -124,8 +127,8 @@ public static class EscapeCodes {
     // ReSharper disable InconsistentNaming
     public const string CustomColorEnd = CUSTOM_COLOR_END;
     public const string CustomBackgroundColorEnd = CUSTOM_BACKGROUND_COLOR_END;
-    public const string PaletteColorEnd = PALETTE_COLOR_END;
-    public const string PaletteBackgroundColorEnd = PALETTE_BACKGROUND_COLOR_END;
+    public const string PaletteColorEnd = TEXT_COLOR_END;
+    public const string PaletteBackgroundColorEnd = BACKGROUND_COLOR_END;
     public const string EnableSecondaryContext = ENABLE_SECONDARY_CONTEXT;
     public const string DisableSecondaryContext = DISABLE_SECONDARY_CONTEXT;
     public const string SwitchColors = SWITCH_COLORS;

@@ -8,12 +8,8 @@ namespace NeoKolors.Common;
 public class ColorPalette {
     
     public int this[int index] => colors[index];
-    private readonly Color[] colors;
-    
-    /// <summary>
-    /// returns the stored color palette as a set of integers, where the bytes mean AARRGGBB
-    /// </summary>
-    public Color[] Colors => colors;
+    private readonly NKColor[] colors;
+    public NKColor[] Colors => colors;
     public int Length => colors.Length;
 
     /// <summary>
@@ -26,7 +22,7 @@ public class ColorPalette {
     /// </summary>
     /// <param name="colors">the field of integers representing argb colors</param>
     /// <param name="autoAlpha">sets alpha channel of every color to #ff if true</param>
-    public ColorPalette(Color[] colors, bool autoAlpha = true) {
+    public ColorPalette(NKColor[] colors, bool autoAlpha = true) {
         this.colors = colors;
 
         if (autoAlpha) {
@@ -40,7 +36,7 @@ public class ColorPalette {
     /// creates a new ordered color palette from a set of colors
     /// </summary>
     public ColorPalette(System.Drawing.Color[] colors) {
-        this.colors = new Color[colors.Length];
+        this.colors = new NKColor[colors.Length];
 
         for (int i = 0; i < colors.Length; i++) {
             this.colors[i] = colors[i].ToArgb();
@@ -53,7 +49,7 @@ public class ColorPalette {
     /// <param name="url">the string</param>
     public ColorPalette(string url) {
 
-        colors = new Color[(url.Length + 1) / 7];
+        colors = new NKColor[(url.Length + 1) / 7];
 
         for (int i = 0; i < url.Length; i += 7) {
             string colorRaw = "" + url[i] + url[i + 1] + url[i + 2] + url[i + 3] + url[i + 4] + url[i + 5];
@@ -111,7 +107,7 @@ public class ColorPalette {
     /// <param name="seed">seed for random</param>
     /// <param name="colorCount">how many colors will the palette contain</param>
     public static ColorPalette GeneratePalette(int seed, int colorCount = 10) {
-        ColorPalette palette = new ColorPalette(new Color[colorCount]);
+        ColorPalette palette = new ColorPalette(new NKColor[colorCount]);
 
         Random rnd = new Random(seed);
 
