@@ -4,10 +4,8 @@
 //
 
 using System.Globalization;
-using NeoKolors.Common;
-using Xunit;
 
-namespace NeoKolors.Test.Common;
+namespace NeoKolors.Common.Tests;
 
 public class UInt24Tests {
 
@@ -75,7 +73,13 @@ public class UInt24Tests {
     [Fact]
     public void TryParse_ValidString_ShouldReturnTrue() {
         string input = "123456";
+        
+        #if !NET5_0_OR_GREATER || NET5_0
+        bool result = UInt24.TryParse(input, null, out UInt24 value);
+        #else
         bool result = UInt24.TryParse(input, NumberStyles.Integer, CultureInfo.InvariantCulture, out UInt24 value);
+        #endif
+        
         Assert.True(result);
         Assert.Equal(123456, (int)value);
     }
@@ -83,11 +87,19 @@ public class UInt24Tests {
     [Fact]
     public void TryParse_InvalidString_ShouldReturnFalse() {
         string input = "invalid";
+        
+        #if !NET5_0_OR_GREATER || NET5_0
+        bool result = UInt24.TryParse(input, null, out UInt24 value);
+        #else
         bool result = UInt24.TryParse(input, NumberStyles.Integer, CultureInfo.InvariantCulture, out UInt24 value);
+        #endif
+        
         Assert.False(result);
-        Assert.Equal(default(UInt24), value);
+        Assert.Equal(default, value);
     }
 
+    #if NET5_0_OR_GREATER && !NET5_0
+    
     [Fact]
     public void TryReadBigEndian_ValidBytes_ShouldReturnTrue() {
         byte[] input = { 0x00, 0x12, 0x34, 0x56 };
@@ -153,4 +165,5 @@ public class UInt24Tests {
         UInt24 value = 0b1000;
         Assert.Equal(3, (int)UInt24.TrailingZeroCount(value));
     }
+    #endif
 }

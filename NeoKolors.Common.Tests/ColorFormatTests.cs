@@ -1,7 +1,11 @@
-﻿using NeoKolors.Common;
+﻿//
+// NeoKolors
+// Copyright (c) 2025 KryKom
+//
+
 using SkiaSharp;
 
-namespace NeoKolors.Test.Common;
+namespace NeoKolors.Common.Tests;
 
 public class ColorFormatTests {
     
