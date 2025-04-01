@@ -54,12 +54,12 @@ public static class ConsoleColors {
 
     
     /// <summary>
-    /// prints a string colored by the <see cref="Color"/>
+    /// prints a string colored by the <see cref="NKColor"/>
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Write(string s, Color c) => 
+    public static void Write(string s, NKColor c) => 
         System.Console.Write(s.AddColor(c));
 
     
@@ -72,7 +72,7 @@ public static class ConsoleColors {
     /// with which will the symbol be replaced,
     /// if a color is -1 the colors will be reset
     /// </param>
-    public static void Write(string s, params (string symbol, Color color)[] colors) => 
+    public static void Write(string s, params (string symbol, NKColor color)[] colors) => 
         System.Console.Write(s.AddColor(colors));
 
 
@@ -122,13 +122,13 @@ public static class ConsoleColors {
     
     
     /// <summary>
-    /// prints a string colored by the universal <see cref="Color"/>
+    /// prints a string colored by the universal <see cref="NKColor"/>
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(string s, Color c) => 
+    public static void WriteLine(string s, NKColor c) => 
         System.Console.WriteLine(s.AddColor(c));
 
 
@@ -142,7 +142,7 @@ public static class ConsoleColors {
     /// if a color is -1 the colors will be reset
     /// </param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(string s, params (string symbol, Color hex)[] colors) => 
+    public static void WriteLine(string s, params (string symbol, NKColor hex)[] colors) => 
         System.Console.WriteLine(s.AddColor(colors));
 
     
@@ -189,12 +189,12 @@ public static class ConsoleColors {
     
     
     /// <summary>
-    /// prints a string with background colored by the universal <see cref="Color"/>
+    /// prints a string with background colored by the universal <see cref="NKColor"/>
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteB(string s, Color c) => 
+    public static void WriteB(string s, NKColor c) => 
         System.Console.Write(s.AddColorB(c));
 
 
@@ -241,12 +241,12 @@ public static class ConsoleColors {
 
     
     /// <summary>
-    /// prints a string with background colored by the universal <see cref="Color"/>
+    /// prints a string with background colored by the universal <see cref="NKColor"/>
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLineB(string s, Color c) => 
+    public static void WriteLineB(string s, NKColor c) => 
         System.Console.WriteLine(s.AddColorB(c));
 
 
@@ -303,7 +303,7 @@ public static class ConsoleColors {
     /// <param name="text">text color</param>
     /// <param name="background">background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Write(string s, Color text, Color background)  =>
+    public static void Write(string s, NKColor text, NKColor background)  =>
         System.Console.Write(s.AddColor(text).AddColorB(background));
     
     
@@ -360,7 +360,7 @@ public static class ConsoleColors {
     /// <param name="text">text color</param>
     /// <param name="background">background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(string s, Color text, Color background)  =>
+    public static void WriteLine(string s, NKColor text, NKColor background)  =>
         System.Console.WriteLine(s.AddColor(text).AddColorB(background));
 
 
@@ -370,7 +370,7 @@ public static class ConsoleColors {
     /// <param name="s">string to print</param>
     /// <param name="st">style to be applied</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Write(string s, Style st) =>
+    public static void Write(string s, NKStyle st) =>
         System.Console.Write(s.AddStyle(st));
     
     
@@ -380,7 +380,7 @@ public static class ConsoleColors {
     /// <param name="s">string to print</param>
     /// <param name="st">style to be applied</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(string s, Style st) =>
+    public static void WriteLine(string s, NKStyle st) =>
         System.Console.WriteLine(s.AddStyle(st));
     
     
@@ -390,7 +390,7 @@ public static class ConsoleColors {
     /// <param name="s">string to print</param>
     /// <param name="st">style to be applied</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Write(char s, Style st) =>
+    public static void Write(char s, NKStyle st) =>
         System.Console.Write(s.AddStyle(st));
     
     
@@ -400,6 +400,6 @@ public static class ConsoleColors {
     /// <param name="s">string to print</param>
     /// <param name="st">style to be applied</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(char s, Style st) =>
+    public static void WriteLine(char s, NKStyle st) =>
         System.Console.WriteLine(s.AddStyle(st));
 }

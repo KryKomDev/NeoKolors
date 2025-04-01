@@ -49,16 +49,16 @@ public static partial class Debug {
     /// </summary>
     public static bool SimpleMessages { get; set; } = false;
 
-    private static Color FATAL_COLOR = Palette.Colors[0];
-    private static Color ERROR_COLOR = Palette.Colors[1];
-    private static Color WARN_COLOR = Palette.Colors[2];
-    private static Color INFO_COLOR = Palette.Colors[3];
-    private static Color DEBUG_COLOR = Palette.Colors[4];
+    private static NKColor FATAL_COLOR = Palette.Colors[0];
+    private static NKColor ERROR_COLOR = Palette.Colors[1];
+    private static NKColor WARN_COLOR = Palette.Colors[2];
+    private static NKColor INFO_COLOR = Palette.Colors[3];
+    private static NKColor DEBUG_COLOR = Palette.Colors[4];
 
     /// <summary>
     /// color of the fatal messages
     /// </summary>
-    public static Color FatalColor {
+    public static NKColor FatalColor {
         get => FATAL_COLOR;
         set {
             FATAL_COLOR = value;
@@ -69,7 +69,7 @@ public static partial class Debug {
     /// <summary>
     /// color of the error messages
     /// </summary>
-    public static Color ErrorColor {
+    public static NKColor ErrorColor {
         get => ERROR_COLOR;
         set {
             ERROR_COLOR = value;
@@ -80,7 +80,7 @@ public static partial class Debug {
     /// <summary>
     /// color of the warning messages
     /// </summary>
-    public static Color WarnColor {
+    public static NKColor WarnColor {
         get => WARN_COLOR;
         set {
             WARN_COLOR = value;
@@ -91,7 +91,7 @@ public static partial class Debug {
     /// <summary>
     /// color of the info messages
     /// </summary>
-    public static Color InfoColor {
+    public static NKColor InfoColor {
         get => INFO_COLOR;
         set {
             INFO_COLOR = value;
@@ -102,7 +102,7 @@ public static partial class Debug {
     /// <summary>
     /// color of the debug messages
     /// </summary>
-    public static Color DebugColor {
+    public static NKColor DebugColor {
         get => DEBUG_COLOR;
         set {
             DEBUG_COLOR = value;
@@ -155,28 +155,28 @@ public static partial class Debug {
     /// <summary>
     /// the highlight color of a fancy exception
     /// </summary>
-    public static Color HighlightColor { get; set; } = new(ConsoleColor.DarkRed);
+    public static NKColor HighlightColor { get; set; } = new(ConsoleColor.DarkRed);
     
     /// <summary>
     /// the color of the exception type shown when a fancy exception is thrown
     /// </summary>
-    public static Color ExceptionNameColor { get; set; } = new(ConsoleColor.Yellow);
+    public static NKColor ExceptionNameColor { get; set; } = new(ConsoleColor.Yellow);
     
     /// <summary>
     /// the color of the exception message shown when a fancy exception is thrown
     /// </summary>
-    public static Color MessageColor { get; set; } = new(ConsoleColor.Red);
+    public static NKColor MessageColor { get; set; } = new(ConsoleColor.Red);
     
     /// <summary>
     /// the color of the filename printed as a part of the stack trace shown when a fancy exception is thrown
     /// </summary>
-    public static Color FileNameColor { get; set; } = new(ConsoleColor.Blue);
+    public static NKColor FileNameColor { get; set; } = new(ConsoleColor.Blue);
     
     /// <summary>
     /// the color of the path to a source file printed as a part of the stack trace shown when a fancy exception is
     /// thrown
     /// </summary>
-    public static Color PathColor { get; set; } = new(ConsoleColor.Gray);
+    public static NKColor PathColor { get; set; } = new(ConsoleColor.Gray);
     
     /// <summary>
     /// whether the path to a source file printed as a part of the stack trace shown when a fancy exception is thrown
@@ -187,12 +187,12 @@ public static partial class Debug {
     /// <summary>
     /// the color of the method name printed as a part of the stack trace shown when a fancy exception is thrown
     /// </summary>
-    public static Color MethodColor { get; set; } = new(ConsoleColor.Blue);
+    public static NKColor MethodColor { get; set; } = new(ConsoleColor.Blue);
     
     /// <summary>
     /// the color of the namespace printed as a part of the stack trace shown when a fancy exception is thrown
     /// </summary>
-    public static Color NamespaceColor { get; set; } = new(ConsoleColor.Gray);
+    public static NKColor NamespaceColor { get; set; } = new(ConsoleColor.Gray);
     
     /// <summary>
     /// whether the namespace printed as a part of the stack trace shown when
@@ -202,7 +202,7 @@ public static partial class Debug {
     /// <summary>
     /// the color of the line number printed as a part of the stack trace shown when a fancy exception is thrown
     /// </summary>
-    public static Color LineNumberColor { get; set; } = new(ConsoleColor.Green);
+    public static NKColor LineNumberColor { get; set; } = new(ConsoleColor.Green);
 
     /// <summary>
     /// if true makes the exception name italic

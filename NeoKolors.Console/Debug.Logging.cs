@@ -108,7 +108,7 @@ public static partial class Debug {
             Output.WriteLine((HideTime
                     ? $"[ WARN ] : {s}"
                     : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] [ WARN ] : {s}")
-                .AddColor((Color)(IsTerminalPaletteSafe ? ConsoleColor.Yellow : WARN_COLOR)));
+                .AddColor((NKColor)(IsTerminalPaletteSafe ? NKConsoleColor.YELLOW : WARN_COLOR)));
         }
         
         Output.Flush();
@@ -136,7 +136,7 @@ public static partial class Debug {
             Output.WriteLine((HideTime
                     ? $"[ INFO ] : {s}"
                     : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] [ INFO ] : {s}")
-                .AddColor((Color)(IsTerminalPaletteSafe ? ConsoleColor.Green : INFO_COLOR)));
+                .AddColor((NKColor)(IsTerminalPaletteSafe ? NKConsoleColor.GREEN : INFO_COLOR)));
         }
         
         Output.Flush();
@@ -166,7 +166,7 @@ public static partial class Debug {
             Output.WriteLine((HideTime
                     ? $"[ DEBUG ] : {s}"
                     : $"[{DateTime.Today:yyyy-MM-dd} {DateTime.Now:HH:mm:ss}] [ DEBUG ] : {s}")
-                .AddColor((Color)(IsTerminalPaletteSafe ? ConsoleColor.Blue : DEBUG_COLOR)));
+                .AddColor((NKColor)(IsTerminalPaletteSafe ? NKConsoleColor.BLUE : DEBUG_COLOR)));
         }
         
         Output.Flush();
