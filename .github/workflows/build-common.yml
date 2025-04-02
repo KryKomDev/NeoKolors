@@ -16,7 +16,7 @@ jobs:
 
     env:
       Solution_Name: NeoKolors.sln
-      Test_Project_Path: NeoKolors.Common\NeoKolors.Common.csproj
+      Test_Project_Path: NeoKolors.Common.Tests\NeoKolors.Common.Tests.csproj
 
     steps:
     - name: Checkout
@@ -27,13 +27,13 @@ jobs:
     - name: Install .NET Core
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0.x
+        dotnet-version: 9.0.x
 
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
 
     - name: Execute unit tests
-      run: dotnet test
+      run: dotnet test $env:Test_Project_Path
 
     - name: Restore the application
       run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
