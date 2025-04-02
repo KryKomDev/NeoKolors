@@ -12,7 +12,7 @@ public class NKStyleTests {
         var style = new NKStyle();
         Assert.True(style.IsFColorDefault);
         Assert.True(style.IsBColorDefault);
-        Assert.Equal(TextStyles.NONE, style.Styles);
+        Assert.Equal(0, (byte)style.Styles);
     }
 
     [Fact]

@@ -4,7 +4,7 @@
 //
 
 using NeoKolors.Common;
-using static NeoKolors.Console.Debug.DebugLevel;
+using static NeoKolors.Console.DebugLevel;
 
 namespace NeoKolors.Console;
 
@@ -115,14 +115,6 @@ public static partial class Debug {
     /// </summary>
     public static DebugLevel Level { get; set; } = FATAL | ERROR | WARN | INFO | DEBUG;
 
-    [Flags]
-    public enum DebugLevel {
-        FATAL = 1,
-        ERROR = 2,
-        WARN = 4,
-        INFO = 8,
-        DEBUG = 16
-    }
 
     /// <summary>
     /// turns all log messages on

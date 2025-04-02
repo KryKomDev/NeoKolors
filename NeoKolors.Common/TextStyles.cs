@@ -9,8 +9,7 @@ namespace NeoKolors.Common;
 /// style types
 /// </summary>
 [Flags]
-public enum TextStyles {
-    NONE = 0,
+public enum TextStyles : byte {
     BOLD = 1,
     ITALIC = 2,
     UNDERLINE = 4,

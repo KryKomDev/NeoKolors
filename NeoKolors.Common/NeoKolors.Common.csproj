@@ -3,7 +3,7 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>0.25.12.0</Version>
+        <Version>0.25.14.2</Version>
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
         <LangVersion>preview</LangVersion>
@@ -15,11 +15,13 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageIcon>Common.png</PackageIcon>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Description>the common utilities for the NeoKolors library pack</Description>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="OneOf" Version="3.0.271" />
-        <PackageReference Include="SkiaSharp" Version="3.118.0-preview.2.3" />
+        <PackageReference Include="SkiaSharp" Version="3.116.1" />
+        <PackageReference Include="System.IO" Version="4.3.0" />
     </ItemGroup>
     
     <ItemGroup>

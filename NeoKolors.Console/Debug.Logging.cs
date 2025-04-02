@@ -152,8 +152,6 @@ public static partial class Debug {
     /// </summary>
     /// <param name="s">desired string message</param>
     public static void Log(string s) {
-        #if DEBUG
-        
         if (!Level.HasFlag(DebugLevel.DEBUG)) return;
         if (s == null) throw new ArgumentNullException(nameof(s));
 
@@ -170,8 +168,6 @@ public static partial class Debug {
         }
         
         Output.Flush();
-        
-        #endif
     }
 
     /// <summary>

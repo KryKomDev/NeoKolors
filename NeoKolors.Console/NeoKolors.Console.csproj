@@ -3,7 +3,7 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>0.25.12.0</Version>
+        <Version>0.25.14.7</Version>
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
         <LangVersion>preview</LangVersion>
@@ -14,6 +14,7 @@
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageIcon>Console.png</PackageIcon>
+        <Description>basic console / logging utilites</Description>
     </PropertyGroup>
     
     <ItemGroup>

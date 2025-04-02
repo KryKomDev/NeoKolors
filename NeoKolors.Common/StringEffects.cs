@@ -128,11 +128,10 @@ public static class StringEffects {
     /// </summary>
     /// <returns>text with colored background</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string AddColorB(this string text, System.Drawing.Color color) {
-        return text.AddColorB(color.R, color.G, color.B);
-    }
+    public static string AddColorB(this string text, System.Drawing.Color color) => 
+        text.AddColorB(color.R, color.G, color.B);
 
-    
+
     /// <summary>
     /// colors the string using symbols defined by the symbol variable of the tuple
     /// </summary>
@@ -263,7 +262,6 @@ public static class StringEffects {
     /// <param name="style">style applied to the text</param>
     /// <returns>string with the style applied</returns>
     /// <exception cref="ArgumentOutOfRangeException">an invalid style was inputted</exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddStyle(this string s, TextStyles style) {
         if (style.HasFlag(BOLD)) s = $"{BOLD_START}{s}{BOLD_END}";
         if (style.HasFlag(ITALIC)) s = $"{ITALIC_START}{s}{ITALIC_END}";
