@@ -2,39 +2,45 @@
 using NeoKolors.Common;
 using NeoKolors.Console;
 using NeoKolors.Tui;
+using NeoKolors.Tui.Fonts;
+using static NeoKolors.Common.TextStyles;
 
 namespace Testing;
 
 public static class NeoKolors {
     public static void Main() {
         Console.OutputEncoding = Encoding.UTF8;
-        Debug.Level = Debug.DebugLevel.ALL;
+        Debug.LogAll();
+        // Debug.Level = Debug.DebugLevel.FATAL | Debug.DebugLevel.ERROR | Debug.DebugLevel.WARN;
         Debug.EnableAutoFancy = true;
-        // Debug.Fatal("fatal");
-        // Debug.Error("error");
-        // Debug.Warn("warn");
-        // Debug.Info("info");
-        // Debug.Msg("debug");
 
-        var s = new Style(0xab_cd_ef_00_00_00_00_02);
-        var d = s.GetFColor();
+        Debug.Fatal("fuck");
+        Debug.Error("fuck");
+        Debug.Warn("what");
+        Debug.Info("ok");
+        Debug.Log("ok");
         
-        var c = new AppConfig(false, new ConsoleKeyInfo('q', ConsoleKey.Q, false, false, true), true, 
-            toggleDebugLogCombination: new ConsoleKeyInfo('d', ConsoleKey.D, false, true, true));
+        var s = new ConsoleScreen();
+        s.Rect(new Rectangle(2, 2, 5, 5), new NKColor(NKConsoleColor.MAGENTA), 
+            BorderStyle.GetAscii(NKConsoleColor.BLUE, NKConsoleColor.MAGENTA));
+        
+        Console.WriteLine("adshoj".AddColor(ConsoleColor.DarkBlue));
+        Console.WriteLine("asdhoj".AddColor(NKConsoleColor.DARK_BLUE));
+        
+        // s.Render();
+
+        // var c = new AppConfig(false, new ConsoleKeyInfo('q', ConsoleKey.Q, false, false, true), true, 
+        //     toggleDebugLogCombination: new ConsoleKeyInfo('d', ConsoleKey.D, false, true, true));
         //
         // var a = new Application(c);
         // var v = new View();
         // a.AddView(v);
         // a.Start();
 
-        // VirtualConsole.Init();
-        // VirtualConsole.SetFColor(0, 0, 0xabcdef);
-        // // System.Console.WriteLine($"{VirtualConsole.Styles[0, 0]:x16}");
-
         // Console.SetOut(new ConsoleScreen());
 
-        Application a = new Application(c);
-        a.Start();
+        // Application a = new Application(c);
+        // a.Start();
 
         /*
 

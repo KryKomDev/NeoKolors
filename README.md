@@ -57,7 +57,7 @@ You can find some basic console color classes in this namespace.
 [![NuGet](https://img.shields.io/nuget/v/NeoKolors.Settings?color=a53c7a)](https://www.nuget.org/packages/NeoKolors.Settings)
 ![Downloads](https://img.shields.io/nuget/dt/NeoKolors.Settings?color=a31c35)
 
-Framework for instance from settings automation and communicating settings between different parts of applications.
+Framework for instance-from-settings automation and communicating settings between different parts of applications.
 
 Tutorial on how to use available in [README](NeoKolors.Settings/README.md)
 
@@ -65,11 +65,11 @@ Tutorial on how to use available in [README](NeoKolors.Settings/README.md)
 
 ## Tui
 
-![.NET 5](https://img.shields.io/badge/.NET-8.0-682a7b)
+![.NET 8](https://img.shields.io/badge/.NET-8.0-682a7b)
 
 [//]: # ([![NuGet]&#40;https://img.shields.io/nuget/v/NeoKolors.Tui&#41;]&#40;https://www.nuget.org/packages/NeoKolors.Tui&#41;)
 
-Includes classes for creating whole GUIs for console.
+Framework for creating TUIs in console.
 
 Coming soon...
 

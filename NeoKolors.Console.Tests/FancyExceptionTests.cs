@@ -3,9 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Console;
-
-namespace NeoKolors.Test.Console;
+namespace NeoKolors.Console.Tests;
 
 public class FancyExceptionTests {
     
