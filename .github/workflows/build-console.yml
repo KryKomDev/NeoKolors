@@ -1,10 +1,10 @@
-name: Build NeoKolors.Common
+name: Build NeoKolors.Console
 
 on:
   push:
     paths:
-      - 'NeoKolors.Common/**'
-      - 'NeoKolors.Common.Tests/**'
+      - 'NeoKolors.Console/**'
+      - 'NeoKolors.Console.Tests/**'
 
 jobs:
   build:
@@ -16,7 +16,7 @@ jobs:
 
     env:
       Solution_Name: NeoKolors.sln
-      Test_Project_Path: NeoKolors.Common.Tests\NeoKolors.Common.Tests.csproj
+      Test_Project_Path: NeoKolors.Console.Tests\NeoKolors.Console.Tests.csproj
 
     steps:
     - name: Checkout
