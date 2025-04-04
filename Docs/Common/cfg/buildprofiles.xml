@@ -6,14 +6,8 @@
     <variables></variables>
     <build-profile instance="common">
         <variables>
-            <primary-color>metallic</primary-color>
-            <noindex-content>true</noindex-content>
-            <header-logo>NeoKolors.png</header-logo>
-        </variables>
-    </build-profile>
-    <build-profile instance="console">
-        <variables>
-            <primary-color>metallic</primary-color>
+            <color-preset>soft</color-preset>
+            <primary-color>emerald</primary-color>
             <noindex-content>true</noindex-content>
             <header-logo>NeoKolors.png</header-logo>
         </variables>

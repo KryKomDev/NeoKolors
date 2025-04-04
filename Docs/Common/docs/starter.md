@@ -1,79 +1,47 @@
-# Starter
+# NeoKolors.Common
 
-<!--Writerside adds this topic when you create a new documentation project.
-You can use it as a sandbox to play with Writerside features, and remove it from the TOC when you don't need it anymore.-->
+![.NET Standard](https://img.shields.io/badge/.NET-Standard2.0-512bd4)
+![.NET 5](https://img.shields.io/badge/.NET-5.0-682a7b)
+[![NuGet](https://img.shields.io/nuget/v/NeoKolors.Common?color=a53c7a)](https://www.nuget.org/packages/NeoKolors.Common)
+![Downloads](https://img.shields.io/nuget/dt/NeoKolors.Common?color=a31c35)
 
-## Add new topics
-You can create empty topics, or choose a template for different types of content that contains some boilerplate structure to help you get started:
+Offers some utilities for working with colors and basic ansi string manipulation.
 
-![Create new topic options](new_topic_options.png){ width=290 }{border-effect=line}
+## NKColor
 
-## Write content
-%product% supports two types of markup: Markdown and XML.
-When you create a new help article, you can choose between two topic types, but this doesn't mean you have to stick to a single format.
-You can author content in Markdown and extend it with semantic attributes or inject entire XML elements.
+Color structure.
+Handy when working with custom and palette colors in console.
+See [](NKColor.md) for more info.
 
-## Inject XML
-For example, this is how you inject a procedure:
+## ColorFormat
 
-<procedure title="Inject a procedure" id="inject-a-procedure">
-    <step>
-        <p>Start typing and select a procedure type from the completion suggestions:</p>
-        <img src="completion_procedure.png" alt="completion suggestions for procedure" border-effect="line"/>
-    </step>
-    <step>
-        <p>Press <shortcut>Tab</shortcut> or <shortcut>Enter</shortcut> to insert the markup.</p>
-    </step>
-</procedure>
+Offers methods for casting between different color formats
+(e.g.
+[System.Drawing.Color](https://learn.microsoft.com/cs-cz/dotnet/api/system.drawing.color?view=net-8.0), 
+[SKColor](https://learn.microsoft.com/en-us/dotnet/api/skiasharp.skcolor?view=skiasharp-2.88),
+int as hex, rgb)
 
-## Add interactive elements
+## ColorPalette
 
-### Tabs
-To add switchable content, you can make use of tabs (inject them by starting to type `tab` on a new line):
+Holds a color palette. Contains a method for random palette generation.
 
-<tabs>
-    <tab title="Markdown">
-        <code-block lang="plain text">![Alt Text](new_topic_options.png){ width=450 }</code-block>
-    </tab>
-    <tab title="Semantic markup">
-        <code-block lang="xml">
-            <![CDATA[<img src="new_topic_options.png" alt="Alt text" width="450px"/>]]></code-block>
-    </tab>
-</tabs>
+## EscapeCodes
 
-### Collapsible blocks
-Apart from injecting entire XML elements, you can use attributes to configure the behavior of certain elements.
-For example, you can collapse a chapter that contains non-essential information:
+Contains ANSI escape sequences.
 
-#### Supplementary info {collapsible="true"}
-Content under a collapsible header will be collapsed by default,
-but you can modify the behavior by adding the following attribute:
-`default-state="expanded"`
+## StringEffects
 
-### Convert selection to XML
-If you need to extend an element with more functions, you can convert selected content from Markdown to semantic markup.
-For example, if you want to merge cells in a table, it's much easier to convert it to XML than do this in Markdown.
-Position the caret anywhere in the table and press <shortcut>Alt+Enter</shortcut>:
+Methods for applying ANSI escape sequences to strings.
 
-<img src="convert_table_to_xml.png" alt="Convert table to XML" width="706" border-effect="line"/>
+## NKStyle
 
-## Feedback and support
-Please report any issues, usability improvements, or feature requests to our
-<a href="https://youtrack.jetbrains.com/newIssue?project=WRS">YouTrack project</a>
-(you will need to register).
+Structure that holds all ANSI styles of a string (foreground and background color, 
+bold, italic, strikethrough, faint, underline, inverse).
 
-You are welcome to join our
-<a href="https://jb.gg/WRS_Slack">public Slack workspace</a>.
-Before you do, please read our [Code of conduct](https://www.jetbrains.com/help/writerside/writerside-code-of-conduct.html).
-We assume that you’ve read and acknowledged it before joining.
+## NKConsoleColor
 
-You can also always email us at [writerside@jetbrains.com](mailto:writerside@jetbrains.com).
+The extended color palette for console.
 
-<seealso>
-    <category ref="wrs">
-        <a href="https://www.jetbrains.com/help/writerside/markup-reference.html">Markup reference</a>
-        <a href="https://www.jetbrains.com/help/writerside/manage-table-of-contents.html">Reorder topics in the TOC</a>
-        <a href="https://www.jetbrains.com/help/writerside/local-build.html">Build and publish</a>
-        <a href="https://www.jetbrains.com/help/writerside/configure-search.html">Configure Search</a>
-    </category>
-</seealso>
+## UInt24
+
+An unsigned 24 bit integer.
