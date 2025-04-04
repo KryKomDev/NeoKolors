@@ -69,4 +69,6 @@ public class PathArgument : IArgument<string> {
                PointsToDirectory == p.PointsToDirectory &&
                PointsToFile == p.PointsToFile;
     }
+
+    object ICloneable.Clone() => Clone();
 }

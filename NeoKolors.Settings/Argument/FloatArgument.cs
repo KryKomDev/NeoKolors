@@ -156,4 +156,5 @@ public class FloatArgument : IArgument<Single> {
     }
     
     public override string ToString() => $"{{\"type\": \"float\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
+    object ICloneable.Clone() => Clone();
 }

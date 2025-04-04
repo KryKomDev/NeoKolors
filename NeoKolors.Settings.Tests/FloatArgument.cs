@@ -1,7 +1,11 @@
-﻿using NeoKolors.Settings.Argument;
+﻿//
+// NeoKolors.Test
+// Copyright (c) 2025 KryKom
+//
+
 using NeoKolors.Settings.Exception;
 
-namespace NeoKolors.Test.Settings;
+namespace NeoKolors.Settings.Tests;
 
 public class FloatArgumentTests {
     

@@ -128,4 +128,6 @@ public class MultiSelectArgument<T> : IArgument<T[]> where T : notnull {
                DefaultSelected == m.DefaultSelected &&
                Selected == m.Selected;
     }
+
+    object ICloneable.Clone() => Clone();
 }

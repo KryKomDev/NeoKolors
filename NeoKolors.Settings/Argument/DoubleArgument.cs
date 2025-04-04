@@ -156,4 +156,5 @@ public class DoubleArgument : IArgument<Double> {
     }
     
     public override string ToString() => $"{{\"type\": \"double\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
+    object ICloneable.Clone() => Clone();
 }

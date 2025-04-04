@@ -159,6 +159,7 @@ public class IntegerArgument : IArgument<Int32> {
                CustomValidate == i.CustomValidate;
     }
     public override string ToString() => $"{{\"type\": \"int\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
+    object ICloneable.Clone() => Clone();
 }
 
 public class UIntegerArgument : IArgument<UInt32> {
@@ -314,4 +315,5 @@ public class UIntegerArgument : IArgument<UInt32> {
     }
     
     public override string ToString() => $"{{\"type\": \"uint\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
+    object ICloneable.Clone() => Clone();
 }

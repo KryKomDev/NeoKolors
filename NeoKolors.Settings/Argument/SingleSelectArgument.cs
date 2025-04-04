@@ -89,4 +89,8 @@ public class SingleSelectArgument<T> : IArgument<T> where T : notnull {
         $"\"index\": {Index}, " +
         $"\"default-index\": {DefaultIndex}, " +
         $"\"options\": [{string.Join(", ", Options.Select(o => $"\"{o}\""))}]}}";
+
+    object ICloneable.Clone() {
+        return Clone();
+    }
 }

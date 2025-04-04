@@ -136,4 +136,6 @@ public class SelectionListArgument<T> : IArgument<T[]> where T : notnull {
                Selected == s.Selected &&
                DefaultValues == s.DefaultValues;
     }
+
+    object ICloneable.Clone() => Clone();
 }

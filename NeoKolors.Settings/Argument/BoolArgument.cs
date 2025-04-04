@@ -3,6 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
+using NeoKolors.Common;
 using NeoKolors.Settings.Exception;
 
 namespace NeoKolors.Settings.Argument;
@@ -14,32 +15,48 @@ public class BoolArgument : IArgument<bool> {
     public BoolArgument(bool defaultValue = false) {
         DefaultValue = defaultValue;
         Value = DefaultValue;
+        
     }
     
     public void Set(object value) {
-        if (value is Boolean i) {
-            Value = i;
+        switch (value) {
+            case bool i:
+                Value = i;
+                break;
+            case string s: {
+                Set(s);
+                break;
+            }
+            case BoolArgument b:
+                Value = b.Value;
+                break;
+            default:
+                throw new InvalidArgumentInputTypeException(typeof(Boolean), value.GetType());
         }
-        else if (value is string s) {
-            bool v;
-            try {
-                v = Boolean.Parse(s);
-            }
-            catch (FormatException e) {
-                throw new ArgumentInputFormatException(typeof(Boolean), s, e.Message);
-            }
-            catch (OverflowException e) {
-                throw new ArgumentInputFormatException(typeof(Boolean), s, e.Message);
-            }
+    }
+
+    /// <summary>
+    /// sets the argument using a string
+    /// </summary>
+    /// <param name="s"></param>
+    /// <exception cref="ArgumentInputFormatException"></exception>
+    public void Set(string s) {
+        bool v;
+
+        s = s.ToLowerInvariant();
+        s = s.CapitalizeFirst();
+        
+        try {
+            v = bool.Parse(s);
+        }
+        catch (FormatException e) {
+            throw new ArgumentInputFormatException(typeof(bool), s, e.Message);
+        }
+        catch (OverflowException e) {
+            throw new ArgumentInputFormatException(typeof(bool), s, e.Message);
+        }
             
-            Value = v;
-        }
-        else if (value is BoolArgument b) {
-            Value = b.Value;
-        }
-        else {
-            throw new InvalidArgumentInputTypeException(typeof(Boolean), value.GetType());
-        }
+        Value = v;
     }
 
     public void Set(bool value) => Value = value;
@@ -54,8 +71,8 @@ public class BoolArgument : IArgument<bool> {
     /// </summary>
     /// <example>
     /// <code>
-    /// argument &lt;&lt;= 123;
-    /// // argument.Value is now 123
+    /// argument &lt;&lt;= true;
+    /// // argument.Value is now true
     /// </code>
     /// </example>
     public static BoolArgument operator <<(BoolArgument argument, bool value) {
@@ -70,7 +87,18 @@ public class BoolArgument : IArgument<bool> {
         return other is BoolArgument b && Get() == b.Get() && DefaultValue == b.DefaultValue;
     }
 
-    public override string ToString() {
-        return $"{{\"type\": \"bool\", \"value\": {Value}, \"default-value\": {DefaultValue}}}";
+    public override string ToString() => 
+        $"{{\"type\": \"bool\", \"value\": {Value}, \"default-value\": {DefaultValue}}}";
+
+    object ICloneable.Clone() => Clone();
+
+    /// <summary>
+    /// creates a new bool argument from a bool string (e.g. true, false, tRuE...)
+    /// </summary>
+    /// <returns></returns>
+    public static BoolArgument Parse(string value) {
+        BoolArgument argument = new();
+        argument.Set(value);
+        return argument;
     }
 }

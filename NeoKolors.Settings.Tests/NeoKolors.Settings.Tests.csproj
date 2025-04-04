@@ -18,6 +18,12 @@
 
     <ItemGroup>
         <Using Include="Xunit"/>
+        <Using Include="NeoKolors.Settings"/>
+        <Using Include="NeoKolors.Settings.Argument"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\NeoKolors.Settings\NeoKolors.Settings.csproj" />
     </ItemGroup>
 
 </Project>

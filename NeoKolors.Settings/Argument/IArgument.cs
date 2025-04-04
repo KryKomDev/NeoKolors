@@ -3,6 +3,8 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Globalization;
+
 namespace NeoKolors.Settings.Argument;
 
 public interface IArgument<out T> : IArgument {
@@ -35,11 +37,11 @@ public interface IArgument<out T> : IArgument {
     public new IArgument<T> Clone();
 }
 
-public interface IArgument : IEquatable<IArgument> {
+public interface IArgument : IEquatable<IArgument>, ICloneable {
     public void Set(object value);
     public object Get();
     public void Reset();
-    public IArgument Clone();
+    public new IArgument Clone();
 
     #if !NETSTANDARD2_0
     
@@ -47,6 +49,6 @@ public interface IArgument : IEquatable<IArgument> {
         argument.Set(value);
         return argument;
     }
-    
-    #endif 
+
+    #endif
 }

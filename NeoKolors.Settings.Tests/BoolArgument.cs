@@ -1,6 +1,9 @@
-﻿using NeoKolors.Settings.Argument;
+﻿//
+// NeoKolors.Test
+// Copyright (c) 2025 KryKom
+//
 
-namespace NeoKolors.Test.Settings;
+namespace NeoKolors.Settings.Tests;
 
 public class BoolArgumentTests {
 
@@ -13,7 +16,7 @@ public class BoolArgumentTests {
         Assert.True(a.Value);
         
         // try with string
-        a.Set("False");
+        a.Set("faLsE");
         Assert.False(a.Value);
         
         // try with another argument

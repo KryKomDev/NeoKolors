@@ -160,6 +160,7 @@ public class LongArgument : IArgument<Int64> {
     }
     
     public override string ToString() => $"{{\"type\": \"long\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
+    object ICloneable.Clone() => Clone();
 }
 
 public class ULongArgument : IArgument<UInt64> {
@@ -315,4 +316,5 @@ public class ULongArgument : IArgument<UInt64> {
     }
     
     public override string ToString() => $"{{\"type\": \"ulong\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
+    object ICloneable.Clone() => Clone();
 }

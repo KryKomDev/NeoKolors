@@ -187,4 +187,6 @@ public class StringArgument : IArgument<string> {
                                          $"\"allow-upper\": {AllowUpper}, " +
                                          $"\"allow-lower\": {AllowLower}, " +
                                          $"\"count-visible-only\": {CountVisibleOnly}}}";
+
+    object ICloneable.Clone() => Clone();
 }
