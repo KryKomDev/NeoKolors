@@ -3,7 +3,9 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Diagnostics.CodeAnalysis;
 using NeoKolors.Settings.Argument;
+using static NeoKolors.Settings.Argument.AllowedPathType;
 using StringArgument = NeoKolors.Settings.Argument.StringArgument;
 
 namespace NeoKolors.Settings;
@@ -11,8 +13,9 @@ namespace NeoKolors.Settings;
 /// <summary>
 /// factory methods for arguments, <see cref="IArgument{T}"/>
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class Arguments {
-    
+
     /// <summary>
     /// creates a new boolean argument
     /// </summary>
@@ -44,7 +47,7 @@ public static class Arguments {
         bool allowUpper = true,
         bool allowLower = true,
         bool countVisibleOnly = true,
-        Func<string, string?>? customValidate = null) => 
+        Func<string, string?>? customValidate = null) =>
         new(minLength,
             maxLength,
             defaultValue,
@@ -67,12 +70,12 @@ public static class Arguments {
     public static IntegerArgument Integer(int min = int.MinValue,
         int max = int.MaxValue,
         int defaultValue = 0,
-        Func<int, string?>? customValidate = null) => 
-        new(min, 
+        Func<int, string?>? customValidate = null) =>
+        new(min,
             max,
             defaultValue,
             customValidate);
-    
+
     /// <summary>
     /// creates a new unsigned integer argument
     /// </summary>
@@ -83,12 +86,12 @@ public static class Arguments {
     public static UIntegerArgument UInteger(uint min = uint.MinValue,
         uint max = uint.MaxValue,
         uint defaultValue = 0,
-        Func<uint, string?>? customValidate = null) => 
-        new(min, 
-            max, 
-            defaultValue, 
+        Func<uint, string?>? customValidate = null) =>
+        new(min,
+            max,
+            defaultValue,
             customValidate);
-    
+
     /// <summary>
     /// creates a new long argument
     /// </summary>
@@ -120,7 +123,7 @@ public static class Arguments {
             max,
             defaultValue,
             customValidate);
-    
+
     /// <summary>
     /// creates a new float argument
     /// </summary>
@@ -136,7 +139,7 @@ public static class Arguments {
             max,
             defaultValue,
             customValidate);
-    
+
     /// <summary>
     /// creates a new double argument
     /// </summary>
@@ -152,15 +155,15 @@ public static class Arguments {
             max,
             defaultValue,
             customValidate);
-    
+
     /// <summary>
     /// creates a new single selection (radio selection) argument
     /// </summary>
     /// <param name="defaultIndex">index of the default selected value</param>
     /// <param name="options">selectable options</param>
     public static SingleSelectArgument<T> SingleSelect<T>(int defaultIndex = 0, params T[] options) where T : notnull =>
-        new(options, defaultIndex); 
-    
+        new(options, defaultIndex);
+
     /// <summary>
     /// creates a new single selection (radio selection) argument
     /// </summary>
@@ -168,7 +171,7 @@ public static class Arguments {
     /// <param name="defaultValue">value that will be selected by default</param>
     public static SingleSelectArgument<T> SingleSelect<T>(T[] options, T defaultValue) where T : notnull =>
         new(options, defaultValue);
-    
+
     /// <summary>
     /// creates a new single selection (radio selection) argument from all members of an enum
     /// </summary>
@@ -184,29 +187,23 @@ public static class Arguments {
     /// <param name="defaultValues">values that are selected by default</param>
     public static MultiSelectArgument<T> MultiSelect<T>(T[] options, params T[] defaultValues) where T : notnull =>
         new(options, defaultValues);
-    
+
     /// <summary>
     /// creates a new multiple selection (checkbox selection) argument from all members of an enum
     /// </summary>
     /// <param name="defaultValues">values that are selected by default</param>
-    public static MultiSelectArgument<T> MultiSelectEnum<T>(params T[] defaultValues) where T : Enum => 
+    public static MultiSelectArgument<T> MultiSelectEnum<T>(params T[] defaultValues) where T : Enum =>
         MultiSelectArgument<T>.FromEnum(defaultValues);
-    
+
     /// <summary>
     /// creates a new path argument
     /// </summary>
     /// <param name="defaultValue">the default path</param>
-    /// <param name="mustExist">whether the supplied path must exist</param>
-    /// <param name="allowAny">whether the argument allows both file and directory paths</param>
-    /// <param name="pointsToFile">
-    /// if <see cref="allowAny"/> is true and this is true then the argument will allow only paths pointing to a file
-    /// </param>
+    /// <param name="allowedPathType">determines the allowed path types</param>
     public static PathArgument Path(
-        string defaultValue = ".", 
-        bool mustExist = true, 
-        bool allowAny = true,
-        bool pointsToFile = true) => 
-        new(defaultValue, mustExist, allowAny, pointsToFile);
+        string defaultValue = ".",
+        AllowedPathType allowedPathType = FILE | DIRECTORY | NOT_EXISTING) =>
+        new(defaultValue, allowedPathType);
     
     /// <summary>
     /// creates a new selection list argument, 

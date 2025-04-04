@@ -3,27 +3,28 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Diagnostics.CodeAnalysis;
 using NeoKolors.Settings.Exception;
+using static NeoKolors.Settings.Argument.AllowedPathType;
 
 namespace NeoKolors.Settings.Argument;
 
 /// <summary>
 /// argument for a path to a file or directory
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class PathArgument : IArgument<string> {
     public string Value { get; private set; }
     public string DefaultValue { get; }
-    public bool MustExist { get; }
-    public bool PointsToFile { get; }
-    public bool PointsToDirectory => !PointsToFile;
-    public bool AllowAny { get; }
+    public bool MustExist => !AllowedPathType.HasFlag(NOT_EXISTING);
+    public bool AllowFilePath => AllowedPathType.HasFlag(FILE);
+    public bool AllowDirectoryPath => AllowedPathType.HasFlag(DIRECTORY);
+    public AllowedPathType AllowedPathType { get; }
     
-    public PathArgument(string defaultValue = ".", bool mustExist = true, bool allowAny = true, bool pointsToFile = true) {
+    public PathArgument(string defaultValue = ".", AllowedPathType allowedPathType = FILE | DIRECTORY | NOT_EXISTING) {
         DefaultValue = defaultValue;
         Value = DefaultValue;
-        MustExist = mustExist;
-        AllowAny = allowAny;
-        PointsToFile = pointsToFile;
+        AllowedPathType = allowedPathType;
     }
 
     void IArgument.Set(object value) => Set(value);
@@ -48,11 +49,9 @@ public class PathArgument : IArgument<string> {
         if (MustExist && !Directory.Exists(path) && !File.Exists(path)) 
             throw new InvalidArgumentInputException("Path does not exist.");
 
-        if (!AllowAny) {
-            bool isFile = Path.HasExtension(path);
-            if (PointsToFile && !isFile) throw new InvalidArgumentInputException("Path must point to a file.");
-            if (PointsToDirectory && isFile) throw new InvalidArgumentInputException("Path must point to a directory.");
-        }
+        bool isFile = Path.HasExtension(path);
+        if (!AllowFilePath && isFile) throw new InvalidArgumentInputException("Path must point to a file.");
+        if (!AllowDirectoryPath && !isFile) throw new InvalidArgumentInputException("Path must point to a directory.");
             
         Value = path;
     }
@@ -64,11 +63,18 @@ public class PathArgument : IArgument<string> {
         return other is PathArgument p &&
                Value == p.Value &&
                DefaultValue == p.DefaultValue &&
-               AllowAny == p.AllowAny &&
-               MustExist == p.MustExist &&
-               PointsToDirectory == p.PointsToDirectory &&
-               PointsToFile == p.PointsToFile;
+               AllowedPathType == p.AllowedPathType;
     }
 
     object ICloneable.Clone() => Clone();
+}
+
+/// <summary>
+/// determines the allowed path types
+/// </summary>
+[Flags]
+public enum AllowedPathType : byte {
+    NOT_EXISTING = 1,
+    DIRECTORY = 2,
+    FILE = 4
 }

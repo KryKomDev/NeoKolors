@@ -4,7 +4,6 @@
 //
 
 using NeoKolors.Settings.Exception;
-using static NeoKolors.Console.Debug;
 
 namespace NeoKolors.Settings.Argument;
 
@@ -13,24 +12,27 @@ namespace NeoKolors.Settings.Argument;
 /// </summary>
 /// <typeparam name="T">type of values that can be selected</typeparam>
 public class MultiSelectArgument<T> : IArgument<T[]> where T : notnull {
-    public Dictionary<int, T> Choices { get; } = new();
-    public bool[] Selected { get; private set; }
+    
+    /// <summary>
+    /// key is the actual value, int is its index
+    /// </summary>
+    public Dictionary<T, int> Choices { get; } = new();
+    public bool[] Selected { get; set; }
     public T[] Value => Get();
     public bool[] DefaultSelected { get; }
 
     public MultiSelectArgument(T[] values, params T[] defaultValues) {
-        for (int i = 0; i < values.Length; i++) Choices.Add(i, values[i]);
+        for (int i = 0; i < values.Length; i++) Choices.Add(values[i], i);
         Selected = new bool[values.Length];
         
         if (values.Length < defaultValues.Length) 
-            Throw(new InvalidArgumentInputException("There is more default values than there are choices."));
+            throw new InvalidArgumentInputException("There is more default values than there are choices.");
         
         DefaultSelected = Select(defaultValues);
-        Set(values);
     }
     
     public MultiSelectArgument(params T[] values) {
-        for (int i = 0; i < values.Length; i++) Choices.Add(i, values[i]);
+        for (int i = 0; i < values.Length; i++) Choices.Add(values[i], i);
         Selected = new bool[values.Length];
         DefaultSelected = [];
         Set(values);
@@ -50,78 +52,119 @@ public class MultiSelectArgument<T> : IArgument<T[]> where T : notnull {
     
     void IArgument.Set(object value) => Set(value);
 
+    /// <summary>
+    /// returns the selected values
+    /// </summary>
     public T[] Get() {
         List<T> selected = new();
+        var a = Choices.Keys.ToArray();
         
         for (int i = 0; i < Selected.Length; i++) {
-            if (Selected[i]) selected.Add(Choices[i]);
+            if (Selected[i]) selected.Add(a[i]);
         }
 
         return selected.ToArray();
     }
     
+    /// <summary>
+    /// resets the argument to the default state as it was after initialization 
+    /// </summary>
     public void Reset() => Selected = DefaultSelected;
 
-    public IArgument<T[]> Clone() => (IArgument<T[]>)MemberwiseClone();
-
+    /// <summary>
+    /// Sets the argument.
+    /// if value is T toggles if the value is selected,
+    /// if value is T[] toggles all values of the array,
+    /// if value is MultiSelectArgument&lt;T&gt; the selections will be copied,
+    /// if value is T the choice will be toggled
+    /// </summary>
+    /// <exception cref="InvalidArgumentInputException">
+    /// choices of the input Multi-select argument are not the same
+    /// </exception>
+    /// <exception cref="InvalidArgumentInputTypeException">value does not match any of the allowed types</exception>
     public void Set(object value) {
-        if (value is T[] ta) {
-            Set(ta);
-        }
-        else if (value is bool[] ba) {
-            if (ba.Length <= Selected.Length) {
-                for (int i = 0; i < ba.Length; i++) Selected[i] = ba[i];
+        switch (value) {
+            case T[] ta: {
+                Set(ta);
+                break;
             }
-            else {
-                for (int i = 0; i < Selected.Length; i++) Selected[i] = ba[i];
+            case bool[] ba: {
+                for (int i = 0; i < Math.Min(ba.Length, Selected.Length); i++) Selected[i] = ba[i];
+                break;
             }
-        }
-        else if (value is MultiSelectArgument<T> msa) {
-            Set(msa.Value);
-        }
-        else if (value is T t) {
-            if (!Choices.ContainsValue(t)) {
-                Error($"Multi-select argument does not contain choice value \"{t.ToString()}\"");
-                return;
+            // ReSharper disable once UsageOfDefaultStructEquality
+            case MultiSelectArgument<T> msa when !Choices.SequenceEqual(msa.Choices):
+                throw new InvalidArgumentInputException("Choices of the input Multi-select argument are not the same.");
+            case MultiSelectArgument<T> msa: {
+                for (int i = 0; i < Selected.Length; i++) Selected[i] = false;
+                Select(msa.Value);
+                break;
             }
-
-            for (int i = 0; i < Choices.Count; i++) if (Choices[i].Equals(t)) Selected[i] = !Selected[i];
-        }
-        else {
-            Throw(new InvalidArgumentInputTypeException(typeof(T), value.GetType()));
+            case T t: {
+                Set(t);
+                break;
+            }
+            default: throw new InvalidArgumentInputTypeException(typeof(T), value.GetType());
         }
     }
 
-    public void Set(T[] values) {
-        foreach (var t in values) {
-            if (!Choices.ContainsValue(t)) {
-                Error($"Multi-select argument does not contain choice value \"{t.ToString()}\"");
-                continue;
-            }
+    /// <summary>
+    /// toggles the selection for values of the array
+    /// </summary>
+    public void Set(params T[] values) {
+        foreach (var value in values) Set(value);
+    }
 
-            for (int i = 0; i < Choices.Count; i++) if (Choices[i].Equals(values[i])) Selected[i] = true;
+    /// <summary>
+    /// toggles the selection for the input value
+    /// </summary>
+    /// <exception cref="InvalidArgumentInputException">value is not inside the array</exception>
+    public void Set(T value) {
+        if (!Choices.TryGetValue(value, out var key))
+            throw new InvalidArgumentInputException(
+                $"Multi-select argument does not contain choice value \"{value.ToString()}\"");
+
+        Selected[key] = !Selected[key];
+    } 
+
+    /// <summary>
+    /// selects the values from the array
+    /// </summary>
+    /// <exception cref="InvalidArgumentInputException">one of the values is not a valid choice</exception>
+    public bool[] Select(params T[] values) {
+        bool[] selected = new bool[Choices.Count];
+        
+        foreach (var value in values) {
+            if (!Choices.TryGetValue(value, out var key))
+                throw new InvalidArgumentInputException(
+                    $"Multi-select argument does not contain choice value \"{value.ToString()}\"");
+
+            Selected[key] = true;
+            selected[key] = true;
+        }
+
+        return selected;
+    }
+    
+    /// <summary>
+    /// deselects the values from the array
+    /// </summary>
+    /// <exception cref="InvalidArgumentInputException">one of the values is not a valid choice</exception>
+    public void Deselect(params T[] values) {
+        foreach (var value in values) {
+            if (!Choices.TryGetValue(value, out var key))
+                throw new InvalidArgumentInputException(
+                    $"Multi-select argument does not contain choice value \"{value.ToString()}\"");
+
+            Selected[key] = false;
         }
     }
 
     object IArgument.Get() => Get();
     void IArgument.Reset() => Reset();
+    public IArgument<T[]> Clone() => (IArgument<T[]>)MemberwiseClone();
     IArgument IArgument.Clone() => Clone();
-
-    private bool[] Select(T[] values) {
-        bool[] selected = new bool[Choices.Count];
-        
-        foreach (var t in values) {
-            if (!Choices.ContainsValue(t)) {
-                Error($"Multi-select argument does not contain choice value \"{t.ToString()}\"");
-                continue;
-            }
-
-            for (int i = 0; i < Choices.Count; i++) if (Choices[i].Equals(t)) selected[i] = true;
-        }
-
-        return selected;
-    }
-
+    
     public bool Equals(IArgument? other) {
         return other is MultiSelectArgument<T> m &&
                Choices == m.Choices &&

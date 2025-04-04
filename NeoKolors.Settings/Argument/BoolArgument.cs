@@ -36,15 +36,14 @@ public class BoolArgument : IArgument<bool> {
     }
 
     /// <summary>
-    /// sets the argument using a string
+    /// sets the argument using a string, all variations of true / false are allowed, e.g. TrUe, fALSe
     /// </summary>
-    /// <param name="s"></param>
-    /// <exception cref="ArgumentInputFormatException"></exception>
+    /// <exception cref="ArgumentInputFormatException">the string is not a valid boolean string</exception>
     public void Set(string s) {
         bool v;
 
         s = s.ToLowerInvariant();
-        s = s.CapitalizeFirst();
+        // s = s.CapitalizeFirst(); TODO: uncomment this
         
         try {
             v = bool.Parse(s);
