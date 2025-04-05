@@ -4,9 +4,9 @@
 
 <instance-profile id="common"
                  name="NeoKolors.Common Documentation"
-                 start-page="starter.md">
+                 start-page="CommonStarter.md">
 
-    <toc-element topic="starter.md"/>
+    <toc-element topic="CommonStarter.md"/>
     <toc-element topic="NKStyle.md">
     </toc-element>
     <toc-element topic="NKConsoleColor.md"/>

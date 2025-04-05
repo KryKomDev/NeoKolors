@@ -4,8 +4,9 @@
 
 <instance-profile id="console"
                  name="NeoKolors.Console Documentation"
-                 start-page="starter.md">
+                 start-page="ConsoleStarter.md">
 
+    <toc-element topic="ConsoleStarter.md"/>
     <toc-element topic="Debug.md">
 
     </toc-element>

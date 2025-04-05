@@ -15,3 +15,6 @@ obj/
 # resharper and rider shit
 /_ReSharper.Caches/
 riderModule.iml
+
+# writerside output
+Docs/out/
