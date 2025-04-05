@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 env:
-  INSTANCE: 'Docs/Common/common'
+  INSTANCE: 'Docs/common'
   DOCKER_VERSION: '243.22562'
 
 jobs:
