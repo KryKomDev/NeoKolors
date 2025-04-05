@@ -8,7 +8,7 @@ on:
 
 env:
   INSTANCE: 'Docs/docs'
-  DOCKER_VERSION: '243.22562'
+  DOCKER_VERSION: '2025.03.8312'
   IS_GROUP: 'true'
 
 jobs:
