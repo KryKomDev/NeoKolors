@@ -3,7 +3,7 @@ name: Deploy NeoKolors.Common documentation
 on:
   push:
     paths:
-      - 'Docs/Common/**'
+      - 'Docs/**'
   workflow_dispatch:
 
 env:
