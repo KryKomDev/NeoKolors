@@ -9,6 +9,7 @@ on:
 env:
   INSTANCE: 'Docs/docs'
   DOCKER_VERSION: '243.22562'
+  IS_GROUP: 'true'
 
 jobs:
   build:
