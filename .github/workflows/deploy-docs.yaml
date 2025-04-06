@@ -81,6 +81,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
 #    needs: [build, test]
+      needs: build
     runs-on: ubuntu-latest
     permissions:
       id-token: write
