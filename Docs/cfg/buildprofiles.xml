@@ -3,7 +3,10 @@
 <buildprofiles xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/build-profiles.xsd"
                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-    <variables></variables>
+    <variables>
+        <custom-css>custom.css</custom-css>    
+    </variables>
+    
     <build-profile instance="common">
         <variables>
             <color-preset>soft</color-preset>
@@ -33,7 +36,7 @@
 
     <build-profile instance="tui">
         <variables>
-            <primary-color>ruby</primary-color>
+            <primary-color>halloween</primary-color>
             <color-preset>soft</color-preset>
             <noindex-content>true</noindex-content>
             <header-logo>NeoKolors.png</header-logo>
