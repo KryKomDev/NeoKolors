@@ -4,8 +4,8 @@
 
 <instance-profile id="settings"
                  name="NeoKolors.Settings Documentation"
-                 start-page="Starter.md">
+                 start-page="SettingsStarter.md">
 
-    <toc-element topic="Starter.md"/>
+    <toc-element topic="SettingsStarter.md"/>
     <toc-element topic="VirtualConsole.md"/>
 </instance-profile>
