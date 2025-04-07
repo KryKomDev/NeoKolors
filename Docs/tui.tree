@@ -4,9 +4,9 @@
 
 <instance-profile id="tui"
                  name="NeoKolors.Tui Documentation"
-                 start-page="Starter.md">
-
-    <toc-element topic="Starter.md"/>
+                 start-page="TuiStarter.md">
+    
+    <toc-element topic="TuiStarter.md"/>
     <toc-element topic="Application.md"/>
     <toc-element topic="VirtualConsole.md"/>
     <toc-element topic="AsciiFontFormat.md"/>
