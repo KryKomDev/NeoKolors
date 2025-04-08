@@ -4,10 +4,10 @@
     xsi:noNamespaceSchemaLocation="https://resources.jetbrains.com/writerside/1.0/build-groups.xsd"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <build-group name="docs">
-        <instance instance-id="common" alias="Common Docs" path="/docs/common"/>
-        <instance instance-id="console" alias="Console Docs" path="/docs/console"/>
-        <instance instance-id="settings" alias="Settings Docs" path="/docs/settings"/>
-        <instance instance-id="tui" alias="Tui Docs" path="/docs/tui"/>
+        <instance instance-id="common" alias="Common Docs" path="/Docs/common"/>
+        <instance instance-id="console" alias="Console Docs" path="/Docs/console"/>
+        <instance instance-id="settings" alias="Settings Docs" path="/Docs/settings"/>
+        <instance instance-id="tui" alias="Tui Docs" path="/Docs/tui"/>
     </build-group>
 
 </build-groups>
