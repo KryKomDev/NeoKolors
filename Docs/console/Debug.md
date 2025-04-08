@@ -1,5 +1,9 @@
 # Debug
 
+```c#
+public static class Debug;
+```
+
 The contents are split in three files, similarly to it 
 the documentation is split in three parts as well.
 

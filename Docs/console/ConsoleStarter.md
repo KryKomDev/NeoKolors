@@ -13,12 +13,12 @@ The Debug class is the logger.
 It offers five message types, the option to change the output 
 and a variety of different configurations.
 
-<!-- insert log messages image here -->
+![debug-log-messages.png](debug-log-messages.png)
 
 Another nice feature is the option to interrupt the throwing of exceptions 
 and making them look nice and readable.
 
-<!-- insert fancy exception image here -->
+![debug-fancy-exception](debug-fancy-exception.png)
 
 ## ConsoleColors
 
