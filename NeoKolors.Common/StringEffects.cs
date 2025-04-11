@@ -3,6 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
@@ -350,4 +351,45 @@ public static class StringEffects {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int VisibleLength(this string text) =>
         Regex.Replace(text, @"\e([^m]*)m", "").Length;
+
+    
+    /// <summary>
+    /// capitalizes all the words within the string
+    /// </summary>
+    /// <exception cref="ArgumentNullException">the string is null</exception>
+    [Pure]
+    public static string Capitalize(this string s) {
+        if (s is null) throw new ArgumentNullException(nameof(s));
+        if (s.Length == 0) return "";
+        if (s.Length == 1) return s.ToUpper();
+
+        string[] words = s.Split(' '); 
+
+        for (int i = 0; i < words.Length; i++) {
+            if (string.IsNullOrEmpty(words[i])) continue;
+            
+            char[] letters = words[i].ToCharArray();
+
+            if (letters.Length <= 0) continue;
+            
+            letters[0] = char.ToUpper(letters[0]);
+            words[i] = new string(letters);
+        }
+
+        return string.Join(" ", words);;
+    }
+    
+    
+    /// <summary>
+    /// makes the first letter of the string capital
+    /// </summary>
+    /// <exception cref="ArgumentNullException">the input string is null</exception>
+    [Pure]
+    public static string CapitalizeFirst(this string input, CultureInfo? cultureInfo = null) =>
+        input switch {
+            null => throw new ArgumentNullException(nameof(input)),
+            "" => "",
+            _ => string.Concat(
+                input[0].ToString().ToUpper(cultureInfo ?? CultureInfo.InvariantCulture), input.Substring(1))
+        };
 }
