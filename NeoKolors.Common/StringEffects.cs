@@ -103,7 +103,7 @@ public static class StringEffects {
     /// <returns>colored text</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, NKColor color) => 
-        $"{color.ControlChar}{s}{TEXT_COLOR_END}";
+        $"{color.Text}{s}{TEXT_COLOR_END}";
 
     
     /// <summary>
@@ -112,7 +112,7 @@ public static class StringEffects {
     /// <returns>text with colored background</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColorB(this string text, NKColor color) => 
-        $"{color.ControlCharB}{text}{BACKGROUND_COLOR_END}";
+        $"{color.Bckg}{text}{BACKGROUND_COLOR_END}";
 
     
     /// <summary>
@@ -140,7 +140,7 @@ public static class StringEffects {
     /// <param name="colors">array of tuples containing the symbol and the color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, params (string symbol, NKColor color)[] colors) => 
-        colors.Aggregate(s, (current, c) => current.Replace(c.symbol, c.color.ControlChar));
+        colors.Aggregate(s, (current, c) => current.Replace(c.symbol, c.color.Text));
     
     
     /// <summary>
@@ -149,7 +149,17 @@ public static class StringEffects {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, NKColor text, NKColor background) => 
         s.AddColor(text).AddColorB(background);
-
+    
+    
+    /// <summary>
+    /// applies styles (using the <see cref="ApplyStyles"/>) and colors
+    /// (using the <see cref="ApplyColors"/>) to the string
+    /// </summary>
+    /// <param name="s">input string with style and color tags</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string ApplyEffects(this string s) => 
+        s.ApplyStyles().ApplyColors();
+    
     
     /// <summary>
     /// adds styles to text using html-like tags
@@ -194,9 +204,6 @@ public static class StringEffects {
             return i.ControlCharB();
         });
 
-        s = s.Replace("</f#>", CUSTOM_COLOR_END);
-        s = s.Replace("</b#>", CUSTOM_BACKGROUND_COLOR_END);
-
         s = s.Replace("<f-black>", PALETTE_COLOR_BLACK);
         s = s.Replace("<f-dark-red>", PALETTE_COLOR_DARK_RED);
         s = s.Replace("<f-dark-green>", PALETTE_COLOR_DARK_GREEN);
@@ -214,6 +221,7 @@ public static class StringEffects {
         s = s.Replace("<f-cyan>", PALETTE_COLOR_CYAN);
         s = s.Replace("<f-white>", PALETTE_COLOR_WHITE);
         s = s.Replace("</f-color>", TEXT_COLOR_END);
+        s = s.Replace("</f#>", TEXT_COLOR_END);
         
         s = s.Replace("<b-black>", PALETTE_BACKGROUND_COLOR_BLACK);
         s = s.Replace("<b-dark-red>", PALETTE_BACKGROUND_COLOR_DARK_RED);
@@ -232,6 +240,7 @@ public static class StringEffects {
         s = s.Replace("<b-cyan>", PALETTE_BACKGROUND_COLOR_CYAN);
         s = s.Replace("<b-white>", PALETTE_BACKGROUND_COLOR_WHITE);
         s = s.Replace("</b-color>", BACKGROUND_COLOR_END);
+        s = s.Replace("</b#>", BACKGROUND_COLOR_END);
         
         return s;
     }
@@ -342,54 +351,4 @@ public static class StringEffects {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddStyle(this char s, NKStyle style) => 
         s.AddStyle(style.Styles).AddColor(style.FColor, style.BColor);
-
-
-    /// <summary>
-    /// returns the total count of the printable / visible characters of a string
-    /// (for example ansi escape characters are not counted)
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int VisibleLength(this string text) =>
-        Regex.Replace(text, @"\e([^m]*)m", "").Length;
-
-    
-    /// <summary>
-    /// capitalizes all the words within the string
-    /// </summary>
-    /// <exception cref="ArgumentNullException">the string is null</exception>
-    [Pure]
-    public static string Capitalize(this string s) {
-        if (s is null) throw new ArgumentNullException(nameof(s));
-        if (s.Length == 0) return "";
-        if (s.Length == 1) return s.ToUpper();
-
-        string[] words = s.Split(' '); 
-
-        for (int i = 0; i < words.Length; i++) {
-            if (string.IsNullOrEmpty(words[i])) continue;
-            
-            char[] letters = words[i].ToCharArray();
-
-            if (letters.Length <= 0) continue;
-            
-            letters[0] = char.ToUpper(letters[0]);
-            words[i] = new string(letters);
-        }
-
-        return string.Join(" ", words);;
-    }
-    
-    
-    /// <summary>
-    /// makes the first letter of the string capital
-    /// </summary>
-    /// <exception cref="ArgumentNullException">the input string is null</exception>
-    [Pure]
-    public static string CapitalizeFirst(this string input, CultureInfo? cultureInfo = null) =>
-        input switch {
-            null => throw new ArgumentNullException(nameof(input)),
-            "" => "",
-            _ => string.Concat(
-                input[0].ToString().ToUpper(cultureInfo ?? CultureInfo.InvariantCulture), input.Substring(1))
-        };
 }

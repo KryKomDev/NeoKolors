@@ -66,30 +66,4 @@ public class StringEffectsTests {
         var color = new NKColor(NKConsoleColor.CYAN);
         Assert.Equal("\e[48;5;14mHello\e[49m", "Hello".AddColorB(color));
     }
-
-    [Fact]
-    public void VisibleLength_ShouldReturnCorrectValue() {
-        var s = "\e[38;2;1;1;1mHello\e[39m World\b";
-        Assert.Equal(12, s.VisibleLength());
-    }
-
-    [Fact]
-    public void Capitalize_ShouldReturnCorrectValue() {
-        var s = "hello, world!";
-        Assert.Equal("Hello, World!", s.Capitalize());
-        s = "";
-        Assert.Equal("", s.Capitalize());
-        s = null;
-        Assert.Throws<ArgumentNullException>(() => s!.Capitalize());
-    }
-
-    [Fact]
-    public void CapitalizeFirst_ShouldReturnCorrectValue() {
-        var s = "hello, world!";
-        Assert.Equal("Hello, world!", s.CapitalizeFirst());
-        s = "";
-        Assert.Equal("", s.CapitalizeFirst());
-        s = null;
-        Assert.Throws<ArgumentNullException>(() => s!.CapitalizeFirst());
-    }
 }

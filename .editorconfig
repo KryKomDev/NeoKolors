@@ -352,7 +352,7 @@ dotnet_naming_rule.private_instance_fields_rule.import_to_resharper = True
 dotnet_naming_rule.private_instance_fields_rule.resharper_description = Instance fields (private)
 dotnet_naming_rule.private_instance_fields_rule.resharper_guid = 4a98fdf6-7d98-4f5a-afeb-ea44ad98c70c
 dotnet_naming_rule.private_instance_fields_rule.severity = warning
-dotnet_naming_rule.private_instance_fields_rule.style = lower_camel_case_style
+dotnet_naming_rule.private_instance_fields_rule.style = _lower_camel_case_style
 dotnet_naming_rule.private_instance_fields_rule.symbols = private_instance_fields_symbols
 dotnet_naming_rule.private_static_fields_rule.import_to_resharper = True
 dotnet_naming_rule.private_static_fields_rule.resharper_description = Static fields (private)
@@ -360,6 +360,7 @@ dotnet_naming_rule.private_static_fields_rule.resharper_exclusive_prefixes_suffi
 dotnet_naming_rule.private_static_fields_rule.resharper_guid = f9fce829-e6f4-4cb2-80f1-5497c44f51df
 dotnet_naming_rule.private_static_fields_rule.severity = warning
 dotnet_naming_rule.private_static_fields_rule.style = all_upper_style
+dotnet_naming_rule.private_static_fields_rule.symbols = constants_symbols
 dotnet_naming_rule.private_static_readonly_rule.import_to_resharper = True
 dotnet_naming_rule.private_static_readonly_rule.resharper_description = Static readonly fields (private)
 dotnet_naming_rule.private_static_readonly_rule.resharper_guid = 15b5b1f1-457c-4ca6-b278-5615aedc07d3

@@ -108,14 +108,14 @@ public class NKColor : ICloneable, IEquatable<NKColor> {
         return Color.GetHashCode();
     }
 
-    public string ControlChar =>
+    public string Text =>
         Color.Match(
             i => i.ControlChar(),
             c => c.ControlChar(),
             _ => EscapeCodes.TEXT_COLOR_END
         );
     
-    public string ControlCharB => 
+    public string Bckg => 
         Color.Match(
             i => i.ControlCharB(),
             c => c.ControlCharB(),
