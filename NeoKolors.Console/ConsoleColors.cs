@@ -5,7 +5,6 @@
 
 using System.Runtime.CompilerServices;
 using NeoKolors.Common;
-using static System.Console;
 
 namespace NeoKolors.Console;
 

@@ -9,7 +9,8 @@ namespace NeoKolors.Console;
 /// determines what logging messages will be printed
 /// </summary>
 [Flags]
-public enum DebugLevel {
+public enum LoggerLevel {
+    NONE = 0,
     FATAL = 1,
     ERROR = 2,
     WARN = 4,

@@ -3,6 +3,8 @@
 // Copyright (c) 2025 KryKom
 //
 
+// ReSharper disable InconsistentNaming
+// ReSharper disable NotAccessedField.Local
 namespace NeoKolors.Console;
 
 /// <summary>
@@ -13,7 +15,7 @@ public class ConsoleProgressBar {
     private readonly int barSize;
     private readonly int minValue;
     private readonly int maxValue;
-    private int currentValue = 0;
+    private int currentValue;
     private bool showData;
     private char beginChar;
     private char endChar;
@@ -136,7 +138,7 @@ public class ConsoleProgressBar {
     }
 
     private void PrintBarPart(bool state) {
-        ConsoleColors.Write("" + barChar, state ? Debug.InfoColor : Debug.ErrorColor);
+        ConsoleColors.Write("" + barChar, state ? NKDebug.Logger.InfoColor : NKDebug.Logger.ErrorColor);
     }
 
     private void PrintBarStart() {
