@@ -3,6 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Globalization;
 using NeoKolors.Common.Exceptions;
 using OneOf;
 
@@ -11,7 +12,7 @@ namespace NeoKolors.Common;
 /// <summary>
 /// color structure that can hold every color supported by the console (+ARGB colors) 
 /// </summary>
-public class NKColor : ICloneable, IEquatable<NKColor> {
+public class NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
     
     public OneOf<int, NKConsoleColor, DefaultColor> Color { get; }
 
@@ -51,6 +52,7 @@ public class NKColor : ICloneable, IEquatable<NKColor> {
     public NKColor(ConsoleColor consoleColor) => Color = ColorFormat.SystemToNK(consoleColor);
     public NKColor() => Color = new DefaultColor();
 
+    public static NKColor Default => new();
     
     public static NKColor FromArgb(int color) => new(color);
     public static NKColor FromArgb(byte r, byte g, byte b) => new((r << 16) | (g << 8) | b);
@@ -135,4 +137,17 @@ public class NKColor : ICloneable, IEquatable<NKColor> {
             c => $"{Enum.GetName(typeof(NKConsoleColor), c)}",
             _ => "Default"
         );
+
+    public string ToString(string format) => 
+        ToString(format, CultureInfo.InvariantCulture);
+    
+    public string ToString(string? format, IFormatProvider? formatProvider) {
+        if (string.IsNullOrEmpty(format)) format = "T";
+        return format switch {
+            "p" or "P" => ToString(),
+            "t" or "T" or "Text" or "f" or "F" or "Forg" => Text,
+            "b" or "B" or "Bckg" => Bckg,
+            _ => Text
+        };
+    }
 }

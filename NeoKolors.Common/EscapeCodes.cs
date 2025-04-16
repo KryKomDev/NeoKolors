@@ -69,7 +69,7 @@ public static class EscapeCodes {
     /// <summary>
     /// disables all styles
     /// </summary>
-    public const string STYLE_END = "\e[0m";
+    public const string FORMATTING_RESET = "\e[0m";
     
     /// <summary>
     /// switches colors of background and text

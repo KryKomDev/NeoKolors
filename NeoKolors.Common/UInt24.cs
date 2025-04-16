@@ -34,25 +34,25 @@ public readonly struct UInt24 :
 
     public override int GetHashCode() {
         unchecked {
-            var hashCode = b0.GetHashCode();
-            hashCode = (hashCode * 397) ^ b1.GetHashCode();
-            hashCode = (hashCode * 397) ^ b2.GetHashCode();
+            var hashCode = _b0.GetHashCode();
+            hashCode = (hashCode * 397) ^ _b1.GetHashCode();
+            hashCode = (hashCode * 397) ^ _b2.GetHashCode();
             return hashCode;
         }
     }
 
-    private readonly byte b0, b1, b2;
+    private readonly byte _b0, _b1, _b2;
 
     public UInt24(UInt32 value) {
-        b0 = (byte)((value      ) & 0xFF);
-        b1 = (byte)((value >> 8 ) & 0xFF);
-        b2 = (byte)((value >> 16) & 0xFF);
+        _b0 = (byte)((value      ) & 0xFF);
+        _b1 = (byte)((value >> 8 ) & 0xFF);
+        _b2 = (byte)((value >> 16) & 0xFF);
     }
 
     public UInt24(Int32 value) {
-        b0 = (byte)((value      ) & 0xFF);
-        b1 = (byte)((value >> 8 ) & 0xFF);
-        b2 = (byte)((value >> 16) & 0xFF);
+        _b0 = (byte)((value      ) & 0xFF);
+        _b1 = (byte)((value >> 8 ) & 0xFF);
+        _b2 = (byte)((value >> 16) & 0xFF);
     }
 
     public int CompareTo(object? obj) {
@@ -71,26 +71,26 @@ public readonly struct UInt24 :
     }
     
     public bool Equals(UInt24 other) {
-        return b2 == other.b2 && b1 == other.b1 && b0 == other.b0;
+        return _b2 == other._b2 && _b1 == other._b1 && _b0 == other._b0;
     }
 
     public static UInt24 MaxValue => new(0x00FFFFFF);
     public static UInt24 MinValue => new(0x00000000);
     
     public static implicit operator UInt24(UInt32 value) => new(value);
-    public static implicit operator UInt32(UInt24 value) => (uint)((value.b2 << 16) | (value.b1 << 8) | value.b0);
+    public static implicit operator UInt32(UInt24 value) => (uint)((value._b2 << 16) | (value._b1 << 8) | value._b0);
     public static implicit operator UInt24(Int32 value) => new(value);
-    public static implicit operator Int32(UInt24 value) => (value.b2 << 16) | (value.b1 << 8) | value.b0;
+    public static implicit operator Int32(UInt24 value) => (value._b2 << 16) | (value._b1 << 8) | value._b0;
     public static implicit operator UInt24(Byte value) => new(value);
     public static implicit operator UInt24(Char value) => new(value);
     public static implicit operator UInt24(Int16 value) => new(value);
     public static implicit operator UInt24(UInt16 value) => new(value);
-    public static implicit operator UInt64(UInt24 value) => (UInt64)((value.b2 << 16) | (value.b1 << 8) | value.b0);
-    public static implicit operator Int64(UInt24 value) => (value.b2 << 16) | (value.b1 << 8) | value.b0;
+    public static implicit operator UInt64(UInt24 value) => (UInt64)((value._b2 << 16) | (value._b1 << 8) | value._b0);
+    public static implicit operator Int64(UInt24 value) => (value._b2 << 16) | (value._b1 << 8) | value._b0;
     
     #if NET5_0_OR_GREATER && !NET5_0
-    public static implicit operator UInt128(UInt24 value) => (UInt128)((value.b2 << 16) | (value.b1 << 8) | value.b0);
-    public static implicit operator Int128(UInt24 value) => (value.b2 << 16) | (value.b1 << 8) | value.b0;
+    public static implicit operator UInt128(UInt24 value) => (UInt128)((value._b2 << 16) | (value._b1 << 8) | value._b0);
+    public static implicit operator Int128(UInt24 value) => (value._b2 << 16) | (value._b1 << 8) | value._b0;
     
     public bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider) {
         return destination.TryWrite(provider, $"{(uint)this}", out charsWritten);
@@ -151,10 +151,10 @@ public readonly struct UInt24 :
     public static bool TryParse(ReadOnlySpan<char> s, IFormatProvider? provider, out UInt24 result) => TryParse(new string(s.ToArray()), provider, out result);
     public static UInt24 operator +(UInt24 left, UInt24 right) => (uint)left + (uint)right;
     public static UInt24 AdditiveIdentity => 0;
-    public static UInt24 operator &(UInt24 left, UInt24 right) => ((left.b2 & right.b2) << 16) | ((left.b1 & right.b1) << 8) | (left.b0 & right.b0);
-    public static UInt24 operator |(UInt24 left, UInt24 right) => ((left.b2 | right.b2) << 16) | ((left.b1 | right.b1) << 8) | (left.b0 | right.b0);
-    public static UInt24 operator ^(UInt24 left, UInt24 right) => ((left.b2 ^ right.b2) << 16) | ((left.b1 ^ right.b1) << 8) | (left.b0 ^ right.b0);
-    public static UInt24 operator ~(UInt24 value) => (~value.b2 << 16) | (~value.b1 << 8) | ~value.b0;
+    public static UInt24 operator &(UInt24 left, UInt24 right) => ((left._b2 & right._b2) << 16) | ((left._b1 & right._b1) << 8) | (left._b0 & right._b0);
+    public static UInt24 operator |(UInt24 left, UInt24 right) => ((left._b2 | right._b2) << 16) | ((left._b1 | right._b1) << 8) | (left._b0 | right._b0);
+    public static UInt24 operator ^(UInt24 left, UInt24 right) => ((left._b2 ^ right._b2) << 16) | ((left._b1 ^ right._b1) << 8) | (left._b0 ^ right._b0);
+    public static UInt24 operator ~(UInt24 value) => (~value._b2 << 16) | (~value._b1 << 8) | ~value._b0;
     public static bool operator ==(UInt24 left, UInt24 right) => Equals(left, right);
     public static bool operator !=(UInt24 left, UInt24 right) => !Equals(left, right);
     public static bool operator >(UInt24 left, UInt24 right) => left.CompareTo(right) > 0;

@@ -72,16 +72,29 @@ public static class StringUtils {
     /// </summary>
     /// <param name="format">the string to format</param>
     /// <param name="args">the arguments for the string</param>
-    #if NET8_0_OR_GREATER
     [Pure]
-    public static string Format([StringSyntax(StringSyntaxAttribute.CompositeFormat)] this string format, 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string Format(
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)] this string format, 
         params object[] args) =>
         string.Format(CultureInfo.InvariantCulture, format, args);
-    #else
-    [Pure]
-        public static string Format(this string format, params object[] args) =>
-            string.Format(CultureInfo.InvariantCulture, format, args);
+
+    /// <summary>
+    /// creates a substring between the indices, including startIndex, excluding endIndex
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// startIndex or endIndex is out of range, startIndex is greater than endIndex
+    /// </exception>
+    #if NET5_0_OR_GREATER
+    [Obsolete("This method can be substituted with range indexer.")]
     #endif
-    
-    
+    public static string InRange(this string s, int startIndex, int endIndex) {
+        if (startIndex < 0 || startIndex >= s.Length) 
+            throw new ArgumentOutOfRangeException(nameof(startIndex), "Start index is out of range.");
+        if (endIndex < 0 || endIndex >= s.Length) 
+            throw new ArgumentOutOfRangeException(nameof(endIndex), "End index is out of range.");
+        if (startIndex > endIndex) 
+            throw new ArgumentOutOfRangeException(nameof(startIndex), "Start index is larger than the end index");
+        return s.Substring(startIndex, endIndex - startIndex);
+    }
 }

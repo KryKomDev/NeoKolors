@@ -3,7 +3,9 @@
 // Copyright (c) 2025 KryKom
 //
 
-using System.Diagnostics.Contracts;
+#if NET8_0_OR_GREATER
+using System.Diagnostics.CodeAnalysis;
+#endif
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
@@ -149,6 +151,41 @@ public static class StringEffects {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, NKColor text, NKColor background) => 
         s.AddColor(text).AddColorB(background);
+
+
+    /// <summary>
+    /// colors the string s using the composition formatting
+    /// </summary>
+    /// <param name="s">the string to be colored</param>
+    /// <param name="colors">an ordered list of the colors</param>
+    public static string AddColors(
+        [StringSyntax(StringSyntaxAttribute.CompositeFormat)] 
+        this string s, params NKColor[] colors) 
+    {
+        object[] sc = new object[colors.Length];
+        
+        for (int i = 0; i < colors.Length; i++)
+            sc[i] = colors[i].Text;
+        
+        return string.Format(s, sc);
+    }
+    
+    /// <summary>
+    /// colors the string's background using the composition formatting
+    /// </summary>
+    /// <param name="s">the string to be colored</param>
+    /// <param name="colors">an ordered list of the colors</param>
+    public static string AddColorsB(
+            [StringSyntax(StringSyntaxAttribute.CompositeFormat)] 
+            this string s, params NKColor[] colors) 
+    {
+        object[] sc = new object[colors.Length];
+        
+        for (int i = 0; i < colors.Length; i++)
+            sc[i] = colors[i].Bckg;
+        
+        return string.Format(s, sc);
+    }
     
     
     /// <summary>
@@ -299,11 +336,13 @@ public static class StringEffects {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ControlChar(this NKConsoleColor color) => GetPaletteFColor((byte)color);
     
+    
     /// <summary>
     /// returns string containing ansi escape sequence coloring background
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ControlCharB(this NKConsoleColor color) => GetPaletteBColor((byte)color);
+    
     
     /// <summary>
     /// returns string containing ansi escape sequence coloring the text

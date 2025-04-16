@@ -3,6 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
 namespace NeoKolors.Common;
@@ -10,7 +11,7 @@ namespace NeoKolors.Common;
 /// <summary>
 /// contains information about console styles (bg / fg color, bold, italic etc.)
 /// </summary>
-public struct NKStyle : ICloneable, IEquatable<NKStyle> {
+public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     
     /// <summary>
     /// The actual compressed style
@@ -204,15 +205,50 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle> {
         SetStyles(s);
     }
 
+    public NKStyle(NKColor f, TextStyles s) {
+        Raw = 0;
+        SetFColor(f);
+        SetBColor(NKColor.Default);
+        SetStyles(s);
+    }
+
+    public NKStyle(NKColor f) {
+        Raw = 0;
+        SetFColor(f);
+        SetBColor(NKColor.Default);
+        SetStyles(0);
+    }
+
+    public NKStyle(TextStyles s) {
+        Raw = 0;
+        SetFColor(NKColor.Default);
+        SetBColor(NKColor.Default);
+        SetStyles(s);
+    }
+
     public NKStyle() {
-        FColor = new NKColor();
-        BColor = new NKColor();
-        Styles = 0;
+        Raw = 0;
+        SetFColor(NKColor.Default);
+        SetBColor(NKColor.Default);
+        SetStyles(0);
     }
     
     public object Clone() => MemberwiseClone();
 
     public override string ToString() => $"FColor: {FColor}, BColor: {BColor}{StylesToString()}";
+    
+    public string ToString(string format) => ToString(format, CultureInfo.InvariantCulture);
+    
+    public string ToString(string? format, IFormatProvider? formatProvider) {
+        if (string.IsNullOrEmpty(format)) format = "s";
+        return format switch {
+            "p" or "P" => ToString(),
+            _ => ToAnsi()
+        };
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public string ToAnsi() => "".AddStyle(this);
 
     private string StylesToString() {
         var output = new List<string>();

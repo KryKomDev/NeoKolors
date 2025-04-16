@@ -3,19 +3,22 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Drawing;
+using System.Globalization;
+
 namespace NeoKolors.Common;
 
 public class ColorPalette {
     
-    public int this[int index] => colors[index];
-    private readonly NKColor[] colors;
-    public NKColor[] Colors => colors;
-    public int Length => colors.Length;
+    public int this[int index] => _colors[index];
+    private readonly NKColor[] _colors;
+    public NKColor[] Colors => _colors;
+    public int Length => _colors.Length;
 
     /// <summary>
     /// returns the stored color palette
     /// </summary>
-    public System.Drawing.Color[] GetColors => colors.Select(c => System.Drawing.Color.FromArgb(c + (0xff << 24))).ToArray();
+    public Color[] GetColors => _colors.Select(c => Color.FromArgb(c + (0xff << 24))).ToArray();
 
     /// <summary>
     /// creates a new ordered color palette from a set of integers, where the bytes mean AARRGGBB
@@ -23,11 +26,11 @@ public class ColorPalette {
     /// <param name="colors">the field of integers representing argb colors</param>
     /// <param name="autoAlpha">sets alpha channel of every color to #ff if true</param>
     public ColorPalette(NKColor[] colors, bool autoAlpha = true) {
-        this.colors = colors;
+        _colors = colors;
 
         if (autoAlpha) {
-            for (int i = 0; i < this.colors.Length; i++) {
-                this.colors[i] |= 0xff << 24;
+            for (int i = 0; i < _colors.Length; i++) {
+                _colors[i] |= 0xff << 24;
             }
         }
     }
@@ -35,11 +38,11 @@ public class ColorPalette {
     /// <summary>
     /// creates a new ordered color palette from a set of colors
     /// </summary>
-    public ColorPalette(System.Drawing.Color[] colors) {
-        this.colors = new NKColor[colors.Length];
+    public ColorPalette(Color[] colors) {
+        _colors = new NKColor[colors.Length];
 
         for (int i = 0; i < colors.Length; i++) {
-            this.colors[i] = colors[i].ToArgb();
+            _colors[i] = colors[i].ToArgb();
         }
     }
 
@@ -49,12 +52,12 @@ public class ColorPalette {
     /// <param name="url">the string</param>
     public ColorPalette(string url) {
 
-        colors = new NKColor[(url.Length + 1) / 7];
+        _colors = new NKColor[(url.Length + 1) / 7];
 
         for (int i = 0; i < url.Length; i += 7) {
             string colorRaw = "" + url[i] + url[i + 1] + url[i + 2] + url[i + 3] + url[i + 4] + url[i + 5];
 
-            colors[i / 7] = int.Parse(colorRaw, System.Globalization.NumberStyles.HexNumber);
+            _colors[i / 7] = int.Parse(colorRaw, NumberStyles.HexNumber);
         }
     }
 
@@ -62,7 +65,7 @@ public class ColorPalette {
     /// prints a palette to the console
     /// </summary>
     public void PrintPalette() {
-        foreach (int c in colors) {
+        foreach (int c in _colors) {
             Console.Write("● ".AddColor(c));
         }
         
@@ -94,7 +97,7 @@ public class ColorPalette {
     /// </summary>
     /// <param name="print">print delegate that prints a single color</param>
     public void PrintPalette(Action<int> print) {
-        foreach (var c in colors) {
+        foreach (var c in _colors) {
             print(c);
         }
         
@@ -122,8 +125,8 @@ public class ColorPalette {
         // Console.WriteLine($"{d.Item1}, {d.Item2}, {d.Item3}");
         
         for (int i = 0; i < colorCount; i++) {
-            System.Drawing.Color color = GenerateColorAtX(a, b, c, d, (float)i / colorCount * 3);
-            palette.colors[i] = color.R << 16 | color.G << 8 | color.B;
+            Color color = GenerateColorAtX(a, b, c, d, (float)i / colorCount * 3);
+            palette._colors[i] = color.R << 16 | color.G << 8 | color.B;
         }
         
         return palette;
@@ -133,7 +136,7 @@ public class ColorPalette {
     /// returns the color located at X in a graph of <c>color = A + B * Cos(2 * PI * (Cx + D))</c>
     /// where A, B, C and D are 3d vectors representing a color (all their values should be between 1 and 0)
     /// </summary>
-    public static System.Drawing.Color GenerateColorAtX(
+    public static Color GenerateColorAtX(
         (double R, double G, double B) a,
         (double R, double G, double B) b,
         (double R, double G, double B) c,
@@ -144,7 +147,7 @@ public class ColorPalette {
         double bl = Math.Cos(2 * Math.PI * (c.B + d.B * 2 * x));
         
         
-        return System.Drawing.Color.FromArgb(
+        return Color.FromArgb(
             Normalize(a.R + b.R * re),
             Normalize(a.G + b.G * gr),
             Normalize(a.B + b.B * bl));
