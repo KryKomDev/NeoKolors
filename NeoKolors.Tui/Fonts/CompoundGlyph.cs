@@ -13,8 +13,15 @@ namespace NeoKolors.Tui.Fonts;
 /// </summary>
 public class CompoundGlyph : Glyph {
 
-    public CompoundGlyph(char character, IGlyph first, IGlyph second, sbyte xOffset = 0, sbyte yOffset = 0) : 
-        base(character, MixGlyphs(first, second), xOffset, yOffset) { }
+    public CompoundGlyph(
+        char character, 
+        IGlyph first,
+        IGlyph second) :
+        base(
+            character, 
+            MixGlyphs(first, second),
+            Math.Min(first.XOffset, second.XOffset),
+            Math.Min(first.YOffset, second.YOffset)) { }
 
     private static char[,] MixGlyphs(IGlyph first, IGlyph second) {
         int smallerX = Math.Min(first.XOffset, second.XOffset);

@@ -38,11 +38,24 @@ public class Glyph : IGlyph {
     /// <summary>
     /// returns the individual characters of the glyph,
     /// the first index represents left / right and the second up / down,
-    /// [0, 0] is top left corner
+    /// [0, 0] is the top left corner
     /// </summary>
     public char[,] Chars { get; }
 
-    
+    /// <inheritdoc cref="IGlyph.GetLines"/>
+    public string[] GetLines() {
+        string[] lines = new string[Height];
+        
+        for (int y = 0; y < Height; y++) {
+            for (int x = 0; x < Width; x++) {
+                lines[y] += Chars[x, y];
+            }
+        }
+
+        return lines;
+    }
+
+
     public Glyph(char character, char[,] glyph, sbyte xOffset = 0, sbyte yOffset = 0) {
         Character = character;
         Chars = glyph;
@@ -61,7 +74,7 @@ public class Glyph : IGlyph {
     }
 
     /// <summary>
-    /// creates a new glyph from a string, individual lines of the glyph shall be separated by newlines
+    /// creates a new glyph from a string, newlines shall separate individual lines of the glyph
     /// </summary>
     /// <param name="character">the character the glyph is supposed to represent</param>
     /// <param name="glyph">the string from which the glyph will be created</param>
@@ -105,7 +118,7 @@ public class Glyph : IGlyph {
 
 
     /// <summary>
-    /// creates a new glyph from a string, individual lines of the glyph shall be separated by newlines
+    /// creates a new glyph from a string, newlines shall separate individual lines of the glyph
     /// </summary>
     /// <param name="character">the character the glyph is supposed to represent</param>
     /// <param name="glyph">the string from which the glyph will be created</param>

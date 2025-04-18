@@ -3,7 +3,6 @@
 // Copyright (c) 2025 KryKom
 //
 
-using System.Runtime.CompilerServices;
 using NeoKolors.Tui.Exceptions;
 
 namespace NeoKolors.Tui.Fonts;
@@ -28,6 +27,7 @@ public class NKFontReader : IFontReader {
     public int LetterSpacing { get; private set; }
     public int WordSpacing { get; private set; }
     public int LineSpacing { get; private set; }
+    public int LineSize { get; private set; }
     
     /// <summary>
     /// string that marks the beginning of a glyph section
@@ -70,7 +70,7 @@ public class NKFontReader : IFontReader {
     private void ReadHeader(string[] lines) {
         if (lines.Length < 6) throw FontReaderException.InvalidHeader();
         
-        // check version of the file
+        // check the version of the file
         string[] version = lines[0].Split(' ');
         if (version is not ["nkaf", "1"]) throw FontReaderException.InvalidFileVersion();
 
@@ -101,7 +101,7 @@ public class NKFontReader : IFontReader {
     private void SetSpacings(string line) {
         string[] spacings = line.Split(' ');
 
-        if (spacings is not [_, _, _]) throw FontReaderException.InvalidSpacings(line);
+        if (spacings is not [_, _, _, _]) throw FontReaderException.InvalidSpacings(line);
 
         try {
             LetterSpacing = int.Parse(spacings[0]);
@@ -123,6 +123,13 @@ public class NKFontReader : IFontReader {
         catch (Exception e) {
             throw FontReaderException.InvalidLineSpacing(e);
         }
+
+        try {
+            LineSize = int.Parse(spacings[3]);
+        }
+        catch (Exception e) {
+            throw FontReaderException.InvalidLineSize(e);
+        }
     }
 
     private void SetWhitespaceMode(string line) {
@@ -143,8 +150,8 @@ public class NKFontReader : IFontReader {
     private NKFont ReadGlyphs(string[] lines) {
         int startMarkerLength = GlyphStartMarker.Length;
         var font = UnknownGlyphMode != UnknownGlyphMode.GLYPH 
-            ? new NKFont(LetterSpacing, WordSpacing, LineSpacing, UnknownGlyphMode) 
-            : new NKFont(LetterSpacing, WordSpacing, LineSpacing, (char)SubstituteGlyph!);
+            ? new NKFont(LetterSpacing, WordSpacing, LineSpacing, LineSize, UnknownGlyphMode) 
+            : new NKFont(LetterSpacing, WordSpacing, LineSpacing, LineSize, (char)SubstituteGlyph!);
 
         for (int i = 5; i < lines.Length; i++) {
             if (lines[i].Length != startMarkerLength + 2 ||

@@ -9,5 +9,5 @@ namespace NeoKolors.Tui;
 /// base class for all renderable classes
 /// </summary>
 public interface IRenderable {
-    public void Render();
+    public void Render(IConsoleScreen target);
 }

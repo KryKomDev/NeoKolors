@@ -1,4 +1,9 @@
-﻿namespace NeoKolors.Tui;
+﻿//
+// NeoKolors
+// Copyright (c) 2025 KryKom
+//
+
+namespace NeoKolors.Tui.Events;
 
 /// <summary>
 /// event argument for keyboard interactions

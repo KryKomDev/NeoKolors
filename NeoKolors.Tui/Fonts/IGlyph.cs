@@ -1,4 +1,9 @@
-﻿namespace NeoKolors.Tui.Fonts;
+﻿//
+// NeoKolors
+// Copyright (c) 2025 KryKom
+//
+
+namespace NeoKolors.Tui.Fonts;
 
 public interface IGlyph {
     
@@ -45,4 +50,9 @@ public interface IGlyph {
     /// if a field is <c>\0</c> (NUL), the character is not rendered 
     /// </summary>
     public char[,] Chars { get; }
+
+    /// <summary>
+    /// returns the individual lines of the glyph
+    /// </summary>
+    public string[] GetLines();
 }
