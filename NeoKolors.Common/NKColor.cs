@@ -14,12 +14,13 @@ namespace NeoKolors.Common;
 /// </summary>
 public class NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
     
-    public OneOf<int, NKConsoleColor, DefaultColor> Color { get; }
+    public OneOf<int, NKConsoleColor, DefaultColor, InheritColor> Color { get; }
 
     public byte R {
         get {
             return Color.Match(
                 i => (byte)(i >> 16),
+                _ => throw InvalidColorCastException.ConsoleColorToCustom(),
                 _ => throw InvalidColorCastException.ConsoleColorToCustom(),
                 _ => throw InvalidColorCastException.ConsoleColorToCustom()
             );
@@ -31,6 +32,7 @@ public class NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
             return Color.Match(
                 i => (byte)(i >> 8),
                 _ => throw InvalidColorCastException.ConsoleColorToCustom(),
+                _ => throw InvalidColorCastException.ConsoleColorToCustom(),
                 _ => throw InvalidColorCastException.ConsoleColorToCustom()
             );
         }
@@ -40,6 +42,7 @@ public class NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
         get {
             return Color.Match(
                 i => (byte)i,
+                _ => throw InvalidColorCastException.ConsoleColorToCustom(),
                 _ => throw InvalidColorCastException.ConsoleColorToCustom(),
                 _ => throw InvalidColorCastException.ConsoleColorToCustom()
             );
@@ -51,8 +54,21 @@ public class NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
     public NKColor(NKConsoleColor consoleColor) => Color = consoleColor;
     public NKColor(ConsoleColor consoleColor) => Color = ColorFormat.SystemToNK(consoleColor);
     public NKColor() => Color = new DefaultColor();
+    
+    // ReSharper disable UnusedParameter.Local
+    private NKColor(DefaultColor _) => Color = new DefaultColor();
+    private NKColor(InheritColor _) => Color = new InheritColor();
+    // ReSharper restore UnusedParameter.Local
 
-    public static NKColor Default => new();
+    /// <summary>
+    /// returns a new color with the default console value
+    /// </summary>
+    public static NKColor Default => new(new DefaultColor());
+    
+    /// <summary>
+    /// returns a new color that indicates that the color should be inherited (not overriden) 
+    /// </summary>
+    public static NKColor Inherit => new(new InheritColor());
     
     public static NKColor FromArgb(int color) => new(color);
     public static NKColor FromArgb(byte r, byte g, byte b) => new((r << 16) | (g << 8) | b);
@@ -69,12 +85,14 @@ public class NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
         color.Color.Match(
             _ => throw InvalidColorCastException.CustomToConsoleColor(),
             c => c,
+            _ => throw InvalidColorCastException.ConsoleColorToCustom(),
             _ => throw InvalidColorCastException.ConsoleColorToCustom()
         );
 
     public static implicit operator int(NKColor color) =>
         color.Color.Match(
             i => i,
+            _ => throw InvalidColorCastException.ConsoleColorToCustom(),
             _ => throw InvalidColorCastException.ConsoleColorToCustom(),
             _ => throw InvalidColorCastException.ConsoleColorToCustom()
         );
@@ -83,12 +101,14 @@ public class NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
         color.Color.Match(
             i => (byte)(i >> 24),
             _ => throw InvalidColorCastException.ConsoleColorToCustom(),
+            _ => throw InvalidColorCastException.ConsoleColorToCustom(),
             _ => throw InvalidColorCastException.ConsoleColorToCustom()
         );
 
     public static implicit operator System.Drawing.Color(NKColor color) =>
         color.Color.Match(
             System.Drawing.Color.FromArgb,
+            _ => throw InvalidColorCastException.ConsoleColorToCustom(),
             _ => throw InvalidColorCastException.ConsoleColorToCustom(),
             _ => throw InvalidColorCastException.ConsoleColorToCustom()
         );
@@ -114,28 +134,32 @@ public class NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
         Color.Match(
             i => i.ControlChar(),
             c => c.ControlChar(),
-            _ => EscapeCodes.TEXT_COLOR_END
+            _ => EscapeCodes.TEXT_COLOR_END,
+            _ => "Inherit"
         );
     
     public string Bckg => 
         Color.Match(
             i => i.ControlCharB(),
             c => c.ControlCharB(),
-            _ => EscapeCodes.BACKGROUND_COLOR_END
+            _ => EscapeCodes.BACKGROUND_COLOR_END,
+            _ => "Inherit"
         );
 
     public void Write() =>
         Color.Match(
             i => $"{"●".AddColor(i)} #{i:x6}",
             c => $"{"●".AddColor(c)} {Enum.GetName(typeof(NKConsoleColor), c)}",
-            _ => "Default"
+            _ => "Default",
+            _ => "Inherit"
         );
 
     public override string ToString() =>
         Color.Match(
             i => $"#{i:x6}",
             c => $"{Enum.GetName(typeof(NKConsoleColor), c)}",
-            _ => "Default"
+            _ => "Default",
+            _ => "Inherit"
         );
 
     public string ToString(string format) => 
@@ -149,5 +173,35 @@ public class NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
             "b" or "B" or "Bckg" => Bckg,
             _ => Text
         };
+    }
+
+    public static void PrintColorCube() {
+        for (int z = 0; z < 6; z++) {
+            for (int y = 0; y < 6; y++) {
+                for (int x = 0; x < 6; x++) {
+                    Console.Write($"{z * 36 + y * 6 + x + 16:x2}"
+                        .AddColorB((byte)(z * 255 / 5), (byte)(y * 255 / 5), (byte)(x * 255 / 5))
+                        .AddColor(
+                            FromArgb((byte)(z * 255 / 5), (byte)(y * 255 / 5), (byte)(x * 255 / 5)).GetInverse()));
+                }
+                Console.WriteLine();
+            }
+
+            Console.WriteLine();
+        }
+    }
+
+    public NKColor GetInverse() {
+        return Color.Match(
+            _ => {
+                byte r = (byte)(255 - R);
+                byte g = (byte)(255 - G);
+                byte b = (byte)(255 - B);
+                return FromArgb(r, g, b);
+            },
+            c => new((NKConsoleColor)(((int)c + 8) % 16)),
+            _ => Default,
+            _ => Inherit
+        );
     }
 }

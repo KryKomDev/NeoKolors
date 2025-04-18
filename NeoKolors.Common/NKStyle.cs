@@ -9,20 +9,20 @@ using System.Runtime.CompilerServices;
 namespace NeoKolors.Common;
 
 /// <summary>
-/// contains information about console styles (bg / fg color, bold, italic etc.)
+/// contains information about console styles (bg / fg color, bold, italic, etc.)
 /// </summary>
 public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     
     /// <summary>
     /// The actual compressed style
     /// Bit 0 represents the most significant bit and bit 63 the least significant bit.<br/>
-    /// <b>meaning</b>:
+    /// <b>Meaning</b>:
     /// <ul>
-    ///     <li>bit 00 - 23: foreground color</li>
-    ///     <li>bit 24 - 47: background color</li>
-    ///     <li>bit 56 - 61: text style bitmap (strikethrough, negative, faint, underline, italic and bold respectively)</li>
+    ///     <li>bit 00-23: foreground color</li>
+    ///     <li>bit 24-47: background color</li>
+    ///     <li>bit 56-61: text style bitmap (strikethrough, negative, faint, underline, italic and bold respectively)</li>
     ///     <li>bit 62: toggles terminal color palette mode for text (uses custom color if 1, palette colors else)  </li>
-    ///     <li>bit 63: toggles terminal color palette mode for background (uses custom color if 1, palette colors else)</li>
+    ///     <li>bit 63: toggles terminal color palette mode for a background (uses custom color if 1, palette colors else)</li>
     /// </ul> 
     /// </summary>
     public ulong Raw { get; private set; }
@@ -93,16 +93,32 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
         get => !IsBColorCustom && (Raw & 0x00_00_00_00_01_00_00_00ul) == 0x00_00_00_00_01_00_00_00ul;
     }
     
+    /// <summary>
+    /// returns whether the text color should be inherited
+    /// </summary>
+    public bool IsFColorInherit {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => !IsFColorCustom && (Raw & 0x00_02_00_00_00_00_00_00ul) == 0x00_02_00_00_00_00_00_00ul;
+    }
     
     /// <summary>
-    /// sets the color of text to a custom color
+    /// returns whether the background color should be inherited
+    /// </summary>
+    public bool IsBColorInherit {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => !IsBColorCustom && (Raw & 0x00_00_00_00_02_00_00_00ul) == 0x00_00_00_00_02_00_00_00ul;
+    }
+    
+    
+    /// <summary>
+    /// sets the color of the text to a custom color
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetFColor(UInt24 color) => 
         Raw = Raw & 0x00_00_00_ff_ff_ff_ff_fdul | ((ulong)color << 40) | 0b10;
 
     /// <summary>
-    /// sets the color of text to a console color
+    /// sets the color of the text to a console color
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetFColor(NKConsoleColor color) => 
@@ -114,17 +130,51 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetFColor() => 
         Raw = Raw & 0x00_00_00_ff_ff_ff_ff_fdul | 0x00_01_00_00_00_00_00_00ul;
+    
+    /// <summary>
+    /// sets the color to be the default color
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetFColor(DefaultColor _) => 
+        Raw = Raw & 0x00_00_00_ff_ff_ff_ff_fdul | 0x00_01_00_00_00_00_00_00ul;
+    
+    /// <summary>
+    /// sets the color to inherit mode
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetFColor(InheritColor _) => 
+        Raw = Raw & 0x00_00_00_ff_ff_ff_ff_fdul | 0x00_02_00_00_00_00_00_00ul;
 
     /// <summary>
-    /// sets the color of text to a color
+    /// sets the color of the text to a color
     /// </summary>
     public void SetFColor(NKColor color) {
-        if (color.Color.IsT0)
+        if (color.Color.IsT0) 
             SetFColor((UInt24)color.Color.AsT0);
-        else if (color.Color.IsT1)
+        else if (color.Color.IsT1) 
             SetFColor(color.Color.AsT1);
-        else
+        else if (color.Color.IsT3) 
+            SetFColor(new InheritColor());
+        else 
             SetFColor();
+    }
+    
+    /// <summary>
+    /// safely sets the color of the text to a color
+    /// </summary>
+    public void SafeSetFColor(NKColor color) {
+        if (color.Color.IsT0) {
+            SetFColor((UInt24)color.Color.AsT0);
+        }
+        else if (color.Color.IsT1) {
+            SetFColor(color.Color.AsT1);
+        }
+        else if (color.Color.IsT3) {
+            // nothing
+        }
+        else {
+            SetFColor();
+        }
     }
 
     /// <summary>
@@ -149,6 +199,20 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
         Raw = Raw & 0xff_ff_ff_00_00_00_ff_feul | 0x00_00_00_00_01_00_00_00ul;
 
     /// <summary>
+    /// sets the background color to the default color
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetBColor(DefaultColor _) => 
+        Raw = Raw & 0xff_ff_ff_00_00_00_ff_feul | 0x00_00_00_00_01_00_00_00ul;
+    
+    /// <summary>
+    /// sets the background color to inherit mode
+    /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void SetBColor(InheritColor _) => 
+        Raw = Raw & 0xff_ff_ff_00_00_00_ff_feul | 0x00_00_00_00_02_00_00_00ul;
+    
+    /// <summary>
     /// sets the background color to a color
     /// </summary>
     public void SetBColor(NKColor color) {
@@ -156,8 +220,28 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
             SetBColor((UInt24)color.Color.AsT0);
         else if (color.Color.IsT1)
             SetBColor(color.Color.AsT1);
+        else if (color.Color.IsT3)
+            SetBColor(new InheritColor());
         else
             SetBColor();
+    }
+    
+    /// <summary>
+    /// safely sets the background color to a color
+    /// </summary>
+    public void SafeSetBColor(NKColor color) {
+        if (color.Color.IsT0) {
+            SetBColor((UInt24)color.Color.AsT0);
+        }
+        else if (color.Color.IsT1) {
+            SetBColor(color.Color.AsT1);
+        }
+        else if (color.Color.IsT3) {
+            // nothing
+        }
+        else {
+            SetBColor();
+        }
     }
 
     /// <summary>
@@ -167,7 +251,9 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
         if (IsFColorCustom)
             return new NKColor((int)(Raw >> 40));
         if (IsFColorDefault)
-            return new NKColor();
+            return NKColor.Default;
+        if (IsFColorInherit)
+            return NKColor.Inherit;
 
         return new NKColor((NKConsoleColor)((Raw & 0x00_00_ff_00_00_00_00_00ul) >> 40));
     }
@@ -179,7 +265,9 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
         if (IsBColorCustom)
             return new NKColor((int)(Raw >> 16));
         if (IsBColorDefault)
-            return new NKColor();
+            return NKColor.Default;
+        if (IsBColorInherit)
+            return NKColor.Inherit;
 
         return new NKColor((NKConsoleColor)((Raw & 0x00_00_00_00_00_ff_00_00ul) >> 16));
     }
@@ -195,7 +283,16 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public TextStyles GetStyles() => (TextStyles)((Raw & 0x00_00_00_00_00_00_00fcul) >> 2);
-
+    
+    /// <summary>
+    /// safely overwrites the contents of this instance with the contents of the other instance
+    /// </summary>
+    public void SafeSet(NKStyle other) {
+        if (!other.IsFColorInherit) SetFColor(other.GetFColor());
+        if (!other.IsBColorInherit) SetBColor(other.GetBColor());
+        SetStyles(other.GetStyles());
+    }
+    
     public NKStyle(ulong raw) => Raw = raw;
 
     public NKStyle(NKColor f, NKColor b, TextStyles s) {
@@ -203,6 +300,13 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
         SetFColor(f);
         SetBColor(b);
         SetStyles(s);
+    }
+    
+    public NKStyle(NKColor f, NKColor b) {
+        Raw = 0;
+        SetFColor(f);
+        SetBColor(b);
+        SetStyles(TextStyles.NONE);
     }
 
     public NKStyle(NKColor f, TextStyles s) {
@@ -216,7 +320,7 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
         Raw = 0;
         SetFColor(f);
         SetBColor(NKColor.Default);
-        SetStyles(0);
+        SetStyles(TextStyles.NONE);
     }
 
     public NKStyle(TextStyles s) {
@@ -230,12 +334,12 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
         Raw = 0;
         SetFColor(NKColor.Default);
         SetBColor(NKColor.Default);
-        SetStyles(0);
+        SetStyles(TextStyles.NONE);
     }
     
     public object Clone() => MemberwiseClone();
 
-    public override string ToString() => $"FColor: {FColor}, BColor: {BColor}{StylesToString()}";
+    public override string ToString() => $"FColor: {FColor:p}, BColor: {BColor:p}{StylesToString()}";
     
     public string ToString(string format) => ToString(format, CultureInfo.InvariantCulture);
     

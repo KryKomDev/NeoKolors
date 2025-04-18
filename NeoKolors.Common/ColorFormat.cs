@@ -162,4 +162,7 @@ public static class ColorFormat {
             _ => White
         };
     }
+
+    public static NKColor SkiaToNK(this SKColor color) =>
+        NKColor.FromArgb(color.Red, color.Green, color.Blue);
 }

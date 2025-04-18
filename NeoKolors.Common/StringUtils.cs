@@ -19,8 +19,8 @@ namespace NeoKolors.Common;
 public static class StringUtils {
     
     /// <summary>
-    /// returns the total count of the printable / visible characters of a string
-    /// (for example ansi escape characters are not counted)
+    /// returns the total count of the printable / visible characters contained by the string
+    /// (for example, ansi escape characters are not counted)
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int VisibleLength(this string text) =>
@@ -96,5 +96,56 @@ public static class StringUtils {
         if (startIndex > endIndex) 
             throw new ArgumentOutOfRangeException(nameof(startIndex), "Start index is larger than the end index");
         return s.Substring(startIndex, endIndex - startIndex);
+    }
+
+    /// <summary>
+    /// chops the string into multiple string with a maximum length
+    /// </summary>
+    /// <param name="s">the string to be chopped</param>
+    /// <param name="maxLength">the maximum length of a single string</param>
+    [Pure]
+    public static string[] Chop(this string s, int maxLength) {
+        if (string.IsNullOrWhiteSpace(s)) return [];
+        if (maxLength <= 0) throw new ArgumentException("Maximum length must be positive", nameof(maxLength));
+
+        List<string> output = [];
+        int currentPosition = 0;
+
+        while (currentPosition < s.Length) {
+            int remainingLength = s.Length - currentPosition;
+            int chunkSize = Math.Min(maxLength, remainingLength);
+
+            int nextNewline = s.IndexOfAny(['\n', '\r'], currentPosition, chunkSize);
+        
+            if (nextNewline != -1) {
+                chunkSize = nextNewline - currentPosition;
+            }
+            else if (chunkSize < remainingLength && !char.IsWhiteSpace(s[currentPosition + chunkSize])) {
+                int lastSpace = s.LastIndexOf(' ', currentPosition + chunkSize - 1, chunkSize);
+            
+                if (lastSpace > currentPosition) {
+                    chunkSize = lastSpace - currentPosition;
+                }
+            }
+
+            string chunk = s.Substring(currentPosition, chunkSize).Trim();
+            if (!string.IsNullOrEmpty(chunk)) {
+                output.Add(chunk);
+            }
+
+            currentPosition += chunkSize;
+            while (currentPosition < s.Length && 
+                   (char.IsWhiteSpace(s[currentPosition]) || s[currentPosition] is '\n' or '\r')) 
+            {
+                if (currentPosition + 1 < s.Length && s[currentPosition] == '\r' && s[currentPosition + 1] == '\n') {
+                    currentPosition++;
+                }
+                
+                currentPosition++;
+            }
+        }
+
+
+        return output.ToArray();
     }
 }
