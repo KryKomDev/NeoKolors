@@ -28,8 +28,8 @@ public partial class NKLogger {
         }
         else {
             Output.WriteLine(HideTime
-                ? "{0}<b><n> FATAL </n></b> : {1}".ApplyStyles().Format(FatalColor.Text, s)
-                : "{0}[{1}] <b><n> FATAL </n></b> : {2}".ApplyStyles().Format(FatalColor.Text, TimeStamp(), s)
+                ? "{0}<b><n> FATAL </n></b> : {1}\e[0m".ApplyStyles().Format(FatalColor.Text, s)
+                : "{0}[{1}] <b><n> FATAL </n></b> : {2}\e[0m".ApplyStyles().Format(FatalColor.Text, TimeStamp(), s)
             );
         }
         
@@ -56,8 +56,8 @@ public partial class NKLogger {
         }
         else {
             Output.WriteLine(HideTime
-                ? "{0}<b><n> ERROR </n></b> : {1}".ApplyStyles().Format(ErrorColor.Text, s)
-                : "{0}[{1}] <b><n> ERROR </n></b> : {2}".ApplyStyles().Format(ErrorColor.Text, TimeStamp(), s)
+                ? "{0}<b><n> ERROR </n></b> : {1}\e[0m".ApplyStyles().Format(ErrorColor.Text, s)
+                : "{0}[{1}] <b><n> ERROR </n></b> : {2}\e[0m".ApplyStyles().Format(ErrorColor.Text, TimeStamp(), s)
             );
         }
         
@@ -80,7 +80,8 @@ public partial class NKLogger {
         if (SimpleMessages)
             Output.WriteLine(HideTime ? $"[ WARN ] : {s}" : $"[{TimeStamp()}] [ WARN ] : {s}");
         else
-            Output.WriteLine((HideTime ? $"[ WARN ] : {s}" : $"[{TimeStamp()}] [ WARN ] : {s}").AddColor(WarnColor));
+            Output.WriteLine((HideTime ? $"[ WARN ] : {s}" : $"[{TimeStamp()}] [ WARN ] : {s}\e[0m")
+                .AddColor(WarnColor));
 
         Output.Flush();
     }
@@ -101,7 +102,8 @@ public partial class NKLogger {
         if (SimpleMessages)
             Output.WriteLine(HideTime ? $"[ INFO ] : {s}" : $"[{TimeStamp()}] [ INFO ] : {s}");
         else
-            Output.WriteLine((HideTime ? $"[ INFO ] : {s}" : $"[{TimeStamp()}] [ INFO ] : {s}").AddColor(InfoColor));
+            Output.WriteLine((HideTime ? $"[ INFO ] : {s}" : $"[{TimeStamp()}] [ INFO ] : {s}\e[0m")
+                .AddColor(InfoColor));
 
         Output.Flush();
     }
@@ -122,7 +124,8 @@ public partial class NKLogger {
         if (SimpleMessages)
             Output.WriteLine(HideTime ? $"[ DEBUG ] : {s}" : $"[{TimeStamp()}] [ DEBUG ] : {s}");
         else
-            Output.WriteLine((HideTime ? $"[ DEBUG ] : {s}" : $"[{TimeStamp()}] [ DEBUG ] : {s}").AddColor(DebugColor));
+            Output.WriteLine((HideTime ? $"[ DEBUG ] : {s}" : $"[{TimeStamp()}] [ DEBUG ] : {s}\e[0m")
+                .AddColor(DebugColor));
 
         Output.Flush();
     }

@@ -89,7 +89,7 @@ public static class NKDebug {
     public static ExceptionFormatter Formatter { get; }
     
     /// <summary>
-    /// if true makes all unhandled exceptions look fancy
+    /// if true, makes all unhandled exceptions look fancy
     /// </summary>
     public static bool EnableAutoFancy { 
         get;
