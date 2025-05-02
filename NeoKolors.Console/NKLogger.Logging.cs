@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 #endif
 using System.Runtime.CompilerServices;
 using NeoKolors.Common;
+using NeoKolors.Common.Util;
 
 namespace NeoKolors.Console;
 
@@ -136,6 +137,28 @@ public partial class NKLogger {
     public void Debug(object o) => Debug(o.ToString()!);
     
     /// <summary>
+    /// prints a debug message, does not work when built in release mode
+    /// </summary>
+    /// <param name="s">desired string message</param>
+    public void Trace(string s) {
+        if (!Level.HasFlag(LoggerLevel.DEBUG)) return;
+        if (s == null) throw new ArgumentNullException(nameof(s));
+
+        if (SimpleMessages)
+            Output.WriteLine(HideTime ? $"[ TRACE ] : {s}" : $"[{TimeStamp()}] [ TRACE ] : {s}");
+        else
+            Output.WriteLine((HideTime ? $"[ TRACE ] : {s}" : $"[{TimeStamp()}] [ TRACE ] : {s}\e[0m")
+                .AddColor(TraceColor));
+
+        Output.Flush();
+    }
+
+    /// <summary>
+    /// prints debug text using the ToString method of the object o and <see cref="Debug(string)"/>
+    /// </summary>
+    public void Trace(object o) => Trace(o.ToString()!);
+    
+    /// <summary>
     /// the timestamp
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -147,11 +170,13 @@ public partial class NKLogger {
     public void Warn([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Warn(string.Format(s, args));
     public void Info([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Info(string.Format(s, args));
     public void Debug([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Debug(string.Format(s, args));
+    public void Trace([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Trace(string.Format(s, args));
     #else
     public void Fatal(string s, params object[] args) => Fatal(string.Format(s, args));
     public void Error(string s, params object[] args) => Error(string.Format(s, args));
     public void Warn(string s, params object[] args) => Warn(string.Format(s, args));
     public void Info(string s, params object[] args) => Info(string.Format(s, args));
     public void Debug(string s, params object[] args) => Debug(string.Format(s, args));
+    public void Trace(string s, params object[] args) => Trace(string.Format(s, args));
     #endif
 }

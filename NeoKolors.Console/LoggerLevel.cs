@@ -15,5 +15,6 @@ public enum LoggerLevel {
     ERROR = 2,
     WARN = 4,
     INFO = 8,
-    DEBUG = 16
+    DEBUG = 16,
+    TRACE = 32
 }

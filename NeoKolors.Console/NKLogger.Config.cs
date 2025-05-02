@@ -77,6 +77,14 @@ public partial class NKLogger {
     }
 
     /// <summary>
+    /// Specifies the color used to represent trace-level log messages.
+    /// </summary>
+    public NKColor TraceColor {
+        get => _config.TraceColor;
+        set => _config.TraceColor = value;
+    }
+
+    /// <summary>
     /// defines the output stream of the logger
     /// </summary>
     public TextWriter Output {
@@ -103,7 +111,7 @@ public partial class NKLogger {
     /// <summary>
     /// makes all messages visible
     /// </summary>
-    public void LogAll() => _config.Level = FATAL | ERROR | WARN | INFO | DEBUG;
+    public void LogAll() => _config.Level = FATAL | ERROR | WARN | INFO | DEBUG | TRACE;
     
     /// <summary>
     /// makes all messages except debug visible

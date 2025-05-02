@@ -24,6 +24,12 @@ public static class NKDebug {
     /// </summary>
     public static NKLogger Logger { get; }
     
+    /// <inheritdoc cref="NKLogger.Trace(string)"/>
+    public static void Trace(string message) => Logger.Trace(message);
+    
+    /// <inheritdoc cref="NKLogger.Trace(object)"/>
+    public static void Trace(object message) => Logger.Trace(message);
+    
     /// <inheritdoc cref="NKLogger.Debug(string)"/>
     public static void Debug(string message) => Logger.Debug(message);
     
@@ -60,14 +66,28 @@ public static class NKDebug {
     public static void Warn([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Warn(string.Format(s, args));
     public static void Info([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Info(string.Format(s, args));
     public static void Debug([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Debug(string.Format(s, args));
+    public static void Trace([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Trace(string.Format(s, args));
     #else
     public static void Fatal(string s, params object[] args) => Fatal(string.Format(s, args));
     public static void Error(string s, params object[] args) => Error(string.Format(s, args));
     public static void Warn(string s, params object[] args) => Warn(string.Format(s, args));
     public static void Info(string s, params object[] args) => Info(string.Format(s, args));
     public static void Debug(string s, params object[] args) => Debug(string.Format(s, args));
+    public static void Trace(string s, params object[] args) => Trace(string.Format(s, args));
     #endif
-    
+
+    /// <summary>
+    /// Sets the output destination for the logger.
+    /// </summary>
+    /// <param name="output">The TextWriter to use as the output destination.</param>
+    public static void SetOutput(TextWriter output) => Logger.Output = output;
+
+    /// <summary>
+    /// Retrieves the current output stream for logging messages.
+    /// </summary>
+    /// <returns>The <see cref="TextWriter"/> currently used for logging output.</returns>
+    public static TextWriter GetOutput() => Logger.Output;
+
     /// <inheritdoc cref="NKLogger.LogAll"/>
     public static void LogAll() => Logger.LogAll();
     
@@ -86,6 +106,9 @@ public static class NKDebug {
     /// <inheritdoc cref="NKLogger.LogNone"/>
     public static void LogNone() => Logger.LogNone();
     
+    /// <summary>
+    /// the global instance of the ExceptionFormatter
+    /// </summary>
     public static ExceptionFormatter Formatter { get; }
     
     /// <summary>

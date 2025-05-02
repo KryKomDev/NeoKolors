@@ -16,7 +16,7 @@ public struct LoggerConfig {
     /// <summary>
     /// configures what messages will be logged
     /// </summary>
-    public LoggerLevel Level { get; set; } = FATAL | ERROR | WARN | INFO | DEBUG;
+    public LoggerLevel Level { get; set; } = FATAL | ERROR | WARN | INFO | DEBUG | TRACE;
     
     /// <summary>
     /// defines the color of the fatal error messages
@@ -44,6 +44,11 @@ public struct LoggerConfig {
     public NKColor DebugColor { get; set; } = NKConsoleColor.BLUE;
     
     /// <summary>
+    /// defines the color of the trace messages
+    /// </summary>
+    public NKColor TraceColor { get; set; } = NKConsoleColor.GRAY;
+    
+    /// <summary>
     /// defines the output stream of the logger
     /// </summary>
     public TextWriter Output { get; set; } = System.Console.Out;
@@ -61,12 +66,13 @@ public struct LoggerConfig {
     public LoggerConfig() { }
 
     public LoggerConfig(
-        LoggerLevel level = FATAL | ERROR | WARN | INFO | DEBUG, 
+        LoggerLevel level = FATAL | ERROR | WARN | INFO | DEBUG | TRACE, 
         NKColor? fatalColor = null, 
         NKColor? errorColor = null, 
         NKColor? warnColor = null, 
         NKColor? infoColor = null, 
         NKColor? debugColor = null, 
+        NKColor? traceColor = null,
         TextWriter? output = null,
         bool simpleMessages = false,
         bool hideTime = false) 
@@ -77,6 +83,7 @@ public struct LoggerConfig {
         WarnColor = warnColor ?? NKConsoleColor.YELLOW;
         InfoColor = infoColor ?? NKConsoleColor.GREEN;
         DebugColor = debugColor ?? NKConsoleColor.BLUE;
+        TraceColor = traceColor ?? NKConsoleColor.GRAY;
         Output = output ?? System.Console.Out;
         SimpleMessages = simpleMessages;
         HideTime = hideTime;

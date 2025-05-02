@@ -5,6 +5,7 @@
 
 using System.Text.RegularExpressions;
 using NeoKolors.Common;
+using NeoKolors.Common.Util;
 using static NeoKolors.Common.NKConsoleColor;
 
 // disabled because of StringUtils.InRange(string, int, int) to make code cleaner
