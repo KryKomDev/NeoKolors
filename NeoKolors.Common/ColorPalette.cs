@@ -5,6 +5,7 @@
 
 using System.Drawing;
 using System.Globalization;
+using static System.Math;
 
 namespace NeoKolors.Common;
 
@@ -142,9 +143,9 @@ public class ColorPalette {
         (double R, double G, double B) c,
         (double R, double G, double B) d, double x) 
     {
-        double re = Math.Cos(2 * Math.PI * (c.R + d.R * 2 * x));
-        double gr = Math.Cos(2 * Math.PI * (c.G + d.G * 2 * x));
-        double bl = Math.Cos(2 * Math.PI * (c.B + d.B * 2 * x));
+        double re = Cos(2 * PI * (c.R + d.R * 2 * x));
+        double gr = Cos(2 * PI * (c.G + d.G * 2 * x));
+        double bl = Cos(2 * PI * (c.B + d.B * 2 * x));
         
         
         return Color.FromArgb(

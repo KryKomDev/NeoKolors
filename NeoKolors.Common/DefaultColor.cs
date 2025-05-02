@@ -3,9 +3,12 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Runtime.InteropServices;
+
 namespace NeoKolors.Common;
 
 /// <summary>
 /// represents the default color in <see cref="NKColor"/>
 /// </summary>
-public record DefaultColor;
+[StructLayout(LayoutKind.Explicit, Size = 0)]
+public record struct DefaultColor;

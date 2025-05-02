@@ -6,6 +6,7 @@
 using NeoKolors.Common.Exceptions;
 using SkiaSharp;
 using static System.ConsoleColor;
+using static System.Math;
 using static NeoKolors.Common.NKConsoleColor;
 
 namespace NeoKolors.Common;
@@ -29,8 +30,8 @@ public static class ColorFormat {
     public static int SkiaToInt(this SKColor c) => c.Alpha << 24 | c.Red << 16 | c.Green << 8 | c.Blue;
     
     public static SKColor HsvToSkia(double hue, double saturation, double value) {
-        int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
-        double f = hue / 60 - Math.Floor(hue / 60);
+        int hi = Convert.ToInt32(Floor(hue / 60)) % 6;
+        double f = hue / 60 - Floor(hue / 60);
         
         value *= 255;
         byte v = Convert.ToByte(value);
@@ -49,8 +50,8 @@ public static class ColorFormat {
     }
 
     public static void SkiaToHsv(SKColor c, out double h, out double s, out double v) {
-        int max = Math.Max(c.Red, Math.Max(c.Green, c.Blue));
-        int min = Math.Min(c.Red, Math.Min(c.Green, c.Blue));
+        int max = Max(c.Red, Max(c.Green, c.Blue));
+        int min = Min(c.Red, Min(c.Green, c.Blue));
 
         h = c.Hue;
         s = max == 0 ? 0 : 1d - 1d * min / max;
@@ -71,8 +72,8 @@ public static class ColorFormat {
     /// returns the hue, saturation and value of the supplied color 
     /// </summary>
     public static void ColorToHsv(this System.Drawing.Color color, out double hue, out double saturation, out double value) {
-        int max = Math.Max(color.R, Math.Max(color.G, color.B));
-        int min = Math.Min(color.R, Math.Min(color.G, color.B));
+        int max = Max(color.R, Max(color.G, color.B));
+        int min = Min(color.R, Min(color.G, color.B));
 
         hue = color.GetHue();
         saturation = max == 0 ? 0 : 1d - 1d * min / max;
@@ -91,8 +92,8 @@ public static class ColorFormat {
     /// creates an instance of <see cref="NKColor"/> from the hsv values
     /// </summary>
     public static System.Drawing.Color HsvToColor(double hue, double saturation, double value) {
-        int hi = Convert.ToInt32(Math.Floor(hue / 60)) % 6;
-        double f = hue / 60 - Math.Floor(hue / 60);
+        int hi = Convert.ToInt32(Floor(hue / 60)) % 6;
+        double f = hue / 60 - Floor(hue / 60);
         
         value *= 255;
         int v = Convert.ToInt32(value);

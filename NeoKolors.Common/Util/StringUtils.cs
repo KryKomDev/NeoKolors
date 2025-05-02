@@ -6,12 +6,13 @@
 #if NET8_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
 #endif
+using System.Collections;
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 
-namespace NeoKolors.Common;
+namespace NeoKolors.Common.Util;
 
 /// <summary>
 /// contains useful methods for working with strings
@@ -65,6 +66,19 @@ public static class StringUtils {
             "" => "",
             _ => string.Concat(
                 input[0].ToString().ToUpper(cultureInfo ?? CultureInfo.InvariantCulture), input.Substring(1))
+        };
+    
+    /// <summary>
+    /// makes the first letter of the string lowercase
+    /// </summary>
+    /// <exception cref="ArgumentNullException">the input string is null</exception>
+    [Pure]
+    public static string DecapitalizeFirst(this string input, CultureInfo? cultureInfo = null) =>
+        input switch {
+            null => throw new ArgumentNullException(nameof(input)),
+            "" => "",
+            _ => string.Concat(
+                input[0].ToString().ToLower(cultureInfo ?? CultureInfo.InvariantCulture), input.Substring(1))
         };
 
     /// <summary>
@@ -147,5 +161,45 @@ public static class StringUtils {
 
 
         return output.ToArray();
+    }
+
+    /// <summary>
+    /// joins the stringified objects from the collection using the separator
+    /// </summary>
+    public static string Join(this IEnumerable collection, string separator) {
+        List<string?> strings = [];
+        foreach (var c in collection) {
+            if (c is null) {
+                strings.Add("");
+                continue;
+            }
+            
+            string? s = c.ToString();
+            strings.Add(s ?? "");
+        }
+        
+        return string.Join(separator, strings);
+    }
+
+    /// <summary>
+    /// Concatenates the elements of a specified collection using the specified separator.
+    /// </summary>
+    /// <typeparam name="TSource">The type of the elements in the collection.</typeparam>
+    /// <param name="collection">The collection whose elements will be concatenated.</param>
+    /// <param name="separator">The string separator to insert between each element of the collection.</param>
+    /// <param name="stringifier">A function to convert each element of the collection to a string.</param>
+    /// <returns>A string consisting of the elements of the collection concatenated using the specified separator.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if the collection or stringifier is null.</exception>
+    public static string Join<TSource>(
+        this IEnumerable<TSource> collection,
+        string separator,
+        Func<TSource?, string?> stringifier) {
+        List<string?> strings = [];
+        foreach (var c in collection) {
+            string? s = stringifier(c);
+            strings.Add(s ?? "");
+        }
+        
+        return string.Join(separator, strings);
     }
 }

@@ -3,9 +3,12 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Runtime.InteropServices;
+
 namespace NeoKolors.Common;
 
 /// <summary>
 /// indicates that the color should be inherited
 /// </summary>
-public record InheritColor;
+[StructLayout(LayoutKind.Explicit, Size = 0)]
+public record struct InheritColor;
