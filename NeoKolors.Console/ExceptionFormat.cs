@@ -1,4 +1,9 @@
-﻿using NeoKolors.Common;
+﻿//
+// NeoKolors
+// Copyright (c) 2025 KryKom
+//
+
+using NeoKolors.Common;
 using static NeoKolors.Common.NKConsoleColor;
 
 namespace NeoKolors.Console;

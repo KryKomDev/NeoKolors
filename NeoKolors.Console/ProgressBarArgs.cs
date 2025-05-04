@@ -5,6 +5,7 @@
 
 namespace NeoKolors.Console;
 
+[Obsolete]
 public class ProgressBarArgs : EventArgs {
     public int Value { get; set; }
 }

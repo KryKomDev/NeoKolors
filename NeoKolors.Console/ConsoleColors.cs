@@ -11,7 +11,7 @@ namespace NeoKolors.Console;
 public static class ConsoleColors {
     
     /// <summary>
-    /// prints a colored string in the console without newline
+    /// prints a colored string in the console without a newline
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="hex">hexadecimal value of the color</param>
@@ -21,7 +21,7 @@ public static class ConsoleColors {
 
     
     /// <summary>
-    /// prints a colored string in the console without newline
+    /// prints a colored string in the console without a newline
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="r">red value of the color</param>
@@ -69,7 +69,7 @@ public static class ConsoleColors {
     /// <param name="colors">
     /// tuple of symbol string and color,
     /// with which will the symbol be replaced,
-    /// if a color is -1 the colors will be reset
+    /// if a color is -1, the colors will be reset
     /// </param>
     public static void Write(string s, params (string symbol, NKColor color)[] colors) => 
         System.Console.Write(s.AddColor(colors));
@@ -78,7 +78,7 @@ public static class ConsoleColors {
     // --- --- let there begin WriteLine implementations --- ---
     
     /// <summary>
-    /// prints a colored string in the console with newline
+    /// prints a colored string in the console with a newline
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="hex">hexadecimal value of the color</param>
@@ -88,7 +88,7 @@ public static class ConsoleColors {
 
     
     /// <summary>
-    /// prints a colored string in the console with newline
+    /// prints a colored string in the console with a newline
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="r">red value of the color</param>
@@ -138,7 +138,7 @@ public static class ConsoleColors {
     /// <param name="colors">
     /// tuple of symbol string and color,
     /// with which will the symbol be replaced,
-    /// if a color is -1 the colors will be reset
+    /// if a color is -1, the colors will be reset
     /// </param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLine(string s, params (string symbol, NKColor hex)[] colors) => 
@@ -146,7 +146,7 @@ public static class ConsoleColors {
 
     
     /// <summary>
-    /// prints a string with colored background in the console without newline
+    /// prints a string with a colored background in the console without a newline
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="hex">hexadecimal value of the color</param>
@@ -156,7 +156,7 @@ public static class ConsoleColors {
 
     
     /// <summary>
-    /// prints a string with colored background in the console without newline
+    /// prints a string with a colored background in the console without a newline
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="r">red value of the color</param>
@@ -168,7 +168,7 @@ public static class ConsoleColors {
 
     
     /// <summary>
-    /// prints a string with background colored by the <see cref="ConsoleColor"/> value
+    /// prints a string with the background colored by the <see cref="ConsoleColor"/> value
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
@@ -178,7 +178,7 @@ public static class ConsoleColors {
     
     
     /// <summary>
-    /// prints a string with background colored by the <see cref="System.Drawing.Color"/>
+    /// prints a string with the background colored by the <see cref="System.Drawing.Color"/>
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
@@ -188,7 +188,7 @@ public static class ConsoleColors {
     
     
     /// <summary>
-    /// prints a string with background colored by the universal <see cref="NKColor"/>
+    /// prints a string with the background colored by the universal <see cref="NKColor"/>
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
@@ -198,7 +198,7 @@ public static class ConsoleColors {
 
 
     /// <summary>
-    /// prints a string with colored background in the console with newline
+    /// prints a string with a colored background in the console with a newline
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="hex">hexadecimal value of the color</param>
@@ -208,7 +208,7 @@ public static class ConsoleColors {
     
     
     /// <summary>
-    /// prints a string with colored background in the console with newline
+    /// prints a string with a colored background in the console with a newline
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="r">red value of the color</param>
@@ -220,7 +220,7 @@ public static class ConsoleColors {
     
     
     /// <summary>
-    /// prints a string with background colored by the <see cref="ConsoleColor"/> value
+    /// prints a string with the background colored by the <see cref="ConsoleColor"/> value
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
@@ -230,7 +230,7 @@ public static class ConsoleColors {
 
     
     /// <summary>
-    /// prints a string with background colored by the <see cref="System.Drawing.Color"/>
+    /// prints a string with the background colored by the <see cref="System.Drawing.Color"/>
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
@@ -240,7 +240,7 @@ public static class ConsoleColors {
 
     
     /// <summary>
-    /// prints a string with background colored by the universal <see cref="NKColor"/>
+    /// prints a string with the background colored by the universal <see cref="NKColor"/>
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
@@ -250,7 +250,7 @@ public static class ConsoleColors {
 
 
     /// <summary>
-    /// prints a colored string with colored background  
+    /// prints a colored string with a colored background  
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="text">text color</param>
@@ -260,7 +260,7 @@ public static class ConsoleColors {
         System.Console.Write(s.AddColor(text).AddColorB(background));
 
     /// <summary>
-    /// prints a colored string with colored background  
+    /// prints a colored string with a colored background  
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="tr">red value of text color</param>
@@ -274,7 +274,7 @@ public static class ConsoleColors {
         System.Console.Write(s.AddColor(tr, tg, tb).AddColorB(br, bg, bb));
     
     /// <summary>
-    /// prints a colored string with colored background  
+    /// prints a colored string with a colored background  
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="text">text color</param>
@@ -285,7 +285,7 @@ public static class ConsoleColors {
     
     
     /// <summary>
-    /// prints a colored string with colored background  
+    /// prints a colored string with a colored background  
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="text">text color</param>
@@ -296,7 +296,7 @@ public static class ConsoleColors {
 
 
     /// <summary>
-    /// prints a colored string with colored background  
+    /// prints a colored string with a colored background  
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="text">text color</param>
@@ -307,7 +307,7 @@ public static class ConsoleColors {
     
     
     /// <summary>
-    /// prints a colored string with colored background  
+    /// prints a colored string with a colored background  
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="text">text color</param>
@@ -317,7 +317,7 @@ public static class ConsoleColors {
         System.Console.WriteLine(s.AddColor(text).AddColorB(background));
 
     /// <summary>
-    /// prints a colored string with colored background  
+    /// prints a colored string with a colored background  
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="tr">red value of text color</param>
@@ -331,7 +331,7 @@ public static class ConsoleColors {
         System.Console.WriteLine(s.AddColor(tr, tg, tb).AddColorB(br, bg, bb));
     
     /// <summary>
-    /// prints a colored string with colored background  
+    /// prints a colored string with a colored background  
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="text">text color</param>
@@ -342,7 +342,7 @@ public static class ConsoleColors {
     
     
     /// <summary>
-    /// prints a colored string with colored background  
+    /// prints a colored string with a colored background  
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="text">text color</param>
@@ -353,7 +353,7 @@ public static class ConsoleColors {
 
 
     /// <summary>
-    /// prints a colored string with colored background  
+    /// prints a colored string with a colored background  
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="text">text color</param>

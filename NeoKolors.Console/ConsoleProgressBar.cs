@@ -10,6 +10,7 @@ namespace NeoKolors.Console;
 /// <summary>
 /// creates a progress bar in the console
 /// </summary>
+[Obsolete]
 public class ConsoleProgressBar {
     
     private readonly int barSize;

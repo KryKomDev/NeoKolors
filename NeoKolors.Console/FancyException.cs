@@ -8,7 +8,7 @@ namespace NeoKolors.Console;
 /// <summary>
 /// a wrapper exception for fancy formatting
 /// </summary>
-[Obsolete("Automatic unhandled exception interruption is available.")]
+[Obsolete("Automatic unhandled exception interruption is available. Set 'NKDebug.EnableAutoFancy' to true to enable automatic interruption.")]
 public sealed class FancyException<TInner> : Exception, IFancyException<TInner> where TInner : Exception {
     public TInner OriginalException { get; }
     public override string ToString() => NKDebug.Formatter.Format(OriginalException);
@@ -29,7 +29,7 @@ public sealed class FancyException<TInner> : Exception, IFancyException<TInner> 
 /// covariant interface for fancy exceptions
 /// </summary>
 /// <typeparam name="TInner">the wrapped exception type</typeparam>
-[Obsolete("Automatic unhandled exception interruption is available.")]
+[Obsolete("Automatic unhandled exception interruption is available. Set 'NKDebug.EnableAutoFancy' to true to enable automatic interruption.")]
 public interface IFancyException<out TInner> where TInner : Exception {
     public TInner OriginalException { get; }
 }
