@@ -20,4 +20,8 @@
         <Using Include="Xunit"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\NeoKolors.Tui\NeoKolors.Tui.csproj" />
+    </ItemGroup>
+
 </Project>

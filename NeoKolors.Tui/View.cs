@@ -22,7 +22,7 @@ public class View : IView {
 
     public Rectangle Perimeter { get; private set; }
 
-    public void Render(IConsoleScreen target) {
+    public void Render(in IConsoleScreen target) {
         
     }
     

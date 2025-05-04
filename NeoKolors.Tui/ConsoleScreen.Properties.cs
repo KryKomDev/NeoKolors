@@ -111,7 +111,7 @@ public partial class ConsoleScreen {
         for (int x = 0; x < Width; x++) {
             for (int y = 0; y < Height; y++) {
                 Chars[x, y] = ' ';
-                Styles[x, y] = new NKStyle();
+                Styles[x, y] = new NKStyle(NKColor.Default, NKColor.Default, TextStyles.NONE);
             }
         }
     }

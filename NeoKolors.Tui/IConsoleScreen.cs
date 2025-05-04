@@ -5,8 +5,9 @@
 
 using NeoKolors.Common;
 using NeoKolors.Tui.Fonts;
-using NeoKolors.Tui.Style;
+using NeoKolors.Tui.Styles;
 using SkiaSharp;
+using NKColor = NeoKolors.Common.NKColor;
 
 namespace NeoKolors.Tui;
 

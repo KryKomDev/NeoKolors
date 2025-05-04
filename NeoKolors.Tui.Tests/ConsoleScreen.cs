@@ -3,9 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Tui;
-
-namespace NeoKolors.Test.Tui;
+namespace NeoKolors.Tui.Tests;
 
 public class ConsoleScreenTests {
 

@@ -18,7 +18,7 @@ public class Window : IView {
     public Action<object?, AppStartEventArgs>? OnStart { get; }
     public Action<object?, EventArgs>? OnStop { get; }
 
-    public void Render(IConsoleScreen target) {
+    public void Render(in IConsoleScreen target) {
         throw new NotImplementedException();
     }
 }

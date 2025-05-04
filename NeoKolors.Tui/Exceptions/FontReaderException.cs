@@ -6,7 +6,7 @@
 namespace NeoKolors.Tui.Exceptions;
 
 public class FontReaderException : Exception {
-    private FontReaderException(string message) : base("Cannot read font file." + message) { }
+    private FontReaderException(string message) : base("Cannot read font file. " + message) { }
 
     public static FontReaderException FontFileDoesNotExist(string path) =>
         new($"Font file specified by path '{path}' does not exist.");
@@ -52,4 +52,26 @@ public class FontReaderException : Exception {
     
     public static FontReaderException InvalidYOffset(char glyph, Exception inner) =>
         new($"Invalid y offset for glyph '{glyph}'. {inner}");
+
+    public static FontReaderException InvalidGlyphDimensions(string actual) =>
+        new($"Invalid glyph dimensions. Expected '<int> <int>', got '{actual}' instead.");
+
+    public static FontReaderException InvalidGlyphWidth(Exception inner) =>
+        new($"Invalid glyph width. {inner}");
+    
+    public static FontReaderException InvalidGlyphHeight(Exception inner) =>
+        new($"Invalid glyph height. {inner}");
+
+    public static FontReaderException InvalidMonospaceMode(Exception inner) =>
+        new($"Invalid monospace mode. {inner}");
+    
+    public static FontReaderException InvalidBaseLine(Exception inner) =>
+        new($"Invalid base line definition. {inner}");
+
+    public static FontReaderException InvalidGlyphDistribution(string actual) =>
+        new($"Invalid glyph distribution." +
+            $" Expected '[ uabc | labc | dig | spc | dia | <char> ]', got {actual} instead.");
+
+    public static FontReaderException InvalidImageDimensions() => 
+        new("Invalid image dimensions. More at https://krykomdev.github.io/NeoKolors/Docs/Tui/Image-Font.html#the-image-file");
 }

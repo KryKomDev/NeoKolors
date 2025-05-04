@@ -53,8 +53,8 @@ public class NKFont : IFont {
             NKDebug.Warn($"Could not find character 'U+{(int)c:x4}'");
             
             return UnknownGlyphMode switch {
-                UnknownGlyphMode.SKIP => Glyph.Empty(),
-                UnknownGlyphMode.DEFAULT => new Glyph(c, $"{c}"),
+                UnknownGlyphMode.SKIP => NKGlyph.Empty(),
+                UnknownGlyphMode.DEFAULT => new NKGlyph(c, $"{c}"),
                 UnknownGlyphMode.GLYPH => Glyphs[SubstituteGlyph],
                 _ => throw new ArgumentOutOfRangeException()
             };
@@ -73,6 +73,8 @@ public class NKFont : IFont {
         var chars = IFont.Separate(c);
         if (chars.diacritics == '\u030c') chars = (chars.baseChar, 'ˇ');
         if (chars.diacritics == '\u0301') chars = (chars.baseChar, '´');
+        if (chars.diacritics == '\u030a') 
+            chars = (chars.baseChar, '°');
         return new CompoundGlyph(c, this[chars.baseChar], this[chars.diacritics]);
     }
 }

@@ -11,7 +11,7 @@ namespace NeoKolors.Tui.Fonts;
 /// <summary>
 /// a glyph mixed from two other glyphs
 /// </summary>
-public class CompoundGlyph : Glyph {
+public class CompoundGlyph : NKGlyph {
 
     public CompoundGlyph(
         char character, 
@@ -37,21 +37,16 @@ public class CompoundGlyph : Glyph {
 
         char[,] chars = new char[w, h];
 
-        for (int x = 0; x < w; x++) {
-            for (int y = 0; y < h; y++) {
-                chars[x, y] = ' ';
-            }
-        }
-
         for (int y = 0; y < first.Height; y++) {
             for (int x = 0; x < first.Width; x++) {
-                chars[-smallerX + first.XOffset + x, -smallerY + first.YOffset + y] = first.Chars[x, y];
+                chars[first.XOffset - smallerX + x, first.YOffset - smallerY + y] = first.Chars[x, y];
             }
         }
         
         for (int y = 0; y < second.Height; y++) {
             for (int x = 0; x < second.Width; x++) {
-                chars[-smallerX + second.XOffset + x, -smallerY + second.YOffset + y] = second.Chars[x, y];
+                if (second.Chars[x, y] != '\0')
+                    chars[second.XOffset - smallerX + x, second.YOffset - smallerY + y] = second.Chars[x, y];
             }
         }
         

@@ -4,8 +4,9 @@
 //
 
 using NeoKolors.Common;
+using NeoKolors.Common.Util;
 using NeoKolors.Tui.Fonts;
-using NeoKolors.Tui.Style;
+using NeoKolors.Tui.Styles;
 using SkiaSharp;
 
 // ReSharper disable ForCanBeConvertedToForeach
@@ -214,6 +215,8 @@ public partial class ConsoleScreen : IConsoleScreen {
                 PixelChanges[x, y] = true;
             }
         }
+
+        if (borderStyle.IsBorderless) return;
 
         // Draw horizontal borders
         if (rectangle.LowerY >= 0 && rectangle.LowerY < Height) {

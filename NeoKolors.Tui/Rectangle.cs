@@ -85,12 +85,12 @@ public struct Rectangle {
     /// <summary>
     /// returns the width of the rectangle
     /// </summary>
-    public int Width => HigherX - LowerX;
+    public int Width => HigherX - LowerX + 1;
     
     /// <summary>
     /// returns the height of the rectangle
     /// </summary>
-    public int Height => HigherY - LowerY;
+    public int Height => HigherY - LowerY + 1;
 
     /// <summary>
     /// determines whether a point is inside the rectangle

@@ -1,6 +1,9 @@
-﻿using NeoKolors.Tui;
+﻿//
+// NeoKolors.Test
+// Copyright (c) 2025 KryKom
+//
 
-namespace NeoKolors.Test.Tui;
+namespace NeoKolors.Tui.Tests;
 
 public class RectangleTests {
     
@@ -16,13 +19,13 @@ public class RectangleTests {
     [Fact]
     public void Width_ShouldReturnCorrectValue() {
         var rect = new Rectangle(2, 2, 5, 5);
-        Assert.Equal(3, rect.Width);
+        Assert.Equal(4, rect.Width);
     }
 
     [Fact]
     public void Height_ShouldReturnCorrectValue() {
         var rect = new Rectangle(2, 2, 5, 5);
-        Assert.Equal(3, rect.Height);
+        Assert.Equal(4, rect.Height);
     }
 
     [Fact]

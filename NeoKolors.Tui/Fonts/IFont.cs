@@ -135,4 +135,9 @@ public interface IFont {
 
         return output.ToArray();
     }
+
+    /// <summary>
+    /// returns a font that behaves the same as if there was no font at all
+    /// </summary>
+    public static IFont Default => new DefaultFont();
 }
