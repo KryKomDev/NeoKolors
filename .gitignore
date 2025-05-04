@@ -1,6 +1,6 @@
 # c# stuff
-bin/
-obj/
+**/bin/
+**/obj/
 /packages/
 
 # github shit
@@ -18,3 +18,6 @@ riderModule.iml
 
 # writerside output
 Docs/out/
+
+# idk
+NeoKolors.sln.DotSettings.user

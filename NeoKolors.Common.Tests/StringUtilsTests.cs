@@ -134,4 +134,97 @@ public class StringUtilsTests {
     private record Point(int X, int Y) {
         public override string ToString() => $"({X},{Y})";
     }
+
+    [Theory]
+    [InlineData(1, "I")]
+    [InlineData(4, "IV")]
+    [InlineData(9, "IX")]
+    [InlineData(49, "XLIX")]
+    [InlineData(99, "XCIX")]
+    [InlineData(499, "CDXCIX")]
+    [InlineData(999, "CMXCIX")]
+    [InlineData(3999, "MMMCMXCIX")]
+    [InlineData(2024, "MMXXIV")]
+    public void ToRoman_BasicConversions_ReturnsCorrectRomanNumerals(int number, string expected) {
+        Assert.Equal(expected, number.ToRoman());
+    }
+
+    [Theory]
+    [InlineData(1, "i")]
+    [InlineData(4, "iv")]
+    [InlineData(9, "ix")]
+    [InlineData(49, "xlix")]
+    [InlineData(99, "xcix")]
+    [InlineData(499, "cdxcix")]
+    [InlineData(999, "cmxcix")]
+    [InlineData(3999, "mmmcmxcix")]
+    [InlineData(2024, "mmxxiv")]
+    public void ToRoman_LowercaseConversions_ReturnsCorrectLowercaseRomanNumerals(int number, string expected) {
+        Assert.Equal(expected, number.ToRoman(lowercase: true));
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(4000)]
+    [InlineData(int.MinValue)]
+    [InlineData(int.MaxValue)]
+    public void ToRoman_InvalidValues_ThrowsArgumentOutOfRangeException(int number) {
+        Assert.Throws<ArgumentOutOfRangeException>(() => number.ToRoman());
+    }
+
+    [Fact]
+    public void ToRoman_AllSingleDigits_ReturnsCorrectRomanNumerals() {
+        var expectedValues = new Dictionary<int, string> {
+            { 1, "I" },
+            { 2, "II" },
+            { 3, "III" },
+            { 4, "IV" },
+            { 5, "V" },
+            { 6, "VI" },
+            { 7, "VII" },
+            { 8, "VIII" },
+            { 9, "IX" }
+        };
+
+        foreach (var pair in expectedValues) {
+            Assert.Equal(pair.Value, pair.Key.ToRoman());
+        }
+    }
+
+    [Theory]
+    [InlineData(10, "X")]
+    [InlineData(20, "XX")]
+    [InlineData(30, "XXX")]
+    [InlineData(40, "XL")]
+    [InlineData(50, "L")]
+    [InlineData(60, "LX")]
+    [InlineData(70, "LXX")]
+    [InlineData(80, "LXXX")]
+    [InlineData(90, "XC")]
+    public void ToRoman_TensValues_ReturnsCorrectRomanNumerals(int number, string expected) {
+        Assert.Equal(expected, number.ToRoman());
+    }
+
+    [Theory]
+    [InlineData(100, "C")]
+    [InlineData(200, "CC")]
+    [InlineData(300, "CCC")]
+    [InlineData(400, "CD")]
+    [InlineData(500, "D")]
+    [InlineData(600, "DC")]
+    [InlineData(700, "DCC")]
+    [InlineData(800, "DCCC")]
+    [InlineData(900, "CM")]
+    public void ToRoman_HundredsValues_ReturnsCorrectRomanNumerals(int number, string expected) {
+        Assert.Equal(expected, number.ToRoman());
+    }
+
+    [Theory]
+    [InlineData(1000, "M")]
+    [InlineData(2000, "MM")]
+    [InlineData(3000, "MMM")]
+    public void ToRoman_ThousandsValues_ReturnsCorrectRomanNumerals(int number, string expected) {
+        Assert.Equal(expected, number.ToRoman());
+    }
 }

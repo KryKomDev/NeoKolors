@@ -59,7 +59,7 @@
 &lt;/AssemblyExplorer&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/CreateUnitTestDialog/TestProjectMapping/=30D94294_002D5495_002D4A54_002DAD97_002D7454B5DEC95B/@EntryIndexedValue">811FA8B8-D174-4A6F-9A1C-B5CA6D72C4A7</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/CreateUnitTestDialog/TestTemplateMapping/=xUnit/@EntryIndexedValue">33ff99d8-b1ad-4ed5-a4fd-376b97c2c841</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=5f31d0fb_002D009a_002D448b_002D87b4_002Da41d782bebec/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=5f31d0fb_002D009a_002D448b_002D87b4_002Da41d782bebec/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.StringEffectsTests&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Tui.RectangleTests&lt;/TestId&gt;&#xD;
@@ -89,9 +89,10 @@
     &lt;TestId&gt;xUnit::7792E1F9-14D2-4D73-91E5-4227F9E1AD1F::net8.0::NeoKolors.Settings.Tests.BoolArgumentTests&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::811FA8B8-D174-4A6F-9A1C-B5CA6D72C4A7::net8.0::NeoKolors.Common.Tests.StringEffectsTests&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::7792E1F9-14D2-4D73-91E5-4227F9E1AD1F::net8.0::NeoKolors.Settings.Tests.MultiSelectArgumentTests&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::811FA8B8-D174-4A6F-9A1C-B5CA6D72C4A7::net8.0::NeoKolors.Common.Tests.StringUtilsTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=861bbe3d_002Deec6_002D4946_002Da5e8_002Dfe4451937413/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="RectangleTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=861bbe3d_002Deec6_002D4946_002Da5e8_002Dfe4451937413/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="RectangleTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.StringEffectsTests&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Tui.RectangleTests&lt;/TestId&gt;&#xD;
