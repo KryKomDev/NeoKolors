@@ -11,19 +11,16 @@ namespace NeoKolors.Common;
 public static class EscapeCodes {
 
     /// <summary>
-    /// sequence for coloring a string with a custom color,
-    /// should be followed by <c>r;g;bm</c> where r, g and b represent red green and blue respectively
+    /// Sequence for coloring a string with a custom color.
+    /// Should be followed by <c>r;g;bm</c> where r, g, and b represent red green and blue respectively
     /// </summary>
-    public const string CUSTOM_COLOR_START = "\e[38;2;";
-    
+    public const string CUSTOM_COLOR_PREFIX = "\e[38;2;";
+
     /// <summary>
-    /// sequence for ending the custom coloring of a string,
-    /// ends only the custom coloring, all other styles are left untouched
+    /// Sequence for setting a custom background color.
+    /// Should be followed by <c>r;g;bm</c> where r, g, and b represent red, green, and blue components respectively.
     /// </summary>
-    public const string CUSTOM_COLOR_END = "\e[38;1;m";
-    
-    public const string CUSTOM_BACKGROUND_COLOR_START = "\e[48;2;";
-    public const string CUSTOM_BACKGROUND_COLOR_END = "\e[48;1;m";
+    public const string CUSTOM_BACKGROUND_COLOR_PREFIX = "\e[48;2;";
     
     public static string GetPaletteFColor(byte color) => $"\e[38;5;{color}m";
     public static string GetPaletteBColor(byte color) => $"\e[48;5;{color}m";
@@ -44,7 +41,11 @@ public static class EscapeCodes {
     public const string PALETTE_COLOR_MAGENTA = "\e[38;5;13m";
     public const string PALETTE_COLOR_CYAN = "\e[38;5;14m";
     public const string PALETTE_COLOR_WHITE = "\e[38;5;15m";
-    
+
+    /// <summary>
+    /// ANSI escape sequence used to reset the text color to the default terminal color.
+    /// Used to revert any previously applied text color changes.
+    /// </summary>
     public const string TEXT_COLOR_END = "\e[39m";
     
     public const string PALETTE_BACKGROUND_COLOR_BLACK = "\e[48;5;0m";
@@ -63,16 +64,20 @@ public static class EscapeCodes {
     public const string PALETTE_BACKGROUND_COLOR_MAGENTA = "\e[48;5;13m";
     public const string PALETTE_BACKGROUND_COLOR_CYAN = "\e[48;5;14m";
     public const string PALETTE_BACKGROUND_COLOR_WHITE = "\e[48;5;15m";
-    
+
+    /// <summary>
+    /// ANSI escape sequence that resets the background color to its default value.
+    /// Used to end custom background coloring in a string.
+    /// </summary>
     public const string BACKGROUND_COLOR_END = "\e[49m";
 
     /// <summary>
-    /// disables all styles
+    /// Resets all text formatting attributes, including color and style, to their default values.
     /// </summary>
     public const string FORMATTING_RESET = "\e[0m";
     
     /// <summary>
-    /// switches colors of background and text
+    /// Switches colors of background and text. We have no idea why it works, and it is not documented.
     /// </summary>
     public const string SWITCH_COLORS = "\e[38;1;7m";
     
@@ -125,8 +130,6 @@ public static class EscapeCodes {
     public static void DisableSecondary() => Console.Write(DISABLE_SECONDARY_CONTEXT);
     
     // ReSharper disable InconsistentNaming
-    public const string CustomColorEnd = CUSTOM_COLOR_END;
-    public const string CustomBackgroundColorEnd = CUSTOM_BACKGROUND_COLOR_END;
     public const string PaletteColorEnd = TEXT_COLOR_END;
     public const string PaletteBackgroundColorEnd = BACKGROUND_COLOR_END;
     public const string EnableSecondaryContext = ENABLE_SECONDARY_CONTEXT;

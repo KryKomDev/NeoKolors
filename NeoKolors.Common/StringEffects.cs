@@ -48,7 +48,7 @@ public static class StringEffects {
     /// <returns>string with colored characters</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, byte red, byte green, byte blue) => 
-        $"{CUSTOM_COLOR_START}{red};{green};{blue}m{s}{TEXT_COLOR_END}";
+        $"{CUSTOM_COLOR_PREFIX}{red};{green};{blue}m{s}{TEXT_COLOR_END}";
 
     
     /// <summary>
@@ -61,7 +61,7 @@ public static class StringEffects {
     /// <returns>string with colored characters</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColorB(this string text, byte red, byte green, byte blue) => 
-        $"{CUSTOM_BACKGROUND_COLOR_START}{red};{green};{blue}m{text}{BACKGROUND_COLOR_END}";
+        $"{CUSTOM_BACKGROUND_COLOR_PREFIX}{red};{green};{blue}m{text}{BACKGROUND_COLOR_END}";
     
     
     /// <summary>
@@ -365,7 +365,7 @@ public static class StringEffects {
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ControlChar(this int color) =>
-        $"{CUSTOM_COLOR_START}{(byte)(color >> 16)};{(byte)(color >> 8)};{(byte)color}m";
+        $"{CUSTOM_COLOR_PREFIX}{(byte)(color >> 16)};{(byte)(color >> 8)};{(byte)color}m";
 
     
     /// <summary>
@@ -373,7 +373,7 @@ public static class StringEffects {
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ControlCharB(this int color) =>
-        $"{CUSTOM_BACKGROUND_COLOR_START}{(byte)(color >> 16)};{(byte)(color >> 8)};{(byte)color}m";
+        $"{CUSTOM_BACKGROUND_COLOR_PREFIX}{(byte)(color >> 16)};{(byte)(color >> 8)};{(byte)color}m";
 
     
     /// <summary>

@@ -185,10 +185,10 @@ public readonly struct UInt24 :
     public static bool IsRealNumber(UInt24 value) => true;
     public static bool IsSubnormal(UInt24 value) => false;
     public static bool IsZero(UInt24 value) => value == 0;
-    public static UInt24 MaxMagnitude(UInt24 x, UInt24 y) => System.Math.Max(x, y);
-    public static UInt24 MaxMagnitudeNumber(UInt24 x, UInt24 y) => System.Math.Max(x, y);
-    public static UInt24 MinMagnitude(UInt24 x, UInt24 y) => System.Math.Min(x, y);
-    public static UInt24 MinMagnitudeNumber(UInt24 x, UInt24 y) => System.Math.Min(x, y);
+    public static UInt24 MaxMagnitude(UInt24 x, UInt24 y) => Math.Max(x, y);
+    public static UInt24 MaxMagnitudeNumber(UInt24 x, UInt24 y) => Math.Max(x, y);
+    public static UInt24 MinMagnitude(UInt24 x, UInt24 y) => Math.Min(x, y);
+    public static UInt24 MinMagnitudeNumber(UInt24 x, UInt24 y) => Math.Min(x, y);
     
     public static UInt24 Parse(ReadOnlySpan<char> s, NumberStyles style, IFormatProvider? provider) {
         uint value = uint.Parse(new string(s.ToArray()), style, provider);

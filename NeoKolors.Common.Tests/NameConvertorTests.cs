@@ -1,5 +1,4 @@
 ﻿using NeoKolors.Common.Util;
-using Xunit;
 
 namespace NeoKolors.Common.Tests;
 
