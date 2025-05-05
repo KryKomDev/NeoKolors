@@ -1,5 +1,8 @@
-﻿using System.Collections;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+﻿//
+// NeoKolors
+// Copyright (c) 2025 KryKom
+//
+
 using NeoKolors.Settings.Exception;
 using static NeoKolors.Settings.Tests.MultiSelectArgumentTests.TestEnum;
 

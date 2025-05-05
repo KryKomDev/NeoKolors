@@ -4,7 +4,7 @@
 //
 
 using System.Text.RegularExpressions;
-using NeoKolors.Common;
+using NeoKolors.Common.Util;
 using NeoKolors.Settings.Exception;
 
 namespace NeoKolors.Settings.Argument;
@@ -189,4 +189,17 @@ public class StringArgument : IArgument<string> {
                                          $"\"count-visible-only\": {CountVisibleOnly}}}";
 
     object ICloneable.Clone() => Clone();
+}
+
+/// <summary>
+/// specifies what features of a string are allowed
+/// </summary>
+[Flags]
+public enum StringFeatures {
+    SPACES = 0x1,
+    NEWLINES = 0x2,
+    SPECIAL = 0x4,
+    NUMBERS = 0x8,
+    UPPER = 0x10,
+    LOWER = 0x20
 }
