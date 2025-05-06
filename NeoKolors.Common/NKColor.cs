@@ -170,6 +170,10 @@ public struct NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
         return Color.GetHashCode();
     }
 
+    /// <summary>
+    /// Represents the ANSI control string or textual representation
+    /// of the foreground color associated with the current <see cref="NKColor"/> instance.
+    /// </summary>
     public string Text =>
         Color.Match(
             i => i.ControlChar(),
@@ -177,8 +181,12 @@ public struct NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
             _ => EscapeCodes.TEXT_COLOR_END,
             _ => "Inherit"
         );
-    
-    public string Bckg => 
+
+    /// <summary>
+    /// Returns the ANSI escape code or control character string representing
+    /// the background color associated with the current <see cref="NKColor"/> instance.
+    /// </summary>
+    public string Bckg =>
         Color.Match(
             i => i.ControlCharB(),
             c => c.ControlCharB(),

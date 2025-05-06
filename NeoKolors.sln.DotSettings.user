@@ -61,7 +61,7 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AXunitTestInvoker_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FSourcesCache_003Fa3224cd781deec2964554220fc9e8d9b7291d373c23d1d64de7128ef192aa849_003FXunitTestInvoker_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	
 	<s:String x:Key="/Default/CodeInspection/Highlighting/SweaWarningsMode/@EntryValue">ShowAndRun</s:String>
-	<s:String x:Key="/Default/CodeStyle/Naming/CSharpNaming/UserRules/=4a98fdf6_002D7d98_002D4f5a_002Dafeb_002Dea44ad98c70c/@EntryIndexedValue">&lt;Policy&gt;&lt;Descriptor Staticness="Instance" AccessRightKinds="Private" Description="Instance fields (private)"&gt;&lt;ElementKinds&gt;&lt;Kind Name="FIELD" /&gt;&lt;Kind Name="READONLY_FIELD" /&gt;&lt;/ElementKinds&gt;&lt;/Descriptor&gt;&lt;Policy Inspect="True" WarnAboutPrefixesAndSuffixes="False" Prefix="_" Suffix="" Style="aaBb" /&gt;&lt;/Policy&gt;</s:String>
+	
 	<s:String x:Key="/Default/Environment/AssemblyExplorer/XmlDocument/@EntryValue">&lt;AssemblyExplorer&gt;&#xD;
   &lt;Assembly Path="C:\Users\krystof\Desktop\projects\Libs\NeoKolors\NeoKolors\obj\Debug\net9.0\NeoKolors.dll" /&gt;&#xD;
 &lt;/AssemblyExplorer&gt;</s:String>
@@ -99,6 +99,7 @@
     &lt;TestId&gt;xUnit::7792E1F9-14D2-4D73-91E5-4227F9E1AD1F::net8.0::NeoKolors.Settings.Tests.MultiSelectArgumentTests&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::811FA8B8-D174-4A6F-9A1C-B5CA6D72C4A7::net8.0::NeoKolors.Common.Tests.StringUtilsTests&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::A6BDA12D-18B6-4A75-B38C-FC04F48A4904::net8.0::NeoKolors.Tui.Tests.RectangleTests&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::811FA8B8-D174-4A6F-9A1C-B5CA6D72C4A7::net8.0::NeoKolors.Common.Tests.List2DTests&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=861bbe3d_002Deec6_002D4946_002Da5e8_002Dfe4451937413/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="RectangleTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;

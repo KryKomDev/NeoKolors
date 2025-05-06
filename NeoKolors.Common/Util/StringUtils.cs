@@ -114,6 +114,36 @@ public static class StringUtils {
     }
 
     /// <summary>
+    /// Extracts a range of elements from the given enumerable collection starting from the specified
+    /// start index to the specified end index, inclusive of the start index but exclusive of the end index.
+    /// </summary>
+    /// <typeparam name="T">The type of the elements in the enumerable collection.</typeparam>
+    /// <param name="enumerable">The enumerable collection from which to extract the range of elements.</param>
+    /// <param name="startIndex">The zero-based starting index of the range to extract.</param>
+    /// <param name="endIndex">The zero-based ending index of the range to extract (exclusive).</param>
+    /// <returns>An enumerable containing the elements from the specified range.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown if <paramref name="startIndex"/> or <paramref name="endIndex"/> is out of the array's bounds,
+    /// or if <paramref name="startIndex"/> is greater than <paramref name="endIndex"/>.
+    /// </exception>
+    #if NET5_0_OR_GREATER
+    [Obsolete("This method can be substituted with range indexer.")]
+    #endif
+    public static IEnumerable<T> InRange<T>(this IEnumerable<T> enumerable, int startIndex, int endIndex) {
+        var array = enumerable as T[] ?? enumerable.ToArray();
+        if (startIndex < 0 || startIndex >= array.Length)
+            throw new ArgumentOutOfRangeException(nameof(startIndex), "Start index is out of range.");
+        if (endIndex < 0 || endIndex >= array.Length)  
+            throw new ArgumentOutOfRangeException(nameof(endIndex), "End index is out of range.");
+        if (startIndex > endIndex) 
+            throw new ArgumentOutOfRangeException(nameof(startIndex), "Start index is larger than the end index");
+
+        for (int i = startIndex; i < endIndex; i++) {
+            yield return array[i];
+        }
+    }
+
+    /// <summary>
     /// chops the string into multiple string with a maximum length
     /// </summary>
     /// <param name="s">the string to be chopped</param>

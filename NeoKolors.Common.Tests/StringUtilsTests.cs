@@ -5,6 +5,7 @@
 
 using System.Collections;
 using NeoKolors.Common.Util;
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace NeoKolors.Common.Tests;
 
@@ -41,6 +42,98 @@ public class StringUtilsTests {
         var s = "hello, {0}".Format("world");
         Assert.Equal("hello, world", s.Format());
     }
+
+    [Theory]
+    [InlineData("Hello, World!", 0, 5, "Hello")]
+    [InlineData("Hello, World!", 7, 12, "World")]
+    [InlineData("Test", 1, 3, "es")]
+    [InlineData("ABC", 0, 1, "A")]
+    public void InRange_String_ValidRanges_ReturnsCorrectSubstring(string input, int start, int end, string expected) {
+        Assert.Equal(expected, input.InRange(start, end));
+    }
+
+    [Theory]
+    [InlineData("Test", -1, 2)]
+    [InlineData("Test", 0, 5)]
+    [InlineData("Test", 4, 4)]
+    [InlineData("Test", 3, 2)]
+    public void InRange_String_InvalidRanges_ThrowsArgumentOutOfRangeException(string input, int start, int end) {
+        Assert.Throws<ArgumentOutOfRangeException>(() => input.InRange(start, end));
+    }
+
+    [Fact]
+    public void InRange_String_StartEqualsEnd_ReturnsEmptyString() {
+        var input = "Test";
+        Assert.Equal("", input.InRange(1, 1));
+    }
+
+    [Fact]
+    public void InRange_String_SingleCharacterExtraction_ReturnsCorrectChar() {
+        var input = "Hello";
+        Assert.Equal("e", input.InRange(1, 2));
+    }
+
+    [Theory]
+    [InlineData(0, 3)]
+    [InlineData(1, 4)]
+    [InlineData(0, 4)]
+    public void InRange_IEnumerable_ValidRanges_ReturnsCorrectElements(int start, int end) {
+        var input = new[] { 1, 2, 3, 4, 5 };
+        var expected = input[start..end];
+        var result = input.InRange(start, end);
+        
+        Assert.Equal(expected, result);
+    }
+
+    [Theory]
+    [InlineData(-1, 3)]
+    [InlineData(0, 6)]
+    [InlineData(4, 3)]
+    [InlineData(5, 5)]
+    public void InRange_IEnumerable_InvalidRanges_ThrowsArgumentOutOfRangeException(int start, int end) {
+        var input = new[] { 1, 2, 3, 4, 5 };
+        Assert.Throws<ArgumentOutOfRangeException>(() => input.InRange(start, end).ToList());
+    }
+
+    [Fact]
+    public void InRange_IEnumerable_EmptyRange_ReturnsEmptySequence() {
+        var input = new[] { 1, 2, 3 };
+        var result = input.InRange(1, 1);
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public void InRange_IEnumerable_SingleElementExtraction_ReturnsCorrectElement() {
+        var input = new[] { 1, 2, 3, 4, 5 };
+        var result = input.InRange(2, 3);
+        Assert.Equal([3], result);
+    }
+
+    [Fact]
+    public void InRange_IEnumerable_WorksWithDifferentTypes() {
+        var input = new[] { "one", "two", "three", "four" };
+        var result = input.InRange(1, 3);
+        Assert.Equal(["two", "three"], result);
+    }
+
+    [Fact]
+    public void InRange_IEnumerable_LazyEvaluation_WorksCorrectly() {
+        var evaluated = false;
+        IEnumerable<int> GetNumbers() {
+            evaluated = true;
+            yield return 1;
+            yield return 2;
+            yield return 3;
+        }
+
+        var result = GetNumbers().InRange(0, 2);
+        Assert.False(evaluated); // Not evaluated until enumerated
+        
+        // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
+        result.ToList(); // Force evaluation
+        Assert.True(evaluated);
+    }
+
     
     [Fact]
     public void Join_WithSimpleCollection_JoinsCorrectly() {
