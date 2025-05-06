@@ -82,7 +82,7 @@ public readonly struct GlyphDistribution {
     public override string ToString() => 
         Distribution.Join(" ", 
             d => d.Match(
-                s => Enum.GetName(s)!.ToLowerInvariant(),
+                s => Enum.GetName(typeof(DistroStrings), s)!.ToLowerInvariant(),
                 c => c.ToString()
             )
         );

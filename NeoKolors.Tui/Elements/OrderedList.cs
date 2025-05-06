@@ -37,7 +37,7 @@ public class OrderedList : IElement {
         int maxW = 0;
         for (int i = 0; i < Children.Count; i++) {
             points[i] = ls.ToString(i + 1);
-            maxW = int.Max(maxW, points[i].Length);
+            maxW = Math.Max(maxW, points[i].Length);
         }
         
         var borderRect = IElement.GetBorderRect(rect, Margin);
@@ -60,7 +60,7 @@ public class OrderedList : IElement {
             
             int o = p.ToIntV(h) + (b.IsBorderless ? 0 : 1) + m.ToIntV(h);
             
-            target.DrawText(points[i], contentRect.LowerX, y + o, s);
+            target.DrawText(points[i], contentRect.LowerX + maxW - points[i].Length, y + o, s);
             Children[i].Render(target, new Rectangle(lx, y, contentRect.HigherX, y + h));
             y += h + 1;
         }

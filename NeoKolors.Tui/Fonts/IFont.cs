@@ -41,7 +41,7 @@ public interface IFont {
     /// returns the glyph for a character
     /// </summary>
     public IGlyph GetGlyph(char c);
-
+    
     /// <summary>
     /// splits a character into its base character and its diacritic character
     /// </summary>

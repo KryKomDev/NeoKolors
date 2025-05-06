@@ -34,7 +34,9 @@ public class NKImageFontReader : IFontReader {
         float fCols = (bmp.Width + 1) / (config.GlyphWidth + 1f);
         float fRows = (bmp.Height + 1) / (config.GlyphHeight + 1f);
 
-        if (!float.IsInteger(fCols) || !float.IsInteger(fRows)) throw FontReaderException.InvalidImageDimensions();
+        const float maxDiff = 0.0001f;
+        if (Math.Abs(fCols - Math.Round(fCols)) > maxDiff || Math.Abs(fRows - Math.Round(fRows)) > maxDiff) 
+            throw FontReaderException.InvalidImageDimensions();
 
         int i = 0;
         for (int y = 0; y < bmp.Height; y += config.GlyphHeight + 1) {
@@ -266,16 +268,16 @@ public class NKImageFontReader : IFontReader {
     /// <param name="config">the configuration of the font</param>
     /// <exception cref="FontWriterException">the path is invalid</exception>
     public static void CreateBlank(string path, string fontName, NKImageFontConfig config) {
-        if (!Path.Exists(path)) throw FontWriterException.InvalidPath();
-        
         string headerPath = Path.Combine(path, fontName + ".nkf");
         string imagePath = Path.Combine(path, fontName + ".png");
         
+        if (!File.Exists(headerPath)) throw FontWriterException.InvalidPath();
+
         File.Create(headerPath).Close();
         File.Create(imagePath).Close();
         File.WriteAllText(headerPath, $"nkif 1\n{fontName}.png\n{config.ToString()}");
 
-        int cols = (int)Math.Floor(double.Sqrt(config.GlyphDistribution.GlyphCount));
+        int cols = (int)Math.Floor(Math.Sqrt(config.GlyphDistribution.GlyphCount));
         int rows = (int)Math.Ceiling(config.GlyphDistribution.GlyphCount / (float)cols);
         
         SKBitmap bmp = new SKBitmap(

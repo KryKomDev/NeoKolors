@@ -26,7 +26,7 @@ public class View : IView {
         
     }
     
-    [SupportedOSPlatform("windows")]
+    // [SupportedOSPlatform("windows")]
     public static void Aaaah(object? sender, KeyEventArgs args) {
         char c = ((KeyEventArgs)args).PressedKey.KeyChar;
         var ki = ((KeyEventArgs)args).PressedKey;

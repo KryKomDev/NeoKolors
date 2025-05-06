@@ -154,7 +154,7 @@ public class Div : IElement {
                 return (rect.HigherY - childHeight, rect.HigherY);
             case AlignItems.CENTER:
                 float offset = (float)(rect.Height - childHeight - 1) / 2;
-                return ((int, int))(float.Floor(rect.LowerY + offset), float.Floor(rect.HigherY - offset));
+                return ((int, int))(Math.Floor(rect.LowerY + offset), Math.Floor(rect.HigherY - offset));
             case AlignItems.STRETCH:
                 return (rect.LowerY, rect.HigherY);
             default:
@@ -236,7 +236,7 @@ public class Div : IElement {
                 return (rect.HigherX - childWidth, rect.HigherX);
             case AlignItems.CENTER:
                 float offset = (float)(rect.Width - childWidth - 1) / 2;
-                return ((int, int))(float.Floor(rect.LowerX + offset), float.Floor(rect.HigherX - offset));
+                return ((int, int))(Math.Floor(rect.LowerX + offset), Math.Floor(rect.HigherX - offset));
             case AlignItems.STRETCH:
                 return (rect.LowerX, rect.HigherX);
             default:
@@ -280,8 +280,8 @@ public class Div : IElement {
             }
 
             int w;
-            if (floor) w = (int)float.Floor(g.Cols[i].ToFloatH(rect.Width));
-            else w = (int)float.Ceiling(g.Cols[i].ToFloatH(rect.Width));
+            if (floor) w = (int)Math.Floor(g.Cols[i].ToFloatH(rect.Width));
+            else w = (int)Math.Ceiling(g.Cols[i].ToFloatH(rect.Width));
 
             sumW += w;
             widths[i] = w;
@@ -309,8 +309,8 @@ public class Div : IElement {
             }
             
             int h;
-            if (floor) h = (int)float.Floor(g.Cols[i].ToFloatV(rect.Height));
-            else h = (int)float.Ceiling(g.Cols[i].ToFloatV(rect.Height));
+            if (floor) h = (int)Math.Floor(g.Cols[i].ToFloatV(rect.Height));
+            else h = (int)Math.Ceiling(g.Cols[i].ToFloatV(rect.Height));
             
             sumH += h;
             heights[i] = h;
@@ -341,19 +341,19 @@ public class Div : IElement {
         int hx = rect.LowerX - 1;
         int hy = rect.LowerY - 1;
 
-        for (int i = 0; i < int.Min(align.LowerX, widths.Length); i++) {
+        for (int i = 0; i < Math.Min(align.LowerX, widths.Length); i++) {
             lx += widths[i];
         }
 
-        for (int i = 0; i < int.Min(align.LowerY, heights.Length); i++) {
+        for (int i = 0; i < Math.Min(align.LowerY, heights.Length); i++) {
             ly += heights[i];
         }
 
-        for (int i = 0; i < int.Min(align.HigherX + 1, widths.Length); i++) {
+        for (int i = 0; i < Math.Min(align.HigherX + 1, widths.Length); i++) {
             hx += widths[i];
         }
 
-        for (int i = 0; i < int.Min(align.HigherY + 1, heights.Length); i++) {
+        for (int i = 0; i < Math.Min(align.HigherY + 1, heights.Length); i++) {
             hy += heights[i];
         }
         

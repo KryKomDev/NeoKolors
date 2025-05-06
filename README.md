@@ -65,7 +65,7 @@ Tutorial on how to use available in [README](NeoKolors.Settings/README.md)
 
 ## Tui
 
-![.NET Standard](https://img.shields.io/badge/.NET-Standard2.0-512bd4)
+![.NET Standard](https://img.shields.io/badge/.NET-Standard2.1-512bd4)
 ![.NET 5](https://img.shields.io/badge/.NET-5.0-682a7b)
 
 [//]: # ([![NuGet]&#40;https://img.shields.io/nuget/v/NeoKolors.Tui&#41;]&#40;https://www.nuget.org/packages/NeoKolors.Tui&#41;)
