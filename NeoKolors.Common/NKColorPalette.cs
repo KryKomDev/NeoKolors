@@ -9,7 +9,7 @@ using static System.Math;
 
 namespace NeoKolors.Common;
 
-public class ColorPalette {
+public readonly struct NKColorPalette {
     
     public int this[int index] => _colors[index];
     private readonly NKColor[] _colors;
@@ -26,7 +26,7 @@ public class ColorPalette {
     /// </summary>
     /// <param name="colors">the field of integers representing argb colors</param>
     /// <param name="autoAlpha">sets alpha channel of every color to #ff if true</param>
-    public ColorPalette(NKColor[] colors, bool autoAlpha = true) {
+    public NKColorPalette(NKColor[] colors, bool autoAlpha = true) {
         _colors = colors;
 
         if (autoAlpha) {
@@ -39,7 +39,7 @@ public class ColorPalette {
     /// <summary>
     /// creates a new ordered color palette from a set of colors
     /// </summary>
-    public ColorPalette(Color[] colors) {
+    public NKColorPalette(Color[] colors) {
         _colors = new NKColor[colors.Length];
 
         for (int i = 0; i < colors.Length; i++) {
@@ -51,7 +51,7 @@ public class ColorPalette {
     /// creates a new palette from the format "rrggbb-rrggbb-..."
     /// </summary>
     /// <param name="url">the string</param>
-    public ColorPalette(string url) {
+    public NKColorPalette(string url) {
 
         _colors = new NKColor[(url.Length + 1) / 7];
 
@@ -110,8 +110,8 @@ public class ColorPalette {
     /// </summary>
     /// <param name="seed">seed for random</param>
     /// <param name="colorCount">how many colors will the palette contain</param>
-    public static ColorPalette GeneratePalette(int seed, int colorCount = 10) {
-        ColorPalette palette = new ColorPalette(new NKColor[colorCount]);
+    public static NKColorPalette GeneratePalette(int seed, int colorCount = 10) {
+        NKColorPalette palette = new NKColorPalette(new NKColor[colorCount]);
 
         Random rnd = new Random(seed);
 

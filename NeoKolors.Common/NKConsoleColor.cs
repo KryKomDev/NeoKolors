@@ -6,11 +6,16 @@
 namespace NeoKolors.Common;
 
 /// <summary>
-/// contains the extended console color palette,
-/// first 16 colors are also contained in System.ConsoleColor,
-/// next 6x6x6 colors represent colors in a 6x6x6 cube where each axis represent a color channel,
-/// last 24 colors are grayscale colors 
+/// Contains the extended console color palette. Each color value corresponds to the same color in the ANSI
+/// representation. The first 16 colors are also contained in System.ConsoleColor,
+/// the next 6x6x6 colors represent colors in a 6x6x6 cube where each axis represents a color channel,
+/// the last 24 colors are equally spaced grayscale colors.
 /// </summary>
+/// <remarks>
+/// Every color value can be directly converted to an ANSI color code with the
+/// <see cref="StringEffects.ControlChar(NKConsoleColor)"/> or <see cref="StringEffects.ControlCharB(NKConsoleColor)"/>
+/// method.
+/// </remarks>
 public enum NKConsoleColor : byte { 
 
     // basic colors
