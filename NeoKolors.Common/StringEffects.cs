@@ -9,12 +9,16 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
+using NeoKolors.Common.Util;
 using static NeoKolors.Common.EscapeCodes;
 using static NeoKolors.Common.TextStyles;
 
 namespace NeoKolors.Common;
 
 public static class StringEffects {
+
+    private const string COMPOSITE = StringSyntaxAttribute.CompositeFormat;
     
     /// <summary>
     /// adds a color to the characters of a string
@@ -22,6 +26,7 @@ public static class StringEffects {
     /// <param name="s">input string</param>
     /// <param name="hex">the hexadecimal representation of the color</param>
     /// <returns>string with colored characters</returns>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, int hex) => 
         $"{hex.ControlChar()}{s}{TEXT_COLOR_END}";
@@ -33,6 +38,7 @@ public static class StringEffects {
     /// <param name="text">input string</param>
     /// <param name="hex">the hexadecimal representation of the color</param>
     /// <returns>string with colored characters</returns>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColorB(this string text, int hex) => 
         $"{hex.ControlCharB()}{text}{BACKGROUND_COLOR_END}";
@@ -46,6 +52,7 @@ public static class StringEffects {
     /// <param name="green">green value of the color</param>
     /// <param name="blue">blue value of the color</param>
     /// <returns>string with colored characters</returns>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, byte red, byte green, byte blue) => 
         $"{CUSTOM_COLOR_PREFIX}{red};{green};{blue}m{s}{TEXT_COLOR_END}";
@@ -59,6 +66,7 @@ public static class StringEffects {
     /// <param name="green">green value of the color</param>
     /// <param name="blue">blue value of the color</param>
     /// <returns>string with colored characters</returns>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColorB(this string text, byte red, byte green, byte blue) => 
         $"{CUSTOM_BACKGROUND_COLOR_PREFIX}{red};{green};{blue}m{text}{BACKGROUND_COLOR_END}";
@@ -68,6 +76,7 @@ public static class StringEffects {
     /// adds a color of the terminal palette to the text
     /// </summary>
     /// <returns>text with colors</returns>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, NKConsoleColor color) => 
         $"{color.ControlChar()}{s}{TEXT_COLOR_END}";
@@ -77,6 +86,7 @@ public static class StringEffects {
     /// adds a color of the terminal palette to the text's background
     /// </summary>
     /// <returns>text with colored background</returns>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColorB(this string text, NKConsoleColor color) => 
         $"{color.ControlCharB()}{text}{BACKGROUND_COLOR_END}";
@@ -86,6 +96,7 @@ public static class StringEffects {
     /// adds a color of the terminal palette to the text
     /// </summary>
     /// <returns>text with colors</returns>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, ConsoleColor color) => 
         $"{color.ControlChar()}{s}{TEXT_COLOR_END}";
@@ -95,6 +106,7 @@ public static class StringEffects {
     /// adds a color of the terminal palette to the text's background
     /// </summary>
     /// <returns>text with colored background</returns>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColorB(this string text, ConsoleColor color) => 
         $"{color.ControlCharB()}{text}{BACKGROUND_COLOR_END}";
@@ -103,6 +115,7 @@ public static class StringEffects {
     /// adds a color to the text
     /// </summary>
     /// <returns>colored text</returns>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, NKColor color) => 
         $"{color.Text}{s}{TEXT_COLOR_END}";
@@ -112,6 +125,7 @@ public static class StringEffects {
     /// adds a colored background to the text
     /// </summary>
     /// <returns>text with colored background</returns>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColorB(this string text, NKColor color) => 
         $"{color.Bckg}{text}{BACKGROUND_COLOR_END}";
@@ -121,6 +135,7 @@ public static class StringEffects {
     /// adds a color to the text
     /// </summary>
     /// <returns>colored text</returns>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, System.Drawing.Color color) => 
         s.AddColor(color.R, color.G, color.B);
@@ -130,62 +145,45 @@ public static class StringEffects {
     /// adds a colored background to the text
     /// </summary>
     /// <returns>text with colored background</returns>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColorB(this string text, System.Drawing.Color color) => 
         text.AddColorB(color.R, color.G, color.B);
-
-
-    /// <summary>
-    /// colors the string using symbols defined by the symbol variable of the tuple
-    /// </summary>
-    /// <param name="s">the string to be colored</param>
-    /// <param name="colors">array of tuples containing the symbol and the color</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string AddColor(this string s, params (string symbol, NKColor color)[] colors) => 
-        colors.Aggregate(s, (current, c) => current.Replace(c.symbol, c.color.Text));
     
     
     /// <summary>
     /// adds color to both the text and the background
     /// </summary>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, NKColor text, NKColor background) => 
         s.AddColor(text).AddColorB(background);
 
 
     /// <summary>
-    /// colors the string s using the composition formatting
+    /// Replaces format items in the input string with the corresponding color values provided in the array of colors.
     /// </summary>
-    /// <param name="s">the string to be colored</param>
-    /// <param name="colors">an ordered list of the colors</param>
-    public static string AddColors(
-        [StringSyntax(StringSyntaxAttribute.CompositeFormat)] 
-        this string s, params NKColor[] colors) 
-    {
-        object[] sc = new object[colors.Length];
-        
-        for (int i = 0; i < colors.Length; i++)
-            sc[i] = colors[i].Text;
-        
-        return string.Format(s, sc);
-    }
+    /// <param name="s">The input string containing format items to be replaced.</param>
+    /// <param name="colors">An array of NKColor instances to format and replace in the input string.</param>
+    /// <returns>A string with the format items replaced by the corresponding color representations.</returns>
+    [System.Diagnostics.Contracts.Pure]
+    [StringFormatMethod(nameof(s))]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string AddColors([StringSyntax(COMPOSITE)] this string s, params NKColor[] colors) => 
+        string.Format(s, colors.Cast<object?>().ToArray());
+
     
     /// <summary>
-    /// colors the string's background using the composition formatting
+    /// Replaces format items in the input string with the corresponding color values provided in the array of colors.
     /// </summary>
-    /// <param name="s">the string to be colored</param>
-    /// <param name="colors">an ordered list of the colors</param>
-    public static string AddColorsB(
-            [StringSyntax(StringSyntaxAttribute.CompositeFormat)] 
-            this string s, params NKColor[] colors) 
-    {
-        object[] sc = new object[colors.Length];
-        
-        for (int i = 0; i < colors.Length; i++)
-            sc[i] = colors[i].Bckg;
-        
-        return string.Format(s, sc);
-    }
+    /// <param name="s">The input string containing format items to be replaced.</param>
+    /// <param name="colors">An array of NKColor instances to format and replace in the input string.</param>
+    /// <returns>A string with the format items replaced by the corresponding color representations.</returns>
+    [System.Diagnostics.Contracts.Pure]
+    [StringFormatMethod(nameof(s))]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string AddColorsB([StringSyntax(COMPOSITE)] this string s, params NKColor[] colors) => 
+        string.Format(s, colors.ToBckg().Cast<object?>().ToArray());
     
     
     /// <summary>
@@ -193,6 +191,7 @@ public static class StringEffects {
     /// (using the <see cref="ApplyColors"/>) to the string
     /// </summary>
     /// <param name="s">input string with style and color tags</param>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ApplyEffects(this string s) => 
         s.ApplyStyles().ApplyColors();
@@ -203,6 +202,7 @@ public static class StringEffects {
     /// </summary>
     /// <param name="s">input text with tags</param>
     /// <returns>text that when printed to console has styles</returns>
+    [System.Diagnostics.Contracts.Pure]
     public static string ApplyStyles(this string s) {
         s = s.Replace("<b>", BOLD_START);
         s = s.Replace("</b>", BOLD_END);
@@ -227,6 +227,7 @@ public static class StringEffects {
     /// </summary>
     /// <param name="s">string to be colored</param>
     /// <returns>colored string</returns>
+    [System.Diagnostics.Contracts.Pure]
     public static string ApplyColors(this string s) {
         
         s = Regex.Replace(s, "<f#.{6}>", match => {
@@ -290,6 +291,7 @@ public static class StringEffects {
     /// <param name="styles">styles applied to the text</param>
     /// <returns>string with the styles applied</returns>
     /// <exception cref="ArgumentOutOfRangeException">an invalid style was inputted</exception>
+    [System.Diagnostics.Contracts.Pure]
     public static string AddStyle(this string s, int styles) {
         if ((styles & 0b000001) == 0b000001) s = s.AddStyle(BOLD);
         if ((styles & 0b000010) == 0b000010) s = s.AddStyle(ITALIC);
@@ -309,6 +311,7 @@ public static class StringEffects {
     /// <param name="style">style applied to the text</param>
     /// <returns>string with the style applied</returns>
     /// <exception cref="ArgumentOutOfRangeException">an invalid style was inputted</exception>
+    [System.Diagnostics.Contracts.Pure]
     public static string AddStyle(this string s, TextStyles style) {
         if (style.HasFlag(BOLD)) s = $"{BOLD_START}{s}{BOLD_END}";
         if (style.HasFlag(ITALIC)) s = $"{ITALIC_START}{s}{ITALIC_END}";
@@ -326,6 +329,7 @@ public static class StringEffects {
     /// <param name="c">input single-character string</param>
     /// <param name="styles">styles applied to text</param>
     /// <returns>styled string</returns>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddStyle(this char c, TextStyles styles) => (c + "").AddStyle(styles);
 
@@ -333,6 +337,7 @@ public static class StringEffects {
     /// <summary>
     /// returns string containing ansi escape sequence coloring the text
     /// </summary>    
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ControlChar(this NKConsoleColor color) => GetPaletteFColor((byte)color);
     
@@ -340,6 +345,7 @@ public static class StringEffects {
     /// <summary>
     /// returns string containing ansi escape sequence coloring background
     /// </summary>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ControlCharB(this NKConsoleColor color) => GetPaletteBColor((byte)color);
     
@@ -347,6 +353,7 @@ public static class StringEffects {
     /// <summary>
     /// returns string containing ansi escape sequence coloring the text
     /// </summary>    
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ControlChar(this ConsoleColor color) => 
         GetPaletteFColor((byte)ColorFormat.SystemToNK(color));
@@ -355,6 +362,7 @@ public static class StringEffects {
     /// <summary>
     /// returns string containing ansi escape sequence coloring background
     /// </summary>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ControlCharB(this ConsoleColor color) => 
         GetPaletteBColor((byte)ColorFormat.SystemToNK(color));
@@ -363,6 +371,7 @@ public static class StringEffects {
     /// <summary>
     /// returns string containing ansi escape sequence coloring the text
     /// </summary>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ControlChar(this int color) =>
         $"{CUSTOM_COLOR_PREFIX}{(byte)(color >> 16)};{(byte)(color >> 8)};{(byte)color}m";
@@ -371,6 +380,7 @@ public static class StringEffects {
     /// <summary>
     /// returns string containing ansi escape sequence coloring background
     /// </summary>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ControlCharB(this int color) =>
         $"{CUSTOM_BACKGROUND_COLOR_PREFIX}{(byte)(color >> 16)};{(byte)(color >> 8)};{(byte)color}m";
@@ -379,6 +389,7 @@ public static class StringEffects {
     /// <summary>
     /// adds styles to a string using the <see cref="NKStyle"/> structure
     /// </summary>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddStyle(this string s, NKStyle style) => 
         s.AddStyle(style.Styles).AddColor(style.FColor, style.BColor);
@@ -387,6 +398,7 @@ public static class StringEffects {
     /// <summary>
     /// adds styles to a string using the <see cref="NKStyle"/> structure
     /// </summary>
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddStyle(this char s, NKStyle style) => 
         s.AddStyle(style.Styles).AddColor(style.FColor, style.BColor);

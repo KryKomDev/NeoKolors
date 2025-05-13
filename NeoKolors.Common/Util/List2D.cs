@@ -21,7 +21,11 @@ public class List2D<T> : List2D, IEnumerable<T> {
     public new int XSize => _matrix.Count;
     public new int YSize => _matrix.Count == 0 ? 0 : _matrix[0].Count;
     public new List<T> this[int index] => _matrix[index];
-    public new T this[int x, int y] => _matrix[x][y];
+
+    public new T this[int x, int y] {
+        get => _matrix[x][y];
+        set => _matrix[x][y] = value;
+    }
     
     public List2D() {
         _matrix = new List<List<T>>();
@@ -146,7 +150,11 @@ public class List2D : IEnumerable {
     public int YSize => _matrix.Count == 0 ? 0 : _matrix[0].Count;
     
     public List<object> this[int index] => _matrix[index];
-    public object this[int x, int y] => _matrix[x][y];
+
+    public object this[int x, int y] {
+        get => _matrix[x][y];
+        set => _matrix[x][y] = value;
+    }
     
     public List2D() {
         _matrix = new List<List<object>>();
@@ -499,6 +507,39 @@ public class List2D : IEnumerable {
         
         // when Span2D is available, use the System.Array-like Fill method implementation 
         
+        for (int i0 = xStart; i0 <= xEnd; i0++) {
+            for (int i1 = yStart; i1 <= yEnd; i1++) {
+                array[i0, i1] = value;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Safely fills a specified 2D array region with the given value, ensuring the region bounds are clamped within the array's dimensions.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the array.</typeparam>
+    /// <param name="array">The target 2D array to be filled.</param>
+    /// <param name="value">The value used to fill the specified region of the array.</param>
+    /// <param name="xStart">The starting index of the fill range in the first dimension (rows).</param>
+    /// <param name="yStart">The starting index of the fill range in the second dimension (columns).</param>
+    /// <param name="xEnd">The ending index of the fill range in the first dimension (rows).</param>
+    /// <param name="yEnd">The ending index of the fill range in the second dimension (columns).</param>
+    /// <exception cref="ArgumentNullException">Thrown when the <paramref name="array"/> is null.</exception>
+    public static void SafeFill<T>(T[,]? array, T value, int xStart, int yStart, int xEnd, int yEnd) {
+        if (array is null)
+            throw new ArgumentNullException(nameof(array));
+
+        xStart = xStart.Clamp(0, array.Len0() - 1);
+        xEnd = xEnd.Clamp(0, array.Len0() - 1);
+        yStart = yStart.Clamp(0, array.Len1() - 1);
+        yEnd = yEnd.Clamp(0, array.Len1() - 1);
+
+        // switch start and end if necessary
+        (xStart, xEnd) = xStart < xEnd ? (xStart, xEnd) : (xEnd, xStart);
+        (yStart, yEnd) = yStart < yEnd ? (yStart, yEnd) : (yEnd, yStart);
+
+        // when Span2D is available, use the System.Array-like Fill method implementation 
+
         for (int i0 = xStart; i0 <= xEnd; i0++) {
             for (int i1 = yStart; i1 <= yEnd; i1++) {
                 array[i0, i1] = value;

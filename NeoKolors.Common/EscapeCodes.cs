@@ -128,7 +128,7 @@ public static class EscapeCodes {
 
     public static void EnableSecondary() => Console.Write(ENABLE_SECONDARY_CONTEXT);
     public static void DisableSecondary() => Console.Write(DISABLE_SECONDARY_CONTEXT);
-    
+
     // ReSharper disable InconsistentNaming
     public const string PaletteColorEnd = TEXT_COLOR_END;
     public const string PaletteBackgroundColorEnd = BACKGROUND_COLOR_END;

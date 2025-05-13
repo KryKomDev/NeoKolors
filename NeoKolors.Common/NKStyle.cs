@@ -288,7 +288,7 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     /// <summary>
     /// safely overwrites the contents of this instance with the contents of the other instance
     /// </summary>
-    public void SafeSet(NKStyle other) {
+    public void Override(NKStyle other) {
         if (!other.IsFColorInherit) SetFColor(other.GetFColor());
         if (!other.IsBColorInherit) SetBColor(other.GetBColor());
         SetStyles(other.GetStyles());
@@ -313,21 +313,21 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     public NKStyle(NKColor f, TextStyles s) {
         Raw = 0;
         SetFColor(f);
-        SetBColor(NKColor.Default);
+        SetBColor(NKColor.Inherit);
         SetStyles(s);
     }
 
     public NKStyle(NKColor f) {
         Raw = 0;
         SetFColor(f);
-        SetBColor(NKColor.Default);
+        SetBColor(NKColor.Inherit);
         SetStyles(TextStyles.NONE);
     }
 
     public NKStyle(TextStyles s) {
         Raw = 0;
         SetFColor(NKColor.Default);
-        SetBColor(NKColor.Default);
+        SetBColor(NKColor.Inherit);
         SetStyles(s);
     }
 
@@ -386,4 +386,15 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator !=(NKStyle left, NKStyle right) => !(left == right);
+
+    /// <summary>
+    /// Overrides the properties of the first NKStyle instance with those of the second NKStyle instance and returns the updated instance.
+    /// </summary>
+    /// <param name="overriden">The NKStyle instance to be overridden.</param>
+    /// <param name="overrider">The NKStyle instance providing the overriding properties.</param>
+    /// <returns>The resulting NKStyle instance after applying the overrides.</returns>
+    public static NKStyle operator <<(NKStyle overriden, NKStyle overrider) {
+        overriden.Override(overrider);
+        return overriden;
+    }
 }

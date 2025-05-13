@@ -10,7 +10,7 @@
 namespace NeoKolors.Common;
 
 [AttributeUsage(AttributeTargets.Method)]
-internal class OverloadResolutionPriorityAttribute : Attribute {
+public class OverloadResolutionPriorityAttribute : Attribute {
     public OverloadResolutionPriorityAttribute(int priority) { }
 }
 

@@ -35,6 +35,8 @@ public static class NKPalettes {
     public static NKColorPalette Gymlit => new("2a15e1-e2e20d-ffffff-504850-3e363f");
     public static NKColorPalette GrayRed => new("141418-2b2d42-8d99ae-edf2f4-ef233c-d90429-9b2337");
     public static NKColorPalette MonoBlue => new("f4f4ff-bfcaeb-899fd6-46567c-020c22");
+    public static NKColorPalette OldSchool => new("1717b2-6666f1-54ffff-ffffff-b2b2b2-000000");
+    public static NKColorPalette OldSchoolExtended => new("1717b2-3f3fd2-6666f1-5db3f8-54ffff-ffffff-b2b2b2-595959-2d2d2d-000000");
 
     /// <summary>
     /// Prints all color palettes defined in the NKPalettes class to the console.

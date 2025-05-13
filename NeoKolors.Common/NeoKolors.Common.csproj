@@ -19,6 +19,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
         <PackageReference Include="OneOf" Version="3.0.271" />
         <PackageReference Include="SkiaSharp" Version="3.116.1" />
         <PackageReference Include="System.IO" Version="4.3.0" />

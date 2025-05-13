@@ -3,17 +3,18 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Common;
-using static NeoKolors.Common.TextStyles;
+using System.Diagnostics.Contracts;
+using System.Runtime.CompilerServices;
 using static NeoKolors.Common.EscapeCodes;
+using static NeoKolors.Common.TextStyles;
 
-namespace NeoKolors.Tui;
+namespace NeoKolors.Common.Util;
 
 /// <summary>
 /// Provides extension methods for applying styles and colors to strings and characters
 /// using the NeoKolors framework.
 /// </summary>
-internal static class Extensions {
+public static class Extensions {
     
     /// <summary>
     /// Applies the specified text style, foreground color, and background color
@@ -81,7 +82,21 @@ internal static class Extensions {
     public static string AddCStyle(this char c, TextStyles style) => 
         c.ToString().AddCStyle(style);
 
-    public static int Between(this int value, int min, int max) => value < min ? min : value > max ? max : value;
+    /// <summary>
+    /// Restricts an integer value to be within the specified minimum and maximum range.
+    /// </summary>
+    /// <param name="value">The integer value to be clamped.</param>
+    /// <param name="min">The minimum allowable value.</param>
+    /// <param name="max">The maximum allowable value.</param>
+    /// <returns>
+    /// The clamped value, which will be equal to <paramref name="min"/> if <paramref name="value"/> is less than <paramref name="min"/>,
+    /// or equal to <paramref name="max"/> if <paramref name="value"/> is greater than <paramref name="max"/>.
+    /// Otherwise, the original <paramref name="value"/> is returned.
+    /// </returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [Pure]
+    public static int Clamp(this int value, int min, int max) => 
+        value < min ? min : value > max ? max : value;
 
     /// <summary>
     /// Calculates the distance between the specified value and a given range defined by minimum and maximum bounds.
@@ -98,4 +113,50 @@ internal static class Extensions {
 
     public static int InRangeLength(this int value, int offset, int min, int max) =>
         offset < min ? min - value : offset > max ? 0 : value;
+
+    public static string ToString(ConsoleKeyInfo key) => 
+        $"{(key.Modifiers.HasFlag(ConsoleModifiers.Control) ? "Ctrl + " : "")}" +
+        $"{(key.Modifiers.HasFlag(ConsoleModifiers.Alt) ? "Alt + " : "")}" +
+        $"{(key.Modifiers.HasFlag(ConsoleModifiers.Shift) ? "Shift + " : "")}" + 
+        $"{key.Key.ToString()}";
+
+    /// <summary>
+    /// Gets the length of the first dimension of a two-dimensional array.
+    /// </summary>
+    /// <typeparam name="T">The type of elements in the array.</typeparam>
+    /// <param name="arr">The two-dimensional array whose first dimension length is to be retrieved.</param>
+    /// <returns>The length of the first dimension of the array.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [Pure]
+    public static int Len0<T>(this T[,] arr) => arr.GetLength(0);
+
+    /// <summary>
+    /// Retrieves the number of elements in the second dimension of a two-dimensional array.
+    /// </summary>
+    /// <param name="arr">The two-dimensional array to retrieve the length of the second dimension from.</param>
+    /// <typeparam name="T">The type of elements in the two-dimensional array.</typeparam>
+    /// <returns>The number of elements in the second dimension of the array.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [Pure]
+    public static int Len1<T>(this T[,] arr) => arr.GetLength(1);
+
+    /// <summary>
+    /// Converts the provided array of <see cref="NKColor"/> instances into a collection
+    /// of <see cref="NKBckg"/> instances.
+    /// </summary>
+    /// <param name="colors">An array of <see cref="NKColor"/> instances to be converted.</param>
+    /// <returns>An enumerable collection of <see cref="NKBckg"/> instances corresponding to the input colors.</returns>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IEnumerable<NKBckg> ToBckg(this NKColor[] colors) => colors.Select(c => new NKBckg(c));
+
+    /// <summary>
+    /// Converts the specified <see cref="NKColor"/> to its corresponding
+    /// <see cref="NKBckg"/> representation.
+    /// </summary>
+    /// <param name="color">The <see cref="NKColor"/> instance to convert.</param>
+    /// <returns>A new <see cref="NKBckg"/> instance representing the background color.</returns>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static NKBckg ToBckg(this NKColor color) => new(color);
 }
