@@ -62,9 +62,24 @@ public struct LoggerConfig {
     /// if true, hides the timestamp
     /// </summary>
     public bool HideTime { get; set; } = false;
+
+    /// <summary>
+    /// Configures how log files are managed, including options such as replacing, appending,
+    /// or creating new files based on various strategies.
+    /// </summary>
+    public LogFileConfig FileConfig { 
+        get;
+        set {
+            field = value;
+            if (value.Config != LogFileConfigType.CUSTOM) {
+                Output = value.CreateOutput();
+            }
+        } 
+    } = LogFileConfig.Custom();
     
     public LoggerConfig() { }
 
+    
     public LoggerConfig(
         LoggerLevel level = FATAL | ERROR | WARN | INFO | DEBUG | TRACE, 
         NKColor? fatalColor = null, 
@@ -87,5 +102,55 @@ public struct LoggerConfig {
         Output = output ?? System.Console.Out;
         SimpleMessages = simpleMessages;
         HideTime = hideTime;
+        FileConfig = LogFileConfig.Custom();
+    }
+    
+    public LoggerConfig(
+        LoggerLevel level = FATAL | ERROR | WARN | INFO | DEBUG | TRACE, 
+        NKColor? fatalColor = null, 
+        NKColor? errorColor = null, 
+        NKColor? warnColor = null, 
+        NKColor? infoColor = null, 
+        NKColor? debugColor = null, 
+        NKColor? traceColor = null,
+        LogFileConfig? fileConfig = null,
+        bool simpleMessages = false,
+        bool hideTime = false) 
+    {
+        Level = level;
+        FatalColor = fatalColor ?? NKConsoleColor.DARK_RED;
+        ErrorColor = errorColor ?? NKConsoleColor.RED;
+        WarnColor = warnColor ?? NKConsoleColor.YELLOW;
+        InfoColor = infoColor ?? NKConsoleColor.GREEN;
+        DebugColor = debugColor ?? NKConsoleColor.BLUE;
+        TraceColor = traceColor ?? NKConsoleColor.GRAY;
+        SimpleMessages = simpleMessages;
+        HideTime = hideTime;
+        FileConfig = fileConfig ?? LogFileConfig.Custom();
+        Output = System.Console.Out;
+    }
+    
+    public LoggerConfig(
+        LoggerLevel level = FATAL | ERROR | WARN | INFO | DEBUG | TRACE, 
+        NKColor? fatalColor = null, 
+        NKColor? errorColor = null, 
+        NKColor? warnColor = null, 
+        NKColor? infoColor = null, 
+        NKColor? debugColor = null, 
+        NKColor? traceColor = null,
+        bool simpleMessages = false,
+        bool hideTime = false) 
+    {
+        Level = level;
+        FatalColor = fatalColor ?? NKConsoleColor.DARK_RED;
+        ErrorColor = errorColor ?? NKConsoleColor.RED;
+        WarnColor = warnColor ?? NKConsoleColor.YELLOW;
+        InfoColor = infoColor ?? NKConsoleColor.GREEN;
+        DebugColor = debugColor ?? NKConsoleColor.BLUE;
+        TraceColor = traceColor ?? NKConsoleColor.GRAY;
+        SimpleMessages = simpleMessages;
+        HideTime = hideTime;
+        FileConfig = LogFileConfig.Custom();
+        Output = System.Console.Out;
     }
 }

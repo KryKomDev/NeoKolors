@@ -8,16 +8,19 @@ using static NeoKolors.Console.LoggerLevel;
 
 namespace NeoKolors.Console;
 
-public partial class NKLogger {
+public partial class NKLogger : IDisposable {
 
     public NKLogger(LoggerConfig? config = null) {
         _config = config ?? new LoggerConfig();
+        
+        if (_config.FileConfig.Config != LogFileConfigType.CUSTOM)
+            _config.Output = FileConfig.CreateOutput();
     }
 
     ~NKLogger() {
-        Output.Close();
+        ReleaseUnmanagedResources();
     }
-    
+
     private LoggerConfig _config;
     
     /// <summary>
@@ -109,6 +112,14 @@ public partial class NKLogger {
     }
 
     /// <summary>
+    /// Gets or sets the configuration for how log files are handled in the logger.
+    /// </summary>
+    public LogFileConfig FileConfig {
+        get => _config.FileConfig;
+        set => _config.FileConfig = value;
+    }
+
+    /// <summary>
     /// makes all messages visible
     /// </summary>
     public void LogAll() => _config.Level = FATAL | ERROR | WARN | INFO | DEBUG | TRACE;
@@ -137,4 +148,14 @@ public partial class NKLogger {
     /// hides all messages
     /// </summary>
     public void LogNone() => _config.Level = NONE;
+
+    private void ReleaseUnmanagedResources() {
+        _config.Output.Close();
+        _config.Output.Dispose();
+    }
+
+    public void Dispose() {
+        ReleaseUnmanagedResources();
+        GC.SuppressFinalize(this);
+    }
 }

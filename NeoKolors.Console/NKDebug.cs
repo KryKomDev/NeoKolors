@@ -80,7 +80,10 @@ public static class NKDebug {
     /// Sets the output destination for the logger.
     /// </summary>
     /// <param name="output">The TextWriter to use as the output destination.</param>
-    public static void SetOutput(TextWriter output) => Logger.Output = output;
+    public static void SetOutput(TextWriter output) {
+        Logger.FileConfig = LogFileConfig.Custom();
+        Logger.Output = output;
+    }
 
     /// <summary>
     /// Retrieves the current output stream for logging messages.
@@ -114,7 +117,7 @@ public static class NKDebug {
     /// <summary>
     /// if true, makes all unhandled exceptions look fancy
     /// </summary>
-    public static bool EnableAutoFancy { 
+    public static bool ExceptionFormatting { 
         get;
         set {
             if (value)

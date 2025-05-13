@@ -3,12 +3,14 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 using NeoKolors.Common;
 
 namespace NeoKolors.Console;
 
-public static class ConsoleColors {
+public static partial class NKConsole {
     
     /// <summary>
     /// prints a colored string in the console without a newline
@@ -61,18 +63,16 @@ public static class ConsoleColors {
     public static void Write(string s, NKColor c) => 
         System.Console.Write(s.AddColor(c));
 
-    
+
     /// <summary>
-    /// prints a string with its characters colored using string symbols
+    /// Writes a string to the console with the specified color applied.
     /// </summary>
-    /// <param name="s">source string</param>
-    /// <param name="colors">
-    /// tuple of symbol string and color,
-    /// with which will the symbol be replaced,
-    /// if a color is -1, the colors will be reset
-    /// </param>
-    public static void Write(string s, params (string symbol, NKColor color)[] colors) => 
-        System.Console.Write(s.AddColor(colors));
+    /// <param name="s">The string to write to the console.</param>
+    /// <param name="colors">The colors to be applied to the string.</param>
+    [StringFormatMethod(nameof(s))]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void WriteF(string s, params NKColor[] colors) =>
+        System.Console.Write(s, colors.Cast<object?>().ToArray());
 
 
     // --- --- let there begin WriteLine implementations --- ---
@@ -114,7 +114,6 @@ public static class ConsoleColors {
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
-    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLine(string s, System.Drawing.Color c) => 
         System.Console.WriteLine(s.AddColor(c));
@@ -125,7 +124,6 @@ public static class ConsoleColors {
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
-    
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLine(string s, NKColor c) => 
         System.Console.WriteLine(s.AddColor(c));
@@ -140,9 +138,10 @@ public static class ConsoleColors {
     /// with which will the symbol be replaced,
     /// if a color is -1, the colors will be reset
     /// </param>
+    [StringFormatMethod(nameof(s))]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(string s, params (string symbol, NKColor hex)[] colors) => 
-        System.Console.WriteLine(s.AddColor(colors));
+    public static void WriteLineF(string s, params NKColor[] colors) => 
+        System.Console.WriteLine(s, colors.Cast<object?>().ToArray());
 
     
     /// <summary>
@@ -195,6 +194,18 @@ public static class ConsoleColors {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteB(string s, NKColor c) => 
         System.Console.Write(s.AddColorB(c));
+    
+    
+    /// <summary>
+    /// Writes a formatted string with specified colors to the console.
+    /// </summary>
+    /// <param name="s">The string to format and write.</param>
+    /// <param name="colors">An array of colors to format the string with.</param>
+    [StringFormatMethod(nameof(s))]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public static void WriteBF(string s, params NKColor[] colors) =>
+        System.Console.Write(s, colors.Cast<object?>().ToArray());
 
 
     /// <summary>
@@ -247,6 +258,18 @@ public static class ConsoleColors {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLineB(string s, NKColor c) => 
         System.Console.WriteLine(s.AddColorB(c));
+
+
+    /// <summary>
+    /// Writes a formatted string with specified colors to the console, followed by a newline.
+    /// </summary>
+    /// <param name="s">The string to format and write.</param>
+    /// <param name="colors">An array of colors to format the string with.</param>
+    [StringFormatMethod(nameof(s))]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public static void WriteLineBF(string s, params NKColor[] colors) =>
+        System.Console.WriteLine(s, colors.Cast<object?>().ToArray());
 
 
     /// <summary>
