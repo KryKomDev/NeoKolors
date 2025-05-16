@@ -109,7 +109,8 @@ public interface IElement : IRenderable {
         Rectangle rect,
         MarginProperty margin,
         PaddingProperty padding,
-        BorderStyle border) {
+        BorderStyle border) 
+    {
         var mr = ApplyMargin(margin, rect);
 
         int lx = padding.Left.Value.Match(

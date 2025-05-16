@@ -12,13 +12,17 @@ namespace NeoKolors.Tui;
 /// </summary>
 public class Window : IView {
     
-    public IRenderable[] Views { get; private set; }
-    public Action<object?, KeyEventArgs>? OnKeyPress { get; }
-    public Action? OnResize { get; }
-    public Action<object?, AppStartEventArgs>? OnStart { get; }
-    public Action<object?, EventArgs>? OnStop { get; }
+    public IView BaseView { get; set; }
+    public void HandleKeyPress(object? sender, KeyEventArgs args) { }
+    public void HandleResize(ResizeEventArgs args) { }
+    public void HandleAppStart(object? sender, AppStartEventArgs args) { }
+    public void HandleAppStop(object? sender, EventArgs args) { }
 
     public void Render(in IConsoleScreen target) {
-        throw new NotImplementedException();
+        
+    }
+
+    public Window(IView baseView) {
+        BaseView = baseView;
     }
 }

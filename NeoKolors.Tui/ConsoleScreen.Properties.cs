@@ -3,9 +3,16 @@
 // Copyright (c) 2025 KryKom
 //
 
+#if ALLOW_SECONDARY_CONTEXT
+#undef ALLOW_SECONDARY_CONTEXT
+#endif
+
+#define ALLOW_SECONDARY_CONTEXT 
+
 using NeoKolors.Common;
 using NeoKolors.Common.Util;
 using NeoKolors.Console;
+using NeoKolors.Tui.Events;
 
 namespace NeoKolors.Tui;
 
@@ -113,16 +120,18 @@ public partial class ConsoleScreen {
         get;
         set {
             if (value) {
-                #if DEBUG
-                    EscapeCodes.EnableSecondary();
+                #if ALLOW_SECONDARY_CONTEXT
+                EscapeCodes.EnableSecondary();
+                NKDebug.Trace("Secondary context mode enabled.");
                 #endif
-                
+
                 System.Console.CursorVisible = false;
                 Render();
             }
             else {
-                #if DEBUG
-                    EscapeCodes.DisableSecondary();
+                #if ALLOW_SECONDARY_CONTEXT
+                EscapeCodes.DisableSecondary();
+                NKDebug.Trace("Secondary context mode disabled.");
                 #endif
                 
                 System.Console.CursorVisible = true;
@@ -152,7 +161,7 @@ public partial class ConsoleScreen {
     /// <summary>
     /// updates the screen size
     /// </summary>
-    public void Resize() {
+    public void Resize(ResizeEventArgs args) {
         Width = System.Console.WindowWidth;
         Height = System.Console.WindowHeight;
 
@@ -161,12 +170,9 @@ public partial class ConsoleScreen {
         List2D.Resize(ref _styles!, Width, Height);
         List2D.Resize(ref _chars!, Width, Height);
         List2D.Resize(ref _changes!, Width, Height);
-
-        for (int x = 0; x < Width; x++) {
-            for (int y = 0; y < Height; y++) {
-                Chars[x, y] = ' ';
-            }
-        }
+        List2D.Fill(_changes, true);
+        
+        NKDebug.Info($"ConsoleScreen has been resized to {Width}x{Height}.");
     }
     
     
@@ -175,14 +181,14 @@ public partial class ConsoleScreen {
     /// </summary>
     /// <returns>method supposed to be used as an event handler for terminal size changes</returns>
     public ConsoleScreen(TextWriter? standardOutput = null, bool testingMode = false) {
-        NKDebug.Trace("Setting up new ConsoleScreen...");
-        
         TestingMode = testingMode;
         StdOut = standardOutput ?? System.Console.Out;
 
         Width = TestingMode ? 1 : System.Console.WindowWidth;
         Height = TestingMode ? 1 : System.Console.WindowHeight;
         
+        NKDebug.Info($"Setting up new ConsoleScreen with width {Width} and height {Height}.");
+
         _styles = new NKStyle[Width, Height];
         _chars = new char[Width, Height];
         _changes = new bool[Width, Height];
@@ -199,17 +205,14 @@ public partial class ConsoleScreen {
         
         NKDebug.Info("ConsoleScreen successfully initialized.");
     }
-    
-    ~ConsoleScreen() {
-        EscapeCodes.DisableSecondary();
-    }
 
     public new void Dispose() {
         _styles = List2D.Empty<NKStyle>();
         _chars = List2D.Empty<char>();
         _changes = List2D.Empty<bool>();
         _output = string.Empty;
-        EscapeCodes.DisableSecondary();
+        ScreenMode = false;
+        NKDebug.Trace("ConsoleScreen disposed.");
     }
 
     public override ValueTask DisposeAsync() {

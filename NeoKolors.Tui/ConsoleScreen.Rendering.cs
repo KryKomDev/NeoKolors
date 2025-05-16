@@ -5,6 +5,7 @@
 
 using NeoKolors.Common;
 using NeoKolors.Common.Util;
+using NeoKolors.Console;
 
 namespace NeoKolors.Tui;
 
@@ -21,8 +22,8 @@ public partial class ConsoleScreen {
 
         for (int y = 0; y < Height; y++) {
 
-            System.Console.SetCursorPosition(0, y);
-
+            TryMoveCursor(0, y);
+            
             for (int x = 0; x < Width; x++) {
             
                 if (!_changes[x, y]) {
@@ -31,7 +32,7 @@ public partial class ConsoleScreen {
                 }
 
                 if (isBehind) {
-                    System.Console.SetCursorPosition(x, y);
+                    TryMoveCursor(x, y);
                     isBehind = false;
                 }
 
@@ -57,5 +58,15 @@ public partial class ConsoleScreen {
         
         System.Console.Write(EscapeCodes.FORMATTING_RESET);
         List2D.Fill(_changes, false);
+    }
+    
+    private void TryMoveCursor(int x, int y) {
+        try {
+            System.Console.SetCursorPosition(x, y);
+        }
+        catch (ArgumentOutOfRangeException) {
+            // terminal is probably being resized, ignore this error
+            NKDebug.Warn("Cursor out of bounds! Ignoring...");
+        }
     }
 }

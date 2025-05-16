@@ -4,6 +4,7 @@
 //
 
 using NeoKolors.Common;
+using NeoKolors.Tui.Events;
 using NeoKolors.Tui.Fonts;
 using NeoKolors.Tui.Styles;
 using SkiaSharp;
@@ -89,5 +90,5 @@ public interface IConsoleScreen {
     /// <param name="samplingOptions">sampling options for SkiaSharp</param>
     public void DrawImage(SKBitmap bitmap, Rectangle rectangle, SKSamplingOptions samplingOptions = default);
 
-    public void Resize();
+    public void Resize(ResizeEventArgs args);
 }

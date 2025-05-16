@@ -3,6 +3,8 @@
 // Copyright (c) 2025 KryKom
 //
 
+using NeoKolors.Common.Util;
+
 namespace NeoKolors.Tui;
 
 /// <summary>
@@ -101,5 +103,14 @@ public struct AppConfig {
         MaxUpdatesPerSecond = 20;
         EnableDebugLogging = false;
         ToggleDebugLogCombination = new ConsoleKeyInfo('d', ConsoleKey.D, false, true, true);
+    }
+
+    public override string ToString() {
+        return $"CtrlCForceQuits: {CtrlCForceQuits}, " +
+               $"InterruptCombination: {Extensions.ToString(InterruptCombination)}, " +
+               $"LazyRender: {LazyRender}, " +
+               $"MaxUpdatesPerSecond: {MaxUpdatesPerSecond}, " +
+               $"EnableDebugLogging: {EnableDebugLogging}, " +
+               $"ToggleDebugLogCombination: {Extensions.ToString(ToggleDebugLogCombination)}";
     }
 }

@@ -7,12 +7,12 @@ using System.Diagnostics.Contracts;
 using NeoKolors.Common;
 using NeoKolors.Tui.Exceptions;
 using NeoKolors.Tui.Styles;
+using static NeoKolors.Tui.Elements.ApplicableStylesAttribute.Predefined;
 
 namespace NeoKolors.Tui.Elements;
 
 [ElementName("div")]
-[ApplicableStyles("align-items", "align-self", "background-color", "border", "display", "padding", "margin", 
-    "flex-direction", "overflow", "justify-content", "grid", "grid-align")]
+[ApplicableStyles(CONTAINER | UNIVERSAL)]
 public class Div : IElement {
     
     public AlignItems AlignItems => Style["align-items"].Value is AlignItems align ? align : AlignItems.STRETCH;
@@ -51,7 +51,6 @@ public class Div : IElement {
         var contentRect = IElement.GetContentRect(rect, Margin, Padding, Border);
         
         target.DrawRect(borderRect, BackgroundColor, Border);
-        target.Render();
         
         switch (Display) {
             case DisplayType.FLEX: 
@@ -247,10 +246,12 @@ public class Div : IElement {
     protected void RenderChildrenBlock(in IConsoleScreen target, Rectangle rect) {
         int current = rect.LowerY;
         for (int i = 0; i < Children.Count; i++) {
-            Children[i].Render(target, new Rectangle(
-                rect.LowerX, current, rect.HigherX, current + Children[i].GetHeight(rect.Width)));
+            int ch = Children[i].GetHeight(rect.Width);
             
-            current += Children[i].GetHeight(rect.Width) + 1;
+            Children[i].Render(target, new Rectangle(
+                rect.LowerX, current, rect.HigherX, current + ch - 1));
+            
+            current += ch;
             if (current > rect.HigherY && !Overflow.HasFlag(OverflowType.VISIBLE_BOTTOM)) break;
         }
     }
@@ -361,18 +362,102 @@ public class Div : IElement {
     }
     
     public int GetWidth(int maxHeight) {
-        throw new NotImplementedException();
+        int w = 0;
+        
+        switch (Display) {
+            case DisplayType.NONE:
+                return 0;
+            case DisplayType.INLINE:
+                throw new NotImplementedException();
+            case DisplayType.INLINE_BLOCK:
+                throw new NotImplementedException();
+            case DisplayType.INLINE_FLEX:
+                throw new NotImplementedException();
+            case DisplayType.INLINE_GRID:
+                throw new NotImplementedException();
+            case DisplayType.BLOCK:
+                w += Children.Sum(c => c.GetWidth(maxHeight));
+                break;
+            case DisplayType.FLEX:
+                switch (FlexDirection) {
+                    case FlexDirection.ROW:
+                        w += Children.Sum(c => c.GetWidth(maxHeight));
+                        break;
+                    case FlexDirection.COLUMN:
+                        w += Children.Max(e => e.GetWidth(maxHeight));
+                        break;
+                    case FlexDirection.ROW_REVERSE:
+                        w += Children.Sum(c => c.GetWidth(maxHeight));
+                        break;
+                    case FlexDirection.COLUMN_REVERSE:
+                        w += Children.Max(e => e.GetWidth(maxHeight));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                break;
+            case DisplayType.GRID:
+                throw new NotImplementedException();
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        return w;
     }
 
     public int GetMinWidth(int maxHeight) {
-        throw new NotImplementedException();
+        return GetWidth(maxHeight);
     }
 
     public int GetHeight(int maxWidth) {
-        throw new NotImplementedException();
+        int h = 0;
+        int contentWidth = IElement.GetContentRect(new Rectangle(0, 0, maxWidth, int.MaxValue), Margin, Padding, Border).Width;
+        int marginHeight = Margin.Top.ToIntV(maxWidth) + Margin.Bottom.ToIntV(maxWidth);
+        int borderHeight = Border.IsBorderless ? 0 : 2;
+        int paddingHeight = Padding.Top.ToIntV(maxWidth) + Padding.Bottom.ToIntV(maxWidth);
+        
+        switch (Display) {
+            case DisplayType.NONE:
+                return 0;
+            case DisplayType.INLINE:
+                throw new NotImplementedException();
+            case DisplayType.INLINE_BLOCK:
+                throw new NotImplementedException();
+            case DisplayType.INLINE_FLEX:
+                throw new NotImplementedException();
+            case DisplayType.INLINE_GRID:
+                throw new NotImplementedException();
+            case DisplayType.BLOCK:
+                h += Children.Sum(c => c.GetHeight(contentWidth));
+                break;
+            case DisplayType.FLEX:
+                switch (FlexDirection) {
+                    case FlexDirection.ROW:
+                        h += Children.Max(e => e.GetHeight(contentWidth)) + 1;
+                        break;
+                    case FlexDirection.COLUMN:
+                        h += Children.Sum(c => c.GetHeight(contentWidth));
+                        break;
+                    case FlexDirection.ROW_REVERSE:
+                        h += Children.Max(e => e.GetHeight(contentWidth)) + 1;
+                        break;
+                    case FlexDirection.COLUMN_REVERSE:
+                        h += Children.Sum(c => c.GetHeight(contentWidth));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+                break;
+            case DisplayType.GRID:
+                throw new NotImplementedException();
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
+
+        return h + marginHeight + borderHeight + paddingHeight;
     }
 
     public int GetMinHeight(int maxWidth) {
-        throw new NotImplementedException();
+        return GetHeight(maxWidth);   
     }
 }

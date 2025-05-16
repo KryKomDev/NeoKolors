@@ -43,16 +43,48 @@ public struct BorderProperty : IStyleProperty<BorderProperty, BorderStyle> {
         set => _value.BottomLeft = value;
     }
 
-    public NKColor FColor {
-        get => _value.FColor;
-        set => _value.FColor = value;
+    public NKStyle StyleTop {
+        get => _value.StyleTop;
+        set => _value.StyleTop = value;
     }
 
-    public NKColor BColor {
-        get => _value.BColor;
-        set => _value.BColor = value;
+    public NKStyle StyleBottom {
+        get => _value.StyleBottom;
+        set => _value.StyleBottom = value;
     }
-    
+
+    public NKStyle StyleLeft {
+        get => _value.StyleLeft;
+        set => _value.StyleLeft = value;
+    }
+
+    public NKStyle StyleRight {
+        get => _value.StyleRight;
+        set => _value.StyleRight = value;
+    }
+
+    public NKStyle StyleTopLeft {
+        get => _value.StyleTopLeft;
+        set => _value.StyleTopLeft = value;
+    }
+
+    public NKStyle StyleTopRight {
+        get => _value.StyleTopRight;
+        set => _value.StyleTopRight = value;
+    }
+
+    public NKStyle StyleBottomLeft {
+        get => _value.StyleBottomLeft;
+        set => _value.StyleBottomLeft = value;
+    }
+
+    public NKStyle StyleBottomRight {
+        get => _value.StyleBottomRight;
+        set => _value.StyleBottomRight = value;
+    }
+
+    public bool IsBorderless => _value.IsBorderless;
+
     public BorderProperty(BorderStyle value) {
         _value = value;
     }

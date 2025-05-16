@@ -30,10 +30,10 @@ public partial class ConsoleScreen : IConsoleScreen {
             if (c == '\0') continue;
             
             _chars[i, y] = c;
-            _styles[i, y].SafeSet(style);
+            _styles[i, y] <<= style;
         }
         
-        List2D.Fill(_changes, true, x.Between(0, Width - 1), y.Between(0, Height - 1), (x + s.Length).Between(0, Width - 1), y.Between(0, Height - 1));
+        List2D.SafeFill(_changes, true, x, y, x + s.Length - 1, y);
     }
     
     /// <inheritdoc cref="IConsoleScreen.DrawText(string,Rectangle,NKStyle,HorizontalAlign,VerticalAlign)"/>
@@ -190,7 +190,7 @@ public partial class ConsoleScreen : IConsoleScreen {
     /// <param name="y">vertical coordinate</param>
     /// <param name="s">the style</param>
     public void TrySafeSetStyle(int x, int y, NKStyle s) {
-        if (x >= 0 && x < Width && y >= 0 && y < Height) _styles[x, y].SafeSet(s);
+        if (x >= 0 && x < Width && y >= 0 && y < Height) _styles[x, y].Override(s);
     }
 
     /// <summary>
@@ -220,75 +220,83 @@ public partial class ConsoleScreen : IConsoleScreen {
         // Fill the rectangle
         for (int x = startX; x <= endX; x++) {
             for (int y = startY; y <= endY; y++) {
+                _chars[x, y] = ' ';
                 _styles[x, y].SafeSetBColor(infill);
-                PixelChanges[x, y] = true;
             }
         }
 
         if (borderStyle.IsBorderless) return;
 
         // Draw horizontal borders
+        // top
         if (rectangle.LowerY >= 0 && rectangle.LowerY < Height) {
             for (int x = startX; x <= endX; x++) {
                 _chars[x, rectangle.LowerY] = borderStyle.Horizontal;
-                _styles[x, rectangle.LowerY].SafeSetBColor(borderStyle.BColor);
-                _styles[x, rectangle.LowerY].SetFColor(borderStyle.FColor);
+                _styles[x, rectangle.LowerY].Override(borderStyle.StyleTop);
             }
         }
 
+        // bottom
         if (rectangle.HigherY >= 0 && rectangle.HigherY < Height) {
             for (int x = startX; x <= endX; x++) {
                 _chars[x, rectangle.HigherY] = borderStyle.Horizontal;
-                _styles[x, rectangle.HigherY].SafeSetBColor(borderStyle.BColor);
-                _styles[x, rectangle.HigherY].SetFColor(borderStyle.FColor);
+                _styles[x, rectangle.HigherY].Override(borderStyle.StyleBottom);
             }
         }
 
         // Draw vertical borders
+        // left
         if (rectangle.LowerX >= 0 && rectangle.LowerX < Width) {
             for (int y = startY; y <= endY; y++) {
                 _chars[rectangle.LowerX, y] = borderStyle.Vertical;
-                _styles[rectangle.LowerX, y].SafeSetBColor(borderStyle.BColor);
-                _styles[rectangle.LowerX, y].SetFColor(borderStyle.FColor);
+                _styles[rectangle.LowerX, y].Override(borderStyle.StyleLeft);
             }
         }
 
+        // right
         if (rectangle.HigherX >= 0 && rectangle.HigherX < Width) {
             for (int y = startY; y <= endY; y++) {
                 _chars[rectangle.HigherX, y] = borderStyle.Vertical;
-                _styles[rectangle.HigherX, y].SafeSetBColor(borderStyle.BColor);
-                _styles[rectangle.HigherX, y].SetFColor(borderStyle.FColor);
+                _styles[rectangle.HigherX, y].Override(borderStyle.StyleRight);
             }
         }
 
+        // top left corner
         if (rectangle.LowerX >= 0 && rectangle.LowerX < Width &&
             rectangle.LowerY >= 0 && rectangle.LowerY < Height) 
         {
             _chars[rectangle.LowerX, rectangle.LowerY] = borderStyle.TopLeft;
+            _styles[rectangle.LowerX, rectangle.LowerY].Override(borderStyle.StyleTopLeft);
         }
         
+        // bottom left corner
         if (rectangle.LowerX >= 0 && rectangle.LowerX < Width &&
             rectangle.HigherY >= 0 && rectangle.HigherY < Height) 
         {
             _chars[rectangle.LowerX, rectangle.HigherY] = borderStyle.BottomLeft;
+            _styles[rectangle.LowerX, rectangle.HigherY].Override(borderStyle.StyleBottomLeft);
         }
         
+        // top right corner
         if (rectangle.HigherX >= 0 && rectangle.HigherX < Width &&
             rectangle.LowerY >= 0 && rectangle.LowerY < Height) 
         {
             _chars[rectangle.HigherX, rectangle.LowerY] = borderStyle.TopRight;
+            _styles[rectangle.HigherX, rectangle.LowerY].Override(borderStyle.StyleTopRight);
         }
         
+        // bottom right corner
         if (rectangle.HigherX >= 0 && rectangle.HigherX < Width &&
             rectangle.HigherY >= 0 && rectangle.HigherY < Height) 
         {
             _chars[rectangle.HigherX, rectangle.HigherY] = borderStyle.BottomRight;
+            _styles[rectangle.HigherX, rectangle.HigherY].Override(borderStyle.StyleBottomRight);
         }
     }
 
     private void SetChangedRect(Rectangle rectangle) => List2D.Fill(_changes, true, 
-            rectangle.LowerX.Between(0, Width - 1), rectangle.LowerY.Between(0, Height - 1), 
-            rectangle.HigherX.Between(0, Width - 1), rectangle.HigherY.Between(0, Height - 1));
+            rectangle.LowerX.Clamp(0, Width - 1), rectangle.LowerY.Clamp(0, Height - 1), 
+            rectangle.HigherX.Clamp(0, Width - 1), rectangle.HigherY.Clamp(0, Height - 1));
 
     public void DrawImage(SKBitmap bitmap, Rectangle border, SKSamplingOptions samplingOptions = default) {
         SetChangedRect(border);

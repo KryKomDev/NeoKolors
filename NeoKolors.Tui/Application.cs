@@ -3,6 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
+using NeoKolors.Common.Util;
 using NeoKolors.Console;
 using NeoKolors.Tui.Events;
 
@@ -19,7 +20,13 @@ public class Application : IApplication {
     /// <summary>
     /// adds a new window to the stack of windows of the application
     /// </summary>
-    public void PushWindow(Window w) => Windows.Add(w);
+    public void PushWindow(Window w) {
+        KeyEvent += w.HandleKeyPress;
+        ResizeEvent += w.HandleResize;
+        StopEvent += w.HandleAppStop;
+        StartEvent += w.HandleAppStart;
+        Windows.Add(w);
+    }
 
     
     /// <summary>
@@ -27,47 +34,36 @@ public class Application : IApplication {
     /// </summary>
     public void PopWindow() => Windows.RemoveAt(Windows.Count - 1);
 
-    
-    /// <summary>
-    /// contains the base rendered elements of the application
-    /// </summary>
-    private List<View> Views { get; } = new();
-
 
     /// <summary>
-    /// adds a view to the base of the application
+    /// Represents the main view at the base level of the application, serving as the foundational interface for
+    /// rendering and managing the application's UI components.
     /// </summary>
-    public void AddView(View v) {
-        Views.Add(v);
-        if (v.OnKeyPress != null) KeyEvent += new KeyEventHandler(v.OnKeyPress);
-        if (v.OnResize != null) ResizeEvent += new ResizeEventHandler(v.OnResize);
-        if (v.OnStart != null) StartEvent += new AppStartEventHandler(v.OnStart);
-        if (v.OnStop != null) StopEvent += new EventHandler(v.OnStop);
-    }
+    private readonly IView _baseView;
 
 
     /// <summary>
     /// called when a key is pressed
     /// </summary>
-    private event KeyEventHandler KeyEvent;
+    public event KeyEventHandler KeyEvent;
     
     
     /// <summary>
     /// called when terminal is resized
     /// </summary>
-    private event ResizeEventHandler ResizeEvent;
+    public event ResizeEventHandler ResizeEvent;
     
     
     /// <summary>
     /// called when the application is started
     /// </summary>
-    private event AppStartEventHandler StartEvent;
+    public event AppStartEventHandler StartEvent;
     
     
     /// <summary>
     /// called when the application is stopped
     /// </summary>
-    private event EventHandler StopEvent;
+    public event EventHandler StopEvent;
 
     
     /// <summary>
@@ -91,38 +87,34 @@ public class Application : IApplication {
     /// <summary>
     /// creates a new tui application with the default configuration
     /// </summary>
-    public Application() {
+    public Application(IView baseView, AppConfig? config = null, ConsoleScreen? screen = null) {
+        
+        // set up fields
+        _baseView = baseView;
         Config = new AppConfig();
+        Screen = screen ?? new ConsoleScreen(System.Console.Out);
+        Config = config ?? new AppConfig();
+
+        // set up events
         KeyEvent = (_, _) => { };
-        ResizeEvent = () => { };
+        ResizeEvent = _ => { };
         StartEvent = (_, _) => { };
         StopEvent = (_, _) => { };
-        Screen = new ConsoleScreen(System.Console.Out);
+
+        // subscribe events
         ResizeEvent += Screen.Resize;
-    }
-    
-    
-    /// <summary>
-    /// creates a new tui application with a custom configuration
-    /// </summary>
-    public Application(AppConfig config) {
-        Config = config;
-        KeyEvent = (_, _) => { };
-        ResizeEvent = () => { };
-        StartEvent = (_, _) => { };
-        StopEvent = (_, _) => { };
-        Screen = new ConsoleScreen(System.Console.Out);
-        ResizeEvent += Screen.Resize;
+        KeyEvent += _baseView.HandleKeyPress;
+        ResizeEvent += _baseView.HandleResize;
+        StartEvent += _baseView.HandleAppStart;
+        StopEvent += _baseView.HandleAppStop;
     }
     
     
     /// <inheritdoc cref="IApplication.Render"/>
     public void Render() {
         
-        // render the base views
-        foreach (var v in Views) {
-            v.Render(Screen);
-        }
+        // render the base view
+        _baseView.Render(Screen);
 
         // render the window stack
         foreach (var w in Windows) {
@@ -133,6 +125,9 @@ public class Application : IApplication {
     
     /// <inheritdoc cref="IApplication.Start"/>
     public void Start() {
+        
+        NKDebug.Info($"Starting application with config: {Config.ToString()}");
+        
         IsRunning = true;
         StartEvent.Invoke(this, new AppStartEventArgs(Config.LazyRender));
         System.Console.SetOut(Screen);
@@ -150,6 +145,9 @@ public class Application : IApplication {
     /// runs the application in lazy render mode
     /// </summary>
     private void RunLazy() {
+        Render();
+        Screen.Render();
+        
         while (IsRunning) {
             var ki = System.Console.ReadKey(true);
 
@@ -167,17 +165,16 @@ public class Application : IApplication {
                 Screen.ToggleScreenMode();
             }
 
-            // terminal has been resized
+            // the terminal has been resized
             if (Screen.Width != System.Console.WindowWidth ||
                 Screen.Height != System.Console.WindowHeight) 
             {
-                ResizeEvent.Invoke();
+                ResizeEvent.Invoke(new ResizeEventArgs(System.Console.WindowWidth, System.Console.WindowHeight));
             }
 
-            if (!Screen.ScreenMode)
-                KeyEvent.Invoke(this, new KeyEventArgs(ki));
+            KeyEvent.Invoke(this, new KeyEventArgs(ki));
             
-            NKDebug.Debug($"Key ?: {ki.KeyChar}");
+            NKDebug.Trace($"Pressed key: {Extensions.ToString(ki)}");
             
             Render();
             Screen.Render();
@@ -218,7 +215,7 @@ public class Application : IApplication {
             if (Screen.Width != System.Console.WindowWidth ||
                 Screen.Height != System.Console.WindowHeight) 
             {
-                ResizeEvent.Invoke();
+                ResizeEvent.Invoke(new ResizeEventArgs(System.Console.WindowWidth, System.Console.WindowHeight));
             }
             
             // invoke all registered subscribers to key events
@@ -238,6 +235,7 @@ public class Application : IApplication {
     
     /// <inheritdoc cref="IApplication.Stop"/>
     public void Stop() {
+        NKDebug.Info("Stopping application...");
         IsRunning = false;
         StopEvent.Invoke(this, EventArgs.Empty);
         Screen.ScreenMode = false;

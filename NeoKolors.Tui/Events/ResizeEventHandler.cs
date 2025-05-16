@@ -8,4 +8,4 @@ namespace NeoKolors.Tui.Events;
 /// <summary>
 /// used for application console window resize events 
 /// </summary>
-public delegate void ResizeEventHandler();
+public delegate void ResizeEventHandler(ResizeEventArgs args);

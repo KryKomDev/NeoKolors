@@ -11,17 +11,20 @@ namespace NeoKolors.Tui.Styles;
 public readonly struct NDivTitleProperty : IStyleProperty<NDivTitleProperty, NDivTitleProperty> {
     
     public NKStyle Style { get; }
+    public HorizontalAlign Align { get; }
     public bool Padding { get; }
     
     public NDivTitleProperty Value => this;
     
-    public NDivTitleProperty(NKStyle style, bool padding = true) {
+    public NDivTitleProperty(NKStyle style, HorizontalAlign align = HorizontalAlign.LEFT, bool padding = true) {
         Style = style;
+        Align = align;
         Padding = padding;
     }
     
     public NDivTitleProperty() {
         Style = new NKStyle(NKColor.Inherit, NKColor.Inherit, TextStyles.BOLD);
+        Align = HorizontalAlign.LEFT;
         Padding = true;
     }
 }

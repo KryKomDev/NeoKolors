@@ -1,10 +1,11 @@
 ﻿using NeoKolors.Common;
 using NeoKolors.Tui.Styles;
+using static NeoKolors.Tui.Elements.ApplicableStylesAttribute.Predefined;
 
 namespace NeoKolors.Tui.Elements;
 
 [ElementName("ol")]
-[ApplicableStyles(ApplicableStylesAttribute.Predefined.CONTAINER, "ol-style", "list-point-style")]
+[ApplicableStyles(CONTAINER | UNIVERSAL, "ol-style", "list-point-style")]
 public class OrderedList : IElement {
     
     public NKStyle PointStyle => Style["list-point-style"].Value is NKStyle color ? color : new NKStyle(NKColor.Default, NKColor.Inherit, TextStyles.NONE);

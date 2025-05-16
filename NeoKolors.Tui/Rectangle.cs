@@ -107,5 +107,5 @@ public struct Rectangle {
     public bool Overlaps(Rectangle r) =>
         r.LowerX < HigherX && r.HigherX > LowerX && r.LowerY < HigherY && r.HigherY > LowerY;
 
-    public override string ToString() => $"hx: {HigherX}, lx: {LowerX}, hy: {HigherY}, ly: {LowerY}";
+    public override string ToString() => $"[{LowerX}, {LowerY}]:[{HigherX}, {HigherY}]";
 }

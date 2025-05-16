@@ -5,7 +5,6 @@
 
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using NeoKolors.Common;
 using NeoKolors.Common.Util;
 using NeoKolors.Console;
 using NeoKolors.Tui.Exceptions;
@@ -18,8 +17,11 @@ namespace NeoKolors.Tui.Styles;
 /// </summary>
 /// <typeparam name="TSelf">the implementing struct itself</typeparam>
 /// <typeparam name="TValue">the type of the value it holds</typeparam>
-public interface IStyleProperty<TSelf, TValue> : IStyleProperty
-    where TSelf : struct, IStyleProperty<TSelf, TValue> {
+public interface IStyleProperty<TSelf, TValue> : 
+    IStyleProperty
+    where TSelf : struct, IStyleProperty<TSelf, TValue> 
+    where TValue : notnull 
+{
     public new TValue Value { get; }
     object IStyleProperty.Value => Value;
 }

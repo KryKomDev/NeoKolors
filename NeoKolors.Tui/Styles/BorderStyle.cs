@@ -16,12 +16,86 @@ public struct BorderStyle {
     public char BottomRight { get; set; }
     public char BottomLeft { get; set; }
     
-    public NKColor FColor { get; set; }
-    public NKColor BColor { get; set; }
-
+    public NKStyle StyleTop { get; set; }
+    public NKStyle StyleBottom { get; set; }
+    public NKStyle StyleLeft { get; set; }
+    public NKStyle StyleRight { get; set; }
+    public NKStyle StyleTopLeft { get; set; }
+    public NKStyle StyleTopRight { get; set; }
+    public NKStyle StyleBottomLeft { get; set; }
+    public NKStyle StyleBottomRight { get; set; }
+    
     public bool IsBorderless { get; }
 
-    public BorderStyle(char vertical,
+    public BorderStyle(
+        char vertical,
+        char horizontal,
+        char topLeft,
+        char topRight,
+        char bottomLeft,
+        char bottomRight,
+        NKStyle? styleTop, 
+        NKStyle? styleBottom = null, 
+        NKStyle? styleLeft = null, 
+        NKStyle? styleRight = null, 
+        NKStyle? styleTopLeft = null, 
+        NKStyle? styleTopRight = null, 
+        NKStyle? styleBottomLeft = null, 
+        NKStyle? styleBottomRight = null) 
+    {
+        Vertical = vertical;
+        Horizontal = horizontal;
+        TopRight = topRight;
+        TopLeft = topLeft;
+        BottomRight = bottomRight;
+        BottomLeft = bottomLeft;
+        StyleTop = styleTop ?? new NKStyle(NKColor.Default, NKColor.Inherit, TextStyles.NONE);
+        StyleBottom = styleBottom ?? new NKStyle(NKColor.Default, NKColor.Inherit, TextStyles.NONE);
+        StyleLeft = styleLeft ?? new NKStyle(NKColor.Default, NKColor.Inherit, TextStyles.NONE);
+        StyleRight = styleRight ?? new NKStyle(NKColor.Default, NKColor.Inherit, TextStyles.NONE);
+        StyleTopLeft = styleTopLeft ?? new NKStyle(NKColor.Default, NKColor.Inherit, TextStyles.NONE);
+        StyleTopRight = styleTopRight ?? new NKStyle(NKColor.Default, NKColor.Inherit, TextStyles.NONE);
+        StyleBottomLeft = styleBottomLeft ?? new NKStyle(NKColor.Default, NKColor.Inherit, TextStyles.NONE);
+        StyleBottomRight = styleBottomRight ?? new NKStyle(NKColor.Default, NKColor.Inherit, TextStyles.NONE);
+        IsBorderless = false;
+    }
+    
+    public BorderStyle(
+        char vertical,
+        char horizontal,
+        char topLeft,
+        char topRight,
+        char bottomLeft,
+        char bottomRight,
+        NKColor? colorTop = null, 
+        NKColor? colorBottom = null, 
+        NKColor? colorLeft = null, 
+        NKColor? colorRight = null, 
+        NKColor? colorTopLeft = null, 
+        NKColor? colorTopRight = null, 
+        NKColor? colorBottomLeft = null, 
+        NKColor? colorBottomRight = null,
+        NKColor? background = null) 
+    {
+        Vertical = vertical;
+        Horizontal = horizontal;
+        TopRight = topRight;
+        TopLeft = topLeft;
+        BottomRight = bottomRight;
+        BottomLeft = bottomLeft;
+        StyleTop = new NKStyle(colorTop ?? NKColor.Default, background ?? NKColor.Inherit, TextStyles.NONE);
+        StyleBottom = new NKStyle(colorBottom ?? NKColor.Default, background ?? NKColor.Inherit, TextStyles.NONE);
+        StyleLeft = new NKStyle(colorLeft ?? NKColor.Default, background ?? NKColor.Inherit, TextStyles.NONE);
+        StyleRight = new NKStyle(colorRight ?? NKColor.Default, background ?? NKColor.Inherit, TextStyles.NONE);
+        StyleTopLeft = new NKStyle(colorTopLeft ?? NKColor.Default, background ?? NKColor.Inherit, TextStyles.NONE);
+        StyleTopRight = new NKStyle(colorTopRight ?? NKColor.Default, background ?? NKColor.Inherit, TextStyles.NONE);
+        StyleBottomLeft = new NKStyle(colorBottomLeft ?? NKColor.Default, background ?? NKColor.Inherit, TextStyles.NONE);
+        StyleBottomRight = new NKStyle(colorBottomRight ?? NKColor.Default, background ?? NKColor.Inherit, TextStyles.NONE);
+        IsBorderless = false;
+    }
+
+    public BorderStyle(
+        char vertical,
         char horizontal,
         char topLeft,
         char topRight,
@@ -36,8 +110,14 @@ public struct BorderStyle {
         TopLeft = topLeft;
         BottomRight = bottomRight;
         BottomLeft = bottomLeft;
-        FColor = textColor ?? NKColor.Default;
-        BColor = backgroundColor ?? NKColor.Inherit;
+        StyleTop = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit, TextStyles.NONE);
+        StyleBottom = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit, TextStyles.NONE);
+        StyleLeft = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit, TextStyles.NONE);
+        StyleRight = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit, TextStyles.NONE);
+        StyleTopLeft = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit, TextStyles.NONE);
+        StyleTopRight = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit, TextStyles.NONE);
+        StyleBottomLeft = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit, TextStyles.NONE);
+        StyleBottomRight = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit, TextStyles.NONE);
         IsBorderless = false;
     }
 
@@ -118,6 +198,52 @@ public struct BorderStyle {
     /// <returns>A BorderStyle instance that is configured to be borderless.</returns>
     public static BorderStyle GetBorderless() =>
         new(true);
+
+    /// <summary>
+    /// Creates a BorderStyle object with an inset appearance.
+    /// </summary>
+    /// <param name="shadow">The shadow color applied to the border elements. Defaults to <see cref="NKColor.Default"/>.</param>
+    /// <param name="highlight">The highlight color applied to the border elements. Defaults to <see cref="NKColor.Default"/>.</param>
+    /// <param name="background">The background color for the border. Defaults to <see cref="NKColor.Default"/>.</param>
+    /// <returns>A BorderStyle instance with outset-style borders.</returns>
+    public static BorderStyle Inset(NKColor? shadow = null, NKColor? highlight = null, NKColor? background = null) =>
+        new('│', '─', '┌', '┐', '└', '┘',
+            shadow, highlight, shadow, highlight, shadow, highlight, shadow, highlight, background);
+    
+    /// <summary>
+    /// Creates a BorderStyle object with an outset appearance.
+    /// </summary>
+    /// <param name="shadow">The shadow color applied to the border elements. Defaults to <see cref="NKColor.Default"/>.</param>
+    /// <param name="highlight">The highlight color applied to the border elements. Defaults to <see cref="NKColor.Default"/>.</param>
+    /// <param name="background">The background color for the border. Defaults to <see cref="NKColor.Default"/>.</param>
+    /// <returns>A BorderStyle instance with outset-style borders.</returns>
+    public static BorderStyle Outset(NKColor? shadow = null, NKColor? highlight = null, NKColor? background = null) =>
+        new('│', '─', '┌', '┐', '└', '┘',
+            highlight, shadow, highlight, shadow, highlight, shadow, highlight, shadow, background);
+    
+    
+
+    /// <summary>
+    /// Creates a BorderStyle object with an inset appearance.
+    /// </summary>
+    /// <param name="shadow">The shadow color applied to the border elements. Defaults to <see cref="NKColor.Default"/>.</param>
+    /// <param name="highlight">The highlight color applied to the border elements. Defaults to <see cref="NKColor.Default"/>.</param>
+    /// <param name="background">The background color for the border. Defaults to <see cref="NKColor.Default"/>.</param>
+    /// <returns>A BorderStyle instance with outset-style borders.</returns>
+    public static BorderStyle InsetThick(NKColor? shadow = null, NKColor? highlight = null, NKColor? background = null) =>
+        new('┃', '━', '┏', '┓', '┗', '┛',
+            shadow, highlight, shadow, highlight, shadow, highlight, shadow, highlight, background);
+    
+    /// <summary>
+    /// Creates a BorderStyle object with an outset appearance.
+    /// </summary>
+    /// <param name="shadow">The shadow color applied to the border elements. Defaults to <see cref="NKColor.Default"/>.</param>
+    /// <param name="highlight">The highlight color applied to the border elements. Defaults to <see cref="NKColor.Default"/>.</param>
+    /// <param name="background">The background color for the border. Defaults to <see cref="NKColor.Default"/>.</param>
+    /// <returns>A BorderStyle instance with outset-style borders.</returns>
+    public static BorderStyle OutsetThick(NKColor? shadow = null, NKColor? highlight = null, NKColor? background = null) =>
+        new('┃', '━', '┏', '┓', '┗', '┛',
+            highlight, shadow, highlight, shadow, highlight, shadow, highlight, shadow, background);
     
     public static BorderStyle Borderless => new(true);
 }

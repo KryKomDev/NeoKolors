@@ -39,7 +39,14 @@ public class NamedDiv : Div {
         else if (t.Length > border.Width - 4) {
             t = $"{t[..Math.Max(border.Width - 5, 0)]}…";
         }
+
+        int xOffset = TitleStyle.Align switch {
+            HorizontalAlign.LEFT => 2,
+            HorizontalAlign.CENTER => border.Width / 2 - t.Length / 2 + 1,
+            HorizontalAlign.RIGHT => border.Width - t.Length - 2,
+            _ => throw new ArgumentOutOfRangeException()
+        };
         
-        target.DrawText(t, border.LowerX + 2, border.LowerY, TitleStyle.Style);
+        target.DrawText(t, border.LowerX + xOffset, border.LowerY, TitleStyle.Style);
     }
 }

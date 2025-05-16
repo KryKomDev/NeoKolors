@@ -119,25 +119,37 @@ public class ApplicableStylesAttribute : Attribute {
         return types.ToArray();
     }
 
-    private static Type[] ContainerStyles() => GetTypes("border", "padding", "margin", "background-color", "display");
-    private static Type[] TextStyles() => GetTypes("color", "background-color", "border", "font", "display");
+    private static Type[] ContainerStyles() => GetTypes("flex-direction", "overflow", "justify-content", "grid");
+    private static Type[] TextStyles() => GetTypes("color", "font");
+    private static Type[] UniversalStyles() => GetTypes(
+        "display", "min-width", "max-width", "min-height", "max-height", "display", "background-color", 
+        "border", "padding", "margin", "grid-align");
 
-    private static Type[] FromEnum(Predefined p) =>
-        p switch {
-            Predefined.CONTAINER => ContainerStyles(),
-            Predefined.TEXT => TextStyles(),
-            _ => throw new ArgumentOutOfRangeException(nameof(p), p, null)
-        };
-    
+    private static Type[] FromEnum(Predefined p) {
+        List<Type> types = [];
+        
+        if (p.HasFlag(Predefined.CONTAINER)) types.AddRange(ContainerStyles());
+        if (p.HasFlag(Predefined.TEXT)) types.AddRange(TextStyles());
+        if (p.HasFlag(Predefined.UNIVERSAL)) types.AddRange(UniversalStyles());
+        
+        return types.ToArray();
+    }
+
+    [Flags]
     public enum Predefined {
         /// <summary>
-        /// border, padding, margin, background
+        /// flex-direction, overflow, justify-content, grid
         /// </summary>
-        CONTAINER,
+        CONTAINER = 1,
         
         /// <summary>
         /// color, background, border, font
         /// </summary>
-        TEXT,
+        TEXT = 2,
+        
+        /// <summary>
+        /// display, min/max-width/height, display, border, padding, margin, background-color, grid-align
+        /// </summary>
+        UNIVERSAL = 4,
     }
 }
