@@ -1,0 +1,26 @@
+﻿/*
+   Symbolic Theme
+   Copyright (c) 2025 KryKom
+*/
+
+footer {
+    border-top: 1px solid var(--divider);
+    margin-top: 1rem;
+    color: var(--text-secondary);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+footer #links {
+    display: flex;
+}
+
+footer #links p {
+    margin-left: 1.5rem;
+}
+
+footer #links a {
+    color: var(--link);
+    text-decoration: none;
+}

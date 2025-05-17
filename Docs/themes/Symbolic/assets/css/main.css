@@ -1,0 +1,85 @@
+/*
+   Symbolic Theme
+   Copyright (c) 2025 KryKom
+*/
+
+@import url('https://cdn.jsdelivr.net/npm/@catppuccin/palette/css/catppuccin.css');
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+:root {
+    --common-accent: #fab387;
+    --console-accent: #a6e3a1;
+    --settings-accent: #74c7ec;
+    --tui-accent: #cba6f7;
+    --gui-accent: #f38ba8;
+
+    --link: #b4befe;
+
+    --text: #cdd6f4;
+    --text-secondary: #a6adc8;
+    --divider: #313244;
+    --dark: #11111b;
+    --background: #181825;
+
+    --mono-font: "Space Mono", monospace;
+    --sans-font: "Space Grotesk", sans-serif;
+}
+
+.common { color: var(--common-accent); }
+.console { color: var(--console-accent); }
+.settings { color: var(--settings-accent); }
+.tui { color: var(--tui-accent); }
+.gui { color: var(--gui-accent); }
+
+html {
+    scroll-behavior: auto;
+    scrollbar-color: var(--ctp-mocha-overlay0) var(--dark);
+}
+
+strong {
+    font-weight: 900;
+}
+
+p code, li code {
+    font-family: var(--mono-font), monospace;
+    font-size: 90%;
+    color: var(--text-secondary);
+    background-color: var(--background);
+    padding: 0.2em 0.4em;
+}
+
+body {
+    color: var(--text);
+    font-family: var(--sans-font), sans-serif;
+    background-color: var(--dark);
+    line-height: 1.7;
+    font-weight: 100;
+    margin: 0.5rem 2rem 2rem;
+    margin-bottom: 0;
+}
+
+#container {
+    max-width: 1200px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+h1, h2, h3, h4 {
+    font-family: var(--mono-font), monospace;
+    font-weight: 500;
+}
+
+main {
+    min-height: calc(100vh - 105px - 95px);
+}
+
+body a {
+    color: var(--link);
+    text-decoration: underline dotted var(--link);
+}
+
+hr {
+    border: 1px solid var(--divider);
+    margin-top: 2rem;
+    margin-bottom: 3rem;
+}

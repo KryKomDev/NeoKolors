@@ -1,3 +1,0 @@
-# ConsoleColors
-
-Start typing here...

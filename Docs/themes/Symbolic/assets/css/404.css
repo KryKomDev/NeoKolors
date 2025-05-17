@@ -1,0 +1,17 @@
+﻿/*
+   Symbolic Theme
+   Copyright (c) 2025 KryKom
+*/
+
+.c404 {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.n404 {
+    font-size: 1000%;
+    margin-bottom: initial;
+    margin-top: initial;
+    color: #f38ba8;
+}

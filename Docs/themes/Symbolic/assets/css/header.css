@@ -1,0 +1,36 @@
+﻿/*
+   Symbolic Theme
+   Copyright (c) 2025 KryKom
+*/
+
+#logo {
+    font-weight: 900;
+}
+
+#logo-author {
+    font-size: 40%;
+}
+
+header {
+    border-bottom: 1px solid var(--divider);
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    list-style: none;
+}
+
+header nav li {
+    margin-right: 3rem;
+}
+
+header nav a {
+    color: var(--link);
+    text-decoration: none;
+    font-weight: 900;
+}

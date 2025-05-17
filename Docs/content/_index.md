@@ -1,4 +1,10 @@
-﻿# NeoKolors
++++
+date = '2025-05-16T17:12:28+02:00'
+draft = true
+title = 'Home'
++++
+
+# Welcome to the official NeoKolors Documentation
 
 ![GitHub License](https://img.shields.io/github/license/KryKomDev/NeoKolors?style=for-the-badge&labelColor=%236c7086&color=%23fab387)
 
@@ -28,15 +34,15 @@ helpful utilities.
 ![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Console?color=a6e3a1&style=for-the-badge&labelColor=6c7086)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/build-console.yml?style=for-the-badge&labelColor=%236c7086&color=%23f9e2af)
 
-NeoKolors.Console offers a fully configurable logger with the option of
-coloring the messages when printing to console. It also offers automatic
+NeoKolors.Console offers a fully configurable logger with the option of 
+coloring the messages when printing to console. It also offers automatic 
 unhandled exception formatting. One of the most basic features is output text styling.
 
 ### Logs
-![Logs](Docs/static/logs.png)
+![Logs](images/logs.png)
 
 ### Exceptions
-![Exception](Docs/static/exception.png)
+![Exception](images/exception.png)
 
 ---
 
@@ -73,11 +79,11 @@ var result = builder.GetResult();
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/build-tui.yml?style=for-the-badge&labelColor=%236c7086&color=%23f9e2af)
 
 NeoKolors.Tui is a framework for creating highly customizable TUI's in console emulators.
-It is made to be as similar as possible to web development.
+It is made to be as similar as possible to web development. 
 
 Picture below is an example of a Ncurses-style like Tui application.
 
-![Tui Application](Docs/static/tui.png)
+![Tui Application](images/tui.png)
 
 ### Presentations
 

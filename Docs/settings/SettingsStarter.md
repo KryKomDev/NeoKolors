@@ -1,3 +1,0 @@
-﻿# Tui manual
-
-Start typing here...
