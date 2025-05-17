@@ -5,41 +5,46 @@ theme = 'Symbolic'
 author = 'KryKom'
 
 [menus]
-[[menus.main]]
-name = 'Home'
-pageRef = '/'
-weight = 10
+    [[menus.main]]
+        name = 'Home'
+        pageRef = '/'
+        weight = 10
 
-[[menus.main]]
-name = 'Common'
-url = '/common'
-weight = 20
+    [[menus.main]]
+        name = 'Common'
+        url = '/common'
+        weight = 20
 
-[[menus.main]]
-name = 'Console'
-url = '/console'
-weight = 21
+    [[menus.main]]
+        name = 'Console'
+        url = '/console'
+        weight = 21
 
-[[menus.main]]
-name = 'Settings'
-url = '/settings'
-weight = 22
+    [[menus.main]]
+        name = 'Settings'
+        url = '/settings'
+        weight = 22
 
-[[menus.main]]
-name = 'Tui'
-url = '/tui'
-weight = 23
+    [[menus.main]]
+        name = 'Tui'
+        url = '/tui'
+        weight = 23
 
-[[menus.main]]
-name = 'Github'
-url = 'https://github.com/KryKomDev/NeoKolors'
-weight = 30
+    [[menus.main]]
+        name = 'Github'
+        url = 'https://github.com/KryKomDev/NeoKolors'
+        weight = 30
+
+[caches]
+    [caches.images]
+        dir = ':cacheDir/images'
 
 [markup]
     [markup.goldmark]
         [markup.goldmark.parser]
             [markup.goldmark.parser.attribute]
                 block = true
+
     [markup.highlight]
         anchorLineNos = true
         codeFences = true
@@ -54,6 +59,7 @@ weight = 30
         style = 'catppuccin-mocha'
         tabWidth = 4
         wrapperClass = 'highlight'
+
     [markup.asciidocExt]
         backend = 'html5'
         extensions = []
