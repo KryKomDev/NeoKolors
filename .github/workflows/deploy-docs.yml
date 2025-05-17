@@ -56,7 +56,8 @@ jobs:
         run: |
           hugo -s \Docs\
             --minify \
-            --baseURL "${{ steps.pages.outputs.base_url }}/"
+            --baseURL "${{ steps.pages.outputs.base_url }}/" \
+            -d \Docs\public
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
