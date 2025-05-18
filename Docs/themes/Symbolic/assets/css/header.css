@@ -34,3 +34,27 @@ header nav a {
     text-decoration: none;
     font-weight: 900;
 }
+
+header nav ul li a {
+    transition-duration: 0.3s;
+}
+
+header nav ul li:nth-child(1) a:hover, header nav ul li:last-child a:hover {
+    color: var(--text);
+}
+
+header nav ul li:nth-child(2) a:hover {
+    color: var(--common-accent);
+}
+
+header nav ul li:nth-child(3) a:hover {
+    color: var(--console-accent);
+}
+
+header nav ul li:nth-child(4) a:hover {
+    color: var(--settings-accent);
+}
+
+header nav ul li:nth-child(5) a:hover {
+    color: var(--tui-accent);
+}

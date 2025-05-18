@@ -5,7 +5,7 @@
 
 footer {
     border-top: 1px solid var(--divider);
-    margin-top: 1rem;
+    margin-top: 3rem;
     color: var(--text-secondary);
     display: flex;
     justify-content: space-between;

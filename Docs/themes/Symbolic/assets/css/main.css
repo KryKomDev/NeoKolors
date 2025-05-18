@@ -69,8 +69,18 @@ h1, h2, h3, h4 {
     font-weight: 500;
 }
 
+main h1 {
+    margin-top: 3rem;
+    font-weight: 600;
+}
+
+main h2 {
+    margin-top: 2rem;
+    font-weight: 600;
+}
+
 main {
-    min-height: calc(100vh - 105px - 95px);
+    min-height: calc(100vh - 105px - 95px - 2rem);
 }
 
 body a {
@@ -82,4 +92,31 @@ hr {
     border: 1px solid var(--divider);
     margin-top: 2rem;
     margin-bottom: 3rem;
+}
+
+h3 a, h4 a {
+    text-decoration: none;
+}
+
+main table {
+    border-spacing: 0;
+    border: 1px solid var(--divider);
+}
+
+main td, main th {
+    padding: 0.7rem;
+    border: 1px solid var(--divider);
+}
+
+main th {
+    background-color: var(--ctp-mocha-surface0);
+}
+
+main tr:nth-child(even) {
+    background-color: var(--ctp-mocha-mantle);
+}
+
+main .highlight table td:nth-child(odd) code span {
+    padding-top: 3px;
+    padding-bottom: 4px;
 }
