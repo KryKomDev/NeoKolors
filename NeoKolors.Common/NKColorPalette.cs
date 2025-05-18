@@ -97,7 +97,7 @@ public readonly struct NKColorPalette {
     /// uses a custom action to print a palette 
     /// </summary>
     /// <param name="print">print delegate that prints a single color</param>
-    public void PrintPalette(Action<int> print) {
+    public void PrintPalette(Action<NKColor> print) {
         foreach (var c in _colors) {
             print(c);
         }

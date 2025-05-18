@@ -5,6 +5,7 @@
 
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using NeoKolors.Common.Util;
 
 namespace NeoKolors.Common;
@@ -12,6 +13,7 @@ namespace NeoKolors.Common;
 /// <summary>
 /// contains information about console styles (bg / fg color, bold, italic, etc.)
 /// </summary>
+[StructLayout(LayoutKind.Explicit, Size = sizeof(ulong))]
 public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     
     /// <summary>
@@ -26,6 +28,7 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     ///     <li>bit 63: toggles terminal color palette mode for a background (uses custom color if 1, palette colors else)</li>
     /// </ul> 
     /// </summary>
+    [field: FieldOffset(0)]
     public ulong Raw { get; private set; }
 
     /// <summary>
@@ -313,21 +316,21 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     public NKStyle(NKColor f, TextStyles s) {
         Raw = 0;
         SetFColor(f);
-        SetBColor(NKColor.Inherit);
+        SetBColor(NKColor.Default);
         SetStyles(s);
     }
 
     public NKStyle(NKColor f) {
         Raw = 0;
         SetFColor(f);
-        SetBColor(NKColor.Inherit);
+        SetBColor(NKColor.Default);
         SetStyles(TextStyles.NONE);
     }
 
     public NKStyle(TextStyles s) {
         Raw = 0;
         SetFColor(NKColor.Default);
-        SetBColor(NKColor.Inherit);
+        SetBColor(NKColor.Default);
         SetStyles(s);
     }
 
@@ -382,10 +385,10 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     }
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator ==(NKStyle left, NKStyle right) => Equals(left, right);
+    public static bool operator ==(NKStyle left, NKStyle right) => left.Equals(right);
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool operator !=(NKStyle left, NKStyle right) => !(left == right);
+    public static bool operator !=(NKStyle left, NKStyle right) => !left.Equals(right);
 
     /// <summary>
     /// Overrides the properties of the first NKStyle instance with those of the second NKStyle instance and returns the updated instance.
@@ -397,4 +400,6 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
         overriden.Override(overrider);
         return overriden;
     }
+    
+    public static NKStyle Default => new(NKColor.Default, NKColor.Inherit, TextStyles.NONE);
 }

@@ -19,22 +19,22 @@ namespace NeoKolors.Common;
 public enum NKConsoleColor : byte { 
 
     // basic colors
-    BLACK = 0,
-    DARK_RED = 1,
-    DARK_GREEN = 2,
-    DARK_YELLOW = 3,
-    DARK_BLUE = 4,
-    DARK_MAGENTA = 5,
-    DARK_CYAN = 6,
-    GRAY = 7,
-    DARK_GRAY = 8,
-    RED = 9,
-    GREEN = 10,
-    YELLOW = 11,
-    BLUE = 12,
-    MAGENTA = 13,
-    CYAN = 14,
-    WHITE = 15,
+    BLACK = 0x00,
+    DARK_RED = 0x01,
+    DARK_GREEN = 0x02,
+    DARK_YELLOW = 0x03,
+    DARK_BLUE = 0x04,
+    DARK_MAGENTA = 0x05,
+    DARK_CYAN = 0x06,
+    GRAY = 0x07,
+    DARK_GRAY = 0x08,
+    RED = 0x09,
+    GREEN = 0x0A,
+    YELLOW = 0x0B,
+    BLUE = 0x0C,
+    MAGENTA = 0x0D,
+    CYAN = 0x0E,
+    WHITE = 0x0F,
     
     // color cube values
     
@@ -291,10 +291,10 @@ public enum NKConsoleColor : byte {
     
     C_LIGHT_YELLOW = 0xE2,
     C_LIGHTER_YELLOW = 0xE3,
-    C_ICTERINE = 0xE5,
-    C_LIGHT_MINDARO = 0xE6,
-    C_CREAM = 0xE7,
-    C_WHITE = 0xE8,
+    C_ICTERINE = 0xE4,
+    C_LIGHT_MINDARO = 0xE5,
+    C_CREAM = 0xE6,
+    C_WHITE = 0xE7,
     
     // grayscale values
     GRAYSCALE_0 = 0xE8,

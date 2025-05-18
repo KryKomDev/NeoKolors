@@ -195,12 +195,12 @@ public struct NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
         );
 
     public void Write() =>
-        Color.Match(
+        Console.Write(Color.Match(
             i => $"{"●".AddColor(i)} #{i:x6}",
             c => $"{"●".AddColor(c)} {Enum.GetName(typeof(NKConsoleColor), c)}",
             _ => "Default",
             _ => "Inherit"
-        );
+        ));
 
     public override string ToString() =>
         Color.Match(
@@ -216,7 +216,7 @@ public struct NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
     public string ToString(string? format, IFormatProvider? formatProvider) {
         if (string.IsNullOrEmpty(format)) format = "T";
         return format switch {
-            "p" or "P" => ToString(),
+            "p" or "P" or "Plain" or "r" or "R" or "Raw" => ToString(),
             "t" or "T" or "Text" or "f" or "F" or "Forg" => Text,
             "b" or "B" or "Bckg" => Bckg,
             _ => Text
