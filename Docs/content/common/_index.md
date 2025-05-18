@@ -63,31 +63,31 @@ Or, manually reference in a project using `<PackageReference>` in your `.csproj`
 
 ## Main Classes
 
-### [NKColor](/common/nkcolor)
+### [NKColor](nkcolor)
 
 `NKColor` structure combines the worlds of classic color data and console color data.
 It is able to hold the classic 24-bit (+ 8-bit alpha channel) color, one of the predefined 
 console colors, the default console color, or it can be in state defining that the color
 should be inherited (something like transparent).
 
-### [NKConsoleColor](/common/nkconsolecolor)
+### [NKConsoleColor](nkconsolecolor)
 
 Enum `NKConoleColor` contains 256 colors. It basically extends the `System.ConsoleColor` enum 
 (although some values do not match). Apart from the basic 16 console colors, it also 
 contains a 6x6x6 RGB color cube and 24 grayscale colors.
 
-### [NKStyle](/common/nkstyle)
+### [NKStyle](nkstyle)
 
 Structure `NKStyle` contains data for string styling. It compresses 2 `NKColor` instances
 (one for text, one for background) and a `TextStyles` instance into a single `long` making
 it a pretty optimized data type.
 
-### [TextStyles](/common/textstyles)
+### [TextStyles](textstyles)
 
 Flag enum `TextStyles` contains six basic styles for text: bold, italic, underline, faint, 
 negative and strikethrough.
 
-### [NKColorPalette](/common/palette)
+### [NKColorPalette](palette)
 
 Works as a collection of colors. New cohesive color palettes can also be generated using the
 `NKColorPalette.GeneratePalette` method.
@@ -100,12 +100,12 @@ A collection of palettes
 
 ## Utilities
 
-### [List2D](/common/util/list2d)
+### [List2D](util/list2d)
 
 A 2-dimensional dynamically sized array. Also contains useful methods 
 for working with 2D arrays like `Resize` or `Fill`. 
 
-### [StringUtils](/common/util/stringutils)
+### [StringUtils](util/stringutils)
 
 Contains useful methods for working with strings.
 
