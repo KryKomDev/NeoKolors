@@ -23,6 +23,8 @@
 
     --mono-font: "Space Mono", monospace;
     --sans-font: "Space Grotesk", sans-serif;
+    
+    --mobile-breakpoint: 600px;
 }
 
 .common { color: var(--common-accent); }
@@ -115,8 +117,21 @@ main th {
 main tr:nth-child(even) {
     background-color: var(--ctp-mocha-mantle);
 }
+@media only screen and (max-width: var(--mobile-breakpoint)) {
+    main .highlight {
+        overflow: scroll;
+    }
+}
 
-main .highlight table td:nth-child(odd) code span {
+main .highlight table td:nth-child(1) code span {
     padding-top: 3px;
     padding-bottom: 4px;
+}
+
+main .highlight table td:nth-child(2) {
+    background-color: var(--ctp-mocha-base);
+}
+
+main img {
+    max-width: 100%;
 }

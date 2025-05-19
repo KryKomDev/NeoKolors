@@ -15,8 +15,17 @@ header {
     border-bottom: 1px solid var(--divider);
     margin-bottom: 1rem;
     display: flex;
+    flex-direction: row;
     justify-content: space-between;
     align-items: center;
+}
+
+@media only screen and (max-width: var(--mobile-breakpoint)) {
+    header {
+        display: block;
+        align-items: center;
+        flex-direction: column !important;
+    }
 }
 
 header nav ul {
@@ -58,3 +67,4 @@ header nav ul li:nth-child(4) a:hover {
 header nav ul li:nth-child(5) a:hover {
     color: var(--tui-accent);
 }
+
