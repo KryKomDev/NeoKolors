@@ -117,8 +117,9 @@ main th {
 main tr:nth-child(even) {
     background-color: var(--ctp-mocha-mantle);
 }
-@media only screen and (max-width: var(--mobile-breakpoint)) {
-    main .highlight {
+
+@media only screen and (max-device-width: 600px) {
+    div.highlight {
         overflow: scroll;
     }
 }
