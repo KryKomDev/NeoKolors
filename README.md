@@ -33,10 +33,10 @@ coloring the messages when printing to console. It also offers automatic
 unhandled exception formatting. One of the most basic features is output text styling.
 
 ### Logs
-![Logs](Docs/static/logs.png)
+![Logs](Docs/static/images/logs.png)
 
 ### Exceptions
-![Exception](Docs/static/exception.png)
+![Exception](Docs/static/images/exception.png)
 
 ---
 
@@ -77,7 +77,7 @@ It is made to be as similar as possible to web development.
 
 Picture below is an example of a Ncurses-style like Tui application.
 
-![Tui Application](Docs/static/tui.png)
+![Tui Application](Docs/static/images/tui.png)
 
 ### Presentations
 
