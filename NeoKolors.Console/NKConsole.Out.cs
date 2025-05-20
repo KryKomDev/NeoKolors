@@ -3,6 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
@@ -424,4 +425,136 @@ public static partial class NKConsole {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLine(char s, NKStyle st) =>
         System.Console.WriteLine(s.AddStyle(st));
+    
+    
+    /// <summary>
+    /// Writes a formatted table to the console based on the provided header, data, and row selector.
+    /// </summary>
+    /// <param name="header">The collection of header strings for the table columns.</param>
+    /// <param name="data">The collection of data items to populate the table rows.</param>
+    /// <param name="rowSelector">
+    /// A function that maps each data item to an array of strings representing the table row values.
+    /// </param>
+    /// <typeparam name="T">The type of the data items in the collection.</typeparam>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the length of any row data does not match the length of the header.
+    /// </exception>
+    public static void WriteTable<T>(
+        IEnumerable<string> header, 
+        IEnumerable<T> data, 
+        Func<T, string[]> rowSelector) 
+    {
+        var headerArr = header as string[] ?? header.ToArray();
+        int cols = headerArr.Length;
+
+        string[][] rows = data.Select(rowSelector).ToArray();
+
+        // check if any row is invalid size
+        if (rows.Any(t => t.Length != cols))
+            throw new ArgumentException("Row length does not match header length");
+        
+        int[] maxWidths = new int[cols];
+
+        // compute max width for header
+        for (int i = 0; i < rows.Length; i++) 
+            maxWidths[i] = headerArr[i].Length;
+
+        // compute max width for data
+        for (int i0 = 0; i0 < rows.Length; i0++) {
+            for (int i1 = 0; i1 < cols; i1++) {
+                maxWidths[i1] = Math.Max(maxWidths[i1], rows[i0][i1].Length);
+            }
+        }
+
+        // print header
+        for (int i = 0; i < cols; i++) System.Console.Write($"| {headerArr[i].PadRight(maxWidths[i])} ");
+        System.Console.WriteLine("|");
+
+        // print separator
+        for (int i = 0; i < cols; i++) System.Console.Write($"|{new string('-', maxWidths[i] + 2)}");
+        System.Console.WriteLine("|");
+        
+        // print data
+        for (int i = 0; i < rows.Length; i++) {
+            for (int j = 0; j < cols; j++) {
+                System.Console.Write($"| {rows[i][j].PadRight(maxWidths[j])} ");
+            }
+            System.Console.WriteLine("|");
+        }
+    }
+
+
+    /// <summary>
+    /// Writes a tabular representation of the provided data to the console.
+    /// </summary>
+    /// <typeparam name="T">The type of the data elements to be displayed in the table.</typeparam>
+    /// <param name="header">
+    /// A collection of strings representing the column headers for the table.
+    /// </param>
+    /// <param name="data">
+    /// A collection of collections, where each inner collection represents a row of data in the table.
+    /// </param>
+    /// <param name="stringifier">
+    /// An optional function to convert elements of type T to their string representation. If not provided, elements'
+    /// ToString() method will be used. Throws a NoNullAllowedException if any element is null and no stringifier
+    /// is provided.
+    /// </param>
+    /// <exception cref="NoNullAllowedException">
+    /// Thrown when a null element is encountered in the data and no stringifier function is provided.
+    /// </exception>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the length of any row in the data does not match the length of the header.
+    /// </exception>
+    public static void WriteTable<T>(
+        IEnumerable<string> header, 
+        IEnumerable<IEnumerable<T>> data,
+        Func<T, string>? stringifier = null) 
+    {
+        stringifier ??= t => {
+            if (t is null)
+                throw new NoNullAllowedException("Cannot convert null element to string");
+            var s = t.ToString();
+            if (s is null)
+                throw new NoNullAllowedException("ToString returned null");
+            return s;
+        };
+
+        var headerArr = header as string[] ?? header.ToArray();
+        int cols = headerArr.Length;
+
+        string[][] rows = data.Select(t => t.Select(stringifier).ToArray()).ToArray();
+
+        // check if any row is invalid size
+        if (rows.Any(t => t.Length != cols))
+            throw new ArgumentException("Row length does not match header length");
+        
+        int[] maxWidths = new int[cols];
+
+        // compute max width for header
+        for (int i = 0; i < rows.Length; i++) 
+            maxWidths[i] = headerArr[i].Length;
+
+        // compute max width for data
+        for (int i0 = 0; i0 < rows.Length; i0++) {
+            for (int i1 = 0; i1 < cols; i1++) {
+                maxWidths[i1] = Math.Max(maxWidths[i1], rows[i0][i1].Length);
+            }
+        }
+
+        // print header
+        for (int i = 0; i < cols; i++) System.Console.Write($"| {headerArr[i].PadRight(maxWidths[i])} ");
+        System.Console.WriteLine("|");
+
+        // print separator
+        for (int i = 0; i < cols; i++) System.Console.Write($"|{new string('-', maxWidths[i] + 2)}");
+        System.Console.WriteLine("|");
+        
+        // print data
+        for (int i = 0; i < rows.Length; i++) {
+            for (int j = 0; j < cols; j++) {
+                System.Console.Write($"| {rows[i][j].PadRight(maxWidths[j])} ");
+            }
+            System.Console.WriteLine("|");
+        }
+    }
 }

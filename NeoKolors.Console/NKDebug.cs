@@ -3,6 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Diagnostics;
 #if NET8_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
 #endif
@@ -17,8 +18,16 @@ public static class NKDebug {
     static NKDebug() {
         Logger = new NKLogger();
         Formatter = new ExceptionFormatter();
+        AppDomain.CurrentDomain.ProcessExit += (_, _) => { Logger.Close(); };
     }
-    
+
+    /// <summary>
+    /// Retrieves an instance of <see cref="NKLogger"/> configured with the specified source.
+    /// </summary>
+    /// <param name="source">The source identifier for the logger instance.</param>
+    /// <returns>An instance of <see cref="NKLogger"/> configured with the specified source.</returns>
+    public static NKLogger GetLogger(string source) => new(Logger.Config, source, true);
+
     /// <summary>
     /// global instance of the NKLogger
     /// </summary>
