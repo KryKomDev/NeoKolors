@@ -5,6 +5,7 @@
 
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using NeoKolors.Common;
@@ -453,34 +454,7 @@ public static partial class NKConsole {
         if (rows.Any(t => t.Length != cols))
             throw new ArgumentException("Row length does not match header length");
         
-        int[] maxWidths = new int[cols];
-
-        // compute max width for header
-        for (int i = 0; i < rows.Length; i++) 
-            maxWidths[i] = headerArr[i].Length;
-
-        // compute max width for data
-        for (int i0 = 0; i0 < rows.Length; i0++) {
-            for (int i1 = 0; i1 < cols; i1++) {
-                maxWidths[i1] = Math.Max(maxWidths[i1], rows[i0][i1].Length);
-            }
-        }
-
-        // print header
-        for (int i = 0; i < cols; i++) System.Console.Write($"| {headerArr[i].PadRight(maxWidths[i])} ");
-        System.Console.WriteLine("|");
-
-        // print separator
-        for (int i = 0; i < cols; i++) System.Console.Write($"|{new string('-', maxWidths[i] + 2)}");
-        System.Console.WriteLine("|");
-        
-        // print data
-        for (int i = 0; i < rows.Length; i++) {
-            for (int j = 0; j < cols; j++) {
-                System.Console.Write($"| {rows[i][j].PadRight(maxWidths[j])} ");
-            }
-            System.Console.WriteLine("|");
-        }
+        WriteTable(headerArr, rows);
     }
 
 
@@ -528,11 +502,16 @@ public static partial class NKConsole {
         if (rows.Any(t => t.Length != cols))
             throw new ArgumentException("Row length does not match header length");
         
+        WriteTable(headerArr, rows);
+    }
+
+    private static void WriteTable(string[] header, string[][] rows) {
+        var cols = header.Length;
         int[] maxWidths = new int[cols];
 
         // compute max width for header
         for (int i = 0; i < rows.Length; i++) 
-            maxWidths[i] = headerArr[i].Length;
+            maxWidths[i] = header[i].Length + 2;
 
         // compute max width for data
         for (int i0 = 0; i0 < rows.Length; i0++) {
@@ -542,7 +521,7 @@ public static partial class NKConsole {
         }
 
         // print header
-        for (int i = 0; i < cols; i++) System.Console.Write($"| {headerArr[i].PadRight(maxWidths[i])} ");
+        for (int i = 0; i < cols; i++) System.Console.Write($"| {header[i].PadRight(maxWidths[i])} ");
         System.Console.WriteLine("|");
 
         // print separator
@@ -556,5 +535,30 @@ public static partial class NKConsole {
             }
             System.Console.WriteLine("|");
         }
+    }
+
+
+    /// <summary>
+    /// Writes a formatted table to the console using the specified header and data.
+    /// </summary>
+    /// <param name="header">An array of column headers for the table.</param>
+    /// <param name="data">An array of data items to populate the table rows.</param>
+    /// <typeparam name="T">The type of the data items.</typeparam>
+    public static void WriteTable<T>(string[] header, params T[] data) {
+        Type t = typeof(T);
+        int cols = header.Length;
+        var props = t.GetProperties().Where(p => header.Contains(p.Name)).ToArray();
+        
+        string[][] rows = new string[data.Length][];
+
+        for (int i = 0; i < data.Length; i++) {
+            rows[i] = new string[cols];
+
+            for (int j = 0; j < props.Length; j++) {
+                rows[i][j] = props[j].GetMethod?.Invoke(data[i], null)?.ToString() ?? "null";
+            }
+        }
+        
+        WriteTable(header, rows);
     }
 }
