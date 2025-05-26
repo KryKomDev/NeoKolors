@@ -103,7 +103,7 @@ public struct LogFileConfig {
     /// Thrown when an invalid or unsupported configuration type is provided.
     /// </exception>
     public TextWriter CreateOutput() {
-        FileStream? fs = null;
+        FileStream? fs;
         switch (Config) {
             case LogFileConfigType.REPLACE:
                 fs = new FileStream(Path, FileMode.Create);

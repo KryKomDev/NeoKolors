@@ -5,10 +5,10 @@
 
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using NeoKolors.Common;
+using NeoKolors.Common.Util;
 
 namespace NeoKolors.Console;
 
@@ -436,6 +436,7 @@ public static partial class NKConsole {
     /// <param name="rowSelector">
     /// A function that maps each data item to an array of strings representing the table row values.
     /// </param>
+    /// <param name="style">The style of the printed table.</param>
     /// <typeparam name="T">The type of the data items in the collection.</typeparam>
     /// <exception cref="ArgumentException">
     /// Thrown when the length of any row data does not match the length of the header.
@@ -443,18 +444,15 @@ public static partial class NKConsole {
     public static void WriteTable<T>(
         IEnumerable<string> header, 
         IEnumerable<T> data, 
-        Func<T, string[]> rowSelector) 
+        Func<T, string[]> rowSelector,
+        NKTableStyle style = NKTableStyle.ASCII) 
     {
         var headerArr = header as string[] ?? header.ToArray();
         int cols = headerArr.Length;
 
         string[][] rows = data.Select(rowSelector).ToArray();
-
-        // check if any row is invalid size
-        if (rows.Any(t => t.Length != cols))
-            throw new ArgumentException("Row length does not match header length");
         
-        WriteTable(headerArr, rows);
+        WriteTable(headerArr, rows, style);
     }
 
 
@@ -473,6 +471,7 @@ public static partial class NKConsole {
     /// ToString() method will be used. Throws a NoNullAllowedException if any element is null and no stringifier
     /// is provided.
     /// </param>
+    /// <param name="style">The style of the printed table.</param>
     /// <exception cref="NoNullAllowedException">
     /// Thrown when a null element is encountered in the data and no stringifier function is provided.
     /// </exception>
@@ -482,7 +481,8 @@ public static partial class NKConsole {
     public static void WriteTable<T>(
         IEnumerable<string> header, 
         IEnumerable<IEnumerable<T>> data,
-        Func<T, string>? stringifier = null) 
+        Func<T, string>? stringifier = null, 
+        NKTableStyle style = NKTableStyle.ASCII) 
     {
         stringifier ??= t => {
             if (t is null)
@@ -494,48 +494,98 @@ public static partial class NKConsole {
         };
 
         var headerArr = header as string[] ?? header.ToArray();
-        int cols = headerArr.Length;
 
         string[][] rows = data.Select(t => t.Select(stringifier).ToArray()).ToArray();
-
-        // check if any row is invalid size
-        if (rows.Any(t => t.Length != cols))
-            throw new ArgumentException("Row length does not match header length");
         
-        WriteTable(headerArr, rows);
+        WriteTable(headerArr, rows, style);
     }
 
-    private static void WriteTable(string[] header, string[][] rows) {
+
+    /// <summary>
+    /// Writes a table to the console with the provided headers and rows.
+    /// </summary>
+    /// <param name="header">An array of header names for the table columns.</param>
+    /// <param name="rows">
+    /// A jagged array representing the rows of the table, with each inner array corresponding to a row of data.
+    /// </param>
+    /// <param name="style">The style of the printed table.</param>
+    /// <exception cref="ArgumentException">
+    /// Thrown when the length of a row does not match the length of the headers.
+    /// </exception>
+    public static void WriteTable(string[] header, string[][] rows, NKTableStyle style = NKTableStyle.ASCII) {
         var cols = header.Length;
+
+        // check if any row is invalid size
+        if (rows.Any(r => r.Length != cols))
+            throw new ArgumentException("Row length does not match header length");
+        
         int[] maxWidths = new int[cols];
 
         // compute max width for header
-        for (int i = 0; i < rows.Length; i++) 
-            maxWidths[i] = header[i].Length + 2;
+        for (int i = 0; i < cols; i++) 
+            maxWidths[i] = header[i].Length;
 
         // compute max width for data
         for (int i0 = 0; i0 < rows.Length; i0++) {
             for (int i1 = 0; i1 < cols; i1++) {
-                maxWidths[i1] = Math.Max(maxWidths[i1], rows[i0][i1].Length);
+                maxWidths[i1] = Math.Max(maxWidths[i1], rows[i0][i1].VisibleLength());
             }
         }
 
+        char vSeparator = style switch {
+            NKTableStyle.BORDERLESS => ' ',
+            NKTableStyle.ASCII => '|',
+            NKTableStyle.NORMAL => '│',
+            _ => throw new ArgumentOutOfRangeException(nameof(style), style, null)
+        };
+
         // print header
-        for (int i = 0; i < cols; i++) System.Console.Write($"| {header[i].PadRight(maxWidths[i])} ");
-        System.Console.WriteLine("|");
+        for (int i = 0; i < cols; i++) 
+            System.Console.Write($"{vSeparator} {header[i].AddStyle(TextStyles.BOLD).VisiblePadRight(maxWidths[i])} ");
+        System.Console.WriteLine(vSeparator);
 
         // print separator
-        for (int i = 0; i < cols; i++) System.Console.Write($"|{new string('-', maxWidths[i] + 2)}");
-        System.Console.WriteLine("|");
+        switch (style) {
+            case NKTableStyle.BORDERLESS:
+                for (int i = 0; i < cols; i++) 
+                    System.Console.Write($"  {new string('─', header[i].Length).VisiblePadRight(maxWidths[i])} ");
+                System.Console.WriteLine();
+                break;
+            case NKTableStyle.ASCII:
+                for (int i = 0; i < cols; i++) 
+                    System.Console.Write($"{vSeparator}{new string('-', maxWidths[i] + 2)}");
+                System.Console.WriteLine(vSeparator);
+                break;
+            case NKTableStyle.NORMAL:
+                System.Console.Write('├');
+                for (int i = 0; i < cols; i++) 
+                    System.Console.Write((i == 0 ? "" : "┼") + new string('─', maxWidths[i] + 2));
+                System.Console.WriteLine("┤");
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(style), style, null);
+        }
         
         // print data
         for (int i = 0; i < rows.Length; i++) {
             for (int j = 0; j < cols; j++) {
-                System.Console.Write($"| {rows[i][j].PadRight(maxWidths[j])} ");
+                System.Console.Write($"{vSeparator} {rows[i][j].VisiblePadRight(maxWidths[j])} ");
             }
-            System.Console.WriteLine("|");
+            System.Console.WriteLine(vSeparator);
         }
     }
+
+
+    /// <summary>
+    /// Writes a formatted table to the console, with a specified header and rows.
+    /// </summary>
+    /// <param name="header">An array of strings representing the header of the table.</param>
+    /// <param name="rows">
+    /// A two-dimensional array of strings representing the rows of the table, converted to a jagged array.
+    /// </param>
+    /// <param name="style">The style of the printed table.</param>
+    public static void WriteTable(string[] header, string[,] rows, NKTableStyle style = NKTableStyle.ASCII) => 
+        WriteTable(header, List2D.ToJagged(rows), style);
 
 
     /// <summary>
@@ -543,22 +593,132 @@ public static partial class NKConsole {
     /// </summary>
     /// <param name="header">An array of column headers for the table.</param>
     /// <param name="data">An array of data items to populate the table rows.</param>
+    /// <param name="style">The style of the printed table.</param>
     /// <typeparam name="T">The type of the data items.</typeparam>
-    public static void WriteTable<T>(string[] header, params T[] data) {
-        Type t = typeof(T);
+    public static void WriteTable<T>(string[] header, NKTableStyle style = NKTableStyle.ASCII, params T[] data) {
+        var t = typeof(T);
         int cols = header.Length;
+        
+        // get properties that match the header
         var props = t.GetProperties().Where(p => header.Contains(p.Name)).ToArray();
+        
+        // check if all properties were found
+        if (props.Length != cols) 
+            throw new ArgumentException("Some properties from header are not valid.");
         
         string[][] rows = new string[data.Length][];
 
+        // get values for each property
         for (int i = 0; i < data.Length; i++) {
             rows[i] = new string[cols];
 
             for (int j = 0; j < props.Length; j++) {
-                rows[i][j] = props[j].GetMethod?.Invoke(data[i], null)?.ToString() ?? "null";
+                var m = props[j].GetMethod;
+
+                if (m is null) {
+                    rows[i][j] = "null";
+                    continue;
+                }
+                
+                var o = m.Invoke(data[i], null);
+
+                if (o is null) {
+                    rows[i][j] = "null";
+                    continue;
+                }
+                
+                rows[i][j] = o.ToString() ?? "null";
             }
         }
         
-        WriteTable(header, rows);
+        WriteTable(header, rows, style);
+    }
+
+    /// <summary>
+    /// Automatically collects all properties of type <see cref="T"/> from a type specified by <see cref="TSource"/>
+    /// and lists their values in a table.
+    /// </summary>
+    /// <param name="header">Properties of <see cref="T"/> to be listed in the table</param>
+    /// <param name="displayName">Whether to add a column for the names of the properties.</param>
+    /// <param name="style">The style of the table</param>
+    /// <typeparam name="T">The type of a single row item</typeparam>
+    /// <typeparam name="TSource">The type to collect the properties from</typeparam>
+    public static void WriteTable<TSource, T>(
+        string[] header, 
+        bool displayName = true, 
+        NKTableStyle style = NKTableStyle.ASCII)
+    {
+        WriteTable<T>(typeof(TSource), header, displayName, style);
+    }
+
+    /// <summary>
+    /// Automatically collects all properties of type <see cref="TTarget"/> from a type specified by <see cref="source"/>
+    /// and lists their values in a table.
+    /// </summary>
+    /// <param name="source">The type to collect the properties from</param>
+    /// <param name="header">Properties of <see cref="TTarget"/> to be listed in the table</param>
+    /// <param name="displayName">Whether to add a column for the names of the properties.</param>
+    /// <param name="style">The style of the table</param>
+    /// <typeparam name="TTarget">The type of a single row item</typeparam>
+    public static void WriteTable<TTarget>(
+        Type source,
+        string[] header, 
+        bool displayName = true, 
+        NKTableStyle style = NKTableStyle.ASCII)
+    {
+        var t = typeof(TTarget);
+        
+        // load static properties
+        var fields = source.GetProperties();
+        Dictionary<string, TTarget> objects = new();
+        
+        foreach (var field in fields) {
+            if (field.PropertyType != t) continue;
+            
+            var palette = field.CanRead ? field.GetValue(null) : null;
+            if (palette is not TTarget p) continue;
+                
+            objects.Add(field.Name, p);
+        }
+        
+        int cols = header.Length;
+        
+        // get properties that match the header
+        var props = t.GetProperties().Where(p => header.Contains(p.Name)).ToArray();
+        
+        // check if all properties were found
+        if (props.Length != cols) 
+            throw new ArgumentException("Some properties from header are not valid.");
+        
+        string[][] rows = new string[objects.Count][];
+
+        // get values for each property
+        for (int i = 0; i < objects.Count; i++) {
+            rows[i] = new string[cols + 1];
+            rows[i][0] = objects.ElementAt(i).Key;
+            
+            for (int j = 1; j < props.Length + 1; j++) {
+                var m = props[j - 1].GetMethod;
+
+                if (m is null) {
+                    rows[i][j] = "null";
+                    continue;
+                }
+                
+                var o = m.Invoke(objects.ElementAt(i).Value, null);
+
+                if (o is null) {
+                    rows[i][j] = "null";
+                    continue;
+                }
+                
+                rows[i][j] = o.ToString() ?? "null";
+            }
+        }
+
+        var h = header.ToList();
+        if (displayName) h.Insert(0, "Name");
+        
+        WriteTable(h.ToArray(), rows, style);
     }
 }

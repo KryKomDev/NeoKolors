@@ -80,17 +80,11 @@ public partial class ExceptionFormatter {
     }
 
     /// <summary>
-    /// if true makes all unhandled exceptions look fancy
+    /// Gets or sets a value indicating whether exception output is redirected to a log.
     /// </summary>
-    public bool AutoFormatting { 
-        get;
-        set {
-            if (value)
-                AppDomain.CurrentDomain.UnhandledException += WriteUnhandled;
-            else
-                AppDomain.CurrentDomain.UnhandledException -= WriteUnhandled;
-
-            field = value;
-        } 
-    } = true;
+    /// <remarks>
+    /// When enabled, unhandled exceptions are also logged instead of purely being output to the console.
+    /// This can be useful for tracking issues in applications where console output is not always monitored.
+    /// </remarks>
+    public bool RedirectToLog { get; set; } = true;
 }

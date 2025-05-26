@@ -3,7 +3,6 @@
 // Copyright (c) 2025 KryKom
 //
 
-using System.Diagnostics;
 #if NET8_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
 #endif
@@ -137,4 +136,16 @@ public static class NKDebug {
             field = value;
         } 
     } = true;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether exception output is redirected to a log.
+    /// </summary>
+    /// <remarks>
+    /// When enabled, unhandled exceptions are also logged instead of purely being output to the console.
+    /// This can be useful for tracking issues in applications where console output is not always monitored.
+    /// </remarks>
+    public static bool RedirectFatalToLog {
+        get => Formatter.RedirectToLog;
+        set => Formatter.RedirectToLog = value;
+    }
 }
