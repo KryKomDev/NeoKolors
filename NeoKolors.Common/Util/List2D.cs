@@ -553,4 +553,17 @@ public class List2D : IEnumerable {
     /// <typeparam name="T">The type of elements in the array.</typeparam>
     /// <returns>A new two-dimensional array with zero rows and zero columns.</returns>
     public static T[,] Empty<T>() => new T[0, 0];
+    
+    public static T[][] ToJagged<T>(T[,] array) {
+        int s0 = array.GetLength(0);
+        int s1 = array.GetLength(1);
+        var jagged = new T[s0][];
+        for (int i = 0; i < s0; i++) {
+            jagged[i] = new T[s1];
+            for (int j = 0; j < s1; j++) {
+                jagged[i][j] = array[i, j];
+            }
+        }
+        return jagged;
+    }
 }

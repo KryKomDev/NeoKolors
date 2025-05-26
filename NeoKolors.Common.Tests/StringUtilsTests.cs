@@ -320,4 +320,112 @@ public class StringUtilsTests {
     public void ToRoman_ThousandsValues_ReturnsCorrectRomanNumerals(int number, string expected) {
         Assert.Equal(expected, number.ToRoman());
     }
+
+    [Fact]
+    public void VisiblePadRight_BasicPadding_WorksCorrectly() {
+        var input = "test";
+        Assert.Equal("test  ", input.VisiblePadRight(6));
+    }
+
+    [Fact]
+    public void VisiblePadRight_WithAnsiEscapeCodes_ConsidersVisibleLengthOnly() {
+        var input = "\e[31mtest\e[0m"; // Red colored "test"
+        Assert.Equal("\e[31mtest\e[0m  ", input.VisiblePadRight(6));
+    }
+
+    [Fact]
+    public void VisiblePadRight_NegativePadding_ThrowsArgumentOutOfRangeException() {
+        var input = "test";
+        Assert.Throws<ArgumentOutOfRangeException>(() => input.VisiblePadRight(-1));
+    }
+
+    [Fact]
+    public void VisiblePadRight_PaddingLessThanLength_ThrowsArgumentOutOfRangeException() {
+        var input = "test";
+        Assert.Throws<ArgumentOutOfRangeException>(() => input.VisiblePadRight(2));
+    }
+
+    [Fact]
+    public void VisiblePadLeft_BasicPadding_WorksCorrectly() {
+        var input = "test";
+        Assert.Equal("  test", input.VisiblePadLeft(6));
+    }
+
+    [Fact]
+    public void VisiblePadLeft_WithAnsiEscapeCodes_ConsidersVisibleLengthOnly() {
+        var input = "\e[31mtest\e[0m"; // Red colored "test"
+        Assert.Equal("  \e[31mtest\e[0m", input.VisiblePadLeft(6));
+    }
+
+    [Fact]
+    public void VisiblePadLeft_NegativePadding_ThrowsArgumentOutOfRangeException() {
+        var input = "test";
+        Assert.Throws<ArgumentOutOfRangeException>(() => input.VisiblePadLeft(-1));
+    }
+
+    [Fact]
+    public void VisiblePadLeft_PaddingLessThanLength_ThrowsArgumentOutOfRangeException() {
+        var input = "test";
+        Assert.Throws<ArgumentOutOfRangeException>(() => input.VisiblePadLeft(2));
+    }
+
+    [Fact]
+    public void VisiblePadCenter_BasicPadding_WorksCorrectly() {
+        var input = "test";
+        Assert.Equal(" test ", input.VisiblePadCenter(6));
+    }
+
+    [Fact]
+    public void VisiblePadCenter_OddPaddingLength_DistributesSpacesCorrectly() {
+        var input = "test";
+        Assert.Equal(" test  ", input.VisiblePadCenter(7));
+    }
+
+    [Fact]
+    public void VisiblePadCenter_WithAnsiEscapeCodes_ConsidersVisibleLengthOnly() {
+        var input = "\e[31mtest\e[0m"; // Red colored "test"
+        Assert.Equal(" \e[31mtest\e[0m ", input.VisiblePadCenter(6));
+    }
+
+    [Fact]
+    public void VisiblePadCenter_NegativePadding_ThrowsArgumentOutOfRangeException() {
+        var input = "test";
+        Assert.Throws<ArgumentOutOfRangeException>(() => input.VisiblePadCenter(-1));
+    }
+
+    [Fact]
+    public void VisiblePadCenter_PaddingLessThanLength_ThrowsArgumentOutOfRangeException() {
+        var input = "test";
+        Assert.Throws<ArgumentOutOfRangeException>(() => input.VisiblePadCenter(2));
+    }
+
+    [Fact]
+    public void PadCenter_BasicPadding_WorksCorrectly() {
+        var input = "test";
+        Assert.Equal(" test ", input.PadCenter(6));
+    }
+
+    [Fact]
+    public void PadCenter_OddPaddingLength_DistributesSpacesCorrectly() {
+        var input = "test";
+        Assert.Equal(" test  ", input.PadCenter(7));
+    }
+
+    [Fact]
+    public void PadCenter_NegativePadding_ThrowsArgumentOutOfRangeException() {
+        var input = "test";
+        Assert.Throws<ArgumentOutOfRangeException>(() => input.PadCenter(-1));
+    }
+
+    [Fact]
+    public void PadCenter_PaddingLessThanLength_ThrowsArgumentOutOfRangeException() {
+        var input = "test";
+        Assert.Throws<ArgumentOutOfRangeException>(() => input.PadCenter(2));
+    }
+
+    [Fact]
+    public void PadCenter_EmptyString_ReturnsOnlyPadding() {
+        var input = "";
+        Assert.Equal("   ", input.PadCenter(3));
+    }
 }

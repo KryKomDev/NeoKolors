@@ -5,41 +5,41 @@
 
 using System.Drawing;
 using System.Globalization;
+using NeoKolors.Common.Util;
 using static System.Math;
 
 namespace NeoKolors.Common;
 
-public readonly struct NKColorPalette {
+public readonly struct NKPalette : IFormattable {
     
     public int this[int index] => _colors[index];
     private readonly NKColor[] _colors;
     public NKColor[] Colors => _colors;
     public int Length => _colors.Length;
-
+    public string Preview => ToPreview();
+    
+    public NKColor Base => _colors[0];
+    public NKColor Background => _colors[1];
+    public NKColor Text => _colors[2];
+    public NKColor TextSecondary => _colors[3];
+    public NKColor Accent => _colors[4];
+    
+    
     /// <summary>
-    /// returns the stored color palette
-    /// </summary>
-    public Color[] GetColors => _colors.Select(c => Color.FromArgb(c + (0xff << 24))).ToArray();
-
-    /// <summary>
-    /// creates a new ordered color palette from a set of integers, where the bytes mean AARRGGBB
+    /// creates a new, ordered color palette from a set of integers, where the bytes mean AARRGGBB
     /// </summary>
     /// <param name="colors">the field of integers representing argb colors</param>
-    /// <param name="autoAlpha">sets alpha channel of every color to #ff if true</param>
-    public NKColorPalette(NKColor[] colors, bool autoAlpha = true) {
+    public NKPalette(NKColor[] colors) {
+        if (colors.Length < 5) throw new ArgumentException("Any palette must contain at least 5 colors.");
         _colors = colors;
-
-        if (autoAlpha) {
-            for (int i = 0; i < _colors.Length; i++) {
-                _colors[i] |= 0xff << 24;
-            }
-        }
     }
 
     /// <summary>
-    /// creates a new ordered color palette from a set of colors
+    /// creates a new, ordered color palette from a set of colors
     /// </summary>
-    public NKColorPalette(Color[] colors) {
+    public NKPalette(Color[] colors) {
+        if (colors.Length < 5) throw new ArgumentException("Any palette must contain at least 5 colors.");
+        
         _colors = new NKColor[colors.Length];
 
         for (int i = 0; i < colors.Length; i++) {
@@ -51,12 +51,14 @@ public readonly struct NKColorPalette {
     /// creates a new palette from the format "rrggbb-rrggbb-..."
     /// </summary>
     /// <param name="url">the string</param>
-    public NKColorPalette(string url) {
+    public NKPalette(string url) {
 
         _colors = new NKColor[(url.Length + 1) / 7];
 
+        if (_colors.Length < 5) throw new ArgumentException("Any palette must contain at least 5 colors.");
+        
         for (int i = 0; i < url.Length; i += 7) {
-            string colorRaw = "" + url[i] + url[i + 1] + url[i + 2] + url[i + 3] + url[i + 4] + url[i + 5];
+            string colorRaw = url.Substring(i, 6);
 
             _colors[i / 7] = int.Parse(colorRaw, NumberStyles.HexNumber);
         }
@@ -71,26 +73,6 @@ public readonly struct NKColorPalette {
         }
         
         Console.Write("\n");
-        
-        // foreach (int c in colors) {
-        //     Console.Write($"{(byte)(c >> 16):X2} ".AddColor((byte)(c >> 16) << 16));
-        // }
-        //
-        // Console.Write("\n");
-        //
-        // foreach (int c in colors) {
-        //     Console.Write($"{(byte)(c >> 8):X2} ".AddColor((byte)(c >> 8) << 8));
-        //
-        // }
-        //
-        // Console.Write("\n");
-        //
-        // foreach (int c in colors) {
-        //     Console.Write($"{(byte)(c >> 0):X2} ".AddColor((byte)(c >> 0) << 0));
-        //
-        // }
-        //
-        // Console.Write("\n");
     }
 
     /// <summary>
@@ -110,20 +92,17 @@ public readonly struct NKColorPalette {
     /// </summary>
     /// <param name="seed">seed for random</param>
     /// <param name="colorCount">how many colors will the palette contain</param>
-    public static NKColorPalette GeneratePalette(int seed, int colorCount = 10) {
-        NKColorPalette palette = new NKColorPalette(new NKColor[colorCount]);
+    public static NKPalette GeneratePalette(int seed, int colorCount = 10) {
+        if (colorCount < 5) throw new ArgumentException("Any palette must contain at least 5 colors.");
+        
+        var palette = new NKPalette(new NKColor[colorCount]);
 
-        Random rnd = new Random(seed);
+        var rnd = new Random(seed);
 
         var a = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
         var b = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
         var c = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
         var d = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
-        
-        // Console.WriteLine($"{a.Item1}, {a.Item2}, {a.Item3}");
-        // Console.WriteLine($"{b.Item1}, {b.Item2}, {b.Item3}");
-        // Console.WriteLine($"{c.Item1}, {c.Item2}, {c.Item3}");
-        // Console.WriteLine($"{d.Item1}, {d.Item2}, {d.Item3}");
         
         for (int i = 0; i < colorCount; i++) {
             Color color = GenerateColorAtX(a, b, c, d, (float)i / colorCount * 3);
@@ -155,4 +134,37 @@ public readonly struct NKColorPalette {
     }
 
     private static byte Normalize(double d) => (byte)((d / 3 + 1f/3f) * 255);
+
+    /// <summary>
+    /// Converts the NKPalette instance to its string representation.
+    /// </summary>
+    /// <returns>A string representation of the palette, where colors are concatenated in their formatted string representation.
+    /// Each color is represented using the "#r" format.</returns>
+    public override string ToString() => _colors.Join(" ", c => c.ToString("#r"));
+
+    /// <summary>
+    /// Converts the colors in the palette to a preview string where each color is represented by a colored bullet symbol.
+    /// </summary>
+    /// <returns>A string containing colored bullet symbols for each color in the palette.</returns>
+    public string ToPreview() => _colors.Join(" ", c => "●".AddColor(c));
+
+    /// <summary>
+    /// Converts the color palette into a URL-encoded string representation,
+    /// where colors are joined with a hyphen.
+    /// </summary>
+    /// <returns>A URL-encoded string representing the palette's colors.</returns>
+    public string ToUrl() => _colors.Join("-", c => c.ToString("r"));
+
+    /// <summary>
+    /// Converts the NKPalette to its string representation using the default format.
+    /// </summary>
+    /// <returns>A string representation of the palette, where colors are concatenated using the "#r" format.</returns>
+    public string ToString(string? format, IFormatProvider? formatProvider) {
+        format ??= "p";
+        return format switch {
+            "p" or "P" or "Preview" => Preview,
+            "u" or "U" or "Url" => ToUrl(),
+            _ => ToString()
+        };
+    }
 }
