@@ -1,0 +1,102 @@
+﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:tns="https://github.com/KryKomDev/NeoKolors/blob/main/NeoKolors.Tui/Schemas/nkfx.xsd"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="https://github.com/KryKomDev/NeoKolors/blob/main/NeoKolors.Tui/Schemas/nkfx.xsd">
+
+    <xsd:element name="NKCFont">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:group ref="tns:Header"/>
+                <xsd:group ref="tns:Spacing"/>
+                <xsd:group ref="tns:GlyphSettings"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:element name="NKIFont">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:group ref="tns:Header"/>
+                <xsd:group ref="tns:Spacing"/>
+                <xsd:group ref="tns:GlyphSettings"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    
+    <!-- header -->
+    <xsd:group name="Header">
+        <xsd:sequence>
+            <xsd:element name="Version">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:pattern value="([0-9])+\.([0-9])+\.([0-9])+(\.)*([A-Za-z0-9])*"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            <xsd:element name="FontName" type="xsd:string"/>
+            <xsd:element name="FontPath" type="xsd:string"/>
+        </xsd:sequence>
+    </xsd:group>
+    
+    
+    <!-- spacing -->
+    
+    <xsd:group name="Spacing">
+        <xsd:sequence>
+            <xsd:element name="LetterSpacing" type="xsd:int"/>
+            <xsd:element name="WordSpacing" type="xsd:int"/>
+            <xsd:element name="LineSpacing" type="xsd:int"/>
+        </xsd:sequence>
+    </xsd:group>
+    
+    
+    <!-- glyph settings -->
+    
+    <xsd:group name="GlyphSettings">
+        <xsd:sequence>
+            
+            <xsd:element name="GlyphStartMarker" type="xsd:string"/>
+            <xsd:element name="GlyphEndMarker" type="xsd:string"/>
+            
+            <xsd:element name="WhitespaceMode">
+                <xsd:simpleType>
+                    <xsd:restriction>
+                        <xsd:enumeration value="transparent"/>
+                        <xsd:enumeration value="overlap"/>
+                        <xsd:enumeration value="mask"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            
+            <xsd:element name="MaskCharacter" default=".">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:length value="1"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            
+            <xsd:element name="UnknownGlyphMode">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="skip"/>
+                        <xsd:enumeration value="replace"/>
+                        <xsd:enumeration value="throw"/>
+                        <xsd:enumeration value="char"/>
+                        <xsd:enumeration value="glyph"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+
+            <xsd:element name="SubstituteGlyph" default="_">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:length value="1"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            
+        </xsd:sequence>
+    </xsd:group>
+    
+</xsd:schema>
