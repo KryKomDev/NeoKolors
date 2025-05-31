@@ -69,6 +69,7 @@ public static class StringUtils {
                 input[0].ToString().ToUpper(cultureInfo ?? CultureInfo.InvariantCulture), input.Substring(1))
         };
     
+    
     /// <summary>
     /// makes the first letter of the string lowercase
     /// </summary>
@@ -82,6 +83,7 @@ public static class StringUtils {
                 input[0].ToString().ToLower(cultureInfo ?? CultureInfo.InvariantCulture), input.Substring(1))
         };
 
+    
     /// <summary>
     /// formats the string using the <see cref="string.Format(System.IFormatProvider?,string,object?)"/>
     /// </summary>
@@ -94,6 +96,7 @@ public static class StringUtils {
         params object[] args) =>
         string.Format(CultureInfo.InvariantCulture, format, args);
 
+    
     /// <summary>
     /// creates a substring between the indices, including startIndex, excluding endIndex
     /// </summary>
@@ -113,6 +116,7 @@ public static class StringUtils {
         return s.Substring(startIndex, endIndex - startIndex);
     }
 
+    
     /// <summary>
     /// Extracts a range of elements from the given enumerable collection starting from the specified
     /// start index to the specified end index, inclusive of the start index but exclusive of the end index.
@@ -143,6 +147,7 @@ public static class StringUtils {
         }
     }
 
+    
     /// <summary>
     /// chops the string into multiple string with a maximum length
     /// </summary>
@@ -194,6 +199,7 @@ public static class StringUtils {
         return output.ToArray();
     }
 
+    
     /// <summary>
     /// joins the stringified objects from the collection using the separator
     /// </summary>
@@ -212,6 +218,7 @@ public static class StringUtils {
         return string.Join(separator, strings);
     }
 
+    
     /// <summary>
     /// Concatenates the elements of a specified collection using the specified separator.
     /// </summary>
@@ -234,15 +241,16 @@ public static class StringUtils {
         return string.Join(separator, strings);
     }
 
+    
     /// <summary>
     /// Converts an integer to its Roman numeral representation.
     /// Supports values from 1 to 3999.
     /// </summary>
     /// <param name="number">The integer to be converted to Roman numerals.</param>
-    /// <param name="lowercase">Specifies whether to return the result in lowercase. Default is false.</param>
+    /// <param name="lowercase">Specifies whether to return the result in the lowercase. Default is false.</param>
     /// <returns>A string representing the Roman numeral equivalent of the given number.</returns>
     /// <exception cref="ArgumentOutOfRangeException">
-    /// Thrown when the supplied number is less than 1 or greater than 3999.
+    /// Thrown when the supplied number is lower than 1 or greater than 3999.
     /// </exception>
     [Pure]
     public static string ToRoman(this int number, bool lowercase = false) {
@@ -303,4 +311,86 @@ public static class StringUtils {
         
         return lowercase ? output.ToLower() : output;
     }
+
+    /// <summary>
+    /// Error message indicating that the specified padding length must be non-negative
+    /// and greater than or equal to the length of the string.
+    /// </summary>
+    private const string PAD_INV_MSG = "Padding length must be non-negative and greater or equal to the string length.";
+    
+    /// <summary>
+    /// Pads the specified string on the right with spaces until the total
+    /// visible length of the string reaches the given padding length.
+    /// ANSI escape characters or other non-printable elements are not considered in the length.
+    /// </summary>
+    /// <param name="s">The string to pad on the right.</param>
+    /// <param name="pad">The total visible length to achieve after padding.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when the padding length is less than the string length.
+    /// </exception>
+    /// <returns>The input string padded with spaces on the right to meet the specified visible length.</returns>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string VisiblePadRight(this string s, int pad) => 
+        pad >= s.VisibleLength() 
+            ? s + new string(' ', pad - s.VisibleLength()) 
+            : throw new ArgumentOutOfRangeException(nameof(pad), PAD_INV_MSG);
+
+    
+    /// <summary>
+    /// Pads the specified string on the left with spaces until the total
+    /// visible length of the string reaches the given padding length.
+    /// ANSI escape characters or other non-printable elements are not considered in the length.
+    /// </summary>
+    /// <param name="s">The string to pad on the left.</param>
+    /// <param name="pad">The total visible length to achieve after padding.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when the padding length is less than the string length.
+    /// </exception>
+    /// <returns>The input string padded with spaces on the left to meet the specified visible length.</returns>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string VisiblePadLeft(this string s, int pad) => 
+        pad >= s.VisibleLength() 
+            ? new string(' ', pad - s.VisibleLength()) + s
+            : throw new ArgumentOutOfRangeException(nameof(pad), PAD_INV_MSG);
+
+    
+    /// <summary>
+    /// Pads the specified string in the center with spaces until the total
+    /// visible length of the string reaches the given padding length.
+    /// ANSI escape characters or other non-printable elements are not considered in the length.
+    /// </summary>
+    /// <param name="s">The string to pad in the center.</param>
+    /// <param name="pad">The total visible length to achieve after padding.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when the padding length is less than the string length.
+    /// </exception>
+    /// <returns>The input string padded with spaces in the center to meet the specified visible length.</returns>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string VisiblePadCenter(this string s, int pad) =>
+        pad >= s.VisibleLength() 
+            ? new string(' ', (int)(Math.Floor((pad - s.VisibleLength()) / 2f))) + s +
+              new string(' ', (int)(Math.Ceiling((pad - s.VisibleLength()) / 2f)))
+            : throw new ArgumentOutOfRangeException(nameof(pad), PAD_INV_MSG);
+    
+    
+    /// <summary>
+    /// Pads the specified string in the center with spaces until the total
+    /// length of the string reaches the given padding length.
+    /// </summary>
+    /// <param name="s">The string to pad in the center.</param>
+    /// <param name="pad">The total visible length to achieve after padding.</param>
+    /// <exception cref="ArgumentOutOfRangeException">
+    /// Thrown when the padding length is less than the string length.
+    /// </exception>
+    /// <returns>The input string padded with spaces in the center to meet the specified visible length.</returns>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string PadCenter(this string s, int pad) =>
+        pad >= s.Length 
+            ? new string(' ', (int)(Math.Floor((pad - s.Length) / 2f))) + s +
+              new string(' ', (int)(Math.Ceiling((pad - s.Length) / 2f)))
+            : throw new ArgumentOutOfRangeException(nameof(pad), PAD_INV_MSG);
 }

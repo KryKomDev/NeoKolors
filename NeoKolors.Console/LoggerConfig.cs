@@ -11,7 +11,7 @@ namespace NeoKolors.Console;
 /// <summary>
 /// configures the NKLogger
 /// </summary>
-public struct LoggerConfig {
+public struct LoggerConfig : ICloneable {
 
     /// <summary>
     /// configures what messages will be logged
@@ -64,6 +64,11 @@ public struct LoggerConfig {
     public bool HideTime { get; set; } = false;
 
     /// <summary>
+    /// Specifies the format used to display timestamps in log messages.
+    /// </summary>
+    public string TimeFormat { get; set; } = "HH:mm:ss";
+
+    /// <summary>
     /// Configures how log files are managed, including options such as replacing, appending,
     /// or creating new files based on various strategies.
     /// </summary>
@@ -77,8 +82,9 @@ public struct LoggerConfig {
         } 
     } = LogFileConfig.Custom();
     
+    
+    
     public LoggerConfig() { }
-
     
     public LoggerConfig(
         LoggerLevel level = FATAL | ERROR | WARN | INFO | DEBUG | TRACE, 
@@ -90,7 +96,8 @@ public struct LoggerConfig {
         NKColor? traceColor = null,
         TextWriter? output = null,
         bool simpleMessages = false,
-        bool hideTime = false) 
+        bool hideTime = false,
+        string timeFormat = "HH:mm:ss") 
     {
         Level = level;
         FatalColor = fatalColor ?? NKConsoleColor.DARK_RED;
@@ -102,6 +109,7 @@ public struct LoggerConfig {
         Output = output ?? System.Console.Out;
         SimpleMessages = simpleMessages;
         HideTime = hideTime;
+        TimeFormat = timeFormat;
         FileConfig = LogFileConfig.Custom();
     }
     
@@ -115,7 +123,8 @@ public struct LoggerConfig {
         NKColor? traceColor = null,
         LogFileConfig? fileConfig = null,
         bool simpleMessages = false,
-        bool hideTime = false) 
+        bool hideTime = false,
+        string timeFormat = "HH:mm:ss") 
     {
         Level = level;
         FatalColor = fatalColor ?? NKConsoleColor.DARK_RED;
@@ -126,6 +135,7 @@ public struct LoggerConfig {
         TraceColor = traceColor ?? NKConsoleColor.GRAY;
         SimpleMessages = simpleMessages;
         HideTime = hideTime;
+        TimeFormat = timeFormat;
         FileConfig = fileConfig ?? LogFileConfig.Custom();
         Output = System.Console.Out;
     }
@@ -139,7 +149,8 @@ public struct LoggerConfig {
         NKColor? debugColor = null, 
         NKColor? traceColor = null,
         bool simpleMessages = false,
-        bool hideTime = false) 
+        bool hideTime = false,
+        string timeFormat = "HH:mm:ss") 
     {
         Level = level;
         FatalColor = fatalColor ?? NKConsoleColor.DARK_RED;
@@ -150,7 +161,10 @@ public struct LoggerConfig {
         TraceColor = traceColor ?? NKConsoleColor.GRAY;
         SimpleMessages = simpleMessages;
         HideTime = hideTime;
+        TimeFormat = timeFormat;
         FileConfig = LogFileConfig.Custom();
         Output = System.Console.Out;
     }
+
+    public object Clone() => MemberwiseClone();
 }

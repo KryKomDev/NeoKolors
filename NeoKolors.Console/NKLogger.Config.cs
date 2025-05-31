@@ -9,17 +9,51 @@ using static NeoKolors.Console.LoggerLevel;
 namespace NeoKolors.Console;
 
 public partial class NKLogger : IDisposable {
-
+    
+    /// <summary>
+    /// A logging utility that provides customizable logging features, including log levels,
+    /// color-coded messages, output configuration, and file logging options.
+    /// </summary>
     public NKLogger(LoggerConfig? config = null) {
         _config = config ?? new LoggerConfig();
+        Source = null;
         
         if (_config.FileConfig.Config != LogFileConfigType.CUSTOM)
             _config.Output = FileConfig.CreateOutput();
     }
 
-    ~NKLogger() {
-        ReleaseUnmanagedResources();
+    /// <summary>
+    /// A logger class for handling configurable logging functionalities
+    /// such as log levels, output formatting, color coding for log severity,
+    /// and managing output destinations.
+    /// </summary>
+    public NKLogger(LoggerConfig? config, string source) : this(config) => 
+        Source = source;
+
+    /// <summary>
+    /// Creates a new NKLogger instance with the specified configuration.
+    /// </summary>
+    /// <param name="config">the configuration</param>
+    /// <param name="source">source of the log messages</param>
+    /// <param name="bypass">if true, does not create a new output stream for the configuration</param>
+    internal NKLogger(LoggerConfig? config, string source, bool bypass) {
+        _config = config ?? new LoggerConfig();
+        Source = source;
+        if (!bypass && _config.FileConfig.Config != LogFileConfigType.CUSTOM)
+            _config.Output = FileConfig.CreateOutput();
     }
+
+    /// <summary>
+    /// Releases any resources associated with the logger, including closing the configured output stream
+    /// to ensure proper cleanup and resource management.
+    /// </summary>
+    public void Close() =>
+        _config.Output.Close();
+
+    /// <summary>
+    /// Identifies the source of the log messages.
+    /// </summary>
+    public string? Source { get; }
 
     private LoggerConfig _config;
     
@@ -112,6 +146,14 @@ public partial class NKLogger : IDisposable {
     }
 
     /// <summary>
+    /// Gets or sets the format used for displaying the timestamp in log messages.
+    /// </summary>
+    public string TimeFormat {
+        get => _config.TimeFormat;
+        set => _config.TimeFormat = value;
+    }
+
+    /// <summary>
     /// Gets or sets the configuration for how log files are handled in the logger.
     /// </summary>
     public LogFileConfig FileConfig {
@@ -149,13 +191,10 @@ public partial class NKLogger : IDisposable {
     /// </summary>
     public void LogNone() => _config.Level = NONE;
 
-    private void ReleaseUnmanagedResources() {
+    public void Dispose() {
         _config.Output.Close();
         _config.Output.Dispose();
-    }
-
-    public void Dispose() {
-        ReleaseUnmanagedResources();
+        _config.Output = null!;
         GC.SuppressFinalize(this);
     }
 }

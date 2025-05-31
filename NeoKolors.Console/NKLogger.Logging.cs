@@ -24,13 +24,13 @@ public partial class NKLogger {
 
         if (SimpleMessages) {
             Output.WriteLine(HideTime
-                ? $"[ FATAL ] : {s}"
-                : $"[{TimeStamp()}] [ FATAL ] : {s}");
+                ? $"{SourceStr}[ FATAL ] : {s}"
+                : $"[{TimeStamp()}] {SourceStr}[ FATAL ] : {s}");
         }
         else {
             Output.WriteLine(HideTime
-                ? "{0}<b><n> FATAL </n></b> : {1}\e[0m".ApplyStyles().Format(FatalColor.Text, s)
-                : "{0}[{1}] <b><n> FATAL </n></b> : {2}\e[0m".ApplyStyles().Format(FatalColor.Text, TimeStamp(), s)
+                ? "{0}{2}<b><n> FATAL </n></b> : {1}\e[0m".ApplyStyles().Format(FatalColor.Text, s, SourceStr)
+                : "{0}[{1}] {3}<b><n> FATAL </n></b> : {2}\e[0m".ApplyStyles().Format(FatalColor.Text, TimeStamp(), s, SourceStr)
             );
         }
         
@@ -52,13 +52,13 @@ public partial class NKLogger {
 
         if (SimpleMessages) {
             Output.WriteLine(HideTime
-                ? $"[ ERROR ] : {s}"
-                : $"[{TimeStamp()}] [ ERROR ] : {s}");
+                ? $"{SourceStr}[ ERROR ] : {s}"
+                : $"[{TimeStamp()}] {SourceStr}[ ERROR ] : {s}");
         }
         else {
             Output.WriteLine(HideTime
-                ? "{0}<b><n> ERROR </n></b> : {1}\e[0m".ApplyStyles().Format(ErrorColor.Text, s)
-                : "{0}[{1}] <b><n> ERROR </n></b> : {2}\e[0m".ApplyStyles().Format(ErrorColor.Text, TimeStamp(), s)
+                ? "{0}{2}<b><n> ERROR </n></b> : {1}\e[0m".ApplyStyles().Format(ErrorColor.Text, s, SourceStr)
+                : "{0}[{1}] {3}<b><n> ERROR </n></b> : {2}\e[0m".ApplyStyles().Format(ErrorColor.Text, TimeStamp(), s, SourceStr)
             );
         }
         
@@ -79,9 +79,9 @@ public partial class NKLogger {
         if (!Level.HasFlag(LoggerLevel.WARN)) return;
 
         if (SimpleMessages)
-            Output.WriteLine(HideTime ? $"[ WARN ] : {s}" : $"[{TimeStamp()}] [ WARN ] : {s}");
+            Output.WriteLine(HideTime ? $"{SourceStr}[ WARN ] : {s}" : $"[{TimeStamp()}] {SourceStr}[ WARN ] : {s}");
         else
-            Output.WriteLine((HideTime ? $"[ WARN ] : {s}" : $"[{TimeStamp()}] [ WARN ] : {s}\e[0m")
+            Output.WriteLine((HideTime ? $"{SourceStr}[ WARN ] : {s}" : $"[{TimeStamp()}] {SourceStr}[ WARN ] : {s}\e[0m")
                 .AddColor(WarnColor));
 
         Output.Flush();
@@ -101,9 +101,9 @@ public partial class NKLogger {
         if (!Level.HasFlag(LoggerLevel.INFO)) return;
 
         if (SimpleMessages)
-            Output.WriteLine(HideTime ? $"[ INFO ] : {s}" : $"[{TimeStamp()}] [ INFO ] : {s}");
+            Output.WriteLine(HideTime ? $"{SourceStr}[ INFO ] : {s}" : $"[{TimeStamp()}] {SourceStr}[ INFO ] : {s}");
         else
-            Output.WriteLine((HideTime ? $"[ INFO ] : {s}" : $"[{TimeStamp()}] [ INFO ] : {s}\e[0m")
+            Output.WriteLine((HideTime ? $"{SourceStr}[ INFO ] : {s}" : $"[{TimeStamp()}] {SourceStr}[ INFO ] : {s}\e[0m")
                 .AddColor(InfoColor));
 
         Output.Flush();
@@ -123,9 +123,9 @@ public partial class NKLogger {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
         if (SimpleMessages)
-            Output.WriteLine(HideTime ? $"[ DEBUG ] : {s}" : $"[{TimeStamp()}] [ DEBUG ] : {s}");
+            Output.WriteLine(HideTime ? $"{SourceStr}[ DEBUG ] : {s}" : $"[{TimeStamp()}] {SourceStr}[ DEBUG ] : {s}");
         else
-            Output.WriteLine((HideTime ? $"[ DEBUG ] : {s}" : $"[{TimeStamp()}] [ DEBUG ] : {s}\e[0m")
+            Output.WriteLine((HideTime ? $"{SourceStr}[ DEBUG ] : {s}" : $"[{TimeStamp()}] {SourceStr}[ DEBUG ] : {s}\e[0m")
                 .AddColor(DebugColor));
 
         Output.Flush();
@@ -145,9 +145,9 @@ public partial class NKLogger {
         if (s == null) throw new ArgumentNullException(nameof(s));
 
         if (SimpleMessages)
-            Output.WriteLine(HideTime ? $"[ TRACE ] : {s}" : $"[{TimeStamp()}] [ TRACE ] : {s}");
+            Output.WriteLine(HideTime ? $"{SourceStr}[ TRACE ] : {s}" : $"[{TimeStamp()}] {SourceStr}[ TRACE ] : {s}");
         else
-            Output.WriteLine((HideTime ? $"[ TRACE ] : {s}" : $"[{TimeStamp()}] [ TRACE ] : {s}\e[0m")
+            Output.WriteLine((HideTime ? $"{SourceStr}[ TRACE ] : {s}" : $"[{TimeStamp()}] {SourceStr}[ TRACE ] : {s}\e[0m")
                 .AddColor(TraceColor));
 
         Output.Flush();
@@ -157,12 +157,14 @@ public partial class NKLogger {
     /// prints debug text using the ToString method of the object o and <see cref="Debug(string)"/>
     /// </summary>
     public void Trace(object o) => Trace(o.ToString()!);
+
+    private string SourceStr => Source is null ? "" : $"[ {Source} ] ";
     
     /// <summary>
     /// the timestamp
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static string TimeStamp() => DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+    private string TimeStamp() => DateTime.Now.ToString(TimeFormat);
     
     #if NET8_0_OR_GREATER
     public void Fatal([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Fatal(string.Format(s, args));

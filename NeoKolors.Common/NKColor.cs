@@ -204,7 +204,7 @@ public struct NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
 
     public override string ToString() =>
         Color.Match(
-            i => $"#{i:x6}",
+            i => $"{i:x6}",
             c => $"{Enum.GetName(typeof(NKConsoleColor), c)}",
             _ => "Default",
             _ => "Inherit"
@@ -216,6 +216,7 @@ public struct NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
     public string ToString(string? format, IFormatProvider? formatProvider) {
         if (string.IsNullOrEmpty(format)) format = "T";
         return format switch {
+            "#p" or "#P" or "#Plain" or "#r" or "#R" or "#Raw" => "#" + ToString(),
             "p" or "P" or "Plain" or "r" or "R" or "Raw" => ToString(),
             "t" or "T" or "Text" or "f" or "F" or "Forg" => Text,
             "b" or "B" or "Bckg" => Bckg,

@@ -17,8 +17,16 @@ public static class NKDebug {
     static NKDebug() {
         Logger = new NKLogger();
         Formatter = new ExceptionFormatter();
+        AppDomain.CurrentDomain.ProcessExit += (_, _) => { Logger.Close(); };
     }
-    
+
+    /// <summary>
+    /// Retrieves an instance of <see cref="NKLogger"/> configured with the specified source.
+    /// </summary>
+    /// <param name="source">The source identifier for the logger instance.</param>
+    /// <returns>An instance of <see cref="NKLogger"/> configured with the specified source.</returns>
+    public static NKLogger GetLogger(string source) => new(Logger.Config, source, true);
+
     /// <summary>
     /// global instance of the NKLogger
     /// </summary>
@@ -128,4 +136,16 @@ public static class NKDebug {
             field = value;
         } 
     } = true;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether exception output is redirected to a log.
+    /// </summary>
+    /// <remarks>
+    /// When enabled, unhandled exceptions are also logged instead of purely being output to the console.
+    /// This can be useful for tracking issues in applications where console output is not always monitored.
+    /// </remarks>
+    public static bool RedirectFatalToLog {
+        get => Formatter.RedirectToLog;
+        set => Formatter.RedirectToLog = value;
+    }
 }
