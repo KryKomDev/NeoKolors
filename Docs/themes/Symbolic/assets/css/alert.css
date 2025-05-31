@@ -26,7 +26,7 @@ blockquote span {
     font-size: 150%;
     font-variation-settings:
         'FILL' 0,
-        'wght' 300,
+        'wght' 500,
         'GRAD' 0,
         'opsz' 24;
 
@@ -58,7 +58,7 @@ blockquote span {
     flex-direction: row;
     align-items: center;
     font-size: 110%;
-    font-weight: 500;
+    font-weight: 900;
 }
 
 blockquote {

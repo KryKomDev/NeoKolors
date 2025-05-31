@@ -8,7 +8,8 @@ title = 'NeoKolors.Common'
 ![.NET 5](https://img.shields.io/badge/.NET-5.0-cba6f7?style=for-the-badge&labelColor=6c7086)
 [![NuGet](https://img.shields.io/nuget/v/NeoKolors.Common?color=f5c2e7&style=for-the-badge&labelColor=6c7086)](https://www.nuget.org/packages/NeoKolors.Common)
 ![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Common?color=a6e3a1&style=for-the-badge&labelColor=6c7086)
-![GitHub License](https://img.shields.io/github/license/KryKomDev/NeoKolors?style=for-the-badge&labelColor=%236c7086&color=%23f9e2af)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/build-common.yml?style=for-the-badge&labelColor=%236c7086&color=%23f9e2af)
+![GitHub License](https://img.shields.io/github/license/KryKomDev/NeoKolors?style=for-the-badge&labelColor=%236c7086&color=%23fab387)
 
 NeoKolors.Common library contains basic common tools, structures and classes
 for working with colors and ANSI escape sequences. It also offers some other 
