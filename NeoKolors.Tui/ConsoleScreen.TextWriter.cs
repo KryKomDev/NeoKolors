@@ -4,10 +4,13 @@
 //
 
 using System.Text;
+using NeoKolors.Console;
 
 namespace NeoKolors.Tui;
 
 public partial class ConsoleScreen : TextWriter {
+    
+    private static readonly NKLogger LOGGER = NKDebug.GetLogger(nameof(ConsoleScreen));
 
     private string _output = "";
     

@@ -15,6 +15,9 @@ public struct DisplayProperty : IStyleProperty<DisplayProperty, DisplayType> {
     }
     
     public DisplayProperty() {
-        Value = DisplayType.INLINE;
+        Value = DisplayType.BLOCK;
     }
+    
+    public static implicit operator DisplayProperty(DisplayType value) => new(value);
+    public static implicit operator DisplayType(DisplayProperty value) => value.Value;
 }

@@ -15,36 +15,17 @@ namespace NeoKolors.Tui.Elements;
 
 [ElementName("p")]
 [ApplicableStyles(UNIVERSAL | TEXT)]
-public class Paragraph : IElement {
-    
-    public NKColor TextColor => Style["color"].Value is NKColor color ? color : NKColor.Inherit;
-    public NKColor BackgroundColor => Style["background-color"].Value is NKColor color ? color : NKColor.Inherit;
-    public BorderStyle Border => Style["border"].Value is BorderStyle s ? s : BorderStyle.GetSolid(NKColor.Inherit);
-    public IFont Font => Style["font"].Value is FontProperty f ? f.Font : IFont.Default;
-    public AlignDirection AlignItems => Style["align-items"].Value is AlignDirection a ? a : new AlignDirection();
-    public PaddingProperty Padding => Style["padding"].Value is PaddingProperty p ? p : new PaddingProperty();
-    public MarginProperty Margin => Style["margin"].Value is MarginProperty m ? m : new MarginProperty();
-    public OverflowType Overflow => Style["overflow"].Value is OverflowType o ? o : VISIBLE_ALL;
-    public DisplayType Display => Style["display"].Value is DisplayType d ? d : DisplayType.BLOCK;
-    public SizeValue MinWidth => Style["min-width"].Value is SizeValue s ? s : new SizeValue();
-    public SizeValue MinHeight => Style["min-height"].Value is SizeValue s ? s : new SizeValue();
-    public SizeValue MaxWidth => Style["max-width"].Value is SizeValue s ? s : new SizeValue();
-    public SizeValue MaxHeight => Style["max-height"].Value is SizeValue s ? s : new SizeValue();
-    
+public class Paragraph : TextElement, IElement {
     
     /// <summary>
     /// the text content of the paragraph
     /// </summary>
     public string Content { get; set; }
 
-    /// <summary>
-    /// Represents the CSS-like selectors associated with the element, allowing the element
-    /// to be styled or targeted based on these identifiers.
-    /// </summary>
     public string[] Selectors { get; set; }
     
     /// <inheritdoc cref="IElement.Style"/>
-    public StyleCollection Style { get; }
+    public override StyleCollection Style { get; }
 
     /// <summary>
     /// A delegate property that handles key press events for the Paragraph element.
@@ -101,15 +82,15 @@ public class Paragraph : IElement {
         
         if (Font != IFont.Default) {
             target.DrawText(Content, contentRect, Font,
-                new NKStyle(TextColor, BackgroundColor),
-                AlignItems.Horizontal, AlignItems.Vertical,
+                new NKStyle(Color, BackgroundColor),
+                TextAlign.Horizontal, TextAlign.Vertical,
                 Overflow is VISIBLE_ALL or VISIBLE_TOP,
                 Overflow is VISIBLE_ALL or VISIBLE_BOTTOM);
         }
         else {
             target.DrawText(Content, contentRect,
-                new NKStyle(TextColor, BackgroundColor),
-                AlignItems.Horizontal, AlignItems.Vertical);
+                new NKStyle(Color, BackgroundColor),
+                TextAlign.Horizontal, TextAlign.Vertical);
         }
     }
 
@@ -120,7 +101,7 @@ public class Paragraph : IElement {
                 (Border.IsBorderless ? 0 : 2);
         
         var min = MinWidth.ToIntH(0);
-        var max = MaxWidth.ToIntH(Int32.MaxValue);
+        var max = MaxWidth.ToIntH(maxHeight);
         return Math.Max(min, Math.Min(w, max));
     }
 
@@ -141,7 +122,7 @@ public class Paragraph : IElement {
     public int GetMinHeight(int maxWidth) => Content.Chop(maxWidth).Length;
 
     /// <summary>
-    /// Handles a key press event for the paragraph element by invoking the <see cref="KeyPressHandler"/> delegate..
+    /// Handles a key press event for the paragraph element by invoking the <see cref="KeyPressHandler"/> delegate.
     /// </summary>
     /// <param name="source">The source object that raised the event.</param>
     /// <param name="args">Event arguments containing details of the key press event.</param>

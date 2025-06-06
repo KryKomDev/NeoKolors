@@ -5,7 +5,6 @@
 
 using NeoKolors.Common;
 using NeoKolors.Common.Util;
-using NeoKolors.Console;
 
 namespace NeoKolors.Tui;
 
@@ -66,7 +65,7 @@ public partial class ConsoleScreen {
         }
         catch (ArgumentOutOfRangeException) {
             // terminal is probably being resized, ignore this error
-            NKDebug.Warn("Cursor out of bounds! Ignoring...");
+            LOGGER.Warn("Cursor out of bounds! Ignoring...");
         }
     }
 }

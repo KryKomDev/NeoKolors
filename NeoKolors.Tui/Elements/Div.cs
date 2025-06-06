@@ -4,7 +4,6 @@
 //
 
 using System.Diagnostics.Contracts;
-using NeoKolors.Common;
 using NeoKolors.Tui.Exceptions;
 using NeoKolors.Tui.Styles;
 using static NeoKolors.Tui.Elements.ApplicableStylesAttribute.Predefined;
@@ -13,24 +12,13 @@ namespace NeoKolors.Tui.Elements;
 
 [ElementName("div")]
 [ApplicableStyles(CONTAINER | UNIVERSAL)]
-public class Div : IElement {
+public class Div : ContainerElement, IElement {
     
-    public AlignItems AlignItems => Style["align-items"].Value is AlignItems align ? align : AlignItems.STRETCH;
-    public AlignDirection AlignSelf => Style["align-self"].Value is AlignDirection align ? align : new AlignDirection();
-    public NKColor BackgroundColor => Style["background-color"].Value is NKColor color ? color : NKColor.Inherit;
-    public BorderStyle Border => Style["border"].Value is BorderStyle s ? s : BorderStyle.GetBorderless();
-    public DisplayType Display => Style["display"].Value is DisplayType d ? d : DisplayType.BLOCK;
-    public PaddingProperty Padding => Style["padding"].Value is PaddingProperty p ? p : new PaddingProperty();
-    public MarginProperty Margin => Style["margin"].Value is MarginProperty m ? m : new MarginProperty();
-    public FlexDirection FlexDirection => Style["flex-direction"].Value is FlexDirection f ? f : FlexDirection.ROW;
-    public OverflowType Overflow => Style["overflow"].Value is OverflowType o ? o : OverflowType.HIDDEN;
-    public GridProperty Grid => Style["grid"].Value is GridProperty g ? g : new GridProperty();
-    public JustifyContent JustifyContent => Style["justify-content"].Value is JustifyContent j ? j : new JustifyContent(); // Todo : implement justify-content
+    public override StyleCollection Style { get; }
     
     public List<IElement> Children { get; }
 
     public string[] Selectors { get; }
-    public StyleCollection Style { get; }
 
     public Div(params IElement[] children) : this([], children) { }
     
@@ -60,12 +48,7 @@ public class Div : IElement {
                     RenderChildrenFlexColumn(target, contentRect); 
                 break;
             case DisplayType.INLINE:
-                break;
-            case DisplayType.INLINE_BLOCK:
-                break;
-            case DisplayType.INLINE_FLEX:
-                break;
-            case DisplayType.INLINE_GRID:
+                RenderChildrenInline(target, contentRect);
                 break;
             case DisplayType.BLOCK:
                 RenderChildrenBlock(target, contentRect);
@@ -74,8 +57,56 @@ public class Div : IElement {
                 RenderChildrenGrid(target, contentRect);
                 break;
             case DisplayType.NONE:
+                break;
             default:                
                 throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    protected void RenderChildrenInline(in IConsoleScreen target, Rectangle rect) {
+        int y = rect.LowerY;
+        int x = rect.LowerX;
+        for (var i = 0; i < Children.Count; i++) {
+
+            int end = i;
+            int xComp = x;
+            int mh = 0;
+            List<int> widths = [];
+            List<int> heights = [];
+            
+            for (int j = i; j < Children.Count; j++) {
+                int cw = Children[j].GetWidth(rect.HigherX - y);
+                if (xComp + cw <= rect.HigherX) {
+                    xComp = rect.LowerX;
+                    int h = Children[j].GetHeight(cw);
+                    mh = Math.Max(mh, h);
+                    widths.Add(cw);
+                    heights.Add(h);
+                }
+                else {
+                    end = j;
+                    break;
+                }
+
+                end = j;
+            }
+
+            xComp = x;
+            for (int j = i; j <= end; j++) {
+                int yo = AlignItems switch {
+                    AlignItems.START => 0,
+                    AlignItems.CENTER => (mh - heights[j - i]) / 2,
+                    AlignItems.END => mh - heights[j - i],
+                    AlignItems.STRETCH => mh,
+                    _ => throw new ArgumentOutOfRangeException()
+                };
+                
+                Children[j].Render(target, new Rectangle(xComp, y, xComp + widths[j - i], y + yo + heights[j - i]));
+                xComp += widths[j - i];
+            }
+
+            y += mh;
+            i = end;
         }
     }
 
@@ -369,12 +400,6 @@ public class Div : IElement {
                 return 0;
             case DisplayType.INLINE:
                 throw new NotImplementedException();
-            case DisplayType.INLINE_BLOCK:
-                throw new NotImplementedException();
-            case DisplayType.INLINE_FLEX:
-                throw new NotImplementedException();
-            case DisplayType.INLINE_GRID:
-                throw new NotImplementedException();
             case DisplayType.BLOCK:
                 w += Children.Sum(c => c.GetWidth(maxHeight));
                 break;
@@ -409,6 +434,22 @@ public class Div : IElement {
         return GetWidth(maxHeight);
     }
 
+    protected int ComputeHeightNone() => 0;
+
+    protected int ComputeHeightInline(int width) {
+        int h = 0;
+        int mh = 0;
+        int cw = 0;
+        for (int i = 0; i < Children.Count; i++) {
+            var w = Children[i].GetWidth(width);
+            if (w + Children[i].GetWidth(width) > width) {
+                
+            }
+        }
+
+        return h;
+    }
+    
     public int GetHeight(int maxWidth) {
         int h = 0;
         int contentWidth = IElement.GetContentRect(new Rectangle(0, 0, maxWidth, int.MaxValue), Margin, Padding, Border).Width;
@@ -418,15 +459,10 @@ public class Div : IElement {
         
         switch (Display) {
             case DisplayType.NONE:
-                return 0;
+                return ComputeHeightNone();
             case DisplayType.INLINE:
-                throw new NotImplementedException();
-            case DisplayType.INLINE_BLOCK:
-                throw new NotImplementedException();
-            case DisplayType.INLINE_FLEX:
-                throw new NotImplementedException();
-            case DisplayType.INLINE_GRID:
-                throw new NotImplementedException();
+                h = ComputeHeightInline(contentWidth);
+                break;
             case DisplayType.BLOCK:
                 h += Children.Sum(c => c.GetHeight(contentWidth));
                 break;

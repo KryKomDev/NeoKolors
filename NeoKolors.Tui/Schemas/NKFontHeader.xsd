@@ -4,18 +4,18 @@
 <!--                             -->
 
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:tns="https://github.com/KryKomDev/NeoKolors/blob/main/NeoKolors.Tui/Schemas/NKFontHeader.xsd"
-            targetNamespace="https://github.com/KryKomDev/NeoKolors/blob/main/NeoKolors.Tui/Schemas/NKFontHeader.xsd"
+            xmlns:tns="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/NKFontHeader.xsd"
+            targetNamespace="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/NKFontHeader.xsd"
             elementFormDefault="qualified">
 
     <!-- font base type -->
     
     <xsd:complexType name="NKFont">
-        <xsd:sequence>
-            <xsd:group ref="tns:Header"/>
-            <xsd:group ref="tns:Dimensions"/>
-            <xsd:group ref="tns:GlyphSettings"/>
-        </xsd:sequence>
+        <xsd:all>
+            <xsd:element name="Header" type="tns:Header"/>
+            <xsd:element name="Dimensions" type="tns:Dimensions"/>
+            <xsd:element name="GlyphConf" type="tns:GlyphConf"/>
+        </xsd:all>
     </xsd:complexType>
     
     
@@ -23,13 +23,12 @@
     
     <xsd:element name="NKCFont">
         <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="tns:NKFont">
-                    <xsd:sequence>
-                        <xsd:group ref="tns:CharFontSettings"/>
-                    </xsd:sequence>
-                </xsd:extension>
-            </xsd:complexContent>
+            <xsd:all>
+                <xsd:element name="Header" type="tns:Header"/>
+                <xsd:element name="Dimensions" type="tns:Dimensions"/>
+                <xsd:element name="GlyphConf" type="tns:GlyphConf"/>
+                <xsd:element name="CharFontConf" type="tns:CharFontConf"/>
+            </xsd:all>
         </xsd:complexType>
     </xsd:element>
     
@@ -51,8 +50,8 @@
     
     <!-- header -->
     
-    <xsd:group name="Header">
-        <xsd:sequence>
+    <xsd:complexType name="Header">
+        <xsd:all>
             <xsd:element name="Version">
                 <xsd:simpleType>
                     <xsd:annotation>
@@ -63,40 +62,39 @@
                     </xsd:restriction>
                 </xsd:simpleType>
             </xsd:element>
-            
+
             <xsd:element name="FontName" type="xsd:string">
                 <xsd:annotation>
                     <xsd:documentation>Name of the font</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-            
+
             <xsd:element name="FontPath" type="xsd:string">
                 <xsd:annotation>
                     <xsd:documentation>Path to the actual font file</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
-        </xsd:sequence>
-    </xsd:group>
+        </xsd:all>
+    </xsd:complexType>
     
     
     <!-- spacing -->
     
-    <xsd:group name="Dimensions">
-        <xsd:sequence>
-            <xsd:element name="LetterSpacing" type="xsd:int" default="1" minOccurs="0"/>
-            <xsd:element name="WordSpacing" type="xsd:int" default="2" minOccurs="0"/>
-            <xsd:element name="LineSpacing" type="xsd:int" default="2" minOccurs="0"/>
-            <xsd:element name="LineSize" type="xsd:int" default="3" minOccurs="0"/>
-        </xsd:sequence>
-    </xsd:group>
+    <xsd:complexType name="Dimensions">
+        <xsd:all>
+            <xsd:element name="LetterSpacing" type="xsd:int"/>
+            <xsd:element name="WordSpacing" type="xsd:int"/>
+            <xsd:element name="LineSpacing" type="xsd:int"/>
+            <xsd:element name="LineSize" type="xsd:int"/>
+        </xsd:all>
+    </xsd:complexType>
     
     
     <!-- glyph settings -->
     
-    <xsd:group name="GlyphSettings">
-        <xsd:sequence>
-            
-            <xsd:element name="MissingGlyphMode" default="skip" minOccurs="0">
+    <xsd:complexType name="GlyphConf">
+        <xsd:all>
+            <xsd:element name="MissingGlyphMode" default="skip">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string">
                         <xsd:enumeration value="char"/>
@@ -107,7 +105,7 @@
                 </xsd:simpleType>
             </xsd:element>
 
-            <xsd:element name="MissingGlyphSubstitute" default="?" minOccurs="0">
+            <xsd:element name="MissingGlyphSubstitute" default="?">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string">
                         <xsd:length value="1"/>
@@ -115,19 +113,26 @@
                 </xsd:simpleType>
             </xsd:element>
             
-        </xsd:sequence>
-    </xsd:group>
+            <xsd:element name="Ligatures" minOccurs="0" default="0">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:int">
+                        <xsd:minInclusive value="0"/>
+                        <xsd:maxInclusive value="3"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+        </xsd:all>
+    </xsd:complexType>
     
     
     <!-- settings for character font glyph definitions -->
     
-    <xsd:group name="CharFontSettings">
-        <xsd:sequence>
-            
-            <xsd:element name="GlyphDefStartMarker" type="xsd:string" default="[[[" minOccurs="0"/>
-            <xsd:element name="GlyphDefEndMarker" type="xsd:string" default="]]]" minOccurs="0"/>
+    <xsd:complexType name="CharFontConf">
+        <xsd:all>
+            <xsd:element name="GlyphDefStartMarker" type="xsd:string" default="[[["/>
+            <xsd:element name="GlyphDefEndMarker" type="xsd:string" default="]]]"/>
 
-            <xsd:element name="WhitespaceMode" default="overlap" minOccurs="0">
+            <xsd:element name="Overlap" default="overlap">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string">
                         <xsd:enumeration value="transparent"/>
@@ -137,15 +142,14 @@
                 </xsd:simpleType>
             </xsd:element>
 
-            <xsd:element name="MaskCharacter" default="." minOccurs="0">
+            <xsd:element name="MaskCharacter" default=".">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string">
                         <xsd:length value="1"/>
                     </xsd:restriction>
                 </xsd:simpleType>
             </xsd:element>
-            
-        </xsd:sequence>
-    </xsd:group>
+        </xsd:all>
+    </xsd:complexType>
     
 </xsd:schema>
