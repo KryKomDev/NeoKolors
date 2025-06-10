@@ -11,6 +11,9 @@ namespace NeoKolors.Tui.Elements;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
 public class ApplicableStylesAttribute : Attribute {
+
+    private static readonly NKLogger LOGGER = NKDebug.GetLogger(nameof(ApplicableStylesAttribute));
+    
     public Type[] Styles { get; }
 
     /// <summary>
@@ -64,7 +67,7 @@ public class ApplicableStylesAttribute : Attribute {
     /// <param name="baseType">the type from which the style constraints will be inherited</param>
     /// <param name="styles">the additional styles that can be applied to the annotated element</param>
     public ApplicableStylesAttribute(Type baseType, params string[] styles) {
-        var a = baseType.GetCustomAttribute<ApplicableStylesAttribute>();
+        var a = baseType.GetCustomAttribute<ApplicableStylesAttribute>(true);
 
         if (a == null) {
             Styles = GetTypes(styles);
@@ -90,7 +93,7 @@ public class ApplicableStylesAttribute : Attribute {
     /// <param name="typeSet">a predefined set of types that can be applied to the annotated element</param>
     /// <param name="styles">the additional styles that can be applied to the annotated element</param>
     public ApplicableStylesAttribute(Predefined typeSet, params string[] styles) {
-        var types = FromEnum(typeSet).ToList();
+        var types = FromPredefined(typeSet).ToList();
         
         foreach (var s in GetTypes(styles)) {
             if (!types.Contains(s)) {
@@ -109,7 +112,7 @@ public class ApplicableStylesAttribute : Attribute {
 
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (t == null) {
-                NKDebug.Warn($"Style {s} cannot be added to the list of applicable styles, as it does not exist.");
+                LOGGER.Warn($"Style {s} cannot be added to the list of applicable styles, as it does not exist.");
                 continue;
             }
             
@@ -120,12 +123,12 @@ public class ApplicableStylesAttribute : Attribute {
     }
 
     private static Type[] ContainerStyles() => GetTypes("flex-direction", "overflow", "justify-content", "grid");
-    private static Type[] TextStyles() => GetTypes("color", "font");
+    private static Type[] TextStyles() => GetTypes("color", "font", "overflow", "text-align");
     private static Type[] UniversalStyles() => GetTypes(
         "display", "min-width", "max-width", "min-height", "max-height", "display", "background-color", 
         "border", "padding", "margin", "grid-align");
 
-    private static Type[] FromEnum(Predefined p) {
+    private static Type[] FromPredefined(Predefined p) {
         List<Type> types = [];
         
         if (p.HasFlag(Predefined.CONTAINER)) types.AddRange(ContainerStyles());
@@ -137,19 +140,20 @@ public class ApplicableStylesAttribute : Attribute {
 
     [Flags]
     public enum Predefined {
-        /// <summary>
-        /// flex-direction, overflow, justify-content, grid
-        /// </summary>
-        CONTAINER = 1,
-        
-        /// <summary>
-        /// color, background, border, font
-        /// </summary>
-        TEXT = 2,
         
         /// <summary>
         /// display, min/max-width/height, display, border, padding, margin, background-color, grid-align
         /// </summary>
-        UNIVERSAL = 4,
+        UNIVERSAL = 1,
+        
+        /// <summary>
+        /// flex-direction, overflow, justify-content, grid
+        /// </summary>
+        CONTAINER = 2,
+        
+        /// <summary>
+        /// color, background, border, font
+        /// </summary>
+        TEXT = 4,
     }
 }

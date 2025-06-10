@@ -11,6 +11,8 @@ namespace NeoKolors.Tui;
 
 public class Application : IApplication {
     
+    private static readonly NKLogger LOGGER = NKDebug.GetLogger(nameof(Application));
+    
     /// <summary>
     /// stack of 'pop-ups'
     /// </summary>
@@ -126,7 +128,7 @@ public class Application : IApplication {
     /// <inheritdoc cref="IApplication.Start"/>
     public void Start() {
         
-        NKDebug.Info($"Starting application with config: {Config.ToString()}");
+        LOGGER.Info($"Starting application with config: {Config.ToString()}");
         
         IsRunning = true;
         StartEvent.Invoke(this, new AppStartEventArgs(Config.LazyRender));
@@ -174,7 +176,7 @@ public class Application : IApplication {
 
             KeyEvent.Invoke(this, new KeyEventArgs(ki));
             
-            NKDebug.Trace($"Pressed key: {Extensions.ToString(ki)}");
+            LOGGER.Trace($"Pressed key: {Extensions.ToString(ki)}");
             
             Render();
             Screen.Render();
@@ -235,7 +237,7 @@ public class Application : IApplication {
     
     /// <inheritdoc cref="IApplication.Stop"/>
     public void Stop() {
-        NKDebug.Info("Stopping application...");
+        LOGGER.Info("Stopping application...");
         IsRunning = false;
         StopEvent.Invoke(this, EventArgs.Empty);
         Screen.ScreenMode = false;

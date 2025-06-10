@@ -11,7 +11,6 @@
 
 using NeoKolors.Common;
 using NeoKolors.Common.Util;
-using NeoKolors.Console;
 using NeoKolors.Tui.Events;
 
 namespace NeoKolors.Tui;
@@ -122,7 +121,7 @@ public partial class ConsoleScreen {
             if (value) {
                 #if ALLOW_SECONDARY_CONTEXT
                 EscapeCodes.EnableSecondary();
-                NKDebug.Trace("Secondary context mode enabled.");
+                LOGGER.Trace("Secondary context mode enabled.");
                 #endif
 
                 System.Console.CursorVisible = false;
@@ -131,7 +130,7 @@ public partial class ConsoleScreen {
             else {
                 #if ALLOW_SECONDARY_CONTEXT
                 EscapeCodes.DisableSecondary();
-                NKDebug.Trace("Secondary context mode disabled.");
+                LOGGER.Trace("Secondary context mode disabled.");
                 #endif
                 
                 System.Console.CursorVisible = true;
@@ -172,7 +171,7 @@ public partial class ConsoleScreen {
         List2D.Resize(ref _changes!, Width, Height);
         List2D.Fill(_changes, true);
         
-        NKDebug.Info($"ConsoleScreen has been resized to {Width}x{Height}.");
+        LOGGER.Info($"ConsoleScreen has been resized to {Width}x{Height}.");
     }
     
     
@@ -187,7 +186,7 @@ public partial class ConsoleScreen {
         Width = TestingMode ? 1 : System.Console.WindowWidth;
         Height = TestingMode ? 1 : System.Console.WindowHeight;
         
-        NKDebug.Info($"Setting up new ConsoleScreen with width {Width} and height {Height}.");
+        LOGGER.Info($"Setting up new ConsoleScreen with width {Width} and height {Height}.");
 
         _styles = new NKStyle[Width, Height];
         _chars = new char[Width, Height];
@@ -203,7 +202,7 @@ public partial class ConsoleScreen {
             }
         }
         
-        NKDebug.Info("ConsoleScreen successfully initialized.");
+        LOGGER.Info("ConsoleScreen successfully initialized.");
     }
 
     public new void Dispose() {
@@ -212,7 +211,7 @@ public partial class ConsoleScreen {
         _changes = List2D.Empty<bool>();
         _output = string.Empty;
         ScreenMode = false;
-        NKDebug.Trace("ConsoleScreen disposed.");
+        LOGGER.Trace("ConsoleScreen disposed.");
     }
 
     public override ValueTask DisposeAsync() {

@@ -15,6 +15,9 @@ namespace NeoKolors.Tui.SourceManagement;
 /// manages the assemblies that are a source of classes for the application 
 /// </summary>
 public static class SourceManager {
+    
+    private static readonly NKLogger LOGGER = NKDebug.GetLogger(nameof(SourceManager));
+    
     private static readonly List<Assembly> ASSEMBLIES = [];
     private static readonly Dictionary<string, Type> STYLES = [];
     private static readonly Dictionary<string, Type> ELEMENTS = [];
@@ -31,7 +34,7 @@ public static class SourceManager {
     /// <param name="assembly">the assembly to be added</param>
     /// <exception cref="InvalidStyleNameException">a style with the same name already exists</exception>
     public static void LoadAssembly(Assembly assembly) {
-        NKDebug.Debug($"Loading assembly {assembly.GetName().Name}");
+        LOGGER.Debug($"Loading assembly {assembly.GetName().Name}");
         
         foreach (var t in assembly.GetTypes()) {
             if (IStyleProperty.IsStyle(t)) 
@@ -56,7 +59,7 @@ public static class SourceManager {
                 throw InvalidStyleNameException.Duplicate(name);
             }
                     
-            NKDebug.Trace($"Registered style '{name}'.");
+            LOGGER.Trace($"Registered style '{name}'.");
             return;
         }
                 
@@ -67,7 +70,7 @@ public static class SourceManager {
             throw InvalidStyleNameException.Duplicate(a.Name);
         }
         
-        NKDebug.Trace($"Registered style '{a.Name}'.");
+        LOGGER.Trace($"Registered style '{a.Name}'.");
     }
 
     private static void AddElement(Type t) {
@@ -83,7 +86,7 @@ public static class SourceManager {
                 throw InvalidElementNameException.Duplicate(name);
             }
                  
-            NKDebug.Trace($"Registered element '{name}'.");
+            LOGGER.Trace($"Registered element '{name}'.");
             return;
         }
                 
@@ -94,7 +97,7 @@ public static class SourceManager {
             throw InvalidElementNameException.Duplicate(a.Name);
         }
 
-        NKDebug.Trace($"Registered element '{a.Name}'.");
+        LOGGER.Trace($"Registered element '{a.Name}'.");
         _ = t.GetCustomAttribute<ApplicableStylesAttribute>();
     }
 

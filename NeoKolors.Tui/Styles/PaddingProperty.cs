@@ -33,4 +33,6 @@ public struct PaddingProperty : IStyleProperty<PaddingProperty, PaddingProperty>
         Right = new SizeValue();
         Bottom = new SizeValue();       
     }
+
+    public static PaddingProperty Zero => new(0, 0, 0, 0);
 }
