@@ -6,6 +6,7 @@
 using System.Text.RegularExpressions;
 using NeoKolors.Common.Util;
 using NeoKolors.Settings.Exception;
+using static NeoKolors.Settings.Argument.StringFeatures;
 
 namespace NeoKolors.Settings.Argument;
 
@@ -32,13 +33,12 @@ public class StringArgument : IArgument<string> {
         bool allowNumbers = true, 
         bool allowUpper = true, 
         bool allowLower = true,
-        bool countVisibleOnly = true,
+        bool countVisibleOnly = false,
         Func<string, string?>? customValidate = null) 
     {
         MinLength = Math.Min(minLength, maxLength);
         MaxLength = Math.Max(minLength, maxLength);
         DefaultValue = defaultValue;
-        Value = DefaultValue;
         AllowSpaces = allowSpaces;
         AllowNewlines = allowNewlines;
         AllowSpecial = allowSpecial;
@@ -47,7 +47,46 @@ public class StringArgument : IArgument<string> {
         AllowLower = allowLower;
         CountVisibleOnly = countVisibleOnly;
         CustomValidate = customValidate;
-        Value = DefaultValue;
+        Value = "";
+        if (defaultValue != "") Set(defaultValue);
+    }
+
+    public StringArgument(
+        uint minLength = 0,
+        uint maxLength = UInt32.MaxValue,
+        string defaultValue = "",
+        StringFeatures allowedStringFeatures = ALL,
+        bool countVisibleOnly = false,
+        Func<string, string?>? customValidate = null) 
+    {
+        MinLength = Math.Min(minLength, maxLength);
+        MaxLength = Math.Max(minLength, maxLength);
+        DefaultValue = defaultValue;
+        AllowSpaces = allowedStringFeatures.HasFlag(SPACES);
+        AllowNewlines = allowedStringFeatures.HasFlag(NEWLINES);
+        AllowSpecial = allowedStringFeatures.HasFlag(SPECIAL);
+        AllowNumbers = allowedStringFeatures.HasFlag(NUMBERS);
+        AllowUpper = allowedStringFeatures.HasFlag(UPPER);
+        AllowLower = allowedStringFeatures.HasFlag(LOWER);
+        CountVisibleOnly = countVisibleOnly;
+        CustomValidate = customValidate;
+        Value = "";
+        if (defaultValue != "") Set(defaultValue);
+    }
+
+    public StringArgument() {
+        MinLength = 0;
+        MaxLength = uint.MaxValue;
+        DefaultValue = "";
+        AllowSpaces = true;
+        AllowNewlines = true;
+        AllowSpecial = true;
+        AllowNumbers = true;
+        AllowUpper = true;
+        AllowLower = true;
+        CountVisibleOnly = false;
+        CustomValidate = null;
+        Value = "";
     }
     
     public string Value { get; private set; }
@@ -196,10 +235,17 @@ public class StringArgument : IArgument<string> {
 /// </summary>
 [Flags]
 public enum StringFeatures {
-    SPACES = 0x1,
-    NEWLINES = 0x2,
-    SPECIAL = 0x4,
-    NUMBERS = 0x8,
-    UPPER = 0x10,
-    LOWER = 0x20
+    ALL = SPACES | NEWLINES | SPECIAL | NUMBERS | UPPER | LOWER,
+    SPACES = 1 << 0,
+    NO_SPACES = ALL ^ SPACES,
+    NEWLINES = 1 << 1,
+    NO_NEWLINES = ALL ^ NEWLINES,
+    SPECIAL = 1 << 2,
+    NO_SPECIAL = ALL ^ SPECIAL,
+    NUMBERS = 1 << 3,
+    NO_NUMBERS = ALL ^ NUMBERS,
+    UPPER = 1 << 4,
+    NO_UPPER = ALL ^ UPPER,
+    LOWER = 1 << 5,
+    NO_LOWER = ALL ^ LOWER,
 }

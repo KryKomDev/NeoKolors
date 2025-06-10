@@ -1,4 +1,6 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003A0200000Cpdb8Low_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002Econfig_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FDecompilerCache_003FILViewer_003Fd29561fd0a684035aef4d824a917c8a74400_003Fe2_003F312b50df_003F0200000Cpdb8Low_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
+	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003A0200000Dpdb8Low_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002Econfig_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FDecompilerCache_003FILViewer_003Fe641ed7d4fd945a8af3b045272cd50c6ac00_003F33_003F0a419c98_003F0200000Dpdb8Low_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AAnsiStringMarshaller_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FSourcesCache_003Fe1ebdedc377a60428ef736cbb74addb150a7edc1c5a4f017ff4f53c18d_003FAnsiStringMarshaller_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AAppDomain_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FSourcesCache_003Fa2ae9b9f3fb4f1ae29cd7c36ef4ba66f9f62a2c94a93f7b844ee2810f95f37_003FAppDomain_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=7020124F_002D9FFC_002D4AC3_002D8F3D_002DAAB8E0240759_002Ff_003AArgumentOutOfRangeException_002Ecs_002Fl_003A_002E_002E_003F_002E_002E_003F_002E_002E_003F_002E_002E_003FAppData_003FRoaming_003FJetBrains_003FRider2024_002E3_003Fresharper_002Dhost_003FSourcesCache_003Fd49485e469b7c56ea29d165b121cd86aa5aeb67e665b5f8c68166f6ede623c9_003FArgumentOutOfRangeException_002Ecs/@EntryIndexedValue">ForceIncluded</s:String>
@@ -67,76 +69,10 @@
 &lt;/AssemblyExplorer&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/CreateUnitTestDialog/TestProjectMapping/=30D94294_002D5495_002D4A54_002DAD97_002D7454B5DEC95B/@EntryIndexedValue">811FA8B8-D174-4A6F-9A1C-B5CA6D72C4A7</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/CreateUnitTestDialog/TestTemplateMapping/=xUnit/@EntryIndexedValue">33ff99d8-b1ad-4ed5-a4fd-376b97c2c841</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=5f31d0fb_002D009a_002D448b_002D87b4_002Da41d782bebec/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="Session" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.StringEffectsTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Tui.RectangleTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.ColorTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.ColorFormatTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.UInt24Tests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Console.FancyException.StaticCreate_ShouldReturnCorrect&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Console.FancyException&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Settings.BoolArgumentTests.Set_ShouldWorkProperly&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Settings.BoolArgumentTests.Reset_ShouldWorkProperly&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Settings.BoolArgumentTests.Equal_ShouldWorkProperly&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Settings.DoubleArgumentTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Settings.IntegerArgumentTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Settings.UIntegerArgumentTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Settings.LongArgumentTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Settings.ULongArgumentTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Settings.FloatArgumentTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Tui.VirtualConsoleTests.SetFColor_ShouldWorkProperly&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Tui.ConsoleScreenTests.SetFColor_ShouldWorkProperly&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Tui.ConsoleScreenTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.CompressedStyleTests.SetBColorCustom_ShouldWorkProperly&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.CompressedStyleTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.StyleTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.NKStyleTests.SetFColorCustom_ShouldWorkProperly&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.NKStyleTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::811FA8B8-D174-4A6F-9A1C-B5CA6D72C4A7::net8.0::NeoKolors.Common.Tests.UInt24Tests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::7792E1F9-14D2-4D73-91E5-4227F9E1AD1F::net8.0::NeoKolors.Settings.Tests.BoolArgumentTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::811FA8B8-D174-4A6F-9A1C-B5CA6D72C4A7::net8.0::NeoKolors.Common.Tests.StringEffectsTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::7792E1F9-14D2-4D73-91E5-4227F9E1AD1F::net8.0::NeoKolors.Settings.Tests.MultiSelectArgumentTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::811FA8B8-D174-4A6F-9A1C-B5CA6D72C4A7::net8.0::NeoKolors.Common.Tests.StringUtilsTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::A6BDA12D-18B6-4A75-B38C-FC04F48A4904::net8.0::NeoKolors.Tui.Tests.RectangleTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::811FA8B8-D174-4A6F-9A1C-B5CA6D72C4A7::net8.0::NeoKolors.Common.Tests.List2DTests&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=c8e46745_002D3bea_002D4bd1_002Dab1f_002D7770d07edf5c/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;Solution /&gt;
 &lt;/SessionState&gt;</s:String>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=861bbe3d_002Deec6_002D4946_002Da5e8_002Dfe4451937413/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="RectangleTests" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.StringEffectsTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Tui.RectangleTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.ColorTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.ColorFormatTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.UInt24Tests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Console.FancyException.StaticCreate_ShouldReturnCorrect&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Console.FancyException&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Settings.BoolArgumentTests.Set_ShouldWorkProperly&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Settings.BoolArgumentTests.Reset_ShouldWorkProperly&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Settings.BoolArgumentTests.Equal_ShouldWorkProperly&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Settings.DoubleArgumentTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Settings.IntegerArgumentTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Settings.UIntegerArgumentTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Settings.LongArgumentTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Settings.ULongArgumentTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Settings.FloatArgumentTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Tui.VirtualConsoleTests.SetFColor_ShouldWorkProperly&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Tui.ConsoleScreenTests.SetFColor_ShouldWorkProperly&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Tui.ConsoleScreenTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.CompressedStyleTests.SetBColorCustom_ShouldWorkProperly&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.CompressedStyleTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.StyleTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.NKStyleTests.SetFColorCustom_ShouldWorkProperly&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::62F04722-91CC-4CF4-B49A-D156C26DF9CD::net9.0::NeoKolors.Test.Common.NKStyleTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::811FA8B8-D174-4A6F-9A1C-B5CA6D72C4A7::net8.0::NeoKolors.Common.Tests.UInt24Tests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::7792E1F9-14D2-4D73-91E5-4227F9E1AD1F::net8.0::NeoKolors.Settings.Tests.BoolArgumentTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::811FA8B8-D174-4A6F-9A1C-B5CA6D72C4A7::net8.0::NeoKolors.Common.Tests.StringEffectsTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::7792E1F9-14D2-4D73-91E5-4227F9E1AD1F::net8.0::NeoKolors.Settings.Tests.MultiSelectArgumentTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::811FA8B8-D174-4A6F-9A1C-B5CA6D72C4A7::net8.0::NeoKolors.Common.Tests.List2DTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::811FA8B8-D174-4A6F-9A1C-B5CA6D72C4A7::net8.0::NeoKolors.Common.Tests.NameConvertorTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::811FA8B8-D174-4A6F-9A1C-B5CA6D72C4A7::net8.0::NeoKolors.Common.Tests.StringUtilsTests&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String>
+	
 	<s:String x:Key="/Default/Monitoring/StartMode/@EntryValue">Disabled</s:String>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=coquilecot/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=icterine/@EntryIndexedValue">True</s:Boolean>

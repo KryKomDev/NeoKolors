@@ -4,7 +4,7 @@
 //
 
 using NeoKolors.Settings.Exception;
-using static NeoKolors.Settings.Tests.MultiSelectArgumentTests.TestEnum;
+using static NeoKolors.Settings.Tests.DummyEnum;
 
 namespace NeoKolors.Settings.Tests;
 
@@ -44,34 +44,32 @@ public class MultiSelectArgumentTests {
 
     [Fact]
     public void FromEnum_ShouldWorkProperly() {
-        var a = MultiSelectArgument<TestEnum>.FromEnum<TestEnum>();
+        var a = MultiSelectArgument<DummyEnum>.FromEnum<DummyEnum>();
         Assert.Equal([
-                new KeyValuePair<TestEnum, int>(A, 0), 
-                new KeyValuePair<TestEnum, int>(B, 1), 
-                new KeyValuePair<TestEnum, int>(C, 2), 
-                new KeyValuePair<TestEnum, int>(D, 3)], 
+                new KeyValuePair<DummyEnum, int>(A, 0), 
+                new KeyValuePair<DummyEnum, int>(B, 1), 
+                new KeyValuePair<DummyEnum, int>(C, 2), 
+                new KeyValuePair<DummyEnum, int>(D, 3)], 
             a.Choices.ToArray());
     }
     
-    internal enum TestEnum { A, B, C, D }
-    
     [Fact]
     public void Select_ShouldWorkProperly() {
-        var a = MultiSelectArgument<TestEnum>.FromEnum<TestEnum>();
+        var a = MultiSelectArgument<DummyEnum>.FromEnum<DummyEnum>();
         a.Select(A, B);
         Assert.Equal([A, B], a.Value);
     }
     
     [Fact]
     public void Deselect_ShouldWorkProperly() {
-        var a = MultiSelectArgument<TestEnum>.FromEnum(A, B, C, D);
+        var a = MultiSelectArgument<DummyEnum>.FromEnum(A, B, C, D);
         a.Deselect(A, B);
         Assert.Equal([C, D], a.Value);
     }
 
     [Fact]
     public void Set_TArr_ShouldWorkProperly() {
-        var a = MultiSelectArgument<TestEnum>.FromEnum<TestEnum>();
+        var a = MultiSelectArgument<DummyEnum>.FromEnum<DummyEnum>();
         a.Set(A, B);
         Assert.Equal([A, B], a.Value);
         a.Set(B, C);
@@ -80,7 +78,7 @@ public class MultiSelectArgumentTests {
 
     [Fact]
     public void Set_T_ShouldWorkProperly() {
-        var a = MultiSelectArgument<TestEnum>.FromEnum<TestEnum>();
+        var a = MultiSelectArgument<DummyEnum>.FromEnum<DummyEnum>();
         a.Set(A);
         Assert.Equal([A], a.Value);
         a.Set(A);
@@ -89,14 +87,14 @@ public class MultiSelectArgumentTests {
 
     [Fact]
     public void Set_ShouldWorkProperly() {
-        var a = MultiSelectArgument<TestEnum>.FromEnum<TestEnum>();
+        var a = MultiSelectArgument<DummyEnum>.FromEnum<DummyEnum>();
         a.Set((object)A);
         Assert.Equal([A], a.Value);
-        TestEnum[] ar = [A, B];
-        ICollection<TestEnum> c = ar;
+        DummyEnum[] ar = [A, B];
+        ICollection<DummyEnum> c = ar;
         a.Set(c);
         Assert.Equal([B], a.Value);
-        var b = MultiSelectArgument<TestEnum>.FromEnum(B, C, D);
+        var b = MultiSelectArgument<DummyEnum>.FromEnum(B, C, D);
         a.Set(b);
         Assert.Equal([B, C, D], a.Value);
         bool[] bl = [true, false, true];

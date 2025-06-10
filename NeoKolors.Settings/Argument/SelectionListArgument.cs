@@ -12,21 +12,27 @@ namespace NeoKolors.Settings.Argument;
 /// </summary>
 /// <typeparam name="T">type of the element</typeparam>
 public class SelectionListArgument<T> : IArgument<T[]> where T : notnull {
-    public T[] Values { get; }
-    public T[] DefaultValues { get; }
+    public T[] Choices { get; }
+    public T[] DefaultSelected { get; }
     public List<T> Selected { get; private set; }
     public T[] Value => Get();
-    
-    public SelectionListArgument(T[] values, params T[] defaultValues) {
-        Values = values;
 
-        foreach (var d in defaultValues)
-            if (!values.Contains(d)) 
+    public SelectionListArgument(params T[] choices) {
+        Choices = choices;
+        DefaultSelected = [];
+        Selected = new List<T>();
+    }
+    
+    public SelectionListArgument(T[] choices, params T[] defaultSelected) {
+        Choices = choices;
+
+        foreach (var d in defaultSelected)
+            if (!choices.Contains(d)) 
                 throw new InvalidArgumentInputException("Default values must be in the list of values.");
         
-        DefaultValues = defaultValues;
+        DefaultSelected = defaultSelected;
         Selected = new();
-        Set(defaultValues);
+        Set(defaultSelected);
     }
     
     /// <summary>
@@ -42,7 +48,7 @@ public class SelectionListArgument<T> : IArgument<T[]> where T : notnull {
 
     void IArgument.Set(object value) => Set(value);
     public T[] Get() => Selected.ToArray();
-    public void Reset() => Selected = DefaultValues.ToList();
+    public void Reset() => Selected = DefaultSelected.ToList();
     public IArgument<T[]> Clone() => (IArgument<T[]>)MemberwiseClone();
 
     /// <summary>
@@ -54,48 +60,71 @@ public class SelectionListArgument<T> : IArgument<T[]> where T : notnull {
     /// value is null -> removes the last value from the selected values, <br/>
     /// value is <see cref="SelectionListArgument{T}"/> -> sets selected values to the values of this argument
     /// </param>
-    /// <exception cref="InvalidArgumentInputException">set value is not contained in <see cref="Values"/></exception>
+    /// <exception cref="InvalidArgumentInputException">set value is not contained in <see cref="Choices"/></exception>
     /// <exception cref="InvalidArgumentInputTypeException">an incompatible type was inputted</exception>
     public void Set(object? value) {
-        if (value is null) {
-            if (Selected.Count != 0) Selected.RemoveAt(Selected.Count - 1);
-        }
-        else if (value is T[] ta) {
-            Selected = new();
-            foreach (var t in ta) {
-                if (Values.Contains(t)) {
-                    Selected.Add(t);
-                }
-                else {
-                    throw new InvalidArgumentInputException(
-                        $"Value must be in the list of values. Instead it was '{t.ToString()}'");
-                }
-            }
-        }
-        else if (value is T t) {
-            if (!Values.Contains(t)) {
-                throw new InvalidArgumentInputException(
-                    $"Value must be in the list of values. Instead it was '{t.ToString()}'");
-            }
-            
-            Selected.Add(t);
-        }
-        else if (value is SelectionListArgument<T> a) {
-            Set(a);
-        }
-        else {
-            throw new InvalidArgumentInputTypeException(typeof(T), value.GetType());
+        switch (value) {
+            case null: 
+                if (Selected.Count != 0) Selected.RemoveAt(Selected.Count - 1);
+                break;
+            case T[] ta:
+                Set(ta);
+                break;
+            case T t:
+                Set(t);
+                break;
+            case SelectionListArgument<T> a:
+                Set(a);
+                break;
+            default:
+                throw new InvalidArgumentInputTypeException(typeof(T), value.GetType());
         }
     }
 
-    private void Set(SelectionListArgument<T> argument) {
-        foreach (var v in argument.Values)
-            if (!Values.Contains(v)) 
+    /// <summary>
+    /// copies the selected values from the input argument to this argument
+    /// </summary>
+    /// <param name="argument">the argument from which the values will be copied</param>
+    /// <exception cref="InvalidArgumentInputException">
+    /// one of the selected values of the input is not present in the selectable values
+    /// </exception>
+    public void Set(SelectionListArgument<T> argument) {
+        foreach (var v in argument.Choices)
+            if (!Choices.Contains(v)) 
                 throw new InvalidArgumentInputException($"Value must be in the list of values. Instead it was '{v.ToString()}'");
 
         T[] c = [];
         argument.Selected.CopyTo(c);
         Selected = c.ToList();
+    }
+
+    /// <summary>
+    /// adds the value to the list of selected values
+    /// </summary>
+    /// <param name="value">the value to be selected</param>
+    /// <exception cref="InvalidArgumentInputException">value is not in the list of selectable values</exception>
+    public void Set(T value) {
+        if (!Choices.Contains(value))
+            throw new InvalidArgumentInputException(
+                $"Value must be in the list of values. Instead it was '{value.ToString()}'");
+        
+        Selected.Add(value);
+    }
+    
+    /// <summary>
+    /// adds the values to the list of selected values
+    /// </summary>
+    /// <param name="values">the values to be selected</param>
+    /// <exception cref="InvalidArgumentInputException">
+    /// one of the values is not in the list of selectable values
+    /// </exception>
+    public void Set(params T[] values) {
+        foreach (var v in values) 
+            if (!Choices.Contains(v))
+                throw new InvalidArgumentInputException(
+                    $"Value must be in the list of values. Instead it was '{v.ToString()}'");
+        
+        Selected.AddRange(values);
     }
     
     /// <summary>
@@ -132,9 +161,9 @@ public class SelectionListArgument<T> : IArgument<T[]> where T : notnull {
     IArgument IArgument.Clone() => Clone();
     public bool Equals(IArgument? other) {
         return other is SelectionListArgument<T> s &&
-               Values == s.Values &&
+               Choices == s.Choices &&
                Selected == s.Selected &&
-               DefaultValues == s.DefaultValues;
+               DefaultSelected == s.DefaultSelected;
     }
 
     object ICloneable.Clone() => Clone();
