@@ -3,21 +3,25 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Settings.Exception;
+using NeoKolors.Common.Util;
+using NeoKolors.Settings.Argument.Exception;
+using NeoKolors.Settings.Attributes;
 
 namespace NeoKolors.Settings.Argument;
 
-public class BoolArgument : IArgument<bool> {
+[DisplayType("bool")]
+public class BoolArgument : IArgument<bool>, IXsdArgument {
     public bool Value { get; private set; }
     public bool DefaultValue { get; }
+    public BoolStringType AllowedStringType { get; set; }
 
-    public BoolArgument(bool defaultValue = false) {
+    public BoolArgument(bool defaultValue = false, BoolStringType allowedStringType = BoolStringType.ALL) {
         DefaultValue = defaultValue;
         Value = DefaultValue;
-        
+        AllowedStringType = allowedStringType;
     }
     
-    public void Set(object value) {
+    public void Set(object? value) {
         switch (value) {
             case bool i:
                 Value = i;
@@ -30,7 +34,7 @@ public class BoolArgument : IArgument<bool> {
                 Value = b.Value;
                 break;
             default:
-                throw new InvalidArgumentInputTypeException(typeof(Boolean), value.GetType());
+                throw new InvalidArgumentInputTypeException(typeof(bool), value?.GetType());
         }
     }
 
@@ -41,8 +45,27 @@ public class BoolArgument : IArgument<bool> {
     public void Set(string s) {
         bool v;
 
+        switch (AllowedStringType) {
+            case BoolStringType.LOWER:
+                if (!s.ContainsUpper()) 
+                    throw new ArgumentInputFormatException(typeof(bool), s, "String contains uppercase characters.");
+                break;
+            case BoolStringType.UPPER:
+                if (!s.ContainsLower()) 
+                    throw new ArgumentInputFormatException(typeof(bool), s, "String contains lowercase characters.");
+                break;
+            case BoolStringType.CAPITAL:
+                if (!s.FirstAndAll(char.IsUpper, char.IsLower)) 
+                    throw new ArgumentInputFormatException(typeof(bool), s, "String is not a capital word.");
+                break;
+            case BoolStringType.ALL:
+                break;
+            default:
+                throw new ArgumentInputFormatException(typeof(bool), s, "Invalid BoolStringType.");
+        }
+        
         s = s.ToLowerInvariant();
-        // s = s.CapitalizeFirst(); TODO: uncomment this
+        s = s.CapitalizeFirst();
         
         try {
             v = bool.Parse(s);
@@ -59,6 +82,8 @@ public class BoolArgument : IArgument<bool> {
 
     public void Set(bool value) => Value = value;
     public bool Get() => Value;
+    public bool GetDefault() => DefaultValue;
+    object IArgument.GetDefault() => GetDefault();
     object IArgument.Get() => Get();
     public void Reset() => Value = DefaultValue;
     public IArgument<bool> Clone() => (IArgument<bool>)MemberwiseClone();
@@ -88,6 +113,13 @@ public class BoolArgument : IArgument<bool> {
     public override string ToString() => 
         $"{{\"type\": \"bool\", \"value\": {Value}, \"default-value\": {DefaultValue}}}";
 
+    public string ToXsd() =>
+        """
+        <xsd:simpleType>
+            <xsd:restriction base="xsd:boolean"/>
+        </xsd:simpleType>
+        """;
+
     object ICloneable.Clone() => Clone();
 
     /// <summary>
@@ -98,5 +130,28 @@ public class BoolArgument : IArgument<bool> {
         BoolArgument argument = new();
         argument.Set(value);
         return argument;
+    }
+    
+    public enum BoolStringType {
+        
+        /// <summary>
+        /// All characters must be lowercase.
+        /// </summary>
+        LOWER =   1,
+        
+        /// <summary>
+        /// All characters must be uppercase.
+        /// </summary>
+        UPPER =   2,
+        
+        /// <summary>
+        /// The first letter must be uppercase.
+        /// </summary>
+        CAPITAL = 3,
+
+        /// <summary>
+        /// Allows any string format regardless of casing.
+        /// </summary>
+        ALL = 4
     }
 }

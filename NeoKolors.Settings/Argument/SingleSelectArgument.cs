@@ -3,7 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Settings.Exception;
+using NeoKolors.Settings.Argument.Exception;
 
 namespace NeoKolors.Settings.Argument;
 
@@ -49,35 +49,41 @@ public class SingleSelectArgument<T> : IArgument<T> where T : notnull {
         foreach (var v in Enum.GetValues(typeof(TEnum))) values.Add((TEnum)v);
 
         return defaultValue is null
-            ? new SingleSelectArgument<TEnum>(values.ToArray(), 0)
+            ? new SingleSelectArgument<TEnum>(values.ToArray())
             : new SingleSelectArgument<TEnum>(values.ToArray(), defaultValue);
     }
 
-    public void Set(object value) {
-        if (value is T s) {
-            for (int i = 0; i < Options.Length; i++) {
-                if (!Options[i].Equals(s)) continue;
-                Index = i;
-                return;
-            }
-
-            throw new InvalidArgumentInputException("Inputted string is not a valid option.");
-        }
-        else if (value is int i) {
-            if (i < 0 || i >= Options.Length)
-                throw new InvalidArgumentInputException($"Option index is out of range. Must be between 0 and {Options.Length - 1} inclusive.");
-            
+    public void Set(T value) {
+        for (int i = 0; i < Options.Length; i++) {
+            if (!Options[i].Equals(value)) continue;
             Index = i;
+            return;
         }
-        else if (value is SingleSelectArgument<T> a) {
-            Set(a.Index);
-        }
-        else {
-            throw new InvalidArgumentInputTypeException(typeof(string[]), value.GetType());
+
+        throw new InvalidArgumentInputException("Inputted string is not a valid option.");
+    }
+
+    public void Set(object? value) {
+        switch (value) {
+            case T s:
+                Set(s);
+                break;
+            case int i when i < 0 || i >= Options.Length:
+                throw new InvalidArgumentInputException($"Option index is out of range. Must be between 0 and {Options.Length - 1} inclusive.");
+            case int i:
+                Index = i;
+                break;
+            case SingleSelectArgument<T> a:
+                Set(a.Index);
+                break;
+            default:
+                throw new InvalidArgumentInputTypeException(typeof(string[]), value?.GetType());
         }
     }
 
     public T Get() => Value;
+    public T GetDefault() => Options[DefaultIndex];
+    object IArgument.GetDefault() => GetDefault();
     public void Reset() => Index = DefaultIndex;
     public IArgument<T> Clone() => (IArgument<T>)MemberwiseClone();
     object IArgument.Get() => Get();

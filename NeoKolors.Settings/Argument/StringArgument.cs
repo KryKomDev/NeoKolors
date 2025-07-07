@@ -5,12 +5,12 @@
 
 using System.Text.RegularExpressions;
 using NeoKolors.Common.Util;
-using NeoKolors.Settings.Exception;
+using NeoKolors.Settings.Argument.Exception;
 using static NeoKolors.Settings.Argument.StringFeatures;
 
 namespace NeoKolors.Settings.Argument;
 
-public class StringArgument : IArgument<string> {
+public class StringArgument : IArgument<string>, IXsdArgument {
     public readonly uint MinLength;
     public readonly uint MaxLength;
     public readonly bool AllowSpaces;
@@ -25,7 +25,7 @@ public class StringArgument : IArgument<string> {
 
     public StringArgument(
         uint minLength = 0, 
-        uint maxLength = UInt32.MaxValue, 
+        uint maxLength = uint.MaxValue, 
         string defaultValue = "", 
         bool allowSpaces = true, 
         bool allowNewlines = true,
@@ -53,7 +53,7 @@ public class StringArgument : IArgument<string> {
 
     public StringArgument(
         uint minLength = 0,
-        uint maxLength = UInt32.MaxValue,
+        uint maxLength = uint.MaxValue,
         string defaultValue = "",
         StringFeatures allowedStringFeatures = ALL,
         bool countVisibleOnly = false,
@@ -91,7 +91,7 @@ public class StringArgument : IArgument<string> {
     
     public string Value { get; private set; }
     
-    public void Set(object value) {
+    public void Set(object? value) {
         if (value is string s) {
             Validate(s);
             Value = s;
@@ -100,7 +100,7 @@ public class StringArgument : IArgument<string> {
             Set(a.Value);
         } 
         else {
-            string? str = value.ToString();
+            string? str = value?.ToString();
             if (str is null) throw new InvalidArgumentInputException("ToString method of input value returned null.");
             Validate(str);
             Value = str;
@@ -111,8 +111,32 @@ public class StringArgument : IArgument<string> {
         Validate(value);
         Value = value;
     }
+    
+    public string ToXsd() =>
+        $"""
+         <xsd:simpleType>
+             <xsd:restriction base="xsd:string">
+                 <xsd:minLength value="{MinLength}"/>
+                 <xsd:maxLength value="{MaxLength}"/>
+                 <xsd:pattern value="{GenerateRegex()}">
+             </xsd:restriction>
+         </xsd:simpleType>
+         """;
+
+    public string GenerateRegex() =>
+        $"[" +
+        $"{(AllowLower ? "[:lower:]" : "")}" +
+        $"{(AllowUpper ? "[:upper:]" : "")}" +
+        $"{(AllowNumbers ? "[:digit:]" : "")}" +
+        $"{(AllowSpecial ? "[:punct:]" : "")}" +
+        $"{(AllowSpaces ? " " : "")}" +
+        $"{(AllowNewlines ? "\\n" : "")}" +
+        $"]*";
+
     public string Get() => Value;
     object IArgument.Get() => Get();
+    public string GetDefault() => DefaultValue;
+    object IArgument.GetDefault() => GetDefault();
     public void Reset() => Value = DefaultValue;
     public IArgument<string> Clone() => (IArgument<string>)MemberwiseClone();
     IArgument IArgument.Clone() => Clone();
@@ -136,12 +160,12 @@ public class StringArgument : IArgument<string> {
     }
 
     public bool IsValid(char c) {
-        if (!AllowUpper && c is >= 'A' and <= 'Z') return false;
-        if (!AllowLower && c is >= 'a' and <= 'z') return false;
-        if (!AllowNumbers && c is >= '0' and <= '9') return false;
+        if (!AllowUpper && char.IsUpper(c)) return false;
+        if (!AllowLower && char.IsLower(c)) return false;
+        if (!AllowNumbers && char.IsNumber(c)) return false;
         if (!AllowNewlines && c is '\n') return false;
-        if (!AllowSpaces && c is ' ') return false;
-        if (!AllowSpecial && c is < '0' or > '9' and < 'A' or > 'Z' and < 'a' or > 'z' and not '\n' and not ' ') return false;
+        if (!AllowSpaces && char.IsWhiteSpace(c)) return false;
+        if (!AllowSpecial && char.IsSymbol(c)) return false;
         
         return true;
     }
@@ -167,7 +191,7 @@ public class StringArgument : IArgument<string> {
     }
 
     /// <summary>
-    /// sets the value of the argument without having to use the <see cref="Set"/> method
+    /// sets the value of the argument without having to use the <see cref="Set(string)"/> method
     /// </summary>
     /// <example>
     /// <code>

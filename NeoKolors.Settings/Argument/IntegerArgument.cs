@@ -3,11 +3,13 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Settings.Exception;
+using NeoKolors.Settings.Argument.Exception;
+using NeoKolors.Settings.Attributes;
 
 namespace NeoKolors.Settings.Argument;
 
-public class IntegerArgument : IArgument<Int32> {
+[DisplayType("int")]
+public class IntegerArgument : IArgument<int>, IXsdArgument {
     public readonly int DefaultValue;
     public readonly int MinValue; 
     public readonly int MaxValue;
@@ -20,7 +22,7 @@ public class IntegerArgument : IArgument<Int32> {
     
     public int Value { get; private set; }
 
-    public IntegerArgument(int min = Int32.MinValue, int max = Int32.MaxValue, int defaultValue = 0, Func<int, string?>? customValidate = null) {
+    public IntegerArgument(int min = int.MinValue, int max = int.MaxValue, int defaultValue = 0, Func<int, string?>? customValidate = null) {
         MinValue = Math.Min(min, max);
         MaxValue = Math.Max(min, max);
         DefaultValue = Math.Min(Math.Max(defaultValue, MinValue), MaxValue);
@@ -28,21 +30,21 @@ public class IntegerArgument : IArgument<Int32> {
         Value = DefaultValue;
     }
     
-    public void Set(object value) {
-        if (value is Int32 i) {
+    public void Set(object? value) {
+        if (value is int i) {
             Validate(i);
             Value = i;
         }
         else if (value is string s) {
             int v;
             try {
-                v = Int32.Parse(s);
+                v = int.Parse(s);
             }
             catch (FormatException e) {
-                throw new ArgumentInputFormatException(typeof(Int32), s, e.Message);
+                throw new ArgumentInputFormatException(typeof(int), s, e.Message);
             }
             catch (OverflowException e) {
-                throw new ArgumentInputFormatException(typeof(Int32), s, e.Message);
+                throw new ArgumentInputFormatException(typeof(int), s, e.Message);
             }
             
             Validate(v);
@@ -52,7 +54,7 @@ public class IntegerArgument : IArgument<Int32> {
             Set(d.Value);
         }
         else {
-            throw new InvalidArgumentInputTypeException(typeof(Int32), value.GetType());
+            throw new InvalidArgumentInputTypeException(typeof(int), value?.GetType());
         }
     }
 
@@ -60,14 +62,40 @@ public class IntegerArgument : IArgument<Int32> {
         Validate(value);
         Value = value;
     }
+    
+    public void Set(string value) {
+        int i;
+        try {
+            i = int.Parse(value);
+        }
+        catch (System.Exception e) {
+            throw new ArgumentInputFormatException(typeof(int), value, e.Message);
+        }
+        
+        Validate(i);
+        Value = i;
+    }
+
+    public string ToXsd() =>
+        $"""
+         <xsd:simpleType>
+             <xsd:restriction base="xsd:int">
+                 <xsd:minInclusive value="{MinValue}"/>
+                 <xsd:maxInclusive value="{MaxValue}"/>
+             </xsd:restriction>
+         </xsd:simpleType>
+         """;
+
     public int Get() => Value;
     object IArgument.Get() => Get();
+    public int GetDefault() => DefaultValue;
+    object IArgument.GetDefault() => GetDefault();
     public void Reset() => Value = DefaultValue;
     public IArgument<int> Clone() => (IArgument<int>)MemberwiseClone();
     IArgument IArgument.Clone() => Clone();
 
     /// <summary>
-    /// sets the value of the argument without having to use the <see cref="Set"/> method
+    /// sets the value of the argument without having to use the <see cref="Set(int)"/> method
     /// </summary>
     /// <example>
     /// <code>
@@ -162,7 +190,8 @@ public class IntegerArgument : IArgument<Int32> {
     object ICloneable.Clone() => Clone();
 }
 
-public class UIntegerArgument : IArgument<UInt32> {
+[DisplayType("uint")]
+public class UIntegerArgument : IArgument<uint>, IXsdArgument {
     public readonly uint DefaultValue;
     public readonly uint MinValue; 
     public readonly uint MaxValue;
@@ -175,7 +204,7 @@ public class UIntegerArgument : IArgument<UInt32> {
     
     public uint Value { get; private set; }
 
-    public UIntegerArgument(uint min = UInt32.MinValue, uint max = UInt32.MaxValue, uint defaultValue = 0, Func<uint, string?>? customValidate = null) {
+    public UIntegerArgument(uint min = uint.MinValue, uint max = uint.MaxValue, uint defaultValue = 0, Func<uint, string?>? customValidate = null) {
         MinValue = Math.Min(min, max);
         MaxValue = Math.Max(min, max);
         DefaultValue = Math.Min(Math.Max(defaultValue, MinValue), MaxValue);
@@ -183,21 +212,21 @@ public class UIntegerArgument : IArgument<UInt32> {
         Value = DefaultValue;
     }
     
-    public void Set(object value) {
-        if (value is UInt32 i) {
+    public void Set(object? value) {
+        if (value is uint i) {
             Validate(i);
             Value = i;
         }
         else if (value is string s) {
             uint v;
             try {
-                v = UInt32.Parse(s);
+                v = uint.Parse(s);
             }
             catch (FormatException e) {
-                throw new ArgumentInputFormatException(typeof(UInt32), s, e.Message);
+                throw new ArgumentInputFormatException(typeof(uint), s, e.Message);
             }
             catch (OverflowException e) {
-                throw new ArgumentInputFormatException(typeof(UInt32), s, e.Message);
+                throw new ArgumentInputFormatException(typeof(uint), s, e.Message);
             }
             
             Validate(v);
@@ -207,7 +236,7 @@ public class UIntegerArgument : IArgument<UInt32> {
             Set(d.Value);
         }
         else {
-            throw new InvalidArgumentInputTypeException(typeof(UInt32), value.GetType());
+            throw new InvalidArgumentInputTypeException(typeof(uint), value?.GetType());
         }
     }
 
@@ -215,14 +244,40 @@ public class UIntegerArgument : IArgument<UInt32> {
         Validate(value);
         Value = value;
     }
+    
+    public void Set(string value) {
+        uint i;
+        try {
+            i = uint.Parse(value);
+        }
+        catch (System.Exception e) {
+            throw new ArgumentInputFormatException(typeof(int), value, e.Message);
+        }
+        
+        Validate(i);
+        Value = i;
+    }
+    
+    public string ToXsd() =>
+        $"""
+         <xsd:simpleType>
+             <xsd:restriction base="xsd:unsignedInt">
+                 <xsd:minInclusive value="{MinValue}"/>
+                 <xsd:maxInclusive value="{MaxValue}"/>
+             </xsd:restriction>
+         </xsd:simpleType>
+         """;
+    
     public uint Get() => Value;
     object IArgument.Get() => Get();
+    public uint GetDefault() => DefaultValue;
+    object IArgument.GetDefault() => GetDefault();
     public void Reset() => Value = DefaultValue;
     public IArgument<uint> Clone() => (IArgument<uint>)MemberwiseClone();
     IArgument IArgument.Clone() => Clone();
 
     /// <summary>
-    /// sets the value of the argument without having to use the <see cref="Set"/> method
+    /// sets the value of the argument without having to use the <see cref="Set(uint)"/> method
     /// </summary>
     /// <example>
     /// <code>

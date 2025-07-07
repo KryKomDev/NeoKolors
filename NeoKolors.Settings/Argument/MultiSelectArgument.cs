@@ -3,7 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Settings.Exception;
+using NeoKolors.Settings.Argument.Exception;
 
 namespace NeoKolors.Settings.Argument;
 
@@ -50,7 +50,7 @@ public class MultiSelectArgument<T> : IArgument<T[]> where T : notnull {
         return new MultiSelectArgument<TEnum>(values.ToArray(), defaultValues);
     }
     
-    void IArgument.Set(object value) => Set(value);
+    void IArgument.Set(object? value) => Set(value);
 
     /// <summary>
     /// returns the selected values
@@ -82,7 +82,7 @@ public class MultiSelectArgument<T> : IArgument<T[]> where T : notnull {
     /// choices of the input Multi-select argument are not the same
     /// </exception>
     /// <exception cref="InvalidArgumentInputTypeException">value does not match any of the allowed types</exception>
-    public void Set(object value) {
+    public void Set(object? value) {
         switch (value) {
             case T[] ta: {
                 Set(ta);
@@ -104,7 +104,7 @@ public class MultiSelectArgument<T> : IArgument<T[]> where T : notnull {
                 Set(t);
                 break;
             }
-            default: throw new InvalidArgumentInputTypeException(typeof(T), value.GetType());
+            default: throw new InvalidArgumentInputTypeException(typeof(T), value?.GetType());
         }
     }
 
@@ -161,6 +161,9 @@ public class MultiSelectArgument<T> : IArgument<T[]> where T : notnull {
     }
 
     object IArgument.Get() => Get();
+
+    public T[] GetDefault() => Choices.Where(c => Selected[c.Value]).Select(c => c.Key).ToArray();
+    object IArgument.GetDefault() => GetDefault();
     void IArgument.Reset() => Reset();
     public IArgument<T[]> Clone() => (IArgument<T[]>)MemberwiseClone();
     IArgument IArgument.Clone() => Clone();

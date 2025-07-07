@@ -3,11 +3,13 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Settings.Exception;
+using NeoKolors.Settings.Argument.Exception;
+using NeoKolors.Settings.Attributes;
 
 namespace NeoKolors.Settings.Argument;
 
-public class DoubleArgument : IArgument<Double> {
+[DisplayType("double")]
+public class DoubleArgument : IArgument<double>, IXsdArgument {
     public double MinValue { get; }
     public double MaxValue { get; }
     public double DefaultValue { get; }
@@ -23,21 +25,21 @@ public class DoubleArgument : IArgument<Double> {
         Value = DefaultValue;
     }
     
-    public void Set(object value) {
-        if (value is Double i) {
+    public void Set(object? value) {
+        if (value is double i) {
             Validate(i);
             Value = i;
         }
         else if (value is string s) {
             double v;
             try {
-                v = Double.Parse(s);
+                v = double.Parse(s);
             }
             catch (FormatException e) {
-                throw new ArgumentInputFormatException(typeof(Double), s, e.Message);
+                throw new ArgumentInputFormatException(typeof(double), s, e.Message);
             }
             catch (OverflowException e) {
-                throw new ArgumentInputFormatException(typeof(Double), s, e.Message);
+                throw new ArgumentInputFormatException(typeof(double), s, e.Message);
             }
             
             Validate(v);
@@ -47,7 +49,7 @@ public class DoubleArgument : IArgument<Double> {
             Set(d.Value);
         }
         else {
-            throw new InvalidArgumentInputTypeException(typeof(Double), value.GetType());
+            throw new InvalidArgumentInputTypeException(typeof(double), value?.GetType());
         }
     }
 
@@ -55,8 +57,34 @@ public class DoubleArgument : IArgument<Double> {
         Validate(value);
         Value = value;
     }
+
+    public void Set(string value) {
+        double d;
+        try {
+            d = double.Parse(value);
+        }
+        catch (System.Exception e) {
+            throw new ArgumentInputFormatException(typeof(double), value, e.Message);
+        }
+        
+        Validate(d);
+        Value = d;
+    }
+
+    public string ToXsd() =>
+        $"""
+         <xsd:simpleType>
+             <xsd:restriction base="xsd:double">
+                  <xsd:minInclusive value="{MinValue}"/>
+                  <xsd:maxInclusive value="{MaxValue}"/>
+             </xsd:restriction>
+         </xsd:simpleType>
+         """;
+
     public double Get() => Value;
     object IArgument.Get() => Get();
+    public double GetDefault() => DefaultValue;
+    object IArgument.GetDefault() => GetDefault();
     public void Reset() => Value = DefaultValue;
     public IArgument<double> Clone() => (IArgument<double>)MemberwiseClone();
     IArgument IArgument.Clone() => Clone();

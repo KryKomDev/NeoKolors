@@ -4,7 +4,8 @@
 //
 
 using System.Diagnostics.CodeAnalysis;
-using NeoKolors.Settings.Exception;
+using NeoKolors.Settings.Argument.Exception;
+using NeoKolors.Settings.Attributes;
 using static NeoKolors.Settings.Argument.AllowedPathType;
 
 namespace NeoKolors.Settings.Argument;
@@ -13,7 +14,8 @@ namespace NeoKolors.Settings.Argument;
 /// argument for a path to a file or directory
 /// </summary>
 [ExcludeFromCodeCoverage]
-public class PathArgument : IArgument<string> {
+[DisplayType("path")]
+public class PathArgument : IArgument<string>, IXsdArgument {
     public string Value { get; private set; }
     public string DefaultValue { get; }
     public bool MustExist => !AllowedPathType.HasFlag(NOT_EXISTING);
@@ -27,13 +29,22 @@ public class PathArgument : IArgument<string> {
         AllowedPathType = allowedPathType;
     }
 
-    void IArgument.Set(object value) => Set(value);
+    public string ToXsd() =>
+        """
+        <xsd:simpleType>
+            <xsd:restriction base="xsd:anyURI"/>
+        </xsd:simpleType>
+        """;
+    
+    void IArgument.Set(object? value) => Set(value);
     public string Get() => Value;
+    public string GetDefault() => DefaultValue;
+    object IArgument.GetDefault() => GetDefault();
     public void Reset() => Value = DefaultValue;
 
     public IArgument<string> Clone() => (IArgument<string>)MemberwiseClone();
 
-    public void Set(object value) {
+    public void Set(object? value) {
         if (value is string s) {
             Set(s);
         }
@@ -41,7 +52,7 @@ public class PathArgument : IArgument<string> {
             Set(p.Value);
         }
         else {
-            throw new InvalidArgumentInputTypeException(typeof(string), value.GetType());
+            throw new InvalidArgumentInputTypeException(typeof(string), value?.GetType());
         }
     }
 

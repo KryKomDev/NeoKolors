@@ -3,11 +3,13 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Settings.Exception;
+using NeoKolors.Settings.Argument.Exception;
+using NeoKolors.Settings.Attributes;
 
 namespace NeoKolors.Settings.Argument;
 
-public class FloatArgument : IArgument<Single> {
+[DisplayType("float")]
+public class FloatArgument : IArgument<float>, IXsdArgument {
     public float MinValue { get; }
     public float MaxValue { get; }
     public float DefaultValue { get; }
@@ -23,21 +25,21 @@ public class FloatArgument : IArgument<Single> {
         Value = DefaultValue;
     }
     
-    public void Set(object value) {
-        if (value is Single i) {
+    public void Set(object? value) {
+        if (value is float i) {
             Validate(i);
             Value = i;
         }
         else if (value is string s) {
             float v;
             try {
-                v = Single.Parse(s);
+                v = float.Parse(s);
             }
             catch (FormatException e) {
-                throw new ArgumentInputFormatException(typeof(Single), s, e.Message);
+                throw new ArgumentInputFormatException(typeof(float), s, e.Message);
             }
             catch (OverflowException e) {
-                throw new ArgumentInputFormatException(typeof(Single), s, e.Message);
+                throw new ArgumentInputFormatException(typeof(float), s, e.Message);
             }
             
             Validate(v);
@@ -47,7 +49,7 @@ public class FloatArgument : IArgument<Single> {
             Set(d.Value);
         }
         else {
-            throw new InvalidArgumentInputTypeException(typeof(Single), value.GetType());
+            throw new InvalidArgumentInputTypeException(typeof(float), value?.GetType());
         }
     }
 
@@ -55,14 +57,40 @@ public class FloatArgument : IArgument<Single> {
         Validate(value);
         Value = value;
     }
+
+    public void Set(string value) {
+        float f;
+        try {
+            f = float.Parse(value);
+        }
+        catch (System.Exception e) {
+            throw new ArgumentInputFormatException(typeof(float), value, e.Message);
+        }
+        
+        Validate(f);
+        Value = f;
+    }
+
+    public string ToXsd() =>
+        $"""
+         <xsd:simpleType>
+             <xsd:restriction base="xsd:float">
+                  <xsd:minInclusive value="{MinValue}"/>
+                  <xsd:maxInclusive value="{MaxValue}"/>
+             </xsd:restriction>
+         </xsd:simpleType>
+         """;
+
     public float Get() => Value;
     object IArgument.Get() => Get();
+    public float GetDefault() => DefaultValue;
+    object IArgument.GetDefault() => GetDefault();
     public void Reset() => Value = DefaultValue;
     public IArgument<float> Clone() => (IArgument<float>)MemberwiseClone();
     IArgument IArgument.Clone() => Clone();
 
     /// <summary>
-    /// sets the value of the argument without having to use the <see cref="Set"/> method
+    /// sets the value of the argument without having to use the <see cref="Set(float)"/> method
     /// </summary>
     /// <example>
     /// <code>

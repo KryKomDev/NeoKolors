@@ -3,7 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Settings.Exception;
+using NeoKolors.Settings.Argument.Exception;
 
 namespace NeoKolors.Settings.Argument;
 
@@ -46,7 +46,7 @@ public class SelectionListArgument<T> : IArgument<T[]> where T : notnull {
         return new SelectionListArgument<TEnum>(values.ToArray(), defaultValues);
     }
 
-    void IArgument.Set(object value) => Set(value);
+    void IArgument.Set(object? value) => Set(value);
     public T[] Get() => Selected.ToArray();
     public void Reset() => Selected = DefaultSelected.ToList();
     public IArgument<T[]> Clone() => (IArgument<T[]>)MemberwiseClone();
@@ -157,6 +157,8 @@ public class SelectionListArgument<T> : IArgument<T[]> where T : notnull {
     }
 
     object IArgument.Get() => Get();
+    public T[] GetDefault() => DefaultSelected;
+    object IArgument.GetDefault() => GetDefault();
     void IArgument.Reset() => Reset();
     IArgument IArgument.Clone() => Clone();
     public bool Equals(IArgument? other) {

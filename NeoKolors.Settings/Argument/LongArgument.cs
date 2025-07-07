@@ -3,24 +3,26 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Settings.Exception;
+using NeoKolors.Settings.Argument.Exception;
+using NeoKolors.Settings.Attributes;
 
 namespace NeoKolors.Settings.Argument;
 
-public class LongArgument : IArgument<Int64> {
+[DisplayType("long")]
+public class LongArgument : IArgument<long>, IXsdArgument {
     public readonly long DefaultValue;
     public readonly long MinValue; 
     public readonly long MaxValue;
     
     /// <summary>
     /// custom validation function <br/>
-    /// validates the value and if invalid returns the cause message, else null
+    /// validates the value, and if invalid returns the cause message, else null
     /// </summary>
     public readonly Func<long, string?>? CustomValidate;
     
     public long Value { get; private set; }
 
-    public LongArgument(long min = Int64.MinValue, long max = Int64.MaxValue, long defaultValue = 0, Func<long, string?>? customValidate = null) {
+    public LongArgument(long min = long.MinValue, long max = long.MaxValue, long defaultValue = 0, Func<long, string?>? customValidate = null) {
         MinValue = Math.Min(min, max);
         MaxValue = Math.Max(min, max);
         DefaultValue = Math.Min(Math.Max(defaultValue, MinValue), MaxValue);
@@ -28,21 +30,21 @@ public class LongArgument : IArgument<Int64> {
         Value = DefaultValue;
     }
     
-    public void Set(object value) {
-        if (value is Int64 i) {
+    public void Set(object? value) {
+        if (value is long i) {
             Validate(i);
             Value = i;
         }
         else if (value is string s) {
             long v;
             try {
-                v = Int64.Parse(s);
+                v = long.Parse(s);
             }
             catch (FormatException e) {
-                throw new ArgumentInputFormatException(typeof(Int64), s, e.Message);
+                throw new ArgumentInputFormatException(typeof(long), s, e.Message);
             }
             catch (OverflowException e) {
-                throw new ArgumentInputFormatException(typeof(Int64), s, e.Message);
+                throw new ArgumentInputFormatException(typeof(long), s, e.Message);
             }
             
             Validate(v);
@@ -52,7 +54,7 @@ public class LongArgument : IArgument<Int64> {
             Set(d.Value);
         }
         else {
-            throw new InvalidArgumentInputTypeException(typeof(Int64), value.GetType());
+            throw new InvalidArgumentInputTypeException(typeof(long), value?.GetType());
         }
     }
 
@@ -60,14 +62,40 @@ public class LongArgument : IArgument<Int64> {
         Validate(value);
         Value = value;
     }
+    
+    public void Set(string value) {
+        long l;
+        try {
+            l = long.Parse(value);
+        }
+        catch (System.Exception e) {
+            throw new ArgumentInputFormatException(typeof(int), value, e.Message);
+        }
+        
+        Validate(l);
+        Value = l;
+    }
+    
+    public string ToXsd() =>
+        $"""
+         <xsd:simpleType>
+             <xsd:restriction base="xsd:long">
+                 <xsd:minInclusive value="{MinValue}"/>
+                 <xsd:maxInclusive value="{MaxValue}"/>
+             </xsd:restriction>
+         </xsd:simpleType>
+         """;
+    
     public long Get() => Value;
     object IArgument.Get() => Get();
+    public long GetDefault() => DefaultValue;
+    object IArgument.GetDefault() => GetDefault();
     public void Reset() => Value = DefaultValue;
     public IArgument<long> Clone() => (IArgument<long>)MemberwiseClone();
     IArgument IArgument.Clone() => Clone();
 
     /// <summary>
-    /// sets the value of the argument without having to use the <see cref="Set"/> method
+    /// sets the value of the argument without having to use the <see cref="Set(long)"/> method
     /// </summary>
     /// <example>
     /// <code>
@@ -163,7 +191,8 @@ public class LongArgument : IArgument<Int64> {
     object ICloneable.Clone() => Clone();
 }
 
-public class ULongArgument : IArgument<UInt64> {
+[DisplayType("ulong")]
+public class ULongArgument : IArgument<ulong>, IXsdArgument {
     public readonly ulong DefaultValue;
     public readonly ulong MinValue; 
     public readonly ulong MaxValue;
@@ -176,7 +205,7 @@ public class ULongArgument : IArgument<UInt64> {
     
     public ulong Value { get; private set; }
 
-    public ULongArgument(ulong min = UInt64.MinValue, ulong max = UInt64.MaxValue, ulong defaultValue = 0, Func<ulong, string?>? customValidate = null) {
+    public ULongArgument(ulong min = ulong.MinValue, ulong max = ulong.MaxValue, ulong defaultValue = 0, Func<ulong, string?>? customValidate = null) {
         MinValue = Math.Min(min, max);
         MaxValue = Math.Max(min, max);
         DefaultValue = Math.Min(Math.Max(defaultValue, MinValue), MaxValue);
@@ -184,21 +213,21 @@ public class ULongArgument : IArgument<UInt64> {
         Value = DefaultValue;
     }
     
-    public void Set(object value) {
-        if (value is UInt64 i) {
+    public void Set(object? value) {
+        if (value is ulong i) {
             Validate(i);
             Value = i;
         }
         else if (value is string s) {
             ulong v;
             try {
-                v = UInt64.Parse(s);
+                v = ulong.Parse(s);
             }
             catch (FormatException e) {
-                throw new ArgumentInputFormatException(typeof(UInt64), s, e.Message);
+                throw new ArgumentInputFormatException(typeof(ulong), s, e.Message);
             }
             catch (OverflowException e) {
-                throw new ArgumentInputFormatException(typeof(UInt64), s, e.Message);
+                throw new ArgumentInputFormatException(typeof(ulong), s, e.Message);
             }
             
             Validate(v);
@@ -208,7 +237,7 @@ public class ULongArgument : IArgument<UInt64> {
             Set(d.Value);
         }
         else {
-            throw new InvalidArgumentInputTypeException(typeof(UInt64), value.GetType());
+            throw new InvalidArgumentInputTypeException(typeof(ulong), value?.GetType());
         }
     }
 
@@ -216,14 +245,40 @@ public class ULongArgument : IArgument<UInt64> {
         Validate(value);
         Value = value;
     }
+    
+    public void Set(string value) {
+        ulong l;
+        try {
+            l = ulong.Parse(value);
+        }
+        catch (System.Exception e) {
+            throw new ArgumentInputFormatException(typeof(int), value, e.Message);
+        }
+        
+        Validate(l);
+        Value = l;
+    }
+    
+    public string ToXsd() =>
+        $"""
+         <xsd:simpleType>
+             <xsd:restriction base="xsd:unsignedLong">
+                 <xsd:minInclusive value="{MinValue}"/>
+                 <xsd:maxInclusive value="{MaxValue}"/>
+             </xsd:restriction>
+         </xsd:simpleType>
+         """;
+    
     public ulong Get() => Value;
     object IArgument.Get() => Get();
+    public ulong GetDefault() => DefaultValue;
+    object IArgument.GetDefault() => GetDefault();
     public void Reset() => Value = DefaultValue;
     public IArgument<ulong> Clone() => (IArgument<ulong>)MemberwiseClone();
     IArgument IArgument.Clone() => Clone();
 
     /// <summary>
-    /// sets the value of the argument without having to use the <see cref="Set"/> method
+    /// sets the value of the argument without having to use the <see cref="Set(ulong)"/> method
     /// </summary>
     /// <example>
     /// <code>
