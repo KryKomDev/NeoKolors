@@ -721,4 +721,34 @@ public static partial class NKConsole {
         
         WriteTable(h.ToArray(), rows, style);
     }
+    
+    /// <summary>
+    /// Moves the cursor to the specified position relatively to the current position.
+    /// </summary>
+    /// <param name="x">x offset from the current position</param>
+    /// <param name="y">y offset from the current position</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void MoveCursor(int x, int y) =>
+        System.Console.SetCursorPosition(System.Console.CursorLeft + x, System.Console.CursorTop + y);
+
+    #if NET5_0_OR_GREATER
+
+    /// <summary>
+    /// Moves the console cursor to a specified position based on the provided indices.
+    /// </summary>
+    /// <param name="x">
+    /// The horizontal offset of the cursor.
+    /// Can be relative (from-start index) or absolute (from-end index).
+    /// </param>
+    /// <param name="y">
+    /// The vertical offset of the cursor.
+    /// Can be relative (from-start index) or absolute (from-end index).
+    /// </param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void MoveCursor(Index x, Index y) => 
+        System.Console.SetCursorPosition(
+            Math.Clamp(x.IsFromEnd ? x.Value : System.Console.CursorLeft + x.Value, 0, System.Console.BufferWidth - 1),
+            Math.Clamp(y.IsFromEnd ? y.Value : System.Console.CursorTop + y.Value, 0, System.Console.BufferHeight - 1));
+    
+    #endif
 }

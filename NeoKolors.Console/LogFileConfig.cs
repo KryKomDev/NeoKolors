@@ -13,7 +13,7 @@ namespace NeoKolors.Console;
 /// Represents the configuration for logging files, including file path, name, and handling behavior.
 /// </summary>
 public struct LogFileConfig {
-    private const string CONFIG_FILE_NAME = "nklog.conf";
+    private const string CONFIG_FILE_NAME = ".nklog";
     
     public LogFileConfigType Config { get; set; }
     public string Path { get; set; }
