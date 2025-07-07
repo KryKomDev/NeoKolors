@@ -6,8 +6,6 @@
 #if NET8_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
 #endif
-using System.Globalization;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using NeoKolors.Common.Util;

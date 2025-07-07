@@ -1,7 +1,5 @@
 ﻿// 
-// NeoKolors
-// Copyright (c) 2025 KryKom
-//
+// NeoKolors//
 
 namespace NeoKolors.Common.Tests;
 

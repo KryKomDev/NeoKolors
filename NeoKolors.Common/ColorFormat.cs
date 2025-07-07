@@ -3,7 +3,6 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Common.Exceptions;
 using SkiaSharp;
 using static System.ConsoleColor;
 using static System.Math;
@@ -149,7 +148,7 @@ public static class ColorFormat {
     /// the passed color is not included in the standard set of colors
     /// </exception>
     public static ConsoleColor NKToSystem(NKConsoleColor color) {
-        if ((byte)color >= 16) throw InvalidColorCastException.NKToSystem(color);
+        ThrowIf((byte)color >= 16, InvalidColorCastException.NKToSystem(color));
         return color switch {
             BLACK or DARK_GREEN or DARK_MAGENTA or GRAY or DARK_GRAY or GREEN or MAGENTA or WHITE => (ConsoleColor)color,
             DARK_BLUE => DarkBlue,

@@ -32,11 +32,21 @@ public static class NameConvertor {
     /// </summary>
     public static string SnakeToCamel(this string name) {
         if (string.IsNullOrWhiteSpace(name)) return string.Empty;
-        return name.Replace('_', ' ')
-                  .Split(' ')
+        return name.Split('_')
                   .Select(x => x.First().ToString().ToUpper() + x.Substring(1))
                   .Aggregate((a, b) => a + b)
                   .DecapitalizeFirst();
+    }
+
+    /// <summary>
+    /// converts a string from space case to camel case, e.g. "hello world" -> "helloWorld"
+    /// </summary>
+    public static string SpaceToCamel(this string name) {
+        if (string.IsNullOrWhiteSpace(name)) return string.Empty;
+        return name.Split(' ')
+                   .Select(x => x.First().ToString().ToUpper() + x.Substring(1))
+                   .Aggregate((a, b) => a + b)
+                   .DecapitalizeFirst();
     }
     
     /// <summary>
@@ -75,7 +85,7 @@ public static class NameConvertor {
     /// <summary>
     /// converts a string from camel case to snake case, e.g. "helloWorld" -> "hello-world"
     /// </summary>
-    public static string KebabFromCamel(this string name) {
+    public static string CamelToKebab(this string name) {
         if (string.IsNullOrWhiteSpace(name)) return string.Empty;
         return name.Aggregate("", (current, c) => 
             current + (current.Length != 0 ? (char.IsUpper(c) ? "-" + char.ToLower(c) : c) : char.ToLower(c)));

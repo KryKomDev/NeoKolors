@@ -80,7 +80,7 @@ public class NameConvertorTests
     [InlineData("APIConfig", "a-p-i-config")]
     public void KebabFromCamel_ConvertsCorrectly(string input, string expected)
     {
-        string result = input.KebabFromCamel();
+        string result = input.CamelToKebab();
         Assert.Equal(expected, result);
     }
 
@@ -120,7 +120,7 @@ public class NameConvertorTests
         _ = input.SnakeToKebab();
         _ = input.ToDotCase();
         _ = input.SnakeToSpace();
-        _ = input.KebabFromCamel();
+        _ = input.CamelToKebab();
         _ = input.PascalToKebab();
         _ = input.EnumToKebab();
     }

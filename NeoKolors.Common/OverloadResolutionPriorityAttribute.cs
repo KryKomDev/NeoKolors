@@ -9,7 +9,7 @@
 
 namespace NeoKolors.Common;
 
-[AttributeUsage(AttributeTargets.Method)]
+[AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor, Inherited = false)]
 public class OverloadResolutionPriorityAttribute : Attribute {
     public OverloadResolutionPriorityAttribute(int priority) { }
 }

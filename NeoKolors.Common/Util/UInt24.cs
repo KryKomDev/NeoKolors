@@ -3,14 +3,11 @@
 // Copyright (c) 2025 KryKom
 //
 
-using System.Globalization;
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
 
 #if !NET5_0
 using System.Buffers.Binary;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Numerics;
 #endif
 #endif

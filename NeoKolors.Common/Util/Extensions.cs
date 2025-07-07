@@ -4,7 +4,6 @@
 //
 
 using System.Diagnostics.Contracts;
-using System.Runtime.CompilerServices;
 using static NeoKolors.Common.EscapeCodes;
 using static NeoKolors.Common.TextStyles;
 
@@ -159,4 +158,40 @@ public static class Extensions {
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static NKBckg ToBckg(this NKColor color) => new(color);
+
+    /// <summary>
+    /// Determines whether all elements, except the first one, in the provided collection
+    /// satisfy a specified condition.
+    /// </summary>
+    /// <param name="strings">The collection of elements to evaluate.</param>
+    /// <param name="predicate">A function that defines the condition each element, except the first one, must satisfy.</param>
+    /// <typeparam name="TSource">The type of elements in the collection.</typeparam>
+    /// <returns>
+    /// <c>true</c> if all elements, excluding the first one, satisfy the condition; otherwise, <c>false</c>.
+    /// </returns>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool AllButFirst<TSource>(this IEnumerable<TSource> strings, Func<TSource, bool> predicate) =>
+        strings.Skip(1).All(predicate);
+
+    /// <summary>
+    /// Determines whether all elements, except the first one, in the provided collection
+    /// satisfy a specified condition.
+    /// </summary>
+    /// <param name="strings">The collection of elements to evaluate.</param>
+    /// <param name="first">A function that defines the condition the first element must satisfy.</param>
+    /// <param name="all">A function that defines the condition each element, except the first one, must satisfy.</param>
+    /// <typeparam name="TSource">The type of elements in the collection.</typeparam>
+    /// <returns>
+    /// <c>true</c> if all elements satisfy their respective condition; otherwise, <c>false</c>.
+    /// </returns>
+    [Pure]
+    public static bool FirstAndAll<TSource>(
+        this IEnumerable<TSource> strings,
+        Func<TSource, bool> first, 
+        Func<TSource, bool> all) 
+    {
+        var e = strings as TSource[] ?? strings.ToArray();
+        return e.Skip(1).All(all) && first(e.First());
+    }
 }

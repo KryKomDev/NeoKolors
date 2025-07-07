@@ -4,7 +4,6 @@
 //
 
 using System.Drawing;
-using System.Globalization;
 using NeoKolors.Common.Util;
 using static System.Math;
 

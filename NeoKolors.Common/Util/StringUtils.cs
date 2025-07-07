@@ -8,9 +8,9 @@ using System.Diagnostics.CodeAnalysis;
 #endif
 using System.Collections;
 using System.Diagnostics.Contracts;
-using System.Globalization;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
+
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace NeoKolors.Common.Util;
 
@@ -156,7 +156,7 @@ public static class StringUtils {
     [Pure]
     public static string[] Chop(this string s, int maxLength) {
         if (string.IsNullOrWhiteSpace(s)) return [];
-        if (maxLength <= 0) throw new ArgumentException("Maximum length must be positive", nameof(maxLength));
+        ArgOutOfRange.ThrowIf(maxLength <= 0, nameof(maxLength), "Maximum length must be positive");
 
         List<string> output = [];
         int currentPosition = 0;
@@ -231,7 +231,8 @@ public static class StringUtils {
     public static string Join<TSource>(
         this IEnumerable<TSource> collection,
         string separator,
-        Func<TSource?, string?> stringifier) {
+        Func<TSource?, string?> stringifier) 
+    {
         List<string?> strings = [];
         foreach (var c in collection) {
             string? s = stringifier(c);
@@ -254,7 +255,7 @@ public static class StringUtils {
     /// </exception>
     [Pure]
     public static string ToRoman(this int number, bool lowercase = false) {
-        if (number is < 1 or > 3999) throw new ArgumentOutOfRangeException(nameof(number));
+        ArgOutOfRange.ThrowIf(number is < 1 or > 3999, nameof(number));
 
         string output = "";
 
@@ -393,4 +394,123 @@ public static class StringUtils {
             ? new string(' ', (int)(Math.Floor((pad - s.Length) / 2f))) + s +
               new string(' ', (int)(Math.Ceiling((pad - s.Length) / 2f)))
             : throw new ArgumentOutOfRangeException(nameof(pad), PAD_INV_MSG);
+
+    /// <summary>
+    /// Returns a substring from the specified string, ensuring safe boundary handling
+    /// by adjusting the start and count parameters to fit within the valid range of the string.
+    /// </summary>
+    /// <param name="s">The input string from which the substring is extracted.</param>
+    /// <param name="start">The zero-based starting character position of the substring.</param>
+    /// <param name="count">The number of characters to retrieve from the starting position.</param>
+    /// <returns>A substring based on the specified start and count parameters, adjusted for safe boundary conditions.</returns>
+    [Pure]
+    public static string SafeSubstring(this string s, int start, int count) {
+        start = start > s.Length - 1 ? s.Length - 1 : start < 0 ? 0 : start;
+        count = count < 0 ? 0 : count + start >= s.Length ? s.Length - start : count;
+        return s.Substring(start, count);
+    }
+
+    /// <summary>
+    /// Determines whether the specified string contains any special characters.
+    /// Special characters are defined as characters that are neither letters nor digits.
+    /// </summary>
+    /// <param name="s">The string to evaluate for the presence of special characters.</param>
+    /// <returns>
+    /// <c>true</c> if the string contains special characters; otherwise, <c>false</c>.
+    /// </returns>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool ContainsSpecial(this string s) =>
+        !string.IsNullOrEmpty(s) && s.Any(c => !(char.IsLetter(c) || char.IsDigit(c)));
+    
+    /// <summary>
+    /// Determines whether the specified string contains any numeric characters.
+    /// </summary>
+    /// <param name="s">The string to check for numeric characters.</param>
+    /// <returns>True if the string contains at least one numeric character; otherwise, false.</returns>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool ContainsNumber(this string s) =>
+        !string.IsNullOrEmpty(s) && s.Any(char.IsDigit);
+
+    /// <summary>
+    /// Determines if the given string contains at least one letter.
+    /// </summary>
+    /// <param name="s">The string to check for the presence of letters.</param>
+    /// <returns>True if the string contains at least one letter; otherwise, false.</returns>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool ContainsLetter(this string s) =>
+        !string.IsNullOrEmpty(s) && s.Any(char.IsLetter);
+
+    /// <summary>
+    /// Determines whether the provided string contains at least one uppercase character.
+    /// </summary>
+    /// <param name="s">The string to evaluate.</param>
+    /// <returns>True if the string contains one or more uppercase characters; otherwise, false.</returns>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool ContainsUpper(this string s) =>
+        !string.IsNullOrEmpty(s) && s.Any(char.IsUpper);
+
+    /// <summary>
+    /// Determines whether the specified string contains any lowercase characters.
+    /// </summary>
+    /// <param name="s">The string to check for lowercase characters.</param>
+    /// <returns>
+    /// <c>true</c> if the specified string contains at least one lowercase character; otherwise, <c>false</c>.
+    /// </returns>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool ContainsLower(this string s) =>
+        !string.IsNullOrEmpty(s) && s.Any(char.IsLower);
+
+    /// <summary>
+    /// Determines whether the specified string is a valid identifier.
+    /// A valid identifier is non-empty, contains only letters, digits, underscores, or '@',
+    /// and does not start with a digit.
+    /// </summary>
+    /// <param name="s">The string to validate as an identifier.</param>
+    /// <returns>True if the string is a valid identifier; otherwise, false.</returns>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsValidIdentifier(this string s) =>
+        !string.IsNullOrEmpty(s) && s.All(c => char.IsLetterOrDigit(c) || c is '_' or '@') && !char.IsDigit(s[0]);
+
+    /// <summary>
+    /// Determines whether the given string consists solely of alphabetic characters.
+    /// </summary>
+    /// <param name="s">The string to evaluate.</param>
+    /// <returns>True if the string is not null, not empty, and contains only letters; otherwise, false.</returns>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsWord(this string s) =>
+        !string.IsNullOrEmpty(s) && s.All(char.IsLetter);
+
+    /// <summary>
+    /// Determines whether a string is non-empty and begins with an uppercase character,
+    /// followed by only lowercase characters.
+    /// </summary>
+    /// <param name="s">The string to evaluate.</param>
+    /// <returns>True if the string is a capital word, otherwise false.</returns>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsCapitalWord(this string s) =>
+        !s.IsWord() && s.FirstAndAll(char.IsUpper, char.IsLower);
+
+    /// <summary>
+    /// Pads each line of the given string to the left by the specified number of spaces.
+    /// Optionally skips padding the first line.
+    /// </summary>
+    /// <param name="s">The input string containing lines to pad.</param>
+    /// <param name="pad">The number of spaces to pad to the left of each line.</param>
+    /// <param name="padFirst">A boolean indicating whether to pad the first line or not.</param>
+    /// <returns>The input string with each line padded to the left as specified.</returns>
+    [Pure]
+    public static string PadLinesLeft(this string s, int pad, bool padFirst = false) {
+        string[] lines = s.Split('\n');
+        for (int i = padFirst ? 0 : 1; i < lines.Length; i++)
+            lines[i] = new string(' ', pad) + lines[i];
+        return lines.Join("\n");
+    }
 }
