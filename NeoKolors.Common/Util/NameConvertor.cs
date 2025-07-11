@@ -54,8 +54,7 @@ public static class NameConvertor {
     /// </summary>
     public static string SnakeToKebab(this string name) {
         if (string.IsNullOrWhiteSpace(name)) return string.Empty;
-        return name.Replace('_', ' ')
-                  .Split(' ')
+        return name.Split('_')
                   .Select(x => x.First().ToString().ToLower() + x.Substring(1))
                   .Aggregate((a, b) => a + '-' + b);
     }
@@ -65,10 +64,9 @@ public static class NameConvertor {
     /// </summary>
     public static string ToDotCase(this string name) {
         if (string.IsNullOrWhiteSpace(name)) return string.Empty;
-        return name.Replace('_', ' ')
-                  .Split(' ')
-                  .Select(x => x.First().ToString().ToLower() + x.Substring(1))
-                  .Aggregate((a, b) => a + '.' + b);
+        return name.Split('_')
+                   .Select(x => x.First().ToString().ToLower() + x.Substring(1))
+                   .Aggregate((a, b) => a + '.' + b);
     }
     
     /// <summary>
@@ -76,10 +74,21 @@ public static class NameConvertor {
     /// </summary>
     public static string SnakeToSpace(this string name) {
         if (string.IsNullOrWhiteSpace(name)) return string.Empty;
-        return name.Replace('_', ' ')
-                  .Split(' ')
-                  .Select(x => x.First().ToString().ToUpper() + x.Substring(1))
-                  .Aggregate((a, b) => a + ' ' + b);
+        return name.Split('_')
+                   .Select(x => x.First().ToString().ToUpper() + x.Substring(1))
+                   .Aggregate((a, b) => a + ' ' + b);
+    }
+
+    /// <summary>
+    /// Separates a Pascal-cased enum name into individual words separated by spaces, e.g. "EnumValueName" -> "Enum Value Name".
+    /// </summary>
+    /// <param name="name">The Pascal-cased enum name to be converted.</param>
+    /// <returns>A string where individual words are separated by spaces.</returns>
+    public static string EnumToSpace(this string name) {
+        if (string.IsNullOrWhiteSpace(name)) return string.Empty;
+        return name.Split('_')
+                   .Select(x => x.ToLower().CapitalizeFirst())
+                   .Join(" ");
     }
 
     /// <summary>

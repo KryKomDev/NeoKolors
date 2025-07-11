@@ -27,7 +27,7 @@ public static class StringEffects {
     [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, int hex) => 
-        $"{hex.ControlChar()}{s}{TEXT_COLOR_END}";
+        $"{hex.ControlChar()}{s}{TEXT_COLOR_RESET}";
 
     
     /// <summary>
@@ -39,7 +39,7 @@ public static class StringEffects {
     [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColorB(this string text, int hex) => 
-        $"{hex.ControlCharB()}{text}{BACKGROUND_COLOR_END}";
+        $"{hex.ControlCharB()}{text}{BCKG_COLOR_RESET}";
 
     
     /// <summary>
@@ -53,7 +53,7 @@ public static class StringEffects {
     [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, byte red, byte green, byte blue) => 
-        $"{CUSTOM_COLOR_PREFIX}{red};{green};{blue}m{s}{TEXT_COLOR_END}";
+        $"{CUSTOM_TEXT_COLOR_FORMAT.Format(red, green, blue)}{s}{TEXT_COLOR_RESET}";
 
     
     /// <summary>
@@ -67,7 +67,7 @@ public static class StringEffects {
     [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColorB(this string text, byte red, byte green, byte blue) => 
-        $"{CUSTOM_BACKGROUND_COLOR_PREFIX}{red};{green};{blue}m{text}{BACKGROUND_COLOR_END}";
+        $"{CUSTOM_BCKG_COLOR_FORMAT.Format(red, green, blue)}{text}{BCKG_COLOR_RESET}";
     
     
     /// <summary>
@@ -77,7 +77,7 @@ public static class StringEffects {
     [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, NKConsoleColor color) => 
-        $"{color.ControlChar()}{s}{TEXT_COLOR_END}";
+        $"{color.ControlChar()}{s}{TEXT_COLOR_RESET}";
 
     
     /// <summary>
@@ -87,7 +87,7 @@ public static class StringEffects {
     [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColorB(this string text, NKConsoleColor color) => 
-        $"{color.ControlCharB()}{text}{BACKGROUND_COLOR_END}";
+        $"{color.ControlCharB()}{text}{BCKG_COLOR_RESET}";
 
     
     /// <summary>
@@ -97,7 +97,7 @@ public static class StringEffects {
     [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, ConsoleColor color) => 
-        $"{color.ControlChar()}{s}{TEXT_COLOR_END}";
+        $"{color.ControlChar()}{s}{TEXT_COLOR_RESET}";
 
     
     /// <summary>
@@ -107,7 +107,7 @@ public static class StringEffects {
     [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColorB(this string text, ConsoleColor color) => 
-        $"{color.ControlCharB()}{text}{BACKGROUND_COLOR_END}";
+        $"{color.ControlCharB()}{text}{BCKG_COLOR_RESET}";
     
     /// <summary>
     /// adds a color to the text
@@ -116,7 +116,7 @@ public static class StringEffects {
     [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColor(this string s, NKColor color) => 
-        $"{color.Text}{s}{TEXT_COLOR_END}";
+        $"{color.Text}{s}{TEXT_COLOR_RESET}";
 
     
     /// <summary>
@@ -126,7 +126,7 @@ public static class StringEffects {
     [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddColorB(this string text, NKColor color) => 
-        $"{color.Bckg}{text}{BACKGROUND_COLOR_END}";
+        $"{color.Bckg}{text}{BCKG_COLOR_RESET}";
 
     
     /// <summary>
@@ -256,27 +256,27 @@ public static class StringEffects {
         s = s.Replace("<f-magenta>", PALETTE_COLOR_MAGENTA);
         s = s.Replace("<f-cyan>", PALETTE_COLOR_CYAN);
         s = s.Replace("<f-white>", PALETTE_COLOR_WHITE);
-        s = s.Replace("</f-color>", TEXT_COLOR_END);
-        s = s.Replace("</f#>", TEXT_COLOR_END);
+        s = s.Replace("</f-color>", TEXT_COLOR_RESET);
+        s = s.Replace("</f#>", TEXT_COLOR_RESET);
         
-        s = s.Replace("<b-black>", PALETTE_BACKGROUND_COLOR_BLACK);
-        s = s.Replace("<b-dark-red>", PALETTE_BACKGROUND_COLOR_DARK_RED);
-        s = s.Replace("<b-dark-green>", PALETTE_BACKGROUND_COLOR_DARK_GREEN);
-        s = s.Replace("<b-dark-yellow>", PALETTE_BACKGROUND_COLOR_DARK_YELLOW);
-        s = s.Replace("<b-dark-blue>", PALETTE_BACKGROUND_COLOR_DARK_BLUE);
-        s = s.Replace("<b-dark-magenta>", PALETTE_BACKGROUND_COLOR_DARK_MAGENTA);
-        s = s.Replace("<b-dark-cyan>", PALETTE_BACKGROUND_COLOR_DARK_CYAN);
-        s = s.Replace("<b-gray>", PALETTE_BACKGROUND_COLOR_GRAY);
-        s = s.Replace("<b-dark-gray>", PALETTE_BACKGROUND_COLOR_DARK_GRAY);
-        s = s.Replace("<b-red>", PALETTE_BACKGROUND_COLOR_RED);
-        s = s.Replace("<b-green>", PALETTE_BACKGROUND_COLOR_GREEN);
-        s = s.Replace("<b-yellow>", PALETTE_BACKGROUND_COLOR_YELLOW);
-        s = s.Replace("<b-blue>", PALETTE_BACKGROUND_COLOR_BLUE);
-        s = s.Replace("<b-magenta>", PALETTE_BACKGROUND_COLOR_MAGENTA);
-        s = s.Replace("<b-cyan>", PALETTE_BACKGROUND_COLOR_CYAN);
-        s = s.Replace("<b-white>", PALETTE_BACKGROUND_COLOR_WHITE);
-        s = s.Replace("</b-color>", BACKGROUND_COLOR_END);
-        s = s.Replace("</b#>", BACKGROUND_COLOR_END);
+        s = s.Replace("<b-black>", PALETTE_BCKG_COLOR_BLACK);
+        s = s.Replace("<b-dark-red>", PALETTE_BCKG_COLOR_DARK_RED);
+        s = s.Replace("<b-dark-green>", PALETTE_BCKG_COLOR_DARK_GREEN);
+        s = s.Replace("<b-dark-yellow>", PALETTE_BCKG_COLOR_DARK_YELLOW);
+        s = s.Replace("<b-dark-blue>", PALETTE_BCKG_COLOR_DARK_BLUE);
+        s = s.Replace("<b-dark-magenta>", PALETTE_BCKG_COLOR_DARK_MAGENTA);
+        s = s.Replace("<b-dark-cyan>", PALETTE_BCKG_COLOR_DARK_CYAN);
+        s = s.Replace("<b-gray>", PALETTE_BCKG_COLOR_GRAY);
+        s = s.Replace("<b-dark-gray>", PALETTE_BCKG_COLOR_DARK_GRAY);
+        s = s.Replace("<b-red>", PALETTE_BCKG_COLOR_RED);
+        s = s.Replace("<b-green>", PALETTE_BCKG_COLOR_GREEN);
+        s = s.Replace("<b-yellow>", PALETTE_BCKG_COLOR_YELLOW);
+        s = s.Replace("<b-blue>", PALETTE_BCKG_COLOR_BLUE);
+        s = s.Replace("<b-magenta>", PALETTE_BCKG_COLOR_MAGENTA);
+        s = s.Replace("<b-cyan>", PALETTE_BCKG_COLOR_CYAN);
+        s = s.Replace("<b-white>", PALETTE_BCKG_COLOR_WHITE);
+        s = s.Replace("</b-color>", BCKG_COLOR_RESET);
+        s = s.Replace("</b#>", BCKG_COLOR_RESET);
         
         return s;
     }
@@ -372,7 +372,7 @@ public static class StringEffects {
     [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ControlChar(this int color) =>
-        $"{CUSTOM_COLOR_PREFIX}{(byte)(color >> 16)};{(byte)(color >> 8)};{(byte)color}m";
+        CUSTOM_TEXT_COLOR_FORMAT.Format((byte)(color >> 16), (byte)(color >> 8), (byte)color);
 
     
     /// <summary>
@@ -381,7 +381,7 @@ public static class StringEffects {
     [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string ControlCharB(this int color) =>
-        $"{CUSTOM_BACKGROUND_COLOR_PREFIX}{(byte)(color >> 16)};{(byte)(color >> 8)};{(byte)color}m";
+        CUSTOM_BCKG_COLOR_FORMAT.Format((byte)(color >> 16), (byte)(color >> 8), (byte)color);
 
     
     /// <summary>

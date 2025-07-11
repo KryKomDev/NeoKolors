@@ -176,7 +176,7 @@ public struct NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
         Color.Match(
             i => i.ControlChar(),
             c => c.ControlChar(),
-            _ => EscapeCodes.TEXT_COLOR_END,
+            _ => EscapeCodes.TEXT_COLOR_RESET,
             _ => "Inherit"
         );
 
@@ -188,7 +188,7 @@ public struct NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
         Color.Match(
             i => i.ControlCharB(),
             c => c.ControlCharB(),
-            _ => EscapeCodes.BACKGROUND_COLOR_END,
+            _ => EscapeCodes.BCKG_COLOR_RESET,
             _ => "Inherit"
         );
 

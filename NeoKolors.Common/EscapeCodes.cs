@@ -10,19 +10,28 @@ namespace NeoKolors.Common;
 /// </summary>
 public static class EscapeCodes {
 
-    /// <summary>
-    /// Sequence for coloring a string with a custom color.
-    /// Should be followed by <c>r;g;bm</c> where r, g, and b represent red green and blue respectively
-    /// </summary>
-    public const string CUSTOM_COLOR_PREFIX = "\e[38;2;";
+    #region COLORING
 
     /// <summary>
-    /// Sequence for setting a custom background color.
-    /// Should be followed by <c>r;g;bm</c> where r, g, and b represent red, green, and blue components respectively.
+    /// ANSI escape sequence format string used to apply a custom text color in the terminal.
+    /// The format uses RGB values, where placeholders {0}, {1}, and {2} represent
+    /// the red, green, and blue color components respectively.
     /// </summary>
-    public const string CUSTOM_BACKGROUND_COLOR_PREFIX = "\e[48;2;";
+    public const string CUSTOM_TEXT_COLOR_FORMAT = "\e[38;2;{0};{1};{2}m";
+
+    /// <summary>
+    /// ANSI escape sequence format string used to apply a custom background color in the terminal.
+    /// The format uses RGB values, where placeholders {0}, {1}, and {2} represent
+    /// the red, green, and blue color components respectively.
+    /// </summary>
+    public const string CUSTOM_BCKG_COLOR_FORMAT = "\e[48;2;{0};{1};{2}m";
     
+    [JetBrains.Annotations.Pure]
+    [System.Diagnostics.Contracts.Pure]
     public static string GetPaletteFColor(byte color) => $"\e[38;5;{color}m";
+    
+    [JetBrains.Annotations.Pure]
+    [System.Diagnostics.Contracts.Pure]
     public static string GetPaletteBColor(byte color) => $"\e[48;5;{color}m";
     
     public const string PALETTE_COLOR_BLACK = "\e[38;5;0m";
@@ -46,94 +55,176 @@ public static class EscapeCodes {
     /// ANSI escape sequence used to reset the text color to the default terminal color.
     /// Used to revert any previously applied text color changes.
     /// </summary>
-    public const string TEXT_COLOR_END = "\e[39m";
+    public const string TEXT_COLOR_RESET = "\e[39m";
     
-    public const string PALETTE_BACKGROUND_COLOR_BLACK = "\e[48;5;0m";
-    public const string PALETTE_BACKGROUND_COLOR_DARK_RED = "\e[48;5;1m";
-    public const string PALETTE_BACKGROUND_COLOR_DARK_GREEN = "\e[48;5;2m";
-    public const string PALETTE_BACKGROUND_COLOR_DARK_YELLOW ="\e[48;5;3m";
-    public const string PALETTE_BACKGROUND_COLOR_DARK_BLUE ="\e[48;5;4m";
-    public const string PALETTE_BACKGROUND_COLOR_DARK_MAGENTA = "\e[48;5;5m";
-    public const string PALETTE_BACKGROUND_COLOR_DARK_CYAN = "\e[48;5;6m";
-    public const string PALETTE_BACKGROUND_COLOR_GRAY = "\e[48;5;7m";
-    public const string PALETTE_BACKGROUND_COLOR_DARK_GRAY = "\e[48;5;8m";
-    public const string PALETTE_BACKGROUND_COLOR_RED = "\e[48;5;9m";
-    public const string PALETTE_BACKGROUND_COLOR_GREEN = "\e[48;5;10m";
-    public const string PALETTE_BACKGROUND_COLOR_YELLOW = "\e[48;5;11m";
-    public const string PALETTE_BACKGROUND_COLOR_BLUE = "\e[48;5;12m";
-    public const string PALETTE_BACKGROUND_COLOR_MAGENTA = "\e[48;5;13m";
-    public const string PALETTE_BACKGROUND_COLOR_CYAN = "\e[48;5;14m";
-    public const string PALETTE_BACKGROUND_COLOR_WHITE = "\e[48;5;15m";
+    public const string PALETTE_BCKG_COLOR_BLACK = "\e[48;5;0m";
+    public const string PALETTE_BCKG_COLOR_DARK_RED = "\e[48;5;1m";
+    public const string PALETTE_BCKG_COLOR_DARK_GREEN = "\e[48;5;2m";
+    public const string PALETTE_BCKG_COLOR_DARK_YELLOW ="\e[48;5;3m";
+    public const string PALETTE_BCKG_COLOR_DARK_BLUE ="\e[48;5;4m";
+    public const string PALETTE_BCKG_COLOR_DARK_MAGENTA = "\e[48;5;5m";
+    public const string PALETTE_BCKG_COLOR_DARK_CYAN = "\e[48;5;6m";
+    public const string PALETTE_BCKG_COLOR_GRAY = "\e[48;5;7m";
+    public const string PALETTE_BCKG_COLOR_DARK_GRAY = "\e[48;5;8m";
+    public const string PALETTE_BCKG_COLOR_RED = "\e[48;5;9m";
+    public const string PALETTE_BCKG_COLOR_GREEN = "\e[48;5;10m";
+    public const string PALETTE_BCKG_COLOR_YELLOW = "\e[48;5;11m";
+    public const string PALETTE_BCKG_COLOR_BLUE = "\e[48;5;12m";
+    public const string PALETTE_BCKG_COLOR_MAGENTA = "\e[48;5;13m";
+    public const string PALETTE_BCKG_COLOR_CYAN = "\e[48;5;14m";
+    public const string PALETTE_BCKG_COLOR_WHITE = "\e[48;5;15m";
 
     /// <summary>
     /// ANSI escape sequence that resets the background color to its default value.
     /// Used to end custom background coloring in a string.
     /// </summary>
-    public const string BACKGROUND_COLOR_END = "\e[49m";
+    public const string BCKG_COLOR_RESET = "\e[49m";
 
     /// <summary>
     /// Resets all text formatting attributes, including color and style, to their default values.
     /// </summary>
     public const string FORMATTING_RESET = "\e[0m";
-    
-    /// <summary>
-    /// Switches colors of background and text. We have no idea why it works, and it is not documented.
-    /// </summary>
-    public const string SWITCH_COLORS = "\e[38;1;7m";
+
+    #endregion
+
+    #region STYLING
     
     public const string BOLD_START = "\e[1m";
+    public const string FAINT_START = "\e[2m";
     public const string ITALIC_START = "\e[3m";
     public const string UNDERLINE_START = "\e[4m";
-    public const string FAINT_START = "\e[2m";
     public const string NEGATIVE_START = "\e[7m";
     public const string STRIKETHROUGH_START = "\e[9m";
     
     public const string BOLD_END = "\e[22m";
+    public const string FAINT_END = "\e[22m";
     public const string ITALIC_END = "\e[23m";
     public const string UNDERLINE_END = "\e[24m";
-    public const string FAINT_END = "\e[22m";
     public const string NEGATIVE_END = "\e[27m";
     public const string STRIKETHROUGH_END = "\e[29m";
 
-    // public const string MOUSE_BUTTON_ON = "\e[?1000h";
-    // public const string MOUSE_HIGHLIGHT_ON = "\e[?1001h";
-    // public const string MOUSE_DRAG_ON = "\e[?1002h";
-    // public const string MOUSE_MOTION_ON = "\e[?1003h";
-    // public const string MOUSE_SRG_ON = "\e[?1006h";
-    //
-    // public const string MOUSE_BUTTON_OFF = "\e[?1000l";
-    // public const string MOUSE_HIGHLIGHT_OFF = "\e[?1001l";
-    // public const string MOUSE_DRAG_OFF = "\e[?1002l";
-    // public const string MOUSE_MOTION_OFF = "\e[?1003l";
-    // public const string MOUSE_SRG_OFF = "\e[?1006l";
-    //
-    // public static void EnableMouseEvents() {
-    //     System.Console.Write(MOUSE_BUTTON_ON);
-    //     System.Console.Write(MOUSE_HIGHLIGHT_ON);
-    //     System.Console.Write(MOUSE_DRAG_ON);
-    //     System.Console.Write(MOUSE_MOTION_ON);
-    //     System.Console.Write(MOUSE_SRG_ON);
-    // }
-    //
-    // public static void DisableMouseEvents() {
-    //     System.Console.Write(MOUSE_BUTTON_OFF);
-    //     System.Console.Write(MOUSE_HIGHLIGHT_OFF);
-    //     System.Console.Write(MOUSE_DRAG_OFF);
-    //     System.Console.Write(MOUSE_MOTION_OFF);
-    //     System.Console.Write(MOUSE_SRG_OFF);
-    // }
+    #endregion
 
-    public const string ENABLE_SECONDARY_CONTEXT = "\e[?1049h";
-    public const string DISABLE_SECONDARY_CONTEXT = "\e[?1049l";
+    #region INPUT
 
-    public static void EnableSecondary() => Console.Write(ENABLE_SECONDARY_CONTEXT);
-    public static void DisableSecondary() => Console.Write(DISABLE_SECONDARY_CONTEXT);
+    /// <summary>
+    /// Enables mouse tracking mode only for mouse button presses.
+    /// </summary>
+    public const string MOUSE_EV_ON_P_ON = "\e[?9h";
+    
+    /// <summary>
+    /// Enables mouse tracking mode only for mouse button presses and releases.
+    /// </summary>
+    public const string MOUSE_EV_ON_PR_ON = "\e[?1000h";
 
-    // ReSharper disable InconsistentNaming
-    public const string PaletteColorEnd = TEXT_COLOR_END;
-    public const string PaletteBackgroundColorEnd = BACKGROUND_COLOR_END;
-    public const string EnableSecondaryContext = ENABLE_SECONDARY_CONTEXT;
-    public const string DisableSecondaryContext = DISABLE_SECONDARY_CONTEXT;
-    public const string SwitchColors = SWITCH_COLORS;
-    // ReSharper restore InconsistentNaming
+    // no idea
+    public const string MOUSE_EV_IN_HIGHLIGHT_ON = "\e[?1001h";
+    
+    /// <summary>
+    /// Enables mouse tracking mode only for mouse button presses, releases, and mouse drags.
+    /// </summary>
+    public const string MOUSE_EV_ON_PRD_ON = "\e[?1002h";
+    
+    /// <summary>
+    /// Enables mouse tracking mode for all mouse events.
+    /// </summary>
+    public const string MOUSE_EV_ON_ALL_ON = "\e[?1003h";
+    
+    /// <summary>
+    /// Enables mouse tracking Unicode encoding support.
+    /// </summary>
+    public const string MOUSE_EV_UTF8_ON = "\e[?1005h";
+    
+    /// <summary>
+    /// Enables SGR mouse tracking protocol.
+    /// </summary>
+    public const string MOUSE_EV_SGR_ON = "\e[?1006h";
+    
+    [Obsolete("URXVT mode is not recommended.")]
+    public const string MOUSE_EV_URXVT_ON = "\e[?1015h";
+    
+    public const string MOUSE_EV_ON_P_OFF = "\e[?9l";
+    public const string MOUSE_EV_ON_PR_OFF = "\e[?1000l";
+    public const string MOUSE_EV_IN_HIGHLIGHT_OFF = "\e[?1001l";
+    public const string MOUSE_EV_ON_PRD_OFF = "\e[?1002l";
+    public const string MOUSE_EV_ON_ALL_OFF = "\e[?1003l";
+    public const string MOUSE_EV_UTF8_OFF = "\e[?1005l";
+    public const string MOUSE_EV_SGR_OFF = "\e[?1006l";
+    
+    [Obsolete("URXVT mode is not recommended.")]
+    public const string MOUSE_EV_URXVT_OFF = "\e[?1015l";
+
+
+    /// <summary>
+    /// Escape sequence to enable bracketed paste mode in the terminal,
+    /// allowing applications to handle clipboard pastes more effectively.
+    /// </summary>
+    public const string ENABLE_BRACKETED_PASTE_MODE = "\e[?2004h";
+
+    /// <summary>
+    /// Escape sequence used to disable bracketed paste mode in the terminal.
+    /// Commonly used to revert clipboard handling to its default state.
+    /// </summary>
+    public const string DISABLE_BRACKETED_PASTE_MODE = "\e[?2004l";
+
+    #endregion
+
+    #region SCREEN
+    
+    /// <summary>
+    /// Escape sequence for enabling the alternate buffer without saving the cursor state.
+    /// This is used to switch to an alternate screen buffer, often in terminal-based applications.
+    /// </summary>
+    public const string ALT_BUFF_NO_SC_ENABLE = "\e[?1047h";
+    
+    /// <summary>
+    /// Escape sequence for disabling the alternate buffer without restoring the cursor state.
+    /// This is used to switch from an alternate screen buffer, often in terminal-based applications.
+    /// </summary>
+    public const string ALT_BUFF_NO_RC_DISABLE = "\e[?1047l";
+
+    /// <summary>
+    /// ANSI escape sequence to save the current state of the cursor in the terminal,
+    /// including its position and potentially other states depending on terminal behavior.
+    /// </summary>
+    public const string SAVE_CURSOR_STATE = "\e[?1048h";
+
+    /// <summary>
+    /// ANSI escape sequence used to restore the previously saved cursor state
+    /// in the terminal, including its position and other attributes.
+    /// </summary>
+    public const string RESTORE_CURSOR_STATE = "\e[?1048l";
+    
+    /// <summary>
+    /// Escape sequence for enabling the alternate buffer while saving the cursor state.
+    /// This is used to switch to an alternate screen buffer, often in terminal-based applications.
+    /// </summary>
+    public const string ALT_BUFF_SC_ENABLE = "\e[?1049h";
+    
+    /// <summary>
+    /// Escape sequence for disabling the alternate buffer while restoring the cursor state.
+    /// This is used to switch from an alternate screen buffer, often in terminal-based applications.
+    /// </summary>
+    public const string ALT_BUFF_RC_DISABLE = "\e[?1049l";
+    
+    #endregion
+
+    public const string REPORT_FOCUS_ENABLE = "\e[?1004h";
+    public const string REPORT_FOCUS_DISABLE = "\e[?1004l";
+
+    #region OSC
+    
+    /// <summary>
+    /// Escape code sequence used to iconify or minimize the current terminal window.
+    /// </summary>
+    public const string ICONIFY_WINDOW = "\e[2t";
+
+    /// <summary>
+    /// Escape sequence to restore and deiconify a minimized window.
+    /// Typically used in terminal applications to request the window to return to its
+    /// normal, unminimized state.
+    /// </summary>
+    public const string DEICONIFY_WINDOW = "\e[1t";
+    
+    #endregion
 }
