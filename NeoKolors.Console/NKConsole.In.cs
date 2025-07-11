@@ -4,9 +4,12 @@
 //
 
 using System.Diagnostics.CodeAnalysis;
+using System.Text;
 using NeoKolors.Common;
+using NeoKolors.Console.Mouse;
 using OneOf;
 using static NeoKolors.Console.BoolStrings;
+using Std = System.Console;
 
 namespace NeoKolors.Console;
 
@@ -32,7 +35,7 @@ public static partial class NKConsole {
         
         while (true) {
             
-            string? s = System.Console.ReadLine();
+            string? s = Std.ReadLine();
             
             if (s == null) {
                 if (reply) WriteLine("Invalid input.", style);
@@ -79,7 +82,7 @@ public static partial class NKConsole {
         
         while (true) {
             
-            string? s = System.Console.ReadLine();
+            string? s = Std.ReadLine();
             
             if (s == null) {
                 if (reply) WriteLine("Invalid input.", style);
@@ -126,7 +129,7 @@ public static partial class NKConsole {
         
         while (true) {
             
-            string? s = System.Console.ReadLine();
+            string? s = Std.ReadLine();
             
             if (s == null) {
                 if (reply) WriteLine("Invalid input.", style);
@@ -173,7 +176,7 @@ public static partial class NKConsole {
         
         while (true) {
             
-            string? s = System.Console.ReadLine();
+            string? s = Std.ReadLine();
             
             if (s == null) {
                 if (reply) WriteLine("Invalid input.", style);
@@ -217,7 +220,7 @@ public static partial class NKConsole {
         
         while (true) {
             
-            string? s = System.Console.ReadLine();
+            string? s = Std.ReadLine();
             
             if (s == null) {
                 if (reply) WriteLine("Invalid input.", style.Value);
@@ -247,7 +250,7 @@ public static partial class NKConsole {
         
         while (true) {
             
-            string? s = System.Console.ReadLine();
+            string? s = Std.ReadLine();
             
             if (s == null) {
                 if (reply) WriteLine("Invalid input.", style.Value);
@@ -292,6 +295,131 @@ public static partial class NKConsole {
     [JetBrains.Annotations.Pure]
     private static string ToString(this BoolStrings b) => 
         b is ALL ? "true, false, yes, no, y, n, on, off, t, f, 1, 0" : b.ToString().ToLower().Replace('_', ',');
+
+    
+    #region INPUT INTERCEPTION
+
+    private static readonly Thread INPUT_THREAD = new(Intercept) {
+        IsBackground = true,
+        Priority = ThreadPriority.BelowNormal,
+        Name = "NeoKolors Input Interceptor"
+    };
+
+    private static void Intercept() {
+        while (InterceptInput) {
+            var i = Std.ReadKey(intercept: true);
+            
+            if (i.KeyChar == '\e') 
+                HandleEscape();
+            else 
+                KeyEvent.Invoke(i);
+        }
+    }
+
+    private static void HandleEscape() {
+        var introducer = Std.ReadKey(intercept: true);
+        
+        if (introducer.KeyChar != '[') {
+            KeyEvent.Invoke(introducer);
+            return;
+        }
+        
+        var next = Std.ReadKey(intercept: true);
+        
+        switch (next.KeyChar) {
+            case 'O':
+                FocusOutEvent.Invoke();
+                break;
+            case 'I':
+                FocusInEvent.Invoke();
+                break;
+            case 'M':
+                HandleMouseEvent();
+                break;
+            case '2':
+                HandlePaste();
+                break;
+        }
+    }
+
+    private static void HandleMouseEvent() {
+        var type = Std.ReadKey(intercept: true);
+        var x = Std.ReadKey(intercept: true);
+        var y = Std.ReadKey(intercept: true);
+        MouseEvent.Invoke(
+            MouseReportProtocol == MouseReportProtocol.SGR
+                ? MouseEventDecomposer.DecomposeSGR(type, x, y)
+                : MouseEventDecomposer.DecomposeUtf8(type, x, y));
+    }
+
+    private static void HandlePaste() {
+        SkipKeys(3);
+        var s = ReadUntil("\e[201~", true);
+        PasteEvent.Invoke(s);
+    }
+
+    private static void SkipKeys(int num) {
+        for (int i = 0; i < num; i++) 
+            Std.ReadKey(intercept: true);
+    }
+    
+    #endregion
+
+    /// <summary>
+    /// Reads input from the console until a specified sequence of characters is detected.
+    /// Returns the input content excluding the given sequence.
+    /// </summary>
+    /// <param name="sequence">
+    /// A string representing the sequence of characters that marks the end of the input.
+    /// The input reading stops as soon as this sequence is detected.
+    /// </param>
+    /// <param name="intercept">
+    /// A boolean value indicating whether the input characters should be intercepted
+    /// (i.e., not displayed in the console) while they are being typed.
+    /// Defaults to false.
+    /// </param>
+    /// <returns>
+    /// A string containing all characters read from the console, excluding the specified sequence.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    /// Thrown if the provided sequence is null or an empty string.
+    /// </exception>
+    public static string ReadUntil(string sequence, bool intercept = false) {
+        if (string.IsNullOrEmpty(sequence)) {
+            throw new ArgumentException("Sequence cannot be null or empty.", nameof(sequence));
+        }
+    
+        var buffer = new StringBuilder();
+        var sequenceIndex = 0;
+    
+        while (true) {
+            var key = Std.ReadKey(intercept);
+            var ch = key.KeyChar;
+        
+            buffer.Append(ch);
+        
+            // Check if the current character matches the expected character in the sequence
+            if (ch == sequence[sequenceIndex]) {
+                sequenceIndex++;
+            
+                // If the entire sequence matched, return the content before it
+                if (sequenceIndex != sequence.Length) 
+                    continue;
+                
+                // Remove the sequence from the end of the buffer
+                buffer.Length -= sequence.Length;
+                return buffer.ToString();
+            }
+
+            // Reset sequence matching if the character doesn't match
+            sequenceIndex = 0;
+            
+            // Check if the current character is the start of the sequence
+            if (ch == sequence[0]) {
+                sequenceIndex = 1;
+            }
+        }
+    }
 }
 
 [Flags]

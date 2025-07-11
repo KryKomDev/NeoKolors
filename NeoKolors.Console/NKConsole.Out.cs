@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using NeoKolors.Common;
 using NeoKolors.Common.Util;
+using Std = System.Console;
 
 namespace NeoKolors.Console;
 
@@ -21,7 +22,7 @@ public static partial class NKConsole {
     /// <param name="hex">hexadecimal value of the color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Write(string s, int hex) => 
-        System.Console.Write(s.AddColor(hex));
+        Std.Write(s.AddColor(hex));
 
     
     /// <summary>
@@ -33,7 +34,7 @@ public static partial class NKConsole {
     /// <param name="b">blue value of the color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Write(string s, byte r, byte g, byte b) => 
-        System.Console.Write(s.AddColor(r, g, b));
+        Std.Write(s.AddColor(r, g, b));
     
     
     /// <summary>
@@ -43,7 +44,7 @@ public static partial class NKConsole {
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Write(string s, System.Drawing.Color c) =>
-        System.Console.Write(s.AddColor(c));
+        Std.Write(s.AddColor(c));
 
     
     /// <summary>
@@ -53,7 +54,7 @@ public static partial class NKConsole {
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Write(string s, ConsoleColor c) => 
-        System.Console.Write(s.AddColor(c));
+        Std.Write(s.AddColor(c));
 
     
     /// <summary>
@@ -63,7 +64,7 @@ public static partial class NKConsole {
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Write(string s, NKColor c) => 
-        System.Console.Write(s.AddColor(c));
+        Std.Write(s.AddColor(c));
 
 
     /// <summary>
@@ -74,7 +75,7 @@ public static partial class NKConsole {
     [StringFormatMethod(nameof(s))]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteF(string s, params NKColor[] colors) =>
-        System.Console.Write(s, colors.Cast<object?>().ToArray());
+        Std.Write(s, colors.Cast<object?>().ToArray());
 
 
     // --- --- let there begin WriteLine implementations --- ---
@@ -86,7 +87,7 @@ public static partial class NKConsole {
     /// <param name="hex">hexadecimal value of the color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLine(string s, int hex) => 
-        System.Console.WriteLine(s.AddColor(hex));
+        Std.WriteLine(s.AddColor(hex));
 
     
     /// <summary>
@@ -98,7 +99,7 @@ public static partial class NKConsole {
     /// <param name="b">blue value of the color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLine(string s, byte r, byte g, byte b) =>
-        System.Console.WriteLine(s.AddColor(r, g, b));
+        Std.WriteLine(s.AddColor(r, g, b));
     
     
     /// <summary>
@@ -108,7 +109,7 @@ public static partial class NKConsole {
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLine(string s, ConsoleColor c) => 
-        System.Console.WriteLine(s.AddColor(c));
+        Std.WriteLine(s.AddColor(c));
     
     
     /// <summary>
@@ -118,7 +119,7 @@ public static partial class NKConsole {
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLine(string s, System.Drawing.Color c) => 
-        System.Console.WriteLine(s.AddColor(c));
+        Std.WriteLine(s.AddColor(c));
     
     
     /// <summary>
@@ -128,7 +129,7 @@ public static partial class NKConsole {
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLine(string s, NKColor c) => 
-        System.Console.WriteLine(s.AddColor(c));
+        Std.WriteLine(s.AddColor(c));
 
 
     /// <summary>
@@ -143,7 +144,7 @@ public static partial class NKConsole {
     [StringFormatMethod(nameof(s))]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLineF(string s, params NKColor[] colors) => 
-        System.Console.WriteLine(s, colors.Cast<object?>().ToArray());
+        Std.WriteLine(s, colors.Cast<object?>().ToArray());
 
     
     /// <summary>
@@ -153,7 +154,7 @@ public static partial class NKConsole {
     /// <param name="hex">hexadecimal value of the color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteB(string s, int hex) => 
-        System.Console.Write(s.AddColorB(hex));
+        Std.Write(s.AddColorB(hex));
 
     
     /// <summary>
@@ -165,7 +166,7 @@ public static partial class NKConsole {
     /// <param name="b">blue value of the color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteB(string s, byte r, byte g, byte b) => 
-        System.Console.Write(s.AddColorB(r, g, b));
+        Std.Write(s.AddColorB(r, g, b));
 
     
     /// <summary>
@@ -175,7 +176,7 @@ public static partial class NKConsole {
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteB(string s, ConsoleColor c) => 
-        System.Console.Write(s.AddColorB(c));
+        Std.Write(s.AddColorB(c));
     
     
     /// <summary>
@@ -185,7 +186,7 @@ public static partial class NKConsole {
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteB(string s, System.Drawing.Color c) => 
-        System.Console.Write(s.AddColorB(c));
+        Std.Write(s.AddColorB(c));
     
     
     /// <summary>
@@ -195,7 +196,7 @@ public static partial class NKConsole {
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteB(string s, NKColor c) => 
-        System.Console.Write(s.AddColorB(c));
+        Std.Write(s.AddColorB(c));
     
     
     /// <summary>
@@ -207,7 +208,7 @@ public static partial class NKConsole {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static void WriteBF(string s, params NKColor[] colors) =>
-        System.Console.Write(s, colors.Cast<object?>().ToArray());
+        Std.Write(s, colors.Cast<object?>().ToArray());
 
 
     /// <summary>
@@ -217,7 +218,7 @@ public static partial class NKConsole {
     /// <param name="hex">hexadecimal value of the color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLineB(string s, int hex) => 
-        System.Console.WriteLine(s.AddColor(hex));
+        Std.WriteLine(s.AddColor(hex));
     
     
     /// <summary>
@@ -229,7 +230,7 @@ public static partial class NKConsole {
     /// <param name="b">blue value of the color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLineB(string s, byte r, byte g, byte b) => 
-        System.Console.WriteLine(s.AddColorB(r, g, b));
+        Std.WriteLine(s.AddColorB(r, g, b));
     
     
     /// <summary>
@@ -239,7 +240,7 @@ public static partial class NKConsole {
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLineB(string s, ConsoleColor c) =>
-        System.Console.WriteLine(s.AddColorB(c));
+        Std.WriteLine(s.AddColorB(c));
 
     
     /// <summary>
@@ -249,7 +250,7 @@ public static partial class NKConsole {
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLineB(string s, System.Drawing.Color c) => 
-        System.Console.WriteLine(s.AddColorB(c));
+        Std.WriteLine(s.AddColorB(c));
 
     
     /// <summary>
@@ -259,7 +260,7 @@ public static partial class NKConsole {
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLineB(string s, NKColor c) => 
-        System.Console.WriteLine(s.AddColorB(c));
+        Std.WriteLine(s.AddColorB(c));
 
 
     /// <summary>
@@ -271,7 +272,7 @@ public static partial class NKConsole {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static void WriteLineBF(string s, params NKColor[] colors) =>
-        System.Console.WriteLine(s, colors.Cast<object?>().ToArray());
+        Std.WriteLine(s, colors.Cast<object?>().ToArray());
 
 
     /// <summary>
@@ -282,7 +283,7 @@ public static partial class NKConsole {
     /// <param name="background">background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Write(string s, int text, int background) =>
-        System.Console.Write(s.AddColor(text).AddColorB(background));
+        Std.Write(s.AddColor(text).AddColorB(background));
 
     /// <summary>
     /// prints a colored string with a colored background  
@@ -296,7 +297,7 @@ public static partial class NKConsole {
     /// <param name="bb">blue value of background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Write(string s, byte tr, byte tg, byte tb, byte br, byte bg, byte bb) =>
-        System.Console.Write(s.AddColor(tr, tg, tb).AddColorB(br, bg, bb));
+        Std.Write(s.AddColor(tr, tg, tb).AddColorB(br, bg, bb));
     
     /// <summary>
     /// prints a colored string with a colored background  
@@ -306,7 +307,7 @@ public static partial class NKConsole {
     /// <param name="background">background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Write(string s, int text, ConsoleColor background)  =>
-        System.Console.Write(s.AddColor(text).AddColorB(background));
+        Std.Write(s.AddColor(text).AddColorB(background));
     
     
     /// <summary>
@@ -317,7 +318,7 @@ public static partial class NKConsole {
     /// <param name="background">background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Write(string s, System.Drawing.Color text, System.Drawing.Color background)  =>
-        System.Console.Write(s.AddColor(text).AddColorB(background));
+        Std.Write(s.AddColor(text).AddColorB(background));
 
 
     /// <summary>
@@ -328,7 +329,7 @@ public static partial class NKConsole {
     /// <param name="background">background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Write(string s, NKColor text, NKColor background)  =>
-        System.Console.Write(s.AddColor(text).AddColorB(background));
+        Std.Write(s.AddColor(text).AddColorB(background));
     
     
     /// <summary>
@@ -339,7 +340,7 @@ public static partial class NKConsole {
     /// <param name="background">background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLine(string s, int text, int background) =>
-        System.Console.WriteLine(s.AddColor(text).AddColorB(background));
+        Std.WriteLine(s.AddColor(text).AddColorB(background));
 
     /// <summary>
     /// prints a colored string with a colored background  
@@ -353,7 +354,7 @@ public static partial class NKConsole {
     /// <param name="bb">blue value of background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLine(string s, byte tr, byte tg, byte tb, byte br, byte bg, byte bb) =>
-        System.Console.WriteLine(s.AddColor(tr, tg, tb).AddColorB(br, bg, bb));
+        Std.WriteLine(s.AddColor(tr, tg, tb).AddColorB(br, bg, bb));
     
     /// <summary>
     /// prints a colored string with a colored background  
@@ -363,7 +364,7 @@ public static partial class NKConsole {
     /// <param name="background">background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLine(string s, int text, ConsoleColor background)  =>
-        System.Console.WriteLine(s.AddColor(text).AddColorB(background));
+        Std.WriteLine(s.AddColor(text).AddColorB(background));
     
     
     /// <summary>
@@ -374,7 +375,7 @@ public static partial class NKConsole {
     /// <param name="background">background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLine(string s, System.Drawing.Color text, System.Drawing.Color background)  =>
-        System.Console.WriteLine(s.AddColor(text).AddColorB(background));
+        Std.WriteLine(s.AddColor(text).AddColorB(background));
 
 
     /// <summary>
@@ -385,7 +386,7 @@ public static partial class NKConsole {
     /// <param name="background">background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLine(string s, NKColor text, NKColor background)  =>
-        System.Console.WriteLine(s.AddColor(text).AddColorB(background));
+        Std.WriteLine(s.AddColor(text).AddColorB(background));
 
 
     /// <summary>
@@ -395,7 +396,7 @@ public static partial class NKConsole {
     /// <param name="st">style to be applied</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Write(string s, NKStyle st) =>
-        System.Console.Write(s.AddStyle(st));
+        Std.Write(s.AddStyle(st));
     
     
     /// <summary>
@@ -405,7 +406,7 @@ public static partial class NKConsole {
     /// <param name="st">style to be applied</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLine(string s, NKStyle st) =>
-        System.Console.WriteLine(s.AddStyle(st));
+        Std.WriteLine(s.AddStyle(st));
     
     
     /// <summary>
@@ -415,7 +416,7 @@ public static partial class NKConsole {
     /// <param name="st">style to be applied</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void Write(char s, NKStyle st) =>
-        System.Console.Write(s.AddStyle(st));
+        Std.Write(s.AddStyle(st));
     
     
     /// <summary>
@@ -425,7 +426,7 @@ public static partial class NKConsole {
     /// <param name="st">style to be applied</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLine(char s, NKStyle st) =>
-        System.Console.WriteLine(s.AddStyle(st));
+        Std.WriteLine(s.AddStyle(st));
     
     
     /// <summary>
@@ -541,26 +542,26 @@ public static partial class NKConsole {
 
         // print header
         for (int i = 0; i < cols; i++) 
-            System.Console.Write($"{vSeparator} {header[i].AddStyle(TextStyles.BOLD).VisiblePadRight(maxWidths[i])} ");
-        System.Console.WriteLine(vSeparator);
+            Std.Write($"{vSeparator} {header[i].AddStyle(TextStyles.BOLD).VisiblePadRight(maxWidths[i])} ");
+        Std.WriteLine(vSeparator);
 
         // print separator
         switch (style) {
             case NKTableStyle.BORDERLESS:
                 for (int i = 0; i < cols; i++) 
-                    System.Console.Write($"  {new string('─', header[i].Length).VisiblePadRight(maxWidths[i])} ");
-                System.Console.WriteLine();
+                    Std.Write($"  {new string('─', header[i].Length).VisiblePadRight(maxWidths[i])} ");
+                Std.WriteLine();
                 break;
             case NKTableStyle.ASCII:
                 for (int i = 0; i < cols; i++) 
-                    System.Console.Write($"{vSeparator}{new string('-', maxWidths[i] + 2)}");
-                System.Console.WriteLine(vSeparator);
+                    Std.Write($"{vSeparator}{new string('-', maxWidths[i] + 2)}");
+                Std.WriteLine(vSeparator);
                 break;
             case NKTableStyle.NORMAL:
-                System.Console.Write('├');
+                Std.Write('├');
                 for (int i = 0; i < cols; i++) 
-                    System.Console.Write((i == 0 ? "" : "┼") + new string('─', maxWidths[i] + 2));
-                System.Console.WriteLine("┤");
+                    Std.Write((i == 0 ? "" : "┼") + new string('─', maxWidths[i] + 2));
+                Std.WriteLine("┤");
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(style), style, null);
@@ -569,9 +570,9 @@ public static partial class NKConsole {
         // print data
         for (int i = 0; i < rows.Length; i++) {
             for (int j = 0; j < cols; j++) {
-                System.Console.Write($"{vSeparator} {rows[i][j].VisiblePadRight(maxWidths[j])} ");
+                Std.Write($"{vSeparator} {rows[i][j].VisiblePadRight(maxWidths[j])} ");
             }
-            System.Console.WriteLine(vSeparator);
+            Std.WriteLine(vSeparator);
         }
     }
 
@@ -729,7 +730,7 @@ public static partial class NKConsole {
     /// <param name="y">y offset from the current position</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void MoveCursor(int x, int y) =>
-        System.Console.SetCursorPosition(System.Console.CursorLeft + x, System.Console.CursorTop + y);
+        Std.SetCursorPosition(Std.CursorLeft + x, Std.CursorTop + y);
 
     #if NET5_0_OR_GREATER
 
