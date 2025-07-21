@@ -7,8 +7,8 @@
 using System.Diagnostics.CodeAnalysis;
 #endif
 using System.Collections;
-using System.Diagnostics.Contracts;
 using System.Text.RegularExpressions;
+using JetBrains.Annotations;
 
 #pragma warning disable CS0618 // Type or member is obsolete
 
@@ -23,7 +23,7 @@ public static class StringUtils {
     /// returns the total count of the printable / visible characters contained by the string
     /// (for example, ansi escape characters are not counted)
     /// </summary>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int VisibleLength(this string text) =>
         Regex.Replace(text, @"\e([^m]*)m", "").Length;
@@ -33,7 +33,7 @@ public static class StringUtils {
     /// capitalizes all the words within the string
     /// </summary>
     /// <exception cref="ArgumentNullException">the string is null</exception>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     public static string Capitalize(this string s) {
         if (s is null) throw new ArgumentNullException(nameof(s));
         if (s.Length == 0) return "";
@@ -60,7 +60,7 @@ public static class StringUtils {
     /// makes the first letter of the string capital
     /// </summary>
     /// <exception cref="ArgumentNullException">the input string is null</exception>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     public static string CapitalizeFirst(this string input, CultureInfo? cultureInfo = null) =>
         input switch {
             null => throw new ArgumentNullException(nameof(input)),
@@ -74,7 +74,7 @@ public static class StringUtils {
     /// makes the first letter of the string lowercase
     /// </summary>
     /// <exception cref="ArgumentNullException">the input string is null</exception>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     public static string DecapitalizeFirst(this string input, CultureInfo? cultureInfo = null) =>
         input switch {
             null => throw new ArgumentNullException(nameof(input)),
@@ -89,7 +89,7 @@ public static class StringUtils {
     /// </summary>
     /// <param name="format">the string to format</param>
     /// <param name="args">the arguments for the string</param>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string Format(
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)] this string format, 
@@ -153,7 +153,7 @@ public static class StringUtils {
     /// </summary>
     /// <param name="s">the string to be chopped</param>
     /// <param name="maxLength">the maximum length of a single string</param>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     public static string[] Chop(this string s, int maxLength) {
         if (string.IsNullOrWhiteSpace(s)) return [];
         ArgOutOfRange.ThrowIf(maxLength <= 0, nameof(maxLength), "Maximum length must be positive");
@@ -253,7 +253,7 @@ public static class StringUtils {
     /// <exception cref="ArgumentOutOfRangeException">
     /// Thrown when the supplied number is lower than 1 or greater than 3999.
     /// </exception>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     public static string ToRoman(this int number, bool lowercase = false) {
         ArgOutOfRange.ThrowIf(number is < 1 or > 3999, nameof(number));
 
@@ -330,7 +330,7 @@ public static class StringUtils {
     /// Thrown when the padding length is less than the string length.
     /// </exception>
     /// <returns>The input string padded with spaces on the right to meet the specified visible length.</returns>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string VisiblePadRight(this string s, int pad) => 
         pad >= s.VisibleLength() 
@@ -349,7 +349,7 @@ public static class StringUtils {
     /// Thrown when the padding length is less than the string length.
     /// </exception>
     /// <returns>The input string padded with spaces on the left to meet the specified visible length.</returns>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string VisiblePadLeft(this string s, int pad) => 
         pad >= s.VisibleLength() 
@@ -368,7 +368,7 @@ public static class StringUtils {
     /// Thrown when the padding length is less than the string length.
     /// </exception>
     /// <returns>The input string padded with spaces in the center to meet the specified visible length.</returns>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string VisiblePadCenter(this string s, int pad) =>
         pad >= s.VisibleLength() 
@@ -387,7 +387,7 @@ public static class StringUtils {
     /// Thrown when the padding length is less than the string length.
     /// </exception>
     /// <returns>The input string padded with spaces in the center to meet the specified visible length.</returns>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string PadCenter(this string s, int pad) =>
         pad >= s.Length 
@@ -403,7 +403,7 @@ public static class StringUtils {
     /// <param name="start">The zero-based starting character position of the substring.</param>
     /// <param name="count">The number of characters to retrieve from the starting position.</param>
     /// <returns>A substring based on the specified start and count parameters, adjusted for safe boundary conditions.</returns>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     public static string SafeSubstring(this string s, int start, int count) {
         start = start > s.Length - 1 ? s.Length - 1 : start < 0 ? 0 : start;
         count = count < 0 ? 0 : count + start >= s.Length ? s.Length - start : count;
@@ -418,7 +418,7 @@ public static class StringUtils {
     /// <returns>
     /// <c>true</c> if the string contains special characters; otherwise, <c>false</c>.
     /// </returns>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool ContainsSpecial(this string s) =>
         !string.IsNullOrEmpty(s) && s.Any(c => !(char.IsLetter(c) || char.IsDigit(c)));
@@ -428,7 +428,7 @@ public static class StringUtils {
     /// </summary>
     /// <param name="s">The string to check for numeric characters.</param>
     /// <returns>True if the string contains at least one numeric character; otherwise, false.</returns>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool ContainsNumber(this string s) =>
         !string.IsNullOrEmpty(s) && s.Any(char.IsDigit);
@@ -438,7 +438,7 @@ public static class StringUtils {
     /// </summary>
     /// <param name="s">The string to check for the presence of letters.</param>
     /// <returns>True if the string contains at least one letter; otherwise, false.</returns>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool ContainsLetter(this string s) =>
         !string.IsNullOrEmpty(s) && s.Any(char.IsLetter);
@@ -448,7 +448,7 @@ public static class StringUtils {
     /// </summary>
     /// <param name="s">The string to evaluate.</param>
     /// <returns>True if the string contains one or more uppercase characters; otherwise, false.</returns>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool ContainsUpper(this string s) =>
         !string.IsNullOrEmpty(s) && s.Any(char.IsUpper);
@@ -460,7 +460,7 @@ public static class StringUtils {
     /// <returns>
     /// <c>true</c> if the specified string contains at least one lowercase character; otherwise, <c>false</c>.
     /// </returns>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool ContainsLower(this string s) =>
         !string.IsNullOrEmpty(s) && s.Any(char.IsLower);
@@ -472,7 +472,7 @@ public static class StringUtils {
     /// </summary>
     /// <param name="s">The string to validate as an identifier.</param>
     /// <returns>True if the string is a valid identifier; otherwise, false.</returns>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsValidIdentifier(this string s) =>
         !string.IsNullOrEmpty(s) && s.All(c => char.IsLetterOrDigit(c) || c is '_' or '@') && !char.IsDigit(s[0]);
@@ -482,7 +482,7 @@ public static class StringUtils {
     /// </summary>
     /// <param name="s">The string to evaluate.</param>
     /// <returns>True if the string is not null, not empty, and contains only letters; otherwise, false.</returns>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsWord(this string s) =>
         !string.IsNullOrEmpty(s) && s.All(char.IsLetter);
@@ -493,7 +493,7 @@ public static class StringUtils {
     /// </summary>
     /// <param name="s">The string to evaluate.</param>
     /// <returns>True if the string is a capital word, otherwise false.</returns>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsCapitalWord(this string s) =>
         !s.IsWord() && s.FirstAndAll(char.IsUpper, char.IsLower);
@@ -506,11 +506,50 @@ public static class StringUtils {
     /// <param name="pad">The number of spaces to pad to the left of each line.</param>
     /// <param name="padFirst">A boolean indicating whether to pad the first line or not.</param>
     /// <returns>The input string with each line padded to the left as specified.</returns>
-    [Pure]
+    [System.Diagnostics.Contracts.Pure]
     public static string PadLinesLeft(this string s, int pad, bool padFirst = false) {
         string[] lines = s.Split('\n');
         for (int i = padFirst ? 0 : 1; i < lines.Length; i++)
             lines[i] = new string(' ', pad) + lines[i];
         return lines.Join("\n");
+    }
+
+    /// <summary>
+    /// Formats the given string by replacing placeholders in the style of {PropertyName} or {PropertyName:Format}
+    /// with the corresponding formatted values from the provided arguments.
+    /// </summary>
+    /// <param name="s">The string containing the placeholders to format.</param>
+    /// <param name="args">An array of arguments used to replace the placeholders.</param>
+    /// <returns>The formatted string with placeholders replaced by their corresponding values.</returns>
+    public static string StructuredFormat([StructuredMessageTemplate] this string? s, params object[]? args) {
+        if (s is null) throw new ArgumentNullException(nameof(s));
+        if (string.IsNullOrEmpty(s) || args == null || args.Length == 0) return s;
+
+        string result = s;
+    
+        // Find all structured placeholders in the format {PropertyName} or {PropertyName:Format}
+        var matches = Regex.Matches(s, @"\{([^}:]+)(?::([^}]*))?\}");
+    
+        for (int i = 0; i < Math.Min(matches.Count, args.Length); i++) {
+            var match = matches[i];
+            string placeholder = match.Value; // e.g., "{Name}" or "{Value:F2}"
+            string? formatSpecifier = match.Groups[2].Success ? match.Groups[2].Value : null; // e.g., "F2" or null
+        
+            // Format the argument
+            string formattedValue;
+            if (!string.IsNullOrEmpty(formatSpecifier) && args[i] is IFormattable formattable)
+                formattedValue = formattable.ToString(formatSpecifier, CultureInfo.InvariantCulture);
+            else
+                formattedValue = args[i].ToString() ?? "";
+
+            // Replace the first occurrence of this placeholder
+            int placeholderIndex = result.IndexOf(placeholder, StringComparison.Ordinal);
+            if (placeholderIndex >= 0) {
+                result = result.Substring(0, placeholderIndex) + formattedValue + 
+                         result.Substring(placeholderIndex + placeholder.Length);
+            }
+        }
+    
+        return result;
     }
 }

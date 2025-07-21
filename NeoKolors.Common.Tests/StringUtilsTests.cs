@@ -428,4 +428,16 @@ public class StringUtilsTests {
         var input = "";
         Assert.Equal("   ", input.PadCenter(3));
     }
+    
+    [Theory]
+    [InlineData("Hello {World}", "Hello World", "World")]
+    [InlineData("{a}{b}{c}", "abc", "a", "b", "c")]
+    [InlineData("{a}{b}{c}", "abc", "a", "b", "c", "d")]
+    [InlineData("{a}{b}{c}{d}", "abc{d}", "a", "b", "c")]
+    public void StructFormat_ShouldReturnCorrectValue(string? input, string output, params object[]? args) {
+        #pragma warning disable CA2254
+        var o = input.StructuredFormat(args);
+        #pragma warning restore CA2254
+        Assert.Equal(output, o);
+    }
 }
