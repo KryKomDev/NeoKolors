@@ -3,34 +3,39 @@
 // Copyright (c) 2025 KryKom
 //
 
-#if NET8_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
 using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
 using NeoKolors.Common;
 using NeoKolors.Common.Util;
 
 namespace NeoKolors.Console;
 
-public partial class NKLogger {
+public sealed partial class NKLogger : ILogger {
     
     /// <summary>
-    /// prints red error text
+    /// Logs a critical error message with optional event identifier and level formatting.
     /// </summary>
-    /// <param name="s">desired string message</param>
-    public void Fatal(string s) {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (!Level.HasFlag(LoggerLevel.ERROR)) return;
+    /// <param name="message">The critical error message to be logged. Cannot be null.</param>
+    /// <param name="id">An optional event identifier associated with the log entry.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
+    public void Crit(string message, EventId? id) {
+        if (message == null) throw new ArgumentNullException(nameof(message));
+        if (!Level.HasFlag(LoggerLevel.CRITICAL)) return;
 
         if (SimpleMessages) {
             Output.WriteLine(HideTime
-                ? $"{SourceStr}[ FATAL ] : {s}"
-                : $"[{TimeStamp()}] {SourceStr}[ FATAL ] : {s}");
+                ? $"{SourceStr(id)}[ CRIT ] : {Indent(message)}"
+                : $"[{TimeStamp()}] {SourceStr(id)}[ CRIT ] : {Indent(message)}");
         }
         else {
             Output.WriteLine(HideTime
-                ? "{0}{2}<b><n> FATAL </n></b> : {1}\e[0m".ApplyStyles().Format(FatalColor.Text, s, SourceStr)
-                : "{0}[{1}] {3}<b><n> FATAL </n></b> : {2}\e[0m".ApplyStyles().Format(FatalColor.Text, TimeStamp(), s, SourceStr)
+                ? "{0}{2}<b><n> CRIT </n></b> : {1}\e[0m"
+                    .ApplyStyles()
+                    .Format(FatalColor.Text, Indent(message), SourceStr(id))
+                : "{0}[{1}] {3}<b><n> CRIT </n></b> : {2}\e[0m"
+                    .ApplyStyles()
+                    .Format(FatalColor.Text, TimeStamp(), Indent(message), SourceStr(id))
             );
         }
         
@@ -38,27 +43,52 @@ public partial class NKLogger {
     }
 
     /// <summary>
-    /// prints red fatal error text using the ToString method of the object o and <see cref="Fatal(string)"/>
+    /// Logs a critical error message.
     /// </summary>
-    public void Fatal(object o) => Fatal(o.ToString()!);
+    /// <param name="message">The critical error message to be logged. Cannot be null.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Crit(string message) => Crit(message: message, id: null);
 
     /// <summary>
-    /// prints red error text
+    /// Logs a critical error message with optional event identifier and level formatting.
     /// </summary>
-    /// <param name="s">desired string message</param>
-    public void Error(string s) {
-        if (s == null) throw new ArgumentNullException(nameof(s));
+    /// <param name="o">The object to be logged</param>
+    /// <param name="id">An optional event identifier associated with the log entry.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Crit(object o, EventId? id = null) => Crit(o.ToString()!, id);
+
+    /// <summary>
+    /// Logs a critical error message from an exception.
+    /// </summary>
+    /// <exception cref="ArgumentNullException">Thrown when the provided exception's ToString returns null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Crit(Exception e) => Crit(e.ToString());
+
+    /// <summary>
+    /// Logs an error message with optional event identifier, formatting and styling as per logger configuration.
+    /// </summary>
+    /// <param name="message">The error message to be logged. Cannot be null.</param>
+    /// <param name="id">An optional event identifier associated with the log entry.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
+    public void Error(string message, EventId? id) {
+        if (message == null) throw new ArgumentNullException(nameof(message));
         if (!Level.HasFlag(LoggerLevel.ERROR)) return;
 
         if (SimpleMessages) {
             Output.WriteLine(HideTime
-                ? $"{SourceStr}[ ERROR ] : {s}"
-                : $"[{TimeStamp()}] {SourceStr}[ ERROR ] : {s}");
+                ? $"{SourceStr(id)}[ FAIL ] : {Indent(message)}"
+                : $"[{TimeStamp()}] {SourceStr(id)}[ FAIL ] : {Indent(message)}");
         }
         else {
             Output.WriteLine(HideTime
-                ? "{0}{2}<b><n> ERROR </n></b> : {1}\e[0m".ApplyStyles().Format(ErrorColor.Text, s, SourceStr)
-                : "{0}[{1}] {3}<b><n> ERROR </n></b> : {2}\e[0m".ApplyStyles().Format(ErrorColor.Text, TimeStamp(), s, SourceStr)
+                ? "{0}{2}<b><n> FAIL </n></b> : {1}\e[0m"
+                    .ApplyStyles()
+                    .Format(ErrorColor.Text, Indent(message), SourceStr(id))
+                : "{0}[{1}] {3}<b><n> FAIL </n></b> : {2}\e[0m"
+                    .ApplyStyles()
+                    .Format(ErrorColor.Text, TimeStamp(), Indent(message), SourceStr(id))
             );
         }
         
@@ -66,119 +96,271 @@ public partial class NKLogger {
     }
     
     /// <summary>
-    /// prints red error text using the ToString method of the object o and <see cref="Error(string)"/>
+    /// Logs an error message.
     /// </summary>
-    public void Error(object o) => Error(o.ToString()!);
-
+    /// <param name="message">The error message to be logged. Cannot be null.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Error(string message) => Error(message: message, id: null);
+    
     /// <summary>
-    /// prints yellow warning text
+    /// Logs an error message with optional event identifier, formatting, and styling as per logger configuration.
     /// </summary>
-    /// <param name="s">desired string message</param>
-    public void Warn(string s) {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (!Level.HasFlag(LoggerLevel.WARN)) return;
+    /// <param name="o">The object to be logged</param>
+    /// <param name="id">An optional event identifier associated with the log entry.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Error(object o, EventId? id = null) => Error(o.ToString()!, id);
+    
+    /// <summary>
+    /// Logs an error message from an exception.
+    /// </summary>
+    /// <exception cref="ArgumentNullException">Thrown when the provided exception's ToString returns null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Error(Exception e) => Error(e.ToString());
+    
+    /// <summary>
+    /// Logs a warning message with optional event identifier, formatting and styling as per logger configuration.
+    /// </summary>
+    /// <param name="message">The warning message to be logged. Cannot be null.</param>
+    /// <param name="id">An optional event identifier associated with the log entry. Defaults to null.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
+    public void Warn(string message, EventId? id) {
+        if (message == null) throw new ArgumentNullException(nameof(message));
+        if (!Level.HasFlag(LoggerLevel.WARNING)) return;
 
         if (SimpleMessages)
-            Output.WriteLine(HideTime ? $"{SourceStr}[ WARN ] : {s}" : $"[{TimeStamp()}] {SourceStr}[ WARN ] : {s}");
+            Output.WriteLine(HideTime 
+                ? $"{SourceStr(id)}[ WARN ] : {Indent(message)}" 
+                : $"[{TimeStamp()}] {SourceStr(id)}[ WARN ] : {Indent(message)}");
         else
-            Output.WriteLine((HideTime ? $"{SourceStr}[ WARN ] : {s}" : $"[{TimeStamp()}] {SourceStr}[ WARN ] : {s}\e[0m")
+            Output.WriteLine(
+                (HideTime 
+                    ? $"{SourceStr(id)}[ WARN ] : {Indent(message)}" 
+                    : $"[{TimeStamp()}] {SourceStr(id)}[ WARN ] : {Indent(message)}\e[0m"
+                )
                 .AddColor(WarnColor));
 
         Output.Flush();
     }
     
     /// <summary>
-    /// prints yellow warning text using the ToString method of the object o and <see cref="Warn(string)"/>
+    /// Logs a warning message.
     /// </summary>
-    public void Warn(object o) => Warn(o.ToString()!);
+    /// <param name="message">The warning message to be logged. Cannot be null.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Warn(string message) => Warn(message: message, id: null);
+
+    /// <summary>
+    /// Logs a warning message with optional event identifier, formatting and styling as per logger configuration.
+    /// </summary>
+    /// <param name="o">The object to be logged</param>
+    /// <param name="id">An optional event identifier associated with the log entry.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Warn(object o, EventId? id = null) => Warn(o.ToString()!, id);
     
     /// <summary>
-    /// prints green info text
+    /// Logs a warning message from an exception.
     /// </summary>
-    /// <param name="s">desired string message</param>
-    public void Info(string s) {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (!Level.HasFlag(LoggerLevel.INFO)) return;
+    /// <exception cref="ArgumentNullException">Thrown when the provided exception's ToString returns null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Warn(Exception e) => Warn(e.ToString());
+    
+    /// <summary>
+    /// Logs an informational message with optional event identifier, formatting and styling as per logger configuration.
+    /// </summary>
+    /// <param name="message">The informational message to be logged. Cannot be null.</param>
+    /// <param name="id">An optional event identifier associated with the log entry.</param>
+    /// <exception cref="ArgumentNullException">Thrown if the provided message is null.</exception>
+    public void Info(string message, EventId? id) {
+        if (message == null) throw new ArgumentNullException(nameof(message));
+        if (!Level.HasFlag(LoggerLevel.INFORMATION)) return;
 
         if (SimpleMessages)
-            Output.WriteLine(HideTime ? $"{SourceStr}[ INFO ] : {s}" : $"[{TimeStamp()}] {SourceStr}[ INFO ] : {s}");
+            Output.WriteLine(HideTime 
+                ? $"{SourceStr(id)}[ INFO ] : {Indent(message)}" 
+                : $"[{TimeStamp()}] {SourceStr(id)}[ INFO ] : {Indent(message)}");
         else
-            Output.WriteLine((HideTime ? $"{SourceStr}[ INFO ] : {s}" : $"[{TimeStamp()}] {SourceStr}[ INFO ] : {s}\e[0m")
+            Output.WriteLine(
+                (HideTime 
+                    ? $"{SourceStr(id)}[ INFO ] : {Indent(message)}" 
+                    : $"[{TimeStamp()}] {SourceStr(id)}[ INFO ] : {Indent(message)}\e[0m"
+                )
                 .AddColor(InfoColor));
 
         Output.Flush();
     }
+    
+    /// <summary>
+    /// Logs an information message.
+    /// </summary>
+    /// <param name="message">The information message to be logged. Cannot be null.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Info(string message) => Info(message: message, id: null);
+    
+    /// <summary>
+    /// Logs an informational message with optional event identifier, formatting and styling as per logger configuration.
+    /// </summary>
+    /// <param name="o">The object to be logged</param>
+    /// <param name="id">An optional event identifier associated with the log entry.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Info(object o, EventId? id = null) => Info(o.ToString()!, id);
 
     /// <summary>
-    /// prints green info text using the ToString method of the object o and <see cref="Info(string)"/>
+    /// Logs a debug-level message with optional event identifier, formatting and styling as per logger configuration.
     /// </summary>
-    public void Info(object o) => Info(o.ToString()!);
-
-    /// <summary>
-    /// prints a debug message, does not work when built in release mode
-    /// </summary>
-    /// <param name="s">desired string message</param>
-    public void Debug(string s) {
+    /// <param name="message">The debug message to be logged. Cannot be null.</param>
+    /// <param name="id">An optional event identifier associated with the log entry.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
+    public void Debug(string message, EventId? id) {
         if (!Level.HasFlag(LoggerLevel.DEBUG)) return;
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        if (message == null) throw new ArgumentNullException(nameof(message));
 
         if (SimpleMessages)
-            Output.WriteLine(HideTime ? $"{SourceStr}[ DEBUG ] : {s}" : $"[{TimeStamp()}] {SourceStr}[ DEBUG ] : {s}");
+            Output.WriteLine(HideTime 
+                ? $"{SourceStr(id)}[ DBUG ] : {Indent(message)}" 
+                : $"[{TimeStamp()}] {SourceStr(id)}[ DBUG ] : {Indent(message)}");
         else
-            Output.WriteLine((HideTime ? $"{SourceStr}[ DEBUG ] : {s}" : $"[{TimeStamp()}] {SourceStr}[ DEBUG ] : {s}\e[0m")
+            Output.WriteLine(
+                (HideTime 
+                    ? $"{SourceStr(id)}[ DBUG ] : {Indent(message)}" 
+                    : $"[{TimeStamp()}] {SourceStr(id)}[ DBUG ] : {Indent(message)}\e[0m"
+                )
                 .AddColor(DebugColor));
 
         Output.Flush();
     }
-
-    /// <summary>
-    /// prints debug text using the ToString method of the object o and <see cref="Debug(string)"/>
-    /// </summary>
-    public void Debug(object o) => Debug(o.ToString()!);
     
     /// <summary>
-    /// prints a debug message, does not work when built in release mode
+    /// Logs a debug message.
     /// </summary>
-    /// <param name="s">desired string message</param>
-    public void Trace(string s) {
+    /// <param name="message">The debug message to be logged. Cannot be null.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Debug(string message) => Debug(message: message, id: null);
+
+    /// <summary>
+    /// Logs a debug-level message with optional event identifier, formatting and styling as per logger configuration.
+    /// </summary>
+    /// <param name="o">The object to be logged</param>
+    /// <param name="id">An optional event identifier associated with the log entry.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Debug(object o, EventId? id = null) => Debug(o.ToString()!, id);
+
+    /// <summary>
+    /// Logs a trace-level message with optional event identifier, formatting and styling as per logger configuration.
+    /// </summary>
+    /// <param name="message">The trace message to be logged. Cannot be null.</param>
+    /// <param name="id">An optional event identifier associated with the log entry.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
+    public void Trace(string message, EventId? id) {
         if (!Level.HasFlag(LoggerLevel.DEBUG)) return;
-        if (s == null) throw new ArgumentNullException(nameof(s));
+        if (message == null) throw new ArgumentNullException(nameof(message));
 
         if (SimpleMessages)
-            Output.WriteLine(HideTime ? $"{SourceStr}[ TRACE ] : {s}" : $"[{TimeStamp()}] {SourceStr}[ TRACE ] : {s}");
+            Output.WriteLine(HideTime 
+                ? $"{SourceStr(id)}[ TRCE ] : {Indent(message)}" 
+                : $"[{TimeStamp()}] {SourceStr(id)}[ TRCE ] : {Indent(message)}");
         else
-            Output.WriteLine((HideTime ? $"{SourceStr}[ TRACE ] : {s}" : $"[{TimeStamp()}] {SourceStr}[ TRACE ] : {s}\e[0m")
+            Output.WriteLine(
+                (HideTime 
+                    ? $"{SourceStr(id)}[ TRCE ] : {Indent(message)}" 
+                    : $"[{TimeStamp()}] {SourceStr(id)}[ TRCE ] : {Indent(message)}\e[0m"
+                )
                 .AddColor(TraceColor));
 
         Output.Flush();
     }
+    
+    /// <summary>
+    /// Logs an information message.
+    /// </summary>
+    /// <param name="message">The information message to be logged. Cannot be null.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Trace(string message) => Trace(message: message, id: null);
 
     /// <summary>
-    /// prints debug text using the ToString method of the object o and <see cref="Debug(string)"/>
+    /// Logs a trace-level message with optional event identifier, formatting and styling as per logger configuration.
     /// </summary>
-    public void Trace(object o) => Trace(o.ToString()!);
+    /// <param name="o">The object to be logged</param>
+    /// <param name="id">An optional event identifier associated with the log entry.</param>
+    /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Trace(object o, EventId? id = null) => Trace(o.ToString()!, id);
 
-    private string SourceStr => Source is null ? "" : $"[ {Source} ] ";
-    
+    private string SourceStr(EventId? id) => 
+        Source is null ? "" : id is null ? $"[ {Source} ] " : $"[ {Source}: {id.ToString()} ] ";
+
+    private string Indent(string s) => IndentMessage.Match(_ => s, indent => $"\n{s}".PadLinesLeft(indent.Spaces));
+
     /// <summary>
     /// the timestamp
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private string TimeStamp() => DateTime.Now.ToString(TimeFormat);
     
-    #if NET8_0_OR_GREATER
-    public void Fatal([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Fatal(string.Format(s, args));
-    public void Error([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Error(string.Format(s, args));
-    public void Warn([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Warn(string.Format(s, args));
-    public void Info([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Info(string.Format(s, args));
-    public void Debug([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Debug(string.Format(s, args));
-    public void Trace([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Trace(string.Format(s, args));
-    #else
-    public void Fatal(string s, params object[] args) => Fatal(string.Format(s, args));
-    public void Error(string s, params object[] args) => Error(string.Format(s, args));
-    public void Warn(string s, params object[] args) => Warn(string.Format(s, args));
-    public void Info(string s, params object[] args) => Info(string.Format(s, args));
-    public void Debug(string s, params object[] args) => Debug(string.Format(s, args));
-    public void Trace(string s, params object[] args) => Trace(string.Format(s, args));
-    #endif
+    public void Crit([StructuredMessageTemplate] string message, params object[] args) => Crit(message.StructuredFormat(args));
+    public void Error([StructuredMessageTemplate] string message, params object[] args) => Error(message.StructuredFormat(args));
+    public void Warn([StructuredMessageTemplate] string message, params object[] args) => Warn(message.StructuredFormat(args));
+    public void Info([StructuredMessageTemplate] string message, params object[] args) => Info(message.StructuredFormat(args));
+    public void Debug([StructuredMessageTemplate] string message, params object[] args) => Debug(message.StructuredFormat(args));
+    public void Trace([StructuredMessageTemplate] string message, params object[] args) => Trace(message.StructuredFormat(args));
+
+    public void Log(LogLevel logLevel, string message, EventId? id) {
+        switch (logLevel) {
+            case LogLevel.Trace:
+                Trace(message, id);
+                break;
+            case LogLevel.Debug:
+                Debug(message, id);
+                break;
+            case LogLevel.Information:
+                Info(message, id);
+                break;
+            case LogLevel.Warning:
+                Warn(message, id);
+                break;
+            case LogLevel.Error:
+                Error(message, id);
+                break;
+            case LogLevel.Critical:
+                Crit(message, id);
+                break;
+            case LogLevel.None:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null);
+        }
+    }
+
+    public void Log(LogLevel logLevel, string message) => Log(logLevel, message, null);
+    
+    public void Log<TState>(
+        LogLevel logLevel,
+        EventId eventId,
+        TState state,
+        Exception? exception,
+        Func<TState, Exception?, string> formatter
+    ) => Log(logLevel, formatter(state, exception), eventId);
+
+    public bool IsEnabled(LogLevel logLevel) {
+        return logLevel switch {
+            LogLevel.Trace => Level.HasFlag(LoggerLevel.TRACE),
+            LogLevel.Debug => Level.HasFlag(LoggerLevel.DEBUG),
+            LogLevel.Information => Level.HasFlag(LoggerLevel.INFORMATION),
+            LogLevel.Warning => Level.HasFlag(LoggerLevel.WARNING),
+            LogLevel.Error => Level.HasFlag(LoggerLevel.ERROR),
+            LogLevel.Critical => Level.HasFlag(LoggerLevel.CRITICAL),
+            LogLevel.None => true,
+            _ => throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null)
+        };
+    }
+    
+    public IDisposable BeginScope<TState>(TState state) where TState : notnull => this;
 }

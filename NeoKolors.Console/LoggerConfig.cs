@@ -3,7 +3,11 @@
 // Copyright (c) 2025 KryKom
 //
 
+#if NET9_0_OR_GREATER
+using System.Runtime.CompilerServices;
+#endif
 using NeoKolors.Common;
+using OneOf;
 using static NeoKolors.Console.LoggerLevel;
 
 namespace NeoKolors.Console;
@@ -16,7 +20,7 @@ public struct LoggerConfig : ICloneable {
     /// <summary>
     /// configures what messages will be logged
     /// </summary>
-    public LoggerLevel Level { get; set; } = FATAL | ERROR | WARN | INFO | DEBUG | TRACE;
+    public LoggerLevel Level { get; set; } = CRITICAL | ERROR | WARNING | INFORMATION | DEBUG | TRACE;
     
     /// <summary>
     /// defines the color of the fatal error messages
@@ -51,8 +55,13 @@ public struct LoggerConfig : ICloneable {
     /// <summary>
     /// defines the output stream of the logger
     /// </summary>
-    public TextWriter Output { get; set; } = System.Console.Out;
-    
+    internal TextWriterReference OutputReference { get; set; } = new(System.Console.Out);
+
+    /// <summary>
+    /// defines the output stream of the logger
+    /// </summary>
+    public TextWriter Output { get => OutputReference.TextWriter; set => OutputReference.TextWriter = value; }
+
     /// <summary>
     /// if true, prints simple uncolored messages
     /// </summary>
@@ -81,13 +90,19 @@ public struct LoggerConfig : ICloneable {
             }
         } 
     } = LogFileConfig.Custom();
+
+    /// <summary>
+    /// Configures the indentation style applied to logged messages.
+    /// </summary>
+    public OneOf<InlineIndent, Indent> IndentMessage { get; set; } = new InlineIndent();
     
     
     
     public LoggerConfig() { }
     
+    [OverloadResolutionPriority(-100)]
     public LoggerConfig(
-        LoggerLevel level = FATAL | ERROR | WARN | INFO | DEBUG | TRACE, 
+        LoggerLevel level = CRITICAL | ERROR | WARNING | INFORMATION | DEBUG | TRACE, 
         NKColor? fatalColor = null, 
         NKColor? errorColor = null, 
         NKColor? warnColor = null, 
@@ -97,7 +112,8 @@ public struct LoggerConfig : ICloneable {
         TextWriter? output = null,
         bool simpleMessages = false,
         bool hideTime = false,
-        string timeFormat = "HH:mm:ss") 
+        string timeFormat = "HH:mm:ss",
+        OneOf<InlineIndent, Indent>? indentMessage = null) 
     {
         Level = level;
         FatalColor = fatalColor ?? NKConsoleColor.DARK_RED;
@@ -111,10 +127,11 @@ public struct LoggerConfig : ICloneable {
         HideTime = hideTime;
         TimeFormat = timeFormat;
         FileConfig = LogFileConfig.Custom();
+        IndentMessage = indentMessage ?? new InlineIndent();
     }
     
     public LoggerConfig(
-        LoggerLevel level = FATAL | ERROR | WARN | INFO | DEBUG | TRACE, 
+        LoggerLevel level = CRITICAL | ERROR | WARNING | INFORMATION | DEBUG | TRACE, 
         NKColor? fatalColor = null, 
         NKColor? errorColor = null, 
         NKColor? warnColor = null, 
@@ -124,7 +141,8 @@ public struct LoggerConfig : ICloneable {
         LogFileConfig? fileConfig = null,
         bool simpleMessages = false,
         bool hideTime = false,
-        string timeFormat = "HH:mm:ss") 
+        string timeFormat = "HH:mm:ss",
+        OneOf<InlineIndent, Indent>? indentMessage = null) 
     {
         Level = level;
         FatalColor = fatalColor ?? NKConsoleColor.DARK_RED;
@@ -138,10 +156,11 @@ public struct LoggerConfig : ICloneable {
         TimeFormat = timeFormat;
         FileConfig = fileConfig ?? LogFileConfig.Custom();
         Output = System.Console.Out;
+        IndentMessage = indentMessage ?? new InlineIndent();
     }
     
     public LoggerConfig(
-        LoggerLevel level = FATAL | ERROR | WARN | INFO | DEBUG | TRACE, 
+        LoggerLevel level = CRITICAL | ERROR | WARNING | INFORMATION | DEBUG | TRACE, 
         NKColor? fatalColor = null, 
         NKColor? errorColor = null, 
         NKColor? warnColor = null, 
@@ -150,7 +169,8 @@ public struct LoggerConfig : ICloneable {
         NKColor? traceColor = null,
         bool simpleMessages = false,
         bool hideTime = false,
-        string timeFormat = "HH:mm:ss") 
+        string timeFormat = "HH:mm:ss",
+        OneOf<InlineIndent, Indent>? indentMessage = null) 
     {
         Level = level;
         FatalColor = fatalColor ?? NKConsoleColor.DARK_RED;
@@ -164,7 +184,14 @@ public struct LoggerConfig : ICloneable {
         TimeFormat = timeFormat;
         FileConfig = LogFileConfig.Custom();
         Output = System.Console.Out;
+        IndentMessage = indentMessage ?? new InlineIndent();
     }
 
     public object Clone() => MemberwiseClone();
+
+    public sealed record InlineIndent;
+
+    public sealed record Indent(int Spaces) {
+        public int Spaces { get; } = Spaces;
+    }
 }

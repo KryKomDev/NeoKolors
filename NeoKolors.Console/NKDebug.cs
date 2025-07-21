@@ -3,9 +3,9 @@
 // Copyright (c) 2025 KryKom
 //
 
-#if NET8_0_OR_GREATER
-using System.Diagnostics.CodeAnalysis;
-#endif
+using JetBrains.Annotations;
+using Microsoft.Extensions.Logging;
+using NeoKolors.Common.Util;
 
 namespace NeoKolors.Console;
 
@@ -17,8 +17,11 @@ public static class NKDebug {
     static NKDebug() {
         Logger = new NKLogger();
         Formatter = new ExceptionFormatter();
-        AppDomain.CurrentDomain.ProcessExit += (_, _) => { Logger.Close(); };
+        AppDomain.CurrentDomain.ProcessExit += (_, _) => { Logger.ForceClose(); };
     }
+    
+    
+    // ==================================== Logger ==================================== //
 
     /// <summary>
     /// Retrieves an instance of <see cref="NKLogger"/> configured with the specified source.
@@ -26,6 +29,12 @@ public static class NKDebug {
     /// <param name="source">The source identifier for the logger instance.</param>
     /// <returns>An instance of <see cref="NKLogger"/> configured with the specified source.</returns>
     public static NKLogger GetLogger(string source) => new(Logger.Config, source, true);
+    
+    /// <summary>
+    /// Retrieves an instance of <see cref="NKLogger"/> configured with the specified source.
+    /// </summary>
+    /// <returns>An instance of <see cref="NKLogger"/> configured with the specified source.</returns>
+    public static NKLogger GetLogger<TSource>() => new(Logger.Config, typeof(TSource).Name, true);
 
     /// <summary>
     /// global instance of the NKLogger
@@ -35,54 +44,45 @@ public static class NKDebug {
     /// <inheritdoc cref="NKLogger.Trace(string)"/>
     public static void Trace(string message) => Logger.Trace(message);
     
-    /// <inheritdoc cref="NKLogger.Trace(object)"/>
+    /// <inheritdoc cref="NKLogger.Trace(object, EventId?)"/>
     public static void Trace(object message) => Logger.Trace(message);
     
     /// <inheritdoc cref="NKLogger.Debug(string)"/>
     public static void Debug(string message) => Logger.Debug(message);
     
-    /// <inheritdoc cref="NKLogger.Debug(object)"/>
+    /// <inheritdoc cref="NKLogger.Debug(object, EventId?)"/>
     public static void Debug(object message) => Logger.Debug(message);
     
     /// <inheritdoc cref="NKLogger.Info(string)"/>
     public static void Info(string message) => Logger.Info(message);
     
-    /// <inheritdoc cref="NKLogger.Info(object)"/>
+    /// <inheritdoc cref="NKLogger.Info(object, EventId?)"/>
     public static void Info(object message) => Logger.Info(message);
     
     /// <inheritdoc cref="NKLogger.Warn(string)"/>
     public static void Warn(string message) => Logger.Warn(message);
     
-    /// <inheritdoc cref="NKLogger.Warn(object)"/>
+    /// <inheritdoc cref="NKLogger.Warn(object, EventId?)"/>
     public static void Warn(object message) => Logger.Warn(message);
     
     /// <inheritdoc cref="NKLogger.Error(string)"/>
     public static void Error(string message) => Logger.Error(message);
     
-    /// <inheritdoc cref="NKLogger.Error(object)"/>
+    /// <inheritdoc cref="NKLogger.Error(object, EventId?)"/>
     public static void Error(object message) => Logger.Error(message);
     
-    /// <inheritdoc cref="NKLogger.Fatal(string)"/>
-    public static void Fatal(string message) => Logger.Fatal(message);
+    /// <inheritdoc cref="NKLogger.Crit(string)"/>
+    public static void Crit(string message) => Logger.Crit(message);
     
-    /// <inheritdoc cref="NKLogger.Fatal(object)"/>
-    public static void Fatal(object message) => Logger.Fatal(message);
+    /// <inheritdoc cref="NKLogger.Crit(object, EventId?)"/>
+    public static void Crit(object message) => Logger.Crit(message);
     
-    #if NET8_0_OR_GREATER
-    public static void Fatal([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Fatal(string.Format(s, args));
-    public static void Error([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Error(string.Format(s, args));
-    public static void Warn([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Warn(string.Format(s, args));
-    public static void Info([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Info(string.Format(s, args));
-    public static void Debug([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Debug(string.Format(s, args));
-    public static void Trace([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s, params object[] args) => Trace(string.Format(s, args));
-    #else
-    public static void Fatal(string s, params object[] args) => Fatal(string.Format(s, args));
-    public static void Error(string s, params object[] args) => Error(string.Format(s, args));
-    public static void Warn(string s, params object[] args) => Warn(string.Format(s, args));
-    public static void Info(string s, params object[] args) => Info(string.Format(s, args));
-    public static void Debug(string s, params object[] args) => Debug(string.Format(s, args));
-    public static void Trace(string s, params object[] args) => Trace(string.Format(s, args));
-    #endif
+    public static void Crit([StructuredMessageTemplate] string s, params object[] args) => Crit(s.StructuredFormat(args));
+    public static void Error([StructuredMessageTemplate] string s, params object[] args) => Error(s.StructuredFormat(args));
+    public static void Warn([StructuredMessageTemplate] string s, params object[] args) => Warn(s.StructuredFormat(args));
+    public static void Info([StructuredMessageTemplate] string s, params object[] args) => Info(s.StructuredFormat(args));
+    public static void Debug([StructuredMessageTemplate] string s, params object[] args) => Debug(s.StructuredFormat(args));
+    public static void Trace([StructuredMessageTemplate] string s, params object[] args) => Trace(s.StructuredFormat(args));
 
     /// <summary>
     /// Sets the output destination for the logger.
@@ -99,23 +99,26 @@ public static class NKDebug {
     /// <returns>The <see cref="TextWriter"/> currently used for logging output.</returns>
     public static TextWriter GetOutput() => Logger.Output;
 
-    /// <inheritdoc cref="NKLogger.LogAll"/>
-    public static void LogAll() => Logger.LogAll();
+    /// <inheritdoc cref="NKLogger.SetLogAll"/>
+    public static void SetLogAll() => Logger.SetLogAll();
     
-    /// <inheritdoc cref="NKLogger.NoDebug"/>
-    public static void NoDebug() => Logger.NoDebug();
+    /// <inheritdoc cref="NKLogger.SetLogInfo"/>
+    public static void SetLogInfo() => Logger.SetLogInfo();
 
-    /// <inheritdoc cref="NKLogger.LogWarn"/>
-    public static void LogWarn() => Logger.LogWarn();
+    /// <inheritdoc cref="NKLogger.SetLogWarn"/>
+    public static void SetLogWarn() => Logger.SetLogWarn();
     
-    /// <inheritdoc cref="NKLogger.LogErrors"/>
-    public static void LogErrors() => Logger.LogErrors();
+    /// <inheritdoc cref="NKLogger.SetLogErrors"/>
+    public static void SetLogErrors() => Logger.SetLogErrors();
     
-    /// <inheritdoc cref="NKLogger.LogFatal"/>
-    public static void LogFatal() => Logger.LogFatal();
+    /// <inheritdoc cref="NKLogger.SetLogCrit"/>
+    public static void SetLogCrit() => Logger.SetLogCrit();
     
-    /// <inheritdoc cref="NKLogger.LogNone"/>
-    public static void LogNone() => Logger.LogNone();
+    /// <inheritdoc cref="NKLogger.SetLogNone"/>
+    public static void SetLogNone() => Logger.SetLogNone();
+    
+    
+    // ============================== Exception Formatter ============================== //
     
     /// <summary>
     /// the global instance of the ExceptionFormatter

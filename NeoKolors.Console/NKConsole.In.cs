@@ -306,13 +306,26 @@ public static partial class NKConsole {
     };
 
     private static void Intercept() {
+        ConsoleKeyInfo i;
+        
+        try {
+            i = Std.ReadKey(intercept: true);
+        }
+        catch (InvalidOperationException e) {
+            // if the input is redirected or is not from a
+            // console or the console is a weird mf like mintty
+            LOGGER.Error(e.Message);
+            InterceptCompat();
+            return;
+        }
+
         while (InterceptInput) {
-            var i = Std.ReadKey(intercept: true);
-            
-            if (i.KeyChar == '\e') 
+            if (i is { KeyChar: '\e', Modifiers: 0 }) 
                 HandleEscape();
             else 
                 KeyEvent.Invoke(i);
+            
+            i = Std.ReadKey(intercept: true);
         }
     }
 
@@ -320,6 +333,13 @@ public static partial class NKConsole {
         var introducer = Std.ReadKey(intercept: true);
         
         if (introducer.KeyChar != '[') {
+            KeyEvent.Invoke(new ConsoleKeyInfo(
+                keyChar: '\e', 
+                key: ConsoleKey.Backspace, 
+                shift: false, 
+                alt: false, 
+                control: false)
+            );
             KeyEvent.Invoke(introducer);
             return;
         }
@@ -334,15 +354,18 @@ public static partial class NKConsole {
                 FocusInEvent.Invoke();
                 break;
             case 'M':
-                HandleMouseEvent();
+                HandleX10MouseEvent();
                 break;
             case '2':
                 HandlePaste();
                 break;
+            case '<':
+                HandleSGRMouseEvent();
+                break;
         }
     }
 
-    private static void HandleMouseEvent() {
+    private static void HandleX10MouseEvent() {
         var type = Std.ReadKey(intercept: true);
         var x = Std.ReadKey(intercept: true);
         var y = Std.ReadKey(intercept: true);
@@ -350,6 +373,10 @@ public static partial class NKConsole {
             MouseReportProtocol == MouseReportProtocol.SGR
                 ? MouseEventDecomposer.DecomposeSGR(type, x, y)
                 : MouseEventDecomposer.DecomposeUtf8(type, x, y));
+    }
+
+    private static void HandleSGRMouseEvent() {
+        throw new NotImplementedException();
     }
 
     private static void HandlePaste() {
@@ -362,7 +389,81 @@ public static partial class NKConsole {
         for (int i = 0; i < num; i++) 
             Std.ReadKey(intercept: true);
     }
-    
+
+    private static void InterceptCompat() {
+        while (InterceptInput) {
+            if (!Std.KeyAvailable) continue;
+            
+            var k = Std.Read();
+
+            switch (k) {
+                case -1: {
+                    break;
+                }
+                case '\e': {
+                    HandleEscapeCompat(); 
+                    break;
+                }
+                default: {
+                    KeyEvent.Invoke(new ConsoleKeyInfo(
+                        keyChar: (char)k, 
+                        key: (ConsoleKey)char.ToLower((char)k), 
+                        shift: char.IsUpper((char)k), 
+                        alt: false, 
+                        control: false));
+                    break;
+                }
+            }
+        }
+    }
+
+    private static void HandleEscapeCompat() {
+        int intro = -1;
+        while (intro is -1) {
+            intro = Std.Read(); 
+        }
+
+        if (intro is not '[') {
+            KeyEvent.Invoke(new ConsoleKeyInfo(
+                keyChar: '\e', 
+                key: ConsoleKey.Backspace, 
+                shift: false, 
+                alt: false, 
+                control: false)
+            );
+            KeyEvent.Invoke(new ConsoleKeyInfo(
+                keyChar: (char)intro, 
+                key: (ConsoleKey)char.ToLower((char)intro), 
+                shift: char.IsUpper((char)intro), 
+                alt: false, 
+                control: false)
+            );
+        }
+        
+        int next = -1;
+        while (next is -1) {
+            next = Std.Read(); 
+        }
+        
+        switch (next) {
+            case 'O':
+                FocusOutEvent.Invoke();
+                break;
+            case 'I':
+                FocusInEvent.Invoke();
+                break;
+            case 'M':
+                HandleX10MouseEvent();
+                break;
+            case '2':
+                HandlePaste();
+                break;
+            case '<':
+                HandleSGRMouseEvent();
+                break;
+        }
+    }
+
     #endregion
 
     /// <summary>

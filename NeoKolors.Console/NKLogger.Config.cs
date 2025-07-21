@@ -4,11 +4,12 @@
 //
 
 using NeoKolors.Common;
+using OneOf;
 using static NeoKolors.Console.LoggerLevel;
 
 namespace NeoKolors.Console;
 
-public partial class NKLogger : IDisposable {
+public sealed partial class NKLogger : IDisposable {
     
     /// <summary>
     /// A logging utility that provides customizable logging features, including log levels,
@@ -17,6 +18,8 @@ public partial class NKLogger : IDisposable {
     public NKLogger(LoggerConfig? config = null) {
         _config = config ?? new LoggerConfig();
         Source = null;
+
+        _config.OutputReference.AddReference();
         
         if (_config.FileConfig.Config != LogFileConfigType.CUSTOM)
             _config.Output = FileConfig.CreateOutput();
@@ -39,22 +42,23 @@ public partial class NKLogger : IDisposable {
     internal NKLogger(LoggerConfig? config, string source, bool bypass) {
         _config = config ?? new LoggerConfig();
         Source = source;
+        
+        _config.OutputReference.AddReference();
+        
         if (!bypass && _config.FileConfig.Config != LogFileConfigType.CUSTOM)
             _config.Output = FileConfig.CreateOutput();
     }
-
-    /// <summary>
-    /// Releases any resources associated with the logger, including closing the configured output stream
-    /// to ensure proper cleanup and resource management.
-    /// </summary>
-    public void Close() =>
-        _config.Output.Close();
 
     /// <summary>
     /// Identifies the source of the log messages.
     /// </summary>
     public string? Source { get; }
 
+    private bool _disposed = false;
+
+    
+    // ==================== Config Delegating Members ==================== //
+    
     private LoggerConfig _config;
     
     /// <summary>
@@ -162,39 +166,51 @@ public partial class NKLogger : IDisposable {
     }
 
     /// <summary>
+    /// Determines the indentation configuration for log messages, allowing for either an inline or spaced indentation style.
+    /// </summary>
+    public OneOf<LoggerConfig.InlineIndent, LoggerConfig.Indent> IndentMessage {
+        get => _config.IndentMessage;
+        set => _config.IndentMessage = value;
+    }
+
+    /// <summary>
     /// makes all messages visible
     /// </summary>
-    public void LogAll() => _config.Level = FATAL | ERROR | WARN | INFO | DEBUG | TRACE;
+    public void SetLogAll() => _config.Level = CRITICAL | ERROR | WARNING | INFORMATION | DEBUG | TRACE;
     
     /// <summary>
     /// makes all messages except debug visible
     /// </summary>
-    public void NoDebug() => _config.Level = FATAL | ERROR | WARN | INFO;
+    public void SetLogInfo() => _config.Level = CRITICAL | ERROR | WARNING | INFORMATION;
     
     /// <summary>
     /// makes fatal, error and warning messages visible
     /// </summary>
-    public void LogWarn() => _config.Level = FATAL | ERROR | WARN;
+    public void SetLogWarn() => _config.Level = CRITICAL | ERROR | WARNING;
     
     /// <summary>
     /// makes only error and fatal messages visible
     /// </summary>
-    public void LogErrors() => _config.Level = FATAL | ERROR;
+    public void SetLogErrors() => _config.Level = CRITICAL | ERROR;
     
     /// <summary>
     /// makes only fatal visible
     /// </summary>
-    public void LogFatal() => _config.Level = FATAL;
+    public void SetLogCrit() => _config.Level = CRITICAL;
     
     /// <summary>
     /// hides all messages
     /// </summary>
-    public void LogNone() => _config.Level = NONE;
-
+    public void SetLogNone() => _config.Level = NONE;
+    
     public void Dispose() {
-        _config.Output.Close();
-        _config.Output.Dispose();
-        _config.Output = null!;
+        if (_disposed) throw new ObjectDisposedException(nameof(NKLogger));
+        _disposed = true;
+        _config.OutputReference.Dispose();
         GC.SuppressFinalize(this);
     }
+
+    ~NKLogger() => Dispose();
+
+    internal void ForceClose() => _config.Output.Close();
 }

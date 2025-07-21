@@ -16,6 +16,8 @@ public partial class NKConsole {
     private static bool REPORT_FOCUS;
     private static bool BRACKETED_PASTE_MODE;
 
+    private static readonly NKLogger LOGGER = NKDebug.GetLogger("NKConsole");
+
     public static bool IsAltBufferOn {
         get => IS_ALT_BUFFER_ON;
         set {
@@ -105,7 +107,7 @@ public partial class NKConsole {
                 case PRESS: Std.Write(MOUSE_EV_ON_P_ON); break;
                 case PRESS_RELEASE: Std.Write(MOUSE_EV_ON_PR_ON); break;
                 case DRAG: Std.Write(MOUSE_EV_ON_PRD_ON); break;
-                case MOVE: Std.Write(MOUSE_EV_ON_ALL_ON); break;
+                case ALL: Std.Write(MOUSE_EV_ON_ALL_ON); break;
                 default: throw new ArgumentOutOfRangeException(nameof(value), value, null);
             }
 
@@ -119,7 +121,7 @@ public partial class NKConsole {
             case PRESS: Std.Write(MOUSE_EV_ON_P_OFF); break;
             case PRESS_RELEASE: Std.Write(MOUSE_EV_ON_PR_OFF); break;
             case DRAG: Std.Write(MOUSE_EV_ON_PRD_OFF); break;
-            case MOVE: Std.Write(MOUSE_EV_ON_ALL_OFF); break;
+            case ALL: Std.Write(MOUSE_EV_ON_ALL_OFF); break;
             default: throw new ArgumentOutOfRangeException(nameof(MOUSE_REPORT_LEVEL), MOUSE_REPORT_LEVEL, null);
         }
     }
@@ -131,7 +133,7 @@ public partial class NKConsole {
     /// </summary>
     public static void EnableMouseEvents() {
         Std.Write(MOUSE_EV_ON_ALL_ON);
-        MOUSE_REPORT_LEVEL = MOVE;
+        MOUSE_REPORT_LEVEL = ALL;
     }
 
     /// <summary>
