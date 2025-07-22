@@ -369,14 +369,42 @@ public static partial class NKConsole {
         var type = Std.ReadKey(intercept: true);
         var x = Std.ReadKey(intercept: true);
         var y = Std.ReadKey(intercept: true);
-        MouseEvent.Invoke(
-            MouseReportProtocol == MouseReportProtocol.SGR
-                ? MouseEventDecomposer.DecomposeSGR(type, x, y)
-                : MouseEventDecomposer.DecomposeUtf8(type, x, y));
+        MouseEvent.Invoke(MouseEventDecomposer.DecomposeUtf8(type, x, y));
     }
 
     private static void HandleSGRMouseEvent() {
-        throw new NotImplementedException();
+        string rawType = ReadUntil(';', true);
+        string rawX = ReadUntil(';', true);
+        string rawY = ReadUntil(out var last, true, 'm', 'M');
+
+        int type;
+        try {
+            type = int.Parse(rawType);
+        }
+        catch {
+            LOGGER.Error("Faulty mouse event type detected.");
+            return;
+        }
+        
+        int x;
+        try {
+            x = int.Parse(rawX);
+        }
+        catch {
+            LOGGER.Error("Faulty mouse event x-axis coordinate detected.");
+            return;
+        }
+        
+        int y;
+        try {
+            y = int.Parse(rawY);
+        }
+        catch {
+            LOGGER.Error("Faulty mouse event y-axis coordinate detected.");
+            return;
+        }
+        
+        MouseEvent.Invoke(MouseEventDecomposer.DecomposeSGR(type, x, y, last == 'M'));
     }
 
     private static void HandlePaste() {
@@ -521,16 +549,66 @@ public static partial class NKConsole {
             }
         }
     }
+
+    /// <summary>
+    /// Reads characters from the console until one of the specified characters is encountered.
+    /// Returns the string composed of all characters read before the specified character is found.
+    /// </summary>
+    /// <param name="last"></param>
+    /// <param name="oneOf">
+    ///     An array of characters that act as delimiters; reading stops when one of these characters is encountered.
+    /// </param>
+    /// <param name="intercept">
+    ///     If true, the read characters are read from the console without being displayed.
+    ///     If false, the characters will be displayed as they are typed.
+    /// </param>
+    /// <returns>
+    /// A string containing all characters read before encountering a specified delimiter character.
+    /// </returns>
+    public static string ReadUntil(out char last, bool intercept = false, params char[] oneOf) {
+        var key = Std.ReadKey(intercept);
+        string s = "";
+
+        while (!oneOf.Contains(key.KeyChar)) {
+            s += key.KeyChar;
+            key = Std.ReadKey(intercept);
+        }
+
+        last = key.KeyChar;
+        return s;
+    }
+
+    /// <summary>
+    /// Reads characters from the console until the specified character is encountered.
+    /// All characters read, including the termination character, are discarded if interception is enabled.
+    /// </summary>
+    /// <param name="c">The character at which to stop reading input.</param>
+    /// <param name="intercept">
+    /// If true, the characters entered will not be displayed in the console.
+    /// If false, the characters will be visible as they are typed.
+    /// </param>
+    /// <returns>A string containing all characters entered up to, but not including, the specified character.</returns>
+    public static string ReadUntil(char c, bool intercept = false) {
+        var key = Std.ReadKey(intercept);
+        string s = "";
+
+        while (key.KeyChar != c) {
+            s += key.KeyChar;
+            key = Std.ReadKey(intercept);
+        }
+
+        return s;
+    }
 }
 
 [Flags]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public enum BoolStrings {
-    TRUE_FALSE = 1,
-    T_F = 2,
-    YES_NO = 4,
-    Y_N = 8,
-    ON_OFF = 0x10,
-    ZERO_ONE = 0x20,
-    ALL = TRUE_FALSE | T_F | YES_NO | Y_N | ON_OFF | ZERO_ONE,
+    TRUE_FALSE = 0x1,
+    T_F        = 0x2,
+    YES_NO     = 0x4,
+    Y_N        = 0x8,
+    ON_OFF     = 0x10,
+    ZERO_ONE   = 0x20,
+    ALL        = TRUE_FALSE | T_F | YES_NO | Y_N | ON_OFF | ZERO_ONE,
 }
