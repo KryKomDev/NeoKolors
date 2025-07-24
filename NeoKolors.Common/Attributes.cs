@@ -1,4 +1,9 @@
-﻿// ReSharper disable CheckNamespace
+﻿//
+// NeoKolors
+// Copyright (c) 2025 KryKom
+//
+
+// ReSharper disable CheckNamespace
 
 #if !NET5_0_OR_GREATER
 

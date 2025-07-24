@@ -16,11 +16,14 @@ public partial class NKConsole {
     private static bool REPORT_FOCUS;
     private static bool BRACKETED_PASTE_MODE;
 
+    private static readonly NKLogger LOGGER = NKDebug.GetLogger("NKConsole");
+
     public static bool IsAltBufferOn {
         get => IS_ALT_BUFFER_ON;
         set {
             Std.Write(value ? ALT_BUFF_SC_ENABLE : ALT_BUFF_RC_DISABLE);
             IS_ALT_BUFFER_ON = value;
+            LOGGER.Info($"Alt buffer set to {value}");
         }
     }
 
@@ -32,6 +35,7 @@ public partial class NKConsole {
     public static void EnableAltBuffer() {
         Std.Write(ALT_BUFF_SC_ENABLE);
         IS_ALT_BUFFER_ON = true;
+        LOGGER.Info($"Alt buffer set to {IS_ALT_BUFFER_ON}");
     }
 
     /// <summary>
@@ -42,6 +46,7 @@ public partial class NKConsole {
     public static void DisableAltBuffer() {
         Std.Write(ALT_BUFF_RC_DISABLE);
         IS_ALT_BUFFER_ON = false;
+        LOGGER.Info($"Alt buffer set to {IS_ALT_BUFFER_ON}");
     }
 
     /// <summary>
@@ -76,6 +81,7 @@ public partial class NKConsole {
             }
 
             field = value;
+            LOGGER.Info($"Mouse reporting protocol set to {value}");
         }
     } = MouseReportProtocol.X10;
 
@@ -105,11 +111,12 @@ public partial class NKConsole {
                 case PRESS: Std.Write(MOUSE_EV_ON_P_ON); break;
                 case PRESS_RELEASE: Std.Write(MOUSE_EV_ON_PR_ON); break;
                 case DRAG: Std.Write(MOUSE_EV_ON_PRD_ON); break;
-                case MOVE: Std.Write(MOUSE_EV_ON_ALL_ON); break;
+                case ALL: Std.Write(MOUSE_EV_ON_ALL_ON); break;
                 default: throw new ArgumentOutOfRangeException(nameof(value), value, null);
             }
 
             MOUSE_REPORT_LEVEL = value;
+            LOGGER.Info($"Mouse reporting level set to {value}");
         }
     }
 
@@ -119,7 +126,7 @@ public partial class NKConsole {
             case PRESS: Std.Write(MOUSE_EV_ON_P_OFF); break;
             case PRESS_RELEASE: Std.Write(MOUSE_EV_ON_PR_OFF); break;
             case DRAG: Std.Write(MOUSE_EV_ON_PRD_OFF); break;
-            case MOVE: Std.Write(MOUSE_EV_ON_ALL_OFF); break;
+            case ALL: Std.Write(MOUSE_EV_ON_ALL_OFF); break;
             default: throw new ArgumentOutOfRangeException(nameof(MOUSE_REPORT_LEVEL), MOUSE_REPORT_LEVEL, null);
         }
     }
@@ -131,7 +138,8 @@ public partial class NKConsole {
     /// </summary>
     public static void EnableMouseEvents() {
         Std.Write(MOUSE_EV_ON_ALL_ON);
-        MOUSE_REPORT_LEVEL = MOVE;
+        MOUSE_REPORT_LEVEL = ALL;
+        LOGGER.Info($"Mouse reporting level set to ALL");
     }
 
     /// <summary>
@@ -159,6 +167,7 @@ public partial class NKConsole {
         set {
             Std.Write(value ? REPORT_FOCUS_ENABLE : REPORT_FOCUS_DISABLE); 
             REPORT_FOCUS = value;
+            LOGGER.Info($"Focus reporting set to {value}");
         }
     }
 
@@ -170,6 +179,7 @@ public partial class NKConsole {
     public static void EnableFocusReporting() {
         Std.Write(REPORT_FOCUS_ENABLE);
         REPORT_FOCUS = true;
+        LOGGER.Info($"Focus reporting set to true");
     }
 
     /// <summary>
@@ -180,6 +190,7 @@ public partial class NKConsole {
     public static void DisableFocusReporting() {
         Std.Write(REPORT_FOCUS_DISABLE);
         REPORT_FOCUS = false;
+        LOGGER.Info($"Focus reporting set to false");
     }
 
     /// <summary>
@@ -224,11 +235,11 @@ public partial class NKConsole {
         BRACKETED_PASTE_MODE = false;
     }
 
-    public static event MouseEvent MouseEvent = delegate { };
-    public static event PasteEvent PasteEvent = delegate { };
-    public static event FocusInEvent FocusInEvent = delegate { };
+    public static event MouseEvent    MouseEvent    = delegate { };
+    public static event PasteEvent    PasteEvent    = delegate { };
+    public static event FocusInEvent  FocusInEvent  = delegate { };
     public static event FocusOutEvent FocusOutEvent = delegate { };
-    public static event KeyEvent   KeyEvent   = delegate { };
+    public static event KeyEvent      KeyEvent      = delegate { };
 
     /// <summary>
     /// Gets value indicating whether input from the terminal is intercepted by NKConsole.
@@ -260,6 +271,7 @@ public partial class NKConsole {
             throw new InvalidOperationException("Input interception is already enabled.");
         
         InterceptInput = true;
+        LOGGER.Info("Starting input interception...");
         INPUT_THREAD.Start();
     }
 
@@ -270,5 +282,6 @@ public partial class NKConsole {
     /// </summary>
     public static void StopInputInterception() {
         InterceptInput = false;
+        LOGGER.Info("Stopping input interception...");
     }
 }

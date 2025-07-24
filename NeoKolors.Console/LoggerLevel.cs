@@ -11,10 +11,10 @@ namespace NeoKolors.Console;
 [Flags]
 public enum LoggerLevel {
     NONE = 0,
-    FATAL = 1,
+    CRITICAL = 1,
     ERROR = 2,
-    WARN = 4,
-    INFO = 8,
+    WARNING = 4,
+    INFORMATION = 8,
     DEBUG = 16,
     TRACE = 32
 }

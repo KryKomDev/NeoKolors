@@ -22,9 +22,9 @@ public class NameConvertorTests
     [InlineData("APIConfig", "a-p-i-config")]
     [InlineData("XML", "x-m-l")]
     [InlineData("Simple", "simple")]
-    public void PascalToSnake_ConvertsCorrectly(string input, string expected)
+    public void PascalToKebab_ConvertsCorrectly(string input, string expected)
     {
-        string result = input.PascalToSnake();
+        string result = input.PascalToKebab();
         Assert.Equal(expected, result);
     }
 
@@ -85,14 +85,14 @@ public class NameConvertorTests
     }
 
     [Theory]
-    [InlineData("HelloWorld", "hello-world")]
-    [InlineData("SimpleTest", "simple-test")]
-    [InlineData("MultipleWordTest", "multiple-word-test")]
+    [InlineData("HelloWorld", "hello_world")]
+    [InlineData("SimpleTest", "simple_test")]
+    [InlineData("MultipleWordTest", "multiple_word_test")]
     [InlineData("Single", "single")]
-    [InlineData("APIConfig", "a-p-i-config")]
-    public void PascalToKebab_ConvertsCorrectly(string input, string expected)
+    [InlineData("APIConfig", "a_p_i_config")]
+    public void PascalToSnake_ConvertsCorrectly(string input, string expected)
     {
-        string result = input.PascalToKebab();
+        string result = input.PascalToSnake();
         Assert.Equal(expected, result);
     }
 
@@ -131,10 +131,9 @@ public class NameConvertorTests
         const string original = "hello_world_test";
         
         // Snake -> Pascal -> Snake -> Kebab
-        string result = original
-            .SnakeToPascal()
-            .PascalToSnake()
-            .SnakeToKebab();
+        string result = original.SnakeToPascal();
+        result = result.PascalToSnake();
+        result = result.SnakeToKebab();
             
         Assert.Equal("hello-world-test", result);
     }
