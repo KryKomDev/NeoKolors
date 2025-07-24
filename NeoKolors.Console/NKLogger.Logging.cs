@@ -297,7 +297,16 @@ public sealed partial class NKLogger : ILogger {
     private string SourceStr(EventId? id) => 
         Source is null ? "" : id is null ? $"[ {Source} ] " : $"[ {Source}: {id.ToString()} ] ";
 
-    private string Indent(string s) => IndentMessage.Match(_ => s, indent => $"\n{s}".PadLinesLeft(indent.Spaces));
+    private string Indent(string s) => IndentMessage.Match(
+        _ => s, 
+        indent => MessageHighlightLine 
+            ? "\n" + s
+              .Split('\n')
+              .Select(allSelector: str => '│'.AddStyle(TextStyles.BOLD) + new string(' ',  indent.Spaces) + str,
+                    lastSelector: str => '╵'.AddStyle(TextStyles.BOLD) + new string(' ',  indent.Spaces) + str)
+              .Join("\n")
+            : $"\n{s}".PadLinesLeft(indent.Spaces)
+    );
 
     /// <summary>
     /// the timestamp

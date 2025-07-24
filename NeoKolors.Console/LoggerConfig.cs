@@ -95,7 +95,11 @@ public struct LoggerConfig : ICloneable {
     /// Configures the indentation style applied to logged messages.
     /// </summary>
     public OneOf<InlineIndent, Indent> IndentMessage { get; set; } = new InlineIndent();
-    
+
+    /// <summary>
+    /// Determines whether each log message is visually highlighted with a surrounding line for emphasis.
+    /// </summary>
+    public bool MessageHighlightLine { get; set; } = true;
     
     
     public LoggerConfig() { }
@@ -113,7 +117,8 @@ public struct LoggerConfig : ICloneable {
         bool simpleMessages = false,
         bool hideTime = false,
         string timeFormat = "HH:mm:ss",
-        OneOf<InlineIndent, Indent>? indentMessage = null) 
+        OneOf<InlineIndent, Indent>? indentMessage = null,
+        bool messageHighlightLine = true) 
     {
         Level = level;
         FatalColor = fatalColor ?? NKConsoleColor.DARK_RED;
@@ -128,6 +133,7 @@ public struct LoggerConfig : ICloneable {
         TimeFormat = timeFormat;
         FileConfig = LogFileConfig.Custom();
         IndentMessage = indentMessage ?? new InlineIndent();
+        MessageHighlightLine = messageHighlightLine;
     }
     
     public LoggerConfig(
@@ -142,7 +148,8 @@ public struct LoggerConfig : ICloneable {
         bool simpleMessages = false,
         bool hideTime = false,
         string timeFormat = "HH:mm:ss",
-        OneOf<InlineIndent, Indent>? indentMessage = null) 
+        OneOf<InlineIndent, Indent>? indentMessage = null,
+        bool messageHighlightLine = true) 
     {
         Level = level;
         FatalColor = fatalColor ?? NKConsoleColor.DARK_RED;
@@ -157,6 +164,7 @@ public struct LoggerConfig : ICloneable {
         FileConfig = fileConfig ?? LogFileConfig.Custom();
         Output = System.Console.Out;
         IndentMessage = indentMessage ?? new InlineIndent();
+        MessageHighlightLine = messageHighlightLine;
     }
     
     public LoggerConfig(
@@ -170,7 +178,8 @@ public struct LoggerConfig : ICloneable {
         bool simpleMessages = false,
         bool hideTime = false,
         string timeFormat = "HH:mm:ss",
-        OneOf<InlineIndent, Indent>? indentMessage = null) 
+        OneOf<InlineIndent, Indent>? indentMessage = null,
+        bool messageHighlightLine = true) 
     {
         Level = level;
         FatalColor = fatalColor ?? NKConsoleColor.DARK_RED;
@@ -185,6 +194,7 @@ public struct LoggerConfig : ICloneable {
         FileConfig = LogFileConfig.Custom();
         Output = System.Console.Out;
         IndentMessage = indentMessage ?? new InlineIndent();
+        MessageHighlightLine = messageHighlightLine;
     }
 
     public object Clone() => MemberwiseClone();
@@ -192,6 +202,6 @@ public struct LoggerConfig : ICloneable {
     public sealed record InlineIndent;
 
     public sealed record Indent(int Spaces) {
-        public int Spaces { get; } = Spaces;
+        public int Spaces { get; } = Spaces >= 0 ? Spaces : throw new ArgumentOutOfRangeException(nameof(Spaces), "Indentation must be greater than or equal to 0.");
     }
 }

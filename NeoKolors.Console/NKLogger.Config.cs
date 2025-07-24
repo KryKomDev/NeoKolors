@@ -174,6 +174,14 @@ public sealed partial class NKLogger : IDisposable {
     }
 
     /// <summary>
+    /// Specifies whether the output message should include a highlighted line for emphasis.
+    /// </summary>
+    public bool MessageHighlightLine {
+        get => _config.MessageHighlightLine;
+        set => _config.MessageHighlightLine = value;
+    }
+
+    /// <summary>
     /// makes all messages visible
     /// </summary>
     public void SetLogAll() => _config.Level = CRITICAL | ERROR | WARNING | INFORMATION | DEBUG | TRACE;
