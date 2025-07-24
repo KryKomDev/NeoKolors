@@ -1,12 +1,12 @@
-name: Publish NeoKolors.Common to NuGet
+name: Publish NeoKolors.Console to NuGet
 
 on:   
   workflow_dispatch:
 
 env:
   Solution_Name: NeoKolors.sln
-  Project_Path: NeoKolors.Common\NeoKolors.Common.csproj
-  Test_Project_Path: NeoKolors.Common.Tests\NeoKolors.Common.Tests.csproj
+  Project_Path: NeoKolors.Console\NeoKolors.Console.csproj
+  Test_Project_Path: NeoKolors.Console.Tests\NeoKolors.Console.Tests.csproj
 
 jobs:
   build:

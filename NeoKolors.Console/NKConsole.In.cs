@@ -306,13 +306,26 @@ public static partial class NKConsole {
     };
 
     private static void Intercept() {
+        ConsoleKeyInfo i;
+        
+        try {
+            i = Std.ReadKey(intercept: true);
+        }
+        catch (InvalidOperationException e) {
+            // if the input is redirected or is not from a
+            // console or the console is a weird mf like mintty
+            LOGGER.Error(e.Message);
+            InterceptCompat();
+            return;
+        }
+
         while (InterceptInput) {
-            var i = Std.ReadKey(intercept: true);
-            
-            if (i.KeyChar == '\e') 
+            if (i is { KeyChar: '\e', Modifiers: 0 }) 
                 HandleEscape();
             else 
                 KeyEvent.Invoke(i);
+            
+            i = Std.ReadKey(intercept: true);
         }
     }
 
@@ -320,6 +333,13 @@ public static partial class NKConsole {
         var introducer = Std.ReadKey(intercept: true);
         
         if (introducer.KeyChar != '[') {
+            KeyEvent.Invoke(new ConsoleKeyInfo(
+                keyChar: '\e', 
+                key: ConsoleKey.Backspace, 
+                shift: false, 
+                alt: false, 
+                control: false)
+            );
             KeyEvent.Invoke(introducer);
             return;
         }
@@ -334,22 +354,57 @@ public static partial class NKConsole {
                 FocusInEvent.Invoke();
                 break;
             case 'M':
-                HandleMouseEvent();
+                HandleX10MouseEvent();
                 break;
             case '2':
                 HandlePaste();
                 break;
+            case '<':
+                HandleSGRMouseEvent();
+                break;
         }
     }
 
-    private static void HandleMouseEvent() {
+    private static void HandleX10MouseEvent() {
         var type = Std.ReadKey(intercept: true);
         var x = Std.ReadKey(intercept: true);
         var y = Std.ReadKey(intercept: true);
-        MouseEvent.Invoke(
-            MouseReportProtocol == MouseReportProtocol.SGR
-                ? MouseEventDecomposer.DecomposeSGR(type, x, y)
-                : MouseEventDecomposer.DecomposeUtf8(type, x, y));
+        MouseEvent.Invoke(MouseEventDecomposer.DecomposeUtf8(type, x, y));
+    }
+
+    private static void HandleSGRMouseEvent() {
+        string rawType = ReadUntil(';', true);
+        string rawX = ReadUntil(';', true);
+        string rawY = ReadUntil(out var last, true, 'm', 'M');
+
+        int type;
+        try {
+            type = int.Parse(rawType);
+        }
+        catch {
+            LOGGER.Error("Faulty mouse event type detected.");
+            return;
+        }
+        
+        int x;
+        try {
+            x = int.Parse(rawX);
+        }
+        catch {
+            LOGGER.Error("Faulty mouse event x-axis coordinate detected.");
+            return;
+        }
+        
+        int y;
+        try {
+            y = int.Parse(rawY);
+        }
+        catch {
+            LOGGER.Error("Faulty mouse event y-axis coordinate detected.");
+            return;
+        }
+        
+        MouseEvent.Invoke(MouseEventDecomposer.DecomposeSGR(type, x, y, last == 'M'));
     }
 
     private static void HandlePaste() {
@@ -362,7 +417,81 @@ public static partial class NKConsole {
         for (int i = 0; i < num; i++) 
             Std.ReadKey(intercept: true);
     }
-    
+
+    private static void InterceptCompat() {
+        while (InterceptInput) {
+            if (!Std.KeyAvailable) continue;
+            
+            var k = Std.Read();
+
+            switch (k) {
+                case -1: {
+                    break;
+                }
+                case '\e': {
+                    HandleEscapeCompat(); 
+                    break;
+                }
+                default: {
+                    KeyEvent.Invoke(new ConsoleKeyInfo(
+                        keyChar: (char)k, 
+                        key: (ConsoleKey)char.ToLower((char)k), 
+                        shift: char.IsUpper((char)k), 
+                        alt: false, 
+                        control: false));
+                    break;
+                }
+            }
+        }
+    }
+
+    private static void HandleEscapeCompat() {
+        int intro = -1;
+        while (intro is -1) {
+            intro = Std.Read(); 
+        }
+
+        if (intro is not '[') {
+            KeyEvent.Invoke(new ConsoleKeyInfo(
+                keyChar: '\e', 
+                key: ConsoleKey.Backspace, 
+                shift: false, 
+                alt: false, 
+                control: false)
+            );
+            KeyEvent.Invoke(new ConsoleKeyInfo(
+                keyChar: (char)intro, 
+                key: (ConsoleKey)char.ToLower((char)intro), 
+                shift: char.IsUpper((char)intro), 
+                alt: false, 
+                control: false)
+            );
+        }
+        
+        int next = -1;
+        while (next is -1) {
+            next = Std.Read(); 
+        }
+        
+        switch (next) {
+            case 'O':
+                FocusOutEvent.Invoke();
+                break;
+            case 'I':
+                FocusInEvent.Invoke();
+                break;
+            case 'M':
+                HandleX10MouseEvent();
+                break;
+            case '2':
+                HandlePaste();
+                break;
+            case '<':
+                HandleSGRMouseEvent();
+                break;
+        }
+    }
+
     #endregion
 
     /// <summary>
@@ -420,16 +549,66 @@ public static partial class NKConsole {
             }
         }
     }
+
+    /// <summary>
+    /// Reads characters from the console until one of the specified characters is encountered.
+    /// Returns the string composed of all characters read before the specified character is found.
+    /// </summary>
+    /// <param name="last"></param>
+    /// <param name="oneOf">
+    ///     An array of characters that act as delimiters; reading stops when one of these characters is encountered.
+    /// </param>
+    /// <param name="intercept">
+    ///     If true, the read characters are read from the console without being displayed.
+    ///     If false, the characters will be displayed as they are typed.
+    /// </param>
+    /// <returns>
+    /// A string containing all characters read before encountering a specified delimiter character.
+    /// </returns>
+    public static string ReadUntil(out char last, bool intercept = false, params char[] oneOf) {
+        var key = Std.ReadKey(intercept);
+        string s = "";
+
+        while (!oneOf.Contains(key.KeyChar)) {
+            s += key.KeyChar;
+            key = Std.ReadKey(intercept);
+        }
+
+        last = key.KeyChar;
+        return s;
+    }
+
+    /// <summary>
+    /// Reads characters from the console until the specified character is encountered.
+    /// All characters read, including the termination character, are discarded if interception is enabled.
+    /// </summary>
+    /// <param name="c">The character at which to stop reading input.</param>
+    /// <param name="intercept">
+    /// If true, the characters entered will not be displayed in the console.
+    /// If false, the characters will be visible as they are typed.
+    /// </param>
+    /// <returns>A string containing all characters entered up to, but not including, the specified character.</returns>
+    public static string ReadUntil(char c, bool intercept = false) {
+        var key = Std.ReadKey(intercept);
+        string s = "";
+
+        while (key.KeyChar != c) {
+            s += key.KeyChar;
+            key = Std.ReadKey(intercept);
+        }
+
+        return s;
+    }
 }
 
 [Flags]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public enum BoolStrings {
-    TRUE_FALSE = 1,
-    T_F = 2,
-    YES_NO = 4,
-    Y_N = 8,
-    ON_OFF = 0x10,
-    ZERO_ONE = 0x20,
-    ALL = TRUE_FALSE | T_F | YES_NO | Y_N | ON_OFF | ZERO_ONE,
+    TRUE_FALSE = 0x1,
+    T_F        = 0x2,
+    YES_NO     = 0x4,
+    Y_N        = 0x8,
+    ON_OFF     = 0x10,
+    ZERO_ONE   = 0x20,
+    ALL        = TRUE_FALSE | T_F | YES_NO | Y_N | ON_OFF | ZERO_ONE,
 }

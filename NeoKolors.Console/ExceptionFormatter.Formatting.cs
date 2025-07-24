@@ -24,11 +24,11 @@ public partial class ExceptionFormatter {
 
         if (RedirectToLog) {
             if (args.ExceptionObject is Exception e1)
-                NKDebug.Fatal(
+                NKDebug.Crit(
                     $"{e1.GetType().Name}: {e1.Message}\n" +
                     $"   Stack Trace:\n{e1.StackTrace?.Replace("   ", "      ")}");
             else
-                NKDebug.Fatal($"An unhandled exception occured.{(args.IsTerminating ? " Terminating..." : "")}");
+                NKDebug.Crit($"An unhandled exception occured.{(args.IsTerminating ? " Terminating..." : "")}");
         }
         
         if (args.IsTerminating) 

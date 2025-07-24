@@ -3,11 +3,11 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>0.25.22.0</Version>
+        <Version>1.0.0.0-rc1</Version>
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
         <LangVersion>preview</LangVersion>
-        <TargetFrameworks>net5.0;net8.0;net9.0;netstandard2.0</TargetFrameworks>
+        <TargetFrameworks>net5.0;net8.0;netstandard2.0;net9.0</TargetFrameworks>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicense>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicense>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
