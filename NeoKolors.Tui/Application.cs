@@ -5,6 +5,8 @@
 
 using NeoKolors.Common.Util;
 using NeoKolors.Console;
+using NeoKolors.Console.Events;
+using NeoKolors.Console.Mouse;
 using NeoKolors.Tui.Events;
 
 namespace NeoKolors.Tui;
@@ -16,7 +18,7 @@ public class Application : IApplication {
     /// <summary>
     /// stack of 'pop-ups'
     /// </summary>
-    private List<Window> Windows { get; } = new();
+    private readonly List<Window> _windows = new();
 
     
     /// <summary>
@@ -27,14 +29,15 @@ public class Application : IApplication {
         ResizeEvent += w.HandleResize;
         StopEvent += w.HandleAppStop;
         StartEvent += w.HandleAppStart;
-        Windows.Add(w);
+        MouseEvent += w.HandleMouseEvent;
+        _windows.Add(w);
     }
 
     
     /// <summary>
     /// removes a window from the stack of windows of the application 
     /// </summary>
-    public void PopWindow() => Windows.RemoveAt(Windows.Count - 1);
+    public void PopWindow() => _windows.RemoveAt(_windows.Count - 1);
 
 
     /// <summary>
@@ -48,6 +51,30 @@ public class Application : IApplication {
     /// called when a key is pressed
     /// </summary>
     public event KeyEventHandler KeyEvent;
+
+    
+    /// <summary>
+    /// Event handler for mouse interaction events within the application.
+    /// </summary>
+    public event MouseEventHandler MouseEvent;
+
+
+    /// <summary>
+    /// Represents an event triggered when the application or one of its elements gains focus.
+    /// </summary>
+    public event FocusInEventHandler FocusInEvent;
+
+
+    /// <summary>
+    /// Event triggered when a loss of keyboard focus occurs within the application.
+    /// </summary>
+    public event FocusOutEventHandler FocusOutEvent;
+
+
+    /// <summary>
+    /// Represents an event triggered when a paste operation occurs in the application.
+    /// </summary>
+    public event PasteEventHandler PasteEvent;
     
     
     /// <summary>
@@ -98,17 +125,17 @@ public class Application : IApplication {
         Config = config ?? new AppConfig();
 
         // set up events
-        KeyEvent = (_, _) => { };
+        KeyEvent = _ => { };
+        MouseEvent = _ => { };
         ResizeEvent = _ => { };
         StartEvent = (_, _) => { };
         StopEvent = (_, _) => { };
+        FocusInEvent = () => { };
+        FocusOutEvent = () => { };
+        PasteEvent = _ => { };
 
         // subscribe events
         ResizeEvent += Screen.Resize;
-        KeyEvent += _baseView.HandleKeyPress;
-        ResizeEvent += _baseView.HandleResize;
-        StartEvent += _baseView.HandleAppStart;
-        StopEvent += _baseView.HandleAppStop;
     }
     
     
@@ -119,7 +146,7 @@ public class Application : IApplication {
         _baseView.Render(Screen);
 
         // render the window stack
-        foreach (var w in Windows) {
+        foreach (var w in _windows) {
             w.Render(Screen);
         }
     }
@@ -129,11 +156,24 @@ public class Application : IApplication {
     public void Start() {
         
         LOGGER.Info($"Starting application with config: {Config.ToString()}");
+
+        NKConsole.EnableMouseEvents();
+        NKConsole.MouseReportProtocol = Config.MouseReportProtocol;
+        NKConsole.EnableBracketedPasteMode();
+        NKConsole.EnableFocusReporting();
+            
+        NKConsole.FocusInEvent += () => FocusInEvent.Invoke();
+        NKConsole.FocusOutEvent += () => FocusOutEvent.Invoke();
+        NKConsole.MouseEvent += info => MouseEvent.Invoke(info);
+        NKConsole.KeyEvent += info => KeyEvent.Invoke(info);
+        NKConsole.PasteEvent += content => PasteEvent.Invoke(content);
+        
+        NKConsole.StartInputInterception();
         
         IsRunning = true;
         StartEvent.Invoke(this, new AppStartEventArgs(Config.LazyRender));
         System.Console.SetOut(Screen);
-        
+
         if (Config.LazyRender) {
             RunLazy();
         }
@@ -149,40 +189,44 @@ public class Application : IApplication {
     private void RunLazy() {
         Render();
         Screen.Render();
-        
-        while (IsRunning) {
-            var ki = System.Console.ReadKey(true);
 
-            // interrupt combination triggered -> stop application
-            if (ki.Key == Config.InterruptCombination.Key && 
-                ki.Modifiers == Config.InterruptCombination.Modifiers)
+        NKConsole.KeyEvent += info => {
+            Render();
+            Screen.Render();
+            
+            if (info.Key == Config.InterruptCombination.Key &&
+                info.Modifiers == Config.InterruptCombination.Modifiers) 
             {
                 Stop();
-                return;
             }
+        };
+
+        NKConsole.MouseEvent += _ => {
+            Render();
+            Screen.Render();
+        };
+
+        int prevWidth = System.Console.WindowWidth;
+        int prevHeight = System.Console.WindowHeight;
+        
+        while (IsRunning) {
             
-            if (ki.Key == Config.InterruptCombination.Key && 
-                ki.Modifiers == Config.InterruptCombination.Modifiers)
+            if (prevWidth == System.Console.BufferWidth &&
+                prevHeight == System.Console.BufferHeight) 
             {
-                Screen.ToggleScreenMode();
+                continue;
             }
 
-            // the terminal has been resized
-            if (Screen.Width != System.Console.WindowWidth ||
-                Screen.Height != System.Console.WindowHeight) 
-            {
-                ResizeEvent.Invoke(new ResizeEventArgs(System.Console.WindowWidth, System.Console.WindowHeight));
-            }
-
-            KeyEvent.Invoke(this, new KeyEventArgs(ki));
+            ResizeEvent.Invoke(new ResizeEventArgs(System.Console.BufferWidth, System.Console.BufferHeight));
             
-            LOGGER.Trace($"Pressed key: {Extensions.ToString(ki)}");
+            prevWidth = System.Console.BufferWidth;
+            prevHeight = System.Console.BufferHeight;
             
             Render();
             Screen.Render();
         }
     }
-
+    
     
     /// <summary>
     /// runs the application in dynamic render mode
@@ -190,39 +234,26 @@ public class Application : IApplication {
     private void RunDynamic() {
         
         // the first frame should be rendered immediately, so last frame was rendered yesterday this time :) 
-        DateTime lastFrame = DateTime.Now.Subtract(new TimeSpan(1, 0, 0, 0));
+        var lastFrame = DateTime.Now.Subtract(new TimeSpan(1, 0, 0, 0));
         
         // minimal time span between frames
-        TimeSpan minDelta = new TimeSpan(0, 0, 0, 0, 1 / Config.MaxUpdatesPerSecond * 1000);
-        
-        while (IsRunning) {
+        var minDelta = new TimeSpan(0, 0, 0, 0, 1 / Config.FpsLimit.Framerate * 1000);
 
-            ConsoleKeyInfo? ki = null;
-            
-            // if a key is available for reading, read it
-            if (System.Console.KeyAvailable) {
-                ki = System.Console.ReadKey(true);
-            }
-            
-            // interrupt combination triggered -> stop application
-            if (ki != null && 
-                ki.Value.Key == Config.InterruptCombination.Key && 
-                ki.Value.Modifiers == Config.InterruptCombination.Modifiers) 
+        NKConsole.KeyEvent += info => {
+            if (info.Key == Config.InterruptCombination.Key &&
+                info.Modifiers == Config.InterruptCombination.Modifiers) 
             {
                 Stop();
-                return;
             }
+        };
+        
+        while (IsRunning) {
             
             // terminal has been resized
             if (Screen.Width != System.Console.WindowWidth ||
                 Screen.Height != System.Console.WindowHeight) 
             {
                 ResizeEvent.Invoke(new ResizeEventArgs(System.Console.WindowWidth, System.Console.WindowHeight));
-            }
-            
-            // invoke all registered subscribers to key events
-            if (ki != null) {
-                KeyEvent.Invoke(this, new KeyEventArgs((ConsoleKeyInfo)ki));
             }
 
             // if the last frame has been rendered in less than minDelta skip rendering for this cycle
@@ -241,5 +272,6 @@ public class Application : IApplication {
         IsRunning = false;
         StopEvent.Invoke(this, EventArgs.Empty);
         Screen.ScreenMode = false;
+        NKConsole.StopInputInterception();
     }
 }

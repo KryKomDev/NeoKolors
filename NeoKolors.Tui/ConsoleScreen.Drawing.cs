@@ -78,7 +78,7 @@ public partial class ConsoleScreen : IConsoleScreen {
                 continue;
             }
             
-            IGlyph g = font.GetGlyph(s[i]);
+            var g = font.GetGlyph(s[i]);
             DrawGlyph(g, x + xOffset, y, style);
             xOffset += g.Width + font.LetterSpacing;
         }
@@ -133,7 +133,7 @@ public partial class ConsoleScreen : IConsoleScreen {
                     continue;
                 }
             
-                IGlyph g = font.GetGlyph(lines[l][i]);
+                var g = font.GetGlyph(lines[l][i]);
                 DrawGlyph(g, border.LowerX + xOffset, 
                     border.LowerY + l * (font.LineSize + font.LineSpacing) + yOffset, 
                     style, border, enableTopOverflow, enableBottomOverflow);
@@ -304,7 +304,7 @@ public partial class ConsoleScreen : IConsoleScreen {
         if (bitmap.IsNull || bitmap.IsEmpty) return;
         if (samplingOptions == default) samplingOptions = SKSamplingOptions.Default;
         
-        SKBitmap resized = bitmap.Resize(new SKImageInfo(border.Width, border.Height), samplingOptions);
+        var resized = bitmap.Resize(new SKImageInfo(border.Width, border.Height), samplingOptions);
         
         for (int y = 0; y < Math.Floor(resized.Height / 2f); y++) {
             for (int x = 0; x < resized.Width; x++) {

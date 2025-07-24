@@ -3,6 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
+using NeoKolors.Console.Mouse;
 using NeoKolors.Tui.Events;
 using static NeoKolors.Tui.Elements.ApplicableStylesAttribute.Predefined;
 
@@ -26,8 +27,9 @@ public class Body : Div, IElement, IView {
     public new int GetHeight(int maxWidth) => throw new InvalidOperationException();
     public new int GetMinHeight(int maxWidth) => throw new InvalidOperationException();
 
-    public void HandleKeyPress(object? sender, KeyEventArgs args) { }
+    public void HandleKeyPress(ConsoleKeyInfo info) { }
     public void HandleResize(ResizeEventArgs args) { }
     public void HandleAppStart(object? sender, AppStartEventArgs args) { }
     public void HandleAppStop(object? sender, EventArgs args) { }
+    public void HandleMouseEvent(MouseEventInfo info) { }
 }

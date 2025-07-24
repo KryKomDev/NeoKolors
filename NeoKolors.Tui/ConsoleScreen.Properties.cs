@@ -11,6 +11,7 @@
 
 using NeoKolors.Common;
 using NeoKolors.Common.Util;
+using NeoKolors.Console;
 using NeoKolors.Tui.Events;
 
 namespace NeoKolors.Tui;
@@ -120,7 +121,7 @@ public partial class ConsoleScreen {
         set {
             if (value) {
                 #if ALLOW_SECONDARY_CONTEXT
-                EscapeCodes.EnableSecondary();
+                NKConsole.EnableAltBuffer();
                 LOGGER.Trace("Secondary context mode enabled.");
                 #endif
 
@@ -129,7 +130,7 @@ public partial class ConsoleScreen {
             }
             else {
                 #if ALLOW_SECONDARY_CONTEXT
-                EscapeCodes.DisableSecondary();
+                NKConsole.DisableAltBuffer();
                 LOGGER.Trace("Secondary context mode disabled.");
                 #endif
                 
