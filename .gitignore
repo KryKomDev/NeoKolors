@@ -3,9 +3,6 @@
 **/obj/
 /packages/
 
-# github shit
-/.github/
-
 # some ide stuff
 /.idea/
 .idea/
