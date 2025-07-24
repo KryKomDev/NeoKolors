@@ -217,6 +217,25 @@ public static class StringUtils {
         
         return string.Join(separator, strings);
     }
+    
+    
+    /// <summary>
+    /// joins the stringified objects from the collection using the separator
+    /// </summary>
+    public static string Join<TSource>(this IEnumerable<TSource> collection, string separator) {
+        List<string?> strings = [];
+        foreach (var c in collection) {
+            if (c is null) {
+                strings.Add("");
+                continue;
+            }
+            
+            string? s = c.ToString();
+            strings.Add(s ?? "");
+        }
+        
+        return string.Join(separator, strings);
+    }
 
     
     /// <summary>
@@ -228,6 +247,7 @@ public static class StringUtils {
     /// <param name="stringifier">A function to convert each element of the collection to a string.</param>
     /// <returns>A string consisting of the elements of the collection concatenated using the specified separator.</returns>
     /// <exception cref="ArgumentNullException">Thrown if the collection or stringifier is null.</exception>
+    [OverloadResolutionPriority(-100)]
     public static string Join<TSource>(
         this IEnumerable<TSource> collection,
         string separator,

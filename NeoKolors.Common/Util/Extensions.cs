@@ -203,8 +203,15 @@ public static class Extensions {
     {
         if (source is null) throw new ArgumentNullException(nameof(source));
         if (allSelector is null) throw new ArgumentNullException(nameof(allSelector));
+        
         var enumerable = source as TSource[] ?? source.ToArray();
+        
         if (!enumerable.Any()) {
+            yield break;
+        }
+        
+        if (enumerable.Length == 1) {
+            yield return allSelector(enumerable.First());
             yield break;
         }
 
