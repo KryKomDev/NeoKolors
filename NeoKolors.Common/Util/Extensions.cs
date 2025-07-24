@@ -194,4 +194,34 @@ public static class Extensions {
         var e = strings as TSource[] ?? strings.ToArray();
         return e.Skip(1).All(all) && first(e.First());
     }
+
+    public static IEnumerable<TResult> Select<TSource, TResult>(
+        this IEnumerable<TSource> source, 
+        Func<TSource, TResult> allSelector,
+        Func<TSource, TResult>? firstSelector = null,
+        Func<TSource, TResult>? lastSelector = null)
+    {
+        if (source is null) throw new ArgumentNullException(nameof(source));
+        if (allSelector is null) throw new ArgumentNullException(nameof(allSelector));
+        var enumerable = source as TSource[] ?? source.ToArray();
+        if (!enumerable.Any()) {
+            yield break;
+        }
+
+        // first element
+        if (firstSelector is null)
+            yield return allSelector(enumerable.First());
+        else
+            yield return firstSelector(enumerable.First());
+
+        // middle elements
+        for (int i = 1; i < enumerable.Length - 1; i++)
+            yield return allSelector(enumerable[i]);
+        
+        // last element
+        if (lastSelector is null)
+            yield return allSelector(enumerable.Last());
+        else
+            yield return lastSelector(enumerable.Last());
+    }
 }
