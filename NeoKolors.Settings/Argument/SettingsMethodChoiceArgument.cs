@@ -21,14 +21,13 @@ public class SettingsMethodChoiceArgument : SingleSelectArgument<string>, IXsdAr
     public static SettingsMethodChoiceArgument FromGroup(SettingsMethodGroup group) =>
         new(group.Options.Select(option => option.Name).ToArray());
 
-    public string ToXsd() {
-        return
-            $"""
-             <xsd:simpleType>
-                 <xsd:restriction base="xsd:string">
-                     {Options.Select(s => $"<xsd:enumeration value=\"{s}\"/>").Join("\n").PadLinesLeft(8)}
-                 </xsd:restriction>
-             </xsd:simpleType>
-             """;
-    }
+    // This is technically unnecessary, but it is faster as it does not call ToString
+    public new string ToXsd() =>
+        $"""
+         <xsd:simpleType>
+             <xsd:restriction base="xsd:string">
+                 {Options.Select(s => $"<xsd:enumeration value=\"{s}\"/>").Join("\n").PadLinesLeft(8)}
+             </xsd:restriction>
+         </xsd:simpleType>
+         """;
 }

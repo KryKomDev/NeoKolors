@@ -12,7 +12,7 @@ public class MultiSelectArgumentTests {
 
     [Fact]
     public void ShouldInitializeProperly() {
-        MultiSelectArgument<int> a = new MultiSelectArgument<int>(1, 2, 3, 4);
+        var a = new MultiSelectArgument<int>(1, 2, 3, 4);
         Assert.Equal([
             new KeyValuePair<int, int>(1, 0), 
             new KeyValuePair<int, int>(2, 1), 
@@ -23,7 +23,7 @@ public class MultiSelectArgumentTests {
 
     [Fact]
     public void ShouldInitializeProperlyWithDefault() {
-        MultiSelectArgument<int> a = new MultiSelectArgument<int>([1, 2, 3, 4], 1, 2);
+        var a = new MultiSelectArgument<int>([1, 2, 3, 4], 1, 2);
         Assert.Equal([
                 new KeyValuePair<int, int>(1, 0), 
                 new KeyValuePair<int, int>(2, 1), 
@@ -34,11 +34,11 @@ public class MultiSelectArgumentTests {
         Assert.Equal([1, 2], a.Value);
         
         Assert.Throws<InvalidArgumentInputException>(() => {
-            MultiSelectArgument<int> b = new MultiSelectArgument<int>([1, 2, 3, 4], 1, 2, 5);
+            var b = new MultiSelectArgument<int>([1, 2, 3, 4], 1, 2, 5);
         });
         
         Assert.Throws<InvalidArgumentInputException>(() => {
-            MultiSelectArgument<int> b = new MultiSelectArgument<int>([1, 2, 3, 4], 1, 2, 3, 4, 4);
+            var b = new MultiSelectArgument<int>([1, 2, 3, 4], 1, 2, 3, 4, 4);
         });
     }
 

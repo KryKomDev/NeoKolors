@@ -9,7 +9,7 @@ public class BoolArgumentTests {
 
     [Fact]
     public void Set_ShouldWorkProperly() {
-        BoolArgument a = new BoolArgument();
+        var a = new BoolArgument();
         
         // try with bool
         a.Set(true);
@@ -28,7 +28,7 @@ public class BoolArgumentTests {
 
     [Fact]
     public void Reset_ShouldWorkProperly() {
-        BoolArgument a = new BoolArgument(defaultValue: true);
+        var a = new BoolArgument(defaultValue: true);
         Assert.True(a.Value);
         a.Set(false);
         Assert.False(a.Value);

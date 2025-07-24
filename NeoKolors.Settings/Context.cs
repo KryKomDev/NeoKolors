@@ -88,7 +88,7 @@ public sealed class Context :
     /// </remarks>
     public Context(params IEnumerable<ArgumentInfo> arguments) {
         foreach (var a in arguments) {
-            Add(a.Name, a.Argument);
+            Add(a.Name, a.Value);
         }
     }
     

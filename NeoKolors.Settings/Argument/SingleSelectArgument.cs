@@ -3,6 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
+using NeoKolors.Common.Util;
 using NeoKolors.Settings.Argument.Exception;
 
 namespace NeoKolors.Settings.Argument;
@@ -10,7 +11,7 @@ namespace NeoKolors.Settings.Argument;
 /// <summary>
 /// single selection argument
 /// </summary>
-public class SingleSelectArgument<T> : IArgument<T> where T : notnull {
+public class SingleSelectArgument<T> : IArgument<T>, IXsdArgument where T : notnull {
     
     public T[] Options { get; }
     public int Index { get; private set; }
@@ -86,6 +87,26 @@ public class SingleSelectArgument<T> : IArgument<T> where T : notnull {
     object IArgument.GetDefault() => GetDefault();
     public void Reset() => Index = DefaultIndex;
     public IArgument<T> Clone() => (IArgument<T>)MemberwiseClone();
+    
+    public void Set(string value) {
+        for (int i = 0; i < Options.Length; i++) {
+            if (Options[i].ToString() != value) continue;
+            Index = i;
+            return;
+        }
+        
+        throw new InvalidArgumentInputException("Inputted string is not a valid option.");
+    }
+    
+    public string ToXsd() =>
+        $"""
+         <xsd:simpleType>
+             <xsd:restriction base="xsd:string">
+                 {Options.Select(o => $"<xsd:enumeration value=\"{o}\"/>").Join("\n").PadLinesLeft(8)}
+             </xsd:restriction>
+         </xsd:simpleType>
+         """;
+    
     object IArgument.Get() => Get();
     void IArgument.Reset() => Reset();
 

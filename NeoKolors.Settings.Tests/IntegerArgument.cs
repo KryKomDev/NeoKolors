@@ -11,7 +11,7 @@ public class IntegerArgumentTests {
     
     [Fact]
     public void Set_ShouldWorkProperly() {
-        IntegerArgument a = new IntegerArgument();
+        var a = new IntegerArgument();
         
         // try with double
         a.Set(1);
@@ -30,20 +30,20 @@ public class IntegerArgumentTests {
 
     [Fact]
     public void Set_ShouldThrowException_ForInvalidString() {
-        IntegerArgument a = new IntegerArgument();
+        var a = new IntegerArgument();
         Assert.Throws<ArgumentInputFormatException>(() => a.Set("invalid"));
     }
 
     [Fact]
     public void Set_ShouldThrowException_ForOutOfRangeValue() {
-        IntegerArgument a = new IntegerArgument(min: 0, max: 10);
+        var a = new IntegerArgument(min: 0, max: 10);
         Assert.Throws<InvalidArgumentInputException>(() => a.Set(-1));
         Assert.Throws<InvalidArgumentInputException>(() => a.Set(11));
     }
 
     [Fact]
     public void Reset_ShouldWorkProperly() {
-        IntegerArgument a = new IntegerArgument(defaultValue: 1);
+        var a = new IntegerArgument(defaultValue: 1);
         Assert.Equal(1, a.Value);
         a.Set(4);
         Assert.Equal(4, a.Value);
@@ -70,7 +70,7 @@ public class UIntegerArgumentTests {
     
     [Fact]
     public void Set_ShouldWorkProperly() {
-        UIntegerArgument a = new UIntegerArgument();
+        var a = new UIntegerArgument();
         
         // try with double
         a.Set(1u);
@@ -89,13 +89,13 @@ public class UIntegerArgumentTests {
 
     [Fact]
     public void Set_ShouldThrowException_ForInvalidString() {
-        UIntegerArgument a = new UIntegerArgument();
+        var a = new UIntegerArgument();
         Assert.Throws<ArgumentInputFormatException>(() => a.Set("invalid"));
     }
 
     [Fact]
     public void Set_ShouldThrowException_ForOutOfRangeValue() {
-        UIntegerArgument a = new UIntegerArgument(min: 2, max: 10);
+        var a = new UIntegerArgument(defaultValue: 2, min: 2, max: 10);
         Assert.Throws<InvalidArgumentInputTypeException>(() => a.Set(-1));
         Assert.Throws<InvalidArgumentInputException>(() => a.Set(1));
         Assert.Throws<InvalidArgumentInputException>(() => a.Set(11));
@@ -103,7 +103,7 @@ public class UIntegerArgumentTests {
 
     [Fact]
     public void Reset_ShouldWorkProperly() {
-        UIntegerArgument a = new UIntegerArgument(defaultValue: 1);
+        var a = new UIntegerArgument(defaultValue: 1);
         Assert.Equal(1u, a.Value);
         a.Set(4);
         Assert.Equal(4u, a.Value);

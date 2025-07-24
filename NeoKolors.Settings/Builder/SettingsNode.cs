@@ -25,7 +25,7 @@ public class SettingsNode<TResult> : ISettingsNode<TResult> {
     /// such as argument or method group information. This property provides a snapshot
     /// of the elements available in the settings node at the time of access.
     /// </remarks>
-    public SettingsElementInfo[] Elements => _elements.Elements;
+    public ISettingsElementInfo[] Elements => _elements.Elements;
 
     /// <summary>
     /// Represents a settings node builder that organizes settings elements and
@@ -67,10 +67,12 @@ public class SettingsNode<TResult> : ISettingsNode<TResult> {
         Context context = [];
 
         foreach (var e in _elements) {
-            if (e.IsArgument)
-                context.Add(e.Name, e.AsArgument);
+            if (e is ArgumentInfo a)
+                context.Add(a.Name, a.Value);
+            else if (e is SettingsMethodGroupInfo g)
+                g.Value.MergeTo(context);
             else
-                e.AsGroup.MergeTo(context);
+                throw SettingsExecutionException.UnknownSettingsElement(e.Name);
         }
         
         return context;

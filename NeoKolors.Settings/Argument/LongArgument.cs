@@ -22,12 +22,17 @@ public class LongArgument : IArgument<long>, IXsdArgument {
     
     public long Value { get; private set; }
 
-    public LongArgument(long min = long.MinValue, long max = long.MaxValue, long defaultValue = 0, Func<long, string?>? customValidate = null) {
+    public LongArgument(
+        long min = long.MinValue,
+        long max = long.MaxValue,
+        long defaultValue = 0,
+        Func<long, string?>? customValidate = null) 
+    {
         MinValue = Math.Min(min, max);
         MaxValue = Math.Max(min, max);
-        DefaultValue = Math.Min(Math.Max(defaultValue, MinValue), MaxValue);
         CustomValidate = customValidate;
-        Value = DefaultValue;
+        Set(defaultValue);
+        DefaultValue = defaultValue;
     }
     
     public void Set(object? value) {
@@ -187,7 +192,8 @@ public class LongArgument : IArgument<long>, IXsdArgument {
                CustomValidate == i.CustomValidate;
     }
     
-    public override string ToString() => $"{{\"type\": \"long\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
+    public override string ToString() => 
+        $"{{\"type\": \"long\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
     object ICloneable.Clone() => Clone();
 }
 
@@ -205,12 +211,17 @@ public class ULongArgument : IArgument<ulong>, IXsdArgument {
     
     public ulong Value { get; private set; }
 
-    public ULongArgument(ulong min = ulong.MinValue, ulong max = ulong.MaxValue, ulong defaultValue = 0, Func<ulong, string?>? customValidate = null) {
+    public ULongArgument(
+        ulong min = ulong.MinValue,
+        ulong max = ulong.MaxValue,
+        ulong defaultValue = 0,
+        Func<ulong, string?>? customValidate = null) 
+    {
         MinValue = Math.Min(min, max);
         MaxValue = Math.Max(min, max);
-        DefaultValue = Math.Min(Math.Max(defaultValue, MinValue), MaxValue);
         CustomValidate = customValidate;
-        Value = DefaultValue;
+        Set(defaultValue);
+        DefaultValue = defaultValue;
     }
     
     public void Set(object? value) {

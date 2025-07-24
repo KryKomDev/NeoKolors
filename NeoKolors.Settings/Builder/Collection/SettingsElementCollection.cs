@@ -11,31 +11,31 @@ using NeoKolors.Settings.Builder.Info;
 
 namespace NeoKolors.Settings.Builder.Collection;
 
-public class SettingsElementCollection : IEnumerable<SettingsElementInfo> {
+public class SettingsElementCollection : IEnumerable<ISettingsElementInfo> {
     
     private static string METHOD_OPTION_ARG_FORMAT;
 
-    private readonly HashSet<SettingsElementInfo> _elements = [];
+    private readonly HashSet<ISettingsElementInfo> _elements = [];
 
     public void Argument(string name, IArgument argument, string? description = null) {
-        if (_elements.Add(new SettingsElementInfo(name, argument, description))) return;
+        if (_elements.Add(new ArgumentInfo(name, argument, description))) return;
         throw SettingsBuilderException.DuplicateElement(name);
     }
 
-    public void Group(string name, SettingsMethodGroupSupplier group) {
+    public void Group(string name, SettingsMethodGroupSupplier group, string? description = null) {
         var g = group(new SettingsMethodGroup());
-        var info = new SettingsElementInfo(name, g);
-
+        var info = new SettingsMethodGroupInfo(name, g, description);
+        
         if (_elements.Contains(info)) throw SettingsBuilderException.DuplicateElement(name);
             
-        _elements.Add(new SettingsElementInfo(NameArg(name), g.GetChoiceArgument()));
+        _elements.Add(new ArgumentInfo(NameArg(name), g.GetChoiceArgument()));
         _elements.Add(info);
     }
 
-    public SettingsElementInfo[] Elements => _elements.ToArray();
+    public ISettingsElementInfo[] Elements => _elements.ToArray();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public IEnumerator<SettingsElementInfo> GetEnumerator() => _elements.GetEnumerator();
+    public IEnumerator<ISettingsElementInfo> GetEnumerator() => _elements.GetEnumerator();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

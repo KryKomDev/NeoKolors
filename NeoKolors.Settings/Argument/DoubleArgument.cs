@@ -17,12 +17,17 @@ public class DoubleArgument : IArgument<double>, IXsdArgument {
     
     public double Value { get; private set; }
 
-    public DoubleArgument(double minValue = double.MinValue, double maxValue = double.MaxValue, double defaultValue = 0, Func<double, string?>? customValidate = null) {
-        MinValue = minValue;
-        MaxValue = maxValue;
-        DefaultValue = defaultValue;
+    public DoubleArgument(
+        double min = double.MinValue, 
+        double max = double.MaxValue,
+        double defaultValue = 0,
+        Func<double, string?>? customValidate = null) 
+    {
+        MinValue = Math.Min(min, max);
+        MaxValue = Math.Max(min, max);
         CustomValidate = customValidate;
-        Value = DefaultValue;
+        Set(defaultValue);
+        DefaultValue = defaultValue;
     }
     
     public void Set(object? value) {

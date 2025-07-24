@@ -22,12 +22,17 @@ public class IntegerArgument : IArgument<int>, IXsdArgument {
     
     public int Value { get; private set; }
 
-    public IntegerArgument(int min = int.MinValue, int max = int.MaxValue, int defaultValue = 0, Func<int, string?>? customValidate = null) {
+    public IntegerArgument(
+        int min = int.MinValue, 
+        int max = int.MaxValue,
+        int defaultValue = 0,
+        Func<int, string?>? customValidate = null) 
+    {
         MinValue = Math.Min(min, max);
         MaxValue = Math.Max(min, max);
-        DefaultValue = Math.Min(Math.Max(defaultValue, MinValue), MaxValue);
         CustomValidate = customValidate;
-        Value = DefaultValue;
+        Set(defaultValue);
+        DefaultValue = defaultValue;
     }
     
     public void Set(object? value) {
@@ -204,12 +209,17 @@ public class UIntegerArgument : IArgument<uint>, IXsdArgument {
     
     public uint Value { get; private set; }
 
-    public UIntegerArgument(uint min = uint.MinValue, uint max = uint.MaxValue, uint defaultValue = 0, Func<uint, string?>? customValidate = null) {
+    public UIntegerArgument(
+        uint min = uint.MinValue, 
+        uint max = uint.MaxValue,
+        uint defaultValue = 0,
+        Func<uint, string?>? customValidate = null)
+    {
         MinValue = Math.Min(min, max);
         MaxValue = Math.Max(min, max);
-        DefaultValue = Math.Min(Math.Max(defaultValue, MinValue), MaxValue);
         CustomValidate = customValidate;
-        Value = DefaultValue;
+        Set(defaultValue);
+        DefaultValue = defaultValue;
     }
     
     public void Set(object? value) {

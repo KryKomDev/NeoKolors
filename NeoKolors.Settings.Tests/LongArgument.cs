@@ -11,7 +11,7 @@ public class LongArgumentTests {
     
     [Fact]
     public void Set_ShouldWorkProperly() {
-        LongArgument a = new LongArgument();
+        var a = new LongArgument();
         
         // try with double
         a.Set(1);
@@ -30,20 +30,20 @@ public class LongArgumentTests {
 
     [Fact]
     public void Set_ShouldThrowException_ForInvalidString() {
-        LongArgument a = new LongArgument();
+        var a = new LongArgument();
         Assert.Throws<ArgumentInputFormatException>(() => a.Set("invalid"));
     }
 
     [Fact]
     public void Set_ShouldThrowException_ForOutOfRangeValue() {
-        LongArgument a = new LongArgument(min: 0, max: 10);
+        var a = new LongArgument(min: 0, max: 10);
         Assert.Throws<InvalidArgumentInputException>(() => a.Set(-1));
         Assert.Throws<InvalidArgumentInputException>(() => a.Set(11));
     }
 
     [Fact]
     public void Reset_ShouldWorkProperly() {
-        LongArgument a = new LongArgument(defaultValue: 1);
+        var a = new LongArgument(defaultValue: 1);
         Assert.Equal(1, a.Value);
         a.Set(4);
         Assert.Equal(4, a.Value);
@@ -70,7 +70,7 @@ public class ULongArgumentTests {
     
     [Fact]
     public void Set_ShouldWorkProperly() {
-        ULongArgument a = new ULongArgument();
+        var a = new ULongArgument();
         
         // try with double
         a.Set(1u);
@@ -89,13 +89,13 @@ public class ULongArgumentTests {
 
     [Fact]
     public void Set_ShouldThrowException_ForInvalidString() {
-        ULongArgument a = new ULongArgument();
+        var a = new ULongArgument();
         Assert.Throws<ArgumentInputFormatException>(() => a.Set("invalid"));
     }
 
     [Fact]
     public void Set_ShouldThrowException_ForOutOfRangeValue() {
-        ULongArgument a = new ULongArgument(min: 2, max: 10);
+        var a = new ULongArgument(defaultValue: 2, min: 2, max: 10);
         Assert.Throws<InvalidArgumentInputTypeException>(() => a.Set(-1));
         Assert.Throws<InvalidArgumentInputException>(() => a.Set(1));
         Assert.Throws<InvalidArgumentInputException>(() => a.Set(11));
@@ -103,7 +103,7 @@ public class ULongArgumentTests {
 
     [Fact]
     public void Reset_ShouldWorkProperly() {
-        ULongArgument a = new ULongArgument(defaultValue: 1);
+        var a = new ULongArgument(defaultValue: 1);
         Assert.Equal(1u, a.Value);
         a.Set(4);
         Assert.Equal(4u, a.Value);

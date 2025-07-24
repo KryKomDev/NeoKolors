@@ -5,21 +5,25 @@ using NeoKolors.Common.Util;
 
 namespace NeoKolors.Settings.Builder.Info;
 
-public readonly struct SettingsMethodGroupInfo : IEquatable<SettingsMethodGroupInfo> {
+public readonly struct SettingsMethodGroupInfo :
+    ISettingsElementInfo<SettingsMethodGroup>, 
+    IEquatable<SettingsMethodGroupInfo> 
+{
     public string Name { get; }
-    public SettingsMethodGroup Group { get; }
+    public SettingsMethodGroup Value { get; }
+    object? ISettingsElementInfo.Value => Value;
     public string? Description { get; }
     
-    public SettingsMethodGroupInfo(string name, SettingsMethodGroup group, string? description = null) {
+    public SettingsMethodGroupInfo(string name, SettingsMethodGroup value, string? description = null) {
         Name = name;
-        Group = group;
+        Value = value;
         Description = description;
     }
 
     public override int GetHashCode() => Name.GetHashCode();
 
     public bool Equals(SettingsMethodGroupInfo other) =>
-        Name == other.Name && Group.Equals(other.Group) && Description == other.Description;
+        Name == other.Name && Value.Equals(other.Value) && Description == other.Description;
     
     public override bool Equals(object? obj) => 
         obj is SettingsMethodGroupInfo other && Equals(other);
@@ -35,7 +39,7 @@ public readonly struct SettingsMethodGroupInfo : IEquatable<SettingsMethodGroupI
              </xsd:annotation>
              <xsd:complexType>
                  <xsd:choice>
-                     {Group.Options.Select(o => o.ToXsd()).Join("\n").PadLinesLeft(12)}
+                     {Value.Options.Select(o => o.ToXsd()).Join("\n").PadLinesLeft(12)}
                  </xsd:choice>
              </xsd:complexType>
          </xsd:element>
