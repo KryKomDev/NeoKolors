@@ -5,4 +5,4 @@ using NeoKolors.Console.Mouse;
 
 namespace NeoKolors.Console.Events;
 
-public delegate void MouseEvent(MouseEventInfo info);
+public delegate void MouseEventHandler(MouseEventInfo info);

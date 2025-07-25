@@ -3,4 +3,4 @@
 
 namespace NeoKolors.Console.Events;
 
-public delegate void FocusInEvent();
+public delegate void KeyEventHandler(ConsoleKeyInfo keyInfo);

@@ -3,4 +3,4 @@
 
 namespace NeoKolors.Console.Events;
 
-public delegate void KeyEvent(ConsoleKeyInfo keyInfo);
+public delegate void PasteEventHandler(string content);
