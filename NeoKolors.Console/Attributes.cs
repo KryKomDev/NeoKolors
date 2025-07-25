@@ -3,17 +3,28 @@
 
 // ReSharper disable InconsistentNaming
 
-#if NETSTANDARD2_0
-
-using static System.AttributeTargets;
 
 // ReSharper disable once CheckNamespace
 namespace System.Runtime.Versioning;
+using static AttributeTargets;
 
-[AttributeUsage(Assembly | Class | Constructor | AttributeTargets.Enum | Event | Field | Method | Module | Property, AllowMultiple = true, Inherited = false)]
+#if NETSTANDARD2_0
+
+[AttributeUsage(Assembly | Class | Constructor | Enum | Event | Field | Method | Module | Property, AllowMultiple = true, Inherited = false)]
 internal class SupportedOSPlatformAttribute : Attribute {
     // ReSharper disable once UnusedParameter.Local
     public SupportedOSPlatformAttribute(string windows) { }
+}
+
+
+#endif
+
+#if !NET8_0_OR_GREATER
+
+[AttributeUsage(Parameter)]
+internal class NotNullWhenAttribute : Attribute {
+    // ReSharper disable once UnusedParameter.Local
+    public NotNullWhenAttribute(bool returnValue) { }
 }
 
 #endif

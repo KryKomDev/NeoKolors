@@ -302,8 +302,9 @@ public sealed partial class NKLogger : ILogger {
         indent => MessageHighlightLine 
             ? "\n" + s
               .Split('\n')
-              .Select(allSelector: str => '│'.AddStyle(TextStyles.BOLD) + new string(' ',  indent.Spaces) + str,
-                    lastSelector: str => '╵'.AddStyle(TextStyles.BOLD) + new string(' ',  indent.Spaces) + str)
+              .Select(allSelector: str => '│' + new string(' ',  indent.Spaces) + str,
+                    lastSelector: str => '╵' + new string(' ',  indent.Spaces) + str,
+                    defaultTo: 1)
               .Join("\n")
             : $"\n{s}".PadLinesLeft(indent.Spaces)
     );

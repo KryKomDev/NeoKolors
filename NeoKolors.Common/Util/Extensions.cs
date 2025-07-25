@@ -195,12 +195,25 @@ public static class Extensions {
         return e.Skip(1).All(all) && first(e.First());
     }
 
+    /// <summary>
+    /// Selects elements from the given source based on the provided selectors and their positions
+    /// (first, middle, last). Allows customization of the selection logic based on position or default options.
+    /// </summary>
+    /// <param name="source">The source collection to enumerate elements from.</param>
+    /// <param name="allSelector">A function to select elements applying to all positions except where overridden.</param>
+    /// <param name="firstSelector">An optional function to select the first element. If null, the allSelector is used.</param>
+    /// <param name="lastSelector">An optional function to select the last element. If null, the allSelector is used.</param>
+    /// <param name="defaultTo">Used when the source enumerable has only 1 element. If -1 uses the firstSelector, if 0 uses the allSelector, if 1 uses the lastSelector.</param>
+    /// <typeparam name="TSource">The type of elements in the source collection.</typeparam>
+    /// <typeparam name="TResult">The type of elements in the resulting collection.</typeparam>
+    /// <returns>An enumerable collection of selected elements based on the provided selectors and logic.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if the source or allSelector parameters are null.</exception>
     public static IEnumerable<TResult> Select<TSource, TResult>(
-        this IEnumerable<TSource> source, 
+        this IEnumerable<TSource> source,
         Func<TSource, TResult> allSelector,
         Func<TSource, TResult>? firstSelector = null,
-        Func<TSource, TResult>? lastSelector = null)
-    {
+        Func<TSource, TResult>? lastSelector = null,
+        int defaultTo = 0) {
         if (source is null) throw new ArgumentNullException(nameof(source));
         if (allSelector is null) throw new ArgumentNullException(nameof(allSelector));
         
@@ -211,7 +224,11 @@ public static class Extensions {
         }
         
         if (enumerable.Length == 1) {
-            yield return allSelector(enumerable.First());
+            yield return defaultTo switch {
+                -1 when firstSelector is not null => firstSelector(enumerable.First()),
+                1 when lastSelector is not null => lastSelector(enumerable.First()),
+                _ => allSelector(enumerable.First())
+            };
             yield break;
         }
 
