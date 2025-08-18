@@ -214,9 +214,7 @@ public class StringArgument : IArgument<string>, IXsdArgument {
         return argument;
     }
 
-    public static implicit operator string(StringArgument argument) {
-        return argument.Value;
-    }
+    public static implicit operator string(StringArgument argument) => argument.Value;
 
     public static implicit operator StringArgument(string value) {
         var argument = new StringArgument();
@@ -224,20 +222,19 @@ public class StringArgument : IArgument<string>, IXsdArgument {
         return argument;
     }
 
-    public bool Equals(IArgument? other) {
-        return other is StringArgument s &&
-               Value == s.Value &&
-               DefaultValue == s.DefaultValue &&
-               MinLength == s.MinLength &&
-               MaxLength == s.MaxLength &&
-               AllowSpaces == s.AllowSpaces &&
-               AllowNewlines == s.AllowNewlines &&
-               AllowSpecial == s.AllowSpecial &&
-               AllowNumbers == s.AllowNumbers &&
-               AllowUpper == s.AllowUpper &&
-               AllowLower == s.AllowLower &&
-               CountVisibleOnly == s.CountVisibleOnly;
-    }
+    public bool Equals(IArgument? other) =>
+        other is StringArgument s &&
+        Value == s.Value &&
+        DefaultValue == s.DefaultValue &&
+        MinLength == s.MinLength &&
+        MaxLength == s.MaxLength &&
+        AllowSpaces == s.AllowSpaces &&
+        AllowNewlines == s.AllowNewlines &&
+        AllowSpecial == s.AllowSpecial &&
+        AllowNumbers == s.AllowNumbers &&
+        AllowUpper == s.AllowUpper &&
+        AllowLower == s.AllowLower &&
+        CountVisibleOnly == s.CountVisibleOnly;
 
     public override string ToString() => $"{{\"value\": {Value}, " +
                                          $"\"default-value\": {DefaultValue}, " +

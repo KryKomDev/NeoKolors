@@ -1,7 +1,7 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 //
-using System.Collections;
+
 using NeoKolors.Settings.Builder.Delegate;
 using NeoKolors.Settings.Builder.Info;
 

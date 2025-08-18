@@ -77,7 +77,7 @@ public interface ISettingsNode {
     /// representing the individual arguments, groups, or configurations associated
     /// with the current settings node.
     /// </remarks>
-    public SettingsElementInfo[] Elements { get; }
+    public ISettingsElementInfo[] Elements { get; }
     
     /// <summary>
     /// Parses the current settings node and generates a context representing

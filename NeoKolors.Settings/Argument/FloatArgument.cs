@@ -17,12 +17,17 @@ public class FloatArgument : IArgument<float>, IXsdArgument {
     
     public float Value { get; private set; }
 
-    public FloatArgument(float minValue = float.MinValue, float maxValue = float.MaxValue, float defaultValue = 0, Func<float, string?>? customValidate = null) {
-        MinValue = minValue;
-        MaxValue = maxValue;
-        DefaultValue = defaultValue;
+    public FloatArgument(
+        float min = float.MinValue, 
+        float max = float.MaxValue, 
+        float defaultValue = 0, 
+        Func<float, string?>? customValidate = null) 
+    {
+        MinValue = Math.Min(min, max);
+        MaxValue = Math.Max(min, max);
         CustomValidate = customValidate;
-        Value = DefaultValue;
+        Set(defaultValue);
+        DefaultValue = defaultValue;
     }
     
     public void Set(object? value) {

@@ -31,7 +31,7 @@ public interface IStyleProperty<TSelf, TValue> :
 /// </summary>
 public interface IStyleProperty {
 
-    private static readonly NKLogger LOGGER = NKDebug.GetLogger(nameof(IStyleProperty));
+    private static readonly NKLogger LOGGER = NKDebug.GetLogger<IStyleProperty>();
     
     public object Value { get; }
     
@@ -69,7 +69,7 @@ public interface IStyleProperty {
             return SourceManager.GetStyle(name);
         }
         catch (InvalidStyleNameException) {
-            LOGGER.Fatal("Style with name '{0}' not found.", name);
+            LOGGER.Crit("Style with name '{0}' not found.", name);
             throw InvalidStyleNameException.NotFound(name);
         }
     }

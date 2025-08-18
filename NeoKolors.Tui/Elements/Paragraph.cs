@@ -30,11 +30,7 @@ public class Paragraph : TextElement, IElement {
     /// <summary>
     /// A delegate property that handles key press events for the Paragraph element.
     /// </summary>
-    /// <remarks>
-    /// The handler is invoked whenever a key press event occurs. The event arguments,
-    /// encapsulated within <see cref="KeyEventArgs"/>, provide information about the pressed key.
-    /// </remarks>
-    public Action<object?, KeyEventArgs> KeyPressHandler { get; set; } = (_, _) => { };
+    public Action<ConsoleKeyInfo> KeyPressHandler { get; set; } = (_) => { };
 
     /// <summary>
     /// Handles resize events for the paragraph element. This property allows
@@ -124,9 +120,8 @@ public class Paragraph : TextElement, IElement {
     /// <summary>
     /// Handles a key press event for the paragraph element by invoking the <see cref="KeyPressHandler"/> delegate.
     /// </summary>
-    /// <param name="source">The source object that raised the event.</param>
-    /// <param name="args">Event arguments containing details of the key press event.</param>
-    public void HandleKeyPress(object? source, KeyEventArgs args) => KeyPressHandler(source, args);
+    /// <param name="info">The info of the key press event.</param>
+    public void HandleKeyPress(ConsoleKeyInfo info) => KeyPressHandler(info);
 
     /// <summary>
     /// Handles the resize event for the paragraph element by invoking the <see cref="ResizeHandler"/> delegate.

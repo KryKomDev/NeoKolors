@@ -3,6 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
+using NeoKolors.Console.Mouse;
 using NeoKolors.Tui.Events;
 
 namespace NeoKolors.Tui;
@@ -13,10 +14,11 @@ namespace NeoKolors.Tui;
 public class Window : IView {
     
     public IView BaseView { get; set; }
-    public void HandleKeyPress(object? sender, KeyEventArgs args) { }
+    public void HandleKeyPress(ConsoleKeyInfo info) { }
     public void HandleResize(ResizeEventArgs args) { }
     public void HandleAppStart(object? sender, AppStartEventArgs args) { }
     public void HandleAppStop(object? sender, EventArgs args) { }
+    public void HandleMouseEvent(MouseEventInfo info) { }
 
     public void Render(in IConsoleScreen target) {
         

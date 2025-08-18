@@ -235,11 +235,11 @@ public partial class NKConsole {
         BRACKETED_PASTE_MODE = false;
     }
 
-    public static event MouseEvent    MouseEvent    = delegate { };
-    public static event PasteEvent    PasteEvent    = delegate { };
-    public static event FocusInEvent  FocusInEvent  = delegate { };
-    public static event FocusOutEvent FocusOutEvent = delegate { };
-    public static event KeyEvent      KeyEvent      = delegate { };
+    public static event MouseEventHandler    MouseEvent    = delegate { };
+    public static event PasteEventHandler    PasteEvent    = delegate { };
+    public static event FocusInEventHandler  FocusInEvent  = delegate { };
+    public static event FocusOutEventHandler FocusOutEvent = delegate { };
+    public static event KeyEventHandler      KeyEvent      = delegate { };
 
     /// <summary>
     /// Gets value indicating whether input from the terminal is intercepted by NKConsole.

@@ -11,7 +11,7 @@ public class DoubleArgumentTests {
     
     [Fact]
     public void Set_ShouldWorkProperly() {
-        DoubleArgument a = new DoubleArgument();
+        var a = new DoubleArgument();
         
         // try with double
         a.Set(1.23);
@@ -30,20 +30,20 @@ public class DoubleArgumentTests {
 
     [Fact]
     public void Set_ShouldThrowException_ForInvalidString() {
-        DoubleArgument a = new DoubleArgument();
+        var a = new DoubleArgument();
         Assert.Throws<ArgumentInputFormatException>(() => a.Set("invalid"));
     }
 
     [Fact]
     public void Set_ShouldThrowException_ForOutOfRangeValue() {
-        DoubleArgument a = new DoubleArgument(minValue: 0, maxValue: 10);
+        var a = new DoubleArgument(min: 0, max: 10);
         Assert.Throws<InvalidArgumentInputException>(() => a.Set(-1));
         Assert.Throws<InvalidArgumentInputException>(() => a.Set(11));
     }
 
     [Fact]
     public void Reset_ShouldWorkProperly() {
-        DoubleArgument a = new DoubleArgument(defaultValue: 1.23);
+        var a = new DoubleArgument(defaultValue: 1.23);
         Assert.Equal(1.23, a.Value);
         a.Set(4.56);
         Assert.Equal(4.56, a.Value);

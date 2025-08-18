@@ -22,5 +22,8 @@ public class SettingsExecutionException : System.Exception {
         new($"Could not return option of name '{optionName}'. Option with that name doesn't exist.");
     
     public static SettingsExecutionException InvalidNodeName(string name) => 
-        new($"Could not choose node 'name'. Node with that name doesn't exist.");
+        new($"Could not choose node '{name}'. Node with that name doesn't exist.");
+    
+    public static SettingsExecutionException UnknownSettingsElement(string name) => 
+        new($"Could not parse node: element named '{name}' is of a unknown type.");
 }

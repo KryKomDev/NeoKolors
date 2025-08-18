@@ -3,4 +3,4 @@
 
 namespace NeoKolors.Console.Events;
 
-public delegate void PasteEvent(string content);
+public delegate void FocusOutEventHandler();

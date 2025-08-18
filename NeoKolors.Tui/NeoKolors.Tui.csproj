@@ -3,7 +3,7 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>0.25.21.0-alpha</Version>
+        <Version>0.25.32</Version>
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
         <LangVersion>preview</LangVersion>
@@ -11,7 +11,7 @@
         <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <TargetFrameworks>net5.0;net8.0;net9.0;netstandard2.1</TargetFrameworks>
+        <TargetFrameworks>net5.0;net8.0;netstandard2.1;net9.0</TargetFrameworks>
     </PropertyGroup>
     
     <ItemGroup>
@@ -27,9 +27,5 @@
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
       <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Library\X11\" />
     </ItemGroup>
 </Project>

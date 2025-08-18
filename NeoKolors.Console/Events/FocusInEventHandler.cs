@@ -3,4 +3,4 @@
 
 namespace NeoKolors.Console.Events;
 
-public delegate void FocusOutEvent();
+public delegate void FocusInEventHandler();

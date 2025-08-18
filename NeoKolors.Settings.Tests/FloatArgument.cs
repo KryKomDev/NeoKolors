@@ -11,7 +11,7 @@ public class FloatArgumentTests {
     
     [Fact]
     public void Set_ShouldWorkProperly() {
-        FloatArgument a = new FloatArgument();
+        var a = new FloatArgument();
         
         // try with double
         a.Set(1.23f);
@@ -30,20 +30,20 @@ public class FloatArgumentTests {
 
     [Fact]
     public void Set_ShouldThrowException_ForInvalidString() {
-        FloatArgument a = new FloatArgument();
+        var a = new FloatArgument();
         Assert.Throws<ArgumentInputFormatException>(() => a.Set("invalid"));
     }
 
     [Fact]
     public void Set_ShouldThrowException_ForOutOfRangeValue() {
-        FloatArgument a = new FloatArgument(minValue: 0, maxValue: 10);
+        var a = new FloatArgument(min: 0, max: 10);
         Assert.Throws<InvalidArgumentInputException>(() => a.Set(-1f));
         Assert.Throws<InvalidArgumentInputException>(() => a.Set(11f));
     }
 
     [Fact]
     public void Reset_ShouldWorkProperly() {
-        FloatArgument a = new FloatArgument(defaultValue: 1.23f);
+        var a = new FloatArgument(defaultValue: 1.23f);
         Assert.Equal(1.23f, a.Value);
         a.Set(4.56f);
         Assert.Equal(4.56f, a.Value);
