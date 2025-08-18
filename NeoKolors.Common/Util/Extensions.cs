@@ -117,7 +117,7 @@ public static class Extensions {
         $"{(key.Modifiers.HasFlag(ConsoleModifiers.Control) ? "Ctrl + " : "")}" +
         $"{(key.Modifiers.HasFlag(ConsoleModifiers.Alt) ? "Alt + " : "")}" +
         $"{(key.Modifiers.HasFlag(ConsoleModifiers.Shift) ? "Shift + " : "")}" + 
-        $"{key.Key.ToString()}";
+        $"{key.Key.ToString()} => '{key.KeyChar}'";
 
     /// <summary>
     /// Gets the length of the first dimension of a two-dimensional array.
