@@ -599,6 +599,21 @@ public static partial class NKConsole {
 
         return s;
     }
+
+    /// <summary>
+    /// Returns true if the alternate console buffer is enabled.
+    /// </summary>
+    public static bool GetAltBufState() {
+        Std.Write(EscapeCodes.REQUEST_ALTBUF_STATE);
+        var res = ReadUntil('y');
+        return res[8] == '1';
+    }
+
+    public static (int Width, int Height) GetScreenSizePx() {
+        Std.Write(EscapeCodes.REPORT_WINDOW_SIZE_PX);
+        var res = ReadUntil('t').Substring(4).Split(';');
+        return (int.Parse(res[0]), int.Parse(res[1]));
+    }
 }
 
 [Flags]
