@@ -16,6 +16,8 @@ riderModule.iml
 # writerside output
 Docs/out/
 
+**/md/
+
 # idk
 NeoKolors.sln.DotSettings.user
 

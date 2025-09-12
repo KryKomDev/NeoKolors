@@ -103,6 +103,7 @@ dotnet_naming_style.i_upper_camel_case_style.required_prefix = I
 dotnet_naming_style.lower_camel_case_style.capitalization = camel_case
 dotnet_naming_style.lower_camel_case_style_1.capitalization = camel_case
 dotnet_naming_style.lower_camel_case_style_1.required_prefix = _
+dotnet_naming_style.lower_camel_case_style_1.word_separator = __
 dotnet_naming_style.t_upper_camel_case_style.capitalization = pascal_case
 dotnet_naming_style.t_upper_camel_case_style.required_prefix = T
 dotnet_naming_style.upper_camel_case_style.capitalization = pascal_case

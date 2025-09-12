@@ -235,12 +235,36 @@ public partial class NKConsole {
         BRACKETED_PASTE_MODE = false;
     }
 
-    public static event MouseEventHandler    MouseEvent    = delegate { };
-    public static event PasteEventHandler    PasteEvent    = delegate { };
-    public static event FocusInEventHandler  FocusInEvent  = delegate { };
-    public static event FocusOutEventHandler FocusOutEvent = delegate { };
-    public static event KeyEventHandler      KeyEvent      = delegate { };
+    // Events for input interception
+    public static event MouseEventHandler          MouseEvent          = delegate { };
+    public static event PasteEventHandler          PasteEvent          = delegate { };
+    public static event FocusInEventHandler        FocusInEvent        = delegate { };
+    public static event FocusOutEventHandler       FocusOutEvent       = delegate { };
+    public static event KeyEventHandler            KeyEvent            = delegate { };
+    public static event WinOpsResponseEventHandler WinOpsResponseEvent = delegate { };
+    public static event DecReqResponseEventHandler DecReqResponseEvent = delegate { };
 
+    private static Task InvokeMouseEvent(MouseEventInfo info) 
+        => Task.Run(() => MouseEvent(info));
+    
+    private static Task InvokePasteEvent(string text) 
+        => Task.Run(() => PasteEvent(text));
+    
+    private static Task InvokeFocusInEvent() 
+        => Task.Run(() => FocusInEvent());
+    
+    private static Task InvokeFocusOutEvent() 
+        => Task.Run(() => FocusOutEvent());
+    
+    private static Task InvokeKeyEvent(ConsoleKeyInfo info) 
+        => Task.Run(() => KeyEvent(info));
+
+    private static Task InvokeWinOpsResponseEvent(WinOpsResponseArgs args) 
+        => Task.Run(() => WinOpsResponseEvent(args));
+    
+    private static Task InvokeDecReqResponseEvent(DecReqResponseArgs args) 
+        => Task.Run(() => DecReqResponseEvent(args));
+    
     /// <summary>
     /// Gets value indicating whether input from the terminal is intercepted by NKConsole.
     /// </summary>

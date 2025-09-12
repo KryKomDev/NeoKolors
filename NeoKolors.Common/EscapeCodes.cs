@@ -3,6 +3,8 @@
 // Copyright (c) 2025 KryKom
 //
 
+using NeoKolors.Common.Util;
+
 namespace NeoKolors.Common;
 
 /// <summary>
@@ -263,11 +265,33 @@ public static class EscapeCodes {
 
     #region DECREQ
 
+    public const string DECREQ_FORMAT = "\e[{0}$p";
+    
     /// <summary>
     /// Requests the state of the alternate buffer.
     /// Should return <c>\e[?1049;1$y</c> if enabled, <c>\e[?1049;2$y</c> if disabled.
     /// </summary>
     public const string REQUEST_ALTBUF_STATE = "\e[?1049$p";
-    
+
+    /// <summary>
+    /// Generates a Device Control Request (DECREQ) escape sequence for the specified terminal private mode.
+    /// </summary>
+    /// <param name="mode">The private mode for which the DECREQ escape sequence should be generated.</param>
+    /// <returns>A string containing the formatted DECREQ escape sequence.</returns>
+    public static string GetDecReq(DecPrivateMode mode) => DECREQ_FORMAT.Format((int)mode);
+
     #endregion
+
+    public enum DecPrivateMode {
+        REPORT_MOUSE_P = 9,
+        REPORT_MOUSE_PR = 1000,
+        REPORT_MOUSE_PRD = 1002,
+        REPORT_MOUSE_ALL = 1003,
+        REPORT_MOUSE_UTF8 = 1005,
+        REPORT_MOUSE_PROTOCOL_SGR = 1006,
+        REPORT_MOUSE_PROTOCOL_URXVT = 1015,
+        REPORT_FOCUS = 1004,
+        ALTERNATE_BUFFER = 1049,
+        BRACKETED_PASTE_MODE = 2004,
+    }
 }

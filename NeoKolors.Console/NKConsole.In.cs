@@ -6,6 +6,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using NeoKolors.Common;
+using NeoKolors.Console.Events;
 using NeoKolors.Console.Mouse;
 using OneOf;
 using static NeoKolors.Console.BoolStrings;
@@ -320,56 +321,157 @@ public static partial class NKConsole {
         }
 
         while (InterceptInput) {
-            if (i is { KeyChar: '\e', Modifiers: 0 }) 
-                HandleEscape();
-            else 
-                KeyEvent.Invoke(i);
-            
+            if (i is { KeyChar: '\e', Modifiers: 0 }) {
+                HandleEscSeq();
+            }
+            else {
+                var i1 = i;
+                _ = Task.Run(() => KeyEvent.Invoke(i1));
+            }
+
             i = Std.ReadKey(intercept: true);
         }
     }
 
-    private static void HandleEscape() {
+    private static void HandleEscSeq() {
         var introducer = Std.ReadKey(intercept: true);
-        
-        if (introducer.KeyChar != '[') {
-            KeyEvent.Invoke(new ConsoleKeyInfo(
+
+        if (introducer.KeyChar == ']') {
+            HandleOsc();
+        }
+        else if (introducer.KeyChar != '[') {
+            _ = Task.Run(() => KeyEvent.Invoke(new ConsoleKeyInfo(
                 keyChar: '\e', 
                 key: ConsoleKey.Backspace, 
                 shift: false, 
                 alt: false, 
                 control: false)
-            );
-            KeyEvent.Invoke(introducer);
+            ));
+            _ = Task.Run(() => KeyEvent.Invoke(introducer));
             return;
         }
         
+        HandleCsi();
+    }
+
+    private static void HandleOsc() {
+        var next = Std.ReadKey(intercept: true);
+
+        switch (next.KeyChar) {
+            case 'L':
+                string label = ReadUntil('\x0f', true);
+                _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.IconLabel(label));
+                break;
+            case 'l':
+                string title = ReadUntil('\x0f', true);
+                _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.WinTitle(title));
+                break;
+        }
+    }
+
+    private static void HandleCsi() {
         var next = Std.ReadKey(intercept: true);
         
         switch (next.KeyChar) {
-            case 'O':
-                FocusOutEvent.Invoke();
-                break;
-            case 'I':
-                FocusInEvent.Invoke();
-                break;
-            case 'M':
-                HandleX10MouseEvent();
-                break;
+            case 'O': 
+                _ = Task.Run(() => FocusOutEvent.Invoke());
+                return;
+            case 'I': 
+                _ = Task.Run(() => FocusInEvent.Invoke());
+                return;
+            case 'M': 
+                HandleX10MouseEvent();  
+                return;         
+            case '1': 
+                _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.WinState(true)); 
+                return;
             case '2':
-                HandlePaste();
-                break;
+                var k = Std.ReadKey(intercept: true);
+                switch (k.KeyChar) {
+                    case '0': HandlePaste();                                                     return;
+                    case 't': _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.WinState(false)); return;
+                    default : LOGGER.Error("How the fuck did this even happen?");                return;
+                }
+            case '3': HandleWinPosResponse(); 
+                return;
+            case '4':
+                HandleWinSizePxResponse();
+                return;
+            case '8':
+                HandleWinSizeResponse();
+                return;
+            case '9':
+                HandleScrSizeResponse();
+                return;
+            case '?':
+                HandleDecReqResponse(); 
+                return;
             case '<':
                 HandleSGRMouseEvent();
-                break;
+                return;
         }
+    }
+
+    private static void HandleScrSizeResponse() {
+        var split = ReadUntil('t', true).Substring(1).Split(';');
+        var h = int.Parse(split[0]);
+        var w = int.Parse(split[1]);
+        _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.ScrSize((w, h)));
+    }
+    
+    private static void HandleWinSizeResponse() {
+        var split = ReadUntil('t', true).Substring(1).Split(';');
+        var h = int.Parse(split[0]);
+        var w = int.Parse(split[1]);
+        _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.WinSize((w, h)));
+    }
+    
+    private static void HandleWinSizePxResponse() {
+        var split = ReadUntil('t', true).Substring(1).Split(';');
+        var h = int.Parse(split[0]);
+        var w = int.Parse(split[1]);
+        _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.WinSizePx((w, h)));
+    }
+
+    private static void HandleWinPosResponse() {
+        var split = ReadUntil('t', true).Substring(1).Split(';');
+        var x = int.Parse(split[0]);
+        var y = int.Parse(split[1]);
+        _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.WinPos((x, y)));
+    }
+
+    private static void HandleDecReqResponse() {
+        string rawType = ReadUntil(';', true);
+        int mode;
+        int type;
+
+        try {
+            mode = int.Parse(rawType);
+        }
+        catch (FormatException) {
+            LOGGER.Error($"Invalid mode in DECREQ response: '{rawType}'.");
+            return;
+        }
+
+        try {
+            type = int.Parse(ReadUntil('$', true));
+        }
+        catch (FormatException) {
+            LOGGER.Error($"Invalid type in DECREQ response: '{rawType}'.");
+            return;
+        }
+        
+        // skips the 'y'
+        SkipKeys(1);
+                
+        _ = InvokeDecReqResponseEvent(new DecReqResponseArgs(mode, (DecReqResponseType)type));
     }
 
     private static void HandleX10MouseEvent() {
         var type = Std.ReadKey(intercept: true);
         var x = Std.ReadKey(intercept: true);
         var y = Std.ReadKey(intercept: true);
-        MouseEvent.Invoke(MouseEventDecomposer.DecomposeUtf8(type, x, y));
+        _ = Task.Run(() => MouseEvent.Invoke(MouseEventDecomposer.DecomposeUtf8(type, x, y)));
     }
 
     private static void HandleSGRMouseEvent() {
@@ -404,13 +506,13 @@ public static partial class NKConsole {
             return;
         }
         
-        MouseEvent.Invoke(MouseEventDecomposer.DecomposeSGR(type, x, y, last == 'M'));
+        _ = Task.Run(() => MouseEvent.Invoke(MouseEventDecomposer.DecomposeSGR(type, x, y, last == 'M')));
     }
 
     private static void HandlePaste() {
         SkipKeys(3);
         var s = ReadUntil("\e[201~", true);
-        PasteEvent.Invoke(s);
+        _ = Task.Run(() => PasteEvent.Invoke(s));
     }
 
     private static void SkipKeys(int num) {
@@ -451,7 +553,10 @@ public static partial class NKConsole {
             intro = Std.Read(); 
         }
 
-        if (intro is not '[') {
+        if (intro is ']') {
+            
+        }
+        else if (intro is not '[') {
             KeyEvent.Invoke(new ConsoleKeyInfo(
                 keyChar: '\e', 
                 key: ConsoleKey.Backspace, 
@@ -466,6 +571,7 @@ public static partial class NKConsole {
                 alt: false, 
                 control: false)
             );
+            return;
         }
         
         int next = -1;
@@ -603,16 +709,74 @@ public static partial class NKConsole {
     /// <summary>
     /// Returns true if the alternate console buffer is enabled.
     /// </summary>
-    public static bool GetAltBufState() {
+    public static bool GetAltBufState() => GetAltBufStateAsync().Result;
+
+    /// <summary>
+    /// Returns true if the alternate console buffer is enabled.
+    /// </summary>
+    public static async Task<bool> GetAltBufStateAsync() {
         Std.Write(EscapeCodes.REQUEST_ALTBUF_STATE);
-        var res = ReadUntil('y');
-        return res[8] == '1';
+        
+        // If multithreaded input interception is not enabled
+        if (!InterceptInput) {
+            var res = ReadUntil('y');
+            return res[8] == '1'; 
+        }
+        
+        var tcs = new TaskCompletionSource<bool>();
+        
+        DecReqResponseEventHandler h = null!;
+        h = a => {
+            if (a.Mode != 1049) return;
+            DecReqResponseEvent -= h;
+            tcs.SetResult(a.Response == DecReqResponseType.ENABLED);
+        };
+
+        DecReqResponseEvent += h;
+
+        return await tcs.Task;
     }
 
-    public static (int Width, int Height) GetScreenSizePx() {
+    /// <summary>
+    /// Retrieves the current size of the console window in pixels as a tuple containing
+    /// the width and height.
+    /// </summary>
+    /// <returns>
+    /// A tuple where the first value is the width in pixels and the second
+    /// value is the height in pixels of the console window.
+    /// </returns>
+    public static (int Width, int Height) GetScreenSizePx() => GetScreenSizePxAsync().Result;
+
+    /// <summary>
+    /// Retrieves the current size of the console window in pixels as a tuple containing
+    /// the width and height.
+    /// </summary>
+    /// <returns>
+    /// A tuple where the first value is the width in pixels and the second
+    /// value is the height in pixels of the console window.
+    /// </returns>
+    public static async Task<(int Width, int Height)> GetScreenSizePxAsync() {
         Std.Write(EscapeCodes.REPORT_WINDOW_SIZE_PX);
-        var res = ReadUntil('t').Substring(4).Split(';');
-        return (int.Parse(res[0]), int.Parse(res[1]));
+        
+        // If multithreaded input interception is not enabled
+        if (!InterceptInput) {
+            var res = ReadUntil('t', true);
+            var split = res.Split(';');
+            return (int.Parse(split[1]), int.Parse(split[2]));
+        }
+        
+        var tcs = new TaskCompletionSource<(int Width, int Height)>();
+        
+        WinOpsResponseEventHandler h = null!;
+        h = a => {
+            if (a.Type != WinOpsResponseType.WIN_SIZE_PX) return;
+            WinOpsResponseEvent -= h;
+            tcs.SetResult(a.AsWinSizePx());
+        };
+
+        WinOpsResponseEvent += h;
+
+        return await tcs.Task;
     }
 }
 
