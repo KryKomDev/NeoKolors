@@ -1,0 +1,41 @@
+﻿<!--                             -->
+<!--  NeoKolors                  -->
+<!--  Copyright (c) 2025 KryKom  -->
+<!--                             -->
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:nk="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/wip/NeoKolors.Tui/Schemas/Fonts/NeoKolors.Font.Common.xsd"
+            targetNamespace="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/wip/NeoKolors.Tui/Schemas/Fonts/NeoKolors.Font.Common.xsd"
+            elementFormDefault="qualified">
+    
+    <xsd:complexType name="Align">
+        <xsd:simpleContent>
+            <xsd:restriction base="xsd:string">
+                <xsd:pattern value="^(top-left|top-center|top-right|center-left|center|center-right|bottom-left|bottom-center|bottom-right|custom,\S+)$"/>
+            </xsd:restriction>
+        </xsd:simpleContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="Mask">
+        <xsd:simpleContent>
+            <xsd:restriction base="xsd:string">
+                <xsd:pattern value="(bckg|forg|custom-bckg,\S|custom-forg,\S)"/>
+            </xsd:restriction>
+        </xsd:simpleContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="AlignPointReplace">
+        <xsd:simpleContent>
+            <xsd:restriction base="xsd:string">
+                <xsd:pattern value="(bckg|none|custom,\S)"/>
+            </xsd:restriction>
+        </xsd:simpleContent>
+    </xsd:complexType>
+    
+    <xsd:simpleType name="CharOrHex">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="(\S|(\\x(\d|[a-f]|[A-F]){2}))"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+</xsd:schema>
