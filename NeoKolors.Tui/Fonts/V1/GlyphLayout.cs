@@ -3,15 +3,10 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Common;
-using NeoKolors.Common.Util;
-using NeoKolors.Tui.Exceptions;
-using OneOf;
+namespace NeoKolors.Tui.Fonts.V1;
 
-namespace NeoKolors.Tui.Fonts;
-
-public readonly struct GlyphDistribution {
-    public OneOf<DistroStrings, char>[] Distribution { get; }
+public readonly struct GlyphLayout {
+    public OneOf<LayoutStrings, char>[] Distribution { get; }
 
     public char this[int index] => GetChars()[index];
     
@@ -19,11 +14,11 @@ public readonly struct GlyphDistribution {
         string chars = "";
         foreach (var d in Distribution) {
             chars += d.Match(s => s switch {
-                    DistroStrings.UABC => "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 
-                    DistroStrings.LABC => "abcdefghijklmnopqrstuvwxyz",
-                    DistroStrings.DIA => "´ˇ¨ ̊",
-                    DistroStrings.DIG => "0123456789",
-                    DistroStrings.SPC => "!\"#$%&'()*+,-./\\:;<=>?@^_`{|}~",
+                    LayoutStrings.UABC => "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 
+                    LayoutStrings.LABC => "abcdefghijklmnopqrstuvwxyz",
+                    LayoutStrings.DIA => "´ˇ¨ ̊",
+                    LayoutStrings.DIG => "0123456789",
+                    LayoutStrings.SPC => "!\"#$%&'()*+,-./\\:;<=>?@^_`{|}~",
                     _ => throw new ArgumentOutOfRangeException()
                 }, 
                 c => c + ""
@@ -33,13 +28,13 @@ public readonly struct GlyphDistribution {
         return chars;
     }
     
-    public GlyphDistribution(OneOf<DistroStrings, char>[] distribution) {
+    public GlyphLayout(params OneOf<LayoutStrings, char>[] distribution) {
         Distribution = distribution;
     }
 
-    public GlyphDistribution(string distribution) {
+    public GlyphLayout(string distribution) {
         string[] split = distribution.Split(' ');
-        List<OneOf<DistroStrings, char>> list = new();
+        List<OneOf<LayoutStrings, char>> list = new();
 
         foreach (string s in split) {
             if (s.Length == 1) {
@@ -47,19 +42,19 @@ public readonly struct GlyphDistribution {
             } 
             else switch (s.ToUpperInvariant()) {
                 case "UABC":
-                    list.Add(DistroStrings.UABC);
+                    list.Add(LayoutStrings.UABC);
                     break;
                 case "LABC":
-                    list.Add(DistroStrings.LABC);
+                    list.Add(LayoutStrings.LABC);
                     break;
                 case "DIG":
-                    list.Add(DistroStrings.DIG);
+                    list.Add(LayoutStrings.DIG);
                     break;
                 case "SPC":
-                    list.Add(DistroStrings.SPC);
+                    list.Add(LayoutStrings.SPC);
                     break;
                 case "DIA":
-                    list.Add(DistroStrings.DIA);
+                    list.Add(LayoutStrings.DIA);
                     break;
                 default:
                     throw FontReaderException.InvalidGlyphDistribution(s);
@@ -69,20 +64,20 @@ public readonly struct GlyphDistribution {
         Distribution = list.ToArray();
     }
 
-    public GlyphDistribution() {
+    public GlyphLayout() {
         Distribution = [
-            DistroStrings.UABC,
-            DistroStrings.LABC, 
-            DistroStrings.DIG,
-            DistroStrings.SPC,
-            DistroStrings.DIA
+            LayoutStrings.UABC,
+            LayoutStrings.LABC, 
+            LayoutStrings.DIG,
+            LayoutStrings.SPC,
+            LayoutStrings.DIA
         ];
     }
     
     public override string ToString() => 
         Distribution.Join(" ", 
             d => d.Match(
-                s => Enum.GetName(typeof(DistroStrings), s)!.ToLowerInvariant(),
+                s => Enum.GetName(typeof(LayoutStrings), s)!.ToLowerInvariant(),
                 c => c.ToString()
             )
         );
@@ -93,11 +88,11 @@ public readonly struct GlyphDistribution {
         foreach (var d in Distribution) {
             length += d.Match(
                 s => s switch {
-                    DistroStrings.UABC => 26,
-                    DistroStrings.LABC => 26,
-                    DistroStrings.DIG => 10,
-                    DistroStrings.SPC => 30,
-                    DistroStrings.DIA => 4,
+                    LayoutStrings.UABC => 26,
+                    LayoutStrings.LABC => 26,
+                    LayoutStrings.DIG => 10,
+                    LayoutStrings.SPC => 30,
+                    LayoutStrings.DIA => 4,
                     _ => throw new ArgumentException("invalid distribution string")
                 },
                 _ => 1
@@ -108,9 +103,11 @@ public readonly struct GlyphDistribution {
     }
     
     public int GlyphCount => GetGlyphCount();
+    
+    public static implicit operator GlyphLayout(string s) => new(s);
 }
 
-public enum DistroStrings {
+public enum LayoutStrings {
     
     /// <summary>
     /// uppercase English alphabet characters

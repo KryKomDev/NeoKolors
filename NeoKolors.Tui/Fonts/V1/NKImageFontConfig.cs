@@ -3,7 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
-namespace NeoKolors.Tui.Fonts;
+namespace NeoKolors.Tui.Fonts.V1;
 
 public struct NKImageFontConfig {
     
@@ -30,11 +30,11 @@ public struct NKImageFontConfig {
     /// <summary>
     /// defines what to do when a glyph is not found
     /// </summary>
-    public UnknownGlyphMode UnknownGlyphMode { get; set; }
+    public MissingGlyphMode MissingGlyphMode { get; set; }
     
     /// <summary>
     /// the substitute glyph to use when a glyph is not found,
-    /// <see cref="UnknownGlyphMode"/> must be set to <see cref="UnknownGlyphMode.GLYPH"/>
+    /// <see cref="MissingGlyphMode"/> must be set to <see cref="MissingGlyphMode.GLYPH"/>
     /// </summary>
     public char SubstituteGlyph { get; set; }
     
@@ -61,7 +61,7 @@ public struct NKImageFontConfig {
     /// <summary>
     /// the distribution of the glyphs in the font
     /// </summary>
-    public GlyphDistribution GlyphDistribution { get; set; }
+    public GlyphLayout GlyphLayout { get; set; }
 
     public NKImageFontConfig(
         int letterSpacing, 
@@ -70,23 +70,23 @@ public struct NKImageFontConfig {
         int lineSize,
         int glyphWidth,
         int glyphHeight,
-        UnknownGlyphMode unknownGlyphMode = UnknownGlyphMode.SKIP, 
+        MissingGlyphMode missingGlyphMode = MissingGlyphMode.SKIP, 
         char substituteGlyph = ' ',
         int baseLine = 0, 
         bool isMonospaced = true, 
-        GlyphDistribution? glyphDistribution = null) 
+        GlyphLayout? glyphDistribution = null) 
     {
         LetterSpacing = letterSpacing;
         WordSpacing = wordSpacing;
         LineSpacing = lineSpacing;
         LineSize = lineSize;
-        UnknownGlyphMode = unknownGlyphMode;
+        MissingGlyphMode = missingGlyphMode;
         SubstituteGlyph = substituteGlyph;
         GlyphWidth = glyphWidth;
         GlyphHeight = glyphHeight;
         BaseLine = baseLine;
         IsMonospaced = isMonospaced;
-        GlyphDistribution = glyphDistribution ?? new GlyphDistribution();
+        GlyphLayout = glyphDistribution ?? new GlyphLayout();
     }
 
     public NKImageFontConfig() {
@@ -94,11 +94,11 @@ public struct NKImageFontConfig {
     }
 
     public override string ToString() {
-        return $"{UnknownGlyphMode}{(UnknownGlyphMode == UnknownGlyphMode.GLYPH ? SubstituteGlyph : "")}\n" +
+        return $"{MissingGlyphMode}{(MissingGlyphMode == MissingGlyphMode.GLYPH ? SubstituteGlyph : "")}\n" +
                $"{LetterSpacing} {WordSpacing} {LineSpacing} {LineSize}\n" +
                $"{GlyphWidth} {GlyphHeight}\n" +
                $"{IsMonospaced}\n" +
                $"{BaseLine}\n" +
-               $"{GlyphDistribution.ToString()}";
+               $"{GlyphLayout.ToString()}";
     }
 }

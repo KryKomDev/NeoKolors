@@ -3,7 +3,7 @@
 // Copyright (c)
 //
 
-namespace NeoKolors.Tui.Fonts;
+namespace NeoKolors.Tui.Fonts.V1;
 
 /// <summary>
 /// represents the default (character) font

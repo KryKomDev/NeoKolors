@@ -3,10 +3,9 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Tui.Exceptions;
-using static NeoKolors.Tui.Fonts.IGlyph;
+using static NeoKolors.Tui.Fonts.V1.IGlyph;
 
-namespace NeoKolors.Tui.Fonts;
+namespace NeoKolors.Tui.Fonts.V1;
 
 /// <summary>
 /// represents a single font glyph
@@ -86,7 +85,7 @@ public class NKGlyph : IGlyph {
     /// </exception>
     public NKGlyph(char character, string glyph, 
         sbyte xOffset = 0, sbyte yOffset = 0, 
-        WhitespaceMode wm = WhitespaceMode.TRANSPARENT) 
+        OverlapMode wm = OverlapMode.TRANSPARENT) 
     {
         Character = character;
         
@@ -107,7 +106,7 @@ public class NKGlyph : IGlyph {
 
         for (int y = 0; y < Height; y++) {
             for (int x = 0; x < Width; x++) {
-                if (x >= lines[y].Length) Chars[x, y] = wm != WhitespaceMode.OVERLAP ? '\0' : ' ';
+                if (x >= lines[y].Length) Chars[x, y] = wm != OverlapMode.OVERLAP ? '\0' : ' ';
                 else Chars[x, y] = lines[y][x];
             }
         }
@@ -130,7 +129,7 @@ public class NKGlyph : IGlyph {
     /// </exception>
     public NKGlyph(char character, string[] glyph, 
         sbyte xOffset = 0, sbyte yOffset = 0, 
-        WhitespaceMode wm = WhitespaceMode.TRANSPARENT) 
+        OverlapMode wm = OverlapMode.TRANSPARENT) 
     {
         int maxWidth = 0;
         
@@ -146,7 +145,7 @@ public class NKGlyph : IGlyph {
 
         for (int y = 0; y < Height; y++) {
             for (int x = 0; x < Width; x++) {
-                if (x >= glyph[y].Length) Chars[x, y] = wm != WhitespaceMode.OVERLAP ? '\0' : ' ';
+                if (x >= glyph[y].Length) Chars[x, y] = wm != OverlapMode.OVERLAP ? '\0' : ' ';
                 else Chars[x, y] = glyph[y][x];
             }
         }
@@ -171,9 +170,9 @@ public class NKGlyph : IGlyph {
     public void PrintGlyph() {
         for (int y = 0; y < Height; y++) {
             for (int x = 0; x < Width; x++) {
-                System.Console.Write(Chars[x, y]);
+                Stdio.Write(Chars[x, y]);
             }
-            System.Console.WriteLine();
+            Stdio.WriteLine();
         }
     }
 

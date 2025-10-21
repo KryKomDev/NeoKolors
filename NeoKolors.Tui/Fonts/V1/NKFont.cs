@@ -3,33 +3,34 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Globalization;
 using System.Text;
-using NeoKolors.Console;
-using NeoKolors.Tui.Exceptions;
 
-namespace NeoKolors.Tui.Fonts;
+namespace NeoKolors.Tui.Fonts.V1;
 
 public class NKFont : IFont {
+
+    private static readonly NKLogger LOGGER = NKDebug.GetLogger(nameof(NKFont));
     
     public int LetterSpacing { get; }
     public int WordSpacing { get; }
     public int LineSpacing { get; }
     public int LineSize { get; }
 
-    public UnknownGlyphMode UnknownGlyphMode { get; }
+    public MissingGlyphMode MissingGlyphMode { get; }
     public char SubstituteGlyph { get; }
     
     
     public NKFont(
         int letterSpacing = 1, int wordSpacing = 2, int lineSpacing = 1, int lineSize = 3,
-        UnknownGlyphMode ugm = UnknownGlyphMode.SKIP) 
+        MissingGlyphMode ugm = MissingGlyphMode.SKIP) 
     {
         LetterSpacing = letterSpacing;
         WordSpacing = wordSpacing;
         LineSpacing = lineSpacing;
         LineSize = lineSize;
-        if (ugm == UnknownGlyphMode.GLYPH) throw FontException.InvalidUnknownGlyphMode();
-        UnknownGlyphMode = ugm;
+        if (ugm == MissingGlyphMode.GLYPH) throw FontException.InvalidUnknownGlyphMode();
+        MissingGlyphMode = ugm;
     }
     
     public NKFont(
@@ -40,7 +41,7 @@ public class NKFont : IFont {
         WordSpacing = wordSpacing;
         LineSpacing = lineSpacing;
         LineSize = lineSize;
-        UnknownGlyphMode = UnknownGlyphMode.GLYPH;
+        MissingGlyphMode = MissingGlyphMode.GLYPH;
         SubstituteGlyph = substitute;
     }
 
@@ -50,12 +51,12 @@ public class NKFont : IFont {
         get {
             if (Glyphs.TryGetValue(c, out var g)) return g;
 
-            NKDebug.Warn($"Could not find character 'U+{(int)c:x4}'");
+            LOGGER.Warn($"Could not find character 'U+{(int)c:x4}'");
             
-            return UnknownGlyphMode switch {
-                UnknownGlyphMode.SKIP => NKGlyph.Empty(),
-                UnknownGlyphMode.DEFAULT => new NKGlyph(c, $"{c}"),
-                UnknownGlyphMode.GLYPH => Glyphs[SubstituteGlyph],
+            return MissingGlyphMode switch {
+                MissingGlyphMode.SKIP => NKGlyph.Empty(),
+                MissingGlyphMode.CHAR => new NKGlyph(c, $"{c}"),
+                MissingGlyphMode.GLYPH => Glyphs[SubstituteGlyph],
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
@@ -77,4 +78,11 @@ public class NKFont : IFont {
             chars = (chars.baseChar, '°');
         return new CompoundGlyph(c, this[chars.baseChar], this[chars.diacritics]);
     }
+    
+    
+    // ------------------------------------------------------ //
+    //                        STATIC                          //
+    // ------------------------------------------------------ //
+    
+    
 }

@@ -4,12 +4,9 @@
 //
 
 using System.Diagnostics.Contracts;
-using NeoKolors.Common;
-using NeoKolors.Common.Util;
-using NeoKolors.Tui.Exceptions;
 using SkiaSharp;
 
-namespace NeoKolors.Tui.Fonts;
+namespace NeoKolors.Tui.Fonts.V1;
 
 public class NKImageFontReader : IFontReader {
     
@@ -25,11 +22,11 @@ public class NKImageFontReader : IFontReader {
     }
     
     private IFont ReadGlyphs(SKBitmap bmp, NKImageFontConfig config) {
-        var font = config.UnknownGlyphMode != UnknownGlyphMode.GLYPH 
-            ? new NKFont(config.LetterSpacing, config.WordSpacing, config.LineSpacing, config.LineSize, config.UnknownGlyphMode) 
+        var font = config.MissingGlyphMode != MissingGlyphMode.GLYPH 
+            ? new NKFont(config.LetterSpacing, config.WordSpacing, config.LineSpacing, config.LineSize, config.MissingGlyphMode) 
             : new NKFont(config.LetterSpacing, config.WordSpacing, config.LineSpacing, config.LineSize, config.SubstituteGlyph);
 
-        string chars = config.GlyphDistribution.GetChars();
+        string chars = config.GlyphLayout.GetChars();
 
         float fCols = (bmp.Width + 1) / (config.GlyphWidth + 1f);
         float fRows = (bmp.Height + 1) / (config.GlyphHeight + 1f);
@@ -59,8 +56,8 @@ public class NKImageFontReader : IFontReader {
 
         for (int x = 0; x < chars.GetLength(0); x++) {
             for (int y = 0; y < chars.GetLength(1); y++) {
-                SKColor c1 = SKColors.Transparent;
-                SKColor c2 = SKColors.Transparent;
+                var c1 = SKColors.Transparent;
+                var c2 = SKColors.Transparent;
                 
                 if (r.Contains(r.LowerX + x, r.LowerY + y * 2)) c1 = bmp.GetPixel(r.LowerX + x, r.LowerY + y * 2);
                 if (r.Contains(r.LowerX + x, r.LowerY + y * 2 + 1)) c2 = bmp.GetPixel(r.LowerX + x, r.LowerY + y * 2 + 1);
@@ -107,7 +104,7 @@ public class NKImageFontReader : IFontReader {
             if (!isEmpty)
                 break;
             
-            dyn.RemoveCol(0);
+            dyn.RemoveX(0);
             x--;
             xDel++;
         }
@@ -125,7 +122,7 @@ public class NKImageFontReader : IFontReader {
             if (!isEmpty)
                 break;
             
-            dyn.RemoveRow(0);
+            dyn.RemoveY(0);
             y--;
             yDel++;
         }
@@ -142,7 +139,7 @@ public class NKImageFontReader : IFontReader {
 
             if (!isEmpty) break;
             
-            dyn.RemoveCol(x);
+            dyn.RemoveX(x);
         }
 
         // reduce bottom to top
@@ -157,7 +154,7 @@ public class NKImageFontReader : IFontReader {
             
             if (!isEmpty) break;
             
-            dyn.RemoveRow(y);
+            dyn.RemoveY(y);
         }
 
         return dyn.ToArray();
@@ -175,14 +172,14 @@ public class NKImageFontReader : IFontReader {
         
         switch (ugm) {
             case ["default"]:
-                config.UnknownGlyphMode = UnknownGlyphMode.DEFAULT;
+                config.MissingGlyphMode = MissingGlyphMode.CHAR;
                 break;
             case ["glyph", _]:
-                config.UnknownGlyphMode = UnknownGlyphMode.GLYPH;
+                config.MissingGlyphMode = MissingGlyphMode.GLYPH;
                 config.SubstituteGlyph = ugm[1][0];
                 break;
             case ["skip"]:
-                config.UnknownGlyphMode = UnknownGlyphMode.SKIP;
+                config.MissingGlyphMode = MissingGlyphMode.SKIP;
                 break;
             default:
                 throw FontReaderException.InvalidUnknownGlyphMode(lines[2]);
@@ -251,7 +248,7 @@ public class NKImageFontReader : IFontReader {
             throw FontReaderException.InvalidBaseLine(e);
         }
 
-        config.GlyphDistribution = new GlyphDistribution(lines[7]);
+        config.GlyphLayout = new GlyphLayout(lines[7]);
 
         return config;
     }
@@ -277,10 +274,10 @@ public class NKImageFontReader : IFontReader {
         File.Create(imagePath).Close();
         File.WriteAllText(headerPath, $"nkif 1\n{fontName}.png\n{config.ToString()}");
 
-        int cols = (int)Math.Floor(Math.Sqrt(config.GlyphDistribution.GlyphCount));
-        int rows = (int)Math.Ceiling(config.GlyphDistribution.GlyphCount / (float)cols);
+        int cols = (int)Math.Floor(Math.Sqrt(config.GlyphLayout.GlyphCount));
+        int rows = (int)Math.Ceiling(config.GlyphLayout.GlyphCount / (float)cols);
         
-        SKBitmap bmp = new SKBitmap(
+        var bmp = new SKBitmap(
             width: cols * (config.GlyphWidth + 1) - 1, 
             height: rows * (config.GlyphHeight + 1) - 1);
 
@@ -290,7 +287,7 @@ public class NKImageFontReader : IFontReader {
             }
         }
         
-        SKImage image = SKImage.FromBitmap(bmp);
+        var image = SKImage.FromBitmap(bmp);
         var d = image.Encode(SKEncodedImageFormat.Png, 100);
         File.WriteAllBytes(imagePath, d.ToArray());
     }

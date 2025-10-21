@@ -3,11 +3,16 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Tui.Exceptions;
+using System.Xml;
+using System.Xml.Schema;
+using System.Xml.Serialization;
+using static System.Xml.Schema.XmlSchemaValidationFlags;
 
-namespace NeoKolors.Tui.Fonts;
+namespace NeoKolors.Tui.Fonts.V1;
 
 public class NKCharFontReader : IFontReader {
+    
+    private static readonly NKLogger LOGGER = NKDebug.GetLogger(nameof(NKCharFontReader));
     
     /// <summary>
     /// path to the font file
@@ -17,7 +22,7 @@ public class NKCharFontReader : IFontReader {
     /// <summary>
     /// determines what to do when a glyph is missing
     /// </summary>
-    public UnknownGlyphMode UnknownGlyphMode { get; private set; }
+    public MissingGlyphMode MissingGlyphMode { get; private set; }
     
     /// <summary>
     /// determines the glyph to substitute with if another glyph is missing
@@ -42,7 +47,7 @@ public class NKCharFontReader : IFontReader {
     /// <summary>
     /// determines how whitespaces will be treated
     /// </summary>
-    public WhitespaceMode WhitespaceMode { get; private set; }
+    public OverlapMode OverlapMode { get; private set; }
     
     /// <summary>
     /// the character that will be treated as an overlapping whitespace
@@ -63,42 +68,89 @@ public class NKCharFontReader : IFontReader {
 
         string[] lines = File.ReadAllLines(Path);
 
-        ReadHeader(lines);
-        return ReadGlyphs(lines);
+        ReadHeader_A1(lines);
+        return ReadGlyphs_A1(lines);
     }
 
-    private void ReadHeader(string[] lines) {
+
+    static NKCharFontReader() {
+        
+        LOGGER.Info("Downloading NKFont header XSD schema...");
+
+        string headerXsd;
+        using (HttpClient http = new()) {
+            headerXsd = http.GetStringAsync(IFontMeta.SCHEMA_URL).Result;
+        }
+        
+        LOGGER.Info("Finished downloading NKFont header XSD schema.");
+        
+        HEADER_SCHEMA = new XmlSchemaSet();
+        
+        LOGGER.Trace("Reading NKFont header XSD schema...");
+
+        using (StringReader stringReader = new(headerXsd))
+        using (var xsdReader = XmlReader.Create(stringReader)) {
+            HEADER_SCHEMA.Add(null, xsdReader);
+        }
+        
+        HEADER_SCHEMA.Compile();
+        
+        LOGGER.Trace("Finished reading NKFont header XSD schema.");
+    }
+
+    public static void Init() {}
+
+    // VERSION XML
+
+    private static readonly XmlSchemaSet HEADER_SCHEMA;
+    
+    private NKCFontMeta ReadHeader_Xml(string path) {
+        var settings = new XmlReaderSettings();
+        settings.Schemas = HEADER_SCHEMA;
+        settings.ValidationType = ValidationType.Schema;
+        settings.ValidationFlags |= ProcessInlineSchema | ReportValidationWarnings | ProcessSchemaLocation;
+
+        var fs = new FileStream(path, FileMode.Open);
+        var reader = XmlReader.Create(fs, settings);
+        var xml = new XmlSerializer(typeof(NKCFontMeta));
+        return (NKCFontMeta)xml.Deserialize(reader)!;
+    }
+    
+    
+    // VERSION ALPHA 1
+    
+    private void ReadHeader_A1(string[] lines) {
         if (lines.Length < 6) throw FontReaderException.InvalidHeader();
         
         // check the version of the file
         string[] version = lines[0].Split(' ');
         if (version is not ["nkcf", "1"]) throw FontReaderException.InvalidFileVersion();
 
-        SetMissingGlyphMode(lines[1]); 
-        SetSpacings(lines[2]);
+        SetMissingGlyphMode_A1(lines[1]); 
+        SetSpacings_A1(lines[2]);
 
         GlyphStartMarker = lines[3];
         GlyphEndMarker = lines[4];
         
-        SetWhitespaceMode(lines[5]);
+        SetWhitespaceMode_A1(lines[5]);
     }
 
-    private void SetMissingGlyphMode(string line) {
+    private void SetMissingGlyphMode_A1(string line) {
         string[] ugm = line.Split(' ');
 
-        UnknownGlyphMode = ugm switch {
-            ["default"] => UnknownGlyphMode.DEFAULT,
-            ["glyph", _] => UnknownGlyphMode.GLYPH,
-            ["skip"] => UnknownGlyphMode.SKIP,
+        MissingGlyphMode = ugm switch {
+            ["default"] => MissingGlyphMode.CHAR,
+            ["glyph", _] => MissingGlyphMode.GLYPH,
+            ["skip"] => MissingGlyphMode.SKIP,
             _ => throw FontReaderException.InvalidUnknownGlyphMode(line)
         };
 
-        if (UnknownGlyphMode != UnknownGlyphMode.GLYPH) return;
+        if (MissingGlyphMode != MissingGlyphMode.GLYPH) return;
         if (ugm[1].Length != 1) throw FontReaderException.InvalidUnknownGlyphModeGlyph(ugm[1]);
         SubstituteGlyph = ugm[1][0];
     }
 
-    private void SetSpacings(string line) {
+    private void SetSpacings_A1(string line) {
         string[] spacings = line.Split(' ');
 
         if (spacings is not [_, _, _, _]) throw FontReaderException.InvalidSpacings(line);
@@ -132,25 +184,25 @@ public class NKCharFontReader : IFontReader {
         }
     }
 
-    private void SetWhitespaceMode(string line) {
+    private void SetWhitespaceMode_A1(string line) {
         string[] split = line.Split(' ');
 
-        WhitespaceMode = split switch {
-            ["transparent"] => WhitespaceMode.TRANSPARENT,
-            ["overlap"] => WhitespaceMode.OVERLAP,
-            ["mask", _] => WhitespaceMode.MASK,
+        OverlapMode = split switch {
+            ["transparent"] => OverlapMode.TRANSPARENT,
+            ["overlap"] => OverlapMode.OVERLAP,
+            ["mask", _] => OverlapMode.MASK,
             _ => throw FontReaderException.InvalidWhitespaceMode(line)
         };
         
-        if (WhitespaceMode != WhitespaceMode.MASK) return;
+        if (OverlapMode != OverlapMode.MASK) return;
         if (split[1].Length != 1) throw FontReaderException.InvalidWhitespaceMaskCharacter(split[1]);
         WhitespaceMask = split[1][0];
     }
 
-    private NKFont ReadGlyphs(string[] lines) {
+    private NKFont ReadGlyphs_A1(string[] lines) {
         int startMarkerLength = GlyphStartMarker.Length;
-        var font = UnknownGlyphMode != UnknownGlyphMode.GLYPH 
-            ? new NKFont(LetterSpacing, WordSpacing, LineSpacing, LineSize, UnknownGlyphMode) 
+        var font = MissingGlyphMode != MissingGlyphMode.GLYPH 
+            ? new NKFont(LetterSpacing, WordSpacing, LineSpacing, LineSize, MissingGlyphMode) 
             : new NKFont(LetterSpacing, WordSpacing, LineSpacing, LineSize, (char)SubstituteGlyph!);
 
         for (int i = 5; i < lines.Length; i++) {
@@ -165,14 +217,14 @@ public class NKCharFontReader : IFontReader {
                 break;
             }
 
-            font.AddGlyph(ReadGlyph(lines[i..(end + 1)]));
+            font.AddGlyph(ReadGlyph_A1(lines[i..(end + 1)]));
             i = end + 1;
         }
 
         return font;
     }
 
-    private NKGlyph ReadGlyph(string[] lines) {
+    private NKGlyph ReadGlyph_A1(string[] lines) {
         char c = lines[0][^1];
         string[] offsets = lines[1].Split(' ');
 
@@ -196,32 +248,14 @@ public class NKCharFontReader : IFontReader {
         }
 
         for (int i = 2; i < lines.Length - 1; i++) {
-            lines[i] = WhitespaceMode switch {
-                WhitespaceMode.TRANSPARENT => lines[i].Replace(' ', '\0'),
-                WhitespaceMode.OVERLAP => lines[i],
-                WhitespaceMode.MASK => lines[i].Replace(' ', '\0').Replace((char)WhitespaceMask!, ' '),
+            lines[i] = OverlapMode switch {
+                OverlapMode.TRANSPARENT => lines[i].Replace(' ', '\0'),
+                OverlapMode.OVERLAP => lines[i],
+                OverlapMode.MASK => lines[i].Replace(' ', '\0').Replace((char)WhitespaceMask!, ' '),
                 _ => throw new ArgumentException()
             };
         }
 
-        return new NKGlyph(c, lines[2..^1], xo, yo,  WhitespaceMode);
+        return new NKGlyph(c, lines[2..^1], xo, yo,  OverlapMode);
     }
-}
-
-/// <summary>
-/// determines what will substitute a missing character
-/// </summary>
-public enum UnknownGlyphMode {
-    DEFAULT = 0,
-    GLYPH = 1,
-    SKIP = 2
-}
-
-/// <summary>
-/// determines how whitespaces will be treated
-/// </summary>
-public enum WhitespaceMode {
-    TRANSPARENT = 0,
-    OVERLAP = 1,
-    MASK = 2,
 }

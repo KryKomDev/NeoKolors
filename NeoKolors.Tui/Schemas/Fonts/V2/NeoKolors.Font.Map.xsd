@@ -4,10 +4,12 @@
 <!--                             -->
 
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:nkc="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/wip/NeoKolors.Tui/Schemas/Fonts/NeoKolors.Font.Common.xsd"
-            xmlns:nk="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/wip/NeoKolors.Tui/Schemas/Fonts/NeoKolors.Font.Map.xsd"
-            targetNamespace="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/wip/NeoKolors.Tui/Schemas/Fonts/NeoKolors.Font.Map.xsd"
+            xmlns:nkc="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/Fonts/V1"
+            xmlns:nk="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/Fonts/V1"
+            targetNamespace="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/Fonts/V1"
             elementFormDefault="qualified">
+
+    <xsd:include schemaLocation="NeoKolors.Font.Common.xsd"/>
     
     <xsd:element name="FontMap">
         <xsd:complexType>
@@ -30,13 +32,13 @@
         </xsd:annotation>
         
         <xsd:all>
-            <xsd:element name="AlignPointReplace" type="nk:AlignPointReplace" minOccurs="0" default="bckg">
+            <xsd:element name="AlignPointReplace" type="nkc:AlignPointReplace" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>Defines the strategy of replacing the alignment point in compound glyphs. The value is 'bckg' by default.</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
             
-            <xsd:element name="Mask" type="nk:Mask" minOccurs="0">
+            <xsd:element name="Mask" type="nkc:Mask" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>Defines the masking strategy to differentiate the glyph from the background. The value is 'bckg' by default.</xsd:documentation>
                 </xsd:annotation>
@@ -54,7 +56,7 @@
                 <xsd:documentation>Defines the symbol the glyph represents.</xsd:documentation>
             </xsd:annotation>
             <xsd:simpleType>
-                <xsd:restriction base="nk:CharOrHex"/>
+                <xsd:restriction base="nkc:CharOrHex"/>
             </xsd:simpleType>
         </xsd:attribute>
         
@@ -72,6 +74,12 @@
                 <xsd:documentation>Defines the ID of the symbol. For some values it is generated automatically, if not supplied.</xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        
+        <xsd:attribute name="AlignPoints" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Defines the chars used as alignment points.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
     <!-- Ligature -->
@@ -82,13 +90,13 @@
         </xsd:annotation>
         
         <xsd:all>
-            <xsd:element name="AlignPointReplace" type="nk:AlignPointReplace" minOccurs="0" default="bckg">
+            <xsd:element name="AlignPointReplace" type="nkc:AlignPointReplace" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>Defines the strategy of replacing the alignment point in compound glyphs. The value is 'bckg' by default.</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
 
-            <xsd:element name="Mask" type="nk:Mask" minOccurs="0" default="bckg">
+            <xsd:element name="Mask" type="nkc:Mask" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>Defines the masking strategy to differentiate the glyph from the background. The value is 'bckg' by default.</xsd:documentation>
                 </xsd:annotation>
@@ -152,7 +160,7 @@
                 </xsd:simpleType>
             </xsd:element>
             
-            <xsd:element name="Align" type="nk:Align">
+            <xsd:element name="Align" type="nkc:Align">
                 <xsd:annotation>
                     <xsd:documentation>Defines the alignment of the secondary glyph relatively to the main glyph.</xsd:documentation>
                 </xsd:annotation>
@@ -164,16 +172,7 @@
                 <xsd:documentation>Defines the symbol the glyph represents.</xsd:documentation>
             </xsd:annotation>
             <xsd:simpleType>
-                <xsd:restriction base="nk:CharOrHex"/>
-            </xsd:simpleType>
-        </xsd:attribute>
-
-        <xsd:attribute name="File" use="required">
-            <xsd:annotation>
-                <xsd:documentation>Defines the file the glyph is stored in.</xsd:documentation>
-            </xsd:annotation>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:anyURI"/>
+                <xsd:restriction base="nkc:CharOrHex"/>
             </xsd:simpleType>
         </xsd:attribute>
 
@@ -192,13 +191,13 @@
         </xsd:annotation>
 
         <xsd:all>
-            <xsd:element name="Mask" type="nk:Mask" minOccurs="0">
+            <xsd:element name="Mask" type="nkc:Mask" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>Defines the masking strategy to differentiate the glyph from the background. The value is 'bckg' by default.</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
             
-            <xsd:element name="IsMain">
+            <xsd:element name="IsMain" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>Defines whether this glyph is the main glyph in the compound.</xsd:documentation>
                 </xsd:annotation>
@@ -207,7 +206,16 @@
                 </xsd:simpleType>
             </xsd:element>
 
-            <xsd:element name="Align" type="nk:Align">
+            <xsd:element name="MainFirst" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>Defines whether the main character comes before the secondary character.</xsd:documentation>
+                </xsd:annotation>
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:boolean"/>
+                </xsd:simpleType>
+            </xsd:element>
+
+            <xsd:element name="Align" type="nkc:Align" minOccurs="0">
                 <xsd:annotation>
                     <xsd:documentation>Defines the alignment of the secondary glyph relatively to the main glyph.</xsd:documentation>
                 </xsd:annotation>
@@ -234,6 +242,9 @@
                                     <xsd:enumeration value="letters-upper"/>
                                     <xsd:enumeration value="letters-lower"/>
                                     <xsd:enumeration value="letters"/>
+                                    <xsd:enumeration value="consonants-upper"/>
+                                    <xsd:enumeration value="consonants-lower"/>
+                                    <xsd:enumeration value="consonants"/>
                                     <xsd:enumeration value="numbers"/>
                                 </xsd:restriction>
                             </xsd:simpleType>
@@ -248,13 +259,13 @@
                 <xsd:documentation>Defines the symbol the glyph represents.</xsd:documentation>
             </xsd:annotation>
             <xsd:simpleType>
-                <xsd:restriction base="nk:CharOrHex"/>
+                <xsd:restriction base="nkc:CharOrHex"/>
             </xsd:simpleType>
         </xsd:attribute>
 
-        <xsd:attribute name="File" use="required">
+        <xsd:attribute name="BaseId" use="required">
             <xsd:annotation>
-                <xsd:documentation>Defines the file the glyph is stored in.</xsd:documentation>
+                <xsd:documentation>The id of one of the glyphs.</xsd:documentation>
             </xsd:annotation>
             <xsd:simpleType>
                 <xsd:restriction base="xsd:anyURI"/>
@@ -267,35 +278,5 @@
             </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>
-
-    <xsd:complexType name="Align">
-        <xsd:simpleContent>
-            <xsd:restriction base="xsd:string">
-                <xsd:pattern value="^(top-left|top-center|top-right|center-left|center|center-right|bottom-left|bottom-center|bottom-right|custom,\S+)$"/>
-            </xsd:restriction>
-        </xsd:simpleContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="Mask">
-        <xsd:simpleContent>
-            <xsd:restriction base="xsd:string">
-                <xsd:pattern value="(bckg|forg|custom-bckg,\S|custom-forg,\S)"/>
-            </xsd:restriction>
-        </xsd:simpleContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="AlignPointReplace">
-        <xsd:simpleContent>
-            <xsd:restriction base="xsd:string">
-                <xsd:pattern value="(bckg|none|custom,\S)"/>
-            </xsd:restriction>
-        </xsd:simpleContent>
-    </xsd:complexType>
-
-    <xsd:simpleType name="CharOrHex">
-        <xsd:restriction base="xsd:string">
-            <xsd:pattern value="(\S|(\\x(\d|[a-f]|[A-F]){2}))"/>
-        </xsd:restriction>
-    </xsd:simpleType>
     
 </xsd:schema>

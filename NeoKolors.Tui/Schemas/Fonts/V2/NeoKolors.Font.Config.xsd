@@ -4,10 +4,12 @@
 <!--                             -->
 
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:nkc="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/wip/NeoKolors.Tui/Schemas/Fonts/NeoKolors.Font.Common.xsd"
-            xmlns:nk="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/wip/NeoKolors.Tui/Schemas/Fonts/NeoKolors.Font.Config.xsd"
-            targetNamespace="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/wip/NeoKolors.Tui/Schemas/Fonts/NeoKolors.Font.Config.xsd"
+            xmlns:nkc="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/Fonts/V1"
+            xmlns:nk="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/Fonts/V1"
+            targetNamespace="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/Fonts/V1"
             elementFormDefault="qualified">
+    
+    <xsd:include schemaLocation="NeoKolors.Font.Common.xsd"/>
     
     <xsd:element name="Font">
         <xsd:annotation>
@@ -21,13 +23,13 @@
                     </xsd:annotation>
                 </xsd:element>
                 
-                <xsd:element name="MapPath" type="nk:MapPath">
-                    <xsd:annotation>
-                        <xsd:documentation>Points to the .nkfm Font MapPath file.</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:element>
+<!--                <xsd:element name="MapPath" type="nk:MapPath">-->
+<!--                    <xsd:annotation>-->
+<!--                        <xsd:documentation>Points to the .nkfm Font MapPath file.</xsd:documentation>-->
+<!--                    </xsd:annotation>-->
+<!--                </xsd:element>-->
                 
-                <xsd:element name="Monospace" type="nk:Monospace" minOccurs="0" default="false">
+                <xsd:element name="Monospace" type="nk:Monospace" minOccurs="0">
                     <xsd:annotation>
                         <xsd:documentation>Whether the font is monospace or not. Default is false.</xsd:documentation>
                     </xsd:annotation>
@@ -45,13 +47,13 @@
                     </xsd:annotation>
                 </xsd:element>
                 
-                <xsd:element name="Ligatures" type="nk:Ligatures" minOccurs="0" default="false">
+                <xsd:element name="Ligatures" type="nk:Ligatures" minOccurs="0">
                     <xsd:annotation>
                         <xsd:documentation>Whether the font uses ligatures. Default is false.</xsd:documentation>
                     </xsd:annotation>
                 </xsd:element>
                 
-                <xsd:element name="Kerning" type="nk:Kerning" minOccurs="0" default="true">
+                <xsd:element name="Kerning" type="nk:Kerning" minOccurs="0">
                     <xsd:annotation>
                         <xsd:documentation>Whether the font renderer should use kerning for this font. Default is true.</xsd:documentation>
                     </xsd:annotation>
@@ -69,6 +71,12 @@
                     </xsd:annotation>
                 </xsd:element>
                 
+                <xsd:element name="WordSpacing" type="nk:WordSpacing">
+                    <xsd:annotation>
+                        <xsd:documentation>Defines the spacing between words (space character width). Ignored if the font is monospaced.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+                
                 <xsd:element name="Global" type="nk:Global">
                     <xsd:annotation>
                         <xsd:documentation>Defines global properties that can be used as default in the font.</xsd:documentation>
@@ -80,15 +88,17 @@
     
     <xsd:complexType name="Name">
         <xsd:simpleContent>
-            <xsd:restriction base="xsd:string"/>
+            <xsd:restriction base="xsd:string">
+                <xsd:pattern value="(\w|\.|_|-|\s)+"/>
+            </xsd:restriction>
         </xsd:simpleContent>
     </xsd:complexType>
     
-    <xsd:complexType name="MapPath">
-        <xsd:simpleContent>
-            <xsd:restriction base="xsd:anyURI"/>
-        </xsd:simpleContent>
-    </xsd:complexType>
+<!--    <xsd:complexType name="MapPath">-->
+<!--        <xsd:simpleContent>-->
+<!--            <xsd:restriction base="xsd:anyURI"/>-->
+<!--        </xsd:simpleContent>-->
+<!--    </xsd:complexType>-->
     
     <xsd:complexType name="Monospace">
         <xsd:simpleContent>
@@ -122,9 +132,7 @@
     
     <xsd:complexType name="WordSpacing">
         <xsd:simpleContent>
-            <xsd:restriction base="xsd:string">
-                <xsd:pattern value="(space-char|\d+)"/>
-            </xsd:restriction>
+            <xsd:restriction base="xsd:int"/>
         </xsd:simpleContent>
     </xsd:complexType>
     
@@ -142,13 +150,13 @@
     
     <xsd:complexType name="Global">
         <xsd:all>
-            <xsd:element name="Align" type="nk:Align" minOccurs="0" default="top-center">
+            <xsd:element name="Align" type="nkc:Align" minOccurs="0" default="top-center">
                 <xsd:annotation>
                     <xsd:documentation>Defines how the compound characters are aligned. The value is 'top-center' by default.</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
             
-            <xsd:element name="Mask" type="nk:Mask" minOccurs="0" default="bckg">
+            <xsd:element name="Mask" type="nkc:Mask" minOccurs="0" default="bckg">
                 <xsd:annotation>
                     <xsd:documentation>Defines the masking strategy to differentiate the glyph from the background. The value is 'bckg' by default.</xsd:documentation>
                 </xsd:annotation>
@@ -159,24 +167,13 @@
                     <xsd:documentation>Defines the strategy of replacing the alignment point in compound glyphs. The value is 'bckg' by default.</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
+            
+            <xsd:element name="AlignPoints" minOccurs="0" default="">
+                <xsd:annotation>
+                    <xsd:documentation>Defines the default align point characters, that will be used if not specified by a component glyph.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
         </xsd:all>
-    </xsd:complexType>
-
-
-    <xsd:complexType name="Align">
-        <xsd:simpleContent>
-            <xsd:restriction base="xsd:string">
-                <xsd:pattern value="^(top-left|top-center|top-right|center-left|center|center-right|bottom-left|bottom-center|bottom-right|custom,\S+)$"/>
-            </xsd:restriction>
-        </xsd:simpleContent>
-    </xsd:complexType>
-
-    <xsd:complexType name="Mask">
-        <xsd:simpleContent>
-            <xsd:restriction base="xsd:string">
-                <xsd:pattern value="(bckg|forg|custom-bckg,\S|custom-forg,\S)"/>
-            </xsd:restriction>
-        </xsd:simpleContent>
     </xsd:complexType>
     
 </xsd:schema>

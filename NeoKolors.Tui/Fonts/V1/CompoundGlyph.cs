@@ -3,10 +3,9 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Tui.Exceptions;
-using static NeoKolors.Tui.Fonts.IGlyph;
+using static NeoKolors.Tui.Fonts.V1.IGlyph;
 
-namespace NeoKolors.Tui.Fonts;
+namespace NeoKolors.Tui.Fonts.V1;
 
 /// <summary>
 /// a glyph mixed from two other glyphs

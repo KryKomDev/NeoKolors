@@ -4,30 +4,19 @@
 <!--                             -->
 
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:tns="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/NKFontHeader.xsd"
+            xmlns:nk="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/NKFontHeader.xsd"
             targetNamespace="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/NKFontHeader.xsd"
             elementFormDefault="qualified">
-
-    <!-- font base type -->
-    
-    <xsd:complexType name="NKFont">
-        <xsd:all>
-            <xsd:element name="Header" type="tns:Header"/>
-            <xsd:element name="Dimensions" type="tns:Dimensions"/>
-            <xsd:element name="GlyphConf" type="tns:GlyphConf"/>
-        </xsd:all>
-    </xsd:complexType>
-    
     
     <!-- char font header -->
     
     <xsd:element name="NKCFont">
         <xsd:complexType>
             <xsd:all>
-                <xsd:element name="Header" type="tns:Header"/>
-                <xsd:element name="Dimensions" type="tns:Dimensions"/>
-                <xsd:element name="GlyphConf" type="tns:GlyphConf"/>
-                <xsd:element name="CharFontConf" type="tns:CharFontConf"/>
+                <xsd:element name="Header" type="nk:Header"/>
+                <xsd:element name="Dimensions" type="nk:Dimensions"/>
+                <xsd:element name="GlyphConf" type="nk:GlyphConf"/>
+                <xsd:element name="CharFontConf" type="nk:CharFontConf"/>
             </xsd:all>
         </xsd:complexType>
     </xsd:element>
@@ -37,13 +26,12 @@
 
     <xsd:element name="NKIFont">
         <xsd:complexType>
-            <xsd:complexContent>
-                <xsd:extension base="tns:NKFont">
-                    <xsd:sequence>
-                        
-                    </xsd:sequence>
-                </xsd:extension>
-            </xsd:complexContent>
+            <xsd:all>
+                <xsd:element name="Header" type="nk:Header"/>
+                <xsd:element name="Dimensions" type="nk:Dimensions"/>
+                <xsd:element name="GlyphConf" type="nk:GlyphConf"/>
+                <xsd:element name="ImgFontConf" type="nk:ImgFontConf"/>
+            </xsd:all>
         </xsd:complexType>
     </xsd:element>
     
@@ -55,7 +43,9 @@
             <xsd:element name="Version">
                 <xsd:simpleType>
                     <xsd:annotation>
-                        <xsd:documentation>Version of the font format in format "major.minor.patch.note"</xsd:documentation>
+                        <xsd:documentation>
+                            Version of the font format in format "major.minor.patch.note"
+                        </xsd:documentation>
                     </xsd:annotation>
                     <xsd:restriction base="xsd:string">
                         <xsd:pattern value="([0-9])+\.([0-9])+\.([0-9])+(\.)*([A-Za-z0-9])*"/>
@@ -65,13 +55,17 @@
 
             <xsd:element name="FontName" type="xsd:string">
                 <xsd:annotation>
-                    <xsd:documentation>Name of the font</xsd:documentation>
+                    <xsd:documentation>
+                        Name of the font
+                    </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
 
             <xsd:element name="FontPath" type="xsd:string">
                 <xsd:annotation>
-                    <xsd:documentation>Path to the actual font file</xsd:documentation>
+                    <xsd:documentation>
+                        Path to the actual font file
+                    </xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
         </xsd:all>
@@ -150,6 +144,49 @@
                 </xsd:simpleType>
             </xsd:element>
         </xsd:all>
+    </xsd:complexType>
+    
+    
+    <!-- settings for image font glyph definitions -->
+    
+    <xsd:complexType name="ImgFontConf">
+        <xsd:all>
+            <xsd:element name="GlyphWidth">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:int">
+                        <xsd:minInclusive value="1"/>
+                        <xsd:maxInclusive value="128"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            
+            <xsd:element name="GlyphHeight">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:int">
+                        <xsd:minInclusive value="1"/>
+                        <xsd:maxInclusive value="128"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+            
+            <xsd:element name="Mono">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:boolean"/>
+                </xsd:simpleType>
+            </xsd:element>
+            
+            <xsd:element name="Layout">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string"/>
+                </xsd:simpleType>
+            </xsd:element>
+        </xsd:all>
+    </xsd:complexType>
+    
+    <xsd:complexType name="a">
+        <xsd:choice>
+            <xsd:element name="a1a" type="xsd:int" maxOccurs="unbounded"/>
+        </xsd:choice>
     </xsd:complexType>
     
 </xsd:schema>

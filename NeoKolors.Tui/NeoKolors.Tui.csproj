@@ -6,22 +6,26 @@
         <Version>0.25.32</Version>
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
-        <LangVersion>preview</LangVersion>
+        <LangVersion>14</LangVersion>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <TargetFrameworks>net5.0;net8.0;netstandard2.1;net9.0</TargetFrameworks>
+        <TargetFrameworks>net5.0;net8.0;net9.0;netstandard2.1;net10.0</TargetFrameworks>
+        <Configurations>Debug;Release;WIP</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
     
     <ItemGroup>
         <ProjectReference Include="..\NeoKolors.Console\NeoKolors.Console.csproj" />
         <ProjectReference Include="..\NeoKolors.Common\NeoKolors.Common.csproj" />
         <ProjectReference Include="..\NeoKolors.Settings\NeoKolors.Settings.csproj" />
+        <ProjectReference Include="..\NeoKolors.Extensions\NeoKolors.Extensions.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
+      <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
+      <PackageReference Include="Metriks" Version="1.1.1" />
       <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
