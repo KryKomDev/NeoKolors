@@ -6,6 +6,8 @@
 #if NET9_0_OR_GREATER
 using System.Runtime.CompilerServices;
 #endif
+using System;
+using System.IO;
 using NeoKolors.Common;
 using OneOf;
 using static NeoKolors.Console.LoggerLevel;

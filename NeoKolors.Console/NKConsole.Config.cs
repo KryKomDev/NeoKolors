@@ -1,6 +1,8 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
+using System;
+using System.Threading.Tasks;
 using NeoKolors.Console.Events;
 using NeoKolors.Console.Mouse;
 using static NeoKolors.Common.EscapeCodes;

@@ -6,7 +6,7 @@ namespace WeekNumber;
 
 public static class Program {
     public static void Main(string[] args) {
-        Debug.EnableAutoFancy = true;
+        NKDebug.ExceptionFormatting = true;
         
         switch (args) {
             case ["-a" or "--all"]:
@@ -29,7 +29,7 @@ public static class Program {
                 break;
         }
         
-        Console.Write(EscapeCodes.STYLE_END);
+        Console.Write(EscapeCodes.FORMATTING_RESET);
     }
 
     private static void Default() {
@@ -38,7 +38,7 @@ public static class Program {
         var calendar = culture.Calendar;
         int weekNumber = calendar.GetWeekOfYear(now, CalendarWeekRule.FirstDay, culture.DateTimeFormat.FirstDayOfWeek);
         
-        ConsoleColors.WriteLine($"Week number: <f-green><b>{weekNumber}</b></f-color>".ApplyColors().ApplyStyles());
+        Console.WriteLine($"Week number: <f-green><b>{weekNumber}</b></f-color>".ApplyColors().ApplyStyles());
     }
 
     private static void All(string v = "") {
@@ -47,11 +47,11 @@ public static class Program {
         var calendar = culture.Calendar;
         int weekNumber = calendar.GetWeekOfYear(now, CalendarWeekRule.FirstDay, culture.DateTimeFormat.FirstDayOfWeek);
         
-        ConsoleColors.WriteLine($"Year: <f-green><b>{now.Year}</b></f-color>".ApplyColors().ApplyStyles());
-        ConsoleColors.WriteLine($"Month: <f-green><b>{now.Month}</b></f-color>".ApplyColors().ApplyStyles());
-        ConsoleColors.WriteLine($"Day: <f-green><b>{now.Day}. {now.DayOfWeek}</b></f-color>".ApplyColors().ApplyStyles());
-        ConsoleColors.WriteLine($"Week: <f-green><b>{weekNumber}</b></f-color>".ApplyColors().ApplyStyles());
-        ConsoleColors.WriteLine($"Version name: <f-green><b>{(now.Year + "")[2..]}w{weekNumber}{v}</b></f-color>".ApplyColors().ApplyStyles());
+        Console.WriteLine($"Year: <f-green><b>{now.Year}</b></f-color>".ApplyColors().ApplyStyles());
+        Console.WriteLine($"Month: <f-green><b>{now.Month}</b></f-color>".ApplyColors().ApplyStyles());
+        Console.WriteLine($"Day: <f-green><b>{now.Day}. {now.DayOfWeek}</b></f-color>".ApplyColors().ApplyStyles());
+        Console.WriteLine($"Week: <f-green><b>{weekNumber}</b></f-color>".ApplyColors().ApplyStyles());
+        Console.WriteLine($"Version name: <f-green><b>{(now.Year + "")[2..]}w{weekNumber}{v}</b></f-color>".ApplyColors().ApplyStyles());
     }
 
     private static void Version(string version) {
@@ -60,7 +60,7 @@ public static class Program {
         var calendar = culture.Calendar;
         int weekNumber = calendar.GetWeekOfYear(now, CalendarWeekRule.FirstDay, culture.DateTimeFormat.FirstDayOfWeek);
         
-        ConsoleColors.WriteLine($"Version name: <f-green><b>{(now.Year + "")[2..]}w{weekNumber}{version}</b></f-color>".ApplyColors().ApplyStyles());
+        Console.WriteLine($"Version name: <f-green><b>{(now.Year + "")[2..]}w{weekNumber}{version}</b></f-color>".ApplyColors().ApplyStyles());
     }
 
     private static void Invalid(string[] args) {

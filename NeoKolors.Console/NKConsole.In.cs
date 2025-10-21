@@ -4,12 +4,21 @@
 //
 
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 using NeoKolors.Common;
 using NeoKolors.Console.Events;
 using NeoKolors.Console.Mouse;
 using OneOf;
 using static NeoKolors.Console.BoolStrings;
+using ArgumentException = System.ArgumentException;
+using ConsoleKey = System.ConsoleKey;
+using ConsoleKeyInfo = System.ConsoleKeyInfo;
+using FormatException = System.FormatException;
+using InvalidOperationException = System.InvalidOperationException;
+using OverflowException = System.OverflowException;
 using Std = System.Console;
 
 namespace NeoKolors.Console;
@@ -27,10 +36,10 @@ public static partial class NKConsole {
     /// <param name="reply">If on the program will write a response to invalid inputs.</param>
     /// <param name="style">The style of the invalid input messages.</param>
     /// <returns>The validated integer input provided by the user.</returns>
-    /// <exception cref="InvalidOperationException">
+    /// <exception cref="System.InvalidOperationException">
     /// Thrown if no valid integer input is provided after repeated prompts or if validation fails.
     /// </exception>
-    public static long ReadLong(Func<long, string?>? validator = null, bool reply = true, NKStyle style = default) {
+    public static long ReadLong(System.Func<long, string?>? validator = null, bool reply = true, NKStyle style = default) {
         validator ??= _ => null;
         style = style == default ? new NKStyle(NKColor.Default, NKColor.Default) : style;
         
@@ -74,10 +83,10 @@ public static partial class NKConsole {
     /// <param name="reply">If on the program will write a response to invalid inputs.</param>
     /// <param name="style">The style of the invalid input messages.</param>
     /// <returns>The validated integer input provided by the user.</returns>
-    /// <exception cref="InvalidOperationException">
+    /// <exception cref="System.InvalidOperationException">
     /// Thrown if no valid integer input is provided after repeated prompts or if validation fails.
     /// </exception>
-    public static int ReadInt(Func<int, string?>? validator = null, bool reply = true, NKStyle style = default) {
+    public static int ReadInt(System.Func<int, string?>? validator = null, bool reply = true, NKStyle style = default) {
         validator ??= _ => null;
         style = style == default ? new NKStyle(NKColor.Default, NKColor.Default) : style;
         
@@ -121,10 +130,10 @@ public static partial class NKConsole {
     /// <param name="reply">If on the program will write a response to invalid inputs.</param>
     /// <param name="style">The style of the invalid input messages.</param>
     /// <returns>The validated integer input provided by the user.</returns>
-    /// <exception cref="InvalidOperationException">
+    /// <exception cref="System.InvalidOperationException">
     /// Thrown if no valid integer input is provided after repeated prompts or if validation fails.
     /// </exception>
-    public static short ReadShort(Func<short, string?>? validator = null, bool reply = true, NKStyle style = default) {
+    public static short ReadShort(System.Func<short, string?>? validator = null, bool reply = true, NKStyle style = default) {
         validator ??= _ => null;
         style = style == default ? new NKStyle(NKColor.Default, NKColor.Default) : style;
         
@@ -168,10 +177,10 @@ public static partial class NKConsole {
     /// <param name="reply">If on the program will write a response to invalid inputs.</param>
     /// <param name="style">The style of the invalid input messages.</param>
     /// <returns>The validated integer input provided by the user.</returns>
-    /// <exception cref="InvalidOperationException">
+    /// <exception cref="System.InvalidOperationException">
     /// Thrown if no valid integer input is provided after repeated prompts or if validation fails.
     /// </exception>
-    public static byte ReadByte(Func<byte, string?>? validator = null, bool reply = true, NKStyle style = default) {
+    public static byte ReadByte(System.Func<byte, string?>? validator = null, bool reply = true, NKStyle style = default) {
         validator ??= _ => null;
         style = style == default ? new NKStyle(NKColor.Default, NKColor.Default) : style;
         
@@ -215,7 +224,7 @@ public static partial class NKConsole {
     /// <param name="reply">If on the program will write a response to invalid inputs.</param>
     /// <param name="style">The style of the invalid input messages.</param>
     /// <returns>The validated string input provided by the user.</returns>
-    public static string ReadString(Func<string, string?>? validator = null, bool reply = true, NKStyle? style = null) {
+    public static string ReadString(System.Func<string, string?>? validator = null, bool reply = true, NKStyle? style = null) {
         validator ??= _ => null;
         style ??= new NKStyle(NKColor.Default, NKColor.Default);
         
@@ -616,7 +625,7 @@ public static partial class NKConsole {
     /// <returns>
     /// A string containing all characters read from the console, excluding the specified sequence.
     /// </returns>
-    /// <exception cref="ArgumentException">
+    /// <exception cref="System.ArgumentException">
     /// Thrown if the provided sequence is null or an empty string.
     /// </exception>
     public static string ReadUntil(string sequence, bool intercept = false) {
@@ -780,7 +789,7 @@ public static partial class NKConsole {
     }
 }
 
-[Flags]
+[System.Flags]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public enum BoolStrings {
     TRUE_FALSE = 0x1,

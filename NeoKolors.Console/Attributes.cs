@@ -5,7 +5,10 @@
 
 
 // ReSharper disable once CheckNamespace
+// ReSharper disable once EmptyNamespace
 namespace System.Runtime.Versioning;
+
+// ReSharper disable once RedundantUsingDirective
 using static AttributeTargets;
 
 #if NETSTANDARD2_0

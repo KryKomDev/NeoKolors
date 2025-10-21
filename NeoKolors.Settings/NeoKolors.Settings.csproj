@@ -15,19 +15,18 @@
         <Title>NeoKolors.Settings</Title>
         <PackageIcon>Settings.png</PackageIcon>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Configurations>Debug;Release;WIP</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
     
     <ItemGroup>
         <ProjectReference Include="..\NeoKolors.Common\NeoKolors.Common.csproj"/>
+        <ProjectReference Include="..\NeoKolors.Console\NeoKolors.Console.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
         <None Include="README.md" Pack="true" PackagePath="\"/>
         <None Include="Settings.png" Pack="true" PackagePath="\"/>
         <None Include="../LICENSE" Pack="true" PackagePath="\"/>
-    </ItemGroup>
-
-    <ItemGroup>
-      <PackageReference Include="NeoKolors.Console" Version="0.25.4" />
     </ItemGroup>
 </Project>

@@ -3,6 +3,8 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System;
+using System.IO;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using NeoKolors.Common.Util;

@@ -5,7 +5,7 @@
 
 using JetBrains.Annotations;
 
-namespace NeoKolors.Common.Util;
+namespace NeoKolors.Extensions;
 
 public static class NameConvertor {
     
@@ -90,7 +90,7 @@ public static class NameConvertor {
     /// Separates a Pascal-cased enum name into individual words separated by spaces, e.g. "EnumValueName" -> "Enum Value Name".
     /// </summary>
     /// <param name="name">The Pascal-cased enum name to be converted.</param>
-    /// <returns>A string where individual words are separated by spaces.</returns>
+    /// <returns>A string where spaces separate individual words.</returns>
     [Pure]
     public static string EnumToSpace(this string name) {
         if (string.IsNullOrWhiteSpace(name)) return string.Empty;

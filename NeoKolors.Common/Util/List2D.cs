@@ -8,9 +8,10 @@ using System.Diagnostics;
 
 namespace NeoKolors.Common.Util;
 
+[Obsolete("Use the Metriks library classes instead.")]
 public class List2D<T> : List2D, IEnumerable<T> {
     
-    private readonly List<List<T>> _matrix;
+    private readonly List<List<T>> _matrix; // TODO: optimize this
     
     public new int Count => XSize * YSize;
     public new int XSize => _matrix.Count;
@@ -97,31 +98,70 @@ public class List2D<T> : List2D, IEnumerable<T> {
     }
     
     /// <inheritdoc cref="List2D.RemoveRow(int)"/>
-    public new void RemoveRow(int index) {
-        if (index < 0 || index >= YSize) throw new IndexOutOfRangeException();
+    public void RemoveY(int y) {
+        if (y < 0 || y >= YSize) throw new IndexOutOfRangeException();
         for (int x = 0; x < XSize; x++)
-            _matrix[x].RemoveAt(index);
+            _matrix[x].RemoveAt(y);
     }
     
     /// <inheritdoc cref="List2D.RemoveRow()"/>
-    public new void RemoveRow() {
+    public void RemoveY() {
         int y = YSize - 1;
         for (int x = 0; x < XSize; x++) 
             _matrix[x].RemoveAt(y);
     }
 
     /// <inheritdoc cref="List2D.RemoveCol(int)"/>
-    public new void RemoveCol(int index) {
-        if (index < 0 || index >= XSize) throw new IndexOutOfRangeException();
-        _matrix.RemoveAt(index);
+    public void RemoveX(int x) {
+        if (x < 0 || x >= XSize) throw new IndexOutOfRangeException();
+        _matrix.RemoveAt(x);
     }
 
     /// <inheritdoc cref="List2D.RemoveCol()"/>   
-    public new void RemoveCol() {
+    public void RemoveX() {
         if (XSize != 0)
             _matrix.RemoveAt(XSize - 1);
     }
 
+    /// <summary>
+    /// Determines whether all elements in a specific row of the 2D list satisfy a specified condition.
+    /// </summary>
+    /// <param name="y">The zero-based index of the row to evaluate.</param>
+    /// <param name="predicate">The condition to test each element in the row.</param>
+    /// <returns>True if all elements in the specified row satisfy the condition; otherwise, false.</returns>
+    /// <exception cref="IndexOutOfRangeException">Thrown if the specified index is out of range.</exception>
+    public bool AllAtY(int y, Predicate<T> predicate) {
+        if (y < 0 || y >= YSize) throw new IndexOutOfRangeException();
+
+        for (int x = 0; x < XSize; x++) {
+            if (predicate(this[x, y])) continue;
+            
+            return false;
+        }
+        
+        return true;
+    }
+
+    /// <summary>
+    /// Determines if all elements in a specified column satisfy the provided predicate.
+    /// </summary>
+    /// <param name="x">The zero-based index of the column to evaluate.</param>
+    /// <param name="predicate">The function used to test each element in the column.</param>
+    /// <returns>True if all elements in the column satisfy the predicate; otherwise, false.</returns>
+    /// <exception cref="IndexOutOfRangeException">
+    /// Thrown when the specified column index is outside the valid range.
+    /// </exception>
+    public bool AllAtX(int x, Predicate<T> predicate) {
+        if (x < 0 || x >= XSize) throw new IndexOutOfRangeException();
+
+        for (int y = 0; y < YSize; y++) {
+            if (predicate(this[x, y])) continue;
+            
+            return false;
+        }        
+        
+        return true;
+    }
     
     public new IEnumerator<T> GetEnumerator() {
         for (int x = 0; x < XSize; x++) {
@@ -524,10 +564,10 @@ public class List2D : IEnumerable {
         if (array is null)
             throw new ArgumentNullException(nameof(array));
 
-        xStart = xStart.Clamp(0, array.Len0() - 1);
-        xEnd = xEnd.Clamp(0, array.Len0() - 1);
-        yStart = yStart.Clamp(0, array.Len1() - 1);
-        yEnd = yEnd.Clamp(0, array.Len1() - 1);
+        xStart = xStart.Clamp(0, array.Len0 - 1);
+        xEnd = xEnd.Clamp(0, array.Len0 - 1);
+        yStart = yStart.Clamp(0, array.Len1 - 1);
+        yEnd = yEnd.Clamp(0, array.Len1 - 1);
 
         // switch start and end if necessary
         (xStart, xEnd) = xStart < xEnd ? (xStart, xEnd) : (xEnd, xStart);

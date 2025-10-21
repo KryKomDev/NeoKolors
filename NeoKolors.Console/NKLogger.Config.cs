@@ -3,6 +3,8 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System;
+using System.IO;
 using NeoKolors.Common;
 using OneOf;
 using static NeoKolors.Console.LoggerLevel;

@@ -3,7 +3,9 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System;
 using System.Diagnostics.Contracts;
+using System.IO;
 using System.Runtime.Serialization.Json;
 using Newtonsoft.Json;
 

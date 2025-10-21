@@ -3,6 +3,8 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System;
+
 namespace NeoKolors.Console;
 
 /// <summary>

@@ -62,13 +62,22 @@ public static class Extensions {
     /// to apply, such as bold, italic, or underline.</param>
     /// <returns>A new string with the specified text styles applied.</returns>
     public static string AddCStyle(this string s, TextStyles style) {
-        if (style.HasFlag(BOLD)) s = $"{BOLD_START}{s}";
-        if (style.HasFlag(ITALIC)) s = $"{ITALIC_START}{s}";
-        if (style.HasFlag(UNDERLINE)) s = $"{UNDERLINE_START}{s}";
-        if (style.HasFlag(FAINT)) s = $"{FAINT_START}{s}";
-        if (style.HasFlag(NEGATIVE)) s = $"{NEGATIVE_START}{s}";
-        if (style.HasFlag(STRIKETHROUGH)) s = $"{STRIKETHROUGH_START}{s}";
+        if (style.IsBold) s = $"{BOLD_START}{s}";
+        if (style.IsItalic) s = $"{ITALIC_START}{s}";
+        if (style.IsUnderline) s = $"{UNDERLINE_START}{s}";
+        if (style.IsFaint) s = $"{FAINT_START}{s}";
+        if (style.IsNegative) s = $"{NEGATIVE_START}{s}";
+        if (style.IsStrikethrough) s = $"{STRIKETHROUGH_START}{s}";
         return s;
+    }
+
+    extension(TextStyles styles) {
+        public bool IsBold =>          styles.HasFlag(BOLD);
+        public bool IsItalic =>        styles.HasFlag(ITALIC);
+        public bool IsUnderline =>     styles.HasFlag(UNDERLINE);
+        public bool IsFaint =>         styles.HasFlag(FAINT);
+        public bool IsNegative =>      styles.HasFlag(NEGATIVE);
+        public bool IsStrikethrough => styles.HasFlag(STRIKETHROUGH);
     }
 
     /// <summary>
@@ -114,11 +123,23 @@ public static class Extensions {
         offset < min ? min - value : offset > max ? 0 : value;
 
     public static string ToString(ConsoleKeyInfo key) => 
-        $"{(key.Modifiers.HasFlag(ConsoleModifiers.Control) ? "Ctrl + " : "")}" +
-        $"{(key.Modifiers.HasFlag(ConsoleModifiers.Alt) ? "Alt + " : "")}" +
-        $"{(key.Modifiers.HasFlag(ConsoleModifiers.Shift) ? "Shift + " : "")}" + 
+        $"{(key.HasCtrl ? "Ctrl + " : "")}" +
+        $"{(key.HasAlt ? "Alt + " : "")}" +
+        $"{(key.HasShift ? "Shift + " : "")}" + 
         $"{key.Key.ToString()} => '{key.KeyChar}'";
 
+    extension(ConsoleModifiers mods) {
+        public bool HasShift => mods.HasFlag(ConsoleModifiers.Shift);
+        public bool HasAlt => mods.HasFlag(ConsoleModifiers.Alt);
+        public bool HasCtrl => mods.HasFlag(ConsoleModifiers.Control);
+    }
+
+    extension(ConsoleKeyInfo key) {
+        public bool HasShift => key.Modifiers.HasFlag(ConsoleModifiers.Shift);
+        public bool HasAlt => key.Modifiers.HasFlag(ConsoleModifiers.Alt);
+        public bool HasCtrl => key.Modifiers.HasFlag(ConsoleModifiers.Control);
+    }
+    
     /// <summary>
     /// Gets the length of the first dimension of a two-dimensional array.
     /// </summary>
@@ -127,7 +148,8 @@ public static class Extensions {
     /// <returns>The length of the first dimension of the array.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [Pure]
-    public static int Len0<T>(this T[,] arr) => arr.GetLength(0);
+    [Obsolete("Replaced by Len0 property.")]
+    public static int GetLen0<T>(this T[,] arr) => arr.GetLength(0);
 
     /// <summary>
     /// Retrieves the number of elements in the second dimension of a two-dimensional array.
@@ -136,9 +158,82 @@ public static class Extensions {
     /// <typeparam name="T">The type of elements in the two-dimensional array.</typeparam>
     /// <returns>The number of elements in the second dimension of the array.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [Pure]
-    public static int Len1<T>(this T[,] arr) => arr.GetLength(1);
+    [Pure]    
+    [Obsolete("Replaced by Len1 property.")]
+    public static int GetLen1<T>(this T[,] arr) => arr.GetLength(1);
 
+    extension<T>(T[,] value) {
+        
+        /// <summary>
+        /// Gets the length of the first dimension of a two-dimensional array.
+        /// </summary>
+        [Pure]
+        [Obsolete("Use Metriks extension properties instead.")]
+        public int Len0 => value.GetLength(0);
+        
+        /// <summary>
+        /// Gets the length of the second dimension of a two-dimensional array.
+        /// </summary>
+        [Pure]
+        [Obsolete("Use Metriks extension properties instead.")]
+        public int Len1 => value.GetLength(1);
+    }
+
+    extension<T>(T[,,] value) {
+        
+        /// <summary>
+        /// Gets the length of the first dimension of a three-dimensional array.
+        /// </summary>
+        [Pure]
+        [Obsolete("Use Metriks extension properties instead.")]
+        public int Len0 => value.GetLength(0);
+        
+        /// <summary>
+        /// Gets the length of the second dimension of a three-dimensional array.
+        /// </summary>
+        [Pure]
+        [Obsolete("Use Metriks extension properties instead.")]
+        public int Len1 => value.GetLength(1);
+        
+        /// <summary>
+        /// Gets the length of the third dimension of a three-dimensional array.
+        /// </summary>
+        [Pure]
+        [Obsolete("Use Metriks extension properties instead.")]
+        public int Len2 => value.GetLength(2);
+    }
+    
+    extension<T>(T[,,,] value) {
+        
+        /// <summary>
+        /// Gets the length of the first dimension of a four-dimensional array.
+        /// </summary>
+        [Pure]
+        [Obsolete("Use Metriks extension properties instead.")]
+        public int Len0 => value.GetLength(0);
+        
+        /// <summary>
+        /// Gets the length of the second dimension of a four-dimensional array.
+        /// </summary>
+        [Pure]
+        [Obsolete("Use Metriks extension properties instead.")]
+        public int Len1 => value.GetLength(1);
+        
+        /// <summary>
+        /// Gets the length of the third dimension of a four-dimensional array.
+        /// </summary>
+        [Pure]
+        [Obsolete("Use Metriks extension properties instead.")]
+        public int Len2 => value.GetLength(2);
+        
+        /// <summary>
+        /// Gets the length of the fourth dimension of a four-dimensional array.
+        /// </summary>
+        [Pure]
+        [Obsolete("Use Metriks extension properties instead.")]
+        public int Len3 => value.GetLength(3);
+    }
+    
     /// <summary>
     /// Converts the provided array of <see cref="NKColor"/> instances into a collection
     /// of <see cref="NKBckg"/> instances.
@@ -313,10 +408,7 @@ public static class Extensions {
                 break;
         }
 
-        return new ConsoleKeyInfo(c, key,
-            modifiers.HasFlag(ConsoleModifiers.Shift),
-            modifiers.HasFlag(ConsoleModifiers.Alt),
-            modifiers.HasFlag(ConsoleModifiers.Control));
+        return new ConsoleKeyInfo(c, key, modifiers.HasShift, modifiers.HasAlt, modifiers.HasCtrl);
     }
 
     /// <summary>
@@ -360,5 +452,15 @@ public static class Extensions {
             '>' => (ConsoleKey.OemPeriod, true),
             _ => ((ConsoleKey)symbol, false)
         };
+    }
+
+    extension(Uri) {
+        public static bool IsLocal(string path) {
+            if (Uri.TryCreate(path, UriKind.Absolute, out var uri))
+                return uri.IsFile;
+    
+            // If it's not a valid absolute URI, check if it's a local path
+            return Path.IsPathRooted(path) || !path.Contains("://");
+        }
     }
 }

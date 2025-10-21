@@ -3,6 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
@@ -22,7 +23,7 @@ public sealed partial class NKLogger : ILogger {
     public void Crit(string message, EventId? id) {
         if (message == null) throw new ArgumentNullException(nameof(message));
         if (!Level.HasFlag(LoggerLevel.CRITICAL)) return;
-
+        
         if (SimpleMessages) {
             Output.WriteLine(HideTime
                 ? $"{SourceStr(id)}[ CRIT ] : {Indent(message)}"

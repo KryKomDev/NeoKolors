@@ -6,8 +6,8 @@
         <Version>1.0.0.0-rc1</Version>
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
-        <LangVersion>preview</LangVersion>
-        <TargetFrameworks>net5.0;net8.0;netstandard2.0;net9.0</TargetFrameworks>
+        <LangVersion>14</LangVersion>
+        <TargetFrameworks>net10.0;net5.0;net8.0;net9.0;netstandard2.1</TargetFrameworks>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicense>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicense>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
@@ -16,12 +16,16 @@
         <PackageIcon>Common.png</PackageIcon>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Description>the common utilities for the NeoKolors library pack</Description>
+        <Configurations>Debug;Release;WIP</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
+        <PackageReference Include="HasFlagExtension" Version="1.0.0" 
+                          OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
         <PackageReference Include="OneOf" Version="3.0.271" />
-        <PackageReference Include="SkiaSharp" Version="3.116.1" />
+        <PackageReference Include="SkiaSharp" Version="3.119.2-preview.1" />
         <PackageReference Include="System.IO" Version="4.3.0" />
     </ItemGroup>
     

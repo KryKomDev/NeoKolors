@@ -3,11 +3,14 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>1.0.0.0-rc1</Version>
+        <LangVersion>preview</LangVersion>
+        <TargetFrameworks>net5.0;net8.0;net9.0;netstandard2.1</TargetFrameworks>
+        <Platforms>AnyCPU</Platforms>
+        <Configurations>Debug;Release;WIP</Configurations>
+
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
-        <LangVersion>preview</LangVersion>
-        <TargetFrameworks>net5.0;net8.0;netstandard2.0;net9.0</TargetFrameworks>
+        <Version>1.0.0.0-rc1</Version>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicense>LICENSE</PackageLicense>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
@@ -19,6 +22,7 @@
     
     <ItemGroup>
         <ProjectReference Include="..\NeoKolors.Common\NeoKolors.Common.csproj"/>
+        <ProjectReference Include="..\NeoKolors.Extensions\NeoKolors.Extensions.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -28,9 +32,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="JetBrains.Annotations" Version="2024.3.0" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.7" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+        <PackageReference Include="HasFlagExtension" Version="1.0.0" 
+                          OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
+        <PackageReference Include="HasFlagExtension.Attributes" Version="1.0.0" />
+        <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0-rc.2.25502.107" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
         <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
     </ItemGroup>
 

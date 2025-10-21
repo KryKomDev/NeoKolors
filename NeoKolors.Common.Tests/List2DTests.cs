@@ -77,7 +77,7 @@ public class List2DTests {
         list.AddRow((int[])[4, 5, 6]);
         list.AddRow((int[])[7, 8, 9]);
         
-        list.RemoveRow(1);
+        list.RemoveY(1);
         
         Assert.Equal(3, list.XSize);
         Assert.Equal(2, list.YSize);
@@ -91,7 +91,7 @@ public class List2DTests {
         list.AddRow((int[])[1, 2, 3]);
         list.AddRow((int[])[4, 5, 6]);
         
-        list.RemoveCol(1);
+        list.RemoveX(1);
         
         Assert.Equal(2, list.XSize);
         Assert.Equal(2, list.YSize);
@@ -149,7 +149,7 @@ public class List2DTests {
         list.AddRow((int[])[1, 2, 3]);
         list.AddRow((int[])[4, 5, 6]);
         
-        list.RemoveRow();
+        list.RemoveY();
         
         Assert.Equal(3, list.XSize);
         Assert.Equal(1, list.YSize);
@@ -163,7 +163,7 @@ public class List2DTests {
         list.AddRow((int[])[1, 2, 3]);
         list.AddRow((int[])[4, 5, 6]);
         
-        list.RemoveCol();
+        list.RemoveX();
         
         Assert.Equal(2, list.XSize);
         Assert.Equal(2, list.YSize);

@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <Version>0.25.32</Version>
+        <Authors>KryKom</Authors>
+        <Company>KryKom</Company>
+        <LangVersion>14</LangVersion>
+        <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <TargetFrameworks>net10.0;net5.0;net8.0;net9.0;netstandard2.1</TargetFrameworks>
+        <Configurations>Debug;Release;WIP</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
+        <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+</Project>

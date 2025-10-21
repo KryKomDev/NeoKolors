@@ -3,6 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System;
 using System.Text.RegularExpressions;
 using NeoKolors.Common;
 using NeoKolors.Common.Util;

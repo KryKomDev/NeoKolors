@@ -1,6 +1,7 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
+using System;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
@@ -10,8 +11,9 @@ namespace NeoKolors.Console;
 
 file static class ConsoleAccelerator {
 
-
+    #if !NETSTANDARD2_1
     [SupportedOSPlatform("windows")]
+    #endif
     internal static class Windows {
 
         [StructLayout(LayoutKind.Sequential)]
@@ -110,9 +112,11 @@ file static class ConsoleAccelerator {
         }
     }
     
+    #if !NETSTANDARD2_1
     [SupportedOSPlatform("linux")]
     [SupportedOSPlatform("macos")]
     [SupportedOSPlatform("freebsd")]
+    #endif
     internal static class Ncurses {
         
         // On Linux/macOS, the ncurses library is typically named libncurses.so or libncurses.dylib.

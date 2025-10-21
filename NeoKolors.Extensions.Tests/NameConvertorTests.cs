@@ -1,17 +1,13 @@
-﻿using NeoKolors.Common.Util;
+﻿namespace NeoKolors.Extensions.Tests;
 
-namespace NeoKolors.Common.Tests;
-
-public class NameConvertorTests
-{
+public class NameConvertorTests {
     [Theory]
     [InlineData("hello_world", "HelloWorld")]
     [InlineData("simple_test", "SimpleTest")]
     [InlineData("multiple_word_test", "MultipleWordTest")]
     [InlineData("already_PascalCase", "AlreadyPascalCase")]
     [InlineData("single", "Single")]
-    public void SnakeToPascal_ConvertsCorrectly(string input, string expected)
-    {
+    public void SnakeToPascal_ConvertsCorrectly(string input, string expected) {
         string result = input.SnakeToPascal();
         Assert.Equal(expected, result);
     }
@@ -22,8 +18,7 @@ public class NameConvertorTests
     [InlineData("APIConfig", "a-p-i-config")]
     [InlineData("XML", "x-m-l")]
     [InlineData("Simple", "simple")]
-    public void PascalToKebab_ConvertsCorrectly(string input, string expected)
-    {
+    public void PascalToKebab_ConvertsCorrectly(string input, string expected) {
         string result = input.PascalToKebab();
         Assert.Equal(expected, result);
     }
@@ -33,8 +28,7 @@ public class NameConvertorTests
     [InlineData("simple_test", "simpleTest")]
     [InlineData("multiple_word_test", "multipleWordTest")]
     [InlineData("single", "single")]
-    public void SnakeToCamel_ConvertsCorrectly(string input, string expected)
-    {
+    public void SnakeToCamel_ConvertsCorrectly(string input, string expected) {
         string result = input.SnakeToCamel();
         Assert.Equal(expected, result);
     }
@@ -44,8 +38,7 @@ public class NameConvertorTests
     [InlineData("simple_test", "simple-test")]
     [InlineData("multiple_word_test", "multiple-word-test")]
     [InlineData("single", "single")]
-    public void SnakeToKebab_ConvertsCorrectly(string input, string expected)
-    {
+    public void SnakeToKebab_ConvertsCorrectly(string input, string expected) {
         string result = input.SnakeToKebab();
         Assert.Equal(expected, result);
     }
@@ -55,8 +48,7 @@ public class NameConvertorTests
     [InlineData("simple_test", "simple.test")]
     [InlineData("multiple_word_test", "multiple.word.test")]
     [InlineData("single", "single")]
-    public void ToDotCase_ConvertsCorrectly(string input, string expected)
-    {
+    public void ToDotCase_ConvertsCorrectly(string input, string expected) {
         string result = input.ToDotCase();
         Assert.Equal(expected, result);
     }
@@ -66,8 +58,7 @@ public class NameConvertorTests
     [InlineData("simple_test", "Simple Test")]
     [InlineData("multiple_word_test", "Multiple Word Test")]
     [InlineData("single", "Single")]
-    public void SnakeToSpace_ConvertsCorrectly(string input, string expected)
-    {
+    public void SnakeToSpace_ConvertsCorrectly(string input, string expected) {
         string result = input.SnakeToSpace();
         Assert.Equal(expected, result);
     }
@@ -78,8 +69,7 @@ public class NameConvertorTests
     [InlineData("multipleWordTest", "multiple-word-test")]
     [InlineData("single", "single")]
     [InlineData("APIConfig", "a-p-i-config")]
-    public void KebabFromCamel_ConvertsCorrectly(string input, string expected)
-    {
+    public void KebabFromCamel_ConvertsCorrectly(string input, string expected) {
         string result = input.CamelToKebab();
         Assert.Equal(expected, result);
     }
@@ -90,8 +80,7 @@ public class NameConvertorTests
     [InlineData("MultipleWordTest", "multiple_word_test")]
     [InlineData("Single", "single")]
     [InlineData("APIConfig", "a_p_i_config")]
-    public void PascalToSnake_ConvertsCorrectly(string input, string expected)
-    {
+    public void PascalToSnake_ConvertsCorrectly(string input, string expected) {
         string result = input.PascalToSnake();
         Assert.Equal(expected, result);
     }
@@ -102,8 +91,7 @@ public class NameConvertorTests
     [InlineData("MULTIPLE_WORD_TEST", "multiple-word-test")]
     [InlineData("SINGLE", "single")]
     [InlineData("API_CONFIG", "api-config")]
-    public void EnumToKebab_ConvertsCorrectly(string input, string expected)
-    {
+    public void EnumToKebab_ConvertsCorrectly(string input, string expected) {
         string result = input.EnumToKebab();
         Assert.Equal(expected, result);
     }
@@ -111,8 +99,7 @@ public class NameConvertorTests
     [Theory]
     [InlineData("")]
     [InlineData("   ")]
-    public void AllMethods_HandleEmptyAndWhitespaceStrings(string input)
-    {
+    public void AllMethods_HandleEmptyAndWhitespaceStrings(string input) {
         // These shouldn't throw exceptions
         _ = input.SnakeToPascal();
         _ = input.PascalToSnake();
@@ -126,8 +113,7 @@ public class NameConvertorTests
     }
 
     [Fact]
-    public void ConversionChain_ProducesExpectedResults()
-    {
+    public void ConversionChain_ProducesExpectedResults() {
         const string original = "hello_world_test";
         
         // Snake -> Pascal -> Snake -> Kebab

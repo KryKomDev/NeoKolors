@@ -3,15 +3,19 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using NeoKolors.Common;
 using NeoKolors.Common.Util;
-using SkiaSharp;
+using ConsoleColor = System.ConsoleColor;
 
 #if NET8_0_OR_GREATER
+using SkiaSharp;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
 using SixLabors.ImageSharp.PixelFormats;
@@ -48,7 +52,7 @@ public static partial class NKConsole {
     
     
     /// <summary>
-    /// prints a string colored by the <see cref="ConsoleColor"/> value
+    /// prints a string colored by the <see cref="System.ConsoleColor"/> value
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
@@ -58,7 +62,7 @@ public static partial class NKConsole {
 
     
     /// <summary>
-    /// prints a string colored by the <see cref="ConsoleColor"/> value
+    /// prints a string colored by the <see cref="System.ConsoleColor"/> value
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
@@ -759,8 +763,8 @@ public static partial class NKConsole {
     [SuppressMessage("ReSharper", "InvokeAsExtensionMethod")]
     public static void MoveCursor(Index x, Index y) => 
         Std.SetCursorPosition(
-            Extensions.Clamp(x.IsFromEnd ? x.Value : Std.CursorLeft + x.Value, 0, Std.BufferWidth - 1),
-            Extensions.Clamp(y.IsFromEnd ? y.Value : Std.CursorTop + y.Value, 0, Std.BufferHeight - 1));
+            Math.Clamp(x.IsFromEnd ? x.Value : Std.CursorLeft + x.Value, 0, Std.BufferWidth - 1),
+            Math.Clamp(y.IsFromEnd ? y.Value : Std.CursorTop + y.Value, 0, Std.BufferHeight - 1));
     
     /// <summary>
     /// Sets the cursor position in the console window.
@@ -771,8 +775,8 @@ public static partial class NKConsole {
     [SuppressMessage("ReSharper", "InvokeAsExtensionMethod")]
     public static void SetCursorPosition(Index x, Index y) =>
         Std.SetCursorPosition(
-            Extensions.Clamp(x.IsFromEnd ? Std.BufferWidth - x.Value : x.Value, 0, Std.BufferWidth - 1),
-            Extensions.Clamp(y.IsFromEnd ? Std.BufferHeight - y.Value : y.Value, 0, Std.BufferWidth - 1));
+            Math.Clamp(x.IsFromEnd ? Std.BufferWidth - x.Value : x.Value, 0, Std.BufferWidth - 1),
+            Math.Clamp(y.IsFromEnd ? Std.BufferHeight - y.Value : y.Value, 0, Std.BufferWidth - 1));
     
 
     /// <summary>

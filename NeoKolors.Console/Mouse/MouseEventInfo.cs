@@ -1,7 +1,9 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
+using System;
 using NeoKolors.Common.Util;
+using NeoKolors.Extensions;
 
 namespace NeoKolors.Console.Mouse;
 
