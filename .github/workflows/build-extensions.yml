@@ -1,11 +1,11 @@
-name: Build NeoKolors.Common
+name: Build NeoKolors.Extensions
 
 on:
   push:
     paths:
-      - 'NeoKolors.Common/**'
-      - 'NeoKolors.Common.Tests/**'
-      - '.github/workflows/build-common.yml'
+      - 'NeoKolors.Extensions/**'
+      - 'NeoKolors.Extensions.Tests/**'
+      - '.github/workflows/build-extensions.yml'
 
 jobs:
   build:
@@ -17,8 +17,8 @@ jobs:
 
     env:
       SolutionName: NeoKolors.sln
-      ProjectPath: NeoKolors.Common\NeoKolors.Common.csproj
-      TestProjectPath: NeoKolors.Common.Tests\NeoKolors.Common.Tests.csproj
+      ProjectPath: NeoKolors.Extensions\NeoKolors.Extensions.csproj
+      TestProjectPath: NeoKolors.Extensions.Tests\NeoKolors.Extensions.Tests.csproj
 
     steps:
     - name: Checkout

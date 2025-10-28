@@ -2,27 +2,37 @@
 
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
+        <TargetFrameworks>net10.0;net5.0;net8.0;net9.0;netstandard2.1</TargetFrameworks>
+        <LangVersion>14</LangVersion>
+        <Configurations>Debug;Release;WIP</Configurations>
+        <Platforms>AnyCPU</Platforms>
         <Nullable>enable</Nullable>
-        <Version>0.25.32</Version>
+
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
-        <LangVersion>14</LangVersion>
+        <Version>0.25.32</Version>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <TargetFrameworks>net10.0;net5.0;net8.0;net9.0;netstandard2.1</TargetFrameworks>
-        <Configurations>Debug;Release;WIP</Configurations>
-        <Platforms>AnyCPU</Platforms>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <PackageIcon>package-icon.png</PackageIcon>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="HasFlagExtension" Version="1.1.0.3" />
+        <PackageReference Include="HasFlagExtension.Attributes" Version="1.1.0" />
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <None Include="../Assets/package-icon.png" Pack="true" PackagePath="\"/>
+        <None Include="README.md" Pack="true" PackagePath="\"/>
     </ItemGroup>
 </Project>

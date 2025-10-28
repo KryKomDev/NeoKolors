@@ -1,4 +1,4 @@
-name: Publish NeoKolors.Common to NuGet
+name: Publish NeoKolors.Extensions to NuGet
 
 on:   
   workflow_dispatch:
@@ -9,8 +9,8 @@ jobs:
     
     env:
       Solution_Name: NeoKolors.sln
-      ProjectPath: NeoKolors.Common\NeoKolors.Common.csproj
-      TestProjectPath: NeoKolors.Common.Tests\NeoKolors.Common.Tests.csproj
+      ProjectPath: NeoKolors.Extensions\NeoKolors.Extensions.csproj
+      TestProjectPath: NeoKolors.Extensions.Tests\NeoKolors.Extensions.Tests.csproj
 
     steps:
     - name: Checkout code

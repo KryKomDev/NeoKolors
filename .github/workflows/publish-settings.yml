@@ -3,14 +3,14 @@ name: Publish NeoKolors.Settings to NuGet
 on:   
   workflow_dispatch:
 
-env:
-  Solution_Name: NeoKolors.sln
-  Project_Path: NeoKolors.Settings\NeoKolors.Settings.csproj
-  Test_Project_Path: NeoKolors.Settings.Tests\NeoKolors.Settings.Tests.csproj
-
 jobs:
   build:
-    runs-on: windows-latest 
+    runs-on: ubuntu-latest
+    
+    env:
+      Solution_Name: NeoKolors.sln
+      ProjectPath: NeoKolors.Settings\NeoKolors.Settings.csproj
+      TestProjectPath: NeoKolors.Settings.Tests\NeoKolors.Settings.Tests.csproj
 
     steps:
     - name: Checkout code
@@ -21,22 +21,23 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '9.0.x'
+        dotnet-version: '10.0.x'
 
     - name: Restore dependencies
-      run: dotnet restore $env:Project_Path
+      run: dotnet restore ${{ env.ProjectPath }}
 
     - name: Build
-      run: dotnet build $env:Project_Path --configuration Release --no-restore
+      run: dotnet build ${{ env.ProjectPath }} --configuration Release --no-restore
   
     - name: Test
-      run: dotnet test $env:Test_Project_Path
+      run: dotnet test ${{ env.TestProjectPath }}
 
     - name: Pack
-      run: dotnet pack $env:Project_Path --configuration Release --no-build --output ./nupkg
+      run: dotnet pack ${{ env.ProjectPath }} --configuration Release --no-build --output ${{ env.NugetOutputDir }}
 
     - name: Push to NuGet
       run: |
-        Get-ChildItem ./nupkg/*.nupkg | ForEach-Object {
+        Get-ChildItem ${{ env.NugetOutputDir }}*.nupkg | ForEach-Object {
           dotnet nuget push $_.FullName --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
         }
+      shell: pwsh

@@ -7,7 +7,7 @@ using JetBrains.Annotations;
 
 namespace NeoKolors.Extensions;
 
-public static class NameConvertor {
+public static partial class NameConvertor {
     
     /// <summary>
     /// converts a string from snake to pascal case, e.g. "hello_world" -> "HelloWorld"

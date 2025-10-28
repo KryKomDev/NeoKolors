@@ -5,6 +5,7 @@ on:
     paths:
       - 'NeoKolors.Tui/**'
       - 'NeoKolors.Tui.Tests/**'
+      - '.github/workflows/build-tui.yml'
 
 jobs:
   build:
@@ -12,11 +13,12 @@ jobs:
       matrix:
         configuration: [Debug, Release]
 
-    runs-on: windows-latest 
+    runs-on: ubuntu-latest 
 
     env:
-      Solution_Name: NeoKolors.sln
-      Test_Project_Path: NeoKolors.Tui.Tests\NeoKolors.Tui.Tests.csproj
+      SolutionName: NeoKolors.sln
+      ProjectPath: NeoKolors.Tui\NeoKolors.Tui.csproj
+      TestProjectPath: NeoKolors.Tui.Tests\NeoKolors.Tui.Tests.csproj
 
     steps:
     - name: Checkout
@@ -27,15 +29,13 @@ jobs:
     - name: Install .NET Core
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 9.0.x
+        dotnet-version: 10.0.x
 
-    - name: Setup MSBuild.exe
-      uses: microsoft/setup-msbuild@v2
+    - name: Build Projects
+      run: dotnet build ${{ env:ProjectPath }} --configuration ${{ matrix.configuration }}
 
     - name: Execute unit tests
-      run: dotnet test $env:Test_Project_Path
+      run: dotnet test ${{ env:TestProjectPath }} --no-restore
 
     - name: Restore the application
-      run: msbuild $env:Solution_Name /t:Restore /p:Configuration=$env:Configuration
-      env:
-        Configuration: ${{ matrix.configuration }}
+      run: dotnet restore ${{ env:SolutionName }}
