@@ -38,4 +38,4 @@ jobs:
       run: dotnet test ${{ env.TestProjectPath }} --no-restore
 
     - name: Restore the application
-      run: dotnet restore ${{ env.SolutionName }}
+      run: dotnet restore ${{ env.ProjectPath }}
