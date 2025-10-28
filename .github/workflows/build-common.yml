@@ -17,8 +17,8 @@ jobs:
 
     env:
       SolutionName: NeoKolors.sln
-      ProjectPath: NeoKolors.Common\NeoKolors.Common.csproj
-      TestProjectPath: NeoKolors.Common.Tests\NeoKolors.Common.Tests.csproj
+      ProjectPath: NeoKolors.Common/NeoKolors.Common.csproj
+      TestProjectPath: NeoKolors.Common.Tests/NeoKolors.Common.Tests.csproj
 
     steps:
     - name: Checkout

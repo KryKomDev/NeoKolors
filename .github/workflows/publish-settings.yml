@@ -9,8 +9,8 @@ jobs:
     
     env:
       Solution_Name: NeoKolors.sln
-      ProjectPath: NeoKolors.Settings\NeoKolors.Settings.csproj
-      TestProjectPath: NeoKolors.Settings.Tests\NeoKolors.Settings.Tests.csproj
+      ProjectPath: NeoKolors.Settings/NeoKolors.Settings.csproj
+      TestProjectPath: NeoKolors.Settings.Tests/NeoKolors.Settings.Tests.csproj
 
     steps:
     - name: Checkout code

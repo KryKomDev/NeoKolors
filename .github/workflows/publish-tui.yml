@@ -9,8 +9,8 @@ jobs:
     
     env:
       Solution_Name: NeoKolors.sln
-      ProjectPath: NeoKolors.Tui\NeoKolors.Tui.csproj
-      TestProjectPath: NeoKolors.Tui.Tests\NeoKolors.Tui.Tests.csproj
+      ProjectPath: NeoKolors.Tui/NeoKolors.Tui.csproj
+      TestProjectPath: NeoKolors.Tui.Tests/NeoKolors.Tui.Tests.csproj
 
     steps:
     - name: Checkout code
