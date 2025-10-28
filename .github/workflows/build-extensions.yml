@@ -32,10 +32,10 @@ jobs:
         dotnet-version: 10.0.x
 
     - name: Build Projects
-      run: dotnet build ${{ env:ProjectPath }} --configuration ${{ matrix.configuration }}
+      run: dotnet build ${{ env.ProjectPath }} --configuration ${{ matrix.configuration }}
 
     - name: Execute unit tests
-      run: dotnet test ${{ env:TestProjectPath }} --no-restore
+      run: dotnet test ${{ env.TestProjectPath }} --no-restore
 
     - name: Restore the application
-      run: dotnet restore ${{ env:SolutionName }}
+      run: dotnet restore ${{ env.SolutionName }}
