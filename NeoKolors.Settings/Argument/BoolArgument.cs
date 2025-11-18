@@ -6,6 +6,7 @@
 using NeoKolors.Common.Util;
 using NeoKolors.Settings.Argument.Exception;
 using NeoKolors.Settings.Attributes;
+using NeoKolors.Extensions;
 
 namespace NeoKolors.Settings.Argument;
 

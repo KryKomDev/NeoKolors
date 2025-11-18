@@ -13,24 +13,32 @@
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageIcon>Common.png</PackageIcon>
+        <PackageIcon>package-icon.png</PackageIcon>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Description>the common utilities for the NeoKolors library pack</Description>
         <Configurations>Debug;Release;WIP</Configurations>
         <Platforms>AnyCPU</Platforms>
+        
+        <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="HasFlagExtension" Version="1.0.0" 
-                          OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <PackageReference Include="HasFlagExtension.Generator" Version="2.0.1.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
         <PackageReference Include="OneOf" Version="3.0.271" />
         <PackageReference Include="SkiaSharp" Version="3.119.2-preview.1" />
-        <PackageReference Include="System.IO" Version="4.3.0" />
     </ItemGroup>
     
     <ItemGroup>
         <None Include="README.md" Pack="true" PackagePath="\" />
-        <None Include="Common.png" Pack="true" PackagePath="\" />
+        <None Include="../LICENSE" Pack="true" PackagePath="\" />
+        <None Include="../Assets/package-icon.png" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="../NeoKolors.Extensions/NeoKolors.Extensions.csproj"/>
     </ItemGroup>
 </Project>

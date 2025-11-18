@@ -4,7 +4,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>preview</LangVersion>
-        <TargetFrameworks>net5.0;net8.0;net9.0;netstandard2.1</TargetFrameworks>
+        <TargetFrameworks>net5.0;net8.0;net9.0;netstandard2.1;net10.0</TargetFrameworks>
         <Platforms>AnyCPU</Platforms>
         <Configurations>Debug;Release;WIP</Configurations>
 
@@ -16,8 +16,10 @@
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageIcon>Console.png</PackageIcon>
+        <PackageIcon>package-icon.png</PackageIcon>
         <Description>basic console / logging utilites</Description>
+        
+        <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
     </PropertyGroup>
     
     <ItemGroup>
@@ -28,17 +30,19 @@
     <ItemGroup>
         <None Include="README.md" Pack="true" PackagePath="\"/>
         <None Include="../LICENSE" Pack="true" PackagePath="\"/>
-        <None Include="Console.png" Pack="true" PackagePath="\"/>
+<!--        <None Include="Console.png" Pack="true" PackagePath="\"/>-->
+        <None Include="../Assets/package-icon.png" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="HasFlagExtension" Version="1.0.0" 
-                          OutputItemType="Analyzer" ReferenceOutputAssembly="true" />
-        <PackageReference Include="HasFlagExtension.Attributes" Version="1.0.0" />
+        <PackageReference Include="HasFlagExtension.Generator" Version="2.0.1.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0-rc.2.25502.107" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-        <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">

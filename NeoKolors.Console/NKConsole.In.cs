@@ -4,10 +4,8 @@
 //
 
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+using System.Diagnostics.Contracts;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using NeoKolors.Common;
 using NeoKolors.Console.Events;
 using NeoKolors.Console.Mouse;
@@ -39,7 +37,7 @@ public static partial class NKConsole {
     /// <exception cref="System.InvalidOperationException">
     /// Thrown if no valid integer input is provided after repeated prompts or if validation fails.
     /// </exception>
-    public static long ReadLong(System.Func<long, string?>? validator = null, bool reply = true, NKStyle style = default) {
+    public static long ReadLong(Func<long, string?>? validator = null, bool reply = true, NKStyle style = default) {
         validator ??= _ => null;
         style = style == default ? new NKStyle(NKColor.Default, NKColor.Default) : style;
         
@@ -86,7 +84,7 @@ public static partial class NKConsole {
     /// <exception cref="System.InvalidOperationException">
     /// Thrown if no valid integer input is provided after repeated prompts or if validation fails.
     /// </exception>
-    public static int ReadInt(System.Func<int, string?>? validator = null, bool reply = true, NKStyle style = default) {
+    public static int ReadInt(Func<int, string?>? validator = null, bool reply = true, NKStyle style = default) {
         validator ??= _ => null;
         style = style == default ? new NKStyle(NKColor.Default, NKColor.Default) : style;
         
@@ -133,7 +131,7 @@ public static partial class NKConsole {
     /// <exception cref="System.InvalidOperationException">
     /// Thrown if no valid integer input is provided after repeated prompts or if validation fails.
     /// </exception>
-    public static short ReadShort(System.Func<short, string?>? validator = null, bool reply = true, NKStyle style = default) {
+    public static short ReadShort(Func<short, string?>? validator = null, bool reply = true, NKStyle style = default) {
         validator ??= _ => null;
         style = style == default ? new NKStyle(NKColor.Default, NKColor.Default) : style;
         
@@ -180,7 +178,7 @@ public static partial class NKConsole {
     /// <exception cref="System.InvalidOperationException">
     /// Thrown if no valid integer input is provided after repeated prompts or if validation fails.
     /// </exception>
-    public static byte ReadByte(System.Func<byte, string?>? validator = null, bool reply = true, NKStyle style = default) {
+    public static byte ReadByte(Func<byte, string?>? validator = null, bool reply = true, NKStyle style = default) {
         validator ??= _ => null;
         style = style == default ? new NKStyle(NKColor.Default, NKColor.Default) : style;
         
@@ -224,7 +222,7 @@ public static partial class NKConsole {
     /// <param name="reply">If on the program will write a response to invalid inputs.</param>
     /// <param name="style">The style of the invalid input messages.</param>
     /// <returns>The validated string input provided by the user.</returns>
-    public static string ReadString(System.Func<string, string?>? validator = null, bool reply = true, NKStyle? style = null) {
+    public static string ReadString(Func<string, string?>? validator = null, bool reply = true, NKStyle? style = null) {
         validator ??= _ => null;
         style ??= new NKStyle(NKColor.Default, NKColor.Default);
         
@@ -276,7 +274,7 @@ public static partial class NKConsole {
         }
     }
     
-    [System.Diagnostics.Contracts.Pure]
+    [Pure]
     [JetBrains.Annotations.Pure]
     private static OneOf<bool, string> ParseBool(string s, BoolStrings b) {
         return s.ToLower() switch {
@@ -296,12 +294,12 @@ public static partial class NKConsole {
         };
     }
     
-    [System.Diagnostics.Contracts.Pure]
+    [Pure]
     [JetBrains.Annotations.Pure]
     private static string InvBoolMsg(BoolStrings b) 
         => $"Invalid input. Please enter a valid boolean. (Allowed: {ToString(b)})";
 
-    [System.Diagnostics.Contracts.Pure]
+    [Pure]
     [JetBrains.Annotations.Pure]
     private static string ToString(this BoolStrings b) => 
         b is ALL ? "true, false, yes, no, y, n, on, off, t, f, 1, 0" : b.ToString().ToLower().Replace('_', ',');
@@ -789,7 +787,7 @@ public static partial class NKConsole {
     }
 }
 
-[System.Flags]
+[Flags]
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public enum BoolStrings {
     TRUE_FALSE = 0x1,

@@ -1,11 +1,14 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-using System;
 using System.Runtime.InteropServices;
+
+#if !NETSTANDARD2_1
 using System.Runtime.Versioning;
+#endif
 
 // ReSharper disable InconsistentNaming
+// ReSharper disable All
 
 namespace NeoKolors.Console;
 

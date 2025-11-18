@@ -3,12 +3,11 @@
 // Copyright (c) 2025 KryKom
 //
 
-using System;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using NeoKolors.Common;
-using NeoKolors.Common.Util;
+using NeoKolors.Extensions;
 
 namespace NeoKolors.Console;
 
@@ -22,7 +21,7 @@ public sealed partial class NKLogger : ILogger {
     /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
     public void Crit(string message, EventId? id) {
         if (message == null) throw new ArgumentNullException(nameof(message));
-        if (!Level.HasFlag(LoggerLevel.CRITICAL)) return;
+        if (!Level.GetLogCritical()) return;
         
         if (SimpleMessages) {
             Output.WriteLine(HideTime
@@ -75,7 +74,7 @@ public sealed partial class NKLogger : ILogger {
     /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
     public void Error(string message, EventId? id) {
         if (message == null) throw new ArgumentNullException(nameof(message));
-        if (!Level.HasFlag(LoggerLevel.ERROR)) return;
+        if (!Level.GetLogError()) return;
 
         if (SimpleMessages) {
             Output.WriteLine(HideTime
@@ -128,7 +127,7 @@ public sealed partial class NKLogger : ILogger {
     /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
     public void Warn(string message, EventId? id) {
         if (message == null) throw new ArgumentNullException(nameof(message));
-        if (!Level.HasFlag(LoggerLevel.WARNING)) return;
+        if (!Level.GetLogWarning()) return;
 
         if (SimpleMessages)
             Output.WriteLine(HideTime 
@@ -177,7 +176,7 @@ public sealed partial class NKLogger : ILogger {
     /// <exception cref="ArgumentNullException">Thrown if the provided message is null.</exception>
     public void Info(string message, EventId? id) {
         if (message == null) throw new ArgumentNullException(nameof(message));
-        if (!Level.HasFlag(LoggerLevel.INFORMATION)) return;
+        if (!Level.GetLogInformation()) return;
 
         if (SimpleMessages)
             Output.WriteLine(HideTime 
@@ -218,7 +217,7 @@ public sealed partial class NKLogger : ILogger {
     /// <param name="id">An optional event identifier associated with the log entry.</param>
     /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
     public void Debug(string message, EventId? id) {
-        if (!Level.HasFlag(LoggerLevel.DEBUG)) return;
+        if (!Level.GetLogDebug()) return;
         if (message == null) throw new ArgumentNullException(nameof(message));
 
         if (SimpleMessages)
@@ -260,7 +259,7 @@ public sealed partial class NKLogger : ILogger {
     /// <param name="id">An optional event identifier associated with the log entry.</param>
     /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
     public void Trace(string message, EventId? id) {
-        if (!Level.HasFlag(LoggerLevel.DEBUG)) return;
+        if (!Level.GetLogTrace()) return;
         if (message == null) throw new ArgumentNullException(nameof(message));
 
         if (SimpleMessages)
@@ -362,12 +361,12 @@ public sealed partial class NKLogger : ILogger {
 
     public bool IsEnabled(LogLevel logLevel) {
         return logLevel switch {
-            LogLevel.Trace => Level.HasFlag(LoggerLevel.TRACE),
-            LogLevel.Debug => Level.HasFlag(LoggerLevel.DEBUG),
-            LogLevel.Information => Level.HasFlag(LoggerLevel.INFORMATION),
-            LogLevel.Warning => Level.HasFlag(LoggerLevel.WARNING),
-            LogLevel.Error => Level.HasFlag(LoggerLevel.ERROR),
-            LogLevel.Critical => Level.HasFlag(LoggerLevel.CRITICAL),
+            LogLevel.Trace => Level.GetLogTrace(),
+            LogLevel.Debug => Level.GetLogDebug(),
+            LogLevel.Information => Level.GetLogInformation(),
+            LogLevel.Warning => Level.GetLogWarning(),
+            LogLevel.Error => Level.GetLogError(),
+            LogLevel.Critical => Level.GetLogCritical(),
             LogLevel.None => true,
             _ => throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null)
         };

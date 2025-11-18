@@ -6,8 +6,6 @@ namespace NeoKolors.Extensions;
 public static class Numeric {
     
     extension(int value) {
-
-        #if NETSTANDARD2_1_OR_GREATER || NET5_0_OR_GREATER
         
         /// <summary>
         /// Determines whether the current numeric value is within the specified range, inclusive of the range's boundaries.
@@ -27,7 +25,14 @@ public static class Numeric {
             
             return value >= range.Start.Value && value <= range.End.Value;
         }
+    }
 
-        #endif
+    extension(int) {
+        public static bool operator ==(int left, Range right) => Belongs(left, right);
+        public static bool operator !=(int left, Range right) => !Belongs(left, right);
+    }
+
+    extension(int val) {
+        public int Clamp(int min, int max) => Math.Clamp(val, min, max);
     }
 }

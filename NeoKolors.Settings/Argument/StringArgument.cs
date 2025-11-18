@@ -143,8 +143,8 @@ public class StringArgument : IArgument<string>, IXsdArgument {
     
     private void Validate(string value) {
         if (CountVisibleOnly) {
-            if (value.VisibleLength() < MinLength) throw new InvalidArgumentInputException($"Input value length is too small (must be at least {MinLength}).");
-            if (value.VisibleLength() > MaxLength) throw new InvalidArgumentInputException($"Input value length is too big (must be at most {MaxLength}).");
+            if (value.GetPlainLength() < MinLength) throw new InvalidArgumentInputException($"Input value length is too small (must be at least {MinLength}).");
+            if (value.GetPlainLength() > MaxLength) throw new InvalidArgumentInputException($"Input value length is too big (must be at most {MaxLength}).");
         }
         else {
             if (value.Length < MinLength) throw new InvalidArgumentInputException($"Input value length is too small (must be at least {MinLength}).");
@@ -172,8 +172,8 @@ public class StringArgument : IArgument<string>, IXsdArgument {
 
     public bool IsValid(string value) {
         if (CountVisibleOnly) {
-            if (value.VisibleLength() < MinLength) return false;
-            if (value.VisibleLength() > MaxLength) return false;
+            if (value.GetPlainLength() < MinLength) return false;
+            if (value.GetPlainLength() > MaxLength) return false;
         }
         else {
             if (value.Length < MinLength) return false;

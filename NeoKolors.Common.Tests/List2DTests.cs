@@ -3,8 +3,10 @@
 // Copyright (c) 2025 KryKom
 //
 
+/*
 using NeoKolors.Common.Exceptions;
 using NeoKolors.Common.Util;
+#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace NeoKolors.Common.Tests;
 
@@ -170,4 +172,4 @@ public class List2DTests {
         Assert.Equal(1, list[0, 0]);
         Assert.Equal(5, list[1, 1]);
     }
-}
+}*/

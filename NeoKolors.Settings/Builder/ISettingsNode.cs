@@ -73,7 +73,7 @@ public interface ISettingsNode {
     /// Gets the collection of settings elements defined within the current settings node.
     /// </summary>
     /// <remarks>
-    /// This property provides access to a collection of <see cref="SettingsElementInfo"/> instances,
+    /// This property provides access to a collection of <see cref="ISettingsElementInfo"/> instances,
     /// representing the individual arguments, groups, or configurations associated
     /// with the current settings node.
     /// </remarks>

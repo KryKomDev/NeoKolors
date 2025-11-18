@@ -1,7 +1,6 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-using System;
 using static System.ConsoleModifiers;
 using static NeoKolors.Console.Mouse.MouseEventType;
 

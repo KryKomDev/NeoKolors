@@ -3,10 +3,9 @@
 // Copyright (c) 2025 KryKom
 //
 
-using System;
 using System.Text.RegularExpressions;
 using NeoKolors.Common;
-using NeoKolors.Common.Util;
+using NeoKolors.Extensions;
 using static NeoKolors.Common.NKConsoleColor;
 
 // disabled because of StringUtils.InRange(string, int, int) to make code cleaner
@@ -97,7 +96,7 @@ public partial class ExceptionFormatter {
         output += m.Value.AddStyle(format.MethodStyle);
         
         // find the method end
-        int methodEnd = s.IndexOf(") in", StringComparison.InvariantCulture);
+        int methodEnd = s.IndexOf(')');
         
         // color method arguments
         output += s.InRange(m.Index + m.Length, methodEnd + 1).AddStyle(format.MethodArgumentsStyle) + "\n";

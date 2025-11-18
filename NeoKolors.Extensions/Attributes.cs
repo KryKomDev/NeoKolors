@@ -5,9 +5,10 @@
 
 // ReSharper disable CheckNamespace
 
+// ReSharper disable once EmptyNamespace
 namespace System.Diagnostics.CodeAnalysis {
     
-    #if !NET5_0_OR_GREATER
+    #if !NET5_0_OR_GREATER && !NETSTANDARD2_1_OR_GREATER
 
     [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
     internal sealed class NotNullAttribute : Attribute { }
@@ -86,29 +87,35 @@ namespace System.Diagnostics.CodeAnalysis {
     /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor, Inherited = false)]
     public class OverloadResolutionPriorityAttribute : Attribute {
-        public OverloadResolutionPriorityAttribute(int priority) { }
+        public int Priority { get; }
+        public OverloadResolutionPriorityAttribute(int priority) {
+            Priority = priority;
+        }
     }
 
     #endif
 }
 
+#if NETSTANDARD2_1
+
 namespace System.Runtime.Versioning {
-    #if NETSTANDARD2_1
     
     [AttributeUsage(AttributeTargets.Parameter)]
     public class SupportedOsPlatformAttribute : Attribute {
         public SupportedOsPlatformAttribute(string platform) { }
     }
-    
-    #endif
 }
 
+#endif
+
+#if NETSTANDARD2_0
+
 namespace System {
-    #if NETSTANDARD2_0
 
     [AttributeUsage(AttributeTargets.Parameter)]
     public class NotNullWhenAttribute : Attribute {
         public NotNullWhenAttribute(bool returnValue) { }
     }
-    #endif
 }
+
+#endif

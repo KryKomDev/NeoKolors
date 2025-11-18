@@ -17,7 +17,7 @@ public class SettingsNode<TResult> : ISettingsNode<TResult> {
     private readonly SettingsElementCollection _elements = new();
 
     /// <summary>
-    /// Gets an array of <see cref="SettingsElementInfo"/> objects representing the elements
+    /// Gets an array of <see cref="ISettingsElementInfo"/> objects representing the elements
     /// within the current settings node.
     /// </summary>
     /// <remarks>
@@ -53,7 +53,7 @@ public class SettingsNode<TResult> : ISettingsNode<TResult> {
     }
 
     public ISettingsNode Constructs(SettingsResultConstructor resultConstructor) {
-        _resultConstructor = (in Context context) => {
+        _resultConstructor = (in context) => {
             var res = resultConstructor(context);
             if (res is TResult result)
                 return result;

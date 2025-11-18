@@ -1,7 +1,6 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-using System;
 using static NeoKolors.Console.Events.WinOpsResponseType;
 
 namespace NeoKolors.Console.Events;

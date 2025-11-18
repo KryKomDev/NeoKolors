@@ -41,7 +41,7 @@ public class SettingsMethodOption {
     /// </summary>
     /// <returns>An instance of <see cref="SettingsMethodOption"/> to allow method chaining.</returns>
     public SettingsMethodOption AutoMerges() {
-        _merger = (in Context c, in Context _) => {
+        _merger = (in c, in _) => {
             c.Set(new Context(_arguments)); 
         };
         return this;

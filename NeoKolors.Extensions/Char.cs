@@ -6,7 +6,7 @@ using System.Text;
 
 namespace NeoKolors.Extensions;
 
-public static class Char {
+public static class CharExtensions {
     
     private static readonly HashSet<char> VOWELS_L = [
         'a', 'e', 'i', 'o', 'u', 'y',

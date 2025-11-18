@@ -3,18 +3,15 @@
 // Copyright (c) 2025 KryKom
 //
 
-using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using NeoKolors.Common;
-using NeoKolors.Common.Util;
+using NeoKolors.Extensions;
 using ConsoleColor = System.ConsoleColor;
 
-#if NET8_0_OR_GREATER
+#if NET8_0_OR_GREATER && !NET10_0
 using SkiaSharp;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats;
@@ -543,7 +540,7 @@ public static partial class NKConsole {
         // compute max width for data
         for (int i0 = 0; i0 < rows.Length; i0++) {
             for (int i1 = 0; i1 < cols; i1++) {
-                maxWidths[i1] = Math.Max(maxWidths[i1], rows[i0][i1].VisibleLength());
+                maxWidths[i1] = Math.Max(maxWidths[i1], rows[i0][i1].GetPlainLength());
             }
         }
 
@@ -600,7 +597,7 @@ public static partial class NKConsole {
     /// </param>
     /// <param name="style">The style of the printed table.</param>
     public static void WriteTable(string[] header, string[,] rows, NKTableStyle style = NKTableStyle.ASCII) => 
-        WriteTable(header, List2D.ToJagged(rows), style);
+        WriteTable(header, Extensions.Enumerable.ToJagged(rows), style);
 
 
     /// <summary>
@@ -746,7 +743,7 @@ public static partial class NKConsole {
     public static void MoveCursor(int x, int y) =>
         Std.SetCursorPosition(Std.CursorLeft + x, Std.CursorTop + y);
     
-    #if NET8_0_OR_GREATER
+    #if NET8_0_OR_GREATER && !NET10_0
 
     /// <summary>
     /// Moves the console cursor to a specified position based on the provided indices.

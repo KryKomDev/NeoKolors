@@ -1,9 +1,6 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-using System;
-using System.IO;
-
 namespace NeoKolors.Console;
 
 internal sealed class TextWriterReference : IDisposable {

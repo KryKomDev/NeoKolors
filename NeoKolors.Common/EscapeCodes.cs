@@ -95,6 +95,17 @@ public static class EscapeCodes {
     public const string FAINT_START = "\e[2m";
     public const string ITALIC_START = "\e[3m";
     public const string UNDERLINE_START = "\e[4m";
+    public const string UNDERLINE_THICK_START = "\e[4:2m";
+    public const string UNDERLINE_CURLY_START = "\e[4:3m";
+    public const string UNDERLINE_DOTTED_START = "\e[4:4m";
+    public const string UNDERLINE_DASHED_START = "\e[4:5m";
+    public const string UNDERLINE_START_TYPE_FORMAT = "\e[4:{0}m";
+    public const string UNDERLINE_COLORED_START_FORMAT = "\e[4;58:2::{0}:{1}:{2}m";
+    public const string UNDERLINE_COLORED_THICK_START_FORMAT = "\e[4:2;58:2::{0}:{1}:{2}m";
+    public const string UNDERLINE_COLORED_CURLY_START_FORMAT = "\e[4:3;58:2::{0}:{1}:{2}m";
+    public const string UNDERLINE_COLORED_DOTTED_START_FORMAT = "\e[4:4;58:2::{0}:{1}:{2}m";
+    public const string UNDERLINE_COLORED_DASHED_START_FORMAT = "\e[4:5;58:2::{0}:{1}:{2}m";
+    public const string UNDERLINE_COLORED_TYPE_START_FORMAT = "\e[4:{0};58:2::{1}:{2}:{3}m";
     public const string NEGATIVE_START = "\e[7m";
     public const string STRIKETHROUGH_START = "\e[9m";
 
@@ -105,6 +116,38 @@ public static class EscapeCodes {
     public const string NEGATIVE_END = "\e[27m";
     public const string STRIKETHROUGH_END = "\e[29m";
 
+    /// <summary>
+    /// Generates an escape sequence to enable underlining with the specified underline type.
+    /// </summary>
+    /// <param name="type">The type of underline to apply, such as normal, thick, curly, dotted, or dashed.
+    /// Defaults to normal if not specified.</param>
+    /// <returns>A string containing the formatted escape sequence to enable the specified underline style.</returns>
+    public static string GetUnderline(UnderlineType type = UnderlineType.NORMAL)
+        => type == UnderlineType.NORMAL 
+            ? UNDERLINE_START 
+            : UNDERLINE_START_TYPE_FORMAT.Format((int)type);
+
+    /// <summary>
+    /// Generates an escape sequence for underlining text with a specific underline style and color.
+    /// </summary>
+    /// <param name="r">The red component of the color in the RGB format (0 to 255).</param>
+    /// <param name="g">The green component of the color in the RGB format (0 to 255).</param>
+    /// <param name="b">The blue component of the color in the RGB format (0 to 255).</param>
+    /// <param name="type">The underline style to apply, such as normal, thick, curly, dotted, or dashed.
+    /// Defaults to normal if not specified.</param>
+    /// <returns>A string containing the formatted escape sequence to apply the
+    /// specified underline style and color.</returns>
+    public static string GetUnderlineColored(byte r, byte g, byte b, UnderlineType type = UnderlineType.NORMAL)
+        => UNDERLINE_COLORED_TYPE_START_FORMAT.Format((int)type, r, g, b);
+
+    public enum UnderlineType {
+        NORMAL = 1,
+        THICK  = 2,
+        CURLY  = 3,
+        DOTTED = 4,
+        DASHED = 5
+    }
+    
     #endregion
 
     #region INPUT

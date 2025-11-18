@@ -10,21 +10,26 @@
 
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
-        <Version>0.25.32</Version>
+        <Version>0.25.44.1</Version>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
-        <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <PackageIcon>package-icon.png</PackageIcon>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        
+        <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="HasFlagExtension" Version="1.1.0.3" />
-        <PackageReference Include="HasFlagExtension.Attributes" Version="1.1.0" />
+        <PackageReference Include="HasFlagExtension.Generator" Version="2.0.1.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
+        <PackageReference Include="Metriks" Version="1.1.2" />
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

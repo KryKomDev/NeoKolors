@@ -5,6 +5,7 @@ using static NeoKolors.Console.Mouse.XTermMouseModifiers;
 
 namespace NeoKolors.Console.Mouse;
 
+// ReSharper disable once UnusedType.Local
 file enum RawMouseEventType {
     NONE_MOVE =         'C',
     NONE_LEFT_PRESS =   ' ',
