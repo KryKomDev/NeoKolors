@@ -1,0 +1,9 @@
+﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:tns="https://github.com/KryKomDev/NeoKolors/blob/main/NeoKolors.Tui/Schemas/Styles.xsd"
+            xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="https://github.com/KryKomDev/NeoKolors/blob/main/NeoKolors.Tui/Schemas/Styles.xsd">
+
+    <xsd:complexType name="selector">
+        <xs:attribute name="type" type="xsd:string"/>
+    </xsd:complexType>
+</xsd:schema>

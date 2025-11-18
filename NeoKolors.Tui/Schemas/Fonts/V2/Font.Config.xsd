@@ -1,0 +1,125 @@
+﻿<!--                             -->
+<!--  NeoKolors                  -->
+<!--  Copyright (c) 2025 KryKom  -->
+<!--                             -->
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:nk="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/Fonts/V2"
+            targetNamespace="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/Fonts/V2"
+            elementFormDefault="qualified"
+            attributeFormDefault="qualified">
+    
+    <xsd:include schemaLocation="Font.Common.xsd"/>
+    
+    <xsd:element name="Font">
+        <xsd:annotation>
+            <xsd:documentation>The root element of the .nkfc NeoKolors Font Configuration file.</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="Name" type="nk:Name">
+                    <xsd:annotation>
+                        <xsd:documentation>Defines the name of the font.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+                
+                <xsd:element name="Version" type="nk:Version">
+                    <xsd:annotation>
+                        <xsd:documentation>Defines the version of font loader to be used.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+
+                <xsd:element name="Ligatures" type="xsd:boolean" default="true" minOccurs="0">
+                    <xsd:annotation>
+                        <xsd:documentation>Whether the font uses ligatures. Default is true.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+
+                <xsd:element name="LetterSpacing" type="xsd:int">
+                    <xsd:annotation>
+                        <xsd:documentation>Defines the spacing between individual letters.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+
+                <xsd:element name="LineSpacing" type="xsd:int">
+                    <xsd:annotation>
+                        <xsd:documentation>Defines the spacing between lines.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+
+                <xsd:element name="Global" type="nk:Global">
+                    <xsd:annotation>
+                        <xsd:documentation>Defines global properties that can be used as default in the font.</xsd:documentation>
+                    </xsd:annotation>
+                </xsd:element>
+                
+                <xsd:choice>
+                    <xsd:element name="Monospace" type="nk:Monospace"/>
+                    <xsd:element name="Variable" type="nk:Variable"/>
+                </xsd:choice>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    
+    <xsd:complexType name="Name">
+        <xsd:simpleContent>
+            <xsd:restriction base="xsd:string">
+                <xsd:pattern value="(\w|\.|_|-|\s)+"/>
+            </xsd:restriction>
+        </xsd:simpleContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="Version">
+        <xsd:simpleContent>
+            <xsd:restriction base="xsd:string">
+                <xsd:pattern value="\d+\.\d+\.\d+(\.(\w|\d|-)+)?"/>
+            </xsd:restriction>
+        </xsd:simpleContent>
+    </xsd:complexType>
+    
+    <xsd:complexType name="Monospace">
+        <xsd:all>
+            <xsd:element name="LetterWidth" type="xsd:unsignedShort" />
+            <xsd:element name="LetterHeight" type="xsd:unsignedShort" />
+            <xsd:element name="AlignToGrid" type="xsd:boolean" minOccurs="0" default="false" />
+        </xsd:all>
+    </xsd:complexType>
+    
+    <xsd:complexType name="Variable">
+        <xsd:all>
+            <xsd:element name="Kerning" type="xsd:boolean" />
+            <xsd:element name="LineKerning" type="xsd:boolean" />
+            <xsd:element name="WordSpacing" type="xsd:int" />
+            <xsd:element name="EmptyLineHeight" type="xsd:int" minOccurs="0" default="2" />
+        </xsd:all>
+    </xsd:complexType>
+    
+    <xsd:complexType name="Global">
+        <xsd:all>
+            <xsd:element name="Align" type="nk:Align" minOccurs="0" default="top-center">
+                <xsd:annotation>
+                    <xsd:documentation>Defines how the compound characters are aligned. The value is 'top-center' by default.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            
+            <xsd:element name="Mask" type="nk:Mask" minOccurs="0" default="bckg">
+                <xsd:annotation>
+                    <xsd:documentation>Defines the masking strategy to differentiate the glyph from the background. The value is 'bckg' by default.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            
+            <xsd:element name="AlignPointReplace" type="nk:AlignPointReplace" minOccurs="0" default="bckg">
+                <xsd:annotation>
+                    <xsd:documentation>Defines the strategy of replacing the alignment point in compound glyphs. The value is 'bckg' by default.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            
+            <xsd:element name="AlignPoints" minOccurs="0" default="">
+                <xsd:annotation>
+                    <xsd:documentation>Defines the default align point characters, that will be used if not specified by a component glyph.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:all>
+    </xsd:complexType>
+    
+</xsd:schema>

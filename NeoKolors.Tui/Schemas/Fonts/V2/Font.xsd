@@ -1,0 +1,9 @@
+﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/Fonts/V2"
+            elementFormDefault="qualified">
+    
+    <xsd:include schemaLocation="Font.Common.xsd"/>
+    <xsd:include schemaLocation="Font.Config.xsd"/>
+    <xsd:include schemaLocation="Font.Map.xsd"/>
+
+</xsd:schema>

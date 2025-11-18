@@ -51,7 +51,7 @@ public class NKFontReader {
         }
         
         string ext = Path.GetExtension(filepath);
-        OneOf.OneOf<NKCFontMeta, NKIFontMeta> meta;
+        OneOf<NKCFontMeta, NKIFontMeta> meta;
         
         switch (ext) {
             case ".nkfh":
@@ -69,7 +69,7 @@ public class NKFontReader {
         );
     }
     
-    private static OneOf.OneOf<NKCFontMeta, NKIFontMeta> ReadHeader_Xml(string path) {
+    private static OneOf<NKCFontMeta, NKIFontMeta> ReadHeader_Xml(string path) {
         
         var settings = new XmlReaderSettings {
             Schemas = HEADER_SCHEMA,

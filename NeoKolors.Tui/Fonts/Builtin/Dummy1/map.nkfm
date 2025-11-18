@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<FontMap xmlns="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/Fonts/V2">
+
+    <Component Symbol="A" File="uppercase/A.nkg"/>
+    <Component Symbol="B" File="uppercase/B.nkg"/>
+    <Component Symbol="C" File="uppercase/C.nkg"/>
+    <Component Symbol="D" File="uppercase/D.nkg"/>
+    <Component Symbol="E" File="uppercase/E.nkg"/>
+    <Component Symbol="F" File="uppercase/F.nkg"/>
+    <Component Symbol="G" File="uppercase/G.nkg"/>
+    <Component Symbol="H" File="uppercase/H.nkg"/>
+    <Component Symbol="I" File="uppercase/I.nkg"/>
+    <Component Symbol="J" File="uppercase/J.nkg"/>
+    <Component Symbol="K" File="uppercase/K.nkg"/>
+    <Component Symbol="L" File="uppercase/L.nkg"/>
+    <Component Symbol="M" File="uppercase/M.nkg"/>
+    <Component Symbol="N" File="uppercase/N.nkg"/>
+    <Component Symbol="O" File="uppercase/O.nkg"/>
+    <Component Symbol="P" File="uppercase/P.nkg"/>
+    <Component Symbol="Q" File="uppercase/Q.nkg"/>
+    <Component Symbol="R" File="uppercase/R.nkg"/>
+    <Component Symbol="S" File="uppercase/S.nkg"/>
+    <Component Symbol="T" File="uppercase/T.nkg"/>
+    <Component Symbol="U" File="uppercase/U.nkg"/>
+    <Component Symbol="V" File="uppercase/V.nkg"/>
+    <Component Symbol="W" File="uppercase/W.nkg"/>
+    <Component Symbol="X" File="uppercase/X.nkg"/>
+    <Component Symbol="Y" File="uppercase/Y.nkg"/>
+    <Component Symbol="Z" File="uppercase/Z.nkg"/>
+
+    <Component Symbol="a" File="lowercase/a.nkg"/>
+    <Component Symbol="b" File="lowercase/b.nkg"/>
+    <Component Symbol="c" File="lowercase/c.nkg"/>
+    <Component Symbol="d" File="lowercase/d.nkg"/>
+    <Component Symbol="e" File="lowercase/e.nkg"/>
+    <Component Symbol="f" File="lowercase/f.nkg"/>
+    <Component Symbol="g" File="lowercase/g.nkg">
+        <Baseline>-1</Baseline>
+    </Component>
+    <Component Symbol="h" File="lowercase/h.nkg"/>
+    <Component Symbol="i" File="lowercase/i.nkg"/>
+    <Component Symbol="j" File="lowercase/j.nkg">
+        <Baseline>-1</Baseline>
+    </Component>
+    <Component Symbol="k" File="lowercase/k.nkg"/>
+    <Component Symbol="l" File="lowercase/l.nkg"/>
+    <Component Symbol="m" File="lowercase/m.nkg"/>
+    <Component Symbol="n" File="lowercase/n.nkg"/>
+    <Component Symbol="o" File="lowercase/o.nkg"/>
+    <Component Symbol="p" File="lowercase/p.nkg">
+        <Baseline>-1</Baseline>
+    </Component>
+    <Component Symbol="q" File="lowercase/q.nkg">
+        <Baseline>-1</Baseline>
+    </Component>
+    <Component Symbol="r" File="lowercase/r.nkg"/>
+    <Component Symbol="s" File="lowercase/s.nkg"/>
+    <Component Symbol="t" File="lowercase/t.nkg"/>
+    <Component Symbol="u" File="lowercase/u.nkg"/>
+    <Component Symbol="v" File="lowercase/v.nkg"/>
+    <Component Symbol="w" File="lowercase/w.nkg"/>
+    <Component Symbol="x" File="lowercase/x.nkg"/>
+    <Component Symbol="y" File="lowercase/y.nkg">
+        <Baseline>-1</Baseline>
+    </Component>
+    <Component Symbol="z" File="lowercase/z.nkg"/>
+    
+    <Component Symbol="'" File="diacritics/apostrophe.nkg">
+        <Baseline>2</Baseline>
+    </Component>
+<!--    <Component Symbol="`" File="diacritics/grave.nkg"/>-->
+<!--    <Component Symbol="^" File="diacritics/circumflex.nkg"/>-->
+<!--    <Component Symbol="~" File="diacritics/tilde.nkg"/>-->
+    <Component Symbol="!" File="special/excl.nkg"/>
+    <Component Symbol="?" File="special/qm.nkg"/>
+    
+    <Component Symbol="¨" Id="umlaut" File="diacritics/umlaut.nkg" />
+    <Component Symbol="´" Id="accent" File="diacritics/accent.nkg" />
+
+    <Ligature Symbol="->" Id="arr-right" File="ligatures/arr-right.nkg">
+        <Baseline>0</Baseline>
+        <AlignPointReplace>custom,r</AlignPointReplace>
+    </Ligature>
+    
+    <Compound Symbol="Ä" Id="A-umlaut">
+        <Main>A</Main>
+        <Secondary>umlaut</Secondary>
+        <Align>custom,+</Align>
+    </Compound>
+    
+    <AutoCompound Symbol="´" BaseId="accent">
+        <Align>custom,+</Align>
+        <Applicable>
+            <Group>vowels</Group>
+        </Applicable>
+    </AutoCompound>
+</FontMap>

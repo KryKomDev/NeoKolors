@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Font xmlns="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/Fonts/V2">
+    <Name>Bytesized</Name>
+    <Version>2</Version>
+    <LetterSpacing>1</LetterSpacing>
+    <LineSpacing>1</LineSpacing>
+    
+    <Global>
+        <Mask>custom-forg,.</Mask>
+        <AlignPoints>+*</AlignPoints>
+    </Global>
+    
+    <Monospace>
+        <LetterWidth>3</LetterWidth>
+        <LetterHeight>2</LetterHeight>
+    </Monospace>
+</Font>

@@ -6,6 +6,7 @@
 using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Text;
+using NeoKolors.Extensions;
 
 namespace NeoKolors.Tui.Fonts.V1;
 

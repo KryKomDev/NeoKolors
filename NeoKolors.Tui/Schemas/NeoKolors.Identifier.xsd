@@ -1,0 +1,17 @@
+﻿<!--                             -->
+<!--  NeoKolors                  -->
+<!--  Copyright (c) 2025 KryKom  -->
+<!--                             -->
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:nk="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/wip/NeoKolors.Tui/Schemas"
+            targetNamespace="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/wip/NeoKolors.Tui/Schemas"
+            elementFormDefault="qualified">
+
+    <xsd:simpleType name="Identifier">
+        <xsd:restriction base="xsd:normalizedString">
+            <xsd:pattern value="([A-Z]|[a-z])([A-Z]|[a-z]|[0-9]|_|-)*"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+</xsd:schema>

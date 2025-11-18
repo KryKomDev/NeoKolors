@@ -1,0 +1,45 @@
+﻿<!--                             -->
+<!--  NeoKolors                  -->
+<!--  Copyright (c) 2025 KryKom  -->
+<!--                             -->
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:nk="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/wip/NeoKolors.Tui/Schemas/Pages"
+            xmlns:nkc="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/wip/NeoKolors.Tui/Schemas"
+            targetNamespace="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/wip/NeoKolors.Tui/Schemas/Pages"
+            elementFormDefault="qualified">
+    
+    <xsd:include schemaLocation="NeoKolors.Pages.ElementGroups.xsd"/>
+    <xsd:include schemaLocation="NeoKolors.Pages.AbstractElement.xsd"/>
+    <xsd:include schemaLocation="../NeoKolors.Identifier.xsd"/>
+    
+    <xsd:complexType name="Div" xml:base="nkc:AbstractElement">
+        <xsd:annotation>
+
+            <xsd:documentation>A division element. Works as a container for other elements.</xsd:documentation>
+        </xsd:annotation>
+        
+        <xsd:sequence>
+            <xsd:group ref="nk:ElementsAll" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        
+        <xsd:attribute name="Id">
+            <xsd:annotation>
+                <xsd:documentation>Defines the id of the element.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="nkc:Identifier"/>
+            </xsd:simpleType>
+        </xsd:attribute>
+        
+        <xsd:attribute name="Class">
+            <xsd:annotation>
+                <xsd:documentation>Defines the class of the element.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="nkc:Identifier"/>
+            </xsd:simpleType>
+        </xsd:attribute>
+    </xsd:complexType>
+    
+</xsd:schema>

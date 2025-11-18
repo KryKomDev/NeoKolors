@@ -4,6 +4,7 @@
 //
 
 using System.Diagnostics.Contracts;
+using Metriks;
 using SkiaSharp;
 
 namespace NeoKolors.Tui.Fonts.V1;
@@ -87,7 +88,7 @@ public class NKImageFontReader : IFontReader {
     }
 
     private static char[,] Reduce(char[,] chars, out int xDel, out int yDel) {
-        var dyn = List2D<char>.FromArray(chars);
+        var dyn = new List2D<char>(chars);
         yDel = 0;
         xDel = 0;
 
@@ -104,7 +105,7 @@ public class NKImageFontReader : IFontReader {
             if (!isEmpty)
                 break;
             
-            dyn.RemoveX(0);
+            dyn.RemoveAtX(0);
             x--;
             xDel++;
         }
@@ -122,7 +123,7 @@ public class NKImageFontReader : IFontReader {
             if (!isEmpty)
                 break;
             
-            dyn.RemoveY(0);
+            dyn.RemoveAtY(0);
             y--;
             yDel++;
         }
@@ -139,7 +140,7 @@ public class NKImageFontReader : IFontReader {
 
             if (!isEmpty) break;
             
-            dyn.RemoveX(x);
+            dyn.RemoveAtX(x);
         }
 
         // reduce bottom to top
@@ -154,7 +155,7 @@ public class NKImageFontReader : IFontReader {
             
             if (!isEmpty) break;
             
-            dyn.RemoveY(y);
+            dyn.RemoveAtY(y);
         }
 
         return dyn.ToArray();
