@@ -34,9 +34,12 @@ public class Div : ContainerElement {
         OnElementUpdated?.Invoke();
     }
     
+    public override ElementInfo Info { get; }
+    
     
     public Div(params IElement[] children) {
         _children       = children.ToList();
+        Info = new ElementInfo();
         _style          = new StyleCollection();
         _layoutCacher   = new LayoutCacher(CanUseMinCache, CanUseMaxCache, CanUseRenderCache);
         _childrenCacher = new ChildrenLayoutCacher(CanUseMinCache, CanUseMaxCache, CanUseRenderCache);

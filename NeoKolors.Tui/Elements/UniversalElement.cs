@@ -119,7 +119,9 @@ public abstract class UniversalElement : IElement {
         }
     }
 
-    
+    public abstract ElementInfo Info { get; }
+
+
     // =========================== IELEMENT IMPLEMENTATION =========================== // 
     
     public abstract void Render(ICharCanvas canvas, Rectangle rect);

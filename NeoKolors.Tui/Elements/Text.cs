@@ -49,16 +49,19 @@ public class Text : TextElement, IElement, INotifyOnRender {
             InvokeElementUpdated();
         }
     }
+    
+    public override ElementInfo Info { get; }
+    
 
     public Text(string text) {
         _text = text;
         _layoutCacher = new LayoutCacher(CanUseMinCache, CanUseMaxCache, CanUseRenderCache);
         _style = new StyleCollection();
+        Info = new ElementInfo();
         OnRender += () => {};
         OnStyleAccess += InvokeElementUpdated;
-    } 
+    }
     
-
     public override void Render(ICharCanvas canvas, Rectangle rect) {
 
         var onRender = Task.Run(OnRender.Invoke);

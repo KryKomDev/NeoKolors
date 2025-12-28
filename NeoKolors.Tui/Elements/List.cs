@@ -34,6 +34,7 @@ public class List : UniversalElement {
         OnElementUpdated?.Invoke();
     }
 
+    public override ElementInfo Info { get; }
     
     // ------------------------------------ STYLE -------------------------------------- //
     
@@ -78,6 +79,7 @@ public class List : UniversalElement {
     public List(params IElement[] children) {
         _children = new List<IElement>(children);
         _style = new StyleCollection();
+        Info = new ElementInfo();
         _layoutCacher   = new LayoutCacher        (CanUseMinCache, CanUseMaxCache, CanUseRenderCache);
         _childrenCacher = new ChildrenLayoutCacher(CanUseMinCache, CanUseMaxCache, CanUseRenderCache);
     }

@@ -9,6 +9,7 @@ namespace NeoKolors.Tui.Elements;
 
 public interface IElement : IRenderable, INode {
     public Styles.StyleCollection Style { get; }
+    public ElementInfo Info { get; }
     
     public void Render(ICharCanvas canvas, Rectangle rect);
     void IRenderable.Render(ICharCanvas canvas) => Render(canvas, new Rectangle(0, 0, canvas.Width, canvas.Height));
