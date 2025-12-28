@@ -26,16 +26,7 @@ public static class NKFontSerializer {
     private static XmlSchemaSet? CONFIG_SCHEMA;
     private static XmlSchemaSet? MAP_SCHEMA;
     
-    static NKFontSerializer() {
-        (CONFIG_SCHEMA, MAP_SCHEMA) = InitSchemas();
-        // #if !NKFONT_XSD_LOCAL || RELEASE // when in release mode, the XSDs are already compiled into the assembly
-        // CONFIG_SCHEMA = GetConfigSchemaAsync().Result;
-        // MAP_SCHEMA    = GetMapSchemaAsync().Result;
-        // #else
-        // CONFIG_SCHEMA = null;
-        // MAP_SCHEMA    = null;
-        // #endif
-    }
+    static NKFontSerializer() => (CONFIG_SCHEMA, MAP_SCHEMA) = InitSchemas();
 
     /// <summary>
     /// Reloads the configuration and mapping schemas used for font serialization.

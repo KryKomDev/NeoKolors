@@ -8,7 +8,6 @@ using NeoKolors.Tui.Fonts.Exceptions;
 using NeoKolors.Tui.Fonts.Serialization.Xml;
 using AlignPointReplace = NeoKolors.Tui.Fonts.Serialization.Xml.AlignPointReplace;
 using Mask = NeoKolors.Tui.Fonts.Serialization.Xml.Mask;
-using Numeric = NeoKolors.Extensions.Numeric;
 
 namespace NeoKolors.Tui.Fonts.Serialization;
 
@@ -168,7 +167,7 @@ public static class NKGlyphReader {
     /// <summary>
     /// Extracts alignment points from a glyph based on the specified alignment characters.
     /// </summary>
-    /// <param name="glyph">The 2D array representation of the glyph, where each element corresponds to a character at
+    /// <param name="glyph">The 2D array representation of the glyph, where each elementOld corresponds to a character at
     /// a specific position.</param>
     /// <param name="alignChars">An array of characters used as alignment markers within the glyph.</param>
     /// <param name="replace">The way of replacing detected align points.</param>

@@ -2,8 +2,9 @@
 // Copyright (c) 2025 KryKom
 
 using System.Runtime.CompilerServices;
+using Metriks;
 using NeoKolors.Tui.Fonts.Exceptions;
-using NeoKolors.Tui.Styles;
+using NeoKolors.Tui.Styles.Values;
 using static NeoKolors.Tui.Fonts.NKFontStringTokenizer;
 using static NeoKolors.Tui.Fonts.NKFontStringTokenizer.TokenType;
 
@@ -124,26 +125,26 @@ public class NKFont : IFont {
     
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void PlaceString(string str, ICharCanvas canvas, int maxWidth) 
-        => PlaceString(str, canvas, new Size(maxWidth, int.MaxValue));
+        => PlaceString(str, canvas, new Size(maxWidth, int.MaxValue), new NKStyle());
 
     
     public void PlaceString(
-        string str, ICharCanvas canvas, Size bounds,
+        string str, ICharCanvas canvas, Rectangle bounds, NKStyle style,
         HorizontalAlign horizontalAlign = HorizontalAlign.LEFT,
         VerticalAlign verticalAlign = VerticalAlign.TOP, bool overflow = false) 
     {
         var tokens = Tokenize(str, this);
 
         if (_info.SpacingInfo.IsMonospace)
-            PlaceMonoWithAlign(tokens, canvas, bounds, horizontalAlign, verticalAlign, overflow);
+            PlaceMonoWithAlign(tokens, canvas, bounds, style, horizontalAlign, verticalAlign, overflow);
         else 
             if (_info.SpacingInfo.AsVariable.Kerning)
                 if (_info.SpacingInfo.AsVariable.LineKerning)
-                    PlaceVariableKerningWithAlignWithLineKerning(tokens, canvas, bounds, horizontalAlign, verticalAlign, overflow);
+                    PlaceVariableKerningWithAlignWithLineKerning(tokens, canvas, bounds, style, horizontalAlign, verticalAlign, overflow);
                 else
-                    PlaceVariableKerningWithAlignNoLineKerning(tokens, canvas, bounds, horizontalAlign, verticalAlign, overflow);
+                    PlaceVariableKerningWithAlignNoLineKerning(tokens, canvas, bounds, style, horizontalAlign, verticalAlign, overflow);
             else 
-                PlaceVariableNoKerningWithAlign(tokens, canvas, bounds, horizontalAlign, verticalAlign, overflow);
+                PlaceVariableNoKerningWithAlign(tokens, canvas, bounds, style, horizontalAlign, verticalAlign, overflow);
     }
 
     // todo: support overflow
@@ -151,7 +152,8 @@ public class NKFont : IFont {
     private void PlaceMonoWithAlign(
         Token[] tokens,
         ICharCanvas canvas,
-        Size bounds,
+        Rectangle bounds,
+        NKStyle style,
         HorizontalAlign horizontalAlign,
         VerticalAlign verticalAlign,
         bool overflow) 
@@ -165,7 +167,7 @@ public class NKFont : IFont {
             VerticalAlign.CENTER => Math.Max(0, (bounds.Height - lineSize * lines.Length) / 2),
             VerticalAlign.BOTTOM => Math.Max(0, bounds.Height - lineSize * lines.Length),
             _ => throw new ArgumentOutOfRangeException()
-        };
+        } + bounds.LowerY;
 
         Func<int, int, int> computeXOffset = horizontalAlign switch {
             HorizontalAlign.LEFT   => static (_, _)          => 0,
@@ -180,7 +182,7 @@ public class NKFont : IFont {
             var lineData = lines[i];
             var lineTokens = lineData.Tokens;
 
-            var xOffset = computeXOffset(lineData.Width, bounds.Width);
+            var xOffset = computeXOffset(lineData.Width, bounds.Width) + bounds.LowerX;
             
             int x = xOffset;
             
@@ -207,7 +209,8 @@ public class NKFont : IFont {
                     _ => throw new ArgumentOutOfRangeException()
                 };
                 
-                canvas.PlaceGlyph(x, y, glyph);
+                canvas.Place(glyph.Glyph, new Point2D(x, y));
+                canvas.Style(style, new Point(x, y), glyph.Glyph);
                 
                 x += charSize;
             }
@@ -216,10 +219,10 @@ public class NKFont : IFont {
         }
     }
 
-    private void PlaceVariableNoKerningWithAlign(
-        Token[] tokens,
+    private void PlaceVariableNoKerningWithAlign(Token[] tokens,
         ICharCanvas canvas,
-        Size bounds,
+        Rectangle bounds,
+        NKStyle style,
         HorizontalAlign horizontalAlign,
         VerticalAlign verticalAlign,
         bool overflow) 
@@ -236,7 +239,7 @@ public class NKFont : IFont {
             VerticalAlign.CENTER => Math.Max(0, (bounds.Height - totalHeight) / 2),
             VerticalAlign.BOTTOM => Math.Max(0, bounds.Height - totalHeight),
             _ => throw new ArgumentOutOfRangeException()
-        }; 
+        } + bounds.LowerY; 
 
         Func<int, int, int> computeXOffset = horizontalAlign switch {
             HorizontalAlign.LEFT   => static (_, _)          => 0,
@@ -251,8 +254,9 @@ public class NKFont : IFont {
             var lineData = lines[i];
             var lineTokens = lineData.Tokens;
 
-            var xOffset = computeXOffset(lineData.Width, bounds.Width);
-            
+            var xOffset = computeXOffset(lineData.Width, bounds.Width) + bounds.LowerX;
+
+            y += lineData.Height;
             int x = xOffset;
             
             for (int j = 0; j < lineTokens.Length; j++) {
@@ -277,19 +281,23 @@ public class NKFont : IFont {
                             .GetGlyph(_simpleGlyphs[tokenData.Value.AsT0.Character].Glyph),
                     _ => throw new ArgumentOutOfRangeException()
                 };
+
+                var idk = y - glyph.BaselineOffset - glyph.Height;
                 
-                canvas.PlaceGlyph(x, y + glyph.BaselineOffset, glyph);
+                canvas.Place(glyph.Glyph, new Point2D(x, idk));
+                canvas.Style(style, new Point(x, idk), glyph.Glyph);
+                
                 x += glyph.Width + charSpacing;
             }
             
-            y += lineData.Height + lineSpacing;
+            y += lineSpacing;
         }
     } 
 
-    private void PlaceVariableKerningWithAlignNoLineKerning(
-        Token[] tokens,
+    private void PlaceVariableKerningWithAlignNoLineKerning(Token[] tokens,
         ICharCanvas canvas,
-        Size bounds,
+        Rectangle bounds,
+        NKStyle style,
         HorizontalAlign horizontalAlign,
         VerticalAlign verticalAlign,
         bool overflow) 
@@ -304,7 +312,7 @@ public class NKFont : IFont {
             VerticalAlign.CENTER => Math.Max(0, (bounds.Height - totalHeight) / 2),
             VerticalAlign.BOTTOM => Math.Max(0, bounds.Height - totalHeight),
             _ => throw new ArgumentOutOfRangeException()
-        }; 
+        } + bounds.LowerY;
 
         Func<int, int, int> computeXOffset = horizontalAlign switch {
             HorizontalAlign.LEFT   => static (_, _)          => 0,
@@ -319,8 +327,9 @@ public class NKFont : IFont {
             var lineData = lines[i];
             var lineTokens = lineData.Tokens;
 
-            var xOffset = computeXOffset(lineData.Width, bounds.Width);
-            
+            var xOffset = computeXOffset(lineData.Width, bounds.Width) + bounds.LowerX;
+
+            y += lineData.Height;
             int x = xOffset;
             
             for (int j = 0; j < lineTokens.Length; j++) {
@@ -346,19 +355,21 @@ public class NKFont : IFont {
                 };
 
                 x += lineData.Offsets[j];
-                canvas.PlaceGlyph(x, y - glyph.BaselineOffset - glyph.Height, glyph);
+                var idk = y - glyph.BaselineOffset - glyph.Height;
+                canvas.Place(glyph.Glyph, new Point2D(x, idk));
+                canvas.Style(style, new Point(x, idk), glyph.Glyph);
             }
             
-            y += lineData.Height + lineSpacing;
+            y += lineSpacing;
         }
     }
     
     // todo: line kerning
     
-    private void PlaceVariableKerningWithAlignWithLineKerning(
-        Token[] tokens,
+    private void PlaceVariableKerningWithAlignWithLineKerning(Token[] tokens,
         ICharCanvas canvas,
-        Size bounds,
+        Rectangle bounds,
+        NKStyle style,
         HorizontalAlign horizontalAlign,
         VerticalAlign verticalAlign,
         bool overflow) 
@@ -368,6 +379,7 @@ public class NKFont : IFont {
 
     #endregion RENDERING
 
+    
     #region OFFSETS CALCULATION
 
     /// <summary>
@@ -452,14 +464,14 @@ public class NKFont : IFont {
             int secondGap = int.MaxValue;
 
             for (int y = l1.Height - 1; y >= 0; y--) {
-                if (l1.UncoordinatedGet(x, y) == null) continue;
+                if (l1[x, y].Char == null) continue;
                 
                 firstGap = (l1.Height - y) - 1;
                 break;
             }
 
             for (int y = 0; y < l2.Height; y++) {
-                if (l2.UncoordinatedGet(x, y) == null) continue;
+                if (l2[x, y].Char == null) continue;
                 
                 secondGap = y;
                 break;
@@ -479,7 +491,7 @@ public class NKFont : IFont {
         if (closest == int.MaxValue) return l1.Width + spacing;
         
         for (int y = l1.Height - 1; y >= 0; y--) {
-            if (l1.UncoordinatedGet(closestX, y) == null) continue;
+            if (l1[closestX, y].Char == null) continue;
             
             return y + 1 + spacing;
         }
@@ -498,7 +510,7 @@ public class NKFont : IFont {
     /// <param name="tokens">The list of tokens to be split into multiple lines.</param>
     /// <param name="maxWidth">The maximum allowed width for a single line of tokens.</param>
     /// <returns>
-    /// An array of <c>LineData</c> objects where each element represents a line of tokens
+    /// An array of <c>LineData</c> objects where each elementOld represents a line of tokens
     /// that fits within the specified maximum width.
     /// </returns>
     private LineData[] SplitLines(Token[] tokens, int maxWidth) {
@@ -613,15 +625,14 @@ public class NKFont : IFont {
 
             switch (tokens[i].Type) {
                 case NEWLINE:
-                    lastSpaceIndex = null;
-                    lineStartIndex = i + 1;
-
                     lines.Add(new LineData(
                         currentWidth,
                         Math.Max(maxY - minY, emptyLineHeight),
-                        tokens.Skip(lineStartIndex).Take(i - lineStartIndex - 1).ToArray()
+                        tokens.Skip(lineStartIndex).Take(i - lineStartIndex).ToArray()
                     ));
                     
+                    lineStartIndex = i + 1;
+                    lastSpaceIndex = null;
                     maxY = int.MinValue;
                     minY = int.MaxValue;
 
@@ -636,7 +647,7 @@ public class NKFont : IFont {
                         lines.Add(new LineData(
                             currentWidth,
                             maxY - minY, 
-                            tokens.Skip(lineStartIndex).Take(i - lineStartIndex - 1).ToArray()
+                            tokens.Skip(lineStartIndex).Take(i - lineStartIndex).ToArray()
                         ));
                         
                         maxY = int.MinValue;
@@ -676,13 +687,16 @@ public class NKFont : IFont {
             if (skip) continue;
             
             if (newWidth > maxWidth) {
+                int splitIndex = lastSpaceIndex ?? (i - 1);
+                int takeCount = splitIndex - lineStartIndex + (lastSpaceIndex == null ? 0 : 1);
+                
                 lines.Add(new LineData(
                     lastSpaceIndex == null ? currentWidth : widthAtLastSpace, 
                     maxY - minY, 
-                    tokens.Skip(lineStartIndex).Take(((lastSpaceIndex) ?? (i - 2)) - lineStartIndex).ToArray()
+                    tokens.Skip(lineStartIndex).Take(takeCount).ToArray()
                 ));
                 
-                i = lastSpaceIndex ?? (i - 2);
+                i = splitIndex;
                 lastSpaceIndex = null;
 
                 lineStartIndex = i + 1;
@@ -712,7 +726,7 @@ public class NKFont : IFont {
         // DON'T THE FUCK TOUCH THIS UNLESS YOU REALLY KNOW WHAT YOU'RE DOING
         // I did not, and it was a great mistake.
         // Every time you edit this method and fail to understand what it does,
-        // add one to this counter: 2
+        // add one to this counter: 3
         
         List<LineData> lines = [];
         int? lastSpaceIndex = null;
@@ -735,16 +749,15 @@ public class NKFont : IFont {
 
             switch (tokens[i].Type) {
                 case NEWLINE:
-                    lastSpaceIndex = null;
-                    lineStartIndex = i + 1;
-                    
                     lines.Add(new LineData(
                         currentWidth,
                         Math.Max(maxY - minY, emptyLineHeight),
-                        tokens.Skip(lineStartIndex).Take(i - lineStartIndex - 1).ToArray(),
+                        tokens.Skip(lineStartIndex).Take(i - lineStartIndex).ToArray(),
                         offsets.ToArray()
                     ));
                     
+                    lineStartIndex = i + 1;
+                    lastSpaceIndex = null;
                     maxY = int.MinValue;
                     minY = int.MaxValue;
                     lastGlyph = null; 
@@ -822,7 +835,7 @@ public class NKFont : IFont {
                 
                 // sorry for the naming but i have absolutely no idea what the fuck these numbers mean...
                 var a = lastSpaceIndex ?? i - 1; 
-                int b = a - lineStartIndex;
+                int b = (lastSpaceIndex ?? i) - lineStartIndex;
                 
                 lines.Add(new LineData(
                     lastSpaceIndex == null ? currentWidth + (lastGlyph?.Width ?? 0) : widthAtLastSpace, 
@@ -862,6 +875,40 @@ public class NKFont : IFont {
         return lines.ToArray();
     }
 
+    
+    public Size GetMinSize(string str) {
+        var tokens = Tokenize(str, this);
+        var lines = tokens.Split(t => t.Type is NEWLINE or SPACE);
+
+        int maxWidth = 0;
+
+        for (int i = 0; i < lines.Length; i++) {
+            var canv = new NKCharCanvas();
+            PlaceString(str, canv);
+            maxWidth = Math.Max(maxWidth, canv.Width);
+        }
+        
+        var canvas = new NKCharCanvas();
+        PlaceString(str, canvas);
+        
+        return new Size(maxWidth, canvas.Height);
+    }
+    
+    public Size GetSize(string str) {
+        var canv = new NKCharCanvas();
+        PlaceString(str, canv);
+        return new Size(canv.Width, canv.Height);
+    }
+    
+    public Size GetSize(string str, int maxWidth) {
+        if (maxWidth < 0) throw new ArgumentOutOfRangeException(nameof(maxWidth), "maxWidth must be >= 0.");
+        if (maxWidth == 0) return Size.Zero;
+        
+        var canv = new NKCharCanvas(0, 0, true);
+        PlaceString(str, canv, maxWidth);
+        return new Size(canv.Width, canv.Height);
+    }
+    
     private readonly struct LineData {
         public int Width { get; }
         public int Height { get; } = 0;

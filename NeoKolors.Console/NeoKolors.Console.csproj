@@ -39,10 +39,10 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0-rc.2.25502.107" />
-        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+        <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+        <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
@@ -51,5 +51,26 @@
 
     <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
       <PackageReference Include="SixPix" Version="0.3.2" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ClCompile Include="Native\NativeResizeHandler.cpp" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="runtimes/linux-x64/native/NativeResizeHandler.so">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Pack>true</Pack>
+        </None>
+
+        <None Include="runtimes/win-x64/native/NativeResizeHandler.dll">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Pack>true</Pack>
+        </None>
+
+        <None Include="runtimes/osx-x64/native/NativeResizeHandler.dylib">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Pack>true</Pack>
+        </None>
     </ItemGroup>
 </Project>

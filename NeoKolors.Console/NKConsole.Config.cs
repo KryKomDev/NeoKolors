@@ -71,12 +71,14 @@ public partial class NKConsole {
                 case MouseReportProtocol.X10: break;
                 case MouseReportProtocol.UTF8: Std.Write(MOUSE_EV_UTF8_OFF); break;
                 case MouseReportProtocol.SGR: Std.Write(MOUSE_EV_SGR_OFF); break;
+                case MouseReportProtocol.SGR_PIXELS: Std.Write(MOUSE_EV_SGR_PIXELS_OFF); break;
                 default: throw new ArgumentOutOfRangeException(nameof(value), value, null);
             }
             switch (value) {
                 case MouseReportProtocol.X10: break;
                 case MouseReportProtocol.UTF8: Std.Write(MOUSE_EV_UTF8_ON); break;
                 case MouseReportProtocol.SGR: Std.Write(MOUSE_EV_SGR_ON); break;
+                case MouseReportProtocol.SGR_PIXELS: Std.Write(MOUSE_EV_SGR_PIXELS_ON); break;
                 default: throw new ArgumentOutOfRangeException(nameof(value), value, null);
             }
 

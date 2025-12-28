@@ -4,10 +4,9 @@
 //
 
 using System.Reflection;
-using NeoKolors.Console;
 using NeoKolors.Tui.Elements;
-using NeoKolors.Tui.Exceptions;
 using NeoKolors.Tui.Styles;
+using IStylePropertyV2 = NeoKolors.Tui.Styles.Properties.IStyleProperty;
 
 namespace NeoKolors.Tui.SourceManagement;
 
@@ -15,11 +14,12 @@ namespace NeoKolors.Tui.SourceManagement;
 /// manages the assemblies that are a source of classes for the application 
 /// </summary>
 public static class SourceManager {
-    
+    /*
     private static readonly NKLogger LOGGER = NKDebug.GetLogger(nameof(SourceManager));
     
     private static readonly List<Assembly> ASSEMBLIES = [];
     private static readonly Dictionary<string, Type> STYLES = [];
+    private static readonly Dictionary<string, Type> STYLES_V2 = [];
     private static readonly Dictionary<string, Type> ELEMENTS = [];
 
     static SourceManager() {
@@ -37,7 +37,7 @@ public static class SourceManager {
         LOGGER.Debug($"Loading assembly {assembly.GetName().Name}");
         
         foreach (var t in assembly.GetTypes()) {
-            if (IStyleProperty.IsStyle(t)) 
+            if (IStylePropertyV2.IsStyle(t))
                 AddStyle(t);
             else if (IElement.IsElement(t)) 
                 AddElement(t);
@@ -73,6 +73,33 @@ public static class SourceManager {
         LOGGER.Trace($"Registered style '{a.Name}'.");
     }
 
+    private static void AddStyleV2(Type t) {
+        var a = t.GetCustomAttribute<StylePropertyNameAttribute>();
+                
+        if (a is null) {
+            string name = IStylePropertyV2.GetName(t);
+                
+            try {
+                STYLES_V2.Add(name, t);
+            }
+            catch (ArgumentException) {
+                throw InvalidStyleNameException.Duplicate(name);
+            }
+                    
+            LOGGER.Trace($"Registered style '{name}'.");
+            return;
+        }
+                
+        try {
+            STYLES_V2.Add(a.Name, t);
+        }
+        catch (ArgumentException) {
+            throw InvalidStyleNameException.Duplicate(a.Name);
+        }
+        
+        LOGGER.Trace($"Registered style '{a.Name}'.");
+    }
+    
     private static void AddElement(Type t) {
         var a = t.GetCustomAttribute<ElementNameAttribute>();
                 
@@ -86,7 +113,7 @@ public static class SourceManager {
                 throw InvalidElementNameException.Duplicate(name);
             }
                  
-            LOGGER.Trace($"Registered element '{name}'.");
+            LOGGER.Trace($"Registered elementOld '{name}'.");
             return;
         }
                 
@@ -97,7 +124,7 @@ public static class SourceManager {
             throw InvalidElementNameException.Duplicate(a.Name);
         }
 
-        LOGGER.Trace($"Registered element '{a.Name}'.");
+        LOGGER.Trace($"Registered elementOld '{a.Name}'.");
         _ = t.GetCustomAttribute<ApplicableStylesAttribute>();
     }
 
@@ -118,12 +145,12 @@ public static class SourceManager {
     }
 
     /// <summary>
-    /// Retrieves the type of the element with the specified name.
+    /// Retrieves the type of the elementOld with the specified name.
     /// </summary>
-    /// <param name="name">The name of the element to retrieve.</param>
-    /// <returns>The type of the element associated with the given name.</returns>
+    /// <param name="name">The name of the elementOld to retrieve.</param>
+    /// <returns>The type of the elementOld associated with the given name.</returns>
     /// <exception cref="InvalidElementNameException">
-    /// Thrown when an element with the specified name cannot be found.
+    /// Thrown when an elementOld with the specified name cannot be found.
     /// </exception>
     public static Type GetElement(string name) {
         try {
@@ -132,5 +159,5 @@ public static class SourceManager {
         catch (KeyNotFoundException) {
             throw InvalidElementNameException.NotFound(name);
         }
-    }
+    }*/
 }

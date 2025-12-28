@@ -10,11 +10,11 @@ namespace NeoKolors.Common;
 /// </summary>
 [Flags]
 public enum TextStyles : byte {
-    NONE = 0,
-    BOLD = 1,
-    ITALIC = 2,
-    UNDERLINE = 4,
-    FAINT = 8,
-    NEGATIVE = 16,
-    STRIKETHROUGH = 32
+    NONE          = 0,
+    BOLD          = 1 << 0,
+    ITALIC        = 1 << 1,
+    UNDERLINE     = 1 << 2,
+    FAINT         = 1 << 3,
+    NEGATIVE      = 1 << 4,
+    STRIKETHROUGH = 1 << 5
 }

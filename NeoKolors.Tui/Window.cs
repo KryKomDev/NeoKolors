@@ -20,7 +20,7 @@ public class Window : IView {
     public void HandleAppStop(object? sender, EventArgs args) { }
     public void HandleMouseEvent(MouseEventInfo info) { }
 
-    public void Render(in IConsoleScreen target) {
+    public void Render(ICharCanvas target) {
         
     }
 

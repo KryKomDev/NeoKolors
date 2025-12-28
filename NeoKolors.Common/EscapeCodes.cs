@@ -3,7 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Common.Util;
+using System.Diagnostics.Contracts;
 
 namespace NeoKolors.Common;
 
@@ -27,14 +27,25 @@ public static class EscapeCodes {
     /// the red, green, and blue color components respectively.
     /// </summary>
     public const string CUSTOM_BCKG_COLOR_FORMAT = "\e[48;2;{0};{1};{2}m";
+    
+    /// <summary>
+    /// ANSI escape sequence format string used to apply a custom background color in the terminal.
+    /// The format uses RGB values, where placeholders {0}, {1}, and {2} represent
+    /// the red, green, and blue color components respectively.
+    /// </summary>
+    public const string CUSTOM_UNDERLINE_COLOR_FORMAT = "\e[58;2;{0};{1};{2}m";
 
-    [JetBrains.Annotations.Pure]
-    [System.Diagnostics.Contracts.Pure]
+    [Pure]
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static string GetPaletteFColor(byte color) => $"\e[38;5;{color}m";
 
-    [JetBrains.Annotations.Pure]
-    [System.Diagnostics.Contracts.Pure]
+    [Pure]
+    [MethodImpl(MethodImplOptions.NoInlining)]
     public static string GetPaletteBColor(byte color) => $"\e[48;5;{color}m";
+    
+    [Pure]
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    public static string GetPaletteUColor(byte color) => $"\e[58;5;{color}m";
 
     public const string PALETTE_COLOR_BLACK = "\e[38;5;0m";
     public const string PALETTE_COLOR_DARK_RED = "\e[38;5;1m";
@@ -81,6 +92,29 @@ public static class EscapeCodes {
     /// Used to end custom background coloring in a string.
     /// </summary>
     public const string BCKG_COLOR_RESET = "\e[49m";
+    
+    public const string PALETTE_UNDERLINE_COLOR_BLACK = "\e[58;5;0m";
+    public const string PALETTE_UNDERLINE_COLOR_DARK_RED = "\e[58;5;1m";
+    public const string PALETTE_UNDERLINE_COLOR_DARK_GREEN = "\e[58;5;2m";
+    public const string PALETTE_UNDERLINE_COLOR_DARK_YELLOW = "\e[58;5;3m";
+    public const string PALETTE_UNDERLINE_COLOR_DARK_BLUE = "\e[58;5;4m";
+    public const string PALETTE_UNDERLINE_COLOR_DARK_MAGENTA = "\e[58;5;5m";
+    public const string PALETTE_UNDERLINE_COLOR_DARK_CYAN = "\e[58;5;6m";
+    public const string PALETTE_UNDERLINE_COLOR_GRAY = "\e[58;5;7m";
+    public const string PALETTE_UNDERLINE_COLOR_DARK_GRAY = "\e[58;5;8m";
+    public const string PALETTE_UNDERLINE_COLOR_RED = "\e[58;5;9m";
+    public const string PALETTE_UNDERLINE_COLOR_GREEN = "\e[58;5;10m";
+    public const string PALETTE_UNDERLINE_COLOR_YELLOW = "\e[58;5;11m";
+    public const string PALETTE_UNDERLINE_COLOR_BLUE = "\e[58;5;12m";
+    public const string PALETTE_UNDERLINE_COLOR_MAGENTA = "\e[58;5;13m";
+    public const string PALETTE_UNDERLINE_COLOR_CYAN = "\e[58;5;14m";
+    public const string PALETTE_UNDERLINE_COLOR_WHITE = "\e[58;5;15m";
+
+    /// <summary>
+    /// ANSI escape sequence that resets the underline color to its default value.
+    /// Used to end custom underline coloring in a string.
+    /// </summary>
+    public const string UNDERLINE_COLOR_RESET = "\e[59m";
 
     /// <summary>
     /// Resets all text formatting attributes, including color and style, to their default values.
@@ -100,12 +134,6 @@ public static class EscapeCodes {
     public const string UNDERLINE_DOTTED_START = "\e[4:4m";
     public const string UNDERLINE_DASHED_START = "\e[4:5m";
     public const string UNDERLINE_START_TYPE_FORMAT = "\e[4:{0}m";
-    public const string UNDERLINE_COLORED_START_FORMAT = "\e[4;58:2::{0}:{1}:{2}m";
-    public const string UNDERLINE_COLORED_THICK_START_FORMAT = "\e[4:2;58:2::{0}:{1}:{2}m";
-    public const string UNDERLINE_COLORED_CURLY_START_FORMAT = "\e[4:3;58:2::{0}:{1}:{2}m";
-    public const string UNDERLINE_COLORED_DOTTED_START_FORMAT = "\e[4:4;58:2::{0}:{1}:{2}m";
-    public const string UNDERLINE_COLORED_DASHED_START_FORMAT = "\e[4:5;58:2::{0}:{1}:{2}m";
-    public const string UNDERLINE_COLORED_TYPE_START_FORMAT = "\e[4:{0};58:2::{1}:{2}:{3}m";
     public const string NEGATIVE_START = "\e[7m";
     public const string STRIKETHROUGH_START = "\e[9m";
 
@@ -126,27 +154,6 @@ public static class EscapeCodes {
         => type == UnderlineType.NORMAL 
             ? UNDERLINE_START 
             : UNDERLINE_START_TYPE_FORMAT.Format((int)type);
-
-    /// <summary>
-    /// Generates an escape sequence for underlining text with a specific underline style and color.
-    /// </summary>
-    /// <param name="r">The red component of the color in the RGB format (0 to 255).</param>
-    /// <param name="g">The green component of the color in the RGB format (0 to 255).</param>
-    /// <param name="b">The blue component of the color in the RGB format (0 to 255).</param>
-    /// <param name="type">The underline style to apply, such as normal, thick, curly, dotted, or dashed.
-    /// Defaults to normal if not specified.</param>
-    /// <returns>A string containing the formatted escape sequence to apply the
-    /// specified underline style and color.</returns>
-    public static string GetUnderlineColored(byte r, byte g, byte b, UnderlineType type = UnderlineType.NORMAL)
-        => UNDERLINE_COLORED_TYPE_START_FORMAT.Format((int)type, r, g, b);
-
-    public enum UnderlineType {
-        NORMAL = 1,
-        THICK  = 2,
-        CURLY  = 3,
-        DOTTED = 4,
-        DASHED = 5
-    }
     
     #endregion
 
@@ -185,6 +192,8 @@ public static class EscapeCodes {
     /// </summary>
     public const string MOUSE_EV_SGR_ON = "\e[?1006h";
 
+    public const string MOUSE_EV_SGR_PIXELS_ON = "\e[?1016h";
+
     [Obsolete("URXVT mode is not recommended.")]
     public const string MOUSE_EV_URXVT_ON = "\e[?1015h";
 
@@ -195,6 +204,7 @@ public static class EscapeCodes {
     public const string MOUSE_EV_ON_ALL_OFF = "\e[?1003l";
     public const string MOUSE_EV_UTF8_OFF = "\e[?1005l";
     public const string MOUSE_EV_SGR_OFF = "\e[?1006l";
+    public const string MOUSE_EV_SGR_PIXELS_OFF = "\e[?1016l";
 
     [Obsolete("URXVT mode is not recommended.")]
     public const string MOUSE_EV_URXVT_OFF = "\e[?1015l";
@@ -321,10 +331,28 @@ public static class EscapeCodes {
     /// </summary>
     /// <param name="mode">The private mode for which the DECREQ escape sequence should be generated.</param>
     /// <returns>A string containing the formatted DECREQ escape sequence.</returns>
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string GetDecReq(DecPrivateMode mode) => DECREQ_FORMAT.Format((int)mode);
-
+    
     #endregion
 
+    #region DEC PM
+
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string GetDecPm(DecPrivateMode mode, bool value) => $"\e]{(int)mode}{(value ? 'h' : 'l')}";
+
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string GetDecPmEnable(DecPrivateMode mode) => GetDecPm(mode, true);
+    
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string GetDecPmDisable(DecPrivateMode mode) => GetDecPm(mode, false);
+    
+    #endregion
+    
     public enum DecPrivateMode {
         REPORT_MOUSE_P = 9,
         REPORT_MOUSE_PR = 1000,

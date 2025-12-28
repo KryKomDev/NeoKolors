@@ -11,7 +11,7 @@
     </Global>
     
     <Variable>
-        <Kerning>true</Kerning>
+        <Kerning>false</Kerning>
         <LineKerning>false</LineKerning>
         <WordSpacing>5</WordSpacing>
         <EmptyLineHeight>4</EmptyLineHeight>

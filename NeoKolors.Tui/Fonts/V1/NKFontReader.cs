@@ -84,7 +84,7 @@ public class NKFontReader {
         var root = doc.Root;
         
         if (root is null) 
-            throw new XmlException("Root element not found.");
+            throw new XmlException("Root elementOld not found.");
         
         var rootName = root.Name.LocalName;
 
@@ -98,7 +98,7 @@ public class NKFontReader {
                 return (NKIFontMeta)xml.Deserialize(reader)!;
             }
             default:
-                throw new XmlException("Root element not recognized.");
+                throw new XmlException("Root elementOld not recognized.");
         }
     }
 

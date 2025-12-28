@@ -16,9 +16,9 @@ public partial class LetterHeight {
             field = value;
         } 
     }
-    
+
     private int? _value;
-    
+
     [XmlIgnore]
     public int Value {
         get {
@@ -30,5 +30,9 @@ public partial class LetterHeight {
             _value = int.Parse(Raw);
             return _value.Value;
         }
+    }
+
+    public LetterHeight() {
+        Raw = "";
     }
 }

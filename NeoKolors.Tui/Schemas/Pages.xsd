@@ -3,6 +3,6 @@
             targetNamespace="https://github.com/KryKomDev/NeoKolors/blob/main/NeoKolors.Tui/Schemas/Pages.xsd"
             elementFormDefault="qualified">
     
-    <xsd:element name="a"/>
+    <xsd:elementOld name="a"/>
 
 </xsd:schema>

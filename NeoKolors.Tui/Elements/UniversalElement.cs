@@ -3,8 +3,8 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Common;
-using NeoKolors.Tui.Styles;
+using NeoKolors.Tui.Styles.Properties;
+using NeoKolors.Tui.Styles.Values;
 
 namespace NeoKolors.Tui.Elements;
 
@@ -13,62 +13,121 @@ namespace NeoKolors.Tui.Elements;
 /// shared by all elements and defines the fundamental structure and behavior for custom elements.
 /// Every property is overridable, so any element can define its defaults.
 /// </summary>
-public abstract class UniversalElement {
-
-    public virtual DisplayType Display {
-        get => Style.Get(new DisplayProperty()).Value;
-        set => Style.Set(new DisplayProperty(value));
+public abstract class UniversalElement : IElement {
+    
+    public virtual bool Visible {
+        get => _style.Get(DefaultVisible).Value;
+        set => _style.Set(new VisibleProperty(value));
     }
 
-    public virtual SizeValue MinWidth {
-        get => Style.Get(new MinWidth(0)).Value;
-        set => Style.Set(new MinWidth(value));
+    protected virtual VisibleProperty DefaultVisible => new(true);
+
+    public virtual Dimension MinWidth {
+        get => _style.Get(DefaultMinWidth).Value;
+        set => _style.Set(new MinWidthProperty(value));
     }
 
-    public virtual SizeValue MaxWidth {
-        get => Style.Get(new MaxWidth(SizeValue.Chars(int.MaxValue))).Value;
-        set => Style.Set(new MaxWidth(value));
+    protected virtual MinWidthProperty DefaultMinWidth => new(Dimension.Auto);
+
+    public virtual Dimension MaxWidth {
+        get => _style.Get(DefaultMaxWidth).Value;
+        set => _style.Set(new MaxWidthProperty(value));
     }
 
-    public virtual SizeValue MinHeight {
-        get => Style.Get(new MinHeight(0)).Value;
-        set => Style.Set(new MinHeight(value));
+    protected virtual MaxWidthProperty DefaultMaxWidth => new(Dimension.Auto);
+
+    public virtual Dimension Width {
+        get => _style.Get(DefaultWidth).Value;
+        set => _style.Set(new WidthProperty(value));
     }
 
-    public virtual SizeValue MaxHeight {
-        get => Style.Get(new MaxHeight(int.MaxValue)).Value;
-        set => Style.Set(new MaxHeight(value));
+    protected virtual WidthProperty DefaultWidth => new(Dimension.Auto);
+
+    public virtual Dimension MinHeight {
+        get => _style.Get(DefaultMinHeight).Value;
+        set => _style.Set(new MinHeightProperty(value));
     }
+
+    protected virtual MaxHeightProperty DefaultMinHeight => new(Dimension.Auto);
+
+    public virtual Dimension MaxHeight {
+        get => _style.Get(DefaultMaxHeight).Value;
+        set => _style.Set(new MaxHeightProperty(value));
+    }
+
+    protected virtual MaxHeightProperty DefaultMaxHeight => new(Dimension.Auto);
+    
+    public virtual Dimension Height {
+        get => _style.Get(DefaultHeight).Value;
+        set => _style.Set(new HeightProperty(value));
+    }
+
+    protected virtual HeightProperty DefaultHeight => new(Dimension.Auto);
 
     public virtual BorderStyle Border {
-        get => Style.Get(new BorderProperty()).Value;
-        set => Style.Set(new BorderProperty(value));
+        get => _style.Get(new BorderProperty(DefaultBorder)).Value;
+        set => _style.Set(new BorderProperty(value));
     }
+
+    protected virtual BorderStyle DefaultBorder => BorderStyle.Borderless;
 
     public virtual PaddingProperty Padding {
-        get => Style.Get(new PaddingProperty());
-        set => Style.Set(value);
+        get => _style.Get(DefaultPadding);
+        set => _style.Set(value);
     }
+
+    protected virtual PaddingProperty DefaultPadding => new();
 
     public virtual MarginProperty Margin {
-        get => Style.Get(new MarginProperty());
-        set => Style.Set(value);
+        get => _style.Get(DefaultMargin);
+        set => _style.Set(value);
     }
+
+    protected virtual MarginProperty DefaultMargin => new();
 
     public virtual NKColor BackgroundColor {
-        get => Style.Get(new BackgroundColorProperty()).Value;
-        set => Style.Set(new BackgroundColorProperty(value));
+        get => _style.Get(DefaultBackgroundColor).Value;
+        set => _style.Set(new BackgroundColorProperty(value));
     }
 
-    public virtual GridAlignProperty GridAlign {
-        get => Style.Get(new GridAlignProperty());
-        set => Style.Set(value);
+    protected virtual BackgroundColorProperty DefaultBackgroundColor => new(NKColor.Inherit);
+
+    public Rectangle GridAlign {
+        get => _style.Get(DefaultGridAlign).Value;
+        set => _style.Set(new GridAlignProperty(value));
     }
 
-    public virtual AlignSelfProperty AlignSelf {
-        get => Style.Get(new AlignSelfProperty());
-        set => Style.Set(value);
+    protected virtual GridAlignProperty DefaultGridAlign => new(new Rectangle(0, 0, 0, 0));
+    
+    public virtual bool Overflow {
+        get => _style.Get(new OverflowProperty(DefaultOverflow)).Value;
+        set => _style.Set(new OverflowProperty(value));
+    }
+    
+    protected virtual bool DefaultOverflow => false;
+    
+    
+    // =========================== STYLE CHANGE NOTIFICATIONS =========================== // 
+
+    protected Styles.StyleCollection _style = new();
+    protected event Action? OnStyleAccess = () => {};
+    
+    public Styles.StyleCollection Style {
+        get {
+            OnStyleAccess?.Invoke();
+            return _style;
+        }
     }
 
-    public abstract StyleCollection Style { get; }
+    
+    // =========================== IELEMENT IMPLEMENTATION =========================== // 
+    
+    public abstract void Render(ICharCanvas canvas, Rectangle rect);
+    public abstract Size GetMinSize(Size parent);
+    public abstract Size GetMaxSize(Size parent);
+    public abstract Size GetRenderSize(Size bounds);
+    public abstract event Action? OnElementUpdated;
+    public abstract OneOf<IElement[], string> GetChildren();
+    public abstract void AddChild(IElement[] child);
+    public abstract void SetChildren(OneOf<IElement[], string> children);
 }

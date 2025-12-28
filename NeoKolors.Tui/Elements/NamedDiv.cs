@@ -1,52 +1,73 @@
-﻿//
-// NeoKolors
+﻿// NeoKolors
 // Copyright (c) 2025 KryKom
-//
 
-using NeoKolors.Tui.Styles;
+using NeoKolors.Tui.Elements.Caching;
+using NeoKolors.Tui.Styles.Properties;
+using NeoKolors.Tui.Styles.Values;
 
 namespace NeoKolors.Tui.Elements;
 
-[ElementName("ndiv")]
-[ApplicableStyles(typeof(Div), "ndiv-title")]
 public class NamedDiv : Div {
-    
-    public NDivTitleProperty TitleStyle => 
-        Style["ndiv-title"].Value is NDivTitleProperty style ? style : new NDivTitleProperty().Value;
-    
-    public string Title { get; }
 
-    public NamedDiv(string title, string[] selectors, params IElement[] content) : base(selectors, content) {
-        Title = title;
+    public string Name {
+        get;
+        set {
+            field = value;
+            InvokeElementUpdated();
+        }
     }
 
-    public NamedDiv(string title, params IElement[] content) : base([], content) {
-        Title = title;
+    
+    // ----------------------------- STYLES ----------------------------- //
+
+    public virtual Dimension TitlePadding {
+        get => _style.Get(new DivTitlePaddingProperty(DefaultTitlePadding)).Value;
+        set => _style.Set(new DivTitlePaddingProperty(value));
     }
 
-    public override void Render(in IConsoleScreen target, Rectangle rect) {
-        base.Render(target, rect);
-        if (Border.IsBorderless) return;
-        var border = IElement.GetBorderRect(rect, Margin);
+    public virtual Dimension DefaultTitlePadding => Dimension.Chars(1);
 
-        string t = Title;
+    public virtual HorizontalAlign TitleAlign {
+        get => _style.Get(new DivTitleAlignProperty(DefaultTitleAlign)).Value;
+        set => _style.Set(new DivTitleAlignProperty(value));
+    }
 
-        if (TitleStyle.Padding) {
-            t = t.Length > border.Width - 6 
-                ? $" {t[..Math.Max(border.Width - 7, 0)]}… " 
-                : $" {t} ";
-        }
-        else if (t.Length > border.Width - 4) {
-            t = $"{t[..Math.Max(border.Width - 5, 0)]}…";
-        }
+    public virtual HorizontalAlign DefaultTitleAlign => HorizontalAlign.LEFT;
+    
+    
+    // -------------------------- CONSTRUCTOR -------------------------- // 
 
-        int xOffset = TitleStyle.Align switch {
-            HorizontalAlign.LEFT => 2,
-            HorizontalAlign.CENTER => border.Width / 2 - t.Length / 2 + 1,
-            HorizontalAlign.RIGHT => border.Width - t.Length - 2,
-            _ => throw new ArgumentOutOfRangeException()
-        };
+    public NamedDiv(string name, params IElement[] children) : base(children) {
+        Name = name;
+    }
+    
+    
+    // --------------------------- RENDERING --------------------------- // 
+    
+    public override void Render(ICharCanvas canvas, Rectangle rect) {
+        base.Render(canvas, rect);
+
+        ElementLayout el;
         
-        target.DrawText(t, border.LowerX + xOffset, border.LowerY, TitleStyle.Style);
+        if (CanUseRenderCache()) {
+            el = _layoutCacher.GetRenderLayout();
+        }
+        else if (CanUseMinCache() && _updateCache.GetHasRender()) {
+            el = _layoutCacher.GetMinLayout();
+        }
+        else if (CanUseMaxCache() && _updateCache.GetHasRender()) {
+            el = _layoutCacher.GetMaxLayout();
+        }
+        else {
+            (el, var cl) = GetRenderLayout(rect.Size);
+            _layoutCacher.SetRender(rect.Size, el);
+            _childrenCacher.SetRender(rect.Size, cl);
+            SetCanUseRenderCache();
+        }
+
+        var bw = el.Border!.Value.Width;
+        int p = TitlePadding.ToScalar(el.Border!.Value.Width);
+        
+        canvas.PlaceString(Name, rect.Lower + el.Border!.Value.Lower + new Point(p, 0), bw - p * 2, TitleAlign);
     }
 }

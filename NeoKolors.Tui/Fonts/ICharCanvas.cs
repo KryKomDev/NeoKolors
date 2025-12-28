@@ -1,6 +1,6 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
-
+/*
 namespace NeoKolors.Tui.Fonts;
 
 public interface ICharCanvas {
@@ -69,3 +69,4 @@ public interface ICharCanvas {
     /// <param name="canvas">The character canvas to be placed onto the current canvas.</param>
     public void PlaceCanvas(int x, int y, ICharCanvas canvas);
 }
+*/

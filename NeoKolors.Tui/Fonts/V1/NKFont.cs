@@ -3,7 +3,6 @@
 // Copyright (c) 2025 KryKom
 //
 
-using System.Globalization;
 using System.Text;
 
 namespace NeoKolors.Tui.Fonts.V1;

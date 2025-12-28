@@ -5,4 +5,4 @@
 
 namespace NeoKolors.Tui.Events;
 
-public delegate void AppStartEventHandler(object? sender, AppStartEventArgs args);
+public delegate void AppStartEventHandler(IApplication sender, AppStartEventArgs args);

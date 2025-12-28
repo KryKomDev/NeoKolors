@@ -3,7 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Tui.Styles;
+using NeoKolors.Tui.Styles.Properties;
 
 namespace NeoKolors.Tui.Exceptions;
 

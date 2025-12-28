@@ -5,7 +5,7 @@ namespace NeoKolors.Extensions;
 
 public static class ConsoleKeyInfoExtensions {
     extension(ConsoleKeyInfo key) {
-        public string ToString() => $"{(key.HasCtrl ? "Ctrl + " : "")}" +
+        public string AsString() => $"{(key.HasCtrl ? "Ctrl + " : "")}" +
                                     $"{(key.HasAlt ? "Alt + " : "")}" +
                                     $"{(key.HasShift ? "Shift + " : "")}" + 
                                     $"{key.Key.ToString()} => '{key.KeyChar}'";

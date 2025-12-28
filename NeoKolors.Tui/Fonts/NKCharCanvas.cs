@@ -1,12 +1,12 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
+/*
 using System.Runtime.CompilerServices;
 using System.Text;
 using Metriks;
 
 namespace NeoKolors.Tui.Fonts;
-
 /// <summary>
 /// Represents a two-dimensional character canvas designed for rendering and manipulation of text elements.
 /// </summary>
@@ -80,3 +80,4 @@ public class NKCharCanvas : ICharCanvas {
         _canvas.Place(arr, new Point2D(x, y));
     }
 }
+*/

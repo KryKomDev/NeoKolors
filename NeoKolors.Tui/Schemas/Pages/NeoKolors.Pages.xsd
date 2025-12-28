@@ -10,8 +10,8 @@
 
     <xsd:include schemaLocation="NeoKolors.Pages.Body.xsd"/>
     
-    <xsd:element name="Body" type="nk:Body">
+    <xsd:elementOld name="Body" type="nk:Body">
         
-    </xsd:element>
+    </xsd:elementOld>
     
 </xsd:schema>

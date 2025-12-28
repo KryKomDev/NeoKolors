@@ -3,7 +3,6 @@
 // Copyright (c) 2025 KryKom
 //
 
-using System.Diagnostics.Contracts;
 using static NeoKolors.Common.EscapeCodes;
 using static NeoKolors.Common.TextStyles;
 
@@ -123,24 +122,4 @@ public static class Extensions {
         public bool HasAlt => key.Modifiers.HasFlag(ConsoleModifiers.Alt);
         public bool HasCtrl => key.Modifiers.HasFlag(ConsoleModifiers.Control);
     }
-
-    /// <summary>
-    /// Converts the provided array of <see cref="NKColor"/> instances into a collection
-    /// of <see cref="NKBckg"/> instances.
-    /// </summary>
-    /// <param name="colors">An array of <see cref="NKColor"/> instances to be converted.</param>
-    /// <returns>An enumerable collection of <see cref="NKBckg"/> instances corresponding to the input colors.</returns>
-    [Pure]
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static IEnumerable<NKBckg> ToBckg(this NKColor[] colors) => colors.Select(c => new NKBckg(c));
-
-    /// <summary>
-    /// Converts the specified <see cref="NKColor"/> to its corresponding
-    /// <see cref="NKBckg"/> representation.
-    /// </summary>
-    /// <param name="color">The <see cref="NKColor"/> instance to convert.</param>
-    /// <returns>A new <see cref="NKBckg"/> instance representing the background color.</returns>
-    [Pure]
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static NKBckg ToBckg(this NKColor color) => new(color);
 }

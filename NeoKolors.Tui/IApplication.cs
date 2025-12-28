@@ -1,9 +1,8 @@
-﻿//
-// NeoKolors
+﻿// NeoKolors
 // Copyright (c) 2025 KryKom
-//
 
 using NeoKolors.Console.Events;
+using NeoKolors.Tui.Dom;
 using NeoKolors.Tui.Events;
 
 namespace NeoKolors.Tui;
@@ -11,10 +10,12 @@ namespace NeoKolors.Tui;
 public interface IApplication {
     
     /// <summary>
-    /// renders the application
+    /// Represents the Document Object Model (DOM) of the application.
+    /// Provides capabilities for accessing and manipulating the application's
+    /// visual hierarchy and elements.
     /// </summary>
-    public void Render();
-    
+    public IDom Dom { get; }
+
     /// <summary>
     /// starts the application life-cycle
     /// </summary>
@@ -48,5 +49,5 @@ public interface IApplication {
     /// Represents an event triggered when the application stop process is initiated.
     /// This event occurs at the conclusion of the application's life-cycle.
     /// </summary>
-    public event EventHandler StopEvent;
+    public event AppStopEventHandler StopEvent;
 }

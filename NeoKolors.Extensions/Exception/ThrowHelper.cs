@@ -3,10 +3,12 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace NeoKolors.Extensions.Exception;
 
+[DebuggerStepThrough]
 public static class ThrowHelper {
     
     /// <summary>
@@ -29,6 +31,7 @@ public static class ThrowHelper {
         if (obj is null) throw exception;
     }
     
+    [DebuggerStepThrough]
     public static class ArgOutOfRange {
         
         /// <summary>

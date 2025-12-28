@@ -2,7 +2,6 @@
 // Copyright (c) 2025 KryKom
 
 using System.Text.RegularExpressions;
-using NeoKolors.Extensions;
 using TokenData = OneOf.OneOf<
     NeoKolors.Tui.Fonts.NKFontStringTokenizer.SimpleToken,
     NeoKolors.Tui.Fonts.NKFontStringTokenizer.LigatureToken, 

@@ -22,7 +22,7 @@ public static class ColorFormat {
     /// converts a color stored in an int to SKColor
     /// </summary>
     /// <param name="c">source int color</param>
-    /// <param name="autoAlpha">if true automatically sets alpha to 255</param>
+    /// <param name="autoAlpha">if true, automatically sets alpha to 255</param>
     public static SKColor IntToSkia(this int c, bool autoAlpha = true) =>
         new((byte)(c >> 16), (byte)(c >> 8), (byte)c, (byte)(autoAlpha ? 255 : (byte)(c >> 24)));
 
@@ -128,14 +128,14 @@ public static class ColorFormat {
     public static NKConsoleColor SystemToNK(ConsoleColor color) {
         return color switch {
             Black or DarkGreen or DarkMagenta or Gray or DarkGray or Green or Magenta or White => (NKConsoleColor)color,
-            DarkBlue => DARK_BLUE,
-            DarkCyan => DARK_CYAN,
-            DarkRed => DARK_RED,
+            DarkBlue   => DARK_BLUE,
+            DarkCyan   => DARK_CYAN,
+            DarkRed    => DARK_RED,
             DarkYellow => DARK_YELLOW,
-            Blue => BLUE,
-            Cyan => CYAN,
-            Red => RED,
-            Yellow => YELLOW,
+            Blue       => BLUE,
+            Cyan       => CYAN,
+            Red        => RED,
+            Yellow     => YELLOW,
             _ => WHITE
         };
     }
@@ -151,18 +151,18 @@ public static class ColorFormat {
         ThrowIf((byte)color >= 16, InvalidColorCastException.NKToSystem(color));
         return color switch {
             BLACK or DARK_GREEN or DARK_MAGENTA or GRAY or DARK_GRAY or GREEN or MAGENTA or WHITE => (ConsoleColor)color,
-            DARK_BLUE => DarkBlue,
-            DARK_CYAN => DarkCyan,
-            DARK_RED => DarkRed,
+            DARK_BLUE   => DarkBlue,
+            DARK_CYAN   => DarkCyan,
+            DARK_RED    => DarkRed,
             DARK_YELLOW => DarkYellow,
-            BLUE => Blue,
-            CYAN => Cyan,
-            RED => Red,
-            YELLOW => Yellow,
+            BLUE        => Blue,
+            CYAN        => Cyan,
+            RED         => Red,
+            YELLOW      => Yellow,
             _ => White
         };
     }
 
     public static NKColor SkiaToNK(this SKColor color) =>
-        NKColor.FromArgb(color.Red, color.Green, color.Blue);
+        NKColor.FromRgb(color.Red, color.Green, color.Blue);
 }

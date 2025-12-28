@@ -3,7 +3,6 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Common.Util;
 using NeoKolors.Console.Mouse;
 
 namespace NeoKolors.Tui;
@@ -20,7 +19,7 @@ public struct AppConfig {
     public bool CtrlCForceQuits {
         get;
         set {
-            System.Console.TreatControlCAsInput = !value;
+            Stdio.TreatControlCAsInput = !value;
 
             field = value;
         }
@@ -104,11 +103,11 @@ public struct AppConfig {
 
     public override string ToString() {
         return $"CtrlCForceQuits: {CtrlCForceQuits}, " +
-               $"InterruptCombination: {Extensions.ToString(InterruptCombination)}, " +
+               $"InterruptCombination: {InterruptCombination.ToString()}, " +
                $"LazyRender: {LazyRender}, " +
                $"MaxUpdatesPerSecond: {FpsLimit}, " +
                $"EnableDebugLogging: {EnableDebugLogging}, " +
-               $"ToggleDebugLogCombination: {Extensions.ToString(ToggleDebugLogCombination)}";
+               $"ToggleDebugLogCombination: {ToggleDebugLogCombination.ToString()}";
     }
 
     public readonly struct FramerateLimit {

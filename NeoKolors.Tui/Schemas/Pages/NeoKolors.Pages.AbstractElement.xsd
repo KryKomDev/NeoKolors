@@ -13,7 +13,7 @@
     <xsd:complexType name="AbstractElement" abstract="true">
         <xsd:attribute name="Id">
             <xsd:annotation>
-                <xsd:documentation>Defines the id of the element.</xsd:documentation>
+                <xsd:documentation>Defines the id of the elementOld.</xsd:documentation>
             </xsd:annotation>
             <xsd:simpleType>
                 <xsd:restriction base="nkc:Identifier"/>
@@ -22,7 +22,7 @@
 
         <xsd:attribute name="Class">
             <xsd:annotation>
-                <xsd:documentation>Defines the class of the element.</xsd:documentation>
+                <xsd:documentation>Defines the class of the elementOld.</xsd:documentation>
             </xsd:annotation>
             <xsd:simpleType>
                 <xsd:restriction base="nkc:Identifier"/>

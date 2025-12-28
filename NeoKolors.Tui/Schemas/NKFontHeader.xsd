@@ -10,37 +10,37 @@
     
     <!-- char font header -->
     
-    <xsd:element name="NKCFont">
+    <xsd:elementOld name="NKCFont">
         <xsd:complexType>
             <xsd:all>
-                <xsd:element name="Header" type="nk:Header"/>
-                <xsd:element name="Dimensions" type="nk:Dimensions"/>
-                <xsd:element name="GlyphConf" type="nk:GlyphConf"/>
-                <xsd:element name="CharFontConf" type="nk:CharFontConf"/>
+                <xsd:elementOld name="Header" type="nk:Header"/>
+                <xsd:elementOld name="Dimensions" type="nk:Dimensions"/>
+                <xsd:elementOld name="GlyphConf" type="nk:GlyphConf"/>
+                <xsd:elementOld name="CharFontConf" type="nk:CharFontConf"/>
             </xsd:all>
         </xsd:complexType>
-    </xsd:element>
+    </xsd:elementOld>
     
     
     <!-- image font header -->
 
-    <xsd:element name="NKIFont">
+    <xsd:elementOld name="NKIFont">
         <xsd:complexType>
             <xsd:all>
-                <xsd:element name="Header" type="nk:Header"/>
-                <xsd:element name="Dimensions" type="nk:Dimensions"/>
-                <xsd:element name="GlyphConf" type="nk:GlyphConf"/>
-                <xsd:element name="ImgFontConf" type="nk:ImgFontConf"/>
+                <xsd:elementOld name="Header" type="nk:Header"/>
+                <xsd:elementOld name="Dimensions" type="nk:Dimensions"/>
+                <xsd:elementOld name="GlyphConf" type="nk:GlyphConf"/>
+                <xsd:elementOld name="ImgFontConf" type="nk:ImgFontConf"/>
             </xsd:all>
         </xsd:complexType>
-    </xsd:element>
+    </xsd:elementOld>
     
     
     <!-- header -->
     
     <xsd:complexType name="Header">
         <xsd:all>
-            <xsd:element name="Version">
+            <xsd:elementOld name="Version">
                 <xsd:simpleType>
                     <xsd:annotation>
                         <xsd:documentation>
@@ -51,23 +51,23 @@
                         <xsd:pattern value="([0-9])+\.([0-9])+\.([0-9])+(\.)*([A-Za-z0-9])*"/>
                     </xsd:restriction>
                 </xsd:simpleType>
-            </xsd:element>
+            </xsd:elementOld>
 
-            <xsd:element name="FontName" type="xsd:string">
+            <xsd:elementOld name="FontName" type="xsd:string">
                 <xsd:annotation>
                     <xsd:documentation>
                         Name of the font
                     </xsd:documentation>
                 </xsd:annotation>
-            </xsd:element>
+            </xsd:elementOld>
 
-            <xsd:element name="FontPath" type="xsd:string">
+            <xsd:elementOld name="FontPath" type="xsd:string">
                 <xsd:annotation>
                     <xsd:documentation>
                         Path to the actual font file
                     </xsd:documentation>
                 </xsd:annotation>
-            </xsd:element>
+            </xsd:elementOld>
         </xsd:all>
     </xsd:complexType>
     
@@ -76,10 +76,10 @@
     
     <xsd:complexType name="Dimensions">
         <xsd:all>
-            <xsd:element name="LetterSpacing" type="xsd:int"/>
-            <xsd:element name="WordSpacing" type="xsd:int"/>
-            <xsd:element name="LineSpacing" type="xsd:int"/>
-            <xsd:element name="LineSize" type="xsd:int"/>
+            <xsd:elementOld name="LetterSpacing" type="xsd:int"/>
+            <xsd:elementOld name="WordSpacing" type="xsd:int"/>
+            <xsd:elementOld name="LineSpacing" type="xsd:int"/>
+            <xsd:elementOld name="LineSize" type="xsd:int"/>
         </xsd:all>
     </xsd:complexType>
     
@@ -88,7 +88,7 @@
     
     <xsd:complexType name="GlyphConf">
         <xsd:all>
-            <xsd:element name="MissingGlyphMode" default="skip">
+            <xsd:elementOld name="MissingGlyphMode" default="skip">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string">
                         <xsd:enumeration value="char"/>
@@ -97,24 +97,24 @@
                         <xsd:enumeration value="throw"/>
                     </xsd:restriction>
                 </xsd:simpleType>
-            </xsd:element>
+            </xsd:elementOld>
 
-            <xsd:element name="MissingGlyphSubstitute" default="?">
+            <xsd:elementOld name="MissingGlyphSubstitute" default="?">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string">
                         <xsd:length value="1"/>
                     </xsd:restriction>
                 </xsd:simpleType>
-            </xsd:element>
+            </xsd:elementOld>
             
-            <xsd:element name="Ligatures" minOccurs="0" default="0">
+            <xsd:elementOld name="Ligatures" minOccurs="0" default="0">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:int">
                         <xsd:minInclusive value="0"/>
                         <xsd:maxInclusive value="3"/>
                     </xsd:restriction>
                 </xsd:simpleType>
-            </xsd:element>
+            </xsd:elementOld>
         </xsd:all>
     </xsd:complexType>
     
@@ -123,10 +123,10 @@
     
     <xsd:complexType name="CharFontConf">
         <xsd:all>
-            <xsd:element name="GlyphDefStartMarker" type="xsd:string" default="[[["/>
-            <xsd:element name="GlyphDefEndMarker" type="xsd:string" default="]]]"/>
+            <xsd:elementOld name="GlyphDefStartMarker" type="xsd:string" default="[[["/>
+            <xsd:elementOld name="GlyphDefEndMarker" type="xsd:string" default="]]]"/>
 
-            <xsd:element name="Overlap" default="overlap">
+            <xsd:elementOld name="Overlap" default="overlap">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string">
                         <xsd:enumeration value="transparent"/>
@@ -134,15 +134,15 @@
                         <xsd:enumeration value="mask"/>
                     </xsd:restriction>
                 </xsd:simpleType>
-            </xsd:element>
+            </xsd:elementOld>
 
-            <xsd:element name="MaskCharacter" default=".">
+            <xsd:elementOld name="MaskCharacter" default=".">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string">
                         <xsd:length value="1"/>
                     </xsd:restriction>
                 </xsd:simpleType>
-            </xsd:element>
+            </xsd:elementOld>
         </xsd:all>
     </xsd:complexType>
     
@@ -151,41 +151,41 @@
     
     <xsd:complexType name="ImgFontConf">
         <xsd:all>
-            <xsd:element name="GlyphWidth">
+            <xsd:elementOld name="GlyphWidth">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:int">
                         <xsd:minInclusive value="1"/>
                         <xsd:maxInclusive value="128"/>
                     </xsd:restriction>
                 </xsd:simpleType>
-            </xsd:element>
+            </xsd:elementOld>
             
-            <xsd:element name="GlyphHeight">
+            <xsd:elementOld name="GlyphHeight">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:int">
                         <xsd:minInclusive value="1"/>
                         <xsd:maxInclusive value="128"/>
                     </xsd:restriction>
                 </xsd:simpleType>
-            </xsd:element>
+            </xsd:elementOld>
             
-            <xsd:element name="Mono">
+            <xsd:elementOld name="Mono">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:boolean"/>
                 </xsd:simpleType>
-            </xsd:element>
+            </xsd:elementOld>
             
-            <xsd:element name="Layout">
+            <xsd:elementOld name="Layout">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string"/>
                 </xsd:simpleType>
-            </xsd:element>
+            </xsd:elementOld>
         </xsd:all>
     </xsd:complexType>
     
     <xsd:complexType name="a">
         <xsd:choice>
-            <xsd:element name="a1a" type="xsd:int" maxOccurs="unbounded"/>
+            <xsd:elementOld name="a1a" type="xsd:int" maxOccurs="unbounded"/>
         </xsd:choice>
     </xsd:complexType>
     

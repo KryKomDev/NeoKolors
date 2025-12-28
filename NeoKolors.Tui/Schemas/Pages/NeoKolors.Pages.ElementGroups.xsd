@@ -10,7 +10,7 @@
 
     <xsd:group name="ElementsAll">
         <xsd:choice>
-            <xsd:element name="Div"/>
+            <xsd:elementOld name="Div"/>
         </xsd:choice>
     </xsd:group>
     

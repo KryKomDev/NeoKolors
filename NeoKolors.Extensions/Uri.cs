@@ -1,8 +1,6 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-using JetBrains.Annotations;
-
 namespace NeoKolors.Extensions;
 
 public static class UriExtensions {

@@ -4,14 +4,13 @@
 //
 
 using System.Drawing;
-using NeoKolors.Common.Util;
 using static System.Math;
 
 namespace NeoKolors.Common;
 
 public readonly struct NKPalette : IFormattable {
     
-    public int this[int index] => _colors[index];
+    public uint this[int index] => _colors[index];
     private readonly NKColor[] _colors;
     public NKColor[] Colors => _colors;
     public int Length => _colors.Length;
@@ -67,7 +66,7 @@ public readonly struct NKPalette : IFormattable {
     /// prints a palette to the console
     /// </summary>
     public void PrintPalette() {
-        foreach (int c in _colors) {
+        foreach (var c in _colors) {
             Console.Write("● ".AddColor(c));
         }
         

@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 namespace NeoKolors.Tui.Fonts.Serialization.Xml;
 
 [XmlRoot("AlignToGrid", Namespace = NKFontSchema.SCHEMA_NAMESPACE)]
-public partial class AlignToGrid {
+public partial class AlignToGrid { // todo: implement
     
     private bool? _field;
     
@@ -21,7 +21,7 @@ public partial class AlignToGrid {
         set => _field = value;
     }
 
-    public static implicit operator bool(AlignToGrid monospace) => monospace?.Value ?? false;
+    public static implicit operator bool(AlignToGrid? monospace) => monospace?.Value ?? false;
     public static implicit operator AlignToGrid(bool value) => new() { Value = value };
     
     public override string ToString() => Value.ToString();

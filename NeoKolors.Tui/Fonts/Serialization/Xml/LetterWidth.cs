@@ -2,6 +2,7 @@
 // Copyright (c) 2025 KryKom
 
 using System.Xml.Serialization;
+#pragma warning disable CS9264 // Non-nullable property must contain a non-null value when exiting constructor. Consider adding the 'required' modifier, or declaring the property as nullable, or adding '[field: MaybeNull, AllowNull]' attributes.
 
 namespace NeoKolors.Tui.Fonts.Serialization.Xml;
 

@@ -12,7 +12,7 @@
     
     <xsd:complexType name="Body">
         <xsd:annotation>
-            <xsd:documentation>The root element for all NeoKolors pages.</xsd:documentation>
+            <xsd:documentation>The root elementOld for all NeoKolors pages.</xsd:documentation>
         </xsd:annotation>
         
         <xsd:sequence>

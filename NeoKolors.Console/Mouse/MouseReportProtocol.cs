@@ -6,5 +6,6 @@ namespace NeoKolors.Console.Mouse;
 public enum MouseReportProtocol {
     X10,
     UTF8,
-    SGR
+    SGR,
+    SGR_PIXELS,
 }

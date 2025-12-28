@@ -1,499 +1,749 @@
-﻿//
-// NeoKolors
+﻿// NeoKolors
 // Copyright (c) 2025 KryKom
-//
 
 using System.Diagnostics.Contracts;
-using NeoKolors.Tui.Exceptions;
+using NeoKolors.Tui.Elements.Caching;
 using NeoKolors.Tui.Styles;
-using static NeoKolors.Tui.Elements.ApplicableStylesAttribute.Predefined;
+using NeoKolors.Tui.Styles.Properties;
+using static NeoKolors.Tui.Styles.Values.Direction;
 
 namespace NeoKolors.Tui.Elements;
 
-[ElementName("div")]
-[ApplicableStyles(CONTAINER | UNIVERSAL)]
-public class Div : ContainerElement, IElement {
+public class Div : ContainerElement {
     
-    public override StyleCollection Style { get; }
+    protected readonly LayoutCacher _layoutCacher;
+    protected readonly ChildrenLayoutCacher _childrenCacher;
     
-    public List<IElement> Children { get; }
-
-    public string[] Selectors { get; }
-
-    public Div(params IElement[] children) : this([], children) { }
+    private protected CacheUpdateFlags _updateCache = CacheUpdateFlags.NONE;
     
-    public Div(string[] selectors, params IElement[] children) {
-        Children = children.ToList();
-        Selectors = selectors;
-        Style = new StyleCollection();
+    // these tell if the cache has been updated for the new content
+    protected bool CanUseMaxCache()    => _updateCache.GetHasMax();
+    protected bool CanUseMinCache()    => _updateCache.GetHasMin();
+    protected bool CanUseRenderCache() => _updateCache.GetHasRender();
+    
+    // these update the _updateCache
+    protected void SetCanUseMaxCache()    => _updateCache |= CacheUpdateFlags.MAX;
+    protected void SetCanUseMinCache()    => _updateCache |= CacheUpdateFlags.MIN;
+    protected void SetCanUseRenderCache() => _updateCache |= CacheUpdateFlags.RENDER;
+    
+    protected List<IElement> _children;
+    public override event Action? OnElementUpdated;
+    
+    protected void InvokeElementUpdated() {
+        _updateCache = CacheUpdateFlags.NONE;
+        OnElementUpdated?.Invoke();
     }
     
-    public void ApplyStyles(StyleCollection styles) {
-        Style.OverrideWith(styles);
+    
+    public Div(params IElement[] children) {
+        _children       = children.ToList();
+        _style          = new StyleCollection();
+        _layoutCacher   = new LayoutCacher(CanUseMinCache, CanUseMaxCache, CanUseRenderCache);
+        _childrenCacher = new ChildrenLayoutCacher(CanUseMinCache, CanUseMaxCache, CanUseRenderCache);
+        OnStyleAccess  += InvokeElementUpdated;
+
+        foreach (var c in children) {
+            c.OnElementUpdated += InvokeElementUpdated;
+        }
     }
     
-    public virtual void Render(in IConsoleScreen target, Rectangle rect) {
-        if (Display == DisplayType.NONE) return;
+    public override void Render(ICharCanvas canvas, Rectangle rect) {
+        if (!Visible) return;
+
+        #if NK_ENABLE_CACHING
         
-        var borderRect = IElement.GetBorderRect(rect, Margin);
-        var contentRect = IElement.GetContentRect(rect, Margin, Padding, Border);
-        
-        target.DrawRect(borderRect, BackgroundColor, Border);
-        
-        switch (Display) {
-            case DisplayType.FLEX: 
-                if (FlexDirection is FlexDirection.ROW or FlexDirection.ROW_REVERSE)
-                    RenderChildrenFlexRow(target, contentRect);
-                else
-                    RenderChildrenFlexColumn(target, contentRect); 
-                break;
-            case DisplayType.INLINE:
-                RenderChildrenInline(target, contentRect);
-                break;
-            case DisplayType.BLOCK:
-                RenderChildrenBlock(target, contentRect);
-                break;
-            case DisplayType.GRID:
-                RenderChildrenGrid(target, contentRect);
-                break;
-            case DisplayType.NONE:
-                break;
-            default:                
-                throw new ArgumentOutOfRangeException();
+        ElementLayout  el;
+        ChildrenLayout cl;
+
+        if (CanUseRenderCache()) {
+            el = _layoutCacher.GetRenderLayout();
+            cl = _childrenCacher.GetRenderLayout();
         }
-    }
-
-    protected void RenderChildrenInline(in IConsoleScreen target, Rectangle rect) {
-        int y = rect.LowerY;
-        int x = rect.LowerX;
-        for (var i = 0; i < Children.Count; i++) {
-
-            int end = i;
-            int xComp = x;
-            int mh = 0;
-            List<int> widths = [];
-            List<int> heights = [];
-            
-            for (int j = i; j < Children.Count; j++) {
-                int cw = Children[j].GetWidth(rect.HigherX - y);
-                if (xComp + cw <= rect.HigherX) {
-                    xComp = rect.LowerX;
-                    int h = Children[j].GetHeight(cw);
-                    mh = Math.Max(mh, h);
-                    widths.Add(cw);
-                    heights.Add(h);
-                }
-                else {
-                    end = j;
-                    break;
-                }
-
-                end = j;
-            }
-
-            xComp = x;
-            for (int j = i; j <= end; j++) {
-                int yo = AlignItems switch {
-                    AlignItems.START => 0,
-                    AlignItems.CENTER => (mh - heights[j - i]) / 2,
-                    AlignItems.END => mh - heights[j - i],
-                    AlignItems.STRETCH => mh,
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-                
-                Children[j].Render(target, new Rectangle(xComp, y, xComp + widths[j - i], y + yo + heights[j - i]));
-                xComp += widths[j - i];
-            }
-
-            y += mh;
-            i = end;
+        else if (CanUseMinCache() && _updateCache.GetHasRender()) {
+            el = _layoutCacher.GetMinLayout();
+            cl = _childrenCacher.GetMinLayout();
         }
-    }
-
-    protected void RenderChildrenFlexRow(in IConsoleScreen target, Rectangle rect) {
-        int total = 0;
-        foreach (var child in Children) {
-            total += child.GetWidth(rect.Height);
-        }
-
-        if (total <= rect.Width) {
-            if (FlexDirection is FlexDirection.ROW) {
-                int c = rect.LowerX;
-                for (int i = 0; i < Children.Count; i++) {
-                    var cw = Children[i].GetWidth(rect.Height);
-                    var v = ComputeAlignItemRow(Children[i].GetHeight(cw), rect);
-                    
-                    Children[i].Render(target, new Rectangle(c, v.LowerY, c + cw, v.HigherY));
-                    
-                    c += cw + 1;
-                }
-            }
-            else if (FlexDirection is FlexDirection.ROW_REVERSE) {
-                int c = rect.HigherX;
-                for (int i = Children.Count - 1; i >= 0; i--) {
-                    var cw = Children[i].GetWidth(rect.Height);
-                    var v = ComputeAlignItemRow(Children[i].GetHeight(cw), rect);
-                    
-                    Children[i].Render(target, new Rectangle(c - cw, v.LowerY, c, v.HigherY));
-                    
-                    c -= cw + 1;
-                }
-            }
-            else {
-                throw new StylePropertyValueOutOfRangeException(typeof(FlexDirection), FlexDirection);
-            }
-            
-            return;
-        }
-        
-        float single = (float)rect.Width / Children.Count;
-        
-        if (FlexDirection is FlexDirection.ROW) {
-            float current = rect.LowerX;
-            for (int i = 0; i < Children.Count; i++) {
-                var v = ComputeAlignItemRow(Children[i].GetHeight((int)single), rect);
-                
-                Children[i].Render(target, new Rectangle(
-                    (int)current, v.LowerY, (int)(current + single - 1), v.HigherY));
-                
-                current += single;
-            }
-        }
-        else if (FlexDirection is FlexDirection.ROW_REVERSE) {
-            float current = rect.HigherX;
-            for (int i = Children.Count - 1; i >= 0; i--) {
-                var v = ComputeAlignItemRow(Children[i].GetHeight((int)single), rect);
-                
-                Children[i].Render(target, new Rectangle(
-                    (int)(current - single - 1), v.LowerY, (int)current, v.HigherY));
-                
-                current += single;
-            }
+        else if (CanUseMaxCache() && _updateCache.GetHasRender()) {
+            el = _layoutCacher.GetMaxLayout();
+            cl = _childrenCacher.GetMaxLayout();
         }
         else {
-            throw new StylePropertyValueOutOfRangeException(typeof(FlexDirection), FlexDirection);
-        }
-    }
-    
-    [Pure]
-    private (int LowerY, int HigherY) ComputeAlignItemRow(int childHeight, Rectangle rect) {
-        switch (AlignItems) {
-            case AlignItems.START: 
-                return (rect.LowerY, childHeight + rect.LowerY);
-            case AlignItems.END: 
-                return (rect.HigherY - childHeight, rect.HigherY);
-            case AlignItems.CENTER:
-                float offset = (float)(rect.Height - childHeight - 1) / 2;
-                return ((int, int))(Math.Floor(rect.LowerY + offset), Math.Floor(rect.HigherY - offset));
-            case AlignItems.STRETCH:
-                return (rect.LowerY, rect.HigherY);
-            default:
-                throw new StylePropertyValueOutOfRangeException(typeof(AlignItems), AlignItems);
-        }
-    }
-
-    protected void RenderChildrenFlexColumn(in IConsoleScreen target, Rectangle rect) {
-        int total = 0;
-        foreach (var child in Children) {
-            total += child.GetHeight(rect.Width);
-        }
-
-        if (total <= rect.Height) {
-            if (FlexDirection is FlexDirection.COLUMN) {
-                int r = rect.LowerY;
-                for (int i = 0; i < Children.Count; i++) {
-                    var ch = Children[i].GetHeight(rect.Width);
-                    var h = ComputeAlignItemCol(Children[i].GetWidth(ch), rect);
-                    
-                    Children[i].Render(target, new Rectangle(h.LowerX, r, h.HigherX, r + ch));
-                    
-                    r += ch + 1;
-                }
-            }
-            else if (FlexDirection is FlexDirection.COLUMN_REVERSE) {
-                int r = rect.HigherY;
-                for (int i = Children.Count - 1; i >= 0; i--) {
-                    var ch = Children[i].GetHeight(rect.Width);
-                    var h = ComputeAlignItemCol(Children[i].GetWidth(ch), rect);
-                    
-                    Children[i].Render(target, new Rectangle(h.LowerX, r - ch, h.HigherX, r));
-                    
-                    r -= ch + 1;
-                }
-            }
-            else {
-                throw new StylePropertyValueOutOfRangeException(typeof(FlexDirection), FlexDirection);
-            }
-            
-            return;
+            (el, cl) = GetRenderLayout(rect);
+            _layoutCacher.SetRender(rect, el);
+            _childrenCacher.SetRender(rect, cl);
+            SetCanUseRenderCache();
         }
         
-        float single = (float)rect.Height / Children.Count;
+        #else
+
+        var (el, cl) = GetRenderLayout(rect);
         
-        if (FlexDirection is FlexDirection.COLUMN) {
-            float current = rect.LowerY;
-            for (int i = 0; i < Children.Count; i++) {
-                var h = ComputeAlignItemCol(Children[i].GetWidth((int)single), rect);
-                
-                Children[i].Render(target, new Rectangle(
-                    h.LowerX, (int)current, h.HigherX, (int)(current + single - 1)));
-                
-                current += single;
-            }
-        }
-        else if (FlexDirection is FlexDirection.COLUMN_REVERSE) {
-            float current = rect.HigherY;
-            for (int i = Children.Count - 1; i >= 0; i--) {
-                var h = ComputeAlignItemCol(Children[i].GetWidth((int)single), rect);
-                
-                Children[i].Render(target, new Rectangle(
-                    h.LowerX, (int)(current - single - 1), h.HigherX, (int)current));
-                
-                current += single;
-            }
+        #endif
+        
+        if (!Border.IsBorderless) {
+            canvas.StyleBackground(el.Border!.Value + rect.Lower, BackgroundColor);
+            canvas.PlaceRectangle(el.Border!.Value + rect.Lower, Border);
         }
         else {
-            throw new StylePropertyValueOutOfRangeException(typeof(FlexDirection), FlexDirection);
+            canvas.StyleBackground(el.Content + rect.Lower, BackgroundColor);
+        }
+
+        for (int i = 0; i < _children.Count; i++) {
+            var child = cl.Children[i];
+            
+            if (child.Size != Size.Zero && child != Rectangle.Zero)
+                _children[i].Render(canvas, child + rect.Lower);
         }
     }
     
+    
+    // --------------------------------- MIN LAYOUT COMP --------------------------------- //
+
+    #region MIN LAYOUT COMP
+    
+    public override Size GetMinSize(Size parent) {
+
+        #if NK_ENABLE_CACHING
+        
+        if (CanUseMinCache())
+            return _layoutCacher.GetMinLayout().ElementSize;
+        
+        var (e, c) = ComputeMinLayout(parent);
+        _layoutCacher.SetMin(parent, e);
+        _childrenCacher.SetMin(parent, c);
+        SetCanUseMinCache();
+        
+        return e.ElementSize;
+    
+        #else
+
+        return ComputeMinLayout(parent).Element.ElementSize;
+
+        #endif
+    }
+
     [Pure]
-    private (int LowerX, int HigherX) ComputeAlignItemCol(int childWidth, Rectangle rect) {
-        switch (AlignItems) {
-            case AlignItems.START: 
-                return (rect.LowerX, childWidth + rect.LowerX);
-            case AlignItems.END: 
-                return (rect.HigherX - childWidth, rect.HigherX);
-            case AlignItems.CENTER:
-                float offset = (float)(rect.Width - childWidth - 1) / 2;
-                return ((int, int))(Math.Floor(rect.LowerX + offset), Math.Floor(rect.HigherX - offset));
-            case AlignItems.STRETCH:
-                return (rect.LowerX, rect.HigherX);
-            default:
-                throw new StylePropertyValueOutOfRangeException(typeof(AlignItems), AlignItems);
-        }
+    protected (ElementLayout Element, ChildrenLayout Children) ComputeMinLayout(Size parent) {
+        return !Visible 
+            ? (ElementLayout.Zero, ChildrenLayout.Empty) 
+            : EnableGrid 
+                ? ComputeMinGridLayout(parent) 
+                : ComputeMinNonGridLayout(parent);
     }
 
-    protected void RenderChildrenBlock(in IConsoleScreen target, Rectangle rect) {
-        int current = rect.LowerY;
-        for (int i = 0; i < Children.Count; i++) {
-            int ch = Children[i].GetHeight(rect.Width);
-            
-            Children[i].Render(target, new Rectangle(
-                rect.LowerX, current, rect.HigherX, current + ch - 1));
-            
-            current += ch;
-            if (current > rect.HigherY && !Overflow.HasFlag(OverflowType.VISIBLE_BOTTOM)) break;
-        }
-    }
-
-    protected void RenderChildrenGrid(in IConsoleScreen target, Rectangle rect) {
-        var (widths, heights) = ComputeGrid(rect);
-        
-        foreach (var c in Children) {
-            c.Render(target, ComputeGridRect(rect, c.Style["grid-align"].Value 
-                is Rectangle align ? align : new Rectangle(0, 0, 0, 0), widths, heights));
-        }
-    }
-
-    private (int[] Widths, int[] Heights) ComputeGrid(Rectangle rect) {
-        var g = Grid;
-
-        int[] widths = new int[g.ColCount];
-        int[] heights = new int[g.RowCount];
-        
-        bool floor = false;
-        int sumW = 0;
-        int skipped = 0;
-        for (int i = 0; i < g.ColCount; i++) {
-            if (!g.Cols[i].IsNumber) {
-                skipped++;
-                continue;
-            }
-
-            int w;
-            if (floor) w = (int)Math.Floor(g.Cols[i].ToFloatH(rect.Width));
-            else w = (int)Math.Ceiling(g.Cols[i].ToFloatH(rect.Width));
-
-            sumW += w;
-            widths[i] = w;
-            floor = !floor;
-        }
-
-        floor = true;
-        float singleW = (rect.Width - sumW) / (float)skipped;
-        for (int i = 0; i < g.ColCount; i++) {
-            if (g.Cols[i].IsNumber) continue;
-
-            if (floor) widths[i] = (int)Math.Floor(singleW);
-            else widths[i] = (int)Math.Ceiling(singleW);
-
-            floor = !floor;
-        }
-        
-        floor = false;
-        int sumH = 0;
-        skipped = 0;
-        for (int i = 0; i < g.RowCount; i++) {
-            if (!g.Rows[i].IsNumber) {
-                skipped++;
-                continue;
-            }
-            
-            int h;
-            if (floor) h = (int)Math.Floor(g.Cols[i].ToFloatV(rect.Height));
-            else h = (int)Math.Ceiling(g.Cols[i].ToFloatV(rect.Height));
-            
-            sumH += h;
-            heights[i] = h;
-            floor = !floor;
-        }
-
-        floor = true;
-        float singleH = (rect.Height - sumH) / (float)skipped;
-        for (int i = 0; i < g.RowCount; i++) {
-            if (g.Rows[i].IsNumber) continue;
-
-            if (floor) {
-                heights[i] = (int)Math.Floor(singleH);
-            }
-            else {
-                heights[i] = (int)Math.Ceiling(singleH);
-            }
-
-            floor = !floor;
-        }
-        
-        return (widths, heights);
-    }
-
-    private Rectangle ComputeGridRect(Rectangle rect, Rectangle align, int[] widths, int[] heights) {
-        int lx = rect.LowerX;
-        int ly = rect.LowerY;
-        int hx = rect.LowerX - 1;
-        int hy = rect.LowerY - 1;
-
-        for (int i = 0; i < Math.Min(align.LowerX, widths.Length); i++) {
-            lx += widths[i];
-        }
-
-        for (int i = 0; i < Math.Min(align.LowerY, heights.Length); i++) {
-            ly += heights[i];
-        }
-
-        for (int i = 0; i < Math.Min(align.HigherX + 1, widths.Length); i++) {
-            hx += widths[i];
-        }
-
-        for (int i = 0; i < Math.Min(align.HigherY + 1, heights.Length); i++) {
-            hy += heights[i];
-        }
-        
-        return new Rectangle(lx, ly, hx, hy);
-    }
-    
-    public int GetWidth(int maxHeight) {
+    [Pure]
+    private (ElementLayout, ChildrenLayout) ComputeMinGridLayout(Size parent) {
         int w = 0;
-        
-        switch (Display) {
-            case DisplayType.NONE:
-                return 0;
-            case DisplayType.INLINE:
-                throw new NotImplementedException();
-            case DisplayType.BLOCK:
-                w += Children.Sum(c => c.GetWidth(maxHeight));
-                break;
-            case DisplayType.FLEX:
-                switch (FlexDirection) {
-                    case FlexDirection.ROW:
-                        w += Children.Sum(c => c.GetWidth(maxHeight));
-                        break;
-                    case FlexDirection.COLUMN:
-                        w += Children.Max(e => e.GetWidth(maxHeight));
-                        break;
-                    case FlexDirection.ROW_REVERSE:
-                        w += Children.Sum(c => c.GetWidth(maxHeight));
-                        break;
-                    case FlexDirection.COLUMN_REVERSE:
-                        w += Children.Max(e => e.GetWidth(maxHeight));
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-                break;
-            case DisplayType.GRID:
-                throw new NotImplementedException();
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-
-        return w;
-    }
-
-    public int GetMinWidth(int maxHeight) {
-        return GetWidth(maxHeight);
-    }
-
-    protected int ComputeHeightNone() => 0;
-
-    protected int ComputeHeightInline(int width) {
         int h = 0;
-        int mh = 0;
-        int cw = 0;
-        for (int i = 0; i < Children.Count; i++) {
-            var w = Children[i].GetWidth(width);
-            if (w + Children[i].GetWidth(width) > width) {
-                
-            }
+        int[] xs = new int[Grid.Columns.Length];
+        int[] xo = new int[Grid.Columns.Length];
+        int[] ys = new int[Grid.Rows.Length];
+        int[] yo = new int[Grid.Rows.Length];
+
+        for (int i = 0; i < Grid.Columns.Length; i++) {
+            var c = Grid.Columns[i];
+            
+            if (c.IsAuto) continue;
+
+            var scalar = c.ToScalar(parent.Width);
+            xs[i] = scalar;
+            w += scalar;
+            xo[i] = w;
         }
 
-        return h;
+        for (int i = 0; i < Grid.Rows.Length; i++) {
+            var r = Grid.Rows[i];
+            
+            if (r.IsAuto) continue;
+
+            var scalar = r.ToScalar(parent.Height);
+            yo[i] = scalar;
+            h += scalar;
+            yo[i] = h;
+        }
+        
+        var content = new Size(w, h);
+
+        var el = IElement.ComputeLayout(content, parent, Margin, Padding, Border,
+            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+
+        var cl = ComputeMinGridChildren(parent, xo, yo, xs, ys);
+        
+        return (el, cl);
+    }
+
+    private ChildrenLayout ComputeMinGridChildren(Size _, int[] xo, int[] yo, int[] xs, int[] ys) {
+        var cl = new Rectangle[_children.Count];
+
+        for (int i = 0; i < _children.Count; i++) {
+            var c = _children[i];
+            var a = c.Style.Get<GridAlignProperty>().Value;
+            cl[i] = new Rectangle(xo[a.LowerX] - xs[a.LowerX], yo[a.LowerY] - ys[a.LowerY],
+                    xo[a.HigherX], yo[a.HigherY]);
+        }
+
+        return new ChildrenLayout(cl);
+    }
+
+    [Pure]
+    private (ElementLayout, ChildrenLayout) ComputeMinNonGridLayout(Size parent) {
+        return Direction is TOP_TO_BOTTOM or BOTTOM_TO_TOP 
+            ? ComputeMinVerticalLayout(parent) 
+            : ComputeMinHorizontalLayout(parent);
+    }
+
+    [Pure]
+    private (ElementLayout, ChildrenLayout) ComputeMinVerticalLayout(Size parent) {
+        int height = 0;
+        int maxWidth = 0;
+        var r = new Rectangle[_children.Count];
+        var y = 0;
+        
+        for (int i = 0; i < _children.Count; i++) {
+            var l = _children[i].GetMinSize(parent);
+            height += l.Height;
+            maxWidth = Math.Max(maxWidth, l.Width);
+            r[i] = l + new Point(0, y);
+            y += l.Height;
+        }
+        
+        var content = new Size(maxWidth, height);
+
+        var el = IElement.ComputeLayout(content, parent, Margin, Padding, Border,
+            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+
+        var cl = new ChildrenLayout(r);
+        
+        return (el, cl);
     }
     
-    public int GetHeight(int maxWidth) {
-        int h = 0;
-        int contentWidth = IElement.GetContentRect(new Rectangle(0, 0, maxWidth, int.MaxValue), Margin, Padding, Border).Width;
-        int marginHeight = Margin.Top.ToIntV(maxWidth) + Margin.Bottom.ToIntV(maxWidth);
-        int borderHeight = Border.IsBorderless ? 0 : 2;
-        int paddingHeight = Padding.Top.ToIntV(maxWidth) + Padding.Bottom.ToIntV(maxWidth);
-        
-        switch (Display) {
-            case DisplayType.NONE:
-                return ComputeHeightNone();
-            case DisplayType.INLINE:
-                h = ComputeHeightInline(contentWidth);
-                break;
-            case DisplayType.BLOCK:
-                h += Children.Sum(c => c.GetHeight(contentWidth));
-                break;
-            case DisplayType.FLEX:
-                switch (FlexDirection) {
-                    case FlexDirection.ROW:
-                        h += Children.Max(e => e.GetHeight(contentWidth)) + 1;
-                        break;
-                    case FlexDirection.COLUMN:
-                        h += Children.Sum(c => c.GetHeight(contentWidth));
-                        break;
-                    case FlexDirection.ROW_REVERSE:
-                        h += Children.Max(e => e.GetHeight(contentWidth)) + 1;
-                        break;
-                    case FlexDirection.COLUMN_REVERSE:
-                        h += Children.Sum(c => c.GetHeight(contentWidth));
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-                break;
-            case DisplayType.GRID:
-                throw new NotImplementedException();
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
+    [Pure]
+    private (ElementLayout, ChildrenLayout) ComputeMinHorizontalLayout(Size parent) {
+        int width = 0;
+        int maxHeight = parent.Height;
+        var r = new Rectangle[_children.Count];
+        int x = 0;
 
-        return h + marginHeight + borderHeight + paddingHeight;
+        for (int i = 0; i < _children.Count; i++) {
+            var l = _children[i].GetMinSize(parent);
+            width += l.Width;
+            maxHeight = Math.Max(maxHeight, l.Height);
+            r[i] = l + new Point(x, 0);
+            x += l.Width;
+        }
+        
+        var content = new Size(width, maxHeight);
+
+        var el = IElement.ComputeLayout(content, parent, Margin, Padding, Border,
+            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        
+        var cl = new ChildrenLayout(r);
+        
+        return (el, cl);
     }
 
-    public int GetMinHeight(int maxWidth) {
-        return GetHeight(maxWidth);   
+    #endregion
+    
+
+    // --------------------------------- MAX LAYOUT COMP --------------------------------- //
+
+    #region MAX LAYOUT COMP
+    
+    public override Size GetMaxSize(Size parent) {
+        #if NK_ENABLE_CACHING
+        
+        if (CanUseMaxCache())
+            return _layoutCacher.GetMaxLayout().ElementSize;
+        
+        var layout = ComputeMaxLayout(parent);
+        _layoutCacher.SetMax(parent, layout);
+        SetCanUseMaxCache();
+        
+        return layout.ElementSize;
+    
+        #else
+
+        return ComputeMaxLayout(parent).ElementSize;
+
+        #endif
+    }
+    
+    [Pure]
+    protected ElementLayout ComputeMaxLayout(Size parent) {
+        return !Visible 
+            ? ElementLayout.Zero
+            : EnableGrid 
+                ? ComputeMaxGridLayout(parent)
+                : ComputeMaxNonGridLayout(parent);
+    }
+
+    [Pure]
+    private ElementLayout ComputeMaxGridLayout(Size parent) {
+        int w   = 0;
+        int wac = 0;
+        int h   = 0;
+        int hac = 0;
+
+        for (int i = 0; i < Grid.Columns.Length; i++) {
+            var c = Grid.Columns[i];
+            
+            if (c.IsAuto) {
+                wac++;
+                continue;
+            }
+            
+            w += c.ToScalar(parent.Width);
+        }
+
+        for (int i = 0; i < Grid.Rows.Length; i++) {
+            var r = Grid.Rows[i];
+
+            if (r.IsAuto) {
+                hac++;
+                continue;
+            }
+            
+            h += r.ToScalar(parent.Height);
+        }
+        
+        var winSize = new Size(Stdio.WindowWidth, Stdio.WindowHeight);
+        
+        var minContent = new Size(w, h);
+        var maxContent = IElement.ComputeLayout(winSize, Margin, Padding, Border,
+            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+
+        if (wac == 0 && hac == 0) {
+            return IElement.ComputeLayout(minContent, parent, Margin, Padding, Border, 
+                Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        }
+
+        if (wac == 0 && hac != 0) {
+            var content = new Size(minContent.Width, Math.Max(maxContent.Content.Height, minContent.Height));
+            return IElement.ComputeLayout(content, parent, Margin, Padding, Border, 
+                Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        }
+
+        if (wac != 0 && hac == 0) {
+            var content = new Size(Math.Max(maxContent.Content.Width, minContent.Width), minContent.Height);
+            return IElement.ComputeLayout(content, parent, Margin, Padding, Border, 
+                Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        }
+        
+        var cont = Size.Max(maxContent.Content, minContent);
+        return IElement.ComputeLayout(cont, parent, Margin, Padding, Border, 
+            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+    }
+
+    [Pure]
+    private ElementLayout ComputeMaxNonGridLayout(Size parent) {
+        return Direction is TOP_TO_BOTTOM or BOTTOM_TO_TOP 
+            ? ComputeMaxVerticalLayout(parent) 
+            : ComputeMaxHorizontalLayout(parent);
+    }
+
+    [Pure]
+    private ElementLayout ComputeMaxVerticalLayout(Size parent) {
+        int height = 0;
+        int maxWidth = 0;
+
+        for (int i = 0; i < _children.Count; i++) {
+            var l = _children[i].GetMaxSize(parent);
+            height += l.Height;
+            maxWidth = Math.Max(maxWidth, l.Width);
+        }
+        
+        var content = new Size(maxWidth, height);
+        
+        return IElement.ComputeLayout(content, parent, Margin, Padding, Border, 
+            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+    }
+    
+    [Pure]
+    private ElementLayout ComputeMaxHorizontalLayout(Size parent) {
+        int width = 0;
+        int maxHeight = parent.Height;
+
+        for (int i = 0; i < _children.Count; i++) {
+            var l = _children[i].GetMaxSize(parent);
+            width += l.Width;
+            maxHeight = Math.Max(maxHeight, l.Height);
+        }
+        
+        var content = new Size(width, maxHeight);
+        
+        return IElement.ComputeLayout(content, parent, Margin, Padding, Border, 
+            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+    }
+
+    #endregion
+    
+    
+    // -------------------------------- RENDER LAYOUT COMP ------------------------------- //
+
+    #region RENDER LAYOUT COMP
+
+    public override Size GetRenderSize(Size parent) => GetRenderLayout(parent).Element.ElementSize;
+
+    protected (ElementLayout Element, ChildrenLayout Children) GetRenderLayout(Size parent) {
+        #if NK_ENABLE_CACHING
+        
+        if (CanUseRenderCache()) 
+            return (_layoutCacher.GetRenderLayout(), _childrenCacher.GetRenderLayout());
+        
+        var layout = ComputeRenderLayout(parent);
+        _layoutCacher.SetRender(parent, layout.Element);
+        _childrenCacher.SetRender(parent, layout.Children);
+        SetCanUseRenderCache();
+
+        return layout;
+
+        #else
+
+        return ComputeRenderLayout(parent);
+        
+        #endif
+    }
+    
+    [Pure]
+    private (ElementLayout Element, ChildrenLayout Children) ComputeRenderLayout(Size parent) {
+        return !Visible 
+            ? (ElementLayout.Zero, ChildrenLayout.Empty)
+            : EnableGrid
+                ? ComputeRenderGridLayout(parent)
+                : ComputeRenderNonGridLayout(parent);
+    }
+
+    [Pure]
+    private (ElementLayout Element, ChildrenLayout Chlidren) ComputeRenderGridLayout(Size parent) {
+        var el = ComputeRenderGridElementLayout(parent);
+        var cl = ComputeRenderGridChildrenLayout(parent, el.Content);
+        
+        return (el, cl);
+    }
+
+    [Pure]
+    private ElementLayout ComputeRenderGridElementLayout(Size parent) {
+        int w   = 0;
+        int wac = 0;
+        int h   = 0;
+        int hac = 0;
+
+        for (int i = 0; i < Grid.Columns.Length; i++) {
+            var c = Grid.Columns[i];
+            
+            if (c.IsAuto) {
+                wac++;
+                continue;
+            }
+            
+            w += c.ToScalar(parent.Width);
+        }
+
+        for (int i = 0; i < Grid.Rows.Length; i++) {
+            var r = Grid.Rows[i];
+
+            if (r.IsAuto) {
+                hac++;
+                continue;
+            }
+            
+            h += r.ToScalar(parent.Height);
+        }
+        
+        var minContent = new Size(w, h);
+        var maxContent = IElement.ComputeLayout(
+            parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+
+        if (wac == 0 && hac == 0) {
+            return IElement.ComputeLayout(minContent, parent, Margin, Padding, Border, 
+                Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        }
+
+        if (wac == 0 && hac != 0) {
+            var content = new Size(minContent.Width, Math.Max(maxContent.Content.Height, minContent.Height));
+            return IElement.ComputeLayout(content, parent, Margin, Padding, Border, 
+                Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        }
+
+        if (wac != 0 && hac == 0) {
+            var content = new Size(Math.Max(maxContent.Content.Width, minContent.Width), minContent.Height);
+            return IElement.ComputeLayout(content, parent, Margin, Padding, Border, 
+                Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        }
+        
+        var cont = Size.Max(maxContent.Content, minContent);
+        return IElement.ComputeLayout(cont, parent, Margin, Padding, Border, 
+            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+    }
+
+    [Pure]
+    private ChildrenLayout ComputeRenderGridChildrenLayout(Size parent, Size content) {
+        int xAutoCount = Grid.Columns.Count(c => c.IsAuto);
+        int yAutoCount = Grid.Rows   .Count(c => c.IsAuto);
+
+        var cc = Grid.Columns.Length;
+        var rc = Grid.Rows.Length;
+
+        int[] xSteps = new int[cc];
+        int[] ySteps = new int[rc];
+        int   width  = 0;
+        int   height = 0;
+        
+        for (int x = 0; x < cc; x++) {
+            var c = Grid.Columns[x];
+            
+            if (c.IsAuto) {
+                xSteps[x] = -1;
+                continue;
+            }
+
+            var scalar = c.ToScalar(parent.Width);
+            xSteps[x] = scalar;
+            width += scalar;
+        }
+
+        for (int y = 0; y < rc; y++) {
+            var r = Grid.Rows[y];
+            
+            if (r.IsAuto) {
+                ySteps[y] = -1;
+                continue;
+            }
+
+            var scalar = r.ToScalar(parent.Height);
+            ySteps[y] = scalar;
+            height += scalar;
+        }
+        
+        int xAutoSize = Math.Max(0, content.Width  - width)  / xAutoCount;
+        int yAutoSize = Math.Max(0, content.Height - height) / yAutoCount;
+
+        int[] xOffsets = new int[cc];
+        int[] yOffsets = new int[rc];
+
+        int cx = 0;
+        
+        for (int x = 0; x < cc; x++) {
+            int nx;
+            
+            if (xSteps[x] == -1) {
+                nx        = xAutoSize;
+                xSteps[x] = xAutoSize;
+            }
+            else {
+                nx = xSteps[x];    
+            }
+
+            cx += nx;
+            xOffsets[x] = cx;
+        }
+
+        int cy = 0;
+
+        for (int y = 0; y < rc; y++) {
+            int ny;
+            
+            if (ySteps[y] == -1) {
+                ny        = yAutoSize;
+                ySteps[y] = yAutoSize;
+            }
+            else {
+                ny = ySteps[y];    
+            }
+
+            cy += ny;
+            yOffsets[y] = cy;
+        }
+        
+        // compute the layout
+        
+        var childrenCount = _children.Count;
+        var childrenLayout = new Rectangle[childrenCount];
+
+        for (int i = 0; i < childrenCount; i++) {
+            var child = _children[i];
+            var a = child.Style.Get<GridAlignProperty>().Value;
+            
+            childrenLayout[i] = new Rectangle(
+                xOffsets[a.LowerX]  - xSteps[a.LowerX], 
+                yOffsets[a.LowerY]  - ySteps[a.LowerY],
+                xOffsets[a.HigherX] - 1,
+                yOffsets[a.HigherY] - 1);
+        }
+        
+        return new ChildrenLayout(childrenLayout);
+    }
+
+    [Pure]
+    private (ElementLayout Element, ChildrenLayout Chlidren) ComputeRenderNonGridLayout(Size parent) {
+        return Direction is TOP_TO_BOTTOM or BOTTOM_TO_TOP
+            ? ComputeRenderVerticalLayout(parent)
+            : ComputeRenderHorizontalLayout(parent);
+    }
+
+    [Pure]
+    private (ElementLayout, ChildrenLayout) ComputeRenderVerticalLayout(Size parent) {
+        var el = IElement.ComputeLayout(
+            parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+
+        var content = el.Content;
+        var cl = new Rectangle[_children.Count];
+        int y = 0;
+        int maxX = 0;
+
+        for (int i = 0; i < _children.Count; i++) {
+            var c =  _children[i];
+            var l = c.GetRenderSize(content);
+            cl[i] = new Rectangle(new Point(content.LowerX, y + content.LowerY), l);
+            y += l.Height;
+            maxX = Math.Max(maxX, l.Width);
+        }
+        
+        content = Size.Min(content, new Size(maxX, y));
+        el = IElement.ComputeLayout(content, parent, 
+            Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        
+        return (el, new ChildrenLayout(cl));
+    }
+
+    [Pure]
+    private (ElementLayout, ChildrenLayout) ComputeRenderHorizontalLayout(Size parent) {
+        var el = IElement.ComputeLayout(
+            parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        
+        var content = el.Content;
+        var cc = _children.Count;
+        
+        var maxR = new Rectangle[cc];
+        int maxXs = 0;
+        int maxMaxY = 0;
+
+        for (int i = 0; i < cc; i++) {
+            var c =  _children[i];
+            var l = c.GetMaxSize(content);
+            maxR[i] = new Rectangle(new Point(content.LowerX + maxXs, content.LowerY), l);
+            maxXs += l.Width;
+            maxMaxY = Math.Max(maxMaxY, l.Height);
+        }
+
+        // elements fit with max width
+        if (maxXs <= content.Width) {
+            var cs = new Size(maxXs, maxMaxY);
+            var fel = IElement.ComputeLayout(cs, parent,
+                Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+
+            return (fel, new ChildrenLayout(maxR));
+        }
+        
+        var minR = new Rectangle[cc];
+        int minXs = 0;
+        int minMaxY = 0;
+         
+        for (int i = 0; i < cc; i++) {
+            var c =  _children[i];
+            var l = c.GetMinSize(content);
+            minR[i] = new Rectangle(new Point(content.LowerX + minXs, content.LowerY), l);
+            minXs += l.Width;
+            minMaxY = Math.Max(minMaxY, l.Height); 
+        }
+
+        // overflow
+        if (minXs >= content.Width) {
+            var cs = new Size(content.Width, minMaxY);
+            var fel = IElement.ComputeLayout(cs, parent,
+                Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+
+            return (fel, new ChildrenLayout(minR));
+        }
+        
+        var rw = new int[cc];
+        int msw = 0;
+        int rsw = 0;
+        bool up = false;
+        
+        for (int i = 0; i < cc; i++) {
+            var w  = (float)maxR[i].Width / maxXs * content.Width;
+            int iw = (int)(up ? Math.Ceiling(w) : Math.Floor(w));
+            
+            if (w < minR[i].Width) {
+                var o = minR[i].Width; 
+                rw[i] = -o;
+                msw += o;
+            }
+            else {
+                rw[i] = iw;
+                rsw += iw;
+                up = !up;
+            }
+        }
+        
+        up = false;
+        
+        for (int i = 0; i < cc; i++) {
+            var f = (float)rw[i] / rsw * (content.Width - msw);
+            
+            if (rw[i] > 0) {
+                rw[i] = (int)(up ? Math.Ceiling(f) : Math.Floor(f));
+                up = !up;
+            }
+            else {
+                rw[i] = -rw[i];
+            }
+        }
+        
+        var rr = new Rectangle[cc];
+        var rx = 0;
+        var rMaxY = 0;
+
+        for (int i = 0; i < cc; i++) {
+            var c = _children[i];
+            var l = c.GetRenderSize(new Size(rw[i], content.Height));
+            rr[i] = new Rectangle(new Point(content.LowerX + rx, content.LowerY), l);
+            rx += l.Width;
+            rMaxY = Math.Max(rMaxY, l.Height); 
+        }
+        
+        var rc = new Size(content.Width, rMaxY);
+        el = IElement.ComputeLayout(
+            rc, parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+
+        return (el, new ChildrenLayout(rr));
+    }
+
+    #endregion
+    
+    
+    // ------------------------------------ CHILDREN ------------------------------------- //
+    
+    public override OneOf<IElement[], string> GetChildren() => _children.ToArray();
+
+    public override void AddChild(IElement[] child) {
+        foreach (var c in child.Except(_children).Distinct()) {
+            c.OnElementUpdated += InvokeElementUpdated;
+        }
+
+        _children.AddRange(child);
+        
+        InvokeElementUpdated();
+    }
+    
+    public override void SetChildren(OneOf<IElement[], string> children) {
+        if (!children.IsT0)
+            throw new InvalidOperationException("Cannot set text to a div.");
+
+        // unsubscribe from old children
+        foreach (var c in _children) {
+            c.OnElementUpdated -= InvokeElementUpdated;
+        }
+
+        // subscribe to new children
+        foreach (var c in children.AsT0) {
+            c.OnElementUpdated += InvokeElementUpdated;
+        }
+        
+        _children = children.AsT0.ToList();
+        
+        // invoke update
+        InvokeElementUpdated();
     }
 }

@@ -5,7 +5,6 @@
 
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
-using NeoKolors.Common.Util;
 using NeoKolors.Extensions;
 
 namespace NeoKolors.Console;

@@ -4,8 +4,7 @@
 //
 
 using System.Reflection;
-using NeoKolors.Console;
-using NeoKolors.Tui.Styles;
+using NeoKolors.Tui.Styles.Properties;
 
 namespace NeoKolors.Tui.Elements;
 
@@ -27,7 +26,7 @@ public class ApplicableStylesAttribute : Attribute {
     /// <summary>
     /// Represents an attribute used to define the types of styles that can be applied to a class or struct.
     /// This attribute can be used to annotate classes or structs implementing the <see cref="IElement"/>,
-    /// specifying one or more style types that are applicable for the annotated element.
+    /// specifying one or more style types that are applicable for the annotated elementOld.
     /// </summary>
     public ApplicableStylesAttribute(params string[] styles) {
         Styles = GetTypes(styles);
@@ -39,7 +38,7 @@ public class ApplicableStylesAttribute : Attribute {
     /// styling-related behaviors or functionalities.
     /// </summary>
     /// <param name="baseType">the type from which the style constraints will be inherited</param>
-    /// <param name="styles">the additional styles that can be applied to the annotated element</param>
+    /// <param name="styles">the additional styles that can be applied to the annotated elementOld</param>
     public ApplicableStylesAttribute(Type baseType, params Type[] styles) {
         var a = baseType.GetCustomAttribute<ApplicableStylesAttribute>();
 
@@ -65,7 +64,7 @@ public class ApplicableStylesAttribute : Attribute {
     /// styling-related behaviors or functionalities.
     /// </summary>
     /// <param name="baseType">the type from which the style constraints will be inherited</param>
-    /// <param name="styles">the additional styles that can be applied to the annotated element</param>
+    /// <param name="styles">the additional styles that can be applied to the annotated elementOld</param>
     public ApplicableStylesAttribute(Type baseType, params string[] styles) {
         var a = baseType.GetCustomAttribute<ApplicableStylesAttribute>(true);
 
@@ -90,8 +89,8 @@ public class ApplicableStylesAttribute : Attribute {
     /// This attribute can be used to enhance type-specific styling configuration capabilities for elements
     /// that support customizable appearance and behavior.
     /// </summary>
-    /// <param name="typeSet">a predefined set of types that can be applied to the annotated element</param>
-    /// <param name="styles">the additional styles that can be applied to the annotated element</param>
+    /// <param name="typeSet">a predefined set of types that can be applied to the annotated elementOld</param>
+    /// <param name="styles">the additional styles that can be applied to the annotated elementOld</param>
     public ApplicableStylesAttribute(Predefined typeSet, params string[] styles) {
         var types = FromPredefined(typeSet).ToList();
         
@@ -108,7 +107,7 @@ public class ApplicableStylesAttribute : Attribute {
         List<Type> types = [];
         
         foreach (var s in names) {
-            var t = IStyleProperty.GetType(s);
+            var t = IStyleProperty.GetByName(s);
 
             // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
             if (t == null) {

@@ -3,12 +3,10 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Common;
 using NeoKolors.Tui.Events;
 using NeoKolors.Tui.Fonts;
-using NeoKolors.Tui.Styles;
+using NeoKolors.Tui.Styles.Values;
 using SkiaSharp;
-using NKColor = NeoKolors.Common.NKColor;
 
 namespace NeoKolors.Tui;
 

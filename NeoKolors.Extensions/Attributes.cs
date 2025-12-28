@@ -1,11 +1,19 @@
-﻿//
+﻿// ReSharper disable RedundantUsingDirective
+//
 // NeoKolors
 // Copyright (c) 2025 KryKom
 //
 
 // ReSharper disable CheckNamespace
+// ReSharper disable EmptyNamespace
+// ReSharper disable UnusedDirective
+// ReSharper disable UnusedAutoPropertyAccessor.Global
+// ReSharper disable UnusedType.Global
+// ReSharper disable UnusedMember.Global
 
-// ReSharper disable once EmptyNamespace
+using System.ComponentModel;
+using System.Diagnostics;
+
 namespace System.Diagnostics.CodeAnalysis {
     
     #if !NET5_0_OR_GREATER && !NETSTANDARD2_1_OR_GREATER
@@ -102,8 +110,18 @@ namespace System.Runtime.Versioning {
     
     [AttributeUsage(AttributeTargets.Parameter)]
     public class SupportedOsPlatformAttribute : Attribute {
-        public SupportedOsPlatformAttribute(string platform) { }
+        public string Platform { get; }
+        
+        public SupportedOsPlatformAttribute(string platform) {
+            Platform = platform;
+        }
     }
+}
+
+namespace System.Runtime.CompilerServices {
+
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public class IsExternalInit;
 }
 
 #endif

@@ -12,7 +12,7 @@ namespace NeoKolors.Tui.Events;
 /// such as key events, resize events, application start events, and application stop events.
 /// </summary>
 /// <remarks>
-/// This class facilitates subscription and unsubscription to events exposed by the IApplication interface and
+/// This class facilitates subscription and unsubscription to events exposed by the IApplicationOld interface and
 /// ensures that event handlers are managed in relation to the source application instance.
 /// </remarks>
 public static class AppEventBus {
@@ -22,9 +22,9 @@ public static class AppEventBus {
     /// Sets the source application instance for the event bus, allowing event handlers to be
     /// subscribed or unsubscribed in relation to this source application.
     /// </summary>
-    /// <param name="sourceApplication">The application instance that will serve as the source of events.</param>
-    public static void SetSourceApplication(IApplication sourceApplication) {
-        SOURCE_APPLICATION = sourceApplication;
+    /// <param name="sourceApplicationOld">The application instance that will serve as the source of events.</param>
+    public static void SetSourceApplication(IApplication sourceApplicationOld) {
+        SOURCE_APPLICATION = sourceApplicationOld;
     }
 
     /// <summary>
@@ -90,7 +90,7 @@ public static class AppEventBus {
     /// execute when the application stop event is triggered.
     /// </summary>
     /// <param name="handler">The method to be invoked when the stop event occurs.</param>
-    public static void SubscribeToStopEvent(EventHandler handler) {
+    public static void SubscribeToStopEvent(AppStopEventHandler handler) {
         if (SOURCE_APPLICATION != null)
             SOURCE_APPLICATION.StopEvent += handler;
     }
@@ -100,7 +100,7 @@ public static class AppEventBus {
     /// from being invoked when a stop event occurs.
     /// </summary>
     /// <param name="handler">The method to be removed from the invocation list of the stop event.</param>
-    public static void UnsubscribeFromStopEvent(EventHandler handler) {
+    public static void UnsubscribeFromStopEvent(AppStopEventHandler handler) {
         if (SOURCE_APPLICATION != null)
             SOURCE_APPLICATION.StopEvent -= handler;
     }

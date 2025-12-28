@@ -119,6 +119,21 @@ public static class Enumerable {
                 yield return array[i];
             }
         }
+
+        /// <summary>
+        /// Splits the collection into subcollections based on the provided predicate.
+        /// </summary>
+        public IEnumerable<IEnumerable<TSource>> Split(Predicate<TSource> predicate) {
+            int lastIndex = 0;
+            var array = strings as TSource[] ?? strings.ToArray();
+        
+            for (int i = 0; i < array.Length; i++) {
+                if (!predicate(array[i])) continue;
+            
+                yield return array[lastIndex..i];
+                lastIndex = i + 1;
+            }
+        }
     }
 
     #if NETSTANDARD2_0
@@ -382,5 +397,21 @@ public static class Enumerable {
             }
         }
         return jagged;
+    }
+    
+    public static T[][] Split<T>(this T[] array, Predicate<T> predicate) {
+        int lastIndex = 0;
+
+        List<T[]> list = [];
+        
+        for (int i = 0; i < array.Length; i++) {
+            if (!predicate(array[i]))
+                continue;
+            
+            list.Add(array[lastIndex..i]);
+            lastIndex = i + 1;
+        }
+        
+        return list.ToArray();
     }
 }
