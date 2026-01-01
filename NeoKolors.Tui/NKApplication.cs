@@ -33,9 +33,10 @@ public class NKApplication : IMouseSupportingApplication {
     public event ResizeEventHandler   ResizeEvent;
     public event AppStartEventHandler StartEvent;
     public event AppStopEventHandler  StopEvent;
+    public event Action               OnRender;
 
     private void InvokeKeyEvent(ConsoleKeyInfo k) => KeyEvent.Invoke(k);
-    private void InvokeMouseEvent(MouseEventInfo m) => MouseEvent.Invoke(m);
+    private void InvokeMouseEvent(MouseEventArgs m) => MouseEvent.Invoke(m);
     private void InvokeResizeEvent(ResizeEventArgs r) => ResizeEvent.Invoke(r);
 
     public NKApplication(NKAppConfig config, IDom dom) {
@@ -47,6 +48,7 @@ public class NKApplication : IMouseSupportingApplication {
         ResizeEvent +=  _     => { };
         StartEvent  += (_, _) => { };
         StopEvent   +=  _     => { };
+        OnRender    += ( )    => { };
     }
     
     public void Start() {
@@ -83,12 +85,16 @@ public class NKApplication : IMouseSupportingApplication {
             RunUnlimited();
         else
             RunLimited();
+        
+        FinalizeRun();
     }
     
     public void Stop() {
         IsRunning = false;
         StopEvent.Invoke(this);
-        
+    }
+
+    private void FinalizeRun() {
         NKConsole.MouseReportLevel = MouseReportLevel.NONE;
         
         if (Config.PauseOnFocusLost) {
@@ -156,6 +162,8 @@ public class NKApplication : IMouseSupportingApplication {
         int targetFps = Config.Rendering.Limit; 
         var frameTime = TimeSpan.FromSeconds(1.0 / targetFps);
         var stopwatch = new Stopwatch();
+        ulong delayedCount = 0;
+        var totalDelay = TimeSpan.Zero;
 
         while (IsRunning) {
             if (IsPaused) {
@@ -168,13 +176,20 @@ public class NKApplication : IMouseSupportingApplication {
 
             var elapsed = stopwatch.Elapsed;
 
-            if (elapsed < frameTime) {
+            if (elapsed <= frameTime) {
                 Thread.Sleep(frameTime - elapsed);
             }
+            else {
+                delayedCount++;
+                totalDelay += elapsed - frameTime;
+            }
         }
+        
+        LOGGER.Info($"Total frames delayed: {delayedCount}\n Total delay: {totalDelay}");
     }
 
     private void Render() {
+        OnRender.Invoke();
         Dom.BaseElement.Render(_screen);
         _screen.Render();
     }

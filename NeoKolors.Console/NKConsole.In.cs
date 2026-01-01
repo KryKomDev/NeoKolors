@@ -513,7 +513,7 @@ public static partial class NKConsole {
             return;
         }
         
-        _ = Task.Run(() => MouseEvent.Invoke(MouseEventDecomposer.DecomposeSGR(type, x, y, last == 'M')));
+        _ = Task.Run(() => MouseEvent.Invoke(MouseEventDecomposer.DecomposeSGR(type, x, y, last)));
     }
 
     private static void HandlePaste() {

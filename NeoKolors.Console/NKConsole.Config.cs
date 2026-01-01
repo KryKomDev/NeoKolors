@@ -246,7 +246,7 @@ public partial class NKConsole {
     public static event WinOpsResponseEventHandler WinOpsResponseEvent = delegate { };
     public static event DecReqResponseEventHandler DecReqResponseEvent = delegate { };
 
-    private static Task InvokeMouseEvent(MouseEventInfo info) 
+    private static Task InvokeMouseEvent(MouseEventArgs info) 
         => Task.Run(() => MouseEvent(info));
     
     private static Task InvokePasteEvent(string text) 
