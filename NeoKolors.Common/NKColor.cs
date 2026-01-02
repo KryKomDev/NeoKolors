@@ -3,7 +3,6 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Common.Util;
 using OneOf;
 
 namespace NeoKolors.Common;
@@ -77,7 +76,6 @@ public readonly struct NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
     public static implicit operator NKColor(ConsoleColor color) => new(color);
     public static implicit operator NKColor(uint color) => FromRgb(color);
     public static implicit operator NKColor(int color) => new(color);
-    public static implicit operator NKColor(UInt24 color) => new(color);
 
     public static implicit operator NKConsoleColor(NKColor color) =>
         color.Value.Match(

@@ -12,20 +12,43 @@ namespace NeoKolors.Common;
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = sizeof(ulong))]
 public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
+
+    private const byte FORG_COL_SIZE   = 24;
+    private const byte BCKG_COL_SIZE   = 24;
+    private const byte STYLES_SIZE     = 8;
+    private const byte FORG_CSW_SIZE    = 1;
+    private const byte BCKG_CSW_SIZE    = 1;
+    
+    // 0-based offsets from the left
+    private const byte FORG_COL_OFFSET = 0;
+    private const byte BCKG_COL_OFFSET = FORG_COL_OFFSET + FORG_COL_SIZE;
+    private const byte STYLES_OFFSET   = BCKG_COL_OFFSET + BCKG_COL_SIZE;
+    private const byte FORG_CSW_OFFSET = STYLES_OFFSET   + STYLES_SIZE;
+    private const byte BCKG_CSW_OFFSET = FORG_CSW_OFFSET + FORG_CSW_SIZE;
+    private const byte FORG_DSW_OFFSET = FORG_COL_OFFSET + 15;
+    private const byte BCKG_DSW_OFFSET = BCKG_COL_OFFSET + 15;
+    private const byte FORG_ISW_OFFSET = FORG_COL_OFFSET + 14;
+    private const byte BCKG_ISW_OFFSET = BCKG_COL_OFFSET + 14;
+    
+    private const byte TOTAL_SIZE = FORG_COL_SIZE + BCKG_COL_SIZE + STYLES_SIZE + FORG_CSW_SIZE + BCKG_CSW_SIZE;
+    private const int UNUSED_SIZE = sizeof(ulong) * 8 - TOTAL_SIZE;
+
+    private const ulong BMP_24 = 0x00_00_00_00_00_ff_ff_fful;
+    private const ulong BMP_08 = 0x00_00_00_00_00_00_00_fful;
     
     [FieldOffset(0)] 
     private ulong _raw;
 
     /// <summary>
     /// The actual compressed style
-    /// Bit 0 represents the most significant bit and bit 63 the least significant bit.<br/>
+    /// Bit 0 represents the most significant bit and bit 64 the least significant bit.<br/>
     /// <b>Meaning</b>:
     /// <ul>
     ///     <li>bit 00-23: foreground color</li>
     ///     <li>bit 24-47: background color</li>
     ///     <li>bit 56-61: text style bitmap (strikethrough, negative, faint, underline, italic and bold respectively)</li>
     ///     <li>bit 62: toggles terminal color palette mode for text (uses custom color if 1, palette colors else)  </li>
-    ///     <li>bit 63: toggles terminal color palette mode for a background (uses custom color if 1, palette colors else)</li>
+    ///     <li>bit 64: toggles terminal color palette mode for a background (uses custom color if 1, palette colors else)</li>
     /// </ul> 
     /// </summary>
     public ulong Raw {
@@ -72,7 +95,7 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     /// </summary>
     public bool IsFColorCustom {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => (_raw & 0b10) == 0b10;
+        get => (_raw >> (64 - FORG_CSW_OFFSET) & 1ul) == 1;
     }
 
     /// <summary>
@@ -80,7 +103,7 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     /// </summary>
     public bool IsBColorCustom {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => (_raw & 0b01) == 0b01;
+        get => (_raw >> (64 - BCKG_CSW_OFFSET) & 1ul) == 1;
     }
 
     /// <summary>
@@ -88,7 +111,7 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     /// </summary>
     public bool IsFColorDefault {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => !IsFColorCustom && (_raw & 0x00_01_00_00_00_00_00_00ul) == 0x00_01_00_00_00_00_00_00ul;
+        get => !IsFColorCustom && (_raw >> (64 - FORG_DSW_OFFSET) & 1ul) == 0;
     }
     
     /// <summary>
@@ -96,7 +119,23 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     /// </summary>
     public bool IsBColorDefault {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => !IsBColorCustom && (_raw & 0x00_00_00_00_01_00_00_00ul) == 0x00_00_00_00_01_00_00_00ul;
+        get => !IsBColorCustom && (_raw >> (64 - BCKG_DSW_OFFSET) & 1ul) == 0;
+    }
+    
+    /// <summary>
+    /// returns whether the text color is a console color
+    /// </summary>
+    public bool IsFColorConsole {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => !IsFColorCustom && (_raw >> (64 - FORG_DSW_OFFSET) & 1ul) == 1;
+    }
+    
+    /// <summary>
+    /// returns whether the background color is a console color
+    /// </summary>
+    public bool IsBColorConsole {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => !IsBColorCustom && (_raw >> (64 - BCKG_DSW_OFFSET) & 1ul) == 1;
     }
     
     /// <summary>
@@ -104,7 +143,7 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     /// </summary>
     public bool IsFColorInherit {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => !IsFColorCustom && (_raw & 0x00_02_00_00_00_00_00_00ul) == 0x00_02_00_00_00_00_00_00ul;
+        get => !IsFColorCustom && (_raw >> (64 - FORG_ISW_OFFSET) & 1ul) == 1;
     }
     
     /// <summary>
@@ -112,52 +151,50 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     /// </summary>
     public bool IsBColorInherit {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => !IsBColorCustom && (_raw & 0x00_00_00_00_02_00_00_00ul) == 0x00_00_00_00_02_00_00_00ul;
+        get => !IsBColorCustom && (_raw >> (64 - BCKG_ISW_OFFSET) & 1ul) == 1;
     }
     
-    
     /// <summary>
     /// sets the color of the text to a custom color
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void SetFColor(uint color) => 
-        _raw = _raw & 0x00_00_00_ff_ff_ff_ff_fdul | ((ulong)color << 40) | 0b10;
-
-    
-    /// <summary>
-    /// sets the color of the text to a custom color
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void SetFColor(UInt24 color) => 
-        _raw = _raw & 0x00_00_00_ff_ff_ff_ff_fdul | ((ulong)color << 40) | 0b10;
+    public void SetFColor(uint color) =>
+        _raw = _raw &  ~(BMP_24  << (64 - FORG_COL_OFFSET - FORG_COL_SIZE)) |
+               ((color & BMP_24) << (64 - FORG_COL_OFFSET - FORG_COL_SIZE)) |
+               (1ul << (64 - FORG_CSW_OFFSET));
 
     /// <summary>
     /// sets the color of the text to a console color
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetFColor(NKConsoleColor color) => 
-        _raw = _raw & 0x00_00_00_ff_ff_ff_ff_fdul | ((ulong)color << 40);
+        _raw = _raw &         ~(BMP_24  << (64 - FORG_COL_OFFSET - FORG_COL_SIZE)) |
+               (((ulong)color & BMP_24) << (64 - FORG_COL_OFFSET - FORG_COL_SIZE)) &
+               ~(1ul << (64 - FORG_CSW_OFFSET)) |
+                 1ul << (64 - FORG_DSW_OFFSET);
 
     /// <summary>
     /// sets the color to be the default color
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetFColor() => 
-        _raw = _raw & 0x00_00_00_ff_ff_ff_ff_fdul | 0x00_01_00_00_00_00_00_00ul;
+        _raw = _raw & ~(BMP_24 << (64 - FORG_COL_OFFSET - FORG_COL_SIZE)) &
+               ~(1ul << (64 - FORG_CSW_OFFSET));
     
     /// <summary>
     /// sets the color to be the default color
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void SetFColor(DefaultColor _) => 
-        _raw = _raw & 0x00_00_00_ff_ff_ff_ff_fdul | 0x00_01_00_00_00_00_00_00ul;
+    public void SetFColor(DefaultColor _) => SetFColor();
     
     /// <summary>
     /// sets the color to inherit mode
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetFColor(InheritColor _) => 
-        _raw = _raw & 0x00_00_00_ff_ff_ff_ff_fdul | 0x00_02_00_00_00_00_00_00ul;
+        _raw = _raw & ~(BMP_24 << (64 - FORG_COL_OFFSET - FORG_COL_SIZE)) |
+               (1ul  << (64 - FORG_ISW_OFFSET)) &
+               ~(1ul << (64 - FORG_CSW_OFFSET));
 
     /// <summary>
     /// sets the color of the text to a color
@@ -200,42 +237,42 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetBColor(uint color) => 
-        _raw = _raw & 0xff_ff_ff_00_00_00_ff_feul | ((ulong)color << 16) | 0b01;
-
-    /// <summary>
-    /// sets the background color to a custom color
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void SetBColor(UInt24 color) => 
-        _raw = _raw & 0xff_ff_ff_00_00_00_ff_feul | ((ulong)color << 16) | 0b01;
+        _raw = _raw &  ~(BMP_24  << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE)) |
+               ((color & BMP_24) << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE)) |
+               (1ul << (64 - BCKG_CSW_OFFSET));
 
     /// <summary>
     /// sets the background color to a console color
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetBColor(NKConsoleColor color) => 
-        _raw = _raw & 0xff_ff_ff_00_00_00_ff_feul | ((ulong)color << 16);
-
+        _raw = _raw &         ~(BMP_24  << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE)) |
+               (((ulong)color & BMP_24) << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE)) &
+               ~(1ul << (64 - BCKG_CSW_OFFSET)) |
+                 1ul << (64 - BCKG_DSW_OFFSET);
+        
     /// <summary>
     /// sets the background color to the default color
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetBColor() => 
-        _raw = _raw & 0xff_ff_ff_00_00_00_ff_feul | 0x00_00_00_00_01_00_00_00ul;
+        _raw = _raw & ~(BMP_24 << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE)) &
+               ~(1ul << (64 - BCKG_CSW_OFFSET));
 
     /// <summary>
     /// sets the background color to the default color
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void SetBColor(DefaultColor _) => 
-        _raw = _raw & 0xff_ff_ff_00_00_00_ff_feul | 0x00_00_00_00_01_00_00_00ul;
+    public void SetBColor(DefaultColor _) => SetBColor();
     
     /// <summary>
     /// sets the background color to inherit mode
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetBColor(InheritColor _) => 
-        _raw = _raw & 0xff_ff_ff_00_00_00_ff_feul | 0x00_00_00_00_02_00_00_00ul;
+        _raw = _raw & ~(BMP_24 << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE)) |
+               (1ul  << (64 - BCKG_ISW_OFFSET)) &
+               ~(1ul << (64 - BCKG_CSW_OFFSET));
     
     /// <summary>
     /// sets the background color to a color
@@ -278,13 +315,13 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     /// </summary>
     public NKColor GetFColor() {
         if (IsFColorCustom)
-            return new NKColor((int)(_raw >> 40));
+            return new NKColor((int)(_raw >> (64 - FORG_COL_OFFSET - FORG_COL_SIZE) & BMP_24));
         if (IsFColorDefault)
             return NKColor.Default;
         if (IsFColorInherit)
             return NKColor.Inherit;
 
-        return new NKColor((NKConsoleColor)((_raw & 0x00_00_ff_00_00_00_00_00ul) >> 40));
+        return new NKColor((NKConsoleColor)(_raw >> (64 - FORG_COL_OFFSET - FORG_COL_SIZE) & BMP_08));
     }
     
     /// <summary>
@@ -292,26 +329,29 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
     /// </summary>
     public NKColor GetBColor() {
         if (IsBColorCustom)
-            return new NKColor((int)(_raw >> 16));
+            return new NKColor((int)(_raw >> (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE) & BMP_24));
         if (IsBColorDefault)
             return NKColor.Default;
         if (IsBColorInherit)
             return NKColor.Inherit;
 
-        return new NKColor((NKConsoleColor)((_raw & 0x00_00_00_00_00_ff_00_00ul) >> 16));
+        return new NKColor((NKConsoleColor)(_raw >> (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE) & BMP_08));
     }
 
     /// <summary>
     /// sets the text styles
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void SetStyles(TextStyles styles) => _raw |= 0x00_00_00_00_00_00_00_fcul & (ulong)((int)styles << 2);
+    public void SetStyles(TextStyles styles) =>
+        _raw = _raw & ~(BMP_08 << (64 - STYLES_OFFSET - STYLES_SIZE)) |
+               ((ulong)styles  << (64 - STYLES_OFFSET - STYLES_SIZE));
 
     /// <summary>
     /// returns the text styles
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public TextStyles GetStyles() => (TextStyles)((_raw & 0x00_00_00_00_00_00_00fcul) >> 2);
+    public TextStyles GetStyles() => 
+        (TextStyles)(_raw >> (64 - STYLES_OFFSET - STYLES_SIZE) & BMP_08);
     
     /// <summary>
     /// safely overwrites the contents of this instance with the contents of the other instance
@@ -324,7 +364,7 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
         return this;
     }
     
-    public NKStyle(ulong raw) => _raw = raw;
+    internal NKStyle(ulong raw) => _raw = raw;
 
     public NKStyle(NKColor f, NKColor b, TextStyles s) {
         _raw = 0;
@@ -363,9 +403,6 @@ public struct NKStyle : ICloneable, IEquatable<NKStyle>, IFormattable {
 
     public NKStyle() {
         _raw = 0;
-        SetFColor(NKColor.Default);
-        SetBColor(NKColor.Default);
-        SetStyles(TextStyles.NONE);
     }
     
     public object Clone() => MemberwiseClone();

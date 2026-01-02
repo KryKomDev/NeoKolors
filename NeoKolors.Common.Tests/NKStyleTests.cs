@@ -99,4 +99,17 @@ public class NKStyleTests {
         Assert.False(style1.Equals(style2));
         Assert.False(style1 == style2);
     }
+    
+    [Fact]
+    public void Constructor_SetsCorrectValues() {
+        var fColor = new NKColor(0xff0000);
+        var bColor = new NKColor(0x00ff00);
+        var styles = TextStyles.BOLD | TextStyles.ITALIC;
+
+        var style = new NKStyle(fColor, bColor, styles);
+
+        Assert.Equal(fColor, style.FColor);
+        Assert.Equal(bColor, style.BColor);
+        Assert.Equal(styles, style.Styles);
+    }
 }

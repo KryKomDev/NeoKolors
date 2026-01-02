@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 #endif
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
+using NeoKolors.Common.Util;
 using static NeoKolors.Common.EscapeCodes;
 using static NeoKolors.Common.TextStyles;
 
@@ -198,8 +199,12 @@ public static class StringEffects {
             s = s.Replace("</u>", UNDERLINE_END);
             s = s.Replace("<f>", FAINT_START);
             s = s.Replace("</f>", FAINT_END);
+            s = s.Replace("<l>", BLINK_START);
+            s = s.Replace("</l>", BLINK_END);
             s = s.Replace("<n>", NEGATIVE_START);
             s = s.Replace("</n>", NEGATIVE_END);
+            s = s.Replace("<v>", INVISIBLE_START);
+            s = s.Replace("</v>", INVISIBLE_END);
             s = s.Replace("<s>", STRIKETHROUGH_START);
             s = s.Replace("</s>", STRIKETHROUGH_END);
             return s;
@@ -269,39 +274,13 @@ public static class StringEffects {
         }
 
         /// <summary>
-        /// adds text styles to the input string
-        /// </summary>
-        /// <param name="styles">styles applied to the text</param>
-        /// <returns>string with the styles applied</returns>
-        /// <exception cref="ArgumentOutOfRangeException">an invalid style was inputted</exception>
-        [System.Diagnostics.Contracts.Pure]
-        public string AddStyle(int styles) {
-            if ((styles & 0b000001) == 0b000001) s = s.AddStyle(BOLD);
-            if ((styles & 0b000010) == 0b000010) s = s.AddStyle(ITALIC);
-            if ((styles & 0b000100) == 0b000100) s = s.AddStyle(UNDERLINE);
-            if ((styles & 0b001000) == 0b001000) s = s.AddStyle(FAINT);
-            if ((styles & 0b010000) == 0b010000) s = s.AddStyle(NEGATIVE);
-            if ((styles & 0b100000) == 0b100000) s = s.AddStyle(STRIKETHROUGH);
-        
-            return s;
-        }
-
-        /// <summary>
         /// adds a single text style to the input string
         /// </summary>
         /// <param name="style">style applied to the text</param>
         /// <returns>string with the style applied</returns>
         /// <exception cref="ArgumentOutOfRangeException">an invalid style was inputted</exception>
         [System.Diagnostics.Contracts.Pure]
-        public string AddStyle(TextStyles style) {
-            if (style.HasFlag(BOLD)) s = $"{BOLD_START}{s}{BOLD_END}";
-            if (style.HasFlag(ITALIC)) s = $"{ITALIC_START}{s}{ITALIC_END}";
-            if (style.HasFlag(UNDERLINE)) s = $"{UNDERLINE_START}{s}{UNDERLINE_END}";
-            if (style.HasFlag(FAINT)) s = $"{FAINT_START}{s}{FAINT_END}";
-            if (style.HasFlag(NEGATIVE)) s = $"{NEGATIVE_START}{s}{NEGATIVE_END}";
-            if (style.HasFlag(STRIKETHROUGH)) s = $"{STRIKETHROUGH_START}{s}{STRIKETHROUGH_END}";
-            return s;
-        }
+        public string AddStyle(TextStyles style) => $"{style.GetEscSeq()}{s}{style.GetNegEscSeq()}";
     }
 
 

@@ -16,7 +16,7 @@ namespace NeoKolors.Common.Util;
 
 #if NET5_0_OR_GREATER && !NET5_0
 
-public readonly struct UInt24 : 
+file readonly struct UInt24 : 
     IMinMaxValue<UInt24>,
     IBinaryInteger<UInt24>
 #else 

@@ -3,6 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
+/*
 using System.Globalization;
 using NeoKolors.Common.Util;
 
@@ -168,3 +169,4 @@ public class UInt24Tests {
     }
     #endif
 }
+*/

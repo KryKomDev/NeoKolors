@@ -12,9 +12,11 @@ namespace NeoKolors.Common;
 public enum TextStyles : byte {
     NONE          = 0,
     BOLD          = 1 << 0,
-    ITALIC        = 1 << 1,
-    UNDERLINE     = 1 << 2,
-    FAINT         = 1 << 3,
-    NEGATIVE      = 1 << 4,
-    STRIKETHROUGH = 1 << 5
+    FAINT         = 1 << 1,
+    ITALIC        = 1 << 2,
+    UNDERLINE     = 1 << 3,
+    BLINK         = 1 << 4,
+    NEGATIVE      = 1 << 5,
+    INVISIBLE     = 1 << 6,
+    STRIKETHROUGH = 1 << 7,
 }

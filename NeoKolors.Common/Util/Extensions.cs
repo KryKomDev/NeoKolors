@@ -3,6 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Text;
 using static NeoKolors.Common.EscapeCodes;
 using static NeoKolors.Common.TextStyles;
 
@@ -121,5 +122,65 @@ public static class Extensions {
         public bool HasShift => key.Modifiers.HasFlag(ConsoleModifiers.Shift);
         public bool HasAlt => key.Modifiers.HasFlag(ConsoleModifiers.Alt);
         public bool HasCtrl => key.Modifiers.HasFlag(ConsoleModifiers.Control);
+    }
+
+    public static string GetEscSeq(this TextStyles styles) {
+        if (styles == NONE) return string.Empty;
+        
+        var sb = new StringBuilder();
+        sb.Append("\e[");
+        sb.Append(styles.GetHasBold()          ? "1;" : "");
+        sb.Append(styles.GetHasFaint()         ? "2;" : "");
+        sb.Append(styles.GetHasItalic()        ? "3;" : "");
+        sb.Append(styles.GetHasUnderline()     ? "4;" : "");
+        sb.Append(styles.GetHasBlink()         ? "5;" : "");
+        sb.Append(styles.GetHasNegative()      ? "6;" : "");
+        sb.Append(styles.GetHasInvisible()     ? "7;" : "");
+        sb.Append(styles.GetHasStrikethrough() ? "8;" : "");
+
+        sb.Remove(sb.Length - 1, 1);
+        sb.Append('m');
+        
+        return sb.ToString();
+    }
+    
+    public static string GetOvrEscSeq(this TextStyles styles) {
+        if (styles == NONE) return string.Empty;
+        
+        var sb = new StringBuilder();
+        sb.Append("\e[0;");
+        sb.Append(styles.GetHasBold()          ? "1;" : "");
+        sb.Append(styles.GetHasFaint()         ? "2;" : "");
+        sb.Append(styles.GetHasItalic()        ? "3;" : "");
+        sb.Append(styles.GetHasUnderline()     ? "4;" : "");
+        sb.Append(styles.GetHasBlink()         ? "5;" : "");
+        sb.Append(styles.GetHasNegative()      ? "6;" : "");
+        sb.Append(styles.GetHasInvisible()     ? "7;" : "");
+        sb.Append(styles.GetHasStrikethrough() ? "8;" : "");
+
+        sb.Remove(sb.Length - 1, 1);
+        sb.Append('m');
+        
+        return sb.ToString();
+    }
+
+    public static string GetNegEscSeq(this TextStyles styles) {
+        if (styles == NONE) return string.Empty;
+        
+        var sb = new StringBuilder();
+        sb.Append("\e[");
+        sb.Append(styles.GetHasBold()          ? "22;" : "");
+        sb.Append(styles.GetHasFaint()         ? "22;" : "");
+        sb.Append(styles.GetHasItalic()        ? "23;" : "");
+        sb.Append(styles.GetHasUnderline()     ? "24;" : "");
+        sb.Append(styles.GetHasBlink()         ? "25;" : "");
+        sb.Append(styles.GetHasNegative()      ? "26;" : "");
+        sb.Append(styles.GetHasInvisible()     ? "27;" : "");
+        sb.Append(styles.GetHasStrikethrough() ? "28;" : "");
+
+        sb.Remove(sb.Length - 1, 1);
+        sb.Append('m');
+        
+        return sb.ToString();
     }
 }

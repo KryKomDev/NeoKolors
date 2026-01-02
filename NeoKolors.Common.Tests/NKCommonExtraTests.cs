@@ -44,35 +44,6 @@ public class NKCommonExtraTests {
     }
 
     [Fact]
-    public void NKStyle_Constructor_SetsCorrectValues() {
-        // Arrange
-        var fColor = new NKColor(0xff0000);
-        var bColor = new NKColor(0x00ff00);
-        var styles = TextStyles.BOLD | TextStyles.ITALIC;
-
-        // Act
-        var style = new NKStyle(fColor, bColor, styles);
-
-        // Assert
-        Assert.Equal(fColor, style.FColor);
-        Assert.Equal(bColor, style.BColor);
-        Assert.Equal(styles, style.Styles);
-    }
-
-    [Fact]
-    public void NKStyle_SetFColor_UpdatesCorrectly() {
-        // Arrange
-        var style = new NKStyle();
-        var color = new NKColor(0x0000ff);
-
-        // Act
-        style.SetFColor(color);
-
-        // Assert
-        Assert.Equal(color, style.FColor);
-    }
-
-    [Fact]
     public void TextStyles_Flags_WorkAsExpected() {
         var styles = TextStyles.BOLD | TextStyles.ITALIC;
         

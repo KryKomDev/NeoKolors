@@ -134,14 +134,18 @@ public static class EscapeCodes {
     public const string UNDERLINE_DOTTED_START = "\e[4:4m";
     public const string UNDERLINE_DASHED_START = "\e[4:5m";
     public const string UNDERLINE_START_TYPE_FORMAT = "\e[4:{0}m";
+    public const string BLINK_START = "\e[5m";
     public const string NEGATIVE_START = "\e[7m";
+    public const string INVISIBLE_START = "\e[8m";
     public const string STRIKETHROUGH_START = "\e[9m";
 
     public const string BOLD_END = "\e[22m";
     public const string FAINT_END = "\e[22m";
     public const string ITALIC_END = "\e[23m";
     public const string UNDERLINE_END = "\e[24m";
+    public const string BLINK_END = "\e[25m";
     public const string NEGATIVE_END = "\e[27m";
+    public const string INVISIBLE_END = "\e[28m";
     public const string STRIKETHROUGH_END = "\e[29m";
 
     /// <summary>
