@@ -25,4 +25,9 @@ public readonly struct MouseEventArgs {
         Position  = position;
         Release   = release;
     }
+
+    public override string ToString() {
+        return $"{(Release ? "Released " : "")}{(Move && Button == MouseButton.RELEASE ? "Moved" : (Move ? $"Dragged {Button}" : Button))} at {Position} with {Modifiers}";
+        // return $"Button: {Button}, Mods: {Modifiers}, Move: {Move}, Pos: {Position}, Release: {Release}";
+    }
 }

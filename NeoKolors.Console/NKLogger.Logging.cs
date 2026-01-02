@@ -4,6 +4,7 @@
 //
 
 using System.Runtime.CompilerServices;
+using System.Text;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
 using NeoKolors.Common;
@@ -20,24 +21,21 @@ public sealed partial class NKLogger : ILogger {
     /// <param name="id">An optional event identifier associated with the log entry.</param>
     /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
     public void Crit(string message, EventId? id) {
-        if (message == null) throw new ArgumentNullException(nameof(message));
         if (!Level.GetLogCritical()) return;
-        
-        if (SimpleMessages) {
-            Output.WriteLine(HideTime
-                ? $"{SourceStr(id)}[ CRIT ] : {Indent(message)}"
-                : $"[{TimeStamp()}] {SourceStr(id)}[ CRIT ] : {Indent(message)}");
+        if (message == null) throw new ArgumentNullException(nameof(message));
+
+        var sb = new StringBuilder();
+
+        if (!HideTime) {
+            sb.Append(TimeStamp());
+            sb.Append(' ');
         }
-        else {
-            Output.WriteLine(HideTime
-                ? "{0}{2}<b><n> CRIT </n></b> : {1}\e[0m"
-                    .ApplyStyles()
-                    .Format(FatalColor.Text, Indent(message), SourceStr(id))
-                : "{0}[{1}] {3}<b><n> CRIT </n></b> : {2}\e[0m"
-                    .ApplyStyles()
-                    .Format(FatalColor.Text, TimeStamp(), Indent(message), SourceStr(id))
-            );
-        }
+
+        sb.Append(SourceStr(id));
+        sb.Append(SimpleMessages ? "[ CRIT ] : " : "<b><n> CRIT </n></b> : ".ApplyStyles());
+        sb.Append(Indent(message));
+
+        Output.WriteLine(!SimpleMessages ? sb.ToString().AddColor(FatalColor) : sb.ToString());
         
         Output.Flush();
     }
@@ -76,21 +74,18 @@ public sealed partial class NKLogger : ILogger {
         if (message == null) throw new ArgumentNullException(nameof(message));
         if (!Level.GetLogError()) return;
 
-        if (SimpleMessages) {
-            Output.WriteLine(HideTime
-                ? $"{SourceStr(id)}[ FAIL ] : {Indent(message)}"
-                : $"[{TimeStamp()}] {SourceStr(id)}[ FAIL ] : {Indent(message)}");
+        var sb = new StringBuilder();
+
+        if (!HideTime) {
+            sb.Append(TimeStamp());
+            sb.Append(' ');
         }
-        else {
-            Output.WriteLine(HideTime
-                ? "{0}{2}<b><n> FAIL </n></b> : {1}\e[0m"
-                    .ApplyStyles()
-                    .Format(ErrorColor.Text, Indent(message), SourceStr(id))
-                : "{0}[{1}] {3}<b><n> FAIL </n></b> : {2}\e[0m"
-                    .ApplyStyles()
-                    .Format(ErrorColor.Text, TimeStamp(), Indent(message), SourceStr(id))
-            );
-        }
+
+        sb.Append(SourceStr(id));
+        sb.Append(SimpleMessages ? "[ CRIT ] : " : "<b><n> FAIL </n></b> : ".ApplyStyles());
+        sb.Append(Indent(message));
+
+        Output.WriteLine(!SimpleMessages ? sb.ToString().AddColor(ErrorColor) : sb.ToString());
         
         Output.Flush();
     }
@@ -126,20 +121,21 @@ public sealed partial class NKLogger : ILogger {
     /// <param name="id">An optional event identifier associated with the log entry. Defaults to null.</param>
     /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
     public void Warn(string message, EventId? id) {
-        if (message == null) throw new ArgumentNullException(nameof(message));
         if (!Level.GetLogWarning()) return;
+        if (message == null) throw new ArgumentNullException(nameof(message));
 
-        if (SimpleMessages)
-            Output.WriteLine(HideTime 
-                ? $"{SourceStr(id)}[ WARN ] : {Indent(message)}" 
-                : $"[{TimeStamp()}] {SourceStr(id)}[ WARN ] : {Indent(message)}");
-        else
-            Output.WriteLine(
-                (HideTime 
-                    ? $"{SourceStr(id)}[ WARN ] : {Indent(message)}" 
-                    : $"[{TimeStamp()}] {SourceStr(id)}[ WARN ] : {Indent(message)}\e[0m"
-                )
-                .AddColor(WarnColor));
+        var sb = new StringBuilder();
+
+        if (!HideTime) {
+            sb.Append(TimeStamp());
+            sb.Append(' ');
+        }
+
+        sb.Append(SourceStr(id));
+        sb.Append("[ WARN ] : ");
+        sb.Append(Indent(message));
+
+        Output.WriteLine(!SimpleMessages ? sb.ToString().AddColor(WarnColor) : sb.ToString());
 
         Output.Flush();
     }
@@ -175,20 +171,21 @@ public sealed partial class NKLogger : ILogger {
     /// <param name="id">An optional event identifier associated with the log entry.</param>
     /// <exception cref="ArgumentNullException">Thrown if the provided message is null.</exception>
     public void Info(string message, EventId? id) {
-        if (message == null) throw new ArgumentNullException(nameof(message));
         if (!Level.GetLogInformation()) return;
+        if (message == null) throw new ArgumentNullException(nameof(message));
 
-        if (SimpleMessages)
-            Output.WriteLine(HideTime 
-                ? $"{SourceStr(id)}[ INFO ] : {Indent(message)}" 
-                : $"[{TimeStamp()}] {SourceStr(id)}[ INFO ] : {Indent(message)}");
-        else
-            Output.WriteLine(
-                (HideTime 
-                    ? $"{SourceStr(id)}[ INFO ] : {Indent(message)}" 
-                    : $"[{TimeStamp()}] {SourceStr(id)}[ INFO ] : {Indent(message)}\e[0m"
-                )
-                .AddColor(InfoColor));
+        var sb = new StringBuilder();
+
+        if (!HideTime) {
+            sb.Append(TimeStamp());
+            sb.Append(' ');
+        }
+
+        sb.Append(SourceStr(id));
+        sb.Append("[ INFO ] : ");
+        sb.Append(Indent(message));
+
+        Output.WriteLine(!SimpleMessages ? sb.ToString().AddColor(InfoColor) : sb.ToString());
 
         Output.Flush();
     }
@@ -220,17 +217,18 @@ public sealed partial class NKLogger : ILogger {
         if (!Level.GetLogDebug()) return;
         if (message == null) throw new ArgumentNullException(nameof(message));
 
-        if (SimpleMessages)
-            Output.WriteLine(HideTime 
-                ? $"{SourceStr(id)}[ DBUG ] : {Indent(message)}" 
-                : $"[{TimeStamp()}] {SourceStr(id)}[ DBUG ] : {Indent(message)}");
-        else
-            Output.WriteLine(
-                (HideTime 
-                    ? $"{SourceStr(id)}[ DBUG ] : {Indent(message)}" 
-                    : $"[{TimeStamp()}] {SourceStr(id)}[ DBUG ] : {Indent(message)}\e[0m"
-                )
-                .AddColor(DebugColor));
+        var sb = new StringBuilder();
+
+        if (!HideTime) {
+            sb.Append(TimeStamp());
+            sb.Append(' ');
+        }
+
+        sb.Append(SourceStr(id));
+        sb.Append("[ DEBUG ] : ");
+        sb.Append(Indent(message));
+
+        Output.WriteLine(!SimpleMessages ? sb.ToString().AddColor(DebugColor) : sb.ToString());
 
         Output.Flush();
     }
@@ -262,17 +260,18 @@ public sealed partial class NKLogger : ILogger {
         if (!Level.GetLogTrace()) return;
         if (message == null) throw new ArgumentNullException(nameof(message));
 
-        if (SimpleMessages)
-            Output.WriteLine(HideTime 
-                ? $"{SourceStr(id)}[ TRCE ] : {Indent(message)}" 
-                : $"[{TimeStamp()}] {SourceStr(id)}[ TRCE ] : {Indent(message)}");
-        else
-            Output.WriteLine(
-                (HideTime 
-                    ? $"{SourceStr(id)}[ TRCE ] : {Indent(message)}" 
-                    : $"[{TimeStamp()}] {SourceStr(id)}[ TRCE ] : {Indent(message)}\e[0m"
-                )
-                .AddColor(TraceColor));
+        var sb = new StringBuilder();
+
+        if (!HideTime) {
+            sb.Append(TimeStamp());
+            sb.Append(' ');
+        }
+
+        sb.Append(SourceStr(id));
+        sb.Append("[ TRCE ] : ");
+        sb.Append(Indent(message));
+
+        Output.WriteLine(!SimpleMessages ? sb.ToString().AddColor(TraceColor) : sb.ToString());
 
         Output.Flush();
     }
@@ -313,7 +312,7 @@ public sealed partial class NKLogger : ILogger {
     /// the timestamp
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private string TimeStamp() => DateTime.Now.ToString(TimeFormat);
+    private string TimeStamp() => $"[ {DateTime.Now.ToString(TimeFormat)} ]";
     
     public void Crit([StructuredMessageTemplate] string message, params object[] args) => Crit(message.StructuredFormat(args));
     public void Error([StructuredMessageTemplate] string message, params object[] args) => Error(message.StructuredFormat(args));
