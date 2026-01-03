@@ -904,4 +904,18 @@ public static partial class NKConsole {
         WriteSixel(SKBitmap.Decode(path), x, y, width, height, sampling);
 
     #endif
+
+    #region WINDOW MANIPULATION
+
+    /// <summary>
+    /// Minimizes the console window by sending an escape sequence to iconify the window.
+    /// </summary>
+    public static void Minimize() => Stdio.Write(EscapeCodes.ICONIFY_WINDOW);
+
+    /// <summary>
+    /// Restores the console window from a minimized state to its normal size.
+    /// </summary>
+    public static void Maximize() => Stdio.Write(EscapeCodes.DEICONIFY_WINDOW);
+
+    #endregion
 }

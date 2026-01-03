@@ -20,7 +20,7 @@ internal static class MouseEventDecomposer {
         var t = GetType(type - 32);
         var pos = new Point2D(x - 32, y - 32);
         
-        return new MouseEventArgs(t.Btn, t.Mods, t.Move, pos);
+        return new MouseEventArgs(t.Btn, t.Mods, t.Move, pos, t is { Btn: MouseButton.RELEASE, Move: false });
     }
 
     /// <summary>
@@ -35,7 +35,7 @@ internal static class MouseEventDecomposer {
         var t = GetType(type.KeyChar - 32);
         var pos = new Point2D(RemapCoordinate(x) - 1, RemapCoordinate(y) - 1);
         
-        return new MouseEventArgs(t.Btn, t.Mods, t.Move, pos);
+        return new MouseEventArgs(t.Btn, t.Mods, t.Move, pos, t is { Btn: MouseButton.RELEASE, Move: false });
     }
 
     /// <summary>

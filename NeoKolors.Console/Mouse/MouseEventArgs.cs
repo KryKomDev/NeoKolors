@@ -30,4 +30,8 @@ public readonly struct MouseEventArgs {
         return $"{(Release ? "Released " : "")}{(Move && Button == MouseButton.RELEASE ? "Moved" : (Move ? $"Dragged {Button}" : Button))} at {Position} with {Modifiers}";
         // return $"Button: {Button}, Mods: {Modifiers}, Move: {Move}, Pos: {Position}, Release: {Release}";
     }
+    
+    public bool IsHover => Button == MouseButton.RELEASE && Move;
+    public bool IsPress => !Release && !Move;
+    public bool IsRelease => Release && !Move;
 }
