@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     
     env:
-      Solution_Name: NeoKolors.sln
+      Solution_Name: NeoKolors.slnx
       ProjectPath: NeoKolors.Settings/NeoKolors.Settings.csproj
       TestProjectPath: NeoKolors.Settings.Tests/NeoKolors.Settings.Tests.csproj
 

@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest 
 
     env:
-      SolutionName: NeoKolors.sln
+      SolutionName: NeoKolors.slnx
       ProjectPath: NeoKolors.Tui/NeoKolors.Tui.csproj
       TestProjectPath: NeoKolors.Tui.Tests/NeoKolors.Tui.Tests.csproj
 
