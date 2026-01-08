@@ -278,7 +278,7 @@ public class NKFont : IFont {
                         _ligatureGlyphs[tokenData!.Value.AsT1.Ligature].Glyph,
                     AUTO_COMPOUND => 
                         _autoCompoundGlyphs[tokenData!.Value.AsT2.Second]
-                            .GetGlyph(_simpleGlyphs[tokenData.Value.AsT0.Character].Glyph),
+                            .GetGlyph(_simpleGlyphs[tokenData.Value.AsT2.Main].Glyph),
                     _ => throw new ArgumentOutOfRangeException()
                 };
 

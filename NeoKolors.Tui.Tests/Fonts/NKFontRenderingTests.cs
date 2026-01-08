@@ -10,6 +10,8 @@ using NeoKolors.Tui.Styles.Values;
 namespace NeoKolors.Tui.Tests;
 
 public class NKFontRenderingTests {
+
+    private const string PATH = "NeoKolors.Tui.Tests.Fonts.BuiltIn.Dummy1.nkf";
     
     private static string GetFontPath() {
         // Try to find the font relative to the test project execution
@@ -33,11 +35,11 @@ public class NKFontRenderingTests {
     [Fact]
     public void PlaceString_ShouldRenderSpecificGlyphContent() {
         var path = GetFontPath();
-        var font = NKFontSerializer.ReadFile(path);
+        var font = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
         var canvas = new NKCharCanvas(50, 20);
         
         // Render 'A' at (0,0)
-        font.PlaceString("A", canvas);
+        font!.PlaceString("A", canvas);
         
         // Based on A.nkg and Dummy1 config:
         // Mask: '.' -> ' ', ' ' -> null. Align: '+' -> null.
@@ -64,12 +66,12 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void PlaceString_ShouldRenderLigatureExactly() {
-        var path = GetFontPath();
-        var font = NKFontSerializer.ReadFile(path);
+        var path = GetFontPath();        
+        var font = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
         var canvas = new NKCharCanvas(50, 20);
         
         // Render "->" at (0,0)
-        font.PlaceString("->", canvas);
+        font!.PlaceString("->", canvas);
         
         // arr-right.nkg (6 spaces prefix):
         //       __
@@ -100,12 +102,12 @@ public class NKFontRenderingTests {
     [Fact]
     public void PlaceString_ShouldHandleLineSpacing() {
         var path = GetFontPath();
-        var font = NKFontSerializer.ReadFile(path);
+        var font = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
         var canvas = new NKCharCanvas(50, 20);
         
         // LineSpacing is 2. A height is 4.
         // First line at y=0. Second line should start at y = 0 + 4 + 2 = 6.
-        font.PlaceString("A\nA", canvas);
+        font!.PlaceString("A\nA", canvas);
         
         // Row 3 of first A is at y=3.
         // Row 0 of second A should be at y=6.
@@ -139,11 +141,11 @@ public class NKFontRenderingTests {
     [Fact]
     public void PlaceString_WithAlignment_ShouldAffectPosition() {
         var path = GetFontPath();
-        var font = NKFontSerializer.ReadFile(path);
+        var font = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
         var canvas = new NKCharCanvas(50, 10);
         
         // Render centered
-        font.PlaceString("Test", canvas, new Rectangle(0, 0, 49, 9), 
+        font!.PlaceString("Test", canvas, new Rectangle(0, 0, 49, 9), 
             new NKStyle(), HorizontalAlign.CENTER, VerticalAlign.CENTER);
         
         // We expect the text NOT to be at (0,0)

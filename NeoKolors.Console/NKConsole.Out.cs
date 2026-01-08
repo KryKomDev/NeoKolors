@@ -7,8 +7,10 @@ using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
+using Metriks;
 using NeoKolors.Common;
 using NeoKolors.Extensions;
+using static NeoKolors.Common.EscapeCodes;
 using ConsoleColor = System.ConsoleColor;
 
 #if NET8_0_OR_GREATER && !NET10_0
@@ -910,12 +912,74 @@ public static partial class NKConsole {
     /// <summary>
     /// Minimizes the console window by sending an escape sequence to iconify the window.
     /// </summary>
-    public static void Minimize() => Stdio.Write(EscapeCodes.ICONIFY_WINDOW);
+    public static void Minimize() => Stdio.Write(ICONIFY_WINDOW);
 
     /// <summary>
     /// Restores the console window from a minimized state to its normal size.
     /// </summary>
-    public static void Maximize() => Stdio.Write(EscapeCodes.DEICONIFY_WINDOW);
+    public static void Maximize() => Stdio.Write(DEICONIFY_WINDOW);
 
     #endregion
+
+    #region DECSET / DECRST
+
+    /// <summary>
+    /// Sets the specified DEC private modes for the terminal.
+    /// </summary>
+    /// <param name="modes">An array of DEC private modes to enable.</param>
+    public static void SetModes(params DecPrivateMode[] modes) => Stdio.Write(GetDecSet(modes));
+
+    /// <summary>
+    /// Resets the specified DEC Private Modes in the terminal.
+    /// </summary>
+    /// <param name="modes">An array of DEC Private Modes to reset.</param>
+    public static void ResetModes(params DecPrivateMode[] modes) => Stdio.Write(GetDecRst(modes));
+
+    /// <summary>
+    /// Saves the current position of the console cursor.
+    /// The cursor's state can be restored later using a corresponding restore method.
+    /// </summary>
+    public static void SaveCursor() => Stdio.Write(SAVE_CURSOR_STATE);
+
+    /// <summary>
+    /// Restores the cursor to its previously saved position in the console.
+    /// </summary>
+    public static void RestoreCursor() => Stdio.Write(RESTORE_CURSOR_STATE);
+
+    /// <summary>
+    /// Hides the cursor in the console window.
+    /// </summary>
+    public static void HideCursor() => Stdio.Write(DISABLE_CURSOR_VISIBLE);
+
+    /// <summary>
+    /// Enables the visibility of the cursor in the console.
+    /// </summary>
+    public static void ShowCursor() => Stdio.Write(ENABLE_CURSOR_VISIBLE);
+
+    #endregion
+
+    /// <summary>
+    /// Attempts to set the cursor position in the console window to the specified coordinates.
+    /// </summary>
+    /// <param name="x">The horizontal position of the cursor, measured in columns.</param>
+    /// <param name="y">The vertical position of the cursor, measured in rows.</param>
+    /// <returns>Returns true if the cursor position was successfully set; otherwise, false.</returns>
+    public static bool TrySetCursorPosition(int x, int y) {
+        if (x != ..^Stdio.BufferWidth || y != ..^Stdio.BufferHeight) 
+            return false;
+        
+        try {
+            Stdio.SetCursorPosition(x, y);
+        }
+        catch (Exception) {
+            LOGGER.Error("Tried to set cursor position outside of bounds.");
+            return false;
+        }
+            
+        return true;
+
+    }
+    
+    public static Size2D WindowSize => new(Stdio.WindowWidth, Stdio.WindowHeight);
+    public static Size2D BufferSize => new(Stdio.BufferWidth, Stdio.BufferHeight);
 }

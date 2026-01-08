@@ -2,14 +2,19 @@
 // Copyright (c) 2025 KryKom
 
 using System.Diagnostics.Contracts;
+using NeoKolors.Console.Mouse;
 using NeoKolors.Tui.Elements.Caching;
+using NeoKolors.Tui.Events;
 using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Properties;
 using static NeoKolors.Tui.Styles.Values.Direction;
 
 namespace NeoKolors.Tui.Elements;
 
-public class Div : ContainerElement {
+public class Div : ContainerElement, IInteractableElement {
+    
+    private static readonly NKLogger LOGGER = NKDebug.GetLogger<Button>();
+    private static bool LOGGED_SRC_ERR = false;
     
     protected readonly LayoutCacher _layoutCacher;
     protected readonly ChildrenLayoutCacher _childrenCacher;
@@ -37,9 +42,53 @@ public class Div : ContainerElement {
     public override ElementInfo Info { get; }
     
     
+    private Rectangle _lastBounds = Rectangle.Zero;
+    private bool _hoverEnable;
+
+    private void InvokeMouseAction(MouseEventArgs a) {
+        if (!_lastBounds.Contains(a.Position.X, a.Position.Y)) {
+            if (!_hoverEnable) 
+                return;
+            
+            OnHoverOut.Invoke();
+            _hoverEnable = false;
+
+            return;
+        }
+        
+        if (a.IsPress) {
+            OnClick.Invoke(a.Button);
+        }
+        else if (a.IsRelease) {
+            OnRelease.Invoke(a.Button);
+        }
+        else if (a.IsHover) {
+            OnHover.Invoke();
+            _hoverEnable = true;
+        }
+    }
+    
+    public event Action<MouseButton> OnClick = _ => { };
+    public event Action<MouseButton> OnRelease = _ => { };
+    public event Action OnHover = () => { };
+    public event Action OnHoverOut = () => { };
+
+    private void SubscribeMouseEvents() {
+        if (!AppEventBus.IsSourceSet) {
+            if (LOGGED_SRC_ERR) return;
+            
+            LOGGER.Error("Source application not set! Cannot register");
+            LOGGED_SRC_ERR = true;
+
+            return;
+        }
+        
+        AppEventBus.SubscribeToMouseEvent(InvokeMouseAction);
+    }
+    
     public Div(params IElement[] children) {
         _children       = children.ToList();
-        Info = new ElementInfo();
+        Info            = new ElementInfo();
         _style          = new StyleCollection();
         _layoutCacher   = new LayoutCacher(CanUseMinCache, CanUseMaxCache, CanUseRenderCache);
         _childrenCacher = new ChildrenLayoutCacher(CanUseMinCache, CanUseMaxCache, CanUseRenderCache);
@@ -48,6 +97,8 @@ public class Div : ContainerElement {
         foreach (var c in children) {
             c.OnElementUpdated += InvokeElementUpdated;
         }
+        
+        SubscribeMouseEvents();
     }
     
     public override void Render(ICharCanvas canvas, Rectangle rect) {
@@ -81,21 +132,30 @@ public class Div : ContainerElement {
 
         var (el, cl) = GetRenderLayout(rect);
         
+        var pos = new Point(
+            Position.AbsoluteX ? Position.X.ToScalar(rect.Width) : rect.LowerX + Position.X.ToScalar(rect.Width), 
+            Position.AbsoluteY ? Position.Y.ToScalar(rect.Width) : rect.LowerY + Position.Y.ToScalar(rect.Height)
+        );
+        
         #endif
         
+        if (!BackgroundColor.IsInherit) {
+            canvas.Fill(el.Border + new Size(-2, -2) + pos + new Point(1, 1), ' ');
+        }
+        
         if (!Border.IsBorderless) {
-            canvas.StyleBackground(el.Border!.Value + rect.Lower, BackgroundColor);
-            canvas.PlaceRectangle(el.Border!.Value + rect.Lower, Border);
+            canvas.StyleBackground(el.Border + pos, BackgroundColor);
+            canvas.PlaceRectangle(el.Border + pos, Border);
         }
         else {
-            canvas.StyleBackground(el.Content + rect.Lower, BackgroundColor);
+            canvas.StyleBackground(el.Border + pos, BackgroundColor);
         }
-
+        
         for (int i = 0; i < _children.Count; i++) {
             var child = cl.Children[i];
             
             if (child.Size != Size.Zero && child != Rectangle.Zero)
-                _children[i].Render(canvas, child + rect.Lower);
+                _children[i].Render(canvas, child + pos);
         }
     }
     

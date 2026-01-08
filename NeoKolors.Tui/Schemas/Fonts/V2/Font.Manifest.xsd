@@ -1,0 +1,30 @@
+﻿<!--                             -->
+<!--  NeoKolors                  -->
+<!--  Copyright (c) 2025 KryKom  -->
+<!--                             -->
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:nk="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/Fonts/V2/Font.xsd"
+            targetNamespace="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/Fonts/V2/Font.xsd"
+            elementFormDefault="qualified"
+            attributeFormDefault="qualified">
+    
+    <xsd:element name="FontManifest">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="Config">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:anyURI"/>
+                    </xsd:simpleType>
+                </xsd:element>                
+                
+                <xsd:element name="Map">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:anyURI"/>
+                    </xsd:simpleType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+</xsd:schema>

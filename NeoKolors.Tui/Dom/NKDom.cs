@@ -2,6 +2,7 @@
 // Copyright (c) 2025 KryKom
 
 using NeoKolors.Tui.Elements;
+using NeoKolors.Tui.Styles.Properties;
 
 namespace NeoKolors.Tui.Dom;
 
@@ -69,6 +70,26 @@ public class NKDom : IDom {
         for (var i = 0; i < t0.Length; i++) {
             var c = t0[i];
             GetElementsByType(type, c, result);
+        }
+    }
+
+    public IEnumerable<IElement> All() {
+        var l = new List<IElement>();
+        All(BaseElement, l);
+        return l;
+    }
+
+    public static void All(IElement element, List<IElement> result) {
+        result.Add(element);
+        
+        var children = element.GetChildren();
+        
+        if (children.IsT1) return;
+        
+        var t0 = children.AsT0;
+        for (int i = 0; i < t0.Length; i++) {
+            var c = t0[i];
+            All(c, result);
         }
     }
 }

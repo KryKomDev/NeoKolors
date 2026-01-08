@@ -3,7 +3,6 @@
 
 using System.Diagnostics.Contracts;
 using NeoKolors.Tui.Dom;
-using NeoKolors.Tui.Styles.Properties;
 using NeoKolors.Tui.Styles.Values;
 namespace NeoKolors.Tui.Elements;
 
@@ -62,9 +61,10 @@ public interface IElement : IRenderable, INode {
     /// <returns>An <c>ElementLayout</c> struct containing computed sizes and positions for the element's overall size, content area, and border area.</returns>
     [Pure]
     public static ElementLayout ComputeLayout(
-        Size content, Size parent,
-        MarginProperty margin,
-        PaddingProperty padding,
+        Size        content, 
+        Size        parent,
+        Spacing     margin,
+        Spacing     padding,
         BorderStyle border) 
     {
         int bd = border.IsBorderless ? 0 : 1;
@@ -109,23 +109,24 @@ public interface IElement : IRenderable, INode {
     /// <returns>An <see cref="ElementLayout"/> struct representing the computed layout settings for the element.</returns>
     [Pure]
     public static ElementLayout ComputeLayout(
-        Size            content, 
-        Size            parent,
-        MarginProperty  margin,
-        PaddingProperty padding,
-        BorderStyle     border,
-        Dimension       width,
-        Dimension       height,
-        Dimension       minWidth,
-        Dimension       maxWidth,
-        Dimension       minHeight,
-        Dimension       maxHeight) 
+        Size         content, 
+        Size         parent,
+        Spacing      margin,
+        Spacing      padding,
+        BorderStyle  border,
+        Dimension    width,
+        Dimension    height,
+        Dimension    minWidth,
+        Dimension    maxWidth,
+        Dimension    minHeight,
+        Dimension    maxHeight) 
     {
         var l = ComputeLayout(content, parent, margin, padding, border);
 
         var e = l.ElementSize;
-        
-        if (width.IsNumber) {
+
+        if (width.IsMinContent) { }
+        else if (width.IsNumber) {
             e = e with { Width = width.ToScalar(parent.Width) };
         }
         else {
@@ -133,8 +134,9 @@ public interface IElement : IRenderable, INode {
             var nw = minWidth.IsNumber ? minWidth.ToScalar(parent.Width) : 0;
             e = e with { Width = Math.DClamp(e.Width, xw, nw) };
         }
-
-        if (height.IsNumber) {
+        
+        if (height.IsMinContent) { }
+        else if (height.IsNumber) {
             e = e with { Height = height.ToScalar(parent.Height) };
         }
         else {
@@ -149,7 +151,7 @@ public interface IElement : IRenderable, INode {
         return new ElementLayout(
             new Size(e.Width, e.Height), 
             new Size(l.Content.Width - dx, l.Content.Height - dy) + l.Content.Lower,
-            new Size(l.Border!.Value.Width - dx, l.Border.Value.Height - dy) + l.Border.Value.Lower 
+            new Size(l.Border.Width - dx, l.Border.Height - dy) + l.Border.Lower 
         );
     }
 
@@ -169,16 +171,16 @@ public interface IElement : IRenderable, INode {
     /// <returns>An <c>ElementLayout</c> struct representing the computed layout size of the element.</returns>
     [Pure]
     public static ElementLayout ComputeLayout(
-        Size            bounds,
-        MarginProperty  margin,
-        PaddingProperty padding,
-        BorderStyle     border,
-        Dimension       width,
-        Dimension       height,
-        Dimension       minWidth,
-        Dimension       maxWidth,
-        Dimension       minHeight,
-        Dimension       maxHeight) 
+        Size        bounds,
+        Spacing     margin,
+        Spacing     padding,
+        BorderStyle border,
+        Dimension   width,
+        Dimension   height,
+        Dimension   minWidth,
+        Dimension   maxWidth,
+        Dimension   minHeight,
+        Dimension   maxHeight) 
     {
         int bd = border.IsBorderless ? 0 : 2;
 

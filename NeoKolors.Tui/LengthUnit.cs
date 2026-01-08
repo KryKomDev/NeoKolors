@@ -23,3 +23,16 @@ public enum LengthUnit {
     VIEWPORT_WIDTH,
     VIEWPORT_HEIGHT,
 }
+
+public static class LengthUnitExtensions {
+    extension(LengthUnit u) {
+        public string String => u switch {
+            LengthUnit.PIXEL => "px",
+            LengthUnit.CHAR => "ch",
+            LengthUnit.PERCENT => "%",
+            LengthUnit.VIEWPORT_WIDTH => "vw",
+            LengthUnit.VIEWPORT_HEIGHT => "vh",
+            _ => throw new ArgumentOutOfRangeException(nameof(u), u, null)
+        };
+    }
+}

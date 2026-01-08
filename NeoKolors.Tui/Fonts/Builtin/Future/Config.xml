@@ -1,0 +1,16 @@
+﻿<Font xmlns="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/Fonts/V2/Font.xsd">
+    <Name>Future</Name>
+    <Version>2</Version>
+    <LetterSpacing>0</LetterSpacing>
+    <LineSpacing>1</LineSpacing>
+    
+    <Global>
+        <Mask>custom-forg,.</Mask>
+    </Global>
+    
+    <Variable>
+        <Kerning>false</Kerning>
+        <LineKerning>false</LineKerning>
+        <WordSpacing>3</WordSpacing>
+    </Variable>
+</Font>

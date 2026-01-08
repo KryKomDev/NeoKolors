@@ -15,8 +15,8 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
         <PackageReference Include="xunit" Version="2.9.3" />
         <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
     </ItemGroup>
 
@@ -25,11 +25,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\NeoKolors.Tui\NeoKolors.Tui.csproj" />
+        <ProjectReference Include="..\NeoKolors.Tui\NeoKolors.Tui.csproj" />
     </ItemGroup>
     
     <ItemGroup>
-        <None Include="./Fonts/BuiltIn/Dummy1.nkf"/>
+        <EmbeddedResource Include=".\Fonts\BuiltIn\Dummy1.nkf" />
     </ItemGroup>
 
 </Project>

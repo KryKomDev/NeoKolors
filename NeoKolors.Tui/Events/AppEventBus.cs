@@ -18,6 +18,10 @@ namespace NeoKolors.Tui.Events;
 public static class AppEventBus {
     private static IApplication? SOURCE_APPLICATION;
 
+    public static bool IsSourceSet => SOURCE_APPLICATION != null;
+    public static IApplication Application =>
+        SOURCE_APPLICATION ?? throw new NullReferenceException("Source Application not set!");
+
     /// <summary>
     /// Sets the source application instance for the event bus, allowing event handlers to be
     /// subscribed or unsubscribed in relation to this source application.
@@ -44,6 +48,25 @@ public static class AppEventBus {
     public static void UnsubscribeFromKeyEvent(KeyEventHandler handler) {
         if (SOURCE_APPLICATION != null)
             SOURCE_APPLICATION.KeyEvent -= handler;
+    }
+    
+    /// <summary>
+    /// Subscribes a handler method to the key event of the source application, enabling it to
+    /// process key-related events as they occur.
+    /// </summary>
+    /// <param name="handler">The method to be invoked when a key event is triggered.</param>
+    public static void SubscribeToMouseEvent(MouseEventHandler handler) {
+        if (SOURCE_APPLICATION is IMouseSupportingApplication msa)
+            msa.MouseEvent += handler;
+    }
+
+    /// <summary>
+    /// Unsubscribes a previously registered key event handler from the source application's key event.
+    /// </summary>
+    /// <param name="handler">The key event handler to be removed from the event subscription.</param>
+    public static void UnsubscribeFromMouseEvent(MouseEventHandler handler) {
+        if (SOURCE_APPLICATION is IMouseSupportingApplication msa)
+            msa.MouseEvent -= handler;
     }
 
     /// <summary>

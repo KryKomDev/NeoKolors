@@ -3,12 +3,15 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace NeoKolors.Tui.Styles.Values;
 
 [StructLayout(LayoutKind.Sequential, Size = 6 * sizeof(char) + 8 * sizeof(long))]
-public struct BorderStyle {
+public struct BorderStyle : IParsableValue<BorderStyle> {
+    
+    private static readonly NKLogger LOGGER = NKDebug.GetLogger<BorderStyle>();
     
     public char Vertical    { get; set; }
     public char Horizontal  { get; set; }
@@ -190,7 +193,7 @@ public struct BorderStyle {
     /// <returns>
     /// A BorderStyle instance with all border characters replaced by spaces and the specified background color.
     /// </returns>
-    public static BorderStyle GetSolid(NKColor? backgroundColor) =>
+    public static BorderStyle GetSolid(NKColor? backgroundColor = null) =>
         new(' ', ' ', ' ', ' ', ' ', ' ', backgroundColor: backgroundColor ?? NKColor.Default);
 
     /// <summary>
@@ -207,7 +210,7 @@ public struct BorderStyle {
     /// <param name="highlight">The highlight color applied to the border elements. Defaults to <see cref="NKColor.Default"/>.</param>
     /// <param name="background">The background color for the border. Defaults to <see cref="NKColor.Default"/>.</param>
     /// <returns>A BorderStyle instance with outset-style borders.</returns>
-    public static BorderStyle Inset(NKColor? shadow = null, NKColor? highlight = null, NKColor? background = null) =>
+    public static BorderStyle GetInset(NKColor? shadow = null, NKColor? highlight = null, NKColor? background = null) =>
         new('│', '─', '┌', '┐', '└', '┘',
             shadow, highlight, shadow, highlight, shadow, highlight, shadow, highlight, background);
     
@@ -218,7 +221,7 @@ public struct BorderStyle {
     /// <param name="highlight">The highlight color applied to the border elements. Defaults to <see cref="NKColor.Default"/>.</param>
     /// <param name="background">The background color for the border. Defaults to <see cref="NKColor.Default"/>.</param>
     /// <returns>A BorderStyle instance with outset-style borders.</returns>
-    public static BorderStyle Outset(NKColor? shadow = null, NKColor? highlight = null, NKColor? background = null) =>
+    public static BorderStyle GetOutset(NKColor? shadow = null, NKColor? highlight = null, NKColor? background = null) =>
         new('│', '─', '┌', '┐', '└', '┘',
             highlight, shadow, highlight, shadow, highlight, shadow, highlight, shadow, background);
     
@@ -231,7 +234,7 @@ public struct BorderStyle {
     /// <param name="highlight">The highlight color applied to the border elements. Defaults to <see cref="NKColor.Default"/>.</param>
     /// <param name="background">The background color for the border. Defaults to <see cref="NKColor.Default"/>.</param>
     /// <returns>A BorderStyle instance with outset-style borders.</returns>
-    public static BorderStyle InsetThick(NKColor? shadow = null, NKColor? highlight = null, NKColor? background = null) =>
+    public static BorderStyle GetInsetThick(NKColor? shadow = null, NKColor? highlight = null, NKColor? background = null) =>
         new('┃', '━', '┏', '┓', '┗', '┛',
             shadow, highlight, shadow, highlight, shadow, highlight, shadow, highlight, background);
     
@@ -242,9 +245,69 @@ public struct BorderStyle {
     /// <param name="highlight">The highlight color applied to the border elements. Defaults to <see cref="NKColor.Default"/>.</param>
     /// <param name="background">The background color for the border. Defaults to <see cref="NKColor.Default"/>.</param>
     /// <returns>A BorderStyle instance with outset-style borders.</returns>
-    public static BorderStyle OutsetThick(NKColor? shadow = null, NKColor? highlight = null, NKColor? background = null) =>
+    public static BorderStyle GetOutsetThick(NKColor? shadow = null, NKColor? highlight = null, NKColor? background = null) =>
         new('┃', '━', '┏', '┓', '┗', '┛',
             highlight, shadow, highlight, shadow, highlight, shadow, highlight, shadow, background);
     
     public static BorderStyle Borderless => new(true);
+    
+    
+    public static BorderStyle Parse(string s, IFormatProvider? provider) {
+        if (s.Equals("Borderless", StringComparison.OrdinalIgnoreCase)) return Borderless;
+
+        var name = s.SubstringUntil('(');
+        var rawParameters = s.Substring(name.Length + 1, s.Length - name.Length - 2);
+        var parameters = rawParameters == "" 
+            ? [] 
+            : rawParameters
+                .Split(',')
+                .Select(a => a.Trim())
+                .Select(NKColor.Parse)
+                .Select(c => (object?)c)
+                .ToArray();
+
+        var method = typeof(BorderStyle).GetMethod("Get" + name);
+        
+        if (method == null) {
+            LOGGER.Error("Could not find border style '{0}'.", name);
+            return Borderless;
+        }
+
+        var pc = method.GetParameters().Length;
+
+        if (parameters.Length < pc) {
+            var np = new object?[pc];
+            Array.Copy(parameters, np, parameters.Length);
+            parameters = np;
+        }
+        else {
+            parameters = parameters[..pc];
+        }
+        
+        var res = method.Invoke(null, parameters);
+
+        if (res == null) {
+            LOGGER.Error("Failed to create border style '{0}'.", name);
+        }
+        
+        return (BorderStyle)(res ?? Borderless);
+    }
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out BorderStyle result) {
+        if (string.IsNullOrEmpty(s)) {
+            result = Borderless;
+            return true;
+        }
+
+        try {
+            result = Parse(s, provider);
+            return true;
+        }
+        catch {
+            result = Borderless;
+            return false;
+        }
+    }
+
+    bool IParsableValue<BorderStyle>.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out BorderStyle result) => TryParse(s, provider, out result);
+    BorderStyle IParsableValue<BorderStyle>.Parse(string s, IFormatProvider? provider) => Parse(s, provider);
 }

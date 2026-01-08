@@ -345,15 +345,29 @@ public static class EscapeCodes {
 
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string GetDecPm(DecPrivateMode mode, bool value) => $"\e]{(int)mode}{(value ? 'h' : 'l')}";
+    public static string GetDecPm(DecPrivateMode mode, bool value) => $"\e[?{(int)mode}{(value ? 'h' : 'l')}";
 
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string GetDecPmEnable(DecPrivateMode mode) => GetDecPm(mode, true);
+    public static string GetDecSet(DecPrivateMode mode) => GetDecPm(mode, true);
+
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string GetDecSet(params DecPrivateMode[] modes) 
+        => $"\e[?{string.Join(';', modes.Select(m => (int)m))}h";
     
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string GetDecPmDisable(DecPrivateMode mode) => GetDecPm(mode, false);
+    public static string GetDecRst(DecPrivateMode mode) => GetDecPm(mode, false);
+    
+    
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string GetDecRst(params DecPrivateMode[] modes) 
+        => $"\e[?{string.Join(';', modes.Select(m => (int)m))}l";
+    
+    public const string ENABLE_CURSOR_VISIBLE = "\e[?25h";
+    public const string DISABLE_CURSOR_VISIBLE = "\e[?25l";
     
     #endregion
     
@@ -368,5 +382,6 @@ public static class EscapeCodes {
         REPORT_FOCUS = 1004,
         ALTERNATE_BUFFER = 1049,
         BRACKETED_PASTE_MODE = 2004,
+        CURSOR_VISIBLE_MODE = 25,
     }
 }

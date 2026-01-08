@@ -1,0 +1,117 @@
+﻿<FontMap xmlns="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/Fonts/V2/Font.xsd">
+    <Component Symbol="A" File="uppercase/A.nkg"/>
+    <Component Symbol="B" File="uppercase/B.nkg"/>
+    <Component Symbol="C" File="uppercase/C.nkg"/>
+    <Component Symbol="D" File="uppercase/D.nkg"/>
+    <Component Symbol="E" File="uppercase/E.nkg"/>
+    <Component Symbol="F" File="uppercase/F.nkg"/>
+    <Component Symbol="G" File="uppercase/G.nkg"/>
+    <Component Symbol="H" File="uppercase/H.nkg"/>
+    <Component Symbol="I" File="uppercase/I.nkg"/>
+    <Component Symbol="J" File="uppercase/J.nkg"/>
+    <Component Symbol="K" File="uppercase/K.nkg"/>
+    <Component Symbol="L" File="uppercase/L.nkg"/>
+    <Component Symbol="M" File="uppercase/M.nkg"/>
+    <Component Symbol="N" File="uppercase/N.nkg"/>
+    <Component Symbol="O" File="uppercase/O.nkg"/>
+    <Component Symbol="P" File="uppercase/P.nkg"/>
+    <Component Symbol="Q" File="uppercase/Q.nkg"/>
+    <Component Symbol="R" File="uppercase/R.nkg"/>
+    <Component Symbol="S" File="uppercase/S.nkg"/>
+    <Component Symbol="T" File="uppercase/T.nkg"/>
+    <Component Symbol="U" File="uppercase/U.nkg"/>
+    <Component Symbol="V" File="uppercase/V.nkg"/>
+    <Component Symbol="W" File="uppercase/W.nkg"/>
+    <Component Symbol="X" File="uppercase/X.nkg"/>
+    <Component Symbol="Y" File="uppercase/Y.nkg"/>
+    <Component Symbol="Z" File="uppercase/Z.nkg"/>
+
+    <Component Symbol="a" File="uppercase/A.nkg"/>
+    <Component Symbol="b" File="uppercase/B.nkg"/>
+    <Component Symbol="c" File="uppercase/C.nkg"/>
+    <Component Symbol="d" File="uppercase/D.nkg"/>
+    <Component Symbol="e" File="uppercase/E.nkg"/>
+    <Component Symbol="f" File="uppercase/F.nkg"/>
+    <Component Symbol="g" File="uppercase/G.nkg"/>
+    <Component Symbol="h" File="uppercase/H.nkg"/>
+    <Component Symbol="i" File="uppercase/I.nkg"/>
+    <Component Symbol="j" File="uppercase/J.nkg"/>
+    <Component Symbol="k" File="uppercase/K.nkg"/>
+    <Component Symbol="l" File="uppercase/L.nkg"/>
+    <Component Symbol="m" File="uppercase/M.nkg"/>
+    <Component Symbol="n" File="uppercase/N.nkg"/>
+    <Component Symbol="o" File="uppercase/O.nkg"/>
+    <Component Symbol="p" File="uppercase/P.nkg"/>
+    <Component Symbol="q" File="uppercase/Q.nkg"/>
+    <Component Symbol="r" File="uppercase/R.nkg"/>
+    <Component Symbol="s" File="uppercase/S.nkg"/>
+    <Component Symbol="t" File="uppercase/T.nkg"/>
+    <Component Symbol="u" File="uppercase/U.nkg"/>
+    <Component Symbol="v" File="uppercase/V.nkg"/>
+    <Component Symbol="w" File="uppercase/W.nkg"/>
+    <Component Symbol="x" File="uppercase/X.nkg"/>
+    <Component Symbol="y" File="uppercase/Y.nkg"/>
+    <Component Symbol="z" File="uppercase/Z.nkg"/>
+
+    <Component Symbol="," File="special/comma.nkg"/>
+    <Component Symbol="." File="special/dot.nkg"/>
+    <Component Symbol="?" File="special/qm.nkg"/>
+    <Component Symbol="!" File="special/em.nkg"/>
+    <Component Symbol="@" File="special/at.nkg"/>
+    <Component Symbol="#" File="special/ht.nkg"/>
+    <Component Symbol="$" File="special/dlr.nkg"/>
+    <Component Symbol="%" File="special/perc.nkg"/>
+    <Component Symbol="\x26" File="special/amp.nkg"/>
+    <Component Symbol="*" File="special/ast.nkg"/>
+    <Component Symbol="(" File="special/lparen.nkg"/>
+    <Component Symbol=")" File="special/rparen.nkg"/>
+    <Component Symbol="_" File="special/under.nkg"/>
+    <Component Symbol="-" File="special/dash.nkg"/>
+    <Component Symbol="+" File="special/plus.nkg"/>
+    <Component Symbol="=" File="special/eq.nkg"/>
+    <Component Symbol="\" File="special/bslash.nkg"/>
+    <Component Symbol="/" File="special/fslash.nkg"/>
+    <Component Symbol="|" File="special/pipe.nkg"/>
+    <Component Symbol="{" File="special/lbrace.nkg"/>
+    <Component Symbol="}" File="special/rbrace.nkg"/>
+    <Component Symbol="[" File="special/lbracket.nkg"/>
+    <Component Symbol="]" File="special/rbracket.nkg"/>
+    <Component Symbol="'" File="special/sq.nkg"/>
+    <Component Symbol="\x22" File="special/dq.nkg"/>
+
+    <Component Symbol="´" Id="accent" File="diacritics/accent.nkg"/>
+    <Component Symbol="¨" Id="umlaut" File="diacritics/umlaut.nkg"/>
+    <Component Symbol="ˇ" Id="caron" File="diacritics/caron.nkg"/>
+    
+    <AutoCompound Symbol="´" BaseId="accent">
+        <Align>top-center</Align>
+        <Applicable>
+            <Group>vowels</Group>
+        </Applicable>
+    </AutoCompound>
+
+    <AutoCompound Symbol="ˇ" BaseId="caron">
+        <Align>top-center</Align>
+        <Applicable>
+            <Chars>ertsdzcn</Chars>
+        </Applicable>
+    </AutoCompound>
+
+    <AutoCompound Symbol="¨" BaseId="umlaut">
+        <Align>top-center</Align>
+        <Applicable>
+            <Group>vowels</Group>
+        </Applicable>
+    </AutoCompound>
+    
+    <Component Symbol="0" File="digits/0.nkg"/>
+    <Component Symbol="1" File="digits/1.nkg"/>
+    <Component Symbol="2" File="digits/2.nkg"/>
+    <Component Symbol="3" File="digits/3.nkg"/>
+    <Component Symbol="4" File="digits/4.nkg"/>
+    <Component Symbol="5" File="digits/5.nkg"/>
+    <Component Symbol="6" File="digits/6.nkg"/>
+    <Component Symbol="7" File="digits/7.nkg"/>
+    <Component Symbol="8" File="digits/8.nkg"/>
+    <Component Symbol="9" File="digits/9.nkg"/>
+</FontMap>

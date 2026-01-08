@@ -2,13 +2,18 @@
 // Copyright (c) 2025 KryKom
 
 using System.Diagnostics.Contracts;
+using NeoKolors.Console.Mouse;
 using NeoKolors.Tui.Elements.Caching;
 using NeoKolors.Tui.Events;
+using NeoKolors.Tui.Styles.Properties;
 using StyleCollection = NeoKolors.Tui.Styles.StyleCollection;
 
 namespace NeoKolors.Tui.Elements;
 
-public class Text : TextElement, IElement, INotifyOnRender {
+public class Text : TextElement, INotifyOnRender, IInteractableElement {
+    
+    private static readonly NKLogger LOGGER = NKDebug.GetLogger<Button>();
+    private static bool LOGGED_SRC_ERR = false;
     
     private readonly LayoutCacher _layoutCacher;
     private string _text;
@@ -52,14 +57,58 @@ public class Text : TextElement, IElement, INotifyOnRender {
     
     public override ElementInfo Info { get; }
     
+    private Rectangle _lastBounds = Rectangle.Zero;
+    private bool _hoverEnable;
 
+    private void InvokeMouseAction(MouseEventArgs a) {
+        if (!_lastBounds.Contains(a.Position.X, a.Position.Y)) {
+            if (!_hoverEnable) 
+                return;
+            
+            OnHoverOut.Invoke();
+            _hoverEnable = false;
+
+            return;
+        }
+        
+        if (a.IsPress) {
+            OnClick.Invoke(a.Button);
+        }
+        else if (a.IsRelease) {
+            OnRelease.Invoke(a.Button);
+        }
+        else if (a.IsHover) {
+            OnHover.Invoke();
+            _hoverEnable = true;
+        }
+    }
+    
+    public event Action<MouseButton> OnClick = _ => { };
+    public event Action<MouseButton> OnRelease = _ => { };
+    public event Action OnHover = () => { };
+    public event Action OnHoverOut = () => { };
+
+    private void SubscribeMouseEvents() {
+        if (!AppEventBus.IsSourceSet) {
+            if (LOGGED_SRC_ERR) return;
+            
+            LOGGER.Error("Source application not set! Cannot register");
+            LOGGED_SRC_ERR = true;
+
+            return;
+        }
+        
+        AppEventBus.SubscribeToMouseEvent(InvokeMouseAction);
+    }
+    
     public Text(string text) {
-        _text = text;
-        _layoutCacher = new LayoutCacher(CanUseMinCache, CanUseMaxCache, CanUseRenderCache);
-        _style = new StyleCollection();
-        Info = new ElementInfo();
-        OnRender += () => {};
+        _text          = text;
+        _layoutCacher  = new LayoutCacher(CanUseMinCache, CanUseMaxCache, CanUseRenderCache);
+        _style         = new StyleCollection();
+        Info           = new ElementInfo();
+        OnRender      += () => {};
         OnStyleAccess += InvokeElementUpdated;
+        SubscribeMouseEvents();
     }
     
     public override void Render(ICharCanvas canvas, Rectangle rect) {
@@ -91,19 +140,26 @@ public class Text : TextElement, IElement, INotifyOnRender {
         
         #endif
         
+        var pos = new Point(
+            Position.AbsoluteX ? Position.X.ToScalar(rect.Width) : rect.LowerX + Position.X.ToScalar(rect.Width), 
+            Position.AbsoluteY ? Position.Y.ToScalar(rect.Width) : rect.LowerY + Position.Y.ToScalar(rect.Height)
+        );
+
+        _lastBounds = layout.Border + pos;
+        
         if (!BackgroundColor.IsInherit) {
-            canvas.Fill(layout.Border!.Value + rect.Lower, ' ');
+            canvas.Fill(layout.Border + pos, ' ');
         }
         
         if (!Border.IsBorderless) {
-            canvas.StyleBackground(layout.Border!.Value + rect.Lower, BackgroundColor);
-            canvas.PlaceRectangle(layout.Border!.Value + rect.Lower, Border);
+            canvas.StyleBackground(layout.Border + pos, BackgroundColor);
+            canvas.PlaceRectangle(layout.Border + pos, Border);
         }
         else {
-            canvas.StyleBackground(layout.Content + rect.Lower, BackgroundColor);
+            canvas.StyleBackground(layout.Border + pos, BackgroundColor);
         }
         
-        Font.PlaceString(_text, canvas, layout.Content + rect.Lower, new NKStyle(Color, BackgroundColor),
+        Font.PlaceString(_text, canvas, layout.Content + pos, new NKStyle(Color, BackgroundColor),
             TextAlign.Horizontal, TextAlign.Vertical);
         
         onRender.Wait();
@@ -135,7 +191,7 @@ public class Text : TextElement, IElement, INotifyOnRender {
     }
 
     [Pure]
-    private ElementLayout ComputeMinLayout(Size parent) {
+    protected ElementLayout ComputeMinLayout(Size parent) {
         var t = Font.GetMinSize(_text);
         return IElement.ComputeLayout(
             t, parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
@@ -162,7 +218,7 @@ public class Text : TextElement, IElement, INotifyOnRender {
     }
     
     [Pure]
-    private ElementLayout ComputeMaxLayout(Size parent) {
+    protected ElementLayout ComputeMaxLayout(Size parent) {
         var compute = Font.GetSize(_text);
         return IElement.ComputeLayout(
             compute, parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
@@ -189,7 +245,7 @@ public class Text : TextElement, IElement, INotifyOnRender {
     }
     
     [Pure]
-    private ElementLayout ComputeRenderLayout(Size bounds) {
+    protected ElementLayout ComputeRenderLayout(Size bounds) {
         var p = Padding.Left.ToScalar(bounds.Width) + Padding.Right.ToScalar(bounds.Width);
         var m = Margin .Left.ToScalar(bounds.Width) + Margin .Right.ToScalar(bounds.Width);
         var b = Border.IsBorderless ? 0 : 2;
@@ -223,4 +279,8 @@ public class Text : TextElement, IElement, INotifyOnRender {
     }
 
     #endregion
+    
+    // --- Style overrides ---
+
+    protected override BackgroundColorProperty DefaultBackgroundColor => new(NKColor.Inherit);
 }

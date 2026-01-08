@@ -71,16 +71,16 @@ public abstract class UniversalElement : IElement {
 
     protected virtual BorderStyle DefaultBorder => BorderStyle.Borderless;
 
-    public virtual PaddingProperty Padding {
-        get => _style.Get(DefaultPadding);
-        set => _style.Set(value);
+    public virtual Spacing Padding {
+        get => _style.Get(DefaultPadding).Value;
+        set => _style.Set(new PaddingProperty(value));
     }
 
     protected virtual PaddingProperty DefaultPadding => new();
 
-    public virtual MarginProperty Margin {
-        get => _style.Get(DefaultMargin);
-        set => _style.Set(value);
+    public virtual Spacing Margin {
+        get => _style.Get(DefaultMargin).Value;
+        set => _style.Set(new MarginProperty(value));
     }
 
     protected virtual MarginProperty DefaultMargin => new();
@@ -90,7 +90,7 @@ public abstract class UniversalElement : IElement {
         set => _style.Set(new BackgroundColorProperty(value));
     }
 
-    protected virtual BackgroundColorProperty DefaultBackgroundColor => new(NKColor.Inherit);
+    protected virtual BackgroundColorProperty DefaultBackgroundColor => new(NKColor.Default);
 
     public Rectangle GridAlign {
         get => _style.Get(DefaultGridAlign).Value;
@@ -105,6 +105,13 @@ public abstract class UniversalElement : IElement {
     }
     
     protected virtual bool DefaultOverflow => false;
+
+    public virtual Position Position {
+        get => _style.Get(DefaultPosition).Value;
+        set => _style.Set(new PositionProperty(value));
+    }
+    
+    protected  virtual PositionProperty DefaultPosition => new();
     
     
     // =========================== STYLE CHANGE NOTIFICATIONS =========================== // 

@@ -72,7 +72,7 @@ public readonly struct ApplicableChars : IEquatable<ApplicableChars> {
 
     public ApplicableChars(AutoCompoundApplicable applicable) {
         Characters = !Equals(applicable.Chars, null) ? applicable.Chars.ToArray() : [];
-        ApplicableGroup = applicable.Group.Aggregate(NONE, (current, a) => current | a);
+        ApplicableGroup = !Equals(applicable.Group, null) ? applicable.Group.Aggregate(NONE, (current, a) => current | a) : NONE;
     }
 
     public bool IsApplicable(char c) {

@@ -543,6 +543,67 @@ public static class String {
     /// <returns>A new string containing only printable and visible characters.</returns>
     public static string GetPlain(this string s) => Regex.Replace(s, @"\0\[(.*)m", ""); // TODO: Add more non-printable characters
 
+    public static string SubstringUntil(this string s, char c) {
+        for (int i = 0; i < s.Length; i++) {
+            if (s[i] == c) 
+                return s[..i];
+        }
+        
+        return s;
+    }
+
+    public static string SubstringAfter(this string s, char c) {
+        for (int i = 0; i < s.Length; i++) {
+            if (s[i] == c)
+                return s[i..];
+        }
+
+        return s;
+    }
+
+    public static string SubstringBetween(
+        this string s,
+        char startChar,
+        char endChar, 
+        bool excludeStart = false,
+        bool excludeEnd   = false) 
+    {
+        int start = -1;
+        int end = -1;
+        
+        for (int i = 0; i < s.Length; i++) {
+            if (s[i] != startChar) continue;
+            
+            start = i;
+            break;
+        }
+
+        if (start == -1) {
+            start = 0;
+        }
+        else if (excludeStart) {
+            if (start + 1 < s.Length)
+                start++;
+        }
+
+        for (int i = start; i < s.Length; i++) {
+            if (s[i] != endChar) continue;
+            
+            end = i;
+            break;
+        }
+        
+        if (end == -1) {
+            end = 0;
+        }
+        else if (excludeEnd) {
+            if (end - 1 >= start)
+                end--;
+        }
+        
+        return s.Substring(start, end - start);
+    }
+    
     extension(string s) {
         
         /// <summary>

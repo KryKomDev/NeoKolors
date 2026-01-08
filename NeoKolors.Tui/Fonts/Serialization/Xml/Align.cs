@@ -7,7 +7,7 @@ using static NeoKolors.Tui.Fonts.Serialization.Xml.Align.Direction;
 
 namespace NeoKolors.Tui.Fonts.Serialization.Xml;
 
-[XmlRoot("Align", Namespace = NKFontSchema.COMMON_SCHEMA_LOCATION)]
+[XmlRoot("Align", Namespace = NKFontSchema.SCHEMA_NAMESPACE)]
 public partial class Align {
     
     [XmlText]

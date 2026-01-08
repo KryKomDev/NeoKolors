@@ -1,6 +1,8 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
+using System.Xml;
+
 namespace NeoKolors.Tui.Fonts.Exceptions;
 
 public sealed class FontSerializerException : Exception {
@@ -34,6 +36,9 @@ public sealed class FontSerializerException : Exception {
     
     public static FontSerializerException MapDeserializationFailed()
         => new("Deserialization of font mappings file failed.");
+
+    public static FontSerializerException ManifestDeserializationFailed()
+        => new("Deserialization of font manifest file failed.");
     
     public static FontSerializerException InvalidFontName(string name) 
         => new($"Invalid font name '{name}'.");
@@ -43,6 +48,9 @@ public sealed class FontSerializerException : Exception {
     
     public static FontSerializerException MapNotFound(string? path = null)
         => new($"Font mappings file not found{(path is null ? "" : " in directory '" + path + "'")}.");
+
+    public static FontSerializerException ManifestNotFound(string? path = null)
+        => new($"Font manifest file not found{(path is null ? "" : " in directory '" + path + "'")}.");
         
     public static FontSerializerException CannotResolveUri(UriFormatException inner)
         => new("Cannot resolve font URI.", inner: inner);
@@ -71,4 +79,7 @@ public sealed class FontSerializerException : Exception {
     
     public static FontSerializerException CouldNotLoadMapXsd() 
         => new("Could not load font mappings XSD.");
+    
+    public static FontSerializerException DeserializationError(string path, Exception inner) 
+        => new($"An error occurred while reading font file {path}.", H_LINK, inner);
 }

@@ -27,13 +27,13 @@ public struct ElementLayout {
     /// If defined, it specifies the dimensions and position of the border relative to the elementOld.
     /// If not defined, the border is not rendered.
     /// </summary>
-    public Rectangle? Border { get; set; }
+    public Rectangle Border { get; set; }
 
-    public ElementLayout(Size elementSize, Rectangle content, Rectangle? border) {
+    public ElementLayout(Size elementSize, Rectangle content, Rectangle border) {
         ElementSize = elementSize;
         Content = content;
         Border = border;
     }
 
-    public static ElementLayout Zero => new(Size.Zero, Size.Zero, null);
+    public static ElementLayout Zero => new(Size.Zero, Size.Zero, Size.Zero);
 }

@@ -65,9 +65,14 @@ public class NamedDiv : Div {
             SetCanUseRenderCache();
         }
 
-        var bw = el.Border!.Value.Width;
-        int p = TitlePadding.ToScalar(el.Border!.Value.Width);
+        var pos = new Point(
+            Position.AbsoluteX ? Position.X.ToScalar(rect.Width) : rect.LowerX + Position.X.ToScalar(rect.Width), 
+            Position.AbsoluteY ? Position.Y.ToScalar(rect.Width) : rect.LowerY + Position.Y.ToScalar(rect.Height)
+        );
         
-        canvas.PlaceString(Name, rect.Lower + el.Border!.Value.Lower + new Point(p, 0), bw - p * 2, TitleAlign);
+        var bw = el.Border.Width;
+        int p = TitlePadding.ToScalar(el.Border.Width);
+        
+        canvas.PlaceString(Name, pos + el.Border.Lower + new Point(p, 0), bw - p * 2, TitleAlign);
     }
 }

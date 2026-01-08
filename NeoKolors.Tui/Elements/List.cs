@@ -112,13 +112,18 @@ public class List : UniversalElement {
         }
         
         if (!Border.IsBorderless) {
-            canvas.StyleBackground(el.Border!.Value + rect.Lower, BackgroundColor);
-            canvas.PlaceRectangle(el.Border!.Value + rect.Lower, Border);
+            canvas.StyleBackground(el.Border + rect.Lower, BackgroundColor);
+            canvas.PlaceRectangle(el.Border + rect.Lower, Border);
         }
         else {
-            canvas.StyleBackground(el.Border!.Value + rect.Lower, BackgroundColor);
+            canvas.StyleBackground(el.Border + rect.Lower, BackgroundColor);
         }
 
+        var pos = new Point(
+            Position.AbsoluteX ? Position.X.ToScalar(rect.Width) : rect.LowerX + Position.X.ToScalar(rect.Width), 
+            Position.AbsoluteY ? Position.Y.ToScalar(rect.Width) : rect.LowerY + Position.Y.ToScalar(rect.Height)
+        );
+        
         var pg = Point;
         int mpw = 0;
 
@@ -137,14 +142,14 @@ public class List : UniversalElement {
                 canvas.PlaceString(
                     p, 
                     new Point(
-                        child.LowerX + rect.LowerX + el.Content.LowerX, 
-                        child.LowerY + rect.LowerY + el.Content.LowerY + PointOffset
+                        child.LowerX + pos.X + el.Content.LowerX, 
+                        child.LowerY + pos.Y + el.Content.LowerY + PointOffset
                     ), 
                     mpw, 
                     PointAlign
                 );
                 
-                _children[i].Render(canvas, child + rect.Lower + co + el.Content.Lower);
+                _children[i].Render(canvas, child + pos + co + el.Content.Lower);
             }
         }
     }

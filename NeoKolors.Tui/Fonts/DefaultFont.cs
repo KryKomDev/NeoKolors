@@ -65,6 +65,7 @@ public class DefaultFont : IFont {
     public Size GetSize(string str) => new(str.Length, 1);
     public Size GetSize(string str, int maxWidth) {
         var l = str.Chop(maxWidth);
-        return new Size(maxWidth, l.Length);
+        var w = l.Select(s => s.Length).Max();
+        return new Size(w, l.Length);
     }
 }

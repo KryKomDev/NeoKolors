@@ -5,6 +5,7 @@
 
 using System.IO.Compression;
 using System.Reflection;
+using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -20,8 +21,8 @@ public static class NKFontSerializer {
     // Do not ask me why I did this. I know it is not necessary,
     // but WHO DA FUCK ACTUALLY CARES?
     // IT'S MANAGED AT COMPILE TIME ANYWAY!!! 
-    private const string CONF_SCHEMA_URL = NKFontSchema.CONFIG_SCHEMA_LOCATION;
-    private const string MAP_SCHEMA_URL = NKFontSchema.MAP_SCHEMA_LOCATION;
+    private const string CONF_SCHEMA_URL = NKFontSchema.SCHEMA_NAMESPACE;
+    private const string MAP_SCHEMA_URL = NKFontSchema.SCHEMA_NAMESPACE;
     
     private static XmlSchemaSet? CONFIG_SCHEMA;
     private static XmlSchemaSet? MAP_SCHEMA;
@@ -186,6 +187,7 @@ public static class NKFontSerializer {
 
     private const string CONFIG_FILE_NAME = "conf.nkfc";
     private const string MAP_FILE_NAME = "map.nkfm";
+    private const string MANIFEST_FILE_NAME = "manifest.nkfont";
     
     
     // --------------------- PUBLIC METHODS --------------------- //
@@ -232,25 +234,47 @@ public static class NKFontSerializer {
     /// <summary>
     /// Reads and deserializes an NKFont object from a directory by processing its configuration
     /// and mapping files. The directory must contain a valid configuration file ("conf.nkfc")
-    /// and a mapping file ("map.nkfm").
+    /// and a mapping file ("Map.xml").
     /// </summary>
     /// <param name="path">The path to the directory containing the font files.</param>
     /// <returns>An <see cref="NKFont"/> object constructed from the provided directory structure.</returns>
-    /// <exception cref="FontSerializerException">Thrown when required files ("conf.nkfc" or "map.nkfm") are missing
+    /// <exception cref="FontSerializerException">Thrown when required files ("conf.nkfc" or "Map.xml") are missing
     /// in the specified directory, or if file deserialization fails.</exception>
     /// <exception cref="NotImplementedException">Thrown when functionality for reading font files
     /// has not yet been implemented.</exception>
     public static NKFont ReadDir(string path) {
-        string configPath = Path.Combine(path, CONFIG_FILE_NAME);
-        if (!File.Exists(configPath))
-            throw FontSerializerException.ConfigNotFound(path);
+        string manifestPath = Path.Combine(path, MANIFEST_FILE_NAME);
 
-        string mapPath = Path.Combine(path, MAP_FILE_NAME);
-        if (!File.Exists(mapPath))
-            throw FontSerializerException.MapNotFound(path);
+        FontConfig config;
+        FontMap map;
+        
+        if (File.Exists(manifestPath)) {
+            var manifest = DeserializeManifestFromFile(manifestPath);
+            
+            string configPath = Path.Combine(path, manifest.Config);
+            if (!File.Exists(configPath))
+                throw FontSerializerException.ConfigNotFound(path);
 
-        var config = DeserializeConfFromFile(configPath);
-        var map = DeserializeMapFromFile(mapPath);
+            string mapPath = Path.Combine(path, manifest.Map);
+            if (!File.Exists(mapPath))
+                throw FontSerializerException.MapNotFound(path);
+
+            config = DeserializeConfFromFile(configPath);
+            map = DeserializeMapFromFile(mapPath);
+        }
+        else {
+            string configPath = Path.Combine(path, CONFIG_FILE_NAME);
+            if (!File.Exists(configPath))
+                throw FontSerializerException.ConfigNotFound(path);
+
+            string mapPath = Path.Combine(path, MAP_FILE_NAME);
+            if (!File.Exists(mapPath))
+                throw FontSerializerException.MapNotFound(path);
+
+            config = DeserializeConfFromFile(configPath);
+            map = DeserializeMapFromFile(mapPath);
+        }
+
         map.SetDefaults(config);
         
         var glyphs = LoadGlyphsDir(map, path);
@@ -283,7 +307,45 @@ public static class NKFontSerializer {
 
         return ExtractZip(stream);
     }
-    
+
+    /// <summary>
+    /// Reads an embedded font resource from the assembly's manifest and extracts it.
+    /// Intended for internal use to load resources bundled within the application.
+    /// </summary>
+    /// <param name="path">The name of the embedded resource.</param>
+    /// <param name="assembly">The assembly the resource is taken from.</param>
+    /// <returns>An <see cref="NKFont"/> instance containing the deserialized font data if the resource is found, or null if not.</returns>
+    public static NKFont? ReadEmbedded(string path, Assembly assembly) {
+        using var stream = assembly.GetManifestResourceStream(path);
+        if (stream == null) {
+            LOGGER.Error("Could not find embedded font '{0}'.", path);
+            return null;
+        }
+
+        return ExtractZip(stream);
+    }
+
+    /// <summary>
+    /// Reads an embedded font resource from the specified assembly.
+    /// The resource must be accessible as an embedded resource within the assembly.
+    /// </summary>
+    /// <param name="path">The path to the embedded font resource within the assembly.</param>
+    /// <typeparam name="TAssemblyType">A type contained in the assembly the resource is taken from.</typeparam>
+    /// <returns>An <see cref="NKFont"/> object representing the font, or null if the resource is not found.</returns>
+    public static NKFont? ReadEmbedded<TAssemblyType>(string path) =>
+        ReadEmbedded(path, typeof(TAssemblyType).Assembly);
+
+    /// <summary>
+    /// Reads an embedded NKFont resource from the specified name.
+    /// This method resolves the embedded resource path based on the provided font name.
+    /// </summary>
+    /// <param name="name">The name of the embedded font resource to read.
+    /// This should correspond to a valid built-in font resource within the assembly.</param>
+    /// <returns>The deserialized <see cref="NKFont"/> object if the embedded resource is found and successfully resolved;
+    /// otherwise, null if the resource cannot be located.</returns>
+    internal static NKFont? ReadInternal(string name)
+        => ReadEmbedded<NKFont>($"{typeof(NKFont).Assembly.GetName().Name}...Fonts.Builtin.{name}.nkf");
+
     // --------------------- PRIVATE METHODS --------------------- //
     
     /// <summary>
@@ -330,7 +392,7 @@ public static class NKFontSerializer {
         
         return glyphs.Values.ToArray();
     }
-
+    
     
     /// <summary>
     /// Extracts and deserializes an <see cref="NKFont"/> object from a ZIP archive stream.
@@ -345,21 +407,40 @@ public static class NKFontSerializer {
 
         ZipArchive zip = new(stream, ZipArchiveMode.Read);
 
-        // load config
-        var configStream = zip.GetEntry(CONFIG_FILE_NAME);
+        // try to load manifest
+        var manifestEntry = zip.GetEntry(MANIFEST_FILE_NAME);
+        
+        FontConfig config;
+        FontMap map;
 
-        if (configStream is null)
-            throw FontSerializerException.ConfigNotFound();
+        if (manifestEntry is not null) {
+            var manifest = DeserializeManifestFromStream(manifestEntry.Open());
+            
+            var configStream = zip.GetEntry(manifest.Config);
+            if (configStream is null) throw FontSerializerException.ConfigNotFound();
+            config = DeserializeConfFromStream(configStream.Open());
 
-        var config = DeserializeConfFromStream(configStream.Open());
+            var mapStream = zip.GetEntry(manifest.Map);
+            if (mapStream is null) throw FontSerializerException.MapNotFound();
+            map = DeserializeMapFromStream(mapStream.Open());
+        } else {
+            // load config
+            var configStream = zip.GetEntry(CONFIG_FILE_NAME);
+
+            if (configStream is null)
+                throw FontSerializerException.ConfigNotFound();
+
+            config = DeserializeConfFromStream(configStream.Open());
         
-        // load map
-        var mapStream = zip.GetEntry(MAP_FILE_NAME);
+            // load map
+            var mapStream = zip.GetEntry(MAP_FILE_NAME);
         
-        if (mapStream is null)
-            throw FontSerializerException.MapNotFound();
+            if (mapStream is null)
+                throw FontSerializerException.MapNotFound();
         
-        var map = DeserializeMapFromStream(mapStream.Open());
+            map = DeserializeMapFromStream(mapStream.Open());
+        }
+        
         map.SetDefaults(config);
         
         var glyphs = LoadGlyphsZip(map, zip);
@@ -519,11 +600,16 @@ public static class NKFontSerializer {
     /// <returns>A deserialized <see cref="FontConfig"/> object containing the font configuration data.</returns>
     /// <exception cref="FontSerializerException">Thrown if deserialization of the font configuration file fails.</exception>
     public static FontConfig DeserializeConfFromFile(string filePath) {
-        var serializer = new XmlSerializer(typeof(FontConfig));
+        try {
+            var serializer = new XmlSerializer(typeof(FontConfig));
 
-        using var fileStream = new FileStream(filePath, FileMode.Open);
-        return (FontConfig)(serializer.Deserialize(fileStream) 
-                            ?? throw FontSerializerException.ConfDeserializationFailed());
+            using var fileStream = new FileStream(filePath, FileMode.Open);
+            return (FontConfig)(serializer.Deserialize(fileStream)
+                                ?? throw FontSerializerException.ConfDeserializationFailed());
+        }
+        catch (Exception x) {
+            throw FontSerializerException.DeserializationError(filePath, x);
+        }
     }
 
     
@@ -563,11 +649,16 @@ public static class NKFontSerializer {
     /// <returns>A deserialized <see cref="FontMap"/> object containing the font mappings data.</returns>
     /// <exception cref="FontSerializerException">Thrown if deserialization of the font mapping file fails.</exception>
     public static FontMap DeserializeMapFromFile(string filePath) {
-        var serializer = new XmlSerializer(typeof(FontMap));
+        try {
+            var serializer = new XmlSerializer(typeof(FontMap));
 
-        using var fileStream = new FileStream(filePath, FileMode.Open);
-        return (FontMap)(serializer.Deserialize(fileStream) 
-                         ?? throw FontSerializerException.MapDeserializationFailed());
+            using var fileStream = new FileStream(filePath, FileMode.Open);
+            return (FontMap)(serializer.Deserialize(fileStream)
+                             ?? throw FontSerializerException.MapDeserializationFailed());
+        }
+        catch (Exception x) {
+            throw FontSerializerException.DeserializationError(filePath, x);
+        }
     }
 
     
@@ -598,6 +689,38 @@ public static class NKFontSerializer {
         return (FontMap)(serializer.Deserialize(xmlContent) 
                          ?? throw FontSerializerException.MapDeserializationFailed());
     }
+
+    /// <summary>
+    /// Deserializes a font manifest file into a <see cref="FontManifest"/> object from the specified file path.
+    /// </summary>
+    /// <param name="filePath">The path of the font manifest file to be deserialized.</param>
+    /// <returns>A deserialized <see cref="FontManifest"/> object containing the font manifest data.</returns>
+    /// <exception cref="FontSerializerException">Thrown if deserialization of the font manifest file fails.</exception>
+    public static FontManifest DeserializeManifestFromFile(string filePath) {
+        try {
+            var serializer = new XmlSerializer(typeof(FontManifest));
+
+            using var fileStream = new FileStream(filePath, FileMode.Open);
+            return (FontManifest)(serializer.Deserialize(fileStream)
+                                  ?? throw FontSerializerException.ManifestDeserializationFailed());
+        }
+        catch (Exception x) {
+            throw FontSerializerException.DeserializationError(filePath, x);
+        }
+    }
+    
+    /// <summary>
+    /// Deserializes a font manifest from the specified XML stream into a <see cref="FontManifest"/> object.
+    /// </summary>
+    /// <param name="xmlContent">The XML stream containing the font manifest data to be deserialized.</param>
+    /// <returns>A deserialized <see cref="FontManifest"/> object containing the font manifest data.</returns>
+    /// <exception cref="FontSerializerException">Thrown if deserialization of the font manifest stream fails.</exception>
+    public static FontManifest DeserializeManifestFromStream(Stream xmlContent) {
+        var serializer = new XmlSerializer(typeof(FontManifest));
+
+        return (FontManifest)(serializer.Deserialize(xmlContent) 
+                              ?? throw FontSerializerException.ManifestDeserializationFailed());
+    }
     
     
     // ----------------------------------------------------------- //
@@ -613,7 +736,10 @@ public static class NKFontSerializer {
     public static void CreateArchive(string path, string outputPath) {
         if (!Directory.Exists(path))
             throw FontSerializerException.ZipInPathMustBeDir(path);
-
+        
+        if (File.Exists(outputPath))
+            File.Delete(outputPath);
+        
         ZipFile.CreateFromDirectory(path, outputPath, CompressionLevel.Optimal, false);
     }
 }

@@ -227,7 +227,7 @@ public static class NKGlyphReader {
 
         for (int y = list.YSize - 1; y >= 0; y--) {
             if (!list.AllAtY(y, t => !t.HasValue)) break;
-            list.ShrinkX();
+            list.ShrinkY();
         }
         
         return list.ToArray();

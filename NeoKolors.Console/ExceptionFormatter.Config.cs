@@ -87,4 +87,14 @@ public partial class ExceptionFormatter {
     /// This can be useful for tracking issues in applications where console output is not always monitored.
     /// </remarks>
     public bool RedirectToLog { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether unhandled exceptions are formatted for better readability.
+    /// </summary>
+    /// <remarks>
+    /// When enabled, unhandled exceptions are processed and displayed with the specified formatting styles.
+    /// This functionality is useful for improving the clarity and presentation of exception information,
+    /// particularly in console-based applications.
+    /// </remarks>
+    public bool FormatUnhandled { get; set; } = true;
 }

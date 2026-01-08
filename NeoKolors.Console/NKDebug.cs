@@ -18,6 +18,7 @@ public static class NKDebug {
         Logger = new NKLogger();
         Formatter = new ExceptionFormatter();
         AppDomain.CurrentDomain.ProcessExit += (_, _) => { Logger.ForceClose(); };
+        EnableExceptionInterruption();
     }
     
     
@@ -128,17 +129,10 @@ public static class NKDebug {
     /// <summary>
     /// if true, makes all unhandled exceptions look fancy
     /// </summary>
-    public static bool ExceptionFormatting { 
-        get;
-        set {
-            if (value)
-                AppDomain.CurrentDomain.UnhandledException += Formatter.WriteUnhandled;
-            else
-                AppDomain.CurrentDomain.UnhandledException -= Formatter.WriteUnhandled;
-
-            field = value;
-        } 
-    } = true;
+    public static bool ExceptionFormatting {
+        get => Formatter.FormatUnhandled;
+        set => Formatter.FormatUnhandled = value;
+    }
 
     /// <summary>
     /// Gets or sets a value indicating whether exception output is redirected to a log.
@@ -150,5 +144,23 @@ public static class NKDebug {
     public static bool RedirectFatalToLog {
         get => Formatter.RedirectToLog;
         set => Formatter.RedirectToLog = value;
+    }
+
+    private static bool EXCEPTION_INTERRUPT = true;
+    
+    public static void EnableExceptionInterruption() {
+        if (EXCEPTION_INTERRUPT)
+            return;
+            
+        AppDomain.CurrentDomain.UnhandledException += Formatter.WriteUnhandled;
+        EXCEPTION_INTERRUPT = true;
+    }
+    
+    public static void DisableExceptionInterruption() {
+        if (!EXCEPTION_INTERRUPT)
+            return;
+        
+        AppDomain.CurrentDomain.UnhandledException -= Formatter.WriteUnhandled;
+        EXCEPTION_INTERRUPT = false;
     }
 }

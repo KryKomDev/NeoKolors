@@ -159,8 +159,8 @@ public static class CharCanvasExtensions {
         public void ForceStyle(Rectangle region, NKStyle style) {
             for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
                 for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
-                    var cellInfo = canvas[x, y];
-                    cellInfo.Style = style;
+                    var cellInfo     = canvas[x, y];
+                    cellInfo.Style   = style;
                     cellInfo.Changed = true;
                 }
             }
@@ -175,9 +175,9 @@ public static class CharCanvasExtensions {
         public void ForceStyleBackground(Rectangle region, NKColor color) {
             for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
                 for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
-                    var cellInfo = canvas[x, y];
-                    var s = cellInfo.Style;
-                    cellInfo.Style = s with { BColor = color };
+                    var cellInfo     = canvas[x, y];
+                    var s            = cellInfo.Style;
+                    cellInfo.Style   = s with { BColor = color };
                     cellInfo.Changed = true;
                 }
             }
@@ -188,8 +188,8 @@ public static class CharCanvasExtensions {
                 for (int y = offset.Y; y < Math.Min(mask.Len1 + offset.Y, canvas.Height + 1); y++) {
                     if (mask[x - offset.X, y - offset.Y] == null) continue;
                     
-                    var cellInfo = canvas[x, y];
-                    cellInfo.Style = cellInfo.Style.Override(style);
+                    var cellInfo     = canvas[x, y];
+                    cellInfo.Style   = cellInfo.Style.Override(style);
                     cellInfo.Changed = true;
                 }
             }
@@ -199,9 +199,9 @@ public static class CharCanvasExtensions {
             if (offset.Y != ..^canvas.Height) return;
 
             var xo = offset.X + align switch {
-                HorizontalAlign.LEFT => 0,
+                HorizontalAlign.LEFT   => 0,
                 HorizontalAlign.CENTER => (window - s.Length) / 2,
-                HorizontalAlign.RIGHT => window - s.Length,
+                HorizontalAlign.RIGHT  => window - s.Length,
                 _ => 0
             };
                 
@@ -234,8 +234,8 @@ public static class CharCanvasExtensions {
         public void ForceFill(Rectangle region, char c) {
             for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
                 for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
-                    var cellInfo = canvas[x, y];
-                    cellInfo.Char = c;
+                    var cellInfo     = canvas[x, y];
+                    cellInfo.Char    = c;
                     cellInfo.Changed = true;
                 }
             }

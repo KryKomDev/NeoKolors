@@ -107,4 +107,9 @@ public interface IStyleProperty {
 
         return null;
     }
+
+    public static bool TryGetByName(string name, out Type? type) {
+        type = GetByName(name);
+        return type != null;
+    }
 }

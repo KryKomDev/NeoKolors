@@ -32,12 +32,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="HasFlagExtension.Generator" Version="2.0.1.1">
+        <PackageReference Include="HasFlagExtension.Generator" Version="2.0.2">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
-        <PackageReference Include="Metriks" Version="1.1.7" />
+        <PackageReference Include="Metriks" Version="1.1.7.3" />
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -52,5 +52,11 @@
     <ItemGroup>
         <EmbeddedResource Include="./Schemas/Fonts/V2/Font.Config.xsd"/>
         <EmbeddedResource Include="./Schemas/Fonts/V2/Font.Map.xsd"/>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <EmbeddedResource Include="./Fonts/Builtin/Bytesized.nkf"/>
+        <EmbeddedResource Include="./Fonts/Builtin/Dummy1.nkf"/>
+        <EmbeddedResource Include="./Fonts/Builtin/Future.nkf"/>
     </ItemGroup>
 </Project>

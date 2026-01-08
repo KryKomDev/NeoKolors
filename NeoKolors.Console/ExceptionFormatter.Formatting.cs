@@ -19,7 +19,7 @@ public partial class ExceptionFormatter {
     /// if added to <c>AppDomain.CurrentDomain.UnhandledException</c>, makes all exceptions formatted
     /// </summary>
     internal void WriteUnhandled(object? sender, UnhandledExceptionEventArgs args) {
-        if (args.ExceptionObject is Exception e0)
+        if (FormatUnhandled && args.ExceptionObject is Exception e0)
             System.Console.Write(Format(e0));
 
         if (RedirectToLog) {
@@ -31,7 +31,7 @@ public partial class ExceptionFormatter {
                 NKDebug.Crit($"An unhandled exception occured.{(args.IsTerminating ? " Terminating..." : "")}");
         }
         
-        if (args.IsTerminating) 
+        if (args.IsTerminating && FormatUnhandled) 
             Environment.Exit(1);
     }
 

@@ -22,7 +22,7 @@ public class NKCharCanvas : ICharCanvas {
     public NKCharCanvas(int width, int height, bool resize = false) {
         _data = new List2D<CellInfo>(width, height);
         _data.Resize(width, height);
-        _data.Fill(() => new CellInfo(null, NKStyle.Default, true, 0));
+        _data.Fill(static () => new CellInfo(null, NKStyle.Default, true, 0));
         _images = [];
         _resize = resize;
     }
@@ -30,7 +30,7 @@ public class NKCharCanvas : ICharCanvas {
     public NKCharCanvas() {
         _data = new List2D<CellInfo>();
         _data.Resize(Stdio.WindowWidth, Stdio.WindowHeight);
-        _data.Fill(() => new CellInfo(null, NKStyle.Default, true, 0));
+        _data.Fill(static () => new CellInfo(null, NKStyle.Default, true, 0));
         _images = [];
         _resize = false;
     }
@@ -116,9 +116,13 @@ public class NKCharCanvas : ICharCanvas {
     }
 
     public void Resize(int width, int height) {
-        _data.Resize(width, height, new CellInfo(null, NKStyle.Default, true, 0));
+        _data.Resize(width, height, static () => new CellInfo(null, NKStyle.Default, true, 0));
     }
-   
+
+    public void Clean() {
+        _data.Fill(static () => new CellInfo(null, NKStyle.Default, true, 0));
+    }
+    
     public void Clear() {
         _data.Clear();
     }

@@ -3,6 +3,8 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Diagnostics.CodeAnalysis;
+using NeoKolors.Tui.Styles.Values;
 using OneOf;
 
 namespace NeoKolors.Common;
@@ -11,7 +13,7 @@ namespace NeoKolors.Common;
 /// color structure that can hold every color supported by the console (+ARGB colors) 
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = sizeof(uint))]
-public readonly struct NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
+public readonly struct NKColor : ICloneable, IEquatable<NKColor>, IFormattable, IParsableValue<NKColor> {
     
     /// <summary>
     /// Represents the underlying 32-bit unsigned integer value used to store the color data,
@@ -226,6 +228,47 @@ public readonly struct NKColor : ICloneable, IEquatable<NKColor>, IFormattable {
     public static bool operator !=(NKColor left, NKColor right) {
         return !left.Equals(right);
     }
+    
+    public static NKColor Parse(string s) => Parse(s, CultureInfo.InvariantCulture);
+    
+    public static NKColor Parse(string s, IFormatProvider? provider) {
+        s = s.Trim();
+        
+        if (s.StartsWith('#')) {
+            var hex = s[1..];
+            if (uint.TryParse(hex, NumberStyles.HexNumber, null, out uint rgb)) {
+                return FromRgb(rgb);
+            }
+        }
+        
+        if (string.Equals(s, "Default", StringComparison.OrdinalIgnoreCase)) return NKColor.Default;
+        if (string.Equals(s, "Inherit", StringComparison.OrdinalIgnoreCase)) return NKColor.Inherit;
+
+        return Enum.TryParse<NKConsoleColor>(s, true, out var nkc) 
+            ? new NKColor(nkc) 
+            : Enum.TryParse<ConsoleColor>(s, true, out var cc) 
+                ? new NKColor(cc) 
+                : throw new FormatException($"Invalid color: {s}");
+    }
+
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out NKColor result) {
+        if (string.IsNullOrEmpty(s)) {
+            result = Default;
+            return true;
+        }
+
+        try {
+            result = Parse(s, provider);
+            return true;
+        }
+        catch {
+            result = Default;
+            return false;
+        }
+    }
+    
+    NKColor IParsableValue<NKColor>.Parse(string s, IFormatProvider? provider) => Parse(s, provider);
+    bool IParsableValue<NKColor>.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out NKColor result) => TryParse(s, provider, out result);
 }
 
 public enum ColorType : uint {

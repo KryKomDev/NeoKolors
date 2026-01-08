@@ -25,6 +25,7 @@ public interface ICharCanvas {
     public ISixelImageInfo[] GetSixelImages();
     
     public void Resize(int width, int height);
+    public void Clean();
     public void Clear();
     
     public CellInfo[,] GetCellsArray();

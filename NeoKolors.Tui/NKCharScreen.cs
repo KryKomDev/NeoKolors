@@ -19,7 +19,9 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
         var lastStyle  = TextStyles.NONE;
         
         for (int y = 0; y < Height; y++) {
-            Stdio.SetCursorPosition(0, y);
+            if (!NKConsole.TrySetCursorPosition(0, y)) 
+                continue;
+            
             var sb = new StringBuilder();
             
             for (int x = 0; x < Width; x++) {
@@ -36,7 +38,7 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
                 cell.Changed = false;
 
                 if (isBehind) 
-                    Stdio.SetCursorPosition(x, y);
+                    NKConsole.TrySetCursorPosition(x, y);
                 
                 isBehind = false;
 
@@ -51,7 +53,7 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
                 }
 
                 if (lastStyle != nkStyle.Styles) {
-                    sb.Append(nkStyle.Styles);
+                    sb.Append((nkStyle.Styles ^ lastStyle).GetOvrEscSeq());
                     lastStyle = nkStyle.Styles;
                 }
 

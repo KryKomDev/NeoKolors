@@ -57,6 +57,14 @@ public readonly struct NKAppConfig {
     /// where focus changes can impact user experience or application state.
     /// </summary>
     public bool PauseOnFocusLost { get; }
+
+    /// <summary>
+    /// Specifies whether the cursor should remain disabled within the application.
+    /// This property controls the visibility and interaction state of the cursor,
+    /// and is primarily intended for terminal-based user interface configurations
+    /// where cursor management is required for optimal user experience.
+    /// </summary>
+    public bool KeepCursorDisabled { get; }
     
     public NKAppConfig(
         RenderingConfig?    rendering            = null, 
@@ -65,7 +73,8 @@ public readonly struct NKAppConfig {
         MouseReportProtocol mouseReportProtocol  = MouseReportProtocol.SGR,
         MouseReportLevel    mouseReportLevel     = MouseReportLevel.ALL, 
         bool                bracketedPaste       = false, 
-        bool                pauseOnFocusLost     = true) 
+        bool                pauseOnFocusLost     = true,
+        bool                keepCursorDisabled   = true) 
     {
         Rendering            = rendering ?? RenderingConfig.Limited(24);
         CtrlCForceQuits      = ctrlCForceQuits;
@@ -74,6 +83,7 @@ public readonly struct NKAppConfig {
         MouseReportLevel     = mouseReportLevel;
         BracketedPaste       = bracketedPaste;
         PauseOnFocusLost     = pauseOnFocusLost;
+        KeepCursorDisabled   = keepCursorDisabled;
     }
 
     public NKAppConfig() {
@@ -84,13 +94,17 @@ public readonly struct NKAppConfig {
         MouseReportLevel     = MouseReportLevel.ALL;
         BracketedPaste       = false;
         PauseOnFocusLost     = true;
+        KeepCursorDisabled   = true;
     }
 
     public override string ToString() {
         return $"Rendering: {Rendering.ToString()}, " +
-               $"Ctrl+C Enabled: {CtrlCForceQuits.ToString()}, " +
                $"Interrupt: {InterruptCombination.AsString()}, " +
                $"Mouse Protocol: {MouseReportProtocol.ToString()}, " +
-               $"Mouse Level: {MouseReportLevel.ToString()}";
+               $"Mouse Level: {MouseReportLevel.ToString()}" +
+               (CtrlCForceQuits    ? ", Ctrl+C Force Quits"    : "Ctrl+C Is Input") +
+               (PauseOnFocusLost   ? ", Pauses On Focus Lost"  : "Runs Without Focus") +
+               (BracketedPaste     ? ", Bracketed Paste"       : "") +
+               (KeepCursorDisabled ? ", Keeps Cursor Disabled" : "");
     }
 }

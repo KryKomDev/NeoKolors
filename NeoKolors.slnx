@@ -1,0 +1,41 @@
+<Solution>
+    <Configurations>
+        <BuildType Name="Debug" />
+        <BuildType Name="Release" />
+        <BuildType Name="WIP" />
+    </Configurations>
+    
+    <Folder Name="/Examples/">
+        <Project Path="Examples/Ascii/Ascii.csproj" />
+        <Project Path="Examples/Neofetch/Neofetch.csproj" />
+        <Project Path="Examples/Testing/Testing.csproj" />
+        <Project Path="Examples/WeekNumber/WeekNumber.csproj" />
+        <Project Path="Examples/XmlTestApp/XmlTestApp.csproj">
+            <BuildType Solution="WIP|*" Project="Debug" />
+        </Project>
+    </Folder>
+
+    <Folder Name="/Tools/">
+        
+    </Folder>
+
+    <Project Path="NeoKolors.Extensions.Tests/NeoKolors.Extensions.Tests.csproj">
+        <BuildType Solution="WIP|*" Project="Debug" />
+    </Project>
+
+    <Project Path="NeoKolors.Extensions/NeoKolors.Extensions.csproj">
+        <BuildType Solution="WIP|*" Project="Debug" />
+    </Project>
+    
+    <Project Path="NeoKolors.Common.Tests/NeoKolors.Common.Tests.csproj" />
+    <Project Path="NeoKolors.Common/NeoKolors.Common.csproj" />
+    
+    <Project Path="NeoKolors.Console.Tests/NeoKolors.Console.Tests.csproj" />
+    <Project Path="NeoKolors.Console/NeoKolors.Console.csproj" />
+    
+    <Project Path="NeoKolors.Settings.Tests/NeoKolors.Settings.Tests.csproj" />
+    <Project Path="NeoKolors.Settings/NeoKolors.Settings.csproj" />
+    
+    <Project Path="NeoKolors.Tui.Tests/NeoKolors.Tui.Tests.csproj" />
+    <Project Path="NeoKolors.Tui/NeoKolors.Tui.csproj" />
+</Solution>

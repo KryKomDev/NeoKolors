@@ -20,19 +20,19 @@ public abstract class TextElement : UniversalElement {
         set => _style.Set(new FontProperty(value));
     }
 
-    public virtual IFont DefaultFont => IFont.Default;
+    protected virtual IFont DefaultFont => IFont.Default;
 
     public virtual NKColor Color {
         get => _style.Get(new TextColorProperty(DefaultColor)).Value;
         set => _style.Set(new TextColorProperty(value));
     }
 
-    public virtual NKColor DefaultColor => new();
+    protected virtual NKColor DefaultColor => new();
     
     public virtual Align TextAlign {
         get => _style.Get(new TextAlignProperty(DefaultTextAlign)).Value;
         set => _style.Set(new TextAlignProperty(value));
     }
 
-    public virtual Align DefaultTextAlign => new(HorizontalAlign.LEFT, VerticalAlign.TOP);
+    protected virtual Align DefaultTextAlign => new(HorizontalAlign.LEFT, VerticalAlign.TOP);
 }

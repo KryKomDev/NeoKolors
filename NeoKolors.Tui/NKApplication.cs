@@ -17,6 +17,8 @@ public class NKApplication : IMouseSupportingApplication {
     // --- Screen ---
     private readonly NKCharScreen _screen = new(Stdio.WindowSize);
     private Size _lastSize = Stdio.WindowSize;
+
+    public NKCharScreen Screen => _screen;
     
     // --- IApp impl ---
     public IDom Dom { get; }
@@ -68,6 +70,10 @@ public class NKApplication : IMouseSupportingApplication {
         NKConsole.MouseEvent += InvokeMouseEvent;
 
         Stdio.TreatControlCAsInput = !Config.CtrlCForceQuits;
+
+        if (Config.KeepCursorDisabled) {
+            NKConsole.HideCursor();
+        }
         
         NKConsole.EnableAltBuffer();
         NKConsole.EnableMouseEvents();
@@ -105,6 +111,10 @@ public class NKApplication : IMouseSupportingApplication {
 
         NKConsole.KeyEvent   -= InvokeKeyEvent;
         NKConsole.MouseEvent -= InvokeMouseEvent;
+
+        if (Config.KeepCursorDisabled) {
+            NKConsole.ShowCursor();
+        }
         
         NKConsole.DisableAltBuffer();
         NKConsole.StopInputInterception();
@@ -185,13 +195,29 @@ public class NKApplication : IMouseSupportingApplication {
             }
         }
         
-        LOGGER.Info($"Total frames delayed: {delayedCount}\n Total delay: {totalDelay}");
+        LOGGER.Info($"\nTotal frames delayed: {delayedCount}\nTotal delay: {totalDelay}");
     }
-
+    
     private void Render() {
+        if (!Config.KeepCursorDisabled) {
+            NKConsole.HideCursor();
+            NKConsole.SaveCursor();
+        }
+        
+        if (_lastSize != Stdio.WindowSize) {
+            _lastSize = Stdio.WindowSize;
+            _screen.Resize(_lastSize.Width, _lastSize.Height);
+            InvokeResizeEvent(new ResizeEventArgs(_lastSize.Width, _lastSize.Height));
+        }
+        
         OnRender.Invoke();
         Dom.BaseElement.Render(_screen);
         _screen.Render();
+        
+        if (!Config.KeepCursorDisabled) {
+            NKConsole.RestoreCursor();
+            NKConsole.ShowCursor();
+        }
     }
 
     private void Pause() {

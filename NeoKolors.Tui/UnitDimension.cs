@@ -28,4 +28,6 @@ public readonly struct UnitDimension {
         LengthUnit.VIEWPORT_HEIGHT => (int)(Stdio.BufferHeight / 100f * Value),
         _ => throw new ArgumentOutOfRangeException()
     };
+
+    public override string ToString() => $"{(Value < 0 ? "- " : "")}{Math.Abs(Value)}{Unit.String}";
 }

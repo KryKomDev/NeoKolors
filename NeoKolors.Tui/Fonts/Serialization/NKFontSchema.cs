@@ -14,13 +14,13 @@ public static class NKFontSchema {
     /// </summary>
     public const string VERSION = "2";
     
-    private const string RELEASE_SCHEMA_NAMESPACE = $"https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/Fonts/V{VERSION}";
+    private const string RELEASE_SCHEMA_NAMESPACE = $"https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/Fonts/V{VERSION}/Font.xsd";
     
     // The WIP branch is used for development and testing new features and changes.
-    private const string WIP_SCHEMA_NAMESPACE = $"https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/wip/NeoKolors.Tui/Schemas/Fonts/V{VERSION}";
+    private const string WIP_SCHEMA_NAMESPACE = $"https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/wip/NeoKolors.Tui/Schemas/Fonts/V{VERSION}/Font.xsd";
     
     // The snapshot branch is used for testing and development.
-    private const string SNAPSHOT_SCHEMA_NAMESPACE = $"https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/snapshot/NeoKolors.Tui/Schemas/Fonts/V{VERSION}";
+    private const string SNAPSHOT_SCHEMA_NAMESPACE = $"https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/snapshot/NeoKolors.Tui/Schemas/Fonts/V{VERSION}/Font.xsd";
     
     // Pozn. autora: už mi z tech padělanejch xsd jebe.
     // Asi se z toho zabiju už fakt.
@@ -47,8 +47,5 @@ public static class NKFontSchema {
         #else
             RELEASE_SCHEMA_NAMESPACE;
         #endif
-        
-    public const string COMMON_SCHEMA_LOCATION = SCHEMA_LOCATION + "/Font.Common.xsd";
-    public const string MAP_SCHEMA_LOCATION    = SCHEMA_LOCATION + "/Font.Map.xsd";
-    public const string CONFIG_SCHEMA_LOCATION = SCHEMA_LOCATION + "/Font.Config.xsd";
+    
 }
