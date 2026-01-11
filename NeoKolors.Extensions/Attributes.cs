@@ -108,7 +108,7 @@ namespace System.Diagnostics.CodeAnalysis {
 
 namespace System.Runtime.Versioning {
     
-    [AttributeUsage(AttributeTargets.Parameter)]
+    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method)]
     public class SupportedOsPlatformAttribute : Attribute {
         public string Platform { get; }
         
