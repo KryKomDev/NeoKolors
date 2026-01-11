@@ -146,7 +146,7 @@ public static class NKDebug {
         set => Formatter.RedirectToLog = value;
     }
 
-    private static bool EXCEPTION_INTERRUPT = true;
+    private static bool EXCEPTION_INTERRUPT;
     
     public static void EnableExceptionInterruption() {
         if (EXCEPTION_INTERRUPT)

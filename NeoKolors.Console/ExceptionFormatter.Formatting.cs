@@ -7,9 +7,9 @@ using System.Text.RegularExpressions;
 using NeoKolors.Common;
 using NeoKolors.Extensions;
 using static NeoKolors.Common.NKConsoleColor;
+using Win32Exception = NeoKolors.Console.Native.Win32Exception;
 
 // disabled because of StringUtils.InRange(string, int, int) to make code cleaner
-#pragma warning disable CS0618 // Type or member is obsolete
 
 namespace NeoKolors.Console;
 
@@ -19,9 +19,6 @@ public partial class ExceptionFormatter {
     /// if added to <c>AppDomain.CurrentDomain.UnhandledException</c>, makes all exceptions formatted
     /// </summary>
     internal void WriteUnhandled(object? sender, UnhandledExceptionEventArgs args) {
-        if (FormatUnhandled && args.ExceptionObject is Exception e0)
-            System.Console.Write(Format(e0));
-
         if (RedirectToLog) {
             if (args.ExceptionObject is Exception e1)
                 NKDebug.Crit(
@@ -30,9 +27,11 @@ public partial class ExceptionFormatter {
             else
                 NKDebug.Crit($"An unhandled exception occured.{(args.IsTerminating ? " Terminating..." : "")}");
         }
-        
-        if (args.IsTerminating && FormatUnhandled) 
-            Environment.Exit(1);
+
+        if (!FormatUnhandled || args.ExceptionObject is not Exception e0) return;
+
+        Stdio.Write(Format(e0));
+        Win32Exception.Mute();
     }
 
     /// <summary>
@@ -61,7 +60,7 @@ public partial class ExceptionFormatter {
             lines[i] = "▍ ".AddColor(format.HighlightColor) + lines[i];
         }
         
-        return string.Join(Environment.NewLine, lines);
+        return string.Join(Environment.NewLine, lines) + Environment.NewLine;
     }
 
     private static string FormatHeader(Exception e, ExceptionFormat format) {
