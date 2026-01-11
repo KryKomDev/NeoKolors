@@ -18,8 +18,8 @@ public class NKStyleTests {
         var style = new NKStyle();
         var color = new NKColor(0x123456);
         style.SetFColor(color);
-        Assert.Equal(color, style.FColor);
         Assert.True(style.IsFColorCustom);
+        Assert.Equal(color, style.FColor);
     }
 
     [Fact]
@@ -27,8 +27,8 @@ public class NKStyleTests {
         var style = new NKStyle();
         var color = new NKColor(0x654321);
         style.SetBColor(color);
-        Assert.Equal(color, style.BColor);
         Assert.True(style.IsBColorCustom);
+        Assert.Equal(color, style.BColor);
     }
     
     [Fact]
@@ -45,8 +45,8 @@ public class NKStyleTests {
         var style = new NKStyle();
         var color = new NKColor(NKConsoleColor.RED);
         style.SetBColor(color);
-        Assert.Equal(color, style.BColor);
         Assert.False(style.IsBColorCustom);
+        Assert.Equal(color, style.BColor);
     }
     
     [Fact]
@@ -100,16 +100,16 @@ public class NKStyleTests {
         Assert.False(style1 == style2);
     }
     
-    [Fact]
-    public void Constructor_SetsCorrectValues() {
-        var fColor = new NKColor(0xff0000);
-        var bColor = new NKColor(0x00ff00);
+    [Theory]
+    [InlineData(0xff0000, 0x00ff00)]
+    [InlineData(NKConsoleColor.RED, NKConsoleColor.BLUE)]
+    public void Constructor_SetsCorrectValues(NKColor f, NKColor b) {
         var styles = TextStyles.BOLD | TextStyles.ITALIC;
 
-        var style = new NKStyle(fColor, bColor, styles);
+        var style = new NKStyle(f, b, styles);
 
-        Assert.Equal(fColor, style.FColor);
-        Assert.Equal(bColor, style.BColor);
+        Assert.Equal(f, style.FColor);
+        Assert.Equal(b, style.BColor);
         Assert.Equal(styles, style.Styles);
     }
 }
