@@ -2,8 +2,6 @@
 // Copyright (c) 2025 KryKom
 
 using System.Text;
-using Metriks;
-using SkiaSharp;
 
 namespace NeoKolors.Tui;
 

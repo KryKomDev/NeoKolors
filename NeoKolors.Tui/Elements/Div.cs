@@ -140,11 +140,11 @@ public class Div : ContainerElement, IInteractableElement {
         #endif
         
         if (!BackgroundColor.IsInherit) {
-            canvas.Fill(el.Border + new Size(-2, -2) + pos + new Point(1, 1), ' ');
+            canvas.Fill(el.Border - Size.Two + pos + Point.One, ' ');
         }
         
         if (!Border.IsBorderless) {
-            canvas.StyleBackground(el.Border + pos, BackgroundColor);
+            canvas.StyleBackground(el.Border - Size.Two + pos + Point.One, BackgroundColor);
             canvas.PlaceRectangle(el.Border + pos, Border);
         }
         else {

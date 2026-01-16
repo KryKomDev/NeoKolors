@@ -3,9 +3,6 @@
 // Copyright (c) 2025 KryKom
 //
 
-using Metriks;
-using NeoKolors.Tui;
-
 namespace NeoKolors.Tui.Tests;
 
 public class NKCharCanvasTests {

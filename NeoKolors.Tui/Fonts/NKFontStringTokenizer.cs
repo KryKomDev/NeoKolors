@@ -212,6 +212,18 @@ public static class NKFontStringTokenizer {
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
+
+        public SimpleToken AsSimple() 
+            => Data is { IsT0: true } ? Data.Value.AsT0 : throw new InvalidOperationException();
+        
+        public LigatureToken AsLigature()
+            => Data is { IsT1: true} ? Data.Value.AsT1 : throw new InvalidOperationException();
+        
+        public AutoCompoundToken AsAutoCompound()
+            => Data is { IsT2: true } ? Data.Value.AsT2 : throw new InvalidOperationException();
+        
+        public SpaceToken AsSpace()
+            => Data is { IsT3: true } ? Data.Value.AsT3 : throw new InvalidOperationException();
     }
 
     public readonly struct SimpleToken {
@@ -224,6 +236,7 @@ public static class NKFontStringTokenizer {
     
     public readonly struct LigatureToken {
         public string Ligature { get; }
+        public int Length => Ligature.Length;
         
         internal LigatureToken(string ligature) {
             Ligature = ligature;

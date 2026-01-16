@@ -23,7 +23,7 @@ public interface IParsableValue<TSelf> : IParsableValue where TSelf : struct, IP
     /// <returns><c>true</c> if <paramref name="s" /> was successfully parsed; otherwise, <c>false</c>.</returns>
     public bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out TSelf result);
     
-    object? IParsableValue.Parse(string s, IFormatProvider? provider) => Parse(s, provider);
+    object IParsableValue.Parse(string s, IFormatProvider? provider) => Parse(s, provider);
 
     bool IParsableValue.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out object? result) {
         var res = TryParse(s, provider, out var d);

@@ -18,6 +18,10 @@ internal static class ResizeHandler {
 
     // Keep the delegate alive so GC doesn't collect it
     private static ResizeCallback _callbackReference;
+
+    static ResizeHandler() {
+        _callbackReference = OnWindowResized;
+    }
     
     public static void Main()
     {
@@ -37,6 +41,7 @@ internal static class ResizeHandler {
             while (true) { Thread.Sleep(1000); }
         }
     }
+    
     static void OnWindowResized(int rows, int cols) {
         WriteLine($"[Signal] Terminal resized to: {rows} rows x {cols} cols");
     }

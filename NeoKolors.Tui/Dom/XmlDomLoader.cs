@@ -139,7 +139,9 @@ public class XmlDomLoader {
             try {
                 var target = type!.GenericTypeArguments[0];
                 var convertedValue = ConvertValue(value, target);
-                element.Style.Set((IStyleProperty)Activator.CreateInstance(type, convertedValue));
+                var property = (IStyleProperty?)Activator.CreateInstance(type, convertedValue);
+                if (property != null)
+                    element.Style.Set(property);
             } 
             catch (Exception e) {
                 LOGGER.Error(e);
@@ -156,7 +158,7 @@ public class XmlDomLoader {
          if (targetType.IsEnum) return Enum.Parse(targetType, value, true);
          if (targetType == typeof(IFont)) return ParseFont(value);
          if (typeof(IParsableValue).IsAssignableFrom(targetType)) {
-             var inst = (IParsableValue)Activator.CreateInstance(targetType);
+             var inst = (IParsableValue?)Activator.CreateInstance(targetType);
              
              if (inst == null) 
                  throw new InvalidOperationException($"Cannot convert {value} to type {targetType.Name}");

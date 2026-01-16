@@ -24,6 +24,8 @@ public readonly struct Point {
     public static implicit operator Point2D(Point p) => new(p.X, p.Y);
     
     public static Point Zero => new(0, 0);
+    public static Point One => new(1, 1);
+    public static Point Two => new(2, 2);
     
     public static Point Min(Point p1, Point p2) => new(Math.Min(p1.X, p2.X), Math.Min(p1.Y, p2.Y));
     public static Point Max(Point p1, Point p2) => new(Math.Max(p1.X, p2.X), Math.Max(p1.Y, p2.Y));

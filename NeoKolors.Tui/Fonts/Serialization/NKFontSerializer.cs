@@ -5,7 +5,6 @@
 
 using System.IO.Compression;
 using System.Reflection;
-using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;

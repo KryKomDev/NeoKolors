@@ -1,8 +1,6 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-using NeoKolors.Console.Mouse;
-using NeoKolors.Tui.Events;
 using NeoKolors.Tui.Styles.Properties;
 
 namespace NeoKolors.Tui.Elements;

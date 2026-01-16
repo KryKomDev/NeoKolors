@@ -148,11 +148,11 @@ public class Text : TextElement, INotifyOnRender, IInteractableElement {
         _lastBounds = layout.Border + pos;
         
         if (!BackgroundColor.IsInherit) {
-            canvas.Fill(layout.Border + pos, ' ');
+            canvas.Fill(layout.Border - Size.Two + pos + Point.One, ' ');
         }
         
         if (!Border.IsBorderless) {
-            canvas.StyleBackground(layout.Border + pos, BackgroundColor);
+            canvas.StyleBackground(layout.Border - Size.Two + pos + Point.One, BackgroundColor);
             canvas.PlaceRectangle(layout.Border + pos, Border);
         }
         else {

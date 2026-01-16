@@ -3,8 +3,6 @@
 // Copyright (c) 2025 KryKom
 
 using NeoKolors.Tui.Elements;
-using NeoKolors.Tui.Styles.Properties;
-using NeoKolors.Tui;
 
 namespace NeoKolors.Tui.Tests.Elements;
 

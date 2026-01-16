@@ -4,9 +4,6 @@
 //
 
 using NeoKolors.Tui.Fonts;
-using NeoKolors.Tui;
-using Metriks;
-using static NeoKolors.Tui.Fonts.Serialization.Xml.AutoCompoundApplicableGroup;
 
 namespace NeoKolors.Tui.Tests;
 
@@ -52,7 +49,7 @@ public class GlyphInfoTests {
     [Fact]
     public void AutoCompoundGlyphInfo_Equality_ShouldWork() {
         var glyph = new MockGlyph { Width = 10, Height = 10 };
-        var applicable = new ApplicableChars([], NONE);
+        var applicable = new ApplicableChars([]);
         var info1 = new AutoCompoundGlyphInfo(glyph, 'A', CompoundGlyphAlignment.Center(), applicable);
         var info2 = new AutoCompoundGlyphInfo(glyph, 'A', CompoundGlyphAlignment.Center(), applicable);
         var info3 = new AutoCompoundGlyphInfo(glyph, 'B', CompoundGlyphAlignment.Center(), applicable);
@@ -63,7 +60,7 @@ public class GlyphInfoTests {
 
     [Fact]
     public void ApplicableChars_ShouldIdentifyApplicableCharacters() {
-        var appChars = new ApplicableChars(new[] { 'x', 'y' }, NONE);
+        var appChars = new ApplicableChars(['x', 'y']);
         
         Assert.True(appChars.IsApplicable('x')); // Explicit char
         Assert.False(appChars.IsApplicable('a')); // Lower letter (not in explicit list and group is NONE)

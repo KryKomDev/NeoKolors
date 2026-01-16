@@ -2,7 +2,7 @@
 // NeoKolors
 // Copyright (c) 2025 KryKom
 //
-
+/*
 using System.Reflection;
 using NeoKolors.Tui.Elements;
 using NeoKolors.Tui.Styles;
@@ -14,7 +14,7 @@ namespace NeoKolors.Tui.SourceManagement;
 /// manages the assemblies that are a source of classes for the application 
 /// </summary>
 public static class SourceManager {
-    /*
+    
     private static readonly NKLogger LOGGER = NKDebug.GetLogger(nameof(SourceManager));
     
     private static readonly List<Assembly> ASSEMBLIES = [];
@@ -159,5 +159,5 @@ public static class SourceManager {
         catch (KeyNotFoundException) {
             throw InvalidElementNameException.NotFound(name);
         }
-    }*/
-}
+    }
+}*/

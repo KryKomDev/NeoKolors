@@ -1,6 +1,4 @@
 using NeoKolors.Common;
-using System;
-using Xunit;
 
 namespace NeoKolors.Console.Tests;
 

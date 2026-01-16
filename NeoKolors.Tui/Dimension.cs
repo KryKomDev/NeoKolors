@@ -23,7 +23,7 @@ public struct Dimension : IParsableValue<Dimension> {
     /// is a tuple containing an integer and a <see cref="LengthUnit"/> (e.g., Pixel, Char, or Percent).
     /// If the value is not numerical (e.g., Auto, MinContent, or MaxContent), this property will return false.
     /// </remarks>
-    public bool IsNumber => Value.IsT0;
+    public bool IsNumber => Value.IsT0 || Value.IsT4;
 
     /// <summary>
     /// Gets a value indicating whether the current <see cref="Dimension"/> instance

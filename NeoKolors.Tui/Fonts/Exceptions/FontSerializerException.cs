@@ -1,8 +1,6 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-using System.Xml;
-
 namespace NeoKolors.Tui.Fonts.Exceptions;
 
 public sealed class FontSerializerException : Exception {

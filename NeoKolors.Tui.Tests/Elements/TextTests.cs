@@ -4,8 +4,6 @@
 
 using NeoKolors.Common;
 using NeoKolors.Tui.Elements;
-using NeoKolors.Tui;
-using NeoKolors.Tui.Styles.Values;
 
 namespace NeoKolors.Tui.Tests.Elements;
 

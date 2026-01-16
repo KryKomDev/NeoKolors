@@ -2,6 +2,7 @@
 // Copyright (c) 2025 KryKom
 
 using NeoKolors.Extensions.Exception;
+// ReSharper disable NotResolvedInText
 
 namespace NeoKolors.Extensions.Tests;
 

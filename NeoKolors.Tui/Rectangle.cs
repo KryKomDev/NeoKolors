@@ -128,6 +128,9 @@ public struct Rectangle : IEquatable<Rectangle> {
     
     public static Rectangle operator +(Rectangle r, Point p) 
         => new(r.LowerX + p.X, r.LowerY + p.Y, r.HigherX + p.X, r.HigherY + p.Y);
+    
+    public static Rectangle operator -(Rectangle r, Size s) 
+        => new(r._lowerX, r._lowerY, r._higherX - s.Width, r._higherY - s.Height);
 
     public bool Equals(Rectangle other) {
         return _lowerX == other._lowerX && _lowerY == other._lowerY && _higherX == other._higherX && _higherY == other._higherY;

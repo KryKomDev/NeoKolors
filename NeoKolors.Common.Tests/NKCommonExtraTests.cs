@@ -1,5 +1,3 @@
-using Xunit;
-
 namespace NeoKolors.Common.Tests;
 
 public class NKCommonExtraTests {

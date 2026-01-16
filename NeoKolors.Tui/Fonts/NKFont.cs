@@ -136,20 +136,20 @@ public class NKFont : IFont {
         var tokens = Tokenize(str, this);
 
         if (_info.SpacingInfo.IsMonospace)
-            PlaceMonoWithAlign(tokens, canvas, bounds, style, horizontalAlign, verticalAlign, overflow);
+            PlaceMono(tokens, canvas, bounds, style, horizontalAlign, verticalAlign, overflow);
         else 
             if (_info.SpacingInfo.AsVariable.Kerning)
                 if (_info.SpacingInfo.AsVariable.LineKerning)
                     PlaceVariableKerningWithAlignWithLineKerning(tokens, canvas, bounds, style, horizontalAlign, verticalAlign, overflow);
                 else
-                    PlaceVariableKerningWithAlignNoLineKerning(tokens, canvas, bounds, style, horizontalAlign, verticalAlign, overflow);
+                    PlaceVariable_CharKerning(tokens, canvas, bounds, style, horizontalAlign, verticalAlign, overflow);
             else 
-                PlaceVariableNoKerningWithAlign(tokens, canvas, bounds, style, horizontalAlign, verticalAlign, overflow);
+                PlaceVariable_NoKerning(tokens, canvas, bounds, style, horizontalAlign, verticalAlign, overflow);
     }
 
     // todo: support overflow
     
-    private void PlaceMonoWithAlign(
+    private void PlaceMono(
         Token[] tokens,
         ICharCanvas canvas,
         Rectangle bounds,
@@ -158,7 +158,7 @@ public class NKFont : IFont {
         VerticalAlign verticalAlign,
         bool overflow) 
     {
-        var lines = SplitLinesMono(tokens, bounds.Width);
+        var lines = SplitLines_Mono(tokens, bounds.Width);
         var lineSize = _info.SpacingInfo.AsMonospace.CharacterHeight + _info.LineSpacing;
         var charSize = _info.SpacingInfo.AsMonospace.CharacterWidth + _info.CharSpacing;
         
@@ -219,7 +219,7 @@ public class NKFont : IFont {
         }
     }
 
-    private void PlaceVariableNoKerningWithAlign(Token[] tokens,
+    private void PlaceVariable_NoKerning(Token[] tokens,
         ICharCanvas canvas,
         Rectangle bounds,
         NKStyle style,
@@ -227,7 +227,7 @@ public class NKFont : IFont {
         VerticalAlign verticalAlign,
         bool overflow) 
     {
-        var lines = SplitLinesVariableNoKerning(tokens, bounds.Width);
+        var lines = SplitLines_Variable_NoKerning(tokens, bounds.Width);
         var wordSpacing = _info.SpacingInfo.AsVariable.WordSpacing;
         var lineSpacing = _info.LineSpacing;
         var charSpacing = _info.CharSpacing;
@@ -294,15 +294,16 @@ public class NKFont : IFont {
         }
     } 
 
-    private void PlaceVariableKerningWithAlignNoLineKerning(Token[] tokens,
-        ICharCanvas canvas,
-        Rectangle bounds,
-        NKStyle style,
+    private void PlaceVariable_CharKerning(
+        Token[]         tokens,
+        ICharCanvas     canvas,
+        Rectangle       bounds,
+        NKStyle         style,
         HorizontalAlign horizontalAlign,
-        VerticalAlign verticalAlign,
-        bool overflow) 
+        VerticalAlign   verticalAlign,
+        bool            overflow) 
     {
-        var lines = SplitLinesVariableKerning(tokens, bounds.Width);
+        var lines = SplitLines_Variable_CharKerning(tokens, bounds.Width);
         var lineSpacing = _info.LineSpacing;
 
         var totalHeight = lines.Sum(l => l.Height) + lineSpacing * (lines.Length - 1);
@@ -351,7 +352,7 @@ public class NKFont : IFont {
                     AUTO_COMPOUND 
                         => _autoCompoundGlyphs[tokenData!.Value.AsT2.Second]
                             .GetGlyph(_simpleGlyphs[tokenData.Value.AsT0.Character].Glyph),
-                    _ => throw new ArgumentOutOfRangeException()
+                    _   => throw new ArgumentOutOfRangeException()
                 };
 
                 x += lineData.Offsets[j];
@@ -367,12 +368,12 @@ public class NKFont : IFont {
     // todo: line kerning
     
     private void PlaceVariableKerningWithAlignWithLineKerning(Token[] tokens,
-        ICharCanvas canvas,
-        Rectangle bounds,
-        NKStyle style,
+        ICharCanvas     canvas,
+        Rectangle       bounds,
+        NKStyle         style,
         HorizontalAlign horizontalAlign,
-        VerticalAlign verticalAlign,
-        bool overflow) 
+        VerticalAlign   verticalAlign,
+        bool            overflow) 
     {
         throw new NotImplementedException();
     }
@@ -501,380 +502,420 @@ public class NKFont : IFont {
     
     #endregion
     
+    
+    // --------------------------- SPLIT LINES --------------------------- //
+    
     #region SPLIT LINES
 
-    /// <summary>
-    /// Splits a list of tokens into separate lines based on the specified maximum width.
-    /// The splitting behavior adapts according to the font's monospaced or kerning characteristics.
-    /// </summary>
-    /// <param name="tokens">The list of tokens to be split into multiple lines.</param>
-    /// <param name="maxWidth">The maximum allowed width for a single line of tokens.</param>
-    /// <returns>
-    /// An array of <c>LineData</c> objects where each elementOld represents a line of tokens
-    /// that fits within the specified maximum width.
-    /// </returns>
-    private LineData[] SplitLines(Token[] tokens, int maxWidth) {
-        return _info.SpacingInfo.IsMonospace
-            ? SplitLinesMono(tokens, maxWidth)
-            : _info.SpacingInfo.AsVariable.Kerning
-                ? SplitLinesVariableKerning(tokens, maxWidth)
-                : SplitLinesVariableNoKerning(tokens, maxWidth);
-    }
-
-    private LineData[] SplitLinesMono(Token[] tokens, int maxWidth) {
+    private LineData[] SplitLines_Mono(Token[] tokens, int maxWidth) {
+        if (tokens.Length == 0)
+            return [];
+        
         List<LineData> lines = [];
+        
+        int lineStart = 0;
         int? lastSpaceIndex = null;
-        int widthAtLastSpace = 0;
+        int lastWidth = 0;
         int currentWidth = 0;
-        int cursor = 0;
-        int lineStartIndex = 0;
-        int charWidth = _info.SpacingInfo.AsMonospace.CharacterWidth;
-        int spacing = _info.CharSpacing;
 
+        int gw = _info.SpacingInfo.AsMonospace.CharacterWidth;
+        
         for (int i = 0; i < tokens.Length; i++) {
-            bool skip = false;
-            
-            switch (tokens[i].Type) {
-                case NEWLINE:
-                    lines.Add(new LineData(
-                        lastSpaceIndex is null ? currentWidth : widthAtLastSpace,
-                        tokens.Skip(lineStartIndex).Take(i - lineStartIndex).ToArray()
-                    ));
-                    
-                    lastSpaceIndex = null;
-                    widthAtLastSpace = 0;
-                    lineStartIndex = i + 1;
-                    currentWidth = 0;
-                    cursor = 0;
-
-                    skip = true;
-                    break;
-                case SPACE:
-                    // // this should not in theory be necessary, but I keep it here for now 
-                    // if (currentWidth + singleCharWidth > maxWidth) {
-                    //     lastSpaceIndex = null;
-                    //     lines.Add(currentLine.ToArray());
-                    //     currentLine.Clear();
-                    //     skip = true;
-                    //     break;
-                    // }
-
-                    int sw = tokens[i].Data!.Value.AsT3.Width;
-                    
-                    widthAtLastSpace = currentWidth;
-                    
+            var t = tokens[i];
+            switch (t.Type) {
+                case SIMPLE or AUTO_COMPOUND or INVALID: {
+                    currentWidth += gw;
+                } break;
+                case LIGATURE: {
+                    currentWidth += t.AsLigature().Length * gw;
+                } break;
+                case SPACE: {
+                    currentWidth += t.AsSpace().Width * gw;
                     lastSpaceIndex = i;
-                    currentWidth = cursor + charWidth * sw + spacing * (sw - 1);
-                    cursor = currentWidth + spacing;
-                    
-                    break;
-                case INVALID or SIMPLE or AUTO_COMPOUND:
-                    currentWidth = cursor + charWidth;
-                    cursor = currentWidth + spacing;
-                    break;
-                case LIGATURE:
-                    int lw = tokens[i].Data!.Value.AsT1.Ligature.Length;
-                    currentWidth = cursor + charWidth * lw + spacing * (lw - 1);
-                    cursor = currentWidth + spacing;
-                    break;
+                } break;
+                case NEWLINE: {
+                     lines.Add(new LineData(currentWidth, tokens.InRange(lineStart, i).ToArray()));
+                     lineStart = i + 1;
+                } break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
-            
-            if (skip) continue;
-            
+
             if (currentWidth > maxWidth) {
-                i = lastSpaceIndex ?? i - 1;
-                
-                lines.Add(new LineData(
-                    lastSpaceIndex is null ? currentWidth : widthAtLastSpace, 
-                    tokens.Skip(lineStartIndex).Take(i - lineStartIndex).ToArray()
-                ));
-                
-                lineStartIndex = i + 1;
-                lastSpaceIndex = null;
-                widthAtLastSpace = 0;
-                currentWidth = 0;
-                cursor = 0;
-            }
-        }
-
-        if (lineStartIndex < tokens.Length) {
-            lines.Add(new LineData(
-                currentWidth,
-                tokens.Skip(lineStartIndex).ToArray()
-            ));
-        }
-        
-        return lines.ToArray();
-    }
-
-    private LineData[] SplitLinesVariableNoKerning(Token[] tokens, int maxWidth) {
-        List<LineData> lines = [];
-        int? lastSpaceIndex = null;
-        int widthAtLastSpace = 0;
-        int currentWidth = 0;
-        int lineStartIndex = 0;
-        int wordSpacing = _info.SpacingInfo.AsVariable.WordSpacing;
-        int emptyLineHeight = _info.SpacingInfo.AsVariable.EmptyLineHeight;
-        int charSpacing = _info.CharSpacing;
-        int maxY = int.MinValue;
-        int minY = int.MaxValue;
-
-        for (int i = 0; i < tokens.Length; i++) {
-            bool skip = false;
-            int newWidth = 0;
-
-            switch (tokens[i].Type) {
-                case NEWLINE:
+                if (lastSpaceIndex.HasValue) {
                     lines.Add(new LineData(
                         currentWidth,
-                        Math.Max(maxY - minY, emptyLineHeight),
-                        tokens.Skip(lineStartIndex).Take(i - lineStartIndex).ToArray()
+                        tokens.InRange(lastSpaceIndex.Value, lastSpaceIndex.Value).ToArray()
                     ));
-                    
-                    lineStartIndex = i + 1;
-                    lastSpaceIndex = null;
-                    maxY = int.MinValue;
-                    minY = int.MaxValue;
 
-                    skip = true;
-                    break;
-                case SPACE:
-                    widthAtLastSpace = currentWidth;
-                    newWidth = currentWidth + wordSpacing * tokens[i].Data!.Value.AsT3.Width;
-                    lastSpaceIndex = i;
-
-                    if (newWidth > maxWidth) {
-                        lines.Add(new LineData(
-                            currentWidth,
-                            maxY - minY, 
-                            tokens.Skip(lineStartIndex).Take(i - lineStartIndex).ToArray()
-                        ));
-                        
-                        maxY = int.MinValue;
-                        minY = int.MaxValue;
-                        skip = true;
-                        lastSpaceIndex = null;
-                        lineStartIndex = i + 1;
-                        currentWidth = 0;
-                    }
-
-                    break;
-                case INVALID or SIMPLE or AUTO_COMPOUND or LIGATURE: {
-                    var t = tokens[i].Data!.Value;
-                    var type = tokens[i].Type;
-
-                    var g = type switch {
-                        SIMPLE
-                            => _simpleGlyphs[t.AsT0.Character].Glyph,
-                        LIGATURE
-                            => _ligatureGlyphs[t.AsT1.Ligature].Glyph,
-                        AUTO_COMPOUND
-                            => _autoCompoundGlyphs[t.AsT2.Second].GetGlyph(_simpleGlyphs[t.AsT2.Main].Glyph),
-                        INVALID
-                            => _invalidTokenGlyph,
-                        _
-                            => throw new InvalidOperationException("Invalid token type.")
-                    };
-
-                    maxY = Math.Max(maxY, g.Height + g.BaselineOffset);
-                    minY = Math.Min(minY, g.BaselineOffset);
-                    
-                    newWidth = currentWidth + g.Width + charSpacing; 
-                    break;
+                    i = lastSpaceIndex.Value;
+                    lineStart = lastSpaceIndex.Value + 1;
                 }
-            }
-
-            if (skip) continue;
-            
-            if (newWidth > maxWidth) {
-                int splitIndex = lastSpaceIndex ?? (i - 1);
-                int takeCount = splitIndex - lineStartIndex + (lastSpaceIndex == null ? 0 : 1);
-                
-                lines.Add(new LineData(
-                    lastSpaceIndex == null ? currentWidth : widthAtLastSpace, 
-                    maxY - minY, 
-                    tokens.Skip(lineStartIndex).Take(takeCount).ToArray()
-                ));
-                
-                i = splitIndex;
-                lastSpaceIndex = null;
-
-                lineStartIndex = i + 1;
-                currentWidth = 0;
-                maxY = int.MinValue;
-                minY = int.MaxValue;
-                continue;
-            }
-            
-            currentWidth = newWidth;
-        }
-
-        if (lineStartIndex < tokens.Length) {
-            lines.Add(new LineData(
-                currentWidth,
-                maxY - minY,
-                tokens.Skip(lineStartIndex).ToArray()
-            ));
-        }
-        
-        return lines.ToArray();
-    }
-
-    private LineData[] SplitLinesVariableKerning(Token[] tokens, int maxWidth) { 
-        
-        // SPOILER:
-        // DON'T THE FUCK TOUCH THIS UNLESS YOU REALLY KNOW WHAT YOU'RE DOING
-        // I did not, and it was a great mistake.
-        // Every time you edit this method and fail to understand what it does,
-        // add one to this counter: 3
-        
-        List<LineData> lines = [];
-        int? lastSpaceIndex = null;
-        int widthAtLastSpace = 0;
-        int heightAtLastSpace = 0;
-        int currentWidth = 0;
-        int lineStartIndex = 0;
-        int wordSpacing = _info.SpacingInfo.AsVariable.WordSpacing;
-        int emptyLineHeight = _info.SpacingInfo.AsVariable.EmptyLineHeight;
-        int charSpacing = _info.CharSpacing;
-        int maxY = int.MinValue;
-        int minY = int.MaxValue;
-        int spacing = charSpacing;
-        IGlyph? lastGlyph = null;
-        List<int> offsets = [];
-
-        for (int i = 0; i < tokens.Length; i++) {
-            bool skip = false;
-            int newWidth = 0;
-
-            switch (tokens[i].Type) {
-                case NEWLINE:
+                else if (lineStart == i) {
                     lines.Add(new LineData(
                         currentWidth,
-                        Math.Max(maxY - minY, emptyLineHeight),
-                        tokens.Skip(lineStartIndex).Take(i - lineStartIndex).ToArray(),
-                        offsets.ToArray()
+                        [tokens[i]]
                     ));
-                    
-                    lineStartIndex = i + 1;
-                    lastSpaceIndex = null;
-                    maxY = int.MinValue;
-                    minY = int.MaxValue;
-                    lastGlyph = null; 
-                    offsets = [];
-                    
-                    skip = true;
-                    break;
-                case SPACE:
-                    
-                    widthAtLastSpace = currentWidth + (lastGlyph?.Width ?? 0);
-                    heightAtLastSpace = maxY - minY;
-                    spacing = wordSpacing * tokens[i].Data!.Value.AsT3.Width;
-                    
-                    newWidth = widthAtLastSpace + spacing; 
-                    lastSpaceIndex = i;
 
-                    if (newWidth > maxWidth) {
-                        lines.Add(new LineData(
-                            currentWidth + (lastGlyph?.Width ?? 0), 
-                            maxY - minY, 
-                            tokens.Skip(lineStartIndex).Take(i - lineStartIndex).ToArray(),
-                            offsets.ToArray()
-                        ));
-                        
-                        maxY = int.MinValue;
-                        minY = int.MaxValue;
-                        skip = true;
-                        lastSpaceIndex = null;
-                        lineStartIndex = i + 1;
-                        currentWidth = 0;
-                        lastGlyph = null;
-                        offsets = [];
-                        spacing = charSpacing;
-                        break;
-                    }
-                    
-                    offsets.Add(-1);
-
-                    break;
-                case INVALID or SIMPLE or AUTO_COMPOUND or LIGATURE: {
-                    var type = tokens[i].Type;
-                    var t = tokens[i].Data;
-
-                    var g = type switch {
-                        SIMPLE
-                            => _simpleGlyphs[t!.Value.AsT0.Character].Glyph,
-                       LIGATURE
-                            => _ligatureGlyphs[t!.Value.AsT1.Ligature].Glyph,
-                        AUTO_COMPOUND
-                            => _autoCompoundGlyphs[t!.Value.AsT2.Second]
-                                .GetGlyph(_simpleGlyphs[t.Value.AsT2.Main].Glyph),
-                        INVALID
-                            => _invalidTokenGlyph,
-                        _
-                            => throw new InvalidOperationException("Invalid token type.")
-                    };
-
-                    maxY = Math.Max(maxY, g.Height + g.BaselineOffset);
-                    minY = Math.Min(minY, g.BaselineOffset);
-
-                    int offset = lastGlyph != null ? GetGlyphOffset(lastGlyph, g, spacing) : 0;
-                    
-                    newWidth = currentWidth + offset + g.Width;
-                    offsets.Add(offset);
-                    spacing = charSpacing;
-                    lastGlyph = g;
-                    break;
+                    lineStart++;
                 }
-            }
+                else {
+                    lines.Add(new LineData(lastWidth, tokens.InRange(lineStart, i).ToArray()));
+                }
 
-            if (skip) continue;
-            
-            if (newWidth > maxWidth) {
-                offsets.RemoveAt(offsets.Count - 1); 
-                
-                // sorry for the naming but i have absolutely no idea what the fuck these numbers mean...
-                var a = lastSpaceIndex ?? i - 1; 
-                int b = (lastSpaceIndex ?? i) - lineStartIndex;
-                
-                lines.Add(new LineData(
-                    lastSpaceIndex == null ? currentWidth + (lastGlyph?.Width ?? 0) : widthAtLastSpace, 
-                    lastSpaceIndex == null ? maxY - minY : heightAtLastSpace, 
-                    tokens.Skip(lineStartIndex).Take(b).ToArray(),
-                    offsets.Take(b).ToArray()
-                ));
-                
-                i = a;
-                lastSpaceIndex = null;
-
-                lineStartIndex = i + 1;
                 currentWidth = 0;
-                maxY = int.MinValue;
-                minY = int.MaxValue;
-                offsets = [];
-                lastGlyph = null;
-                spacing = charSpacing;
-                continue;
             }
-            
-            
-            if (tokens[i].Type != SPACE) {
-                currentWidth = newWidth - (lastGlyph?.Width ?? 0); 
-            }
+
+            lastWidth = currentWidth;
         }
 
-        if (lineStartIndex < tokens.Length) {
+        if (lineStart < tokens.Length) {
             lines.Add(new LineData(
-                currentWidth + (lastGlyph?.Width ?? 0), 
-                maxY - minY,
-                tokens.Skip(lineStartIndex).ToArray(),
-                offsets.ToArray()
+                currentWidth,
+                tokens.Skip(lineStart).ToArray()
             ));
         }
         
         return lines.ToArray();
     }
 
+    private LineData[] SplitLines_Variable_NoKerning(Token[] tokens, int maxWidth) {
+        if (tokens.Length == 0)
+            return [];
+        
+        // precompute widths and positions
+        int[] widths = new int[tokens.Length];
+        int[] up     = new int[tokens.Length];
+        int[] dn     = new int[tokens.Length];
+
+        for (int i = 0; i < tokens.Length; i++) {
+            var t = tokens[i];
+            
+            if (t.Type is AUTO_COMPOUND or INVALID or LIGATURE or SIMPLE) {
+                var g = GetGlyph(t);
+                widths[i] = g.Width + _info.CharSpacing;
+                up[i]     = g.BaselineOffset + g.Height;
+                dn[i]     = g.BaselineOffset;
+            }
+            else {
+                widths[i] = t.Type is SPACE ? t.AsSpace().Width * _info.SpacingInfo.AsVariable.WordSpacing : 0;
+                up[i]     = int.MinValue;
+                dn[i]     = int.MaxValue;
+            }
+        }
+        
+        // compute lines
+        List<LineData> lines = [];
+        
+        int lineStart = 0;
+        int? lastSpaceIndex = null;
+        int lastSpaceWidth = 0;
+        int lastWidth = 0;
+        int currentWidth = 0;
+        
+        for (int i = 0; i < tokens.Length; i++) {
+            var t = tokens[i];
+            switch (t.Type) {
+                case SIMPLE or AUTO_COMPOUND or INVALID or LIGATURE: {
+                    currentWidth += widths[i];
+                } break;
+                case SPACE: {
+                    lastSpaceWidth = currentWidth;
+                    currentWidth += widths[i];
+                    lastSpaceIndex = i;
+                } break;
+                case NEWLINE: {
+                    lines.Add(new LineData(currentWidth, tokens.InRange(lineStart, i).ToArray()));
+                    lineStart = i + 1;
+                } break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            if (currentWidth > maxWidth) {
+                if (lastSpaceIndex.HasValue) {
+                    var si = lastSpaceIndex.Value;
+                    
+                    lines.Add(new LineData(
+                        lastSpaceWidth,
+                        up.InRange(lineStart, si).Max() - dn.InRange(lineStart, si).Min(),
+                        tokens.InRange(lineStart, si).ToArray()
+                    ));
+
+                    i = si;
+                    lineStart = si + 1;
+                    lastSpaceIndex = null;
+                }
+                else if (lineStart == i) {
+                    lines.Add(new LineData(
+                        currentWidth,
+                        up[i] - dn[i],
+                        [tokens[i]]
+                    ));
+
+                    lineStart++;
+                }
+                else {
+                    lines.Add(new LineData(
+                        lastWidth, 
+                        up.InRange(lineStart, i).Max() - dn.InRange(lineStart, i).Min(), 
+                        tokens.InRange(lineStart, i).ToArray()
+                    ));
+                }
+
+                currentWidth = 0;
+            }
+
+            lastWidth = currentWidth;
+        }
+
+        if (lineStart < tokens.Length) {
+            lines.Add(new LineData(
+                currentWidth,
+                up.Skip(lineStart).Max() - dn.Skip(lineStart).Min(),
+                tokens.Skip(lineStart).ToArray()
+            ));
+        }
+        
+        return lines.ToArray();
+    }
+
+    private LineData[] SplitLines_Variable_CharKerning(Token[] tokens, int maxWidth) {
+        if (tokens.Length == 0)
+            return [];
+        
+        // precompute offsets
+        int[] offsets = new int[tokens.Length];
+        int[] widths  = new int[tokens.Length];
+        int[] up      = new int[tokens.Length];
+        int[] dn      = new int[tokens.Length];
+
+        // fill first cell
+        offsets[0] = 0;
+        IGlyph? lg = null;
+
+        if (tokens[0].Type is AUTO_COMPOUND or INVALID or LIGATURE or SIMPLE) {
+            lg = GetGlyph(tokens[0]);
+            widths[0] = lg.Width;
+            up[0]     = lg.BaselineOffset + lg.Height;
+            dn[0]     = lg.BaselineOffset;
+        }
+        else {
+            widths[0] = 0;
+            up[0]     = int.MinValue;
+            dn[0]     = int.MaxValue;
+        }
+        
+        int cs = _info.CharSpacing;
+        int spacing = cs;
+        
+        // fill all other cells
+        for (int i = 1; i < tokens.Length; i++) {
+            switch (tokens[i].Type) {
+                case AUTO_COMPOUND or INVALID or LIGATURE or SIMPLE: {
+                    var g      = GetGlyph(tokens[i]);
+                    offsets[i] = lg == null ? 0 : GetGlyphOffset(lg, g, spacing);
+                    widths[i]  = g.Width;
+                    up[i]      = g.BaselineOffset + g.Height;
+                    dn[i]      = g.BaselineOffset;
+                    spacing    = cs;
+                    lg         = g;
+                } break;
+                case SPACE: {
+                    up[i]      = int.MinValue;
+                    dn[i]      = int.MaxValue;
+                    spacing    = cs;
+                } break;
+                case NEWLINE: {
+                    lg = null;
+                    up[i] = int.MinValue;
+                    dn[i] = int.MaxValue;
+                    spacing = cs;
+                } break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+        
+        // compute lines
+        List<LineData> lines = [];
+        
+        int lineStart = 0;
+        int? lastSpaceIndex = null;
+        int lastSpaceWidth = 0;
+        int lastWidth = 0;
+        int currentWidth = 0;
+        int currentOffset = 0;
+        
+        for (int i = 0; i < tokens.Length; i++) {
+            var t = tokens[i];
+            switch (t.Type) {
+                case AUTO_COMPOUND or INVALID or LIGATURE or SIMPLE: {
+                    currentWidth = currentOffset + widths[i];
+                    currentOffset += offsets[i];
+                } break;
+                case SPACE: {
+                    lastSpaceIndex = i;
+                    lastSpaceWidth = currentWidth;
+                } break;
+                case NEWLINE: {
+                    lines.Add(new LineData(
+                        currentWidth, 
+                        up     .InRange(lineStart, i).Max() - dn.InRange(lineStart, i).Min(),
+                        tokens .InRange(lineStart, i).ToArray(),
+                        offsets.InRange(lineStart, i).ToArray()
+                    ));
+                    
+                    lineStart = i + 1;
+                    currentOffset = 0;
+                    currentWidth  = 0;
+                } break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            if (currentWidth > maxWidth) {
+                if (lastSpaceIndex.HasValue) {
+                    var j = lastSpaceIndex.Value;
+                    
+                    lines.Add(new LineData(
+                        lastSpaceWidth,
+                        up     .InRange(lineStart, j).Max() - dn.InRange(lineStart, j).Min(),
+                        tokens .InRange(lineStart, j).ToArray(),
+                        offsets.InRange(lineStart, j).ToArray()
+                    ));
+
+                    i = lastSpaceIndex.Value;
+                    lineStart = lastSpaceIndex.Value + 1;
+                }
+                else if (lineStart == i) {
+                    lines.Add(new LineData(
+                        currentWidth,
+                        up[i] - dn[i],
+                        [tokens [i]],
+                        [offsets[i]]
+                    ));
+
+                    lineStart++;
+                }
+                else {
+                    lines.Add(new LineData(
+                        lastWidth,
+                        up     .InRange(lineStart, i).Max() - dn.InRange(lineStart, i).Min(),
+                        tokens .InRange(lineStart, i).ToArray(),
+                        offsets.InRange(lineStart, i).ToArray()
+                    ));
+                    
+                    lineStart = i;
+                    i -= 1;
+                }
+
+                lastSpaceIndex = null;
+                lastSpaceWidth = 0;
+                currentOffset  = 0;
+
+                currentWidth = 0;
+            }
+
+            lastWidth = currentWidth;
+        }
+
+        // add remaining tokens
+        if (lineStart < tokens.Length) {
+            lines.Add(new LineData(
+                currentOffset + widths[tokens.Length - 1],
+                up     .Skip(lineStart).Max() - dn.Skip(lineStart).Min(),
+                tokens .Skip(lineStart).ToArray(),
+                offsets.Skip(lineStart).ToArray()
+            ));
+        }
+        
+        return lines.ToArray();
+    }
+    
+    #endregion SPLIT LINES NEW
+    
+    private record LineData {
+        
+        /// <summary>
+        /// Represents the width of a line of text in chars.
+        /// </summary>
+        /// <remarks>
+        /// The <c>Width</c> property defines the horizontal extent of a line, measured in units used
+        /// by the layout engine. It is crucial for determining the alignment and horizontal positioning
+        /// of text elements within the bounding area during rendering.
+        /// </remarks>
+        public int Width { get; }
+
+        /// <summary>
+        /// Represents the height of a text line in chars.
+        /// </summary>
+        /// <remarks>
+        /// The <c>Height</c> property is used to specify the vertical size of a line. It is calculated
+        /// based on the font metrics and any additional spacing applied during text layout. This
+        /// value is essential for determining the total height of multiple lines of text and for
+        /// aligning text within a given area.
+        /// </remarks>
+        public int Height { get; } = 0;
+
+        /// <summary>
+        /// A collection of tokens representing glyphs for a line of text.
+        /// </summary>
+        /// <remarks>
+        /// The <c>Tokens</c> property provides information about the glyphs associated with the text,
+        /// including simple glyphs, ligatures, and auto-compound glyphs. These tokens are used for
+        /// rendering text with specified alignment, spacing, and kerning.
+        /// </remarks>
+        public Token[] Tokens { get; }
+
+        /// <summary>
+        /// Represents the relative horizontal offsets for tokens within a text line.
+        /// </summary>
+        /// <remarks>
+        /// The <c>Offsets</c> property provides an array of integer values indicating the horizontal displacement
+        /// for each token in a line of text. These offsets are used to adjust the positioning of tokens during rendering,
+        /// ensuring precise placement of glyphs based on alignment, spacing, and other layout considerations.
+        /// Each value in the array corresponds to a specific token in the <c>Tokens</c> collection.
+        /// </remarks>
+        public int[] Offsets { get; } = [];
+
+        public LineData(int width, Token[] tokens) {
+            Width = width;
+            Tokens = tokens;
+        }
+        
+        public LineData(int width, int height, Token[] tokens) {
+            Width = width;
+            Height = height;
+            Tokens = tokens;
+        }
+        
+        public LineData(int width, int height, Token[] tokens, int[] offsets) {
+            Width = width;
+            Height = height;
+            Tokens = tokens;
+            Offsets = offsets;
+        }
+
+        public override string ToString() {
+            return $"LineData(Width: {Width}, Height: {Height}, Tokens: {Tokens.Length}, string: {
+                Tokens.Select(t => t.Type switch {
+                    AUTO_COMPOUND => t.Data!.Value.AsT2.Main.ToString() + t.Data.Value.AsT2.Second,
+                    INVALID => "\uf059", 
+                    SIMPLE => t.Data!.Value.AsT0.Character.ToString(),
+                    LIGATURE => t.Data!.Value.AsT1.Ligature, 
+                    SPACE => " ", 
+                    NEWLINE => "\n", 
+                    _ => throw new ArgumentOutOfRangeException()
+                }).Aggregate((a, b) => a + b)
+            })";
+        }
+    }
+    
+    
+    // --------------------------- SIZE COMP --------------------------- //
+    
+    #region SIZE COMP
     
     public Size GetMinSize(string str) {
         var tokens = Tokenize(str, this);
@@ -907,45 +948,6 @@ public class NKFont : IFont {
         var canv = new NKCharCanvas(0, 0, true);
         PlaceString(str, canv, maxWidth);
         return new Size(canv.Width, canv.Height);
-    }
-    
-    private readonly struct LineData {
-        public int Width { get; }
-        public int Height { get; } = 0;
-        public Token[] Tokens { get; }
-        public int[] Offsets { get; } = [];
-        
-        public LineData(int width, Token[] tokens) {
-            Width = width;
-            Tokens = tokens;
-        }
-        
-        public LineData(int width, int height, Token[] tokens) {
-            Width = width;
-            Height = height;
-            Tokens = tokens;
-        }
-        
-        public LineData(int width, int height, Token[] tokens, int[] offsets) {
-            Width = width;
-            Height = height;
-            Tokens = tokens;
-            Offsets = offsets;
-        }
-
-        public override string ToString() {
-            return $"LineData(Width: {Width}, Height: {Height}, Tokens: {Tokens.Length}, string: {
-                Tokens.Select(t => t.Type switch {
-                    AUTO_COMPOUND => t.Data!.Value.AsT2.Main.ToString() + t.Data.Value.AsT2.Second,
-                    INVALID => "Invalid", 
-                    SIMPLE => t.Data!.Value.AsT0.Character.ToString(),
-                    LIGATURE => t.Data!.Value.AsT1.Ligature, 
-                    SPACE => " ", 
-                    NEWLINE => "\n", 
-                    _ => throw new ArgumentOutOfRangeException()
-                }).Aggregate((a, b) => a + b)
-            })";
-        }
     }
     
     #endregion
@@ -996,6 +998,34 @@ public class NKFont : IFont {
     public int MaxLigatureLength => GetMaxLigatureLength();
 
     #endregion
+
+    private IGlyph GetAutoCompoundGlyph(AutoCompoundToken token) 
+        => _autoCompoundGlyphs[token.Second].GetGlyph(_simpleGlyphs[token.Main].Glyph);
+
+    private IGlyph GetGlyph(Token token) {
+        return token.Type switch {
+            INVALID          => _invalidTokenGlyph,
+            SIMPLE           => _simpleGlyphs[token.Data!.Value.AsT0.Character].Glyph,
+            LIGATURE         => _ligatureGlyphs[token.Data!.Value.AsT1.Ligature].Glyph,
+            AUTO_COMPOUND    => GetAutoCompoundGlyph(token.AsAutoCompound()),
+            SPACE or NEWLINE => throw new InvalidOperationException(),
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
+
+    private int GetWidth(Token token) {
+        return token.Type switch {
+            INVALID       => _invalidTokenGlyph.Width,
+            SIMPLE        => _simpleGlyphs[token.Data!.Value.AsT0.Character].Glyph.Width,
+            LIGATURE      => _ligatureGlyphs[token.Data!.Value.AsT1.Ligature].Glyph.Width,
+            AUTO_COMPOUND => GetAutoCompoundGlyph(token.AsAutoCompound()).Width,
+            NEWLINE       => 0,
+            SPACE         => token.AsSpace().Width * (_info.SpacingInfo.IsVariable 
+                ? _info.SpacingInfo.AsVariable.WordSpacing 
+                : _info.SpacingInfo.AsMonospace.CharacterWidth),
+            _ => throw new ArgumentOutOfRangeException()
+        };
+    }
     
     #if DEBUG || WIP
     

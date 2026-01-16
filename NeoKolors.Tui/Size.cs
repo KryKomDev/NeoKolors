@@ -6,7 +6,6 @@
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using Metriks;
-using String = NeoKolors.Extensions.String;
 
 namespace NeoKolors.Tui;
 
@@ -63,4 +62,6 @@ public readonly struct Size : IEquatable<Size> {
         => new(Math.Min(left.Width, right.Width), Math.Min(left.Height, right.Height));
     
     public static Size Zero => new(0, 0);
+    public static Size One => new(1, 1);
+    public static Size Two => new(2, 2);
 }

@@ -10,7 +10,6 @@ using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using NeoKolors.Common.Util;
 using static NeoKolors.Common.EscapeCodes;
-using static NeoKolors.Common.TextStyles;
 
 namespace NeoKolors.Common;
 

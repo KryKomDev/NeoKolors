@@ -4,8 +4,6 @@
 //
 
 using NeoKolors.Tui.Fonts;
-using NeoKolors.Tui;
-using Metriks;
 
 namespace NeoKolors.Tui.Tests;
 

@@ -1,6 +1,3 @@
-using System.Drawing;
-using Xunit;
-
 namespace NeoKolors.Common.Tests;
 
 public class NKPaletteTests {

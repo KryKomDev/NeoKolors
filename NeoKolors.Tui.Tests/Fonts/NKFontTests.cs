@@ -4,8 +4,6 @@
 
 using NeoKolors.Tui.Fonts;
 using NeoKolors.Tui.Fonts.Exceptions;
-using NeoKolors.Tui;
-using Metriks;
 using static NeoKolors.Tui.Fonts.Serialization.Xml.AutoCompoundApplicableGroup;
 
 namespace NeoKolors.Tui.Tests;

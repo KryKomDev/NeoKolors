@@ -184,8 +184,8 @@ public static class CharCanvasExtensions {
         }
 
         public void Style<T>(NKStyle style, Point offset, T?[,] mask) {
-            for (int x = offset.X; x < Math.Min(mask.Len0 + offset.X, canvas.Width + 1); x++) {
-                for (int y = offset.Y; y < Math.Min(mask.Len1 + offset.Y, canvas.Height + 1); y++) {
+            for (int x = offset.X; x < Math.Min(mask.Len0 + offset.X, canvas.Width); x++) {
+                for (int y = offset.Y; y < Math.Min(mask.Len1 + offset.Y, canvas.Height); y++) {
                     if (mask[x - offset.X, y - offset.Y] == null) continue;
                     
                     var cellInfo     = canvas[x, y];
