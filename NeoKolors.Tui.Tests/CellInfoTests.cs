@@ -4,6 +4,7 @@
 //
 
 using NeoKolors.Common;
+using NeoKolors.Tui.Rendering;
 
 namespace NeoKolors.Tui.Tests;
 
@@ -18,16 +19,6 @@ public class CellInfoTests {
         Assert.Equal(style, cell.Style);
         Assert.True(cell.Changed);
         Assert.Equal(5, cell.ZIndex);
-    }
-
-    [Fact]
-    public void Default_ShouldReturnDefaultValues() {
-        var cell = CellInfo.Default;
-        
-        Assert.Null(cell.Char);
-        Assert.Equal(NKStyle.Default, cell.Style);
-        Assert.True(cell.Changed);
-        Assert.Equal(0, cell.ZIndex);
     }
 
     [Fact]

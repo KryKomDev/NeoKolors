@@ -4,7 +4,7 @@
 using Metriks;
 using NeoKolors.Tui.Styles.Values;
 
-namespace NeoKolors.Tui;
+namespace NeoKolors.Tui.Rendering;
 
 /// <summary>
 /// Provides extension methods for manipulating and interacting with ICharCanvas objects
@@ -238,6 +238,44 @@ public static class CharCanvasExtensions {
                     cellInfo.Char    = c;
                     cellInfo.Changed = true;
                 }
+            }
+        }
+
+        internal void StyleCheckerBckg(Rectangle region, CheckerBckg checker) {
+            int cw = Math.Max(1, checker.Width);
+            int ch = Math.Max(1, checker.Height);
+
+            int startX = Math.Max(0, region.LowerX);
+            int endX   = Math.Min(canvas.Width, region.HigherX + 1);
+            int startY = Math.Max(0, region.LowerY);
+            int endY   = Math.Min(canvas.Height, region.HigherY + 1);
+
+            if (startX >= endX || startY >= endY) return;
+
+            bool xs = false;
+            
+            for (int x = startX; x < endX;) {
+                int w = Math.Min(cw, endX - x);
+                bool ys = false;
+
+                for (int y = startY; y < endY;) {
+                    int h = Math.Min(ch, endY - y);
+                    var color = (xs ^ ys) ? checker.C1 : checker.C2;
+
+                    for (int ix = 0; ix < w; ix++) {
+                        for (int iy = 0; iy < h; iy++) {
+                            var cellInfo     = canvas[x + ix, y + iy];
+                            cellInfo.Style   = cellInfo.Style with { BColor = color };
+                            cellInfo.Changed = true;
+                        }
+                    }
+
+                    y += h;
+                    ys = !ys;
+                }
+
+                x += w;
+                xs = !xs;
             }
         }
     }

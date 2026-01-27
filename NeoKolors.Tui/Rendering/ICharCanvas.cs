@@ -4,7 +4,7 @@
 using Metriks;
 using SkiaSharp;
 
-namespace NeoKolors.Tui;
+namespace NeoKolors.Tui.Rendering;
 
 public interface ICharCanvas {
     
@@ -21,8 +21,8 @@ public interface ICharCanvas {
     
     public void Restyle(NKStyle[,] styles, Point2D offset = default, int zIndex = 0);
     
-    public void PlaceSixel(SKImage image, Point2D offset, Size2D size, int zIndex = 0);
-    public ISixelImageInfo[] GetSixelImages();
+    public void PlaceSixel(SKBitmap image, Point2D offset, Size2D size, Size2D charSize, int zIndex = 0);
+    public ISixelImageInfo[] GetSixels();
     
     public void Resize(int width, int height);
     public void Clean();

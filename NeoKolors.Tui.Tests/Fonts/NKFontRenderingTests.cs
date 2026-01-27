@@ -2,9 +2,9 @@
 // NeoKolors.Test
 // Copyright (c) 2025 KryKom
 
-using NeoKolors.Tui.Fonts;
 using NeoKolors.Tui.Fonts.Serialization;
 using NeoKolors.Common;
+using NeoKolors.Tui.Rendering;
 using NeoKolors.Tui.Styles.Values;
 
 namespace NeoKolors.Tui.Tests;
@@ -34,7 +34,6 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void PlaceString_ShouldRenderSpecificGlyphContent() {
-        var path = GetFontPath();
         var font = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
         var canvas = new NKCharCanvas(50, 20);
         
@@ -66,7 +65,6 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void PlaceString_ShouldRenderLigatureExactly() {
-        var path = GetFontPath();        
         var font = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
         var canvas = new NKCharCanvas(50, 20);
         
@@ -101,7 +99,6 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void PlaceString_ShouldHandleLineSpacing() {
-        var path = GetFontPath();
         var font = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
         var canvas = new NKCharCanvas(50, 20);
         
@@ -113,34 +110,31 @@ public class NKFontRenderingTests {
         // Row 0 of second A should be at y=6.
         
         Assert.Equal('/', canvas[0, 3].Char); // Bottom row of first A
-        Assert.Null(canvas[0, 4].Char);       // Line spacing row 1
-        Assert.Null(canvas[0, 5].Char);       // Line spacing row 2
+        Assert.Equal(' ', canvas[0, 4].Char);       // Line spacing row 1
+        Assert.Equal(' ', canvas[0, 5].Char);       // Line spacing row 2
         Assert.Equal('_', canvas[3, 6].Char); // Top row of second A
     }
 
     [Fact]
     public void PlaceString_ShouldHandleWordSpacing() {
-        var path = GetFontPath();
-        var font = NKFontSerializer.ReadFile(path);
+        var font = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
         var canvas = new NKCharCanvas(100, 20);
-        var info = (NKFontInfo)font.Info;
         
         // WordSpacing is 5. Width of A is 8. CharSpacing is 2.
         // "A A" -> A at x=0.
         // x becomes 0 + 8 + 2 = 10.
         // space of 5 -> x becomes 10 + 5 = 15.
         // second A at x = 15.
-        font.PlaceString("A A", canvas);
+        font!.PlaceString("A A", canvas);
         
         Assert.Equal('/', canvas[0, 3].Char);   // Leftmost of first A
-        Assert.Null(canvas[8, 3].Char);         // Char spacing start
-        Assert.Null(canvas[14, 3].Char);        // Word space end
+        Assert.Equal(' ', canvas[8, 3].Char);         // Char spacing start
+        Assert.Equal(' ', canvas[14, 3].Char);        // Word space end
         Assert.Equal('/', canvas[15, 3].Char);  // Leftmost of second A
     }
 
     [Fact]
     public void PlaceString_WithAlignment_ShouldAffectPosition() {
-        var path = GetFontPath();
         var font = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
         var canvas = new NKCharCanvas(50, 10);
         
@@ -150,7 +144,7 @@ public class NKFontRenderingTests {
         
         // We expect the text NOT to be at (0,0)
         // Check top-left corner
-        Assert.Null(canvas[0, 0].Char);
+        Assert.Equal(' ', canvas[0, 0].Char);
         
         // Check somewhere in the middle (approximate)
         // Center of 50x10 is (25, 5).
@@ -166,6 +160,7 @@ public class NKFontRenderingTests {
                 }
             }
         }
+        
         Assert.True(drawn, "Canvas should contain centered text.");
     }
 }

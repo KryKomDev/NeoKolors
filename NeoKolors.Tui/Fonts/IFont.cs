@@ -1,6 +1,7 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
+using NeoKolors.Tui.Rendering;
 using NeoKolors.Tui.Styles.Values;
 
 namespace NeoKolors.Tui.Fonts;

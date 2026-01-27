@@ -1,7 +1,8 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-using NeoKolors.Tui.SourceManagement;
+using ImplTypeCheck;
+using NeoKolors.Tui.Global;
 using BindingFlags = System.Reflection.BindingFlags;
 
 namespace NeoKolors.Tui.Styles.Properties;
@@ -20,6 +21,7 @@ public interface IStyleProperty<out TValue, in TSelf> : IStyleProperty where
     #endif
 }
 
+[ImplType(ImplKind.ValueType)]
 public interface IStyleProperty {
     
     public object Value { get; }

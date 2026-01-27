@@ -3,9 +3,11 @@
 
 using System.Text;
 
-namespace NeoKolors.Tui;
+namespace NeoKolors.Tui.Rendering;
 
 public class NKCharScreen : NKCharCanvas, ICharScreen {
+
+    private List<SixelImageInfo> _prevImages = [];
     
     public NKCharScreen(int width, int height) : base(width, height) { }
     public NKCharScreen(Size size) : base(size.Width, size.Height) { }
@@ -26,7 +28,7 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
                 var cell = _data[x, y];
                 var (c, nkStyle, _, _) = cell;
                 
-                if (!cell.Changed) {
+                if (!cell.Changed || cell.Char is null) {
                     Stdio.Write(sb.ToString());
                     sb.Clear();
                     isBehind = true;
@@ -55,7 +57,7 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
                     lastStyle = nkStyle.Styles;
                 }
 
-                if (c is null || char.IsControl(c.Value))
+                if (char.IsControl(c!.Value))
                     sb.Append(' ');
                 else
                     sb.Append(c);
@@ -67,6 +69,17 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
             
             isBehind = true;
         }
+
+        var ri = _images.Except(_prevImages).ToArray();
+        
+        for (int i = 0; i < ri.Length; i++) {
+            var b = ri[i];
+            NKConsole.WriteSixel(b.Image, b.Offset.X, b.Offset.Y, b.Size.X, b.Size.Y);
+        }
+
+        _prevImages.Clear();
+        _prevImages.AddRange(_images);
+        _images.Clear();
     }
     
     // ============================= TESTING OVERRIDE METHODS ============================= // 

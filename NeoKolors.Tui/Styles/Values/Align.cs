@@ -46,8 +46,12 @@ public struct Align : IParsableValue<Align> {
         }
     }
 
-    Align IParsableValue<Align>.Parse(string s, IFormatProvider? provider) => Parse(s, provider);
-    bool IParsableValue<Align>.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out Align result) => TryParse(s, provider, out result);
+    Align IParsableValue<Align>.Parse(string s, IFormatProvider? provider) 
+        => Parse(s, provider);
+    bool IParsableValue<Align>.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out Align result) 
+        => TryParse(s, provider, out result);
+    
+    public static Align Center => new(H.CENTER, V.CENTER);
 }
 
 public enum HorizontalAlign {

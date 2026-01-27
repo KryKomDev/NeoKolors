@@ -10,10 +10,10 @@ namespace NeoKolors.Tui.Elements;
 
 /// <summary>
 /// Represents a container elementOld in the NeoKolors TUI framework, designed to manage and lay out child elements
-/// using flexible styling and alignment properties. This abstract class extends <see cref="UniversalElement"/>
+/// using flexible styling and alignment properties. This abstract class extends <see cref="UniversalElement{T}"/>
 /// and additionally supports features like flex-direction, overflow behavior, and grid alignment.
 /// </summary>
-public abstract class ContainerElement : UniversalElement {
+public abstract class ContainerElement : UniversalElement<IElement[]> {
 
     public virtual JustifyContent JustifyContent {
         get => _style.Get(new JustifyContentProperty(DefaultJustifyContent)).Value;

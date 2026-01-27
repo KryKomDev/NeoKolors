@@ -3,15 +3,49 @@
 
 using System.Diagnostics.Contracts;
 using NeoKolors.Tui.Dom;
+using NeoKolors.Tui.Rendering;
+using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Values;
 namespace NeoKolors.Tui.Elements;
 
+public interface IElement<T> : IElement, INode<T> { }
+
 public interface IElement : IRenderable, INode {
-    public Styles.StyleCollection Style { get; }
-    public ElementInfo Info { get; }
     
+    /// <summary>
+    /// Represents the visual appearance configuration of an element.
+    /// </summary>
+    /// <remarks>
+    /// This property defines various stylistic attributes such as colors, fonts, margins,
+    /// and other visual aspects that dictate the look and feel of an element.
+    /// Adjusting the Style property allows customization or theming of the element's appearance.
+    /// </remarks>
+    public StyleCollection Style { get; }
+
+    /// <summary>
+    /// Contains descriptive information or metadata related to an object or entity.
+    /// </summary>
+    /// <remarks>
+    /// This property provides details or context about the associated object, which may include
+    /// labels, summaries, or other relevant data. It is primarily used to convey additional information
+    /// that helps in understanding or processing the object.
+    /// </remarks>
+    public ElementInfo Info { get; }
+
+    /// <summary>
+    /// Renders the element onto the specified canvas within the defined rectangular region.
+    /// </summary>
+    /// <param name="canvas">The drawing surface where the element will be rendered.</param>
+    /// <param name="rect">The rectangular area within the canvas
+    /// that defines the bounds for rendering the element.</param>
     public void Render(ICharCanvas canvas, Rectangle rect);
-    void IRenderable.Render(ICharCanvas canvas) => Render(canvas, new Rectangle(0, 0, canvas.Width, canvas.Height));
+
+    /// <summary>
+    /// Renders the content onto the specified canvas within the full dimensions of the canvas.
+    /// </summary>
+    /// <param name="canvas">The drawing surface on which the content will be rendered.</param>
+    void IRenderable.Render(ICharCanvas canvas)
+        => Render(canvas, new Rectangle(0, 0, canvas.Width, canvas.Height));
 
     /// <summary>
     /// Calculates the minimum layout size required by the element based on the provided parent size.
@@ -32,9 +66,9 @@ public interface IElement : IRenderable, INode {
     /// <summary>
     /// Computes the render layout size of an element based on the given bounding size.
     /// </summary>
-    /// <param name="bounds">The bounding size within which the element's render layout is calculated.</param>
+    /// <param name="parent">The bounding size within which the element's render layout is calculated.</param>
     /// <returns>A <see cref="Size"/> struct representing the computed width and height of the render layout.</returns>
-    public Size GetRenderSize(Size bounds);
+    public Size GetRenderSize(Size parent);
 
     /// <summary>
     /// Event triggered whenever the state of an element is updated.
@@ -44,7 +78,6 @@ public interface IElement : IRenderable, INode {
     /// allowing additional actions to be performed in response to those updates.
     /// </remarks>
     public event Action OnElementUpdated;
-    
     
     // -------------------------------------------------------------- //
     //                       LAYOUT COMPUTATION                       //
@@ -109,17 +142,17 @@ public interface IElement : IRenderable, INode {
     /// <returns>An <see cref="ElementLayout"/> struct representing the computed layout settings for the element.</returns>
     [Pure]
     public static ElementLayout ComputeLayout(
-        Size         content, 
-        Size         parent,
-        Spacing      margin,
-        Spacing      padding,
-        BorderStyle  border,
-        Dimension    width,
-        Dimension    height,
-        Dimension    minWidth,
-        Dimension    maxWidth,
-        Dimension    minHeight,
-        Dimension    maxHeight) 
+        Size        content, 
+        Size        parent,
+        Spacing     margin,
+        Spacing     padding,
+        BorderStyle border,
+        Dimension   width,
+        Dimension   height,
+        Dimension   minWidth,
+        Dimension   maxWidth,
+        Dimension   minHeight,
+        Dimension   maxHeight) 
     {
         var l = ComputeLayout(content, parent, margin, padding, border);
 

@@ -95,15 +95,15 @@ public class XmlDomLoader {
         
         // Handle Children
         if (xmlElement.HasElements) {
-             var children = xmlElement.Elements().Select(ParseElement).ToList();
-             
-             if (children.Count > 0) {
-                 element.AddChild(children.ToArray());
-             }
+            if (element is not IElement<IElement[]> container)
+                return element;
+            
+            var children = xmlElement.Elements().Select(ParseElement).ToList();
+            if (children.Count > 0) container.SetChildNode(children.ToArray());
         } 
         else if (!string.IsNullOrEmpty(textContent)) {
             try {
-                element.SetChildren(textContent);
+                element.SetChildNode(textContent);
             }
             catch {
                 // ignored
@@ -155,7 +155,7 @@ public class XmlDomLoader {
          if (targetType == typeof(float)) return float.Parse(value);
          if (targetType == typeof(double)) return double.Parse(value);
          if (targetType == typeof(bool)) return bool.Parse(value);
-         if (targetType.IsEnum) return Enum.Parse(targetType, value, true);
+         if (targetType.IsEnum) return ParseEnum(targetType, value);
          if (targetType == typeof(IFont)) return ParseFont(value);
          if (typeof(IParsableValue).IsAssignableFrom(targetType)) {
              var inst = (IParsableValue?)Activator.CreateInstance(targetType);
@@ -174,5 +174,13 @@ public class XmlDomLoader {
             res = IFont.Default;
 
         return res ?? IFont.Default;
+    }
+
+    private static object? ParseEnum(Type targetType, string value) {
+        var res = Enum.TryParse(targetType, value, true, out var result);
+        if (res) return result;
+
+        res = Enum.TryParse(targetType, value.Replace('_', '-'), true, out result);
+        return res ? result : null;
     }
 }

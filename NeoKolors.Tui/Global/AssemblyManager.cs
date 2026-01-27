@@ -3,7 +3,7 @@
 
 using System.Reflection;
 
-namespace NeoKolors.Tui.SourceManagement;
+namespace NeoKolors.Tui.Global;
 
 public static class AssemblyManager {
     private static readonly NKLogger LOGGER = NKDebug.GetLogger(nameof(AssemblyManager));

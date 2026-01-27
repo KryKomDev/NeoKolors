@@ -5,6 +5,7 @@
 
 using NeoKolors.Console.Mouse;
 using NeoKolors.Tui.Events;
+using NeoKolors.Tui.Rendering;
 
 namespace NeoKolors.Tui;
 

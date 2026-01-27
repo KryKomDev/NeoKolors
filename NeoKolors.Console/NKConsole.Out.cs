@@ -10,17 +10,8 @@ using JetBrains.Annotations;
 using Metriks;
 using NeoKolors.Common;
 using NeoKolors.Extensions;
-using static NeoKolors.Common.EscapeCodes;
-using ConsoleColor = System.ConsoleColor;
-
-#if NET8_0_OR_GREATER && !NET10_0
 using SkiaSharp;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
-using SixPix;
-#endif
+using static NeoKolors.Common.EscapeCodes;
 
 using Std = System.Console;
 
@@ -745,8 +736,7 @@ public static partial class NKConsole {
     public static void MoveCursor(int x, int y) =>
         Std.SetCursorPosition(Std.CursorLeft + x, Std.CursorTop + y);
     
-    #if NET8_0_OR_GREATER && !NET10_0
-
+    
     /// <summary>
     /// Moves the console cursor to a specified position based on the provided indices.
     /// </summary>
@@ -776,136 +766,82 @@ public static partial class NKConsole {
         Std.SetCursorPosition(
             Math.Clamp(x.IsFromEnd ? Std.BufferWidth - x.Value : x.Value, 0, Std.BufferWidth - 1),
             Math.Clamp(y.IsFromEnd ? Std.BufferHeight - y.Value : y.Value, 0, Std.BufferWidth - 1));
+
+
+    // ===================================================================================== //
+    //                                ---  SIXEL WRITING  ---                                //
+    // ===================================================================================== //
+
+    #region SIXEL
     
+    /// <summary>
+    /// Writes the given image to the console in the Sixel graphics format.
+    /// </summary>
+    /// <param name="image">The bitmap image to be converted and written to the console in Sixel format.</param>
+    public static void WriteSixel(SKBitmap image) => Std.Write(image.ToSixel());
 
     /// <summary>
-    /// Writes an image to the console in Sixel format from the specified file path.
+    /// Renders a bitmap image in sixel format to the console output at the specified position.
     /// </summary>
-    /// <param name="path">The path to the image file to be displayed in Sixel format.</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteSixel(string path) => WriteSixel(Image.Load<Rgba32>(new DecoderOptions(), path));
+    /// <param name="image">The bitmap image to render.</param>
+    /// <param name="x">The x-coordinate of the starting position.</param>
+    /// <param name="y">The y-coordinate of the starting position.</param>
+    public static void WriteSixel(SKBitmap image, int x, int y) => WriteSixel(image, ^x, ^y);
 
     /// <summary>
-    /// Renders a sixel image onto the console at a specified position, loading the image from the provided file path.
+    /// Renders a given bitmap image as a sixel graphic at a specified position in the console.
     /// </summary>
-    /// <param name="path">The file path of the image to be rendered.</param>
-    /// <param name="x">The horizontal position in the console where the image will be rendered.</param>
-    /// <param name="y">The vertical position in the console where the image will be rendered.</param>
-    public static void WriteSixel(string path, Index x, Index y) =>
-        WriteSixel(Image.Load<Rgba32>(new DecoderOptions(), path), x, y);
-
-    /// <summary>
-    /// Writes a SIXEL-encoded representation of an image to the console.
-    /// </summary>
-    /// <param name="image">The image to encode and display in SIXEL format.</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteSixel(Image<Rgba32> image) => Std.WriteLine(Sixel.Encode(image).ToArray());
-
-    /// <summary>
-    /// Writes an image to the console using the sixel encoding at a specified cursor position.
-    /// </summary>
-    /// <param name="image">The image to display in the console.</param>
-    /// <param name="x">The horizontal position in the console where the image will be displayed.</param>
-    /// <param name="y">The vertical position in the console where the image will be displayed.</param>
-    public static void WriteSixel(Image<Rgba32> image, Index x, Index y) {
-        SetCursorPosition(x, y);
-        WriteSixel(image);
-    }
-
-    /// <summary>
-    /// Writes a Sixel-encoded representation of the provided image at a specific position in the console,
-    /// resizing the image to the specified dimensions before rendering.
-    /// </summary>
-    /// <param name="image">The image to be written to the console.</param>
-    /// <param name="x">The horizontal position of the image start as an <see cref="Index"/>.</param>
-    /// <param name="y">The vertical position of the image start as an <see cref="Index"/>.</param>
-    /// <param name="width">The width to which the image should be resized.</param>
-    /// <param name="height">The height to which the image should be resized.</param>
-    public static void WriteSixel(Image<Rgba32> image, Index x, Index y, int width, int height) {
-        SetCursorPosition(x, y);
-        image.Mutate(context => context.Resize(width, height));
-        WriteSixel(image);           
+    /// <param name="image">The bitmap image to be converted and displayed as sixel graphics.</param>
+    /// <param name="x">The horizontal position in the console buffer where the sixel graphic will be rendered.</param>
+    /// <param name="y">The vertical position in the console buffer where the sixel graphic will be rendered.</param>
+    public static void WriteSixel(SKBitmap image, Index x, Index y) {
+        SaveCursor();
+        MoveCursor(x, y);
+        Std.Write(image.ToSixel());
+        RestoreCursor();
     }
     
     /// <summary>
-    /// Writes a SIXEL-encoded representation of an image to the console.
+    /// Renders an SKBitmap image using the Sixel protocol at a specified position and size in the console.
     /// </summary>
-    /// <param name="image">The image to encode and display in SIXEL format.</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteSixel(SKImage image) => Std.WriteLine(Sixel.Encode(image.Encode().AsStream()).ToArray());
-
-    /// <summary>
-    /// Writes an image to the console using the sixel encoding at a specified cursor position.
-    /// </summary>
-    /// <param name="image">The image to display in the console.</param>
-    /// <param name="x">The horizontal position in the console where the image will be displayed.</param>
-    /// <param name="y">The vertical position in the console where the image will be displayed.</param>
-    public static void WriteSixel(SKImage image, Index x, Index y) {
-        SetCursorPosition(x, y);
-        WriteSixel(image);
-    }
-
-    /// <summary>
-    /// Writes a Sixel-encoded representation of the provided image at a specific position in the console,
-    /// resizing the image to the specified dimensions before rendering.
-    /// </summary>
-    /// <param name="image">The image to be written to the console.</param>
-    /// <param name="x">The horizontal position of the image start as an <see cref="Index"/>.</param>
-    /// <param name="y">The vertical position of the image start as an <see cref="Index"/>.</param>
-    /// <param name="width">The width to which the image should be resized.</param>
-    /// <param name="height">The height to which the image should be resized.</param>
-    /// <param name="sampling">The options for resizing the image.</param>
+    /// <param name="image">The SKBitmap image to render.</param>
+    /// <param name="x">The horizontal position (in columns) of the image's starting point.</param>
+    /// <param name="y">The vertical position (in rows) of the image's starting point.</param>
+    /// <param name="width">The width (in pixels) of the image to render.</param>
+    /// <param name="height">The height (in pixels) of the image to render.</param>
+    /// <param name="sampling">The SKSamplingOptions to apply for scaling the image, if specified.</param>
     public static void WriteSixel(
-        SKImage image, Index x, Index y, int width, int height, SKSamplingOptions? sampling = null) => 
-            WriteSixel(SKBitmap.FromImage(image));
+        SKBitmap           image,
+        int x,     int     y,
+        int width, int     height,
+        SKSamplingOptions? sampling = null)
+            => WriteSixel(image, ^x, ^y, width, height, sampling);
 
     /// <summary>
-    /// Writes the given bitmap to the console in Sixel format.
+    /// Renders a given image as a sixel graphic at the specified position in the console.
     /// </summary>
-    /// <param name="bmp">The bitmap image to be encoded and displayed in Sixel format.</param>
-    public static void WriteSixel(SKBitmap bmp) => 
-        Std.WriteLine(Sixel.Encode(bmp.Encode(SKEncodedImageFormat.Png, 100).AsStream()).ToArray());
-
-    /// <summary>
-    /// Writes the provided SKBitmap object as a sixel graphic to the console.
-    /// </summary>
-    /// <param name="bmp">The bitmap image to encode and write as sixel data.</param>
-    /// <param name="x">The horizontal cursor position where the sixel begins.</param>
-    /// <param name="y">The vertical cursor position where the sixel begins.</param>
-    public static void WriteSixel(SKBitmap bmp, Index x, Index y) {
-        SetCursorPosition(x, y);
-        WriteSixel(bmp);
+    /// <param name="image">The bitmap image to render as a sixel graphic.</param>
+    /// <param name="x">The horizontal position in the console to render the image. Supports relative or absolute indexing.</param>
+    /// <param name="y">The vertical position in the console to render the image. Supports relative or absolute indexing.</param>
+    /// <param name="width">The desired width for the rendered image in pixels.</param>
+    /// <param name="height">The desired height for the rendered image in pixels.</param>
+    /// <param name="sampling">Optional sampling options for scaling the image. Defaults to <see cref="SKSamplingOptions.Default"/> if not provided.</param>
+    public static void WriteSixel(
+        SKBitmap           image,
+        Index x,     Index y,
+        int   width, int   height,
+        SKSamplingOptions? sampling = null) 
+    {
+        var bmp = new SKBitmap(width, height);
+        image.ScalePixels(bmp, sampling ?? SKSamplingOptions.Default);
+        
+        SaveCursor();
+        MoveCursor(x, y);
+        Std.Write(bmp.ToSixel());
+        RestoreCursor();
     }
-
-    /// <summary>
-    /// Writes a sixel-encoded representation of the given image to the console.
-    /// </summary>
-    /// <param name="bmp">The bitmap image to encode and write.</param>
-    /// <param name="x">The horizontal position in the console where the output starts.</param>
-    /// <param name="y">The vertical position in the console where the output starts.</param>
-    /// <param name="width">The desired width of the image in the console.</param>
-    /// <param name="height">The desired height of the image in the console.</param>
-    /// <param name="sampling">The sampling options used for resizing the image, or null to use default options.</param>
-    public static void WriteSixel(SKBitmap bmp, Index x, Index y, int width, int height,
-        SKSamplingOptions? sampling = null) {
-        SetCursorPosition(x, y);
-        bmp = bmp.Resize(new SKImageInfo(width, height), sampling ?? new SKSamplingOptions(SKFilterMode.Nearest));
-        WriteSixel(bmp);
-    }
-
-    /// <summary>
-    /// Writes a sixel graphic to the console at the specified location and dimensions.
-    /// </summary>
-    /// <param name="path">The file path of the image to render as a sixel graphic.</param>
-    /// <param name="x">The horizontal index position where the sixel graphic will begin.</param>
-    /// <param name="y">The vertical index position where the sixel graphic will begin.</param>
-    /// <param name="width">The display width of the sixel graphic.</param>
-    /// <param name="height">The display height of the sixel graphic.</param>
-    /// <param name="sampling">The sampling options used for resizing the image, or null to use default options.</param>
-    public static void WriteSixel(string path, Index x, Index y, int width, int height, SKSamplingOptions? sampling = null) =>
-        WriteSixel(SKBitmap.Decode(path), x, y, width, height, sampling);
-
-    #endif
+    
+    #endregion
 
     #region WINDOW MANIPULATION
 

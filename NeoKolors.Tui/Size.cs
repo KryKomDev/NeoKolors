@@ -43,6 +43,9 @@ public readonly struct Size : IEquatable<Size> {
     public static implicit operator Size(Size2D s) => new(s.X, s.Y);
     
     [DebuggerStepThrough]
+    public static implicit operator Size2D(Size s) => new(s.Width, s.Height);
+    
+    [DebuggerStepThrough]
     public static implicit operator Size(Rectangle r) => r.Size;
 
     [DebuggerStepThrough]

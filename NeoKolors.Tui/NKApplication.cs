@@ -7,6 +7,8 @@ using NeoKolors.Tui.Events;
 using System.Diagnostics;
 using NeoKolors.Console.Mouse;
 using NeoKolors.Tui.Extensions;
+using NeoKolors.Tui.Global;
+using NeoKolors.Tui.Rendering;
 
 namespace NeoKolors.Tui;
 
@@ -16,12 +18,13 @@ public class NKApplication : IMouseSupportingApplication {
     
     // --- Screen ---
     private readonly NKCharScreen _screen = new(Stdio.WindowSize);
-    private Size _lastSize = Stdio.WindowSize;
+    private Size _lastSize     = Size.Zero;
+    private Size _lasPixelSize = Size.Zero;
 
     public NKCharScreen Screen => _screen;
     
     // --- IApp impl ---
-    public IDom Dom { get; }
+    public IRenderable Base { get; set; }
     public NKAppConfig Config { get; }
     
     // --- Flow control ---
@@ -41,9 +44,9 @@ public class NKApplication : IMouseSupportingApplication {
     private void InvokeMouseEvent(MouseEventArgs m) => MouseEvent.Invoke(m);
     private void InvokeResizeEvent(ResizeEventArgs r) => ResizeEvent.Invoke(r);
 
-    public NKApplication(NKAppConfig config, IDom dom) {
+    public NKApplication(NKAppConfig config, IRenderable @base) {
         Config = config;
-        Dom = dom;
+        Base   = @base;
 
         KeyEvent    +=  _     => { };
         MouseEvent  +=  _     => { };
@@ -195,7 +198,9 @@ public class NKApplication : IMouseSupportingApplication {
             }
         }
         
-        LOGGER.Info($"\nTotal frames delayed: {delayedCount}\nTotal delay: {totalDelay}");
+        LOGGER.Info($"\nTotal frames delayed: {delayedCount}" +
+                    $"\nTotal delay: {totalDelay}" +
+                    $"\nAverage delay per frame: {totalDelay / delayedCount}");
     }
     
     private void Render() {
@@ -208,10 +213,13 @@ public class NKApplication : IMouseSupportingApplication {
             _lastSize = Stdio.WindowSize;
             _screen.Resize(_lastSize.Width, _lastSize.Height);
             InvokeResizeEvent(new ResizeEventArgs(_lastSize.Width, _lastSize.Height));
+            _lasPixelSize = NKConsole.GetScreenSizePx();
+            ScreenSizeTracker.SetScreenSizeCh(_lastSize);
+            ScreenSizeTracker.SetScreenSizePx(_lasPixelSize);
         }
         
         OnRender.Invoke();
-        Dom.BaseElement.Render(_screen);
+        Base.Render(_screen);
         _screen.Render();
         
         if (!Config.KeepCursorDisabled) {

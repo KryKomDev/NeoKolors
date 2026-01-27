@@ -22,6 +22,8 @@ public record ElementInfo {
         _classes = [];
     }
 
+    public static ElementInfo Default => new();
+
     public void AddClass(string className) => _classes.Add(className);
     public void RemoveClass(string className) => _classes.Remove(className);
     public bool IsOfClass(string className) => _classes.Contains(className);

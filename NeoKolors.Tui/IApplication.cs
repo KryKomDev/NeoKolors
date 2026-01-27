@@ -14,7 +14,7 @@ public interface IApplication {
     /// Provides capabilities for accessing and manipulating the application's
     /// visual hierarchy and elements.
     /// </summary>
-    public IDom Dom { get; }
+    public IRenderable Base { get; }
 
     /// <summary>
     /// starts the application life-cycle

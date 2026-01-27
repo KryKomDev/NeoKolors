@@ -2,6 +2,7 @@
 // Copyright (c) 2025 KryKom
 
 using System.Collections;
+using NeoKolors.Tui.Events;
 using NeoKolors.Tui.Styles.Properties;
 
 namespace NeoKolors.Tui.Styles;
@@ -9,6 +10,7 @@ namespace NeoKolors.Tui.Styles;
 public class StyleCollection : IEnumerable<IStyleProperty> {
     
     private readonly Dictionary<Type, IStyleProperty> _styles = new();
+    public event StyleChangedHandler StyleChanged = _ => {};
 
     public IStyleProperty this[Type type] {
         get {
@@ -22,6 +24,7 @@ public class StyleCollection : IEnumerable<IStyleProperty> {
                 IStyleProperty.ThrowNotStyle(type);
             
             _styles[type] = value;
+            StyleChanged.Invoke(value);
         }
     }
 
@@ -56,6 +59,8 @@ public class StyleCollection : IEnumerable<IStyleProperty> {
             _styles[style.GetType()] = style;
         else 
             _styles.TryAdd(style.GetType(), style);
+        
+        StyleChanged.Invoke(style);
     }
 
     public void Set(StyleCollection other) {

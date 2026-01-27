@@ -5,6 +5,7 @@ using System.Diagnostics.Contracts;
 using NeoKolors.Console.Mouse;
 using NeoKolors.Tui.Elements.Caching;
 using NeoKolors.Tui.Events;
+using NeoKolors.Tui.Rendering;
 using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Properties;
 using static NeoKolors.Tui.Styles.Values.Direction;
@@ -778,9 +779,9 @@ public class Div : ContainerElement, IInteractableElement {
     
     // ------------------------------------ CHILDREN ------------------------------------- //
     
-    public override OneOf<IElement[], string> GetChildren() => _children.ToArray();
+    public override IElement[] GetChildNode() => _children.ToArray();
 
-    public override void AddChild(IElement[] child) {
+    public void AddChild(IElement[] child) {
         foreach (var c in child.Except(_children).Distinct()) {
             c.OnElementUpdated += InvokeElementUpdated;
         }
@@ -790,9 +791,7 @@ public class Div : ContainerElement, IInteractableElement {
         InvokeElementUpdated();
     }
     
-    public override void SetChildren(OneOf<IElement[], string> children) {
-        if (!children.IsT0)
-            throw new InvalidOperationException("Cannot set text to a div.");
+    public override void SetChildNode(IElement[] childNode) {
 
         // unsubscribe from old children
         foreach (var c in _children) {
@@ -800,11 +799,11 @@ public class Div : ContainerElement, IInteractableElement {
         }
 
         // subscribe to new children
-        foreach (var c in children.AsT0) {
+        foreach (var c in childNode) {
             c.OnElementUpdated += InvokeElementUpdated;
         }
         
-        _children = children.AsT0.ToList();
+        _children = childNode.ToList();
         
         // invoke update
         InvokeElementUpdated();

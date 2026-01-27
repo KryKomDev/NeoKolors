@@ -4,7 +4,7 @@
 using Metriks;
 using SkiaSharp;
 
-namespace NeoKolors.Tui;
+namespace NeoKolors.Tui.Rendering;
 
 public class NKCharCanvas : ICharCanvas {
     
@@ -22,7 +22,7 @@ public class NKCharCanvas : ICharCanvas {
     public NKCharCanvas(int width, int height, bool resize = false) {
         _data = new List2D<CellInfo>(width, height);
         _data.Resize(width, height);
-        _data.Fill(static () => new CellInfo(null, NKStyle.Default, true, 0));
+        _data.Fill(CellInfo.GetDefault);
         _images = [];
         _resize = resize;
     }
@@ -30,7 +30,7 @@ public class NKCharCanvas : ICharCanvas {
     public NKCharCanvas() {
         _data = new List2D<CellInfo>();
         _data.Resize(Stdio.WindowWidth, Stdio.WindowHeight);
-        _data.Fill(static () => new CellInfo(null, NKStyle.Default, true, 0));
+        _data.Fill(CellInfo.GetDefault);
         _images = [];
         _resize = false;
     }
@@ -107,20 +107,21 @@ public class NKCharCanvas : ICharCanvas {
         }
     }
     
-    public void PlaceSixel(SKImage image, Point2D offset, Size2D size, int zIndex = 0) {
-        _images.Add(new SixelImageInfo(image, size, offset, zIndex));
+    public void PlaceSixel(SKBitmap image, Point2D offset, Size2D size, Size2D charSize, int zIndex = 0) {
+        _images.Add(new SixelImageInfo(image, size, charSize, offset, zIndex));
+        _data.Fill(() => CellInfo.GetNull(zIndex), offset, charSize);
     }
 
-    public ISixelImageInfo[] GetSixelImages() {
+    public ISixelImageInfo[] GetSixels() {
         return _images.Select(i => (ISixelImageInfo)i).ToArray();
     }
 
     public void Resize(int width, int height) {
-        _data.Resize(width, height, static () => new CellInfo(null, NKStyle.Default, true, 0));
+        _data.Resize(width, height, CellInfo.GetDefault);
     }
 
     public void Clean() {
-        _data.Fill(static () => new CellInfo(null, NKStyle.Default, true, 0));
+        _data.Fill(CellInfo.GetDefault);
     }
     
     public void Clear() {

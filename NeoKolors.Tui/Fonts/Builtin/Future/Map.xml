@@ -55,6 +55,7 @@
 
     <Component Symbol="," File="special/comma.nkg"/>
     <Component Symbol="." File="special/dot.nkg"/>
+    <Component Symbol=":" File="special/col.nkg"/>
     <Component Symbol="?" File="special/qm.nkg"/>
     <Component Symbol="!" File="special/em.nkg"/>
     <Component Symbol="@" File="special/at.nkg"/>

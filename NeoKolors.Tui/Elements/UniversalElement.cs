@@ -3,6 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
+using NeoKolors.Tui.Rendering;
 using NeoKolors.Tui.Styles.Properties;
 using NeoKolors.Tui.Styles.Values;
 
@@ -13,7 +14,7 @@ namespace NeoKolors.Tui.Elements;
 /// shared by all elements and defines the fundamental structure and behavior for custom elements.
 /// Every property is overridable, so any element can define its defaults.
 /// </summary>
-public abstract class UniversalElement : IElement {
+public abstract class UniversalElement<T> : IElement<T> {
     
     public virtual bool Visible {
         get => _style.Get(DefaultVisible).Value;
@@ -112,7 +113,11 @@ public abstract class UniversalElement : IElement {
     }
     
     protected  virtual PositionProperty DefaultPosition => new();
-    
+
+    public virtual int ZIndex {
+        get => _style.Get(new ZIndexProperty(0)).Value;
+        set => _style.Set(new ZIndexProperty(value));
+    }
     
     // =========================== STYLE CHANGE NOTIFICATIONS =========================== // 
 
@@ -134,9 +139,8 @@ public abstract class UniversalElement : IElement {
     public abstract void Render(ICharCanvas canvas, Rectangle rect);
     public abstract Size GetMinSize(Size parent);
     public abstract Size GetMaxSize(Size parent);
-    public abstract Size GetRenderSize(Size bounds);
+    public abstract Size GetRenderSize(Size parent);
     public abstract event Action? OnElementUpdated;
-    public abstract OneOf<IElement[], string> GetChildren();
-    public abstract void AddChild(IElement[] child);
-    public abstract void SetChildren(OneOf<IElement[], string> children);
+    public abstract T GetChildNode();
+    public abstract void SetChildNode(T childNode);
 }

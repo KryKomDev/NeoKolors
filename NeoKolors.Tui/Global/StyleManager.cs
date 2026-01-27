@@ -4,7 +4,7 @@
 using System.Reflection;
 using NeoKolors.Tui.Styles.Properties;
 
-namespace NeoKolors.Tui.SourceManagement;
+namespace NeoKolors.Tui.Global;
 
 /// <summary>
 /// Manages and provides access to a collection of styles within the application.

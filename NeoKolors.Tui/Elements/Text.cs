@@ -5,6 +5,7 @@ using System.Diagnostics.Contracts;
 using NeoKolors.Console.Mouse;
 using NeoKolors.Tui.Elements.Caching;
 using NeoKolors.Tui.Events;
+using NeoKolors.Tui.Rendering;
 using NeoKolors.Tui.Styles.Properties;
 using StyleCollection = NeoKolors.Tui.Styles.StyleCollection;
 
@@ -262,19 +263,11 @@ public class Text : TextElement, INotifyOnRender, IInteractableElement {
     
     #region INode impl
     
-    public override OneOf<IElement[], string> GetChildren() => _text;
-    public override void AddChild(IElement[] child) => throw new InvalidOperationException("Cannot add children to paragraph.");
+    public override string GetChildNode() => _text;
 
-    public override void SetChildren(OneOf<IElement[], string> children) {
-        if (children.IsT0)
-            throw new InvalidOperationException("Cannot set children to paragraph.");
-
-        var text = children.AsT1;
-        
-        if (text == _text) return;
-
-        _text = text;
-        
+    public override void SetChildNode(string childNode) {
+        if (childNode == _text) return;
+        _text = childNode;
         InvokeElementUpdated();
     }
 

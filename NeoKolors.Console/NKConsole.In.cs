@@ -6,6 +6,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Text;
+using Metriks;
 using NeoKolors.Common;
 using NeoKolors.Console.Events;
 using NeoKolors.Console.Mouse;
@@ -430,14 +431,14 @@ public static partial class NKConsole {
         var split = ReadUntil('t', true).Substring(1).Split(';');
         var h = int.Parse(split[0]);
         var w = int.Parse(split[1]);
-        _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.WinSize((w, h)));
+        _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.WinSize(new Size2D(w, h)));
     }
     
     private static void HandleWinSizePxResponse() {
         var split = ReadUntil('t', true).Substring(1).Split(';');
         var h = int.Parse(split[0]);
         var w = int.Parse(split[1]);
-        _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.WinSizePx((w, h)));
+        _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.WinSizePx(new Size2D(w, h)));
     }
 
     private static void HandleWinPosResponse() {
@@ -752,7 +753,7 @@ public static partial class NKConsole {
     /// A tuple where the first value is the width in pixels and the second
     /// value is the height in pixels of the console window.
     /// </returns>
-    public static (int Width, int Height) GetScreenSizePx() => GetScreenSizePxAsync().Result;
+    public static Size2D GetScreenSizePx() => GetScreenSizePxAsync().Result;
 
     /// <summary>
     /// Retrieves the current size of the console window in pixels as a tuple containing
@@ -762,17 +763,17 @@ public static partial class NKConsole {
     /// A tuple where the first value is the width in pixels and the second
     /// value is the height in pixels of the console window.
     /// </returns>
-    public static async Task<(int Width, int Height)> GetScreenSizePxAsync() {
+    public static async Task<Size2D> GetScreenSizePxAsync() {
         Std.Write(EscapeCodes.REPORT_WINDOW_SIZE_PX);
         
         // If multithreaded input interception is not enabled
         if (!InterceptInput) {
             var res = ReadUntil('t', true);
             var split = res.Split(';');
-            return (int.Parse(split[1]), int.Parse(split[2]));
+            return new Size2D(int.Parse(split[1]), int.Parse(split[2]));
         }
         
-        var tcs = new TaskCompletionSource<(int Width, int Height)>();
+        var tcs = new TaskCompletionSource<Size2D>();
         
         WinOpsResponseEventHandler h = null!;
         h = a => {

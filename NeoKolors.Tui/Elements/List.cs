@@ -2,13 +2,14 @@
 // Copyright (c) 2025 KryKom
 
 using NeoKolors.Tui.Elements.Caching;
+using NeoKolors.Tui.Rendering;
 using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Properties;
 using NeoKolors.Tui.Styles.Values;
 
 namespace NeoKolors.Tui.Elements;
 
-public class List : UniversalElement {
+public class List : UniversalElement<IElement[]> {
     
     
     private readonly LayoutCacher _layoutCacher;
@@ -247,13 +248,13 @@ public class List : UniversalElement {
     
     // -------------------------------- RENDER LAYOUT COMP ------------------------------- //
     
-    public override Size GetRenderSize(Size bounds) {
+    public override Size GetRenderSize(Size parent) {
         if (CanUseRenderCache())
             return _layoutCacher.GetRenderLayout().ElementSize;
         
-        var (e, c) = GetRenderLayout(bounds);
-        _layoutCacher.SetRender(bounds, e);
-        _childrenCacher.SetRender(bounds, c);
+        var (e, c) = GetRenderLayout(parent);
+        _layoutCacher.SetRender(parent, e);
+        _childrenCacher.SetRender(parent, c);
         SetCanUseRenderCache();
 
         return e.ElementSize;
@@ -296,9 +297,9 @@ public class List : UniversalElement {
     
     // ------------------------------------ CHILDREN ------------------------------------- //
     
-    public override OneOf<IElement[], string> GetChildren() => _children.ToArray();
+    public override IElement[] GetChildNode() => _children.ToArray();
 
-    public override void AddChild(IElement[] child) {
+    public void AddChild(IElement[] child) {
         foreach (var c in child.Except(_children).Distinct()) {
             c.OnElementUpdated += InvokeElementUpdated;
         }
@@ -308,9 +309,7 @@ public class List : UniversalElement {
         InvokeElementUpdated();
     }
     
-    public override void SetChildren(OneOf<IElement[], string> children) {
-        if (!children.IsT0)
-            throw new InvalidOperationException("Cannot set text to a div.");
+    public override void SetChildNode(IElement[] childNode) {
 
         // unsubscribe from old children
         foreach (var c in _children) {
@@ -318,11 +317,11 @@ public class List : UniversalElement {
         }
 
         // subscribe to new children
-        foreach (var c in children.AsT0) {
+        foreach (var c in childNode) {
             c.OnElementUpdated += InvokeElementUpdated;
         }
         
-        _children = children.AsT0.ToList();
+        _children = childNode.ToList();
         
         // invoke update
         InvokeElementUpdated();

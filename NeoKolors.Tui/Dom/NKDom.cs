@@ -18,13 +18,12 @@ public class NKDom : IDom {
     public static IElement? GetElementById(string id, IElement element) {
         if (element.Info.Id == id) return element;
         
-        var oneOf = element.GetChildren();
+        var oneOf = element.GetChildNode();
         
-        if (oneOf.IsT1) return null;
+        if (oneOf is not IElement[] children) return null;
 
-        var t0 = oneOf.AsT0;
-        for (var i = 0; i < t0.Length; i++) {
-            var c = t0[i];
+        for (var i = 0; i < children.Length; i++) {
+            var c = children[i];
             var res = GetElementById(id, c);
             if (res != null) return res;
         }
@@ -41,13 +40,12 @@ public class NKDom : IDom {
     public static void GetElementsByClass(string className, IElement element, List<IElement> result) {
         if (element.Info.IsOfClass(className)) result.Add(element);
         
-        var children = element.GetChildren();
+        var node = element.GetChildNode();
         
-        if (children.IsT1) return;
+        if (node is not IElement[] children) return;
 
-        var t0 = children.AsT0;
-        for (var i = 0; i < t0.Length; i++) {
-            var c = t0[i];
+        for (var i = 0; i < children.Length; i++) {
+            var c = children[i];
             GetElementsByClass(className, c, result);
         }
     }
@@ -61,13 +59,12 @@ public class NKDom : IDom {
     public static void GetElementsByType(Type type, IElement element, List<IElement> result) {
         if (element.GetType() == type) result.Add(element);
         
-        var children = element.GetChildren();
+        var node = element.GetChildNode();
         
-        if (children.IsT1) return;
+        if (node is not IElement[] children) return;
 
-        var t0 = children.AsT0;
-        for (var i = 0; i < t0.Length; i++) {
-            var c = t0[i];
+        for (var i = 0; i < children.Length; i++) {
+            var c = children[i];
             GetElementsByType(type, c, result);
         }
     }
@@ -81,13 +78,12 @@ public class NKDom : IDom {
     public static void All(IElement element, List<IElement> result) {
         result.Add(element);
         
-        var children = element.GetChildren();
+        var node = element.GetChildNode();
         
-        if (children.IsT1) return;
-        
-        var t0 = children.AsT0;
-        for (int i = 0; i < t0.Length; i++) {
-            var c = t0[i];
+        if (node is not IElement[] children) return;
+
+        for (int i = 0; i < children.Length; i++) {
+            var c = children[i];
             All(c, result);
         }
     }

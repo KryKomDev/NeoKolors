@@ -10,10 +10,10 @@ using NeoKolors.Tui.Styles.Values;
 namespace NeoKolors.Tui.Elements;
 
 /// <summary>
-/// Represents a text-based elementOld in the NeoKolors TUI framework, inheriting from <see cref="UniversalElement"/>.
+/// Represents a text-based elementOld in the NeoKolors TUI framework, inheriting from <see cref="UniversalElement{T}"/>.
 /// This class provides properties for styling text, such as font and color settings.
 /// </summary>
-public abstract class TextElement : UniversalElement {
+public abstract class TextElement : UniversalElement<string> {
     
     public virtual IFont Font {
         get => _style.Get(new FontProperty(DefaultFont)).Value;

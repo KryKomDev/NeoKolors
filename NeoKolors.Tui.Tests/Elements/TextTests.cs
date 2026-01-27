@@ -30,14 +30,8 @@ public class TextTests {
     [Fact]
     public void SetChildren_WithText_ShouldUpdateContent() {
         var text = new Text("Initial");
-        text.SetChildren("New Content");
+        text.SetChildNode("New Content");
         Assert.Equal("New Content", text.Content);
-    }
-
-    [Fact]
-    public void SetChildren_WithElements_ShouldThrow() {
-        var text = new Text("Initial");
-        Assert.Throws<InvalidOperationException>(() => text.SetChildren(new IElement[] { new Text("Child") }));
     }
 
     [Fact]

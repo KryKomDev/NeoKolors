@@ -4,6 +4,7 @@
 using System.Runtime.CompilerServices;
 using Metriks;
 using NeoKolors.Tui.Fonts.Exceptions;
+using NeoKolors.Tui.Rendering;
 using NeoKolors.Tui.Styles.Values;
 using static NeoKolors.Tui.Fonts.NKFontStringTokenizer;
 using static NeoKolors.Tui.Fonts.NKFontStringTokenizer.TokenType;
@@ -194,22 +195,11 @@ public class NKFont : IFont {
                     continue;
                 }
                 
-                var tokenData = token.Data;
+                var glyph = GetGlyph(token);
+
+                int yp = y - glyph.BaselineOffset;
                 
-                var glyph = token.Type switch {
-                    INVALID => 
-                        _invalidTokenGlyph,
-                    SIMPLE => 
-                        _simpleGlyphs[tokenData!.Value.AsT0.Character].Glyph,
-                    LIGATURE => 
-                        _ligatureGlyphs[tokenData!.Value.AsT1.Ligature].Glyph,
-                    AUTO_COMPOUND => 
-                        _autoCompoundGlyphs[tokenData!.Value.AsT2.Second]
-                            .GetGlyph(_simpleGlyphs[tokenData.Value.AsT0.Character].Glyph),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
-                
-                canvas.Place(glyph.Glyph, new Point2D(x, y));
+                canvas.Place(glyph.Glyph, new Point2D(x, yp));
                 canvas.Style(style, new Point(x, y), glyph.Glyph);
                 
                 x += charSize;
@@ -267,25 +257,12 @@ public class NKFont : IFont {
                     continue;
                 }
                 
-                var tokenData = token.Data;
-                
-                var glyph = token.Type switch {
-                    INVALID => 
-                        _invalidTokenGlyph,
-                    SIMPLE => 
-                        _simpleGlyphs[tokenData!.Value.AsT0.Character].Glyph,
-                    LIGATURE => 
-                        _ligatureGlyphs[tokenData!.Value.AsT1.Ligature].Glyph,
-                    AUTO_COMPOUND => 
-                        _autoCompoundGlyphs[tokenData!.Value.AsT2.Second]
-                            .GetGlyph(_simpleGlyphs[tokenData.Value.AsT2.Main].Glyph),
-                    _ => throw new ArgumentOutOfRangeException()
-                };
+                var glyph = GetGlyph(token);
 
-                var idk = y - glyph.BaselineOffset - glyph.Height;
+                var yp = y - glyph.BaselineOffset - glyph.Height;
                 
-                canvas.Place(glyph.Glyph, new Point2D(x, idk));
-                canvas.Style(style, new Point(x, idk), glyph.Glyph);
+                canvas.Place(glyph.Glyph, new Point2D(x, yp));
+                canvas.Style(style, new Point(x, yp), glyph.Glyph);
                 
                 x += glyph.Width + charSpacing;
             }
@@ -339,24 +316,13 @@ public class NKFont : IFont {
                 if (token.Type == SPACE) {
                     continue;
                 }
-                
-                var tokenData = token.Data;
-                
-                var glyph = token.Type switch {
-                    INVALID 
-                        => _invalidTokenGlyph,
-                    SIMPLE
-                        => _simpleGlyphs[tokenData!.Value.AsT0.Character].Glyph,
-                    LIGATURE 
-                        => _ligatureGlyphs[tokenData!.Value.AsT1.Ligature].Glyph,
-                    AUTO_COMPOUND 
-                        => _autoCompoundGlyphs[tokenData!.Value.AsT2.Second]
-                            .GetGlyph(_simpleGlyphs[tokenData.Value.AsT0.Character].Glyph),
-                    _   => throw new ArgumentOutOfRangeException()
-                };
+
+                var glyph = GetGlyph(token);
 
                 x += lineData.Offsets[j];
+                
                 var idk = y - glyph.BaselineOffset - glyph.Height;
+                
                 canvas.Place(glyph.Glyph, new Point2D(x, idk));
                 canvas.Style(style, new Point(x, idk), glyph.Glyph);
             }
@@ -367,7 +333,8 @@ public class NKFont : IFont {
     
     // todo: line kerning
     
-    private void PlaceVariableKerningWithAlignWithLineKerning(Token[] tokens,
+    private void PlaceVariableKerningWithAlignWithLineKerning(
+        Token[]         tokens,
         ICharCanvas     canvas,
         Rectangle       bounds,
         NKStyle         style,
@@ -625,7 +592,11 @@ public class NKFont : IFont {
                     lastSpaceIndex = i;
                 } break;
                 case NEWLINE: {
-                    lines.Add(new LineData(currentWidth, tokens.InRange(lineStart, i).ToArray()));
+                    lines.Add(new LineData(
+                        currentWidth, 
+                        up.InRange(lineStart, i).Max() - dn.InRange(lineStart, i).Min(),
+                        tokens.InRange(lineStart, i).ToArray()
+                    ));
                     lineStart = i + 1;
                 } break;
                 default:
