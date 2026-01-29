@@ -21,7 +21,21 @@ public interface IParsableValue<TSelf> : IParsableValue where TSelf : struct, IP
     /// <param name="provider">An object that provides culture-specific formatting information about <paramref name="s" />.</param>
     /// <param name="result">On return, contains the result of successfully parsing <paramref name="s" /> or an undefined value on failure.</param>
     /// <returns><c>true</c> if <paramref name="s" /> was successfully parsed; otherwise, <c>false</c>.</returns>
-    public bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out TSelf result);
+    public bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out TSelf result) {
+        if (s == null) {
+            result = default;
+            return false;
+        }
+        
+        try {
+            result = Parse(s, provider);
+            return true;
+        }
+        catch {
+            result = default;
+            return false;
+        }
+    }
     
     object IParsableValue.Parse(string s, IFormatProvider? provider) => Parse(s, provider);
 

@@ -22,13 +22,39 @@ public static class AppEventBus {
     public static IApplication Application =>
         SOURCE_APPLICATION ?? throw new NullReferenceException("Source Application not set!");
 
+    public static event KeyEventHandler      KeyEvent    = delegate { };
+    public static event MouseEventHandler    MouseEvent  = delegate { };
+    public static event ResizeEventHandler   ResizeEvent = delegate { };
+    public static event AppStartEventHandler StartEvent  = delegate { };
+    public static event AppStopEventHandler  StopEvent   = delegate { };
+    
     /// <summary>
     /// Sets the source application instance for the event bus, allowing event handlers to be
     /// subscribed or unsubscribed in relation to this source application.
     /// </summary>
-    /// <param name="sourceApplicationOld">The application instance that will serve as the source of events.</param>
-    public static void SetSourceApplication(IApplication sourceApplicationOld) {
-        SOURCE_APPLICATION = sourceApplicationOld;
+    /// <param name="sourceApplication">The application instance that will serve as the source of events.</param>
+    public static void SetSourceApplication(IApplication sourceApplication) {
+        if (SOURCE_APPLICATION != null) {
+            SOURCE_APPLICATION.StartEvent  -= StartEvent;
+            SOURCE_APPLICATION.StopEvent   -= StopEvent;
+            SOURCE_APPLICATION.ResizeEvent -= ResizeEvent;
+            SOURCE_APPLICATION.KeyEvent    -= KeyEvent;
+
+            if (SOURCE_APPLICATION is IMouseSupportingApplication om) {
+                om.MouseEvent -= MouseEvent;
+            }
+        }
+        
+        SOURCE_APPLICATION = sourceApplication;
+        
+        SOURCE_APPLICATION.StartEvent  += StartEvent;
+        SOURCE_APPLICATION.StopEvent   += StopEvent;
+        SOURCE_APPLICATION.ResizeEvent += ResizeEvent;
+        SOURCE_APPLICATION.KeyEvent    += KeyEvent;
+
+        if (SOURCE_APPLICATION is IMouseSupportingApplication nm) {
+            nm.MouseEvent += MouseEvent;
+        }
     }
 
     /// <summary>
@@ -37,8 +63,7 @@ public static class AppEventBus {
     /// </summary>
     /// <param name="handler">The method to be invoked when a key event is triggered.</param>
     public static void SubscribeToKeyEvent(KeyEventHandler handler) {
-        if (SOURCE_APPLICATION != null)
-            SOURCE_APPLICATION.KeyEvent += handler;
+        KeyEvent += handler;
     }
 
     /// <summary>
@@ -46,8 +71,7 @@ public static class AppEventBus {
     /// </summary>
     /// <param name="handler">The key event handler to be removed from the event subscription.</param>
     public static void UnsubscribeFromKeyEvent(KeyEventHandler handler) {
-        if (SOURCE_APPLICATION != null)
-            SOURCE_APPLICATION.KeyEvent -= handler;
+        KeyEvent -= handler;
     }
     
     /// <summary>
@@ -56,8 +80,7 @@ public static class AppEventBus {
     /// </summary>
     /// <param name="handler">The method to be invoked when a key event is triggered.</param>
     public static void SubscribeToMouseEvent(MouseEventHandler handler) {
-        if (SOURCE_APPLICATION is IMouseSupportingApplication msa)
-            msa.MouseEvent += handler;
+        MouseEvent += handler;
     }
 
     /// <summary>
@@ -65,8 +88,7 @@ public static class AppEventBus {
     /// </summary>
     /// <param name="handler">The key event handler to be removed from the event subscription.</param>
     public static void UnsubscribeFromMouseEvent(MouseEventHandler handler) {
-        if (SOURCE_APPLICATION is IMouseSupportingApplication msa)
-            msa.MouseEvent -= handler;
+        MouseEvent -= handler;
     }
 
     /// <summary>
@@ -75,8 +97,7 @@ public static class AppEventBus {
     /// </summary>
     /// <param name="handler">The handler to be invoked when the resize event is triggered.</param>
     public static void SubscribeToResizeEvent(ResizeEventHandler handler) {
-        if (SOURCE_APPLICATION != null)
-            SOURCE_APPLICATION.ResizeEvent += handler;
+        ResizeEvent += handler;
     }
 
     /// <summary>
@@ -84,8 +105,7 @@ public static class AppEventBus {
     /// </summary>
     /// <param name="handler">The event handler to be unsubscribed from the resize event.</param>
     public static void UnsubscribeFromResizeEvent(ResizeEventHandler handler) {
-        if (SOURCE_APPLICATION != null)
-            SOURCE_APPLICATION.ResizeEvent -= handler;
+        ResizeEvent -= handler;
     }
 
     /// <summary>
@@ -94,8 +114,7 @@ public static class AppEventBus {
     /// </summary>
     /// <param name="handler">The delegate that will handle the start event.</param>
     public static void SubscribeToStartEvent(AppStartEventHandler handler) {
-        if (SOURCE_APPLICATION != null)
-            SOURCE_APPLICATION.StartEvent += handler;
+        StartEvent += handler;
     }
 
     /// <summary>
@@ -104,8 +123,7 @@ public static class AppEventBus {
     /// </summary>
     /// <param name="handler">The event handler to unsubscribe from the application start event.</param>
     public static void UnsubscribeFromStartEvent(AppStartEventHandler handler) {
-        if (SOURCE_APPLICATION != null)
-            SOURCE_APPLICATION.StartEvent -= handler;
+        StartEvent -= handler;
     }
 
     /// <summary>
@@ -114,8 +132,7 @@ public static class AppEventBus {
     /// </summary>
     /// <param name="handler">The method to be invoked when the stop event occurs.</param>
     public static void SubscribeToStopEvent(AppStopEventHandler handler) {
-        if (SOURCE_APPLICATION != null)
-            SOURCE_APPLICATION.StopEvent += handler;
+        StopEvent += handler;
     }
 
     /// <summary>
@@ -124,7 +141,6 @@ public static class AppEventBus {
     /// </summary>
     /// <param name="handler">The method to be removed from the invocation list of the stop event.</param>
     public static void UnsubscribeFromStopEvent(AppStopEventHandler handler) {
-        if (SOURCE_APPLICATION != null)
-            SOURCE_APPLICATION.StopEvent -= handler;
+        StopEvent -= handler;
     }
 }

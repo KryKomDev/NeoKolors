@@ -138,7 +138,7 @@ public static class NKGlyphReader {
         using var reader = new StreamReader(stream, Encoding.UTF8);
         string s = reader.ReadToEnd();
         
-        var lines = s.Split('\n');
+        var lines = s.Split(["\r\n", "\n", "\r"], StringSplitOptions.None);
         
         return ReadGlyph(lines, mask);
     }

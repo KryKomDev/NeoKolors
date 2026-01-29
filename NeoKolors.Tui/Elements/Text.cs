@@ -6,15 +6,11 @@ using NeoKolors.Console.Mouse;
 using NeoKolors.Tui.Elements.Caching;
 using NeoKolors.Tui.Events;
 using NeoKolors.Tui.Rendering;
-using NeoKolors.Tui.Styles.Properties;
 using StyleCollection = NeoKolors.Tui.Styles.StyleCollection;
 
 namespace NeoKolors.Tui.Elements;
 
 public class Text : TextElement, INotifyOnRender, IInteractableElement {
-    
-    private static readonly NKLogger LOGGER = NKDebug.GetLogger<Button>();
-    private static bool LOGGED_SRC_ERR = false;
     
     private readonly LayoutCacher _layoutCacher;
     private string _text;
@@ -90,15 +86,6 @@ public class Text : TextElement, INotifyOnRender, IInteractableElement {
     public event Action OnHoverOut = () => { };
 
     private void SubscribeMouseEvents() {
-        if (!AppEventBus.IsSourceSet) {
-            if (LOGGED_SRC_ERR) return;
-            
-            LOGGER.Error("Source application not set! Cannot register");
-            LOGGED_SRC_ERR = true;
-
-            return;
-        }
-        
         AppEventBus.SubscribeToMouseEvent(InvokeMouseAction);
     }
     
@@ -195,7 +182,7 @@ public class Text : TextElement, INotifyOnRender, IInteractableElement {
     protected ElementLayout ComputeMinLayout(Size parent) {
         var t = Font.GetMinSize(_text);
         return IElement.ComputeLayout(
-            t, parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+            t, parent, Margin, Padding, Border);
     }
     
     public override Size GetMaxSize(Size parent) {
@@ -222,7 +209,7 @@ public class Text : TextElement, INotifyOnRender, IInteractableElement {
     protected ElementLayout ComputeMaxLayout(Size parent) {
         var compute = Font.GetSize(_text);
         return IElement.ComputeLayout(
-            compute, parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+            compute, parent, Margin, Padding, Border);
     }
 
     public override Size GetRenderSize(Size parent) {
@@ -272,8 +259,4 @@ public class Text : TextElement, INotifyOnRender, IInteractableElement {
     }
 
     #endregion
-    
-    // --- Style overrides ---
-
-    protected override BackgroundColorProperty DefaultBackgroundColor => new(NKColor.Inherit);
 }

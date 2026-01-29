@@ -2,7 +2,6 @@
 // Copyright (c) 2025 KryKom
 
 using NeoKolors.Console.Events;
-using NeoKolors.Tui.Dom;
 using NeoKolors.Tui.Events;
 
 namespace NeoKolors.Tui;

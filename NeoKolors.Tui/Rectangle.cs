@@ -3,11 +3,14 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Diagnostics;
+
 namespace NeoKolors.Tui;
 
 /// <summary>
 /// a 2D rectangle structure
 /// </summary>
+[DebuggerStepThrough]
 public struct Rectangle : IEquatable<Rectangle> {
     
     private int _lowerX;

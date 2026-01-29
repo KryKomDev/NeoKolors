@@ -91,7 +91,7 @@ public abstract class UniversalElement<T> : IElement<T> {
         set => _style.Set(new BackgroundColorProperty(value));
     }
 
-    protected virtual BackgroundColorProperty DefaultBackgroundColor => new(NKColor.Default);
+    protected virtual BackgroundColorProperty DefaultBackgroundColor => new(NKColor.Inherit);
 
     public Rectangle GridAlign {
         get => _style.Get(DefaultGridAlign).Value;

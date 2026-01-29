@@ -29,7 +29,7 @@ public class NKCharCanvas : ICharCanvas {
 
     public NKCharCanvas() {
         _data = new List2D<CellInfo>();
-        _data.Resize(Stdio.WindowWidth, Stdio.WindowHeight);
+        _data.Resize(Stdio.BufferWidth, Stdio.BufferHeight);
         _data.Fill(CellInfo.GetDefault);
         _images = [];
         _resize = false;

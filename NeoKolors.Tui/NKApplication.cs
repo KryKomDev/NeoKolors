@@ -2,7 +2,6 @@
 // Copyright (c) 2025 KryKom
 
 using NeoKolors.Console.Events;
-using NeoKolors.Tui.Dom;
 using NeoKolors.Tui.Events;
 using System.Diagnostics;
 using NeoKolors.Console.Mouse;
@@ -17,7 +16,7 @@ public class NKApplication : IMouseSupportingApplication {
     private static readonly NKLogger LOGGER = NKDebug.GetLogger<NKApplication>();
     
     // --- Screen ---
-    private readonly NKCharScreen _screen = new(Stdio.WindowSize);
+    private readonly NKCharScreen _screen = new(Stdio.BufferSize);
     private Size _lastSize     = Size.Zero;
     private Size _lasPixelSize = Size.Zero;
 
@@ -209,8 +208,8 @@ public class NKApplication : IMouseSupportingApplication {
             NKConsole.SaveCursor();
         }
         
-        if (_lastSize != Stdio.WindowSize) {
-            _lastSize = Stdio.WindowSize;
+        if (_lastSize != Stdio.BufferSize) {
+            _lastSize = Stdio.BufferSize;
             _screen.Resize(_lastSize.Width, _lastSize.Height);
             InvokeResizeEvent(new ResizeEventArgs(_lastSize.Width, _lastSize.Height));
             _lasPixelSize = NKConsole.GetScreenSizePx();

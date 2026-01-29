@@ -135,11 +135,34 @@ public class XmlDomLoader {
                 LOGGER.Error(e);
             }
         }
-        else if (IStyleProperty.TryGetByName(name, out var type) && typeof(IStyleProperty<,>).IsAssignableFrom(type)) {
+        else if (IStyleProperty.TryGetByName(name, out var type)) {
             try {
-                var target = type!.GenericTypeArguments[0];
+                Type target;
+
+                if (IStyleProperty.IsPartial(type)) {
+                    var partial = (IPartialStyleProperty?)Activator.CreateInstance(type);
+
+                    if (partial == null) {
+                        LOGGER.Error("Construction of a partial property failed.");
+                        return;
+                    }
+                    
+                    target = partial.ValueType;
+                }
+                else {
+                    var full = (IStyleProperty?)Activator.CreateInstance(type);
+
+                    if (full == null) {
+                        LOGGER.Error("Construction of a property failed.");
+                        return;
+                    }
+                    
+                    target = full.ValueType;
+                }
+                
                 var convertedValue = ConvertValue(value, target);
                 var property = (IStyleProperty?)Activator.CreateInstance(type, convertedValue);
+                
                 if (property != null)
                     element.Style.Set(property);
             } 

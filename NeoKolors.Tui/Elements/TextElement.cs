@@ -35,4 +35,6 @@ public abstract class TextElement : UniversalElement<string> {
     }
 
     protected virtual Align DefaultTextAlign => new(HorizontalAlign.LEFT, VerticalAlign.TOP);
+
+    protected override BackgroundColorProperty DefaultBackgroundColor => new(NKColor.Inherit);
 }

@@ -3,7 +3,7 @@
 
 namespace NeoKolors.Tui.Styles.Values;
 
-internal readonly record struct CheckerBckg {
+internal readonly record struct CheckerBckg : IParsableValue<CheckerBckg> {
     public NKColor C1 { get; }
     public NKColor C2 { get; }
     public int Width { get; }
@@ -17,5 +17,14 @@ internal readonly record struct CheckerBckg {
         Enabled = enabled;
         Width = width;
         Height = height;
+    }
+
+
+    public CheckerBckg Parse(string s, IFormatProvider? provider) {
+        var c = s.Split(' ');
+        if (c.Length != 2) 
+            throw new FormatException();
+
+        return new CheckerBckg(NKColor.Parse(c[0]), NKColor.Parse(c[1]));
     }
 }

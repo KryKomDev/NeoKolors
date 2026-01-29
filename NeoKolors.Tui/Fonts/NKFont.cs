@@ -210,12 +210,12 @@ public class NKFont : IFont {
     }
 
     private void PlaceVariable_NoKerning(Token[] tokens,
-        ICharCanvas canvas,
-        Rectangle bounds,
-        NKStyle style,
+        ICharCanvas     canvas,
+        Rectangle       bounds,
+        NKStyle         style,
         HorizontalAlign horizontalAlign,
-        VerticalAlign verticalAlign,
-        bool overflow) 
+        VerticalAlign   verticalAlign,
+        bool            overflow) 
     {
         var lines = SplitLines_Variable_NoKerning(tokens, bounds.Width);
         var wordSpacing = _info.SpacingInfo.AsVariable.WordSpacing;
@@ -895,19 +895,19 @@ public class NKFont : IFont {
         int maxWidth = 0;
 
         for (int i = 0; i < lines.Length; i++) {
-            var canv = new NKCharCanvas();
+            var canv = new NKCharCanvas(0, 0, true);
             PlaceString(str, canv);
             maxWidth = Math.Max(maxWidth, canv.Width);
         }
         
-        var canvas = new NKCharCanvas();
+        var canvas = new NKCharCanvas(0, 0, true);
         PlaceString(str, canvas);
         
         return new Size(maxWidth, canvas.Height);
     }
     
     public Size GetSize(string str) {
-        var canv = new NKCharCanvas();
+        var canv = new NKCharCanvas(0, 0, true);
         PlaceString(str, canv);
         return new Size(canv.Width, canv.Height);
     }

@@ -241,14 +241,12 @@ public readonly struct NKColor : ICloneable, IEquatable<NKColor>, IFormattable, 
             }
         }
         
-        if (string.Equals(s, "Default", StringComparison.OrdinalIgnoreCase)) return NKColor.Default;
-        if (string.Equals(s, "Inherit", StringComparison.OrdinalIgnoreCase)) return NKColor.Inherit;
+        if (string.Equals(s, "Default", StringComparison.OrdinalIgnoreCase)) return Default;
+        if (string.Equals(s, "Inherit", StringComparison.OrdinalIgnoreCase)) return Inherit;
 
         return Enum.TryParse<NKConsoleColor>(s, true, out var nkc) 
-            ? new NKColor(nkc) 
-            : Enum.TryParse<ConsoleColor>(s, true, out var cc) 
-                ? new NKColor(cc) 
-                : throw new FormatException($"Invalid color: {s}");
+            ? new NKColor(nkc)
+            : throw new FormatException($"Invalid color: {s}");
     }
 
     public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out NKColor result) {

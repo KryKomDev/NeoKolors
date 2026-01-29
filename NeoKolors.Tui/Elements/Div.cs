@@ -14,9 +14,6 @@ namespace NeoKolors.Tui.Elements;
 
 public class Div : ContainerElement, IInteractableElement {
     
-    private static readonly NKLogger LOGGER = NKDebug.GetLogger<Button>();
-    private static bool LOGGED_SRC_ERR = false;
-    
     protected readonly LayoutCacher _layoutCacher;
     protected readonly ChildrenLayoutCacher _childrenCacher;
     
@@ -41,7 +38,6 @@ public class Div : ContainerElement, IInteractableElement {
     }
     
     public override ElementInfo Info { get; }
-    
     
     private Rectangle _lastBounds = Rectangle.Zero;
     private bool _hoverEnable;
@@ -75,15 +71,6 @@ public class Div : ContainerElement, IInteractableElement {
     public event Action OnHoverOut = () => { };
 
     private void SubscribeMouseEvents() {
-        if (!AppEventBus.IsSourceSet) {
-            if (LOGGED_SRC_ERR) return;
-            
-            LOGGER.Error("Source application not set! Cannot register");
-            LOGGED_SRC_ERR = true;
-
-            return;
-        }
-        
         AppEventBus.SubscribeToMouseEvent(InvokeMouseAction);
     }
     
@@ -132,13 +119,13 @@ public class Div : ContainerElement, IInteractableElement {
         #else
 
         var (el, cl) = GetRenderLayout(rect);
+
+        #endif
         
         var pos = new Point(
             Position.AbsoluteX ? Position.X.ToScalar(rect.Width) : rect.LowerX + Position.X.ToScalar(rect.Width), 
             Position.AbsoluteY ? Position.Y.ToScalar(rect.Width) : rect.LowerY + Position.Y.ToScalar(rect.Height)
         );
-        
-        #endif
         
         if (!BackgroundColor.IsInherit) {
             canvas.Fill(el.Border - Size.Two + pos + Point.One, ' ');
@@ -150,6 +137,11 @@ public class Div : ContainerElement, IInteractableElement {
         }
         else {
             canvas.StyleBackground(el.Border + pos, BackgroundColor);
+        }
+        
+        var checkerBckg = Style.Get<CheckerBckgProperty>().Value;
+        if (checkerBckg.Enabled) {
+            canvas.StyleCheckerBckg(el.Border + pos, checkerBckg);
         }
         
         for (int i = 0; i < _children.Count; i++) {
@@ -370,7 +362,7 @@ public class Div : ContainerElement, IInteractableElement {
             h += r.ToScalar(parent.Height);
         }
         
-        var winSize = new Size(Stdio.WindowWidth, Stdio.WindowHeight);
+        var winSize = new Size(Stdio.BufferWidth, Stdio.BufferHeight);
         
         var minContent = new Size(w, h);
         var maxContent = IElement.ComputeLayout(winSize, Margin, Padding, Border,
@@ -407,11 +399,14 @@ public class Div : ContainerElement, IInteractableElement {
 
     [Pure]
     private ElementLayout ComputeMaxVerticalLayout(Size parent) {
+        var el = IElement.ComputeLayout(parent, Margin, Padding, Border, 
+            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        
         int height = 0;
         int maxWidth = 0;
 
         for (int i = 0; i < _children.Count; i++) {
-            var l = _children[i].GetMaxSize(parent);
+            var l = _children[i].GetMaxSize(el.Content);
             height += l.Height;
             maxWidth = Math.Max(maxWidth, l.Width);
         }
@@ -424,11 +419,14 @@ public class Div : ContainerElement, IInteractableElement {
     
     [Pure]
     private ElementLayout ComputeMaxHorizontalLayout(Size parent) {
+        var el = IElement.ComputeLayout(parent, Margin, Padding, Border, 
+            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        
         int width = 0;
         int maxHeight = parent.Height;
 
         for (int i = 0; i < _children.Count; i++) {
-            var l = _children[i].GetMaxSize(parent);
+            var l = _children[i].GetMaxSize(el.Content);
             width += l.Width;
             maxHeight = Math.Max(maxHeight, l.Height);
         }

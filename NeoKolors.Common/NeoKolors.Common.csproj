@@ -27,7 +27,10 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="ImplTypeCheck" Version="1.0.1" />
+        <PackageReference Include="Implyzer" Version="1.1.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
         <PackageReference Include="OneOf" Version="3.0.271" />
         <PackageReference Include="SkiaSharp" Version="3.119.2-preview.1" />

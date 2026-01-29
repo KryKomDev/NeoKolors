@@ -4,6 +4,8 @@
 //
 
 using NeoKolors.Tui.Fonts;
+// ReSharper disable UnusedAutoPropertyAccessor.Local
+// ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
 
 namespace NeoKolors.Tui.Tests;
 

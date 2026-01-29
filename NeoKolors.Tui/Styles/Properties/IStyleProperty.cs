@@ -1,7 +1,8 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-using ImplTypeCheck;
+using System.Diagnostics.CodeAnalysis;
+using Implyzer;
 using NeoKolors.Tui.Global;
 using BindingFlags = System.Reflection.BindingFlags;
 
@@ -14,6 +15,8 @@ public interface IStyleProperty<out TValue, in TSelf> : IStyleProperty where
     public new TValue Value { get; }
     object IStyleProperty.Value => Value;
 
+    Type IStyleProperty.ValueType => typeof(TValue);
+
     public static TValue ToTValue(TSelf property) => property.Value;
     
     #if NET8_0_OR_GREATER
@@ -25,6 +28,7 @@ public interface IStyleProperty<out TValue, in TSelf> : IStyleProperty where
 public interface IStyleProperty {
     
     public object Value { get; }
+    public Type ValueType { get; }
 
     
     // ---------------------------------- STATIC METHODS ---------------------------------- //
@@ -59,6 +63,32 @@ public interface IStyleProperty {
     public static bool IsStyle(Type t) =>
         t is { IsInterface: false, IsAbstract: false } && typeof(IStyleProperty).IsAssignableFrom(t);
 
+    /// <summary>
+    /// Determines whether the specified type is a valid partial style property type.
+    /// </summary>
+    /// <param name="t">The type to check. The type must be non-abstract, non-interface, implement
+    /// <see cref="IStyleProperty"/>, and implement <see cref="IPartialStyleProperty"/>.</param>
+    /// <returns><see langword="true"/> if the specified type is a valid partial style property type; otherwise,
+    /// <see langword="false"/>.</returns>
+    public static bool IsPartial(Type t) =>
+        IsStyle(t) && typeof(IPartialStyleProperty).IsAssignableFrom(t);
+
+    /// <summary>
+    /// Determines whether the given <see cref="IStyleProperty"/> is a partial style property and, if so,
+    /// retrieves it as an <see cref="IPartialStyleProperty"/>.
+    /// </summary>
+    /// <param name="property">The <see cref="IStyleProperty"/> to check.</param>
+    /// <param name="partialProperty">When this method returns, contains the <see cref="IPartialStyleProperty"/>
+    /// instance if the given property is partial; otherwise, null.</param>
+    /// <returns>True if the given property is a partial style property; otherwise, false.</returns>
+    public static bool TryIsPartial(
+        IStyleProperty property,
+        [NotNullWhen(returnValue: true)] out IPartialStyleProperty? partialProperty) 
+    {
+        partialProperty = property as IPartialStyleProperty;
+        return partialProperty != null;
+    }
+    
     /// <summary>
     /// Throws an exception if the provided type is not a valid style property.
     /// </summary>
@@ -98,19 +128,10 @@ public interface IStyleProperty {
     public static string GetName<T>() => GetName(typeof(T));
 
     public static Type? GetByName(string name) {
-        var styles = StyleManager.GetStyles();
-
-        for (var i = 0; i < styles.Length; i++) {
-            var style = styles[i];
-            
-            if (GetName(style) == name || style.Name == name)
-                return style;
-        }
-
-        return null;
+        return StyleManager.GetTypeByName(name);
     }
 
-    public static bool TryGetByName(string name, out Type? type) {
+    public static bool TryGetByName(string name, [NotNullWhen(returnValue: true)] out Type? type) {
         type = GetByName(name);
         return type != null;
     }
