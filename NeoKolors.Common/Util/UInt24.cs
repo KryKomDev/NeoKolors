@@ -3,6 +3,8 @@
 // Copyright (c) 2025 KryKom
 //
 
+#if NK_ENABLE_UINT24
+
 #if NET5_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
 
@@ -761,3 +763,5 @@ public readonly struct UInt24 :
     }
     #endif
 }
+
+#endif

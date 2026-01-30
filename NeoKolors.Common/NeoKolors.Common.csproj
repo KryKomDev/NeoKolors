@@ -23,11 +23,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="HasFlagExtension.Generator" Version="2.0.2">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Implyzer" Version="1.1.0">
+        <PackageReference Include="HasFlagExtension.Generator" Version="2.1.2">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
