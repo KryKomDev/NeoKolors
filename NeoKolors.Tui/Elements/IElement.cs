@@ -2,6 +2,7 @@
 // Copyright (c) 2025 KryKom
 
 using System.Diagnostics.Contracts;
+using Implyzer;
 using NeoKolors.Tui.Dom;
 using NeoKolors.Tui.Rendering;
 using NeoKolors.Tui.Styles;
@@ -10,6 +11,7 @@ namespace NeoKolors.Tui.Elements;
 
 public interface IElement<T> : IElement, INode<T> { }
 
+[IndirectImpl(typeof(IElement<>))]
 public interface IElement : IRenderable, INode {
     
     /// <summary>

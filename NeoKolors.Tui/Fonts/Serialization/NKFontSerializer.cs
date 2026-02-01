@@ -23,8 +23,10 @@ public static class NKFontSerializer {
     private const string CONF_SCHEMA_URL = NKFontSchema.SCHEMA_NAMESPACE;
     private const string MAP_SCHEMA_URL = NKFontSchema.SCHEMA_NAMESPACE;
     
+    // ReSharper disable NotAccessedField.Local
     private static XmlSchemaSet? CONFIG_SCHEMA;
     private static XmlSchemaSet? MAP_SCHEMA;
+    // ReSharper restore NotAccessedField.Local
     
     static NKFontSerializer() => (CONFIG_SCHEMA, MAP_SCHEMA) = InitSchemas();
 
@@ -697,7 +699,7 @@ public static class NKFontSerializer {
     /// <exception cref="FontSerializerException">Thrown if deserialization of the font manifest file fails.</exception>
     public static FontManifest DeserializeManifestFromFile(string filePath) {
         try {
-            var serializer = new XmlSerializer(typeof(FontManifest));
+            var serializer = new XmlSerializer(typeof(FontManifest), defaultNamespace: NKFontSchema.SCHEMA_NAMESPACE);
 
             using var fileStream = new FileStream(filePath, FileMode.Open);
             return (FontManifest)(serializer.Deserialize(fileStream)
@@ -715,7 +717,7 @@ public static class NKFontSerializer {
     /// <returns>A deserialized <see cref="FontManifest"/> object containing the font manifest data.</returns>
     /// <exception cref="FontSerializerException">Thrown if deserialization of the font manifest stream fails.</exception>
     public static FontManifest DeserializeManifestFromStream(Stream xmlContent) {
-        var serializer = new XmlSerializer(typeof(FontManifest));
+        var serializer = new XmlSerializer(typeof(FontManifest), defaultNamespace: NKFontSchema.SCHEMA_NAMESPACE);
 
         return (FontManifest)(serializer.Deserialize(xmlContent) 
                               ?? throw FontSerializerException.ManifestDeserializationFailed());

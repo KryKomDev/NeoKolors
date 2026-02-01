@@ -1,6 +1,8 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
+using Implyzer;
+
 namespace NeoKolors.Tui.Dom;
 
 public interface INode<T> : INode {
@@ -16,6 +18,7 @@ public interface INode<T> : INode {
     }
 }
 
+[IndirectImpl(typeof(INode<>))]
 public interface INode {
     public object? GetChildNode();
     public void SetChildNode(object? childNode);

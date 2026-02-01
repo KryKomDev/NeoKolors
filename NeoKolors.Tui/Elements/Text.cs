@@ -10,7 +10,7 @@ using StyleCollection = NeoKolors.Tui.Styles.StyleCollection;
 
 namespace NeoKolors.Tui.Elements;
 
-public class Text : TextElement, INotifyOnRender, IInteractableElement {
+public class Text : TextElement, INotifyOnRender, IInteractableElement<string> {
     
     private readonly LayoutCacher _layoutCacher;
     private string _text;

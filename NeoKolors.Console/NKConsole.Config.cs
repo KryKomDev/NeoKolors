@@ -283,31 +283,4 @@ public partial class NKConsole {
     /// or applicable, such as during shutdown or initialization phases.
     /// </exception>
     public static bool InterceptInput { get; private set; }
-
-    /// <summary>
-    /// Activates the input interception mechanism and initiates the input handling thread.
-    /// Once initiated, the console will begin to listen for user inputs such as keys, mouse events,
-    /// and other interactions, enabling dynamic response handling in terminal applications.
-    /// </summary>
-    /// <exception cref="InvalidOperationException">
-    /// Input interception is already enabled.
-    /// </exception>
-    public static void StartInputInterception() {
-        if (InterceptInput)
-            throw new InvalidOperationException("Input interception is already enabled.");
-        
-        InterceptInput = true;
-        LOGGER.Info("Starting input interception...");
-        INPUT_THREAD.Start();
-    }
-
-    /// <summary>
-    /// Stops the interception of input by setting the internal state to false.
-    /// This is used to cease capturing or processing input events, thereby
-    /// restoring the default behavior where input is no longer intercepted.
-    /// </summary>
-    public static void StopInputInterception() {
-        InterceptInput = false;
-        LOGGER.Info("Stopping input interception...");
-    }
 }

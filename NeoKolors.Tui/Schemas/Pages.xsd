@@ -1,8 +1,0 @@
-﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:tns="https://github.com/KryKomDev/NeoKolors/blob/main/NeoKolors.Tui/Schemas/Pages.xsd"
-            targetNamespace="https://github.com/KryKomDev/NeoKolors/blob/main/NeoKolors.Tui/Schemas/Pages.xsd"
-            elementFormDefault="qualified">
-    
-    <xsd:elementOld name="a"/>
-
-</xsd:schema>

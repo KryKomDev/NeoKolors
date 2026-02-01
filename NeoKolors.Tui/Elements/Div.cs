@@ -12,7 +12,7 @@ using static NeoKolors.Tui.Styles.Values.Direction;
 
 namespace NeoKolors.Tui.Elements;
 
-public class Div : ContainerElement, IInteractableElement {
+public class Div : ContainerElement, IInteractableElement<IElement[]> {
     
     protected readonly LayoutCacher _layoutCacher;
     protected readonly ChildrenLayoutCacher _childrenCacher;

@@ -8,17 +8,25 @@ using System.Diagnostics.Contracts;
 using System.Text;
 using Metriks;
 using NeoKolors.Common;
+using NeoKolors.Console.Driver;
+using NeoKolors.Console.Driver.DotNet;
 using NeoKolors.Console.Events;
 using NeoKolors.Console.Mouse;
 using OneOf;
 using static NeoKolors.Console.BoolStrings;
 using ArgumentException = System.ArgumentException;
-using ConsoleKey = System.ConsoleKey;
 using ConsoleKeyInfo = System.ConsoleKeyInfo;
 using FormatException = System.FormatException;
 using InvalidOperationException = System.InvalidOperationException;
 using OverflowException = System.OverflowException;
 using Std = System.Console;
+
+#if NK_ENABLE_NATIVE_INPUT
+using NeoKolors.Console.Driver.Linux;
+using NeoKolors.Console.Driver.Windows;
+using System.Runtime.InteropServices;
+#endif
+
 
 namespace NeoKolors.Console;
 
@@ -308,303 +316,68 @@ public static partial class NKConsole {
     
     #region INPUT INTERCEPTION
 
-    private static readonly Thread INPUT_THREAD = new(Intercept) {
-        IsBackground = true,
-        Priority = ThreadPriority.BelowNormal,
-        Name = "NeoKolors Input Interceptor"
-    };
+    private static readonly IInputDriver INPUT_DRIVER = 
+        #if NK_ENABLE_NATIVE_INPUT
+        RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? new WindowsInputDriver() :
+        RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? new LinuxInputDriver() : 
+        new DotNetInputDriver();
+        #else
+        new DotNetInputDriver();
+        #endif
 
-    private static void Intercept() {
-        ConsoleKeyInfo i;
+    /// <summary>
+    /// Activates the input interception mechanism and initiates the input handling thread.
+    /// Once initiated, the console will begin to listen for user inputs such as keys, mouse events,
+    /// and other interactions, enabling dynamic response handling in terminal applications.
+    /// </summary>
+    /// <exception cref="InvalidOperationException">
+    /// Input interception is already enabled.
+    /// </exception>
+    public static void StartInputInterception() {
+        if (InterceptInput)
+            throw new InvalidOperationException("Input interception is already enabled.");
         
-        try {
-            i = Std.ReadKey(intercept: true);
-        }
-        catch (InvalidOperationException e) {
-            // if the input is redirected or is not from a
-            // console or the console is a weird mf like mintty
-            LOGGER.Error(e.Message);
-            InterceptCompat();
-            return;
-        }
-
-        while (InterceptInput) {
-            if (i is { KeyChar: '\e', Modifiers: 0 }) {
-                HandleEscSeq();
-            }
-            else {
-                var i1 = i;
-                _ = Task.Run(() => KeyEvent.Invoke(i1));
-            }
-
-            i = Std.ReadKey(intercept: true);
-        }
-    }
-
-    private static void HandleEscSeq() {
-        var introducer = Std.ReadKey(intercept: true);
-
-        if (introducer.KeyChar == ']') {
-            HandleOsc();
-        }
-        else if (introducer.KeyChar != '[') {
-            _ = Task.Run(() => KeyEvent.Invoke(new ConsoleKeyInfo(
-                keyChar: '\e', 
-                key: ConsoleKey.Backspace, 
-                shift: false, 
-                alt: false, 
-                control: false)
-            ));
-            _ = Task.Run(() => KeyEvent.Invoke(introducer));
-            return;
-        }
+        InterceptInput = true;
+        LOGGER.Info("Starting input interception...");
         
-        HandleCsi();
-    }
-
-    private static void HandleOsc() {
-        var next = Std.ReadKey(intercept: true);
-
-        switch (next.KeyChar) {
-            case 'L':
-                string label = ReadUntil('\x0f', true);
-                _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.IconLabel(label));
-                break;
-            case 'l':
-                string title = ReadUntil('\x0f', true);
-                _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.WinTitle(title));
-                break;
-        }
-    }
-
-    private static void HandleCsi() {
-        var next = Std.ReadKey(intercept: true);
+        INPUT_DRIVER.Key += OnKey;
+        INPUT_DRIVER.Mouse += OnMouse;
+        INPUT_DRIVER.FocusIn += OnFocusIn;
+        INPUT_DRIVER.FocusOut += OnFocusOut;
+        INPUT_DRIVER.Paste += OnPaste;
+        INPUT_DRIVER.WinOpsResponse += OnWinOpsResponse;
+        INPUT_DRIVER.DecReqResponse += OnDecReqResponse;
         
-        switch (next.KeyChar) {
-            case 'O': 
-                _ = Task.Run(() => FocusOutEvent.Invoke());
-                return;
-            case 'I': 
-                _ = Task.Run(() => FocusInEvent.Invoke());
-                return;
-            case 'M': 
-                HandleX10MouseEvent();  
-                return;         
-            case '1': 
-                _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.WinState(true)); 
-                return;
-            case '2':
-                var k = Std.ReadKey(intercept: true);
-                switch (k.KeyChar) {
-                    case '0': HandlePaste();                                                     return;
-                    case 't': _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.WinState(false)); return;
-                    default : LOGGER.Error("How the fuck did this even happen?");                return;
-                }
-            case '3': HandleWinPosResponse(); 
-                return;
-            case '4':
-                HandleWinSizePxResponse();
-                return;
-            case '8':
-                HandleWinSizeResponse();
-                return;
-            case '9':
-                HandleScrSizeResponse();
-                return;
-            case '?':
-                HandleDecReqResponse(); 
-                return;
-            case '<':
-                HandleSGRMouseEvent();
-                return;
-        }
+        INPUT_DRIVER.Start();
     }
 
-    private static void HandleScrSizeResponse() {
-        var split = ReadUntil('t', true).Substring(1).Split(';');
-        var h = int.Parse(split[0]);
-        var w = int.Parse(split[1]);
-        _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.ScrSize((w, h)));
-    }
-    
-    private static void HandleWinSizeResponse() {
-        var split = ReadUntil('t', true).Substring(1).Split(';');
-        var h = int.Parse(split[0]);
-        var w = int.Parse(split[1]);
-        _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.WinSize(new Size2D(w, h)));
-    }
-    
-    private static void HandleWinSizePxResponse() {
-        var split = ReadUntil('t', true).Substring(1).Split(';');
-        var h = int.Parse(split[0]);
-        var w = int.Parse(split[1]);
-        _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.WinSizePx(new Size2D(w, h)));
-    }
-
-    private static void HandleWinPosResponse() {
-        var split = ReadUntil('t', true).Substring(1).Split(';');
-        var x = int.Parse(split[0]);
-        var y = int.Parse(split[1]);
-        _ = InvokeWinOpsResponseEvent(WinOpsResponseArgs.WinPos((x, y)));
-    }
-
-    private static void HandleDecReqResponse() {
-        string rawType = ReadUntil(';', true);
-        int mode;
-        int type;
-
-        try {
-            mode = int.Parse(rawType);
-        }
-        catch (FormatException) {
-            LOGGER.Error($"Invalid mode in DECREQ response: '{rawType}'.");
-            return;
-        }
-
-        try {
-            type = int.Parse(ReadUntil('$', true));
-        }
-        catch (FormatException) {
-            LOGGER.Error($"Invalid type in DECREQ response: '{rawType}'.");
-            return;
-        }
+    /// <summary>
+    /// Stops the interception of input by setting the internal state to false.
+    /// This is used to cease capturing or processing input events, thereby
+    /// restoring the default behavior where input is no longer intercepted.
+    /// </summary>
+    public static void StopInputInterception() {
+        InterceptInput = false;
+        LOGGER.Info("Stopping input interception...");
         
-        // skips the 'y'
-        SkipKeys(1);
-                
-        _ = InvokeDecReqResponseEvent(new DecReqResponseArgs(mode, (DecReqResponseType)type));
-    }
-
-    private static void HandleX10MouseEvent() {
-        var type = Std.ReadKey(intercept: true);
-        var x = Std.ReadKey(intercept: true);
-        var y = Std.ReadKey(intercept: true);
-        _ = Task.Run(() => MouseEvent.Invoke(MouseEventDecomposer.DecomposeUtf8(type, x, y)));
-    }
-
-    private static void HandleSGRMouseEvent() {
-        string rawType = ReadUntil(';', true);
-        string rawX = ReadUntil(';', true);
-        string rawY = ReadUntil(out var last, true, 'm', 'M');
-
-        int type;
-        try {
-            type = int.Parse(rawType);
-        }
-        catch {
-            LOGGER.Error("Faulty mouse event type detected.");
-            return;
-        }
+        INPUT_DRIVER.Stop();
         
-        int x;
-        try {
-            x = int.Parse(rawX);
-        }
-        catch {
-            LOGGER.Error("Faulty mouse event x-axis coordinate detected.");
-            return;
-        }
-        
-        int y;
-        try {
-            y = int.Parse(rawY);
-        }
-        catch {
-            LOGGER.Error("Faulty mouse event y-axis coordinate detected.");
-            return;
-        }
-        
-        _ = Task.Run(() => MouseEvent.Invoke(MouseEventDecomposer.DecomposeSGR(type, x, y, last)));
+        INPUT_DRIVER.Key -= OnKey;
+        INPUT_DRIVER.Mouse -= OnMouse;
+        INPUT_DRIVER.FocusIn -= OnFocusIn;
+        INPUT_DRIVER.FocusOut -= OnFocusOut;
+        INPUT_DRIVER.Paste -= OnPaste;
+        INPUT_DRIVER.WinOpsResponse -= OnWinOpsResponse;
+        INPUT_DRIVER.DecReqResponse -= OnDecReqResponse;
     }
 
-    private static void HandlePaste() {
-        SkipKeys(3);
-        var s = ReadUntil("\e[201~", true);
-        _ = Task.Run(() => PasteEvent.Invoke(s));
-    }
-
-    private static void SkipKeys(int num) {
-        for (int i = 0; i < num; i++) 
-            Std.ReadKey(intercept: true);
-    }
-
-    private static void InterceptCompat() {
-        while (InterceptInput) {
-            if (!Std.KeyAvailable) continue;
-            
-            var k = Std.Read();
-
-            switch (k) {
-                case -1: {
-                    break;
-                }
-                case '\e': {
-                    HandleEscapeCompat(); 
-                    break;
-                }
-                default: {
-                    KeyEvent.Invoke(new ConsoleKeyInfo(
-                        keyChar: (char)k, 
-                        key: (ConsoleKey)char.ToLower((char)k), 
-                        shift: char.IsUpper((char)k), 
-                        alt: false, 
-                        control: false));
-                    break;
-                }
-            }
-        }
-    }
-
-    private static void HandleEscapeCompat() {
-        int intro = -1;
-        while (intro is -1) {
-            intro = Std.Read(); 
-        }
-
-        if (intro is ']') {
-            
-        }
-        else if (intro is not '[') {
-            KeyEvent.Invoke(new ConsoleKeyInfo(
-                keyChar: '\e', 
-                key: ConsoleKey.Backspace, 
-                shift: false, 
-                alt: false, 
-                control: false)
-            );
-            KeyEvent.Invoke(new ConsoleKeyInfo(
-                keyChar: (char)intro, 
-                key: (ConsoleKey)char.ToLower((char)intro), 
-                shift: char.IsUpper((char)intro), 
-                alt: false, 
-                control: false)
-            );
-            return;
-        }
-        
-        int next = -1;
-        while (next is -1) {
-            next = Std.Read(); 
-        }
-        
-        switch (next) {
-            case 'O':
-                FocusOutEvent.Invoke();
-                break;
-            case 'I':
-                FocusInEvent.Invoke();
-                break;
-            case 'M':
-                HandleX10MouseEvent();
-                break;
-            case '2':
-                HandlePaste();
-                break;
-            case '<':
-                HandleSGRMouseEvent();
-                break;
-        }
-    }
+    private static void OnKey(ConsoleKeyInfo k) => KeyEvent(k);
+    private static void OnMouse(MouseEventArgs m) => MouseEvent(m);
+    private static void OnFocusIn() => FocusInEvent();
+    private static void OnFocusOut() => FocusOutEvent();
+    private static void OnPaste(string s) => PasteEvent(s);
+    private static void OnWinOpsResponse(WinOpsResponseArgs a) => WinOpsResponseEvent(a);
+    private static void OnDecReqResponse(DecReqResponseArgs a) => DecReqResponseEvent(a);
 
     #endregion
 

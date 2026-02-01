@@ -384,4 +384,8 @@ public static class EscapeCodes {
         BRACKETED_PASTE_MODE = 2004,
         CURSOR_VISIBLE_MODE = 25,
     }
+
+    public enum OscMode {
+        
+    }
 }

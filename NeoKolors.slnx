@@ -2,12 +2,11 @@
     <Configurations>
         <BuildType Name="Debug" />
         <BuildType Name="Release" />
-        <BuildType Name="WIP" />
     </Configurations>
 
     <!--  Libs  -->
     
-    <Project Path="NeoKolors.Extensions/NeoKolors.Extensions.csproj"/>
+    <Project Path="NeoKolors.Extensions/NeoKolors.Extensions.csproj" />
     <Project Path="NeoKolors.Common/NeoKolors.Common.csproj" />
     <Project Path="NeoKolors.Console/NeoKolors.Console.csproj" />
     <Project Path="NeoKolors.Settings/NeoKolors.Settings.csproj" />
@@ -15,10 +14,11 @@
     
     <!--  Tests  -->
     
-    <Project Path="NeoKolors.Extensions.Tests/NeoKolors.Extensions.Tests.csproj"/>
+    <Project Path="NeoKolors.Extensions.Tests/NeoKolors.Extensions.Tests.csproj" />
     <Project Path="NeoKolors.Common.Tests/NeoKolors.Common.Tests.csproj" />
     <Project Path="NeoKolors.Console.Tests/NeoKolors.Console.Tests.csproj" />
     <Project Path="NeoKolors.Settings.Tests/NeoKolors.Settings.Tests.csproj" />
+    <Project Path="NeoKolors.Tui.Generators/NeoKolors.Tui.Generators.csproj"/>
     <Project Path="NeoKolors.Tui.Tests/NeoKolors.Tui.Tests.csproj" />
 
     <!--  Examples  -->

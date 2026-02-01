@@ -5,10 +5,17 @@ using System.Runtime.InteropServices;
 
 namespace NeoKolors.Console.Native;
 
-internal static class Win32Exception {
-    
+// ReSharper disable once PartialTypeWithSinglePart
+internal static partial class Win32Exception {
+
+    #if NET7_0_OR_GREATER
+    [LibraryImport("kernel32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool SetStdHandle(int nStdHandle, IntPtr hHandle);
+    #else
     [DllImport("kernel32.dll")]
     private static extern bool SetStdHandle(int nStdHandle, IntPtr hHandle);
+    #endif
 
     private const int STD_ERROR_HANDLE = -12;
 

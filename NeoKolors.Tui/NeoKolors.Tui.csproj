@@ -29,17 +29,15 @@
         <ProjectReference Include="..\NeoKolors.Common\NeoKolors.Common.csproj" />
         <ProjectReference Include="..\NeoKolors.Settings\NeoKolors.Settings.csproj" />
         <ProjectReference Include="..\NeoKolors.Extensions\NeoKolors.Extensions.csproj" />
+        <ProjectReference Include="..\NeoKolors.Tui.Generators\NeoKolors.Tui.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="HasFlagExtension.Generator" Version="2.0.2">
+        <PackageReference Include="HasFlagExtension.Generator" Version="2.1.2">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Implyzer" Version="1.1.0">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
+        <PackageReference Include="Implyzer" Version="1.2.0" />
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
         <PackageReference Include="Metriks" Version="1.1.8.1" />
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">

@@ -20,6 +20,7 @@
         <Description>basic console / logging utilites</Description>
         
         <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+        <AllowUnsafeBlocks Condition="$([MSBuild]::VersionGreaterThanOrEquals('$([MSBuild]::GetTargetFrameworkVersion('$(TargetFramework)'))','6.0'))">true</AllowUnsafeBlocks>
     </PropertyGroup>
     
     <ItemGroup>
@@ -35,41 +36,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="HasFlagExtension.Generator" Version="2.0.2">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Implyzer" Version="1.1.0">
+        <PackageReference Include="HasFlagExtension.Generator" Version="2.1.2">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
-        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.2" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <ClCompile Include="Native\NativeResizeHandler.cpp" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <None Include="runtimes/linux-x64/native/NativeResizeHandler.so">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Pack>true</Pack>
-        </None>
-
-        <None Include="runtimes/win-x64/native/NativeResizeHandler.dll">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Pack>true</Pack>
-        </None>
-
-        <None Include="runtimes/osx-x64/native/NativeResizeHandler.dylib">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <Pack>true</Pack>
-        </None>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Driver\" />
     </ItemGroup>
 </Project>
