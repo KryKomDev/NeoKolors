@@ -1,13 +1,18 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
-using NeoKolors.Tui.Styles.Properties;
+using NeoKolors.Tui.Styles;
 
 namespace NeoKolors.Tui.Elements;
 
 public class Button : Text {
-    
-    public Button(string text) : base(text) { }
 
-    protected override WidthProperty DefaultWidth => new(Dimension.MinContent);
+    public new static StyleCollection DefaultStyles { get; } = new() {
+        Width = Dimension.MinContent,
+
+        ReadOnly = true,
+    };
+    
+    public Button(string text) : base(text, DefaultStyles) { }
+    public Button(string text, StyleCollection defaultStyles) : base(text, defaultStyles) { }
 }

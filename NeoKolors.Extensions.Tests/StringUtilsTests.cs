@@ -238,7 +238,7 @@ public class StringUtilsTests {
     [InlineData(3999, "MMMCMXCIX")]
     [InlineData(2024, "MMXXIV")]
     public void ToRoman_BasicConversions_ReturnsCorrectRomanNumerals(int number, string expected) {
-        Assert.Equal(expected, number.ToRoman());
+        Assert.Equal(expected, string.ToRoman(number));
     }
 
     [Theory]
@@ -252,7 +252,7 @@ public class StringUtilsTests {
     [InlineData(3999, "mmmcmxcix")]
     [InlineData(2024, "mmxxiv")]
     public void ToRoman_LowercaseConversions_ReturnsCorrectLowercaseRomanNumerals(int number, string expected) {
-        Assert.Equal(expected, number.ToRoman(lowercase: true));
+        Assert.Equal(expected, string.ToRoman(number, lowercase: true));
     }
 
     [Theory]
@@ -262,7 +262,7 @@ public class StringUtilsTests {
     [InlineData(int.MinValue)]
     [InlineData(int.MaxValue)]
     public void ToRoman_InvalidValues_ThrowsArgumentOutOfRangeException(int number) {
-        Assert.Throws<ArgumentOutOfRangeException>(() => number.ToRoman());
+        Assert.Throws<ArgumentOutOfRangeException>(() => string.ToRoman(number));
     }
 
     [Fact]
@@ -280,7 +280,7 @@ public class StringUtilsTests {
         };
 
         foreach (var pair in expectedValues) {
-            Assert.Equal(pair.Value, pair.Key.ToRoman());
+            Assert.Equal(pair.Value, string.ToRoman(pair.Key));
         }
     }
 
@@ -295,7 +295,7 @@ public class StringUtilsTests {
     [InlineData(80, "LXXX")]
     [InlineData(90, "XC")]
     public void ToRoman_TensValues_ReturnsCorrectRomanNumerals(int number, string expected) {
-        Assert.Equal(expected, number.ToRoman());
+        Assert.Equal(expected, string.ToRoman(number));
     }
 
     [Theory]
@@ -309,7 +309,7 @@ public class StringUtilsTests {
     [InlineData(800, "DCCC")]
     [InlineData(900, "CM")]
     public void ToRoman_HundredsValues_ReturnsCorrectRomanNumerals(int number, string expected) {
-        Assert.Equal(expected, number.ToRoman());
+        Assert.Equal(expected, string.ToRoman(number));
     }
 
     [Theory]
@@ -317,7 +317,7 @@ public class StringUtilsTests {
     [InlineData(2000, "MM")]
     [InlineData(3000, "MMM")]
     public void ToRoman_ThousandsValues_ReturnsCorrectRomanNumerals(int number, string expected) {
-        Assert.Equal(expected, number.ToRoman());
+        Assert.Equal(expected, string.ToRoman(number));
     }
 
     [Fact]

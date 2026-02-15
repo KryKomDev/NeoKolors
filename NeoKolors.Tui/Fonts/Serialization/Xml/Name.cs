@@ -1,5 +1,5 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 using System.Xml.Serialization;
 using NeoKolors.Tui.Fonts.Exceptions;

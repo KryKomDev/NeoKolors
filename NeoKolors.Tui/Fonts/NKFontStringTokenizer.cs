@@ -1,7 +1,6 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
-using System.Text.RegularExpressions;
 using TokenData = OneOf.OneOf<
     NeoKolors.Tui.Fonts.NKFontStringTokenizer.SimpleToken,
     NeoKolors.Tui.Fonts.NKFontStringTokenizer.LigatureToken, 
@@ -17,31 +16,31 @@ namespace NeoKolors.Tui.Fonts;
 /// </summary>
 public static class NKFontStringTokenizer {
 
-    public static Token[] Tokenize(string str, NKFont font) {
+    public static Token[] Tokenize(AnsiString str, NKFont font) {
         var tokens = new List<Token>();
         int i = 0;
         
-        str = Regex.Replace(str, @"\s+\n", "\n");
+        var chars = str.ToArray();
 
-        while (i < str.Length) {
+        while (i < chars.Length) {
             
             // skip spaces
             int spaces = 0;
 
-            for (int j = i; j < str.Length; j++) {
-                if (str[j] != ' ') break;
+            for (int j = i; j < chars.Length; j++) {
+                if (chars[j].Char != ' ') break;
                 spaces += 1;
             }
             
             if (spaces > 0) {
-                tokens.Add(Token.Space(spaces));
+                tokens.Add(Token.Space(spaces, chars[i].Style));
                 i += spaces;
                 continue;
             }
 
             // skip newlines
-            if (str[i] == '\n') {
-                tokens.Add(Token.Newline());
+            if (chars[i].Char == '\n') {
+                tokens.Add(Token.Newline(chars[i].Style));
                 i += 1;
                 continue;
             }
@@ -56,12 +55,13 @@ public static class NKFontStringTokenizer {
             
             // ligature detection
 
-            for (int j = Math.Min(str.Length - i, font.MaxLigatureLength); j >= 0; j--) {
-                string candidate = str.Substring(i, j);
+            for (int j = Math.Min(chars.Length - i, font.MaxLigatureLength); j >= 0; j--) {
+                var candidateChars = chars[i..(i + j)];
+                var candidate = new string(candidateChars.Select(c => c.Char).ToArray());
 
                 if (!font.HasLigature(candidate)) continue;
                 
-                token = Token.Ligature(candidate);
+                token = Token.Ligature(candidate, chars[i].Style);
                 add = j;
                 break;
             }
@@ -74,17 +74,17 @@ public static class NKFontStringTokenizer {
             
             // auto-compound detection
             
-            if (i != str.Length - 1) {
-                char st = str[i];
-                char nd = str[i + 1];
+            if (i != chars.Length - 1) {
+                char st = chars[i].Char;
+                char nd = chars[i + 1].Char;
                 bool success = false;
                 
                 if (font.HasAutoCompound(nd, st, false)) {
-                    token = Token.AutoCompound(st, nd, false);
+                    token = Token.AutoCompound(st, nd, false, chars[i].Style);
                     success = true;
                 }
                 else if (font.HasAutoCompound(st, nd, true)) {
-                    token = Token.AutoCompound(st, nd, true);
+                    token = Token.AutoCompound(st, nd, true, chars[i].Style);
                     success = true;
                 }
 
@@ -97,8 +97,8 @@ public static class NKFontStringTokenizer {
             
             // simple glyph detection
 
-            if (font.HasSimple(str[i])) {
-                token = Token.Simple(str[i]);
+            if (font.HasSimple(chars[i].Char)) {
+                token = Token.Simple(chars[i].Char, chars[i].Style);
                 tokens.Add(token.Value);
                 i += 1;
                 continue;
@@ -106,7 +106,7 @@ public static class NKFontStringTokenizer {
             
             // split character into two tokens
             
-            var split = char.SeparateDiacritics(str[i]);
+            var split = char.SeparateDiacritics(chars[i].Char);
 
             if (split.Diacritics is not null) {
                 var st = split.BaseChar;
@@ -114,11 +114,11 @@ public static class NKFontStringTokenizer {
                 bool success = false;
                 
                 if (font.HasAutoCompound(nd, st, false)) {
-                    token = Token.AutoCompound(st, nd, false);
+                    token = Token.AutoCompound(st, nd, false, chars[i].Style);
                     success = true;
                 }
                 else if (font.HasAutoCompound(st, nd, true)) {
-                    token = Token.AutoCompound(st, nd, true);
+                    token = Token.AutoCompound(st, nd, true, chars[i].Style);
                     success = true;
                 }
 
@@ -129,77 +129,34 @@ public static class NKFontStringTokenizer {
                 continue;
             }
             
-            tokens.Add(Token.Invalid());
+            tokens.Add(Token.Invalid(chars[i].Style));
             i += 1;
         }
         
         return tokens.ToArray();
     }
-    
-    // what is the best way I can split a string into tokens that represent simple, ligature and auto-compound glyphs?
-    // public static Token[] TokenizeS(string str, NKFont font) {
-    //     var tokens = new List<Token>();
-    //     int i = 0;
-    //
-    //     while (i < str.Length) {
-    //         Token? token = null;
-    //         int maxLength = 0;
-    //
-    //         // Try to find the longest matching sequence starting at position i
-    //         // Check ligatures first (they usually have priority)
-    //         for (int length = Math.Min(str.Length - i, GetMaxLigatureLength(font)); length > 0; length--) {
-    //             string candidate = str.Substring(i, length);
-    //
-    //             if (font.HasLigature(candidate)) {
-    //                 token = new Token(candidate, TokenType.LIGATURE);
-    //                 maxLength = length;
-    //                 break;
-    //             }
-    //         }
-    //
-    //         // If no ligature found, check auto-compound sequences
-    //         if (token == null) {
-    //             for (int length = Math.Min(str.Length - i, 2); length > 0; length--) {
-    //                 string candidate = str.Substring(i, length);
-    //
-    //                 if (font.HasAutoCompound(candidate[1], ' ')) {
-    //                     token = new Token(candidate, TokenType.AUTO_COMPOUND);
-    //                     maxLength = length;
-    //                     break;
-    //                 }
-    //             }
-    //         }
-    //
-    //         // If no special sequence found, treat as simple glyph
-    //         if (token == null) {
-    //             token = new Token(str[i].ToString(), TokenType.SIMPLE);
-    //             maxLength = 1;
-    //         }
-    //
-    //         tokens.Add(token.Value);
-    //         i += maxLength;
-    //     }
-    //
-    //     return tokens.ToArray();
-    // }
+
+    public static Token[] Tokenize(string str, NKFont font) => Tokenize(new AnsiString(str), font);
 
     public readonly struct Token {
         
         public TokenData Data { get; }
         public TokenType Type { get; }
+        public NKStyle   Style { get; }
         
-        internal Token(TokenData data, TokenType type) {
+        internal Token(TokenData data, TokenType type, NKStyle style = default) {
             Data = data;
             Type = type;
+            Style = style;
         }
         
-        public static Token Invalid() => new(null, TokenType.INVALID);
-        public static Token Simple(char content) => new(new SimpleToken(content), TokenType.SIMPLE);
-        public static Token Ligature(string content) => new(new LigatureToken(content), TokenType.LIGATURE);
-        public static Token AutoCompound(char main, char nd, bool mainFirst) 
-            => new(new AutoCompoundToken(main, nd, mainFirst), TokenType.AUTO_COMPOUND);
-        public static Token Space(int width) => new(new SpaceToken(width), TokenType.SPACE);
-        public static Token Newline() => new(null, TokenType.NEWLINE);
+        public static Token Invalid(NKStyle style = default) => new(null, TokenType.INVALID, style);
+        public static Token Simple(char content, NKStyle style = default) => new(new SimpleToken(content), TokenType.SIMPLE, style);
+        public static Token Ligature(string content, NKStyle style = default) => new(new LigatureToken(content), TokenType.LIGATURE, style);
+        public static Token AutoCompound(char main, char nd, bool mainFirst, NKStyle style = default) 
+            => new(new AutoCompoundToken(main, nd, mainFirst), TokenType.AUTO_COMPOUND, style);
+        public static Token Space(int width, NKStyle style = default) => new(new SpaceToken(width), TokenType.SPACE, style);
+        public static Token Newline(NKStyle style = default) => new(null, TokenType.NEWLINE, style);
 
         public override string ToString() {
             return Type switch {

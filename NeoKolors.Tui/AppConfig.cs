@@ -1,6 +1,6 @@
 ﻿//
 // NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 //
 
 using NeoKolors.Console.Mouse;

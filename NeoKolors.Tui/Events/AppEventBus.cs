@@ -1,9 +1,10 @@
 ﻿//
 // NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 //
 
 using NeoKolors.Console.Events;
+using NeoKolors.Console.Mouse;
 
 namespace NeoKolors.Tui.Events;
 
@@ -28,32 +29,39 @@ public static class AppEventBus {
     public static event AppStartEventHandler StartEvent  = delegate { };
     public static event AppStopEventHandler  StopEvent   = delegate { };
     
+    private static void InvokeKeyEvent(ConsoleKeyInfo k) => KeyEvent(k);
+    private static void InvokeMouseEvent(MouseEventArgs a) => MouseEvent(a);
+    private static void InvokeResizeEvent(ResizeEventArgs a) => ResizeEvent(a);
+    private static void InvokeStartEvent(IApplication sender, AppStartEventArgs args) => StartEvent(sender, args);
+    private static void InvokeStopEvent(IApplication sender) => StopEvent(sender);
+    
+    
     /// <summary>
     /// Sets the source application instance for the event bus, allowing event handlers to be
     /// subscribed or unsubscribed in relation to this source application.
     /// </summary>
     /// <param name="sourceApplication">The application instance that will serve as the source of events.</param>
     public static void SetSourceApplication(IApplication sourceApplication) {
-        if (SOURCE_APPLICATION != null) {
-            SOURCE_APPLICATION.StartEvent  -= StartEvent;
-            SOURCE_APPLICATION.StopEvent   -= StopEvent;
-            SOURCE_APPLICATION.ResizeEvent -= ResizeEvent;
-            SOURCE_APPLICATION.KeyEvent    -= KeyEvent;
+        if (SOURCE_APPLICATION is not null) {
+            SOURCE_APPLICATION.StartEvent  -= InvokeStartEvent;
+            SOURCE_APPLICATION.StopEvent   -= InvokeStopEvent;
+            SOURCE_APPLICATION.ResizeEvent -= InvokeResizeEvent;
+            SOURCE_APPLICATION.KeyEvent    -= InvokeKeyEvent;
 
             if (SOURCE_APPLICATION is IMouseSupportingApplication om) {
-                om.MouseEvent -= MouseEvent;
+                om.MouseEvent -= InvokeMouseEvent;
             }
         }
         
         SOURCE_APPLICATION = sourceApplication;
         
-        SOURCE_APPLICATION.StartEvent  += StartEvent;
-        SOURCE_APPLICATION.StopEvent   += StopEvent;
-        SOURCE_APPLICATION.ResizeEvent += ResizeEvent;
-        SOURCE_APPLICATION.KeyEvent    += KeyEvent;
+        SOURCE_APPLICATION.StartEvent  += InvokeStartEvent;
+        SOURCE_APPLICATION.StopEvent   += InvokeStopEvent;
+        SOURCE_APPLICATION.ResizeEvent += InvokeResizeEvent;
+        SOURCE_APPLICATION.KeyEvent    += InvokeKeyEvent;
 
         if (SOURCE_APPLICATION is IMouseSupportingApplication nm) {
-            nm.MouseEvent += MouseEvent;
+            nm.MouseEvent += InvokeMouseEvent;
         }
     }
 

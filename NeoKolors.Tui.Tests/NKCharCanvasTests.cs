@@ -33,7 +33,7 @@ public class NKCharCanvasTests {
         // Based on Point.cs: public static implicit operator Point2D(Point p) => new(p.X, p.Y);
         // So we can pass new Point(2, 2)
         
-        canvas.PlaceString(text, new Point(2, 2));
+        canvas.Place(text, new Point(2, 2));
 
         for (int i = 0; i < text.Length; i++) {
             var cell = canvas[2 + i, 2];
@@ -51,7 +51,7 @@ public class NKCharCanvasTests {
         // x=4: 'l'
         // x=5: out of bounds (should not throw, just clip)
         
-        canvas.PlaceString(text, new Point(2, 2));
+        canvas.Place(text, new Point(2, 2));
         
         // Check valid chars
         Assert.Equal('H', canvas[2, 2].Char);
@@ -65,7 +65,7 @@ public class NKCharCanvasTests {
     [Fact]
     public void Clear_ShouldResetCanvas() {
         var canvas = new NKCharCanvas(10, 5);
-        canvas.PlaceString("Test", new Point(0, 0));
+        canvas.Place("Test", new Point(0, 0));
         
         canvas.Clear();
         

@@ -1,5 +1,5 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 using System.Text;
 
@@ -23,6 +23,26 @@ public class DimensionExpression {
         
         foreach (var d in _operands) {
             result += d.ToScalar(parent);
+        }
+        
+        return result;
+    }
+    
+    public int ToScalarX(int parent) {
+        int result = 0;
+        
+        foreach (var d in _operands) {
+            result += d.ToScalarX(parent);
+        }
+        
+        return result;
+    }
+    
+    public int ToScalarY(int parent) {
+        int result = 0;
+        
+        foreach (var d in _operands) {
+            result += d.ToScalarY(parent);
         }
         
         return result;

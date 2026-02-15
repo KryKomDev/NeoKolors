@@ -1,5 +1,5 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 using System.Runtime.CompilerServices;
 using Metriks;
@@ -134,18 +134,47 @@ public class NKFont : IFont {
         HorizontalAlign horizontalAlign = HorizontalAlign.LEFT,
         VerticalAlign verticalAlign = VerticalAlign.TOP, bool overflow = false) 
     {
-        var tokens = Tokenize(str, this);
+        var tokens = Tokenize(new AnsiString(str, style), this);
 
         if (_info.SpacingInfo.IsMonospace)
-            PlaceMono(tokens, canvas, bounds, style, horizontalAlign, verticalAlign, overflow);
+            PlaceMono(tokens, canvas, bounds, horizontalAlign, verticalAlign, overflow);
         else 
             if (_info.SpacingInfo.AsVariable.Kerning)
                 if (_info.SpacingInfo.AsVariable.LineKerning)
-                    PlaceVariableKerningWithAlignWithLineKerning(tokens, canvas, bounds, style, horizontalAlign, verticalAlign, overflow);
+                    PlaceVariableKerningWithAlignWithLineKerning(tokens, canvas, bounds, horizontalAlign, verticalAlign, overflow);
                 else
-                    PlaceVariable_CharKerning(tokens, canvas, bounds, style, horizontalAlign, verticalAlign, overflow);
+                    PlaceVariable_CharKerning(tokens, canvas, bounds, horizontalAlign, verticalAlign, overflow);
             else 
-                PlaceVariable_NoKerning(tokens, canvas, bounds, style, horizontalAlign, verticalAlign, overflow);
+                PlaceVariable_NoKerning(tokens, canvas, bounds, horizontalAlign, verticalAlign, overflow);
+    }
+
+    // TODO: IMPLEMENT STYLED STRING RENDERING
+    
+    public void PlaceString(AnsiString str, ICharCanvas canvas) {
+        PlaceString(str.String, canvas);
+    }
+    
+    public void PlaceString(AnsiString str, ICharCanvas canvas, int maxWidth) {
+        PlaceString(str.String, canvas, maxWidth);
+    }
+
+    public void PlaceString(
+        AnsiString str, ICharCanvas canvas, Rectangle bounds,
+        HorizontalAlign horizontalAlign = HorizontalAlign.LEFT, VerticalAlign verticalAlign = VerticalAlign.TOP,
+        bool overflow = false) 
+    {
+        var tokens = Tokenize(str, this);
+
+        if (_info.SpacingInfo.IsMonospace)
+            PlaceMono(tokens, canvas, bounds, horizontalAlign, verticalAlign, overflow);
+        else 
+        if (_info.SpacingInfo.AsVariable.Kerning)
+            if (_info.SpacingInfo.AsVariable.LineKerning)
+                PlaceVariableKerningWithAlignWithLineKerning(tokens, canvas, bounds, horizontalAlign, verticalAlign, overflow);
+            else
+                PlaceVariable_CharKerning(tokens, canvas, bounds, horizontalAlign, verticalAlign, overflow);
+        else 
+            PlaceVariable_NoKerning(tokens, canvas, bounds, horizontalAlign, verticalAlign, overflow);
     }
 
     // todo: support overflow
@@ -154,7 +183,6 @@ public class NKFont : IFont {
         Token[] tokens,
         ICharCanvas canvas,
         Rectangle bounds,
-        NKStyle style,
         HorizontalAlign horizontalAlign,
         VerticalAlign verticalAlign,
         bool overflow) 
@@ -200,7 +228,7 @@ public class NKFont : IFont {
                 int yp = y - glyph.BaselineOffset;
                 
                 canvas.Place(glyph.Glyph, new Point2D(x, yp));
-                canvas.Style(style, new Point(x, y), glyph.Glyph);
+                canvas.Style(token.Style, new Point(x, y), glyph.Glyph);
                 
                 x += charSize;
             }
@@ -212,7 +240,6 @@ public class NKFont : IFont {
     private void PlaceVariable_NoKerning(Token[] tokens,
         ICharCanvas     canvas,
         Rectangle       bounds,
-        NKStyle         style,
         HorizontalAlign horizontalAlign,
         VerticalAlign   verticalAlign,
         bool            overflow) 
@@ -262,7 +289,7 @@ public class NKFont : IFont {
                 var yp = y - glyph.BaselineOffset - glyph.Height;
                 
                 canvas.Place(glyph.Glyph, new Point2D(x, yp));
-                canvas.Style(style, new Point(x, yp), glyph.Glyph);
+                canvas.Style(token.Style, new Point(x, yp), glyph.Glyph);
                 
                 x += glyph.Width + charSpacing;
             }
@@ -275,7 +302,6 @@ public class NKFont : IFont {
         Token[]         tokens,
         ICharCanvas     canvas,
         Rectangle       bounds,
-        NKStyle         style,
         HorizontalAlign horizontalAlign,
         VerticalAlign   verticalAlign,
         bool            overflow) 
@@ -324,7 +350,7 @@ public class NKFont : IFont {
                 var idk = y - glyph.BaselineOffset - glyph.Height;
                 
                 canvas.Place(glyph.Glyph, new Point2D(x, idk));
-                canvas.Style(style, new Point(x, idk), glyph.Glyph);
+                canvas.Style(token.Style, new Point(x, idk), glyph.Glyph);
             }
             
             y += lineSpacing;
@@ -337,7 +363,6 @@ public class NKFont : IFont {
         Token[]         tokens,
         ICharCanvas     canvas,
         Rectangle       bounds,
-        NKStyle         style,
         HorizontalAlign horizontalAlign,
         VerticalAlign   verticalAlign,
         bool            overflow) 
@@ -890,14 +915,19 @@ public class NKFont : IFont {
     
     public Size GetMinSize(string str) {
         var tokens = Tokenize(str, this);
-        var lines = tokens.Split(t => t.Type is NEWLINE or SPACE);
+        var lines = tokens.Split(t => t.Type is NEWLINE);
 
         int maxWidth = 0;
 
-        for (int i = 0; i < lines.Length; i++) {
-            var canv = new NKCharCanvas(0, 0, true);
-            PlaceString(str, canv);
-            maxWidth = Math.Max(maxWidth, canv.Width);
+        foreach (var line in lines) {
+            var lineTokens = line.Split(t => t.Type is SPACE);
+            foreach (var word in lineTokens) {
+                int wordWidth = 0;
+                foreach (var token in word) {
+                    wordWidth += GetWidth(token);
+                }
+                maxWidth = Math.Max(maxWidth, wordWidth);
+            }
         }
         
         var canvas = new NKCharCanvas(0, 0, true);
@@ -920,6 +950,10 @@ public class NKFont : IFont {
         PlaceString(str, canv, maxWidth);
         return new Size(canv.Width, canv.Height);
     }
+    
+    public Size GetMinSize(AnsiString str) => GetMinSize(str.String);
+    public Size GetSize(AnsiString str) => GetSize(str.String);
+    public Size GetSize(AnsiString str, int maxWidth) => GetSize(str.String, maxWidth);
     
     #endregion
     

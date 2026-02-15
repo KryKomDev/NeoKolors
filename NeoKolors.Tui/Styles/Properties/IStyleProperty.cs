@@ -1,5 +1,5 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 using System.Diagnostics.CodeAnalysis;
 using Implyzer;
@@ -25,6 +25,7 @@ public interface IStyleProperty<out TValue, in TSelf> : IStyleProperty where
 }
 
 [ImplType(ImplKind.ValueType)]
+[IndirectImpl(typeof(IStyleProperty<,>))]
 public interface IStyleProperty {
     
     public object Value { get; }
@@ -96,6 +97,7 @@ public interface IStyleProperty {
     /// <see cref="IStyleProperty"/>.</param>
     /// <exception cref="ArgumentException">Thrown when the specified type does not meet the requirements for being
     /// a valid style property.</exception>
+    [DoesNotReturn]
     public static void ThrowNotStyle(Type t) =>
         throw new ArgumentException($"Type {t} is not a style property!");
 
@@ -134,5 +136,15 @@ public interface IStyleProperty {
     public static bool TryGetByName(string name, [NotNullWhen(returnValue: true)] out Type? type) {
         type = GetByName(name);
         return type != null;
+    }
+
+    public static bool TryIsStyle(Type type, [NotNullWhen(returnValue: true)] out IStyleProperty? style) {
+        if (IsStyle(type)) {
+            style = Create(type);
+            return true;
+        }
+
+        style = null;
+        return false;
     }
 }

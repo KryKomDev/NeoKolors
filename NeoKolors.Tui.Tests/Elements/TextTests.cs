@@ -2,7 +2,6 @@
 // NeoKolors.Test
 // Copyright (c) 2025 KryKom
 
-using NeoKolors.Common;
 using NeoKolors.Tui.Elements;
 
 namespace NeoKolors.Tui.Tests.Elements;
@@ -23,7 +22,7 @@ public class TextTests {
         
         text.Content = "Updated";
         
-        Assert.Equal("Updated", text.Content);
+        Assert.Equal("Updated", text.Content.String);
         Assert.True(eventFired);
     }
 
@@ -31,7 +30,7 @@ public class TextTests {
     public void SetChildren_WithText_ShouldUpdateContent() {
         var text = new Text("Initial");
         text.SetChildNode("New Content");
-        Assert.Equal("New Content", text.Content);
+        Assert.Equal("New Content", text.Content.String);
     }
 
     [Fact]
@@ -44,13 +43,5 @@ public class TextTests {
         
         Assert.True(size.Width > 0);
         Assert.True(size.Height > 0);
-    }
-    
-    [Fact]
-    public void Style_ShouldStoreProperties() {
-        var text = new Text("Styled");
-        text.Color = NKConsoleColor.RED;
-        
-        Assert.Equal(new NKColor(NKConsoleColor.RED), text.Color);
     }
 }

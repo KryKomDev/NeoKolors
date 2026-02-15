@@ -11,7 +11,7 @@ public class NKCommonExtraTests {
         var inverse = color.GetInverse();
 
         // Assert
-        Assert.Equal(ColorType.RGB, inverse.Type);
+        Assert.Equal(NKColor.ColorType.RGB, inverse.Type);
         Assert.Equal(255 - 100, (byte)(inverse.AsRgb >> 16));
         Assert.Equal(255 - 150, (byte)(inverse.AsRgb >> 8));
         Assert.Equal(255 - 200, (byte)inverse.AsRgb);
@@ -26,7 +26,7 @@ public class NKCommonExtraTests {
         var inverse = color.GetInverse();
 
         // Assert
-        Assert.Equal(ColorType.CONSOLE_COLOR, inverse.Type);
+        Assert.Equal(NKColor.ColorType.CONSOLE_COLOR, inverse.Type);
         Assert.Equal(NKConsoleColor.DARK_GRAY, inverse.AsPalette); // (0 + 8) % 16 = 8
     }
 

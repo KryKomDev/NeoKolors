@@ -1,5 +1,5 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 using System.Diagnostics.Contracts;
 using Implyzer;
@@ -47,7 +47,7 @@ public interface IElement : IRenderable, INode {
     /// </summary>
     /// <param name="canvas">The drawing surface on which the content will be rendered.</param>
     void IRenderable.Render(ICharCanvas canvas)
-        => Render(canvas, new Rectangle(0, 0, canvas.Width, canvas.Height));
+        => Render(canvas, new Rectangle(0, 0, canvas.Width - 1, canvas.Height - 1));
 
     /// <summary>
     /// Calculates the minimum layout size required by the element based on the provided parent size.
@@ -85,36 +85,363 @@ public interface IElement : IRenderable, INode {
     //                       LAYOUT COMPUTATION                       //
     // -------------------------------------------------------------- //
 
+    
+    //
+    // The following methods can be used to compute the dimensions of an element in 
+    // certain scenarios. To see what they do and how to use them correctly, see 
+    // NeoKolors.Tui/Docs/Layout/Layout-Computation-Methods.md
+    //
+
+    
     /// <summary>
-    /// Computes the layout of an element based on its content size, parent container size, and style properties such as margin, padding, and border.
+    /// Computes the layout of an element based on the specified content, bounds, spacing, dimensions, and functions
+    /// for calculating minimum and maximum content sizes.
     /// </summary>
-    /// <param name="content">The size of the content to be laid out.</param>
-    /// <param name="parent">The size of the parent container in which the element is being laid out.</param>
-    /// <param name="margin">The margin style properties defining the spacing outside the element.</param>
-    /// <param name="padding">The padding style properties defining the spacing inside the element, around the content.</param>
-    /// <param name="border">The border style properties, including whether the element's border is present or absent.</param>
-    /// <returns>An <c>ElementLayout</c> struct containing computed sizes and positions for the element's overall size, content area, and border area.</returns>
+    /// <param name="bounds">The available size within which the element can be laid out.</param>
+    /// <param name="margin">The spacing outside the element to separate it from other elements.</param>
+    /// <param name="border">The border style of the element.</param>
+    /// <param name="padding">The spacing inside the element between its border and its content.</param>
+    /// <param name="width">The width constraint of the element.</param>
+    /// <param name="height">The height constraint of the element.</param>
+    /// <param name="minWidth">The minimum width constraint of the element.</param>
+    /// <param name="maxWidth">The maximum width constraint of the element.</param>
+    /// <param name="minHeight">The minimum height constraint of the element.</param>
+    /// <param name="maxHeight">The maximum height constraint of the element.</param>
+    /// <param name="computeContent">A function to compute the content size of the element for the given width.</param>
+    /// <param name="computeMinContent">A function to compute the minimum content size of the element.</param>
+    /// <param name="computeMaxContent">A function to compute the maximum content size of the element.</param>
+    /// <returns>The computed layout of the element, including its size and positioning adjustments.</returns>
     [Pure]
-    public static ElementLayout ComputeLayout(
-        Size        content, 
-        Size        parent,
+    public static ElementLayout ComputeLayoutFromBounds(
+        Size           bounds,
+        Spacing        margin,
+        BorderStyle    border,
+        Spacing        padding,
+        Dimension      width,
+        Dimension      height,
+        Dimension      minWidth,
+        Dimension      maxWidth,
+        Dimension      minHeight,
+        Dimension      maxHeight,
+        Func<int, int> computeContent,
+        Func<Size>     computeMinContent,
+        Func<Size>     computeMaxContent) 
+    {
+        // margin
+        int ml = margin.Left  .ToScalarX(bounds.Width);
+        int mr = margin.Right .ToScalarX(bounds.Width);
+        int mt = margin.Top   .ToScalarY(bounds.Height);
+        int mb = margin.Bottom.ToScalarY(bounds.Height);
+
+        // padding
+        int pl = padding.Left  .ToScalarX(bounds.Width);
+        int pr = padding.Right .ToScalarX(bounds.Width);
+        int pt = padding.Top   .ToScalarY(bounds.Height);
+        int pb = padding.Bottom.ToScalarY(bounds.Height);
+        
+        var c = ComputeLayoutFromBounds(bounds, (ml, mr, mt, mb), (pl, pr, pt, pb), border).Content.Size;
+        
+        c = RecomputeContentBoxSize(
+            c,
+            bounds, 
+            margin, border, padding,
+            width, height, 
+            minWidth, maxWidth,
+            minHeight, maxHeight,
+            computeContent,
+            computeMinContent,
+            computeMaxContent
+        );
+        
+        return ComputeLayoutFromContent(c, (ml, mr, mt, mb), (pl, pr, pt, pb), border);
+    }
+    
+    /// <summary>
+    /// Computes the layout of an element based on the specified content, bounds, spacing, dimensions, and functions
+    /// for calculating minimum and maximum content sizes.
+    /// </summary>
+    /// <param name="bounds">The available size within which the element can be laid out.</param>
+    /// <param name="margin">The spacing outside the element to separate it from other elements.</param>
+    /// <param name="border">The border style of the element.</param>
+    /// <param name="padding">The spacing inside the element between its border and its content.</param>
+    /// <param name="width">The width constraint of the element.</param>
+    /// <param name="height">The height constraint of the element.</param>
+    /// <param name="minWidth">The minimum width constraint of the element.</param>
+    /// <param name="maxWidth">The maximum width constraint of the element.</param>
+    /// <param name="minHeight">The minimum height constraint of the element.</param>
+    /// <param name="maxHeight">The maximum height constraint of the element.</param>
+    /// <returns>The computed layout of the element, including its size and positioning adjustments.</returns>
+    [Pure]
+    public static ElementLayout ComputeLayoutFromBounds(
+        Size           bounds,
+        Spacing        margin,
+        BorderStyle    border,
+        Spacing        padding,
+        Dimension      width,
+        Dimension      height,
+        Dimension      minWidth,
+        Dimension      maxWidth,
+        Dimension      minHeight,
+        Dimension      maxHeight) 
+    {
+        // margin
+        int ml = margin.Left  .ToScalarX(bounds.Width);
+        int mr = margin.Right .ToScalarX(bounds.Width);
+        int mt = margin.Top   .ToScalarY(bounds.Height);
+        int mb = margin.Bottom.ToScalarY(bounds.Height);
+
+        // padding
+        int pl = padding.Left  .ToScalarX(bounds.Width);
+        int pr = padding.Right .ToScalarX(bounds.Width);
+        int pt = padding.Top   .ToScalarY(bounds.Height);
+        int pb = padding.Bottom.ToScalarY(bounds.Height);
+        
+        var c = ComputeLayoutFromBounds(bounds, (ml, mr, mt, mb), (pl, pr, pt, pb), border).Content.Size;
+        
+        c = RecomputeContentBoxSize(
+            c, 
+            bounds, 
+            margin, border, padding, 
+            width, height,
+            minWidth, maxWidth,
+            minHeight, maxHeight
+        );
+        
+        return ComputeLayoutFromContent(c, (ml, mr, mt, mb), (pl, pr, pt, pb), border);
+    }
+
+    /// <summary>
+    /// Computes the layout of an element based on the specified content, bounds, spacing, dimensions, and functions
+    /// for calculating minimum and maximum content sizes.
+    /// </summary>
+    /// <param name="content">The size of the content to be laid out within the element.</param>
+    /// <param name="parent">The parent element content box size to be used as a reference when recomputing the relative units.</param>
+    /// <param name="margin">The spacing outside the element to separate it from other elements.</param>
+    /// <param name="border">The border style of the element.</param>
+    /// <param name="padding">The spacing inside the element between its border and its content.</param>
+    /// <param name="width">The width constraint of the element.</param>
+    /// <param name="height">The height constraint of the element.</param>
+    /// <param name="minWidth">The minimum width constraint of the element.</param>
+    /// <param name="maxWidth">The maximum width constraint of the element.</param>
+    /// <param name="minHeight">The minimum height constraint of the element.</param>
+    /// <param name="maxHeight">The maximum height constraint of the element.</param>
+    /// <param name="computeContent">A function to compute the content size of the element for the given width.</param>
+    /// <param name="computeMinContent">A function to compute the minimum content size of the element.</param>
+    /// <param name="computeMaxContent">A function to compute the maximum content size of the element.</param>
+    /// <returns>The computed layout of the element, including its size and positioning adjustments.</returns>
+    [Pure]
+    public static ElementLayout ComputeLayoutFromContent(
+        Size           content,
+        Size           parent,
+        Spacing        margin,
+        BorderStyle    border,
+        Spacing        padding,
+        Dimension      width,
+        Dimension      height,
+        Dimension      minWidth,
+        Dimension      maxWidth,
+        Dimension      minHeight,
+        Dimension      maxHeight,
+        Func<int, int> computeContent,
+        Func<Size>     computeMinContent,
+        Func<Size>     computeMaxContent) 
+    {
+        var c = content;
+        
+        c = RecomputeContentBoxSize(
+            c,
+            parent,
+            margin, border, padding,
+            width, height,
+            minWidth, maxWidth,
+            minHeight, maxHeight,
+            computeContent, 
+            computeMinContent,
+            computeMaxContent
+        );
+        
+        return ComputeLayoutFromContent(c, margin, padding, border);
+    }
+
+
+    /// <summary>
+    /// Computes the layout of an element based on the specified content, bounds, spacing, dimensions, and functions
+    /// for calculating minimum and maximum content sizes.
+    /// </summary>
+    /// <param name="content">The size of the content to be laid out within the element.</param>
+    /// <param name="parent">The parent element content box size to be used as a reference when recomputing the relative units.</param>
+    /// <param name="margin">The spacing outside the element to separate it from other elements.</param>
+    /// <param name="border">The border style of the element.</param>
+    /// <param name="padding">The spacing inside the element between its border and its content.</param>
+    /// <param name="width">The width constraint of the element.</param>
+    /// <param name="height">The height constraint of the element.</param>
+    /// <param name="minWidth">The minimum width constraint of the element.</param>
+    /// <param name="maxWidth">The maximum width constraint of the element.</param>
+    /// <param name="minHeight">The minimum height constraint of the element.</param>
+    /// <param name="maxHeight">The maximum height constraint of the element.</param>
+    /// <returns>The computed layout of the element, including its size and positioning adjustments.</returns>
+    [Pure]
+    public static ElementLayout ComputeLayoutFromContent(
+        Size           content,
+        Size           parent,
+        Spacing        margin,
+        BorderStyle    border,
+        Spacing        padding,
+        Dimension      width,
+        Dimension      height,
+        Dimension      minWidth,
+        Dimension      maxWidth,
+        Dimension      minHeight,
+        Dimension      maxHeight) 
+    {
+        var c = content;
+        
+        c = RecomputeContentBoxSize(
+            c,
+            parent,
+            margin,    border, padding, 
+            width,     height,
+            minWidth,  maxWidth,
+            minHeight, maxHeight
+        );
+        
+        return ComputeLayoutFromContent(c, margin, padding, border);
+    }
+
+    [Pure]
+    private static Size RecomputeContentBoxSize(
+        Size            content, 
+        Size            parent,
+        Spacing         margin,
+        BorderStyle     border,
+        Spacing         padding,
+        Dimension       width,
+        Dimension       height,
+        Dimension       minWidth,
+        Dimension       maxWidth,
+        Dimension       minHeight,
+        Dimension       maxHeight,
+        Func<int, int>? computeContent    = null,
+        Func<Size>?     computeMinContent = null,
+        Func<Size>?     computeMaxContent = null) 
+    {
+        computeMinContent ??= ( ) => new Size(content.Width, content.Height);
+        computeMaxContent ??= ( ) => new Size(content.Width, content.Height);
+        computeContent    ??= (_) => content.Height;
+        
+        Size? minC = null;
+        Size? maxC = null;
+        var c = content;
+
+        // recompute the width of the content box
+        if (width.IsMinContent) {
+            minC = computeMinContent();
+            c = c with { Width = minC.Value.Width };
+        }
+        else if (width.IsMaxContent) {
+            maxC = computeMaxContent();
+            c = c with { Width = maxC.Value.Width };
+        }
+        else if (width.IsStretch) {
+            var w = parent.Width 
+                - margin .Left.ToScalarX(parent.Width) - margin .Right.ToScalarX(parent.Width) 
+                - padding.Left.ToScalarX(parent.Width) - padding.Right.ToScalarX(parent.Width) 
+                - (border.IsBorderless ? 0 : 2);
+            
+            c = c with { Width = w };
+        }
+        else if (width.IsNumber) {
+            int w = width.ToScalarX(parent.Width);
+
+            // if the height is automatically computed, recompute it for the given width
+            if (height.IsAuto) {
+                int h = computeContent(w);
+                c = new Size(width: w, height: h);   
+            }
+            else {
+                c = c with { Width = w };
+            }
+        }
+        else {
+            var xw = maxWidth.IsNumber ? maxWidth.ToScalarX(parent.Width) : int.MaxValue;
+            var nw = minWidth.IsNumber ? minWidth.ToScalarX(parent.Width) : 0;
+            c = c with { Width = Math.DClamp(content.Width, xw, nw) };
+        }
+
+        // recompute the height of the content box
+        if (height.IsMinContent) {
+            minC ??= computeMinContent();
+            c = c with { Height = minC.Value.Height };
+        }
+        else if (height.IsMaxContent) {
+            maxC ??= computeMaxContent();
+            c = c with { Height = maxC.Value.Height };
+        }
+        else if (width.IsStretch) {
+            var h = parent.Height 
+                - margin .Top.ToScalarY(parent.Height) - margin .Bottom.ToScalarY(parent.Height) 
+                - padding.Top.ToScalarY(parent.Height) - padding.Bottom.ToScalarY(parent.Height) 
+                - (border.IsBorderless ? 0 : 2);
+            
+            c = c with { Height = h };
+        }
+        else if (height.IsNumber) {
+            c = c with { Height = height.ToScalarY(parent.Height) };
+        }
+        else {
+            var xh = maxHeight.IsNumber ? maxHeight.ToScalarY(parent.Height) : int.MaxValue;
+            var nh = minHeight.IsNumber ? minHeight.ToScalarY(parent.Height) : 0;
+            c = c with { Height = Math.DClamp(content.Height, xh, nh) };
+        }
+
+        return c;
+    }
+
+    [Pure]
+    private static ElementLayout ComputeLayoutFromContent(
+        Size        content,
         Spacing     margin,
         Spacing     padding,
+        BorderStyle border) 
+    {
+        var ml = margin.Left  .ToScalarX(content.Width);
+        var mr = margin.Right .ToScalarX(content.Width);
+        var mt = margin.Top   .ToScalarY(content.Height);
+        var mb = margin.Bottom.ToScalarY(content.Height);
+        
+        var pl = padding.Left  .ToScalarX(content.Width);
+        var pr = padding.Right .ToScalarX(content.Width);
+        var pt = padding.Top   .ToScalarY(content.Height);
+        var pb = padding.Bottom.ToScalarY(content.Height);
+
+        return ComputeLayoutFromContent(
+            content,
+            (ml, mr, mt, mb),
+            (pl, pr, pt, pb),
+            border
+        );
+    }
+    
+    [Pure]
+    private static ElementLayout ComputeLayoutFromContent(
+        Size content,
+        (int L, int R, int T, int B) margin,
+        (int L, int R, int T, int B) padding,
         BorderStyle border) 
     {
         int bd = border.IsBorderless ? 0 : 1;
 
         // margin
-        int ml = margin.Left  .ToScalar(parent.Width);
-        int mr = margin.Right .ToScalar(parent.Width);
-        int mt = margin.Top   .ToScalar(parent.Height);
-        int mb = margin.Bottom.ToScalar(parent.Height);
+        int ml = margin.L;
+        int mr = margin.R;
+        int mt = margin.T;
+        int mb = margin.B;
 
         // padding
-        int pl = padding.Left  .ToScalar(parent.Width);
-        int pr = padding.Right .ToScalar(parent.Width);
-        int pt = padding.Top   .ToScalar(parent.Height);
-        int pb = padding.Bottom.ToScalar(parent.Height);
+        int pl = padding.L;
+        int pr = padding.R;
+        int pt = padding.T;
+        int pb = padding.B;
         
         var e = new Size(content.Width + pl + pr + bd * 2 + ml + mr, content.Height + pt + pb + bd * 2 + mt + mb);
         var c = new Rectangle(new Point(ml + pl + bd, mt + pt + bd), content);
@@ -127,112 +454,41 @@ public interface IElement : IRenderable, INode {
         return new ElementLayout(e, c, b);
     }
 
-    /// <summary>
-    /// Computes the layout settings for an element based on its content, parent dimensions, and style properties.
-    /// </summary>
-    /// <param name="content">The size of the content within the element.</param>
-    /// <param name="parent">The size of the parent container, used for calculating relative dimensions.</param>
-    /// <param name="margin">The margin property that defines space outside the element.</param>
-    /// <param name="padding">The padding property that defines space between content and the element's edges.</param>
-    /// <param name="border">The border style of the element, affecting its dimensions.</param>
-    /// <param name="width">The width property of the element, defining its horizontal sizing behavior.</param>
-    /// <param name="height">The height property of the element, defining its vertical sizing behavior.</param>
-    /// <param name="minWidth">The minimum width property of the element, setting a lower bound on the width.</param>
-    /// <param name="maxWidth">The maximum width property of the element, setting an upper bound on the width.</param>
-    /// <param name="minHeight">The minimum height property of the element, setting a lower bound on the height.</param>
-    /// <param name="maxHeight">The maximum height property of the element, setting an upper bound on the height.</param>
-    /// <returns>An <see cref="ElementLayout"/> struct representing the computed layout settings for the element.</returns>
     [Pure]
-    public static ElementLayout ComputeLayout(
-        Size        content, 
-        Size        parent,
-        Spacing     margin,
-        Spacing     padding,
-        BorderStyle border,
-        Dimension   width,
-        Dimension   height,
-        Dimension   minWidth,
-        Dimension   maxWidth,
-        Dimension   minHeight,
-        Dimension   maxHeight) 
+    private static ElementLayout ComputeLayoutFromBounds(
+        Size bounds,
+        (int L, int R, int T, int B) margin,
+        (int L, int R, int T, int B) padding,
+        BorderStyle border) 
     {
-        var l = ComputeLayout(content, parent, margin, padding, border);
-
-        var e = l.ElementSize;
-
-        if (width.IsMinContent) { }
-        else if (width.IsNumber) {
-            e = e with { Width = width.ToScalar(parent.Width) };
-        }
-        else {
-            var xw = maxWidth.IsNumber ? maxWidth.ToScalar(parent.Width) : int.MaxValue;
-            var nw = minWidth.IsNumber ? minWidth.ToScalar(parent.Width) : 0;
-            e = e with { Width = Math.DClamp(e.Width, xw, nw) };
-        }
-        
-        if (height.IsMinContent) { }
-        else if (height.IsNumber) {
-            e = e with { Height = height.ToScalar(parent.Height) };
-        }
-        else {
-            var xh = maxHeight.IsNumber ? maxHeight.ToScalar(parent.Height) : int.MaxValue;
-            var nh = minHeight.IsNumber ? minHeight.ToScalar(parent.Height) : 0;
-            e = e with { Height = Math.DClamp(e.Height, xh, nh) };
-        }
-        
-        int dx = l.ElementSize.Width  - e.Width;
-        int dy = l.ElementSize.Height - e.Height;
-
-        return new ElementLayout(
-            new Size(e.Width, e.Height), 
-            new Size(l.Content.Width - dx, l.Content.Height - dy) + l.Content.Lower,
-            new Size(l.Border.Width - dx, l.Border.Height - dy) + l.Border.Lower 
-        );
-    }
-
-    /// <summary>
-    /// Computes the layout of an element based on its size constraints, margins, padding, and border styles.
-    /// </summary>
-    /// <param name="bounds">The available size of the parent container.</param>
-    /// <param name="margin">The margin properties of the element, defining the space outside the border.</param>
-    /// <param name="padding">The padding properties of the element, defining the space inside the border.</param>
-    /// <param name="border">The border style applied to the element, including whether it is borderless.</param>
-    /// <param name="width">The desired width of the element, if specified.</param>
-    /// <param name="height">The desired height of the element, if specified.</param>
-    /// <param name="minWidth">The minimum width constraint of the element.</param>
-    /// <param name="maxWidth">The maximum width constraint of the element.</param>
-    /// <param name="minHeight">The minimum height constraint of the element.</param>
-    /// <param name="maxHeight">The maximum height constraint of the element.</param>
-    /// <returns>An <c>ElementLayout</c> struct representing the computed layout size of the element.</returns>
-    [Pure]
-    public static ElementLayout ComputeLayout(
-        Size        bounds,
-        Spacing     margin,
-        Spacing     padding,
-        BorderStyle border,
-        Dimension   width,
-        Dimension   height,
-        Dimension   minWidth,
-        Dimension   maxWidth,
-        Dimension   minHeight,
-        Dimension   maxHeight) 
-    {
-        int bd = border.IsBorderless ? 0 : 2;
+        int bd = border.IsBorderless ? 0 : 1;
 
         // margin
-        int ml = margin.Left  .ToScalar(bounds.Width);
-        int mr = margin.Right .ToScalar(bounds.Width);
-        int mt = margin.Top   .ToScalar(bounds.Height);
-        int mb = margin.Bottom.ToScalar(bounds.Height);
+        int ml = margin.L;
+        int mr = margin.R;
+        int mt = margin.T;
+        int mb = margin.B;
 
         // padding
-        int pl = padding.Left  .ToScalar(bounds.Width);
-        int pr = padding.Right .ToScalar(bounds.Width);
-        int pt = padding.Top   .ToScalar(bounds.Height);
-        int pb = padding.Bottom.ToScalar(bounds.Height);
-
-        var c = new Size(bounds.Width - ml - mr - bd - pl - pr, bounds.Height - mt - mb - bd - pt - pb);
+        int pl = padding.L;
+        int pr = padding.R;
+        int pt = padding.T;
+        int pb = padding.B;
         
-        return ComputeLayout(c, bounds, margin, padding, border, width, height, minWidth, maxWidth, minHeight, maxHeight);
-    }
+        var e = bounds;
+        var c = new Rectangle(
+            new Point(ml + pl + bd, mt + pt + bd), 
+            new Size(
+                bounds.Width  - (ml + mr + pl + pr + 2 * bd), 
+                bounds.Height - (mt + mb + pt + pb + 2 * bd)
+            )
+        );
+
+        // no border
+        if (bd == 0) return new ElementLayout(e, c, e);
+
+        // yes border :)
+        var b = new Rectangle(new Point(ml, mt), new Size(e.Width - ml - mr, e.Height - mt - mb));
+        return new ElementLayout(e, c, b);
+    } 
 }

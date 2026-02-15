@@ -1,5 +1,5 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 using Metriks;
 using SkiaSharp;
@@ -17,7 +17,9 @@ public interface ICharCanvas {
     public void Place(ICharCanvas canvas, Point2D offset = default);
     public void Place(CellInfo[,] cells,  Point2D offset = default);
     public void Place(char?[,]    chars,  Point2D offset = default, int zIndex = 0);
-    public void PlaceString(string str, Point2D offset = default, int zIndex = 0);
+    public void Place(string str, Point2D offset = default, int zIndex = 0);
+    public void Place(AnsiString str, Point2D offset = default, int zIndex = 0);
+    public void Place(AnsiChar c, Point2D offset = default, int zIndex = 0);
     
     public void Restyle(NKStyle[,] styles, Point2D offset = default, int zIndex = 0);
     

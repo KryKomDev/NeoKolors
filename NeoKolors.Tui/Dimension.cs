@@ -1,18 +1,17 @@
 ﻿//
 // NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 //
 
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
-using NeoKolors.Tui.Styles.Values;
 
 namespace NeoKolors.Tui;
 
 public struct Dimension : IParsableValue<Dimension> {
     
-    public OneOf<UnitDimension, Auto, MinContent, MaxContent, DimensionExpression> Value { get; set; }
+    public OneOf<UnitDimension, Auto, MinContent, MaxContent, DimensionExpression, Stretch> Value { get; set; }
     
     /// <summary>
     /// Gets a value indicating whether the current <see cref="Dimension"/> instance
@@ -59,6 +58,18 @@ public struct Dimension : IParsableValue<Dimension> {
     /// </remarks>
     public bool IsMaxContent => Value.IsT3;
 
+    /// <summary>
+    /// Gets a value indicating whether the current <see cref="Dimension"/> instance
+    /// represents a stretch value.
+    /// </summary>
+    /// <remarks>
+    /// This property checks if the underlying value of the <see cref="Dimension"/>
+    /// is categorized as a <see cref="Stretch"/> type. A stretch value is typically
+    /// used to represent flexible or proportional sizing, where the dimension can
+    /// adjust dynamically based on the available space.
+    /// </remarks>
+    public bool IsStretch => Value.IsT5;
+
     public Dimension(int value, LengthUnit unit) {
         Value = new UnitDimension(value, unit);
     }
@@ -75,6 +86,10 @@ public struct Dimension : IParsableValue<Dimension> {
         Value = maxContent;
     }
 
+    private Dimension(Stretch stretch) {
+        Value = stretch;
+    }
+
     private Dimension(DimensionExpression x) {
         Value = x;
     }
@@ -82,6 +97,7 @@ public struct Dimension : IParsableValue<Dimension> {
     public static Dimension Auto => new(new Auto());
     public static Dimension MinContent => new(new MinContent());
     public static Dimension MaxContent => new(new MaxContent());
+    public static Dimension Stretch => new(new Stretch());
     public static Dimension Zero => new(0, LengthUnit.CHAR);
     public static Dimension Chars(int value) => new(value, LengthUnit.CHAR);
     public static Dimension Pixels(int value) => new(value, LengthUnit.PIXEL);
@@ -97,7 +113,8 @@ public struct Dimension : IParsableValue<Dimension> {
             _ => "auto",
             _ => "min-content",
             _ => "max-content",
-            x => x.ToString()
+            x => x.ToString(),
+            _ => "stretch"
         );
     }
 
@@ -107,7 +124,30 @@ public struct Dimension : IParsableValue<Dimension> {
             _ => throw new InvalidOperationException("Cannot convert Auto, MinContent, or MaxContent to scalar value."),
             _ => throw new InvalidOperationException("Cannot convert Auto, MinContent, or MaxContent to scalar value."),
             _ => throw new InvalidOperationException("Cannot convert Auto, MinContent, or MaxContent to scalar value."),
-            x => x.ToScalar(parent)
+            x => x.ToScalar(parent),
+            _ => throw new InvalidOperationException("Cannot convert Auto, MinContent, or MaxContent to Scalar value.")
+        );
+    }
+    
+    public int ToScalarX(int parent) {
+        return Value.Match(
+            t => t.GetScalarX(parent),
+            _ => throw new InvalidOperationException("Cannot convert Auto, MinContent, or MaxContent to scalar value."),
+            _ => throw new InvalidOperationException("Cannot convert Auto, MinContent, or MaxContent to scalar value."),
+            _ => throw new InvalidOperationException("Cannot convert Auto, MinContent, or MaxContent to scalar value."),
+            x => x.ToScalarX(parent),
+            _ => throw new InvalidOperationException("Cannot convert Auto, MinContent, or MaxContent to Scalar value.")
+        );
+    }
+    
+    public int ToScalarY(int parent) {
+        return Value.Match(
+            t => t.GetScalarY(parent),
+            _ => throw new InvalidOperationException("Cannot convert Auto, MinContent, or MaxContent to scalar value."),
+            _ => throw new InvalidOperationException("Cannot convert Auto, MinContent, or MaxContent to scalar value."),
+            _ => throw new InvalidOperationException("Cannot convert Auto, MinContent, or MaxContent to scalar value."),
+            x => x.ToScalarY(parent),
+            _ => throw new InvalidOperationException("Cannot convert Auto, MinContent, or MaxContent to Scalar value.")
         );
     }
 
@@ -153,6 +193,7 @@ public struct Dimension : IParsableValue<Dimension> {
         if (s == "auto") return Auto;
         if (s is "min-content" or "mincontent") return MinContent;
         if (s is "max-content" or "maxcontent") return MaxContent;
+        if (s is "stretch") return Stretch;
         
         var ops = s.Split(' ');
 
@@ -233,3 +274,9 @@ public record struct MinContent;
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 0)]
 public record struct MaxContent;
+
+/// <summary>
+/// Represents a value that makes the margin box stretch to fill available space.
+/// </summary>
+[StructLayout(LayoutKind.Explicit, Size = 0)]
+public record struct Stretch;

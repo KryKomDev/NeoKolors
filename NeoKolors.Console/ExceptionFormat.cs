@@ -75,15 +75,15 @@ public struct ExceptionFormat {
         ShowHighlight           = true;
         HighlightColor          = DARK_RED;
         ExceptionNamespaceStyle = new NKStyle();
-        ExceptionTypeStyle      = new NKStyle(YELLOW, TextStyles.ITALIC);
+        ExceptionTypeStyle      = new NKStyle(YELLOW, s: TextStyles.ITALIC);
         MessageStyle            = new NKStyle(RED);
-        FileNameStyle           = new NKStyle(BLUE, TextStyles.BOLD);
+        FileNameStyle           = new NKStyle(BLUE, s: TextStyles.BOLD);
         PathStyle               = new NKStyle(GRAY);
-        MethodStyle             = new NKStyle(BLUE, TextStyles.ITALIC | TextStyles.BOLD);
+        MethodStyle             = new NKStyle(BLUE, s: TextStyles.ITALIC | TextStyles.BOLD);
         MethodSourceStyle       = new NKStyle(GRAY);
         MethodArgumentsStyle    = new NKStyle();
         LineNumberStyle         = new NKStyle(GREEN);
-        HelpLinkStyle           = new NKStyle(TextStyles.ITALIC);
+        HelpLinkStyle           = new NKStyle(s: TextStyles.ITALIC);
     }
 
     public ExceptionFormat(
@@ -103,14 +103,14 @@ public struct ExceptionFormat {
         ShowHighlight           = showHighlight;
         HighlightColor          = highlightColor          ?? DARK_RED;
         ExceptionNamespaceStyle = exceptionNamespaceStyle ?? new NKStyle();
-        ExceptionTypeStyle      = exceptionTypeStyle      ?? new NKStyle(YELLOW, TextStyles.ITALIC);
+        ExceptionTypeStyle      = exceptionTypeStyle      ?? new NKStyle(YELLOW, s: TextStyles.ITALIC);
         MessageStyle            = messageStyle            ?? new NKStyle(RED);
-        FileNameStyle           = fileNameStyle           ?? new NKStyle(BLUE, TextStyles.BOLD);
+        FileNameStyle           = fileNameStyle           ?? new NKStyle(BLUE, s: TextStyles.BOLD);
         PathStyle               = pathStyle               ?? new NKStyle(GRAY);
-        MethodStyle             = methodStyle             ?? new NKStyle(BLUE, TextStyles.ITALIC | TextStyles.BOLD);
+        MethodStyle             = methodStyle             ?? new NKStyle(BLUE, s: TextStyles.ITALIC | TextStyles.BOLD);
         MethodSourceStyle       = methodSourceStyle       ?? new NKStyle(GRAY);
         MethodArgumentsStyle    = methodArgumentsStyle    ?? new NKStyle();
         LineNumberStyle         = lineNumberStyle         ?? new NKStyle(GREEN);
-        HelpLinkStyle           = helpLinkStyle           ?? new NKStyle(TextStyles.ITALIC);
+        HelpLinkStyle           = helpLinkStyle           ?? new NKStyle(s: TextStyles.ITALIC);
     }
 }

@@ -8,7 +8,6 @@ using System.Diagnostics.CodeAnalysis;
 #endif
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
-using NeoKolors.Common.Util;
 using static NeoKolors.Common.EscapeCodes;
 
 namespace NeoKolors.Common;
@@ -416,4 +415,62 @@ public static class StringEffects {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static string AddStyle(this char s, NKStyle style) => 
         s.AddStyle(style.Styles).AddColor(style.FColor, style.BColor);
+    
+    /// <summary>
+    /// Applies the specified text style, foreground color, and background color
+    /// from the provided <see cref="NKStyle"/> to the given string.
+    /// </summary>
+    /// <param name="s">The string to which the style and colors will be applied.</param>
+    /// <param name="style">The <see cref="NKStyle"/>
+    /// containing the styles, foreground color, and background color to apply.
+    /// </param>
+    /// <returns>A new string with the applied styles and colors.</returns>
+    public static string AddCStyle(this string s, NKStyle style) =>
+        s.AddCStyle(style.Styles).AddCColorF(style.FColor).AddCColorB(style.BColor);
+
+    /// <summary>
+    /// Applies the specified text style, foreground color, and background color
+    /// from the provided <see cref="NKStyle"/> to the given character.
+    /// </summary>
+    /// <param name="c">The character to which the style and colors will be applied.</param>
+    /// <param name="style">The <see cref="NKStyle"/> containing the styles, foreground color,
+    /// and background color to apply.</param>
+    /// <returns>A new string derived from the character with the applied styles and colors.</returns>
+    public static string AddCStyle(this char c, NKStyle style) =>
+        c.ToString().AddCStyle(style.Styles).AddCColorF(style.FColor).AddCColorB(style.BColor);
+
+    /// <param name="s">The string to which the foreground color will be applied.</param>
+    extension(string s) {
+        /// <summary>
+        /// Applies the specified foreground color from the provided <see cref="NKColor"/> to the given string.
+        /// </summary>
+        /// <param name="color">The <see cref="NKColor"/> specifying the foreground color to apply.</param>
+        /// <returns>A new string with the applied foreground color.</returns>
+        public string AddCColorF(NKColor color) => $"{color.Text}{s}";
+
+        /// <summary>
+        /// Applies the specified background color from the provided <see cref="NKColor"/> to the given string.
+        /// </summary>
+        /// <param name="color">The <see cref="NKColor"/> containing the background color to apply.</param>
+        /// <returns>A new string with the applied background color.</returns>
+        public string AddCColorB(NKColor color) => $"{color.Bckg}{s}";
+
+        /// <summary>
+        /// Applies the specified text style to the given string.
+        /// </summary>
+        /// <param name="style">The <see cref="TextStyles"/> value specifying the styles
+        /// to apply, such as bold, italic, or underline.</param>
+        /// <returns>A new string with the specified text styles applied.</returns>
+        public string AddCStyle(TextStyles style) {
+            if (style.GetIsBold()) s = $"{BOLD_START}{s}";
+            if (style.GetIsItalic()) s = $"{ITALIC_START}{s}";
+            if (style.GetIsUnderline()) s = $"{UNDERLINE_START}{s}";
+            if (style.GetIsFaint()) s = $"{FAINT_START}{s}";
+            if (style.GetIsNegative()) s = $"{NEGATIVE_START}{s}";
+            if (style.GetIsStrikethrough()) s = $"{STRIKETHROUGH_START}{s}";
+            return s;
+        }
+    }
+    
+    
 }

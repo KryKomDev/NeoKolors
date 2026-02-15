@@ -1,5 +1,5 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 using NeoKolors.Tui.Styles.Values;
 
@@ -57,16 +57,16 @@ public struct ListPointProperty : IStyleProperty<ListPointGenerator, ListPointPr
     public static ListPointProperty Alphabet           => new(i => ((char)(i - 1 + 'a')).ToString());
     public static ListPointProperty AlphabetDot        => new(i => ((char)(i - 1 + 'a')) + ".");
     public static ListPointProperty AlphabetBracket    => new(i => ((char)(i - 1 + 'a')) + ")");
-    public static ListPointProperty Roman              => new(i => i.ToRoman(true));
-    public static ListPointProperty RomanDot           => new(i => i.ToRoman(true) + ".");
-    public static ListPointProperty RomanBracket       => new(i => i.ToRoman(true) + ")");
+    public static ListPointProperty Roman              => new(i => string.ToRoman(i, true));
+    public static ListPointProperty RomanDot           => new(i => string.ToRoman(i, true) + ".");
+    public static ListPointProperty RomanBracket       => new(i => string.ToRoman(i, true) + ")");
     public static ListPointProperty Arabic             => new(i => i.ToString());
     public static ListPointProperty ArabicDot          => new(i => i + ".");
     public static ListPointProperty ArabicBracket      => new(i => i + ")");
     public static ListPointProperty CapAlphabet        => new(i => ((char)(i - 1 + 'A')).ToString());
     public static ListPointProperty CapAlphabetDot     => new(i => ((char)(i - 1 + 'A')) + ".");
     public static ListPointProperty CapAlphabetBracket => new(i => ((char)(i - 1 + 'A')) + ")");
-    public static ListPointProperty CapRoman           => new(i => i.ToRoman());
-    public static ListPointProperty CapRomanDot        => new(i => i.ToRoman() + ".");
-    public static ListPointProperty CapRomanBracket    => new(i => i.ToRoman() + ")");
+    public static ListPointProperty CapRoman           => new(i => string.ToRoman(i, true));
+    public static ListPointProperty CapRomanDot        => new(i => string.ToRoman(i, true) + ".");
+    public static ListPointProperty CapRomanBracket    => new(i => string.ToRoman(i, true) + ")");
 }

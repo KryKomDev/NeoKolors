@@ -1,6 +1,6 @@
 ﻿//
 // NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 //
 
 using System.Diagnostics;
@@ -82,6 +82,8 @@ public struct Rectangle : IEquatable<Rectangle> {
     
     public Point Lower => new(_lowerX, _lowerY);
     public Point Higher => new(_higherX, _higherY);
+    public Range XRange => new(LowerX, HigherY);
+    public Range YRange => new(LowerY, HigherY);
 
     public Rectangle(int lowerX, int lowerY, int higherX, int higherY) {
         _lowerX = Math.Min(lowerX, higherX);

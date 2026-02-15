@@ -1,19 +1,49 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 using System.Diagnostics.Contracts;
 using NeoKolors.Console.Mouse;
 using NeoKolors.Tui.Elements.Caching;
 using NeoKolors.Tui.Events;
 using NeoKolors.Tui.Rendering;
+using NeoKolors.Tui.Styles;
+using NeoKolors.Tui.Styles.Properties;
 using StyleCollection = NeoKolors.Tui.Styles.StyleCollection;
 
 namespace NeoKolors.Tui.Elements;
 
-public class Text : TextElement, INotifyOnRender, IInteractableElement<string> {
+public class Text : AbstractTextElement, INotifyOnRender, IMouseInteractableElement<AnsiString> {
+
+    #region Content
+    
+    private AnsiString _text;
+    
+    public virtual AnsiString Content {
+        get => _text.Clone();
+        set {
+            if (value.First().Style != NKStyle.Default) {
+                _text = value;
+            }
+            else {
+                var v = value.Style(new NKStyle(_style.TextColor, _style.BackgroundColor, _style.TextStyle));
+
+                if (v == _text) 
+                    return;
+
+                _text = v;
+            }
+
+            InvokeElementUpdated();
+        }
+    }
+    
+    public override ElementInfo Info { get; }
+
+    #endregion
+
+    #region Cache
     
     private readonly LayoutCacher _layoutCacher;
-    private string _text;
     
     /// <summary>
     /// Tracks whether the paragraph content has been modified,
@@ -33,26 +63,22 @@ public class Text : TextElement, INotifyOnRender, IInteractableElement<string> {
     private void SetCanUseMinCache()    => _updateCache |= CacheUpdateFlags.MIN;
     private void SetCanUseRenderCache() => _updateCache |= CacheUpdateFlags.RENDER;
 
-    public event OnRenderEventHandler OnRender;
-    public override event Action? OnElementUpdated;
+    #endregion
+
+    #region Events
     
-    private void InvokeElementUpdated() {
-        _updateCache = CacheUpdateFlags.NONE;
-        OnElementUpdated?.Invoke();
+    protected event Action _onElementUpdated = delegate { };
+    
+    public event OnRenderEventHandler OnRender;
+    public override event Action? OnElementUpdated {
+        add => _onElementUpdated += value;
+        remove => _onElementUpdated += value;
     }
 
-    public string Content {
-        get => _text;
-        set {
-            if (value == _text) return;
-            
-            _text = value;
-            
-            InvokeElementUpdated();
-        }
+    protected void InvokeElementUpdated() {
+        _updateCache = CacheUpdateFlags.NONE;
+        _onElementUpdated.Invoke();
     }
-    
-    public override ElementInfo Info { get; }
     
     private Rectangle _lastBounds = Rectangle.Zero;
     private bool _hoverEnable;
@@ -62,43 +88,139 @@ public class Text : TextElement, INotifyOnRender, IInteractableElement<string> {
             if (!_hoverEnable) 
                 return;
             
-            OnHoverOut.Invoke();
+            _onHoverOut.Invoke();
             _hoverEnable = false;
 
             return;
         }
         
         if (a.IsPress) {
-            OnClick.Invoke(a.Button);
+            _onClick.Invoke(a.Button);
         }
         else if (a.IsRelease) {
-            OnRelease.Invoke(a.Button);
+            _onRelease.Invoke(a.Button);
         }
         else if (a.IsHover) {
-            OnHover.Invoke();
+            _onHover.Invoke();
             _hoverEnable = true;
         }
     }
     
-    public event Action<MouseButton> OnClick = _ => { };
-    public event Action<MouseButton> OnRelease = _ => { };
-    public event Action OnHover = () => { };
-    public event Action OnHoverOut = () => { };
+    private event Action<MouseButton> _onClick = delegate { }; 
+    private event Action<MouseButton> _onRelease = delegate { }; 
+    private event Action _onHover = delegate { }; 
+    private event Action _onHoverOut = delegate { }; 
+    private int _onClickCount = 0;
+    private int _onReleaseCount = 0;
+    private int _onHoverCount = 0;
+    private int _onHoverOutCount = 0;
+    private bool Unsubscribed => 
+        _onClickCount == 0 && _onReleaseCount == 0 && _onHoverCount == 0 && _onHoverOutCount == 0;
+    
+    public event Action<MouseButton> OnClick {
+        add {
+            TrySubMouse();
+            
+            _onClick += value;
+            _onClickCount++;
+        }
+        remove {
+            _onClick -= value;
+            _onClickCount--;
+            
+            TryUnsubMouse();
+        }
+    }
 
-    private void SubscribeMouseEvents() {
-        AppEventBus.SubscribeToMouseEvent(InvokeMouseAction);
+    public event Action<MouseButton> OnRelease {
+        add {
+            TrySubMouse();
+            
+            _onRelease += value;
+            _onReleaseCount++;
+        }
+        remove {
+            _onRelease -= value;
+            _onReleaseCount--;
+            
+            TryUnsubMouse();
+        }
     }
     
-    public Text(string text) {
+    public event Action OnHover {
+        add {
+            TrySubMouse();
+            
+            _onHover += value;
+            _onHoverCount++;
+        }
+        remove {
+            _onHover -= value;
+            _onHoverCount--;
+            
+            TryUnsubMouse();
+        }
+    }
+    
+    public event Action OnHoverOut {
+        add {
+            TrySubMouse();
+            
+            _onHoverOut += value;
+            _onHoverCount++;
+        }
+        remove {
+            _onHoverOut -= value;
+            _onHoverOutCount--;
+            
+            TryUnsubMouse();
+        }
+    }
+
+    private void TrySubMouse() {
+        if (Unsubscribed) 
+            AppEventBus.SubscribeToMouseEvent(InvokeMouseAction);
+    }
+
+    private void TryUnsubMouse() {
+        if (Unsubscribed)
+            AppEventBus.UnsubscribeFromMouseEvent(InvokeMouseAction);
+    }
+
+    private void OnStyleChanged(IStyleProperty changedProp) {
+        switch (changedProp) {
+            case TextColorProperty tc:
+                _text = _text.Restyle(new NKStyle(tc.Value, _style.BackgroundColor, _style.TextStyle));
+                break;
+            case BackgroundColorProperty bc:
+                _text = _text.Restyle(new NKStyle(_style.TextColor, bc.Value, _style.TextStyle));
+                break;
+            case TextStyleProperty ts:
+                _text = _text.Restyle(new NKStyle(_style.TextColor, _style.BackgroundColor, ts.Value));
+                break;
+        }
+        
+        InvokeElementUpdated();
+    }
+    
+    #endregion
+
+    protected new static StyleCollection DefaultStyles { get; } = new(AbstractTextElement.DefaultStyles) {
+        ReadOnly = true
+    };
+    
+    public Text(string text) : this(text, DefaultStyles) { }
+    
+    protected Text(string text, StyleCollection defaultStyles) : base(defaultStyles) {
         _text          = text;
         _layoutCacher  = new LayoutCacher(CanUseMinCache, CanUseMaxCache, CanUseRenderCache);
-        _style         = new StyleCollection();
         Info           = new ElementInfo();
-        OnRender      += () => {};
-        OnStyleAccess += InvokeElementUpdated;
-        SubscribeMouseEvents();
+        OnRender            += () => {};
+        _style.StyleChanged += OnStyleChanged;
     }
+
     
+
     public override void Render(ICharCanvas canvas, Rectangle rect) {
 
         var onRender = Task.Run(OnRender.Invoke);
@@ -127,28 +249,30 @@ public class Text : TextElement, INotifyOnRender, IInteractableElement<string> {
         var layout = ComputeRenderLayout(rect.Size);
         
         #endif
-        
+
+        var sp = _style.Position;
         var pos = new Point(
-            Position.AbsoluteX ? Position.X.ToScalar(rect.Width) : rect.LowerX + Position.X.ToScalar(rect.Width), 
-            Position.AbsoluteY ? Position.Y.ToScalar(rect.Width) : rect.LowerY + Position.Y.ToScalar(rect.Height)
+            sp.AbsoluteX ? sp.X.ToScalarX(rect.Width)  : rect.LowerX + sp.X.ToScalarX(rect.Width), 
+            sp.AbsoluteY ? sp.Y.ToScalarY(rect.Height) : rect.LowerY + sp.Y.ToScalarY(rect.Height)
         );
 
         _lastBounds = layout.Border + pos;
         
-        if (!BackgroundColor.IsInherit) {
-            canvas.Fill(layout.Border - Size.Two + pos + Point.One, ' ');
+        if (!_style.BackgroundColor.IsInherit) {
+            var clearRegion = _style.Border.IsBorderless 
+                ? layout.Border + pos 
+                : layout.Border - Size.Two + pos + Point.One;
+            
+            canvas.Fill(clearRegion, ' ');
+            canvas.Style(clearRegion, new NKStyle(_style.TextColor, _style.BackgroundColor, _style.TextStyle));
         }
         
-        if (!Border.IsBorderless) {
-            canvas.StyleBackground(layout.Border - Size.Two + pos + Point.One, BackgroundColor);
-            canvas.PlaceRectangle(layout.Border + pos, Border);
-        }
-        else {
-            canvas.StyleBackground(layout.Border + pos, BackgroundColor);
+        if (!_style.Border.IsBorderless) {
+            canvas.PlaceRectangle(layout.Border + pos, _style.Border);
         }
         
-        Font.PlaceString(_text, canvas, layout.Content + pos, new NKStyle(Color, BackgroundColor),
-            TextAlign.Horizontal, TextAlign.Vertical);
+        _style.Font.PlaceString(Content, canvas, layout.Content + pos, 
+            _style.TextAlign.Horizontal, _style.TextAlign.Vertical, _style.Overflow);
         
         onRender.Wait();
     }
@@ -179,10 +303,24 @@ public class Text : TextElement, INotifyOnRender, IInteractableElement<string> {
     }
 
     [Pure]
-    protected ElementLayout ComputeMinLayout(Size parent) {
-        var t = Font.GetMinSize(_text);
-        return IElement.ComputeLayout(
-            t, parent, Margin, Padding, Border);
+    protected ElementLayout ComputeMinLayout(Size bounds) {
+        var compute = _style.Font.GetMinSize(Content);
+        return IElement.ComputeLayoutFromContent(
+            compute,
+            bounds,
+            _style.Margin,
+            _style.Border,
+            _style.Padding,
+            _style.Width,
+            _style.Height,
+            _style.MinWidth,
+            _style.MaxWidth,
+            _style.MinHeight,
+            _style.MaxHeight,
+            (w) => _style.Font.GetSize(_text, w).Height,
+            ( ) => _style.Font.GetMinSize(_text),
+            ( ) => _style.Font.GetSize(_text)
+        );
     }
     
     public override Size GetMaxSize(Size parent) {
@@ -206,10 +344,24 @@ public class Text : TextElement, INotifyOnRender, IInteractableElement<string> {
     }
     
     [Pure]
-    protected ElementLayout ComputeMaxLayout(Size parent) {
-        var compute = Font.GetSize(_text);
-        return IElement.ComputeLayout(
-            compute, parent, Margin, Padding, Border);
+    protected ElementLayout ComputeMaxLayout(Size bounds) {
+        var compute = _style.Font.GetSize(Content);
+        return IElement.ComputeLayoutFromContent(
+            compute,
+            bounds,
+            _style.Margin,
+            _style.Border,
+            _style.Padding,
+            _style.Width,
+            _style.Height,
+            _style.MinWidth,
+            _style.MaxWidth,
+            _style.MinHeight,
+            _style.MaxHeight,
+            (w) => _style.Font.GetSize(_text, w).Height,
+            ( ) => _style.Font.GetMinSize(_text),
+            ( ) => _style.Font.GetSize(_text)
+        );
     }
 
     public override Size GetRenderSize(Size parent) {
@@ -234,13 +386,23 @@ public class Text : TextElement, INotifyOnRender, IInteractableElement<string> {
     
     [Pure]
     protected ElementLayout ComputeRenderLayout(Size bounds) {
-        var p = Padding.Left.ToScalar(bounds.Width) + Padding.Right.ToScalar(bounds.Width);
-        var m = Margin .Left.ToScalar(bounds.Width) + Margin .Right.ToScalar(bounds.Width);
-        var b = Border.IsBorderless ? 0 : 2;
-        
-        var content = Font.GetSize(_text, bounds.Width - p - m - b);
-        return IElement.ComputeLayout(
-            content, bounds, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        var compute = _style.Font.GetSize(Content);
+        return IElement.ComputeLayoutFromContent(
+            compute,
+            bounds,
+            _style.Margin,
+            _style.Border,
+            _style.Padding,
+            _style.Width,
+            _style.Height,
+            _style.MinWidth,
+            _style.MaxWidth,
+            _style.MinHeight,
+            _style.MaxHeight,
+            (w) => _style.Font.GetSize(_text, w).Height,
+            ( ) => _style.Font.GetMinSize(_text),
+            ( ) => _style.Font.GetSize(_text)
+        );
     }
     
     #endregion
@@ -250,11 +412,11 @@ public class Text : TextElement, INotifyOnRender, IInteractableElement<string> {
     
     #region INode impl
     
-    public override string GetChildNode() => _text;
+    public override AnsiString GetChildNode() => Content;
 
-    public override void SetChildNode(string childNode) {
-        if (childNode == _text) return;
-        _text = childNode;
+    public override void SetChildNode(AnsiString childNode) {
+        if (childNode == Content) return;
+        Content = childNode;
         InvokeElementUpdated();
     }
 

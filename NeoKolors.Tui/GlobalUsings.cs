@@ -1,5 +1,5 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 global using NeoKolors.Common;
 global using NeoKolors.Common.Util;

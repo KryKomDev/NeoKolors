@@ -1,5 +1,5 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 namespace NeoKolors.Tui.Styles.Properties;
 
@@ -13,4 +13,6 @@ public readonly struct PaddingRightProperty : IPartialStyleProperty<Dimension, P
     public PaddingProperty Combine(PaddingProperty baseProperty) {
         return new PaddingProperty(baseProperty.Left, Value, baseProperty.Top, baseProperty.Bottom);
     }
+    
+    public PaddingRightProperty Extract(PaddingProperty baseProperty) => new(baseProperty.Right);
 }

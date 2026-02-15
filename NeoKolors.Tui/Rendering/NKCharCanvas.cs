@@ -1,5 +1,5 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 using Metriks;
 using SkiaSharp;
@@ -81,7 +81,7 @@ public class NKCharCanvas : ICharCanvas {
         }
     }
 
-    public void PlaceString(string str, Point2D offset = default, int zIndex = 0) {
+    public void Place(string str, Point2D offset = default, int zIndex = 0) {
         if (offset.Y != ..^Height)
             return;
 
@@ -95,7 +95,38 @@ public class NKCharCanvas : ICharCanvas {
             xi++;
         }
     }
+
+    public void Place(AnsiString str, Point2D offset = default, int zIndex = 0) {
+        if (offset.Y != ..^Height)
+            return;
+
+        int xi = 0;
+        var chars = str.ToArray();
+        
+        for (int x = Math.Clamp(offset.X, 0, Width); x < Math.Clamp(offset.X + str.Length, 0, Width); x++) {
+            var cellInfo = _data[x, offset.Y];
+            if (cellInfo.ZIndex <= zIndex) {
+                cellInfo.Char  = chars[xi].Char;
+                cellInfo.Style = cellInfo.Style.Override(chars[xi].Style);
+            }
+
+            xi++;
+        }
+    }
     
+    public void Place(AnsiChar c, Point2D offset = default, int zIndex = 0) {
+        if (offset.X != ..^Width || offset.Y != ..^Height) 
+            return;
+        
+        var cellInfo = _data[offset.X, offset.Y];
+
+        if (cellInfo.ZIndex > zIndex)
+            return;
+        
+        cellInfo.Char  = c.Char;
+        cellInfo.Style = cellInfo.Style.Override(c.Style);
+    }
+
     public void Restyle(NKStyle[,] styles, Point2D offset = default, int zIndex = 0) {
         for (int x = offset.X; x < Math.Min(styles.Len0 + offset.X, _data.XSize); x++) {
             for (int y = offset.Y; y < Math.Min(styles.Len1 + offset.Y, _data.YSize); y++) {

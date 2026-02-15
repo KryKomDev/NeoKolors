@@ -1,5 +1,5 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 namespace NeoKolors.Tui.Styles.Properties;
 
@@ -12,4 +12,6 @@ public readonly struct MarginLeftProperty : IPartialStyleProperty<Dimension, Mar
 
     public MarginProperty Combine(MarginProperty baseProperty) 
         => new(Value, baseProperty.Right, baseProperty.Top, baseProperty.Bottom);
+    
+    public MarginLeftProperty Extract(MarginProperty baseProperty) => new(baseProperty.Left);
 }

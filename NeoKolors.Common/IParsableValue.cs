@@ -2,10 +2,11 @@
 // Copyright (c) 2025 KryKom
 
 using System.Diagnostics.CodeAnalysis;
+using Implyzer;
 
-namespace NeoKolors.Tui.Styles.Values;
+namespace NeoKolors.Common;
 
-public interface IParsableValue<TSelf> : IParsableValue where TSelf : struct, IParsableValue<TSelf> {
+public interface IParsableValue<TSelf> : IParsableValue where TSelf : IParsableValue<TSelf>, new() {
     
     /// <summary>Parses a string into a value.</summary>
     /// <param name="s">The string to parse.</param>
@@ -23,7 +24,7 @@ public interface IParsableValue<TSelf> : IParsableValue where TSelf : struct, IP
     /// <returns><c>true</c> if <paramref name="s" /> was successfully parsed; otherwise, <c>false</c>.</returns>
     public bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out TSelf result) {
         if (s == null) {
-            result = default;
+            result = new TSelf();
             return false;
         }
         
@@ -32,7 +33,7 @@ public interface IParsableValue<TSelf> : IParsableValue where TSelf : struct, IP
             return true;
         }
         catch {
-            result = default;
+            result = new TSelf();
             return false;
         }
     }
@@ -46,6 +47,7 @@ public interface IParsableValue<TSelf> : IParsableValue where TSelf : struct, IP
     }
 }
 
+[IndirectImpl(typeof(IParsableValue<>))]
 public interface IParsableValue {
     
     /// <summary>Parses a string into a value.</summary>

@@ -78,13 +78,6 @@ public class NKStyleTests {
     }
 
     [Fact]
-    public void TestClone() {
-        var style = new NKStyle(new NKColor(0x123456), new NKColor(0x654321), TextStyles.BOLD);
-        var clone = (NKStyle)style.Clone();
-        Assert.Equal(style, clone);
-    }
-
-    [Fact]
     public void TestEquals() {
         var style1 = new NKStyle(new NKColor(0x123456), new NKColor(0x654321), TextStyles.BOLD);
         var style2 = new NKStyle(new NKColor(0x123456), new NKColor(0x654321), TextStyles.BOLD);
@@ -111,5 +104,101 @@ public class NKStyleTests {
         Assert.Equal(f, style.FColor);
         Assert.Equal(b, style.BColor);
         Assert.Equal(styles, style.Styles);
+    }
+
+    // [Fact]
+    // public void Constructor_RunUntilFail_Rgb_Rgb() {
+    //     var r = new Random();
+    //     var f = new NKColor(r.Next(0, 0xffffff));
+    //     var b = new NKColor(r.Next(0, 0xffffff));
+    //     var s = (TextStyles)r.Next(0, 0xff);
+    //     var n = new NKStyle(f, b, s);
+    //     Assert.Equal(f, n.FColor);
+    //     Assert.Equal(b, n.BColor);
+    //     Assert.Equal(s, n.Styles);
+    // }
+    //
+    // [Fact]
+    // public void Constructor_RunUntilFail_Rgb_Con() {
+    //     var r = new Random();
+    //     var f = new NKColor(r.Next(0, 0xffffff));
+    //     var b = new NKColor((NKConsoleColor)r.Next(0, 0xff));
+    //     var s = (TextStyles)r.Next(0, 0xff);
+    //     var n = new NKStyle(f, b, s);
+    //     Assert.Equal(f, n.FColor);
+    //     Assert.Equal(b, n.BColor);
+    //     Assert.Equal(s, n.Styles);
+    // }
+    //
+    // [Fact]
+    // public void Constructor_RunUntilFail_Con_Rgb() {
+    //     var r = new Random();
+    //     var f = new NKColor((NKConsoleColor)r.Next(0, 0xff));
+    //     var b = new NKColor(r.Next(0, 0xffffff));
+    //     var s = (TextStyles)r.Next(0, 0xff);
+    //     var n = new NKStyle(f, b, s);
+    //     Assert.Equal(f, n.FColor);
+    //     Assert.Equal(b, n.BColor);
+    //     Assert.Equal(s, n.Styles);
+    // }
+    
+    [Fact]
+    public void Constructor_ShouldInitCorrectly_Default_Inherit() {
+        var f = NKColor.Default;
+        var b = NKColor.Inherit;
+        var s = TextStyles.NONE;
+        var n = new NKStyle(f, b, s);
+        Assert.Equal(f, n.FColor);
+        Assert.Equal(b, n.BColor);
+        Assert.Equal(s, n.Styles);
+    }
+    
+    
+    [Fact]
+    public void SetStyles_ShouldPreserveColors() {
+        var f = new NKColor(0x112233);
+        var b = new NKColor(0x445566);
+        var s = new NKStyle(f, b);
+        
+        Assert.Equal(f, s.FColor);
+        Assert.Equal(b, s.BColor);
+        Assert.Equal(TextStyles.NONE, s.Styles);
+        
+        s.SetStyles(TextStyles.BOLD | TextStyles.UNDERLINE);
+        
+        Assert.Equal(f, s.FColor);
+        Assert.Equal(b, s.BColor);
+        Assert.Equal(TextStyles.BOLD | TextStyles.UNDERLINE, s.Styles);
+        
+        s.SetStyles(TextStyles.NONE);
+        Assert.Equal(TextStyles.NONE, s.Styles);
+        Assert.Equal(f, s.FColor);
+        Assert.Equal(b, s.BColor);
+    }
+
+    [Fact]
+    public void SetFColor_ShouldPreserveStyles() {
+        var s = new NKStyle(s: TextStyles.ITALIC);
+        Assert.Equal(TextStyles.ITALIC, s.Styles);
+        
+        s.SetFColor(new NKColor(0xAABBCC));
+        Assert.Equal(TextStyles.ITALIC, s.Styles);
+    }
+
+    [Fact]
+    public void SetBColor_ShouldPreserveStyles() {
+        var s = new NKStyle(s: TextStyles.STRIKETHROUGH);
+        Assert.Equal(TextStyles.STRIKETHROUGH, s.Styles);
+        
+        s.SetBColor(new NKColor(0xDDEEFF));
+        Assert.Equal(TextStyles.STRIKETHROUGH, s.Styles);
+    }
+
+    [Fact]
+    public void SetStyles_Overwrite_ShouldWork() {
+        var s = new NKStyle(s: TextStyles.BOLD);
+        s.SetStyles(TextStyles.FAINT); // Overwrite, not merge
+        Assert.Equal(TextStyles.FAINT, s.Styles);
+        Assert.False(s.Styles.HasFlag(TextStyles.BOLD));
     }
 }

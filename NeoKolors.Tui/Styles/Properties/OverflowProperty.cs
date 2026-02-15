@@ -1,5 +1,5 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 namespace NeoKolors.Tui.Styles.Properties;
 
@@ -11,6 +11,6 @@ public struct OverflowProperty : IStyleProperty<bool, OverflowProperty> {
     }
 
     public OverflowProperty() {
-        Value = false;
+        Value = true;
     }
 }

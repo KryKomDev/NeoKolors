@@ -1,9 +1,16 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 namespace NeoKolors.Tui;
 
 public readonly struct UnitDimension {
+
+    #if NK_3_WIDE_PIXELS
+    private const int PIXEL_WIDTH = 3;
+    #else
+    private const int PIXEL_WIDTH = 2;
+    #endif
+    
     public int Value { get; }
     public LengthUnit Unit { get; }
     
@@ -27,6 +34,24 @@ public readonly struct UnitDimension {
         LengthUnit.VIEWPORT_WIDTH  => (int)(Stdio.BufferWidth  / 100f * Value),
         LengthUnit.VIEWPORT_HEIGHT => (int)(Stdio.BufferHeight / 100f * Value),
         _ => throw new ArgumentOutOfRangeException()
+    };
+    
+    public int GetScalarX(int parent) => Unit switch {
+        LengthUnit.PIXEL           => Value * PIXEL_WIDTH,
+        LengthUnit.CHAR            => Value,
+        LengthUnit.PERCENT         => (int)(parent             / 100f * Value),
+        LengthUnit.VIEWPORT_WIDTH  => (int)(Stdio.BufferWidth  / 100f * Value),
+        LengthUnit.VIEWPORT_HEIGHT => (int)(Stdio.BufferHeight / 100f * Value),
+        _                          => throw new ArgumentOutOfRangeException()
+    };
+    
+    public int GetScalarY(int parent) => Unit switch {
+        LengthUnit.PIXEL           => Value,
+        LengthUnit.CHAR            => Value,
+        LengthUnit.PERCENT         => (int)(parent             / 100f * Value),
+        LengthUnit.VIEWPORT_WIDTH  => (int)(Stdio.BufferWidth  / 100f * Value),
+        LengthUnit.VIEWPORT_HEIGHT => (int)(Stdio.BufferHeight / 100f * Value),
+        _                          => throw new ArgumentOutOfRangeException()
     };
 
     public override string ToString() => $"{(Value < 0 ? "- " : "")}{Math.Abs(Value)}{Unit.String}";

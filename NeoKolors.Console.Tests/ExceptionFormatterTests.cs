@@ -1,4 +1,5 @@
 using NeoKolors.Common;
+using System.Runtime.CompilerServices;
 
 namespace NeoKolors.Console.Tests;
 
@@ -121,4 +122,67 @@ public class ExceptionFormatterTests {
         Assert.Contains("http://example.com", result);
         Assert.Contains("For more information about this exception, see:", result);
     }
+
+    [Fact]
+    public void Format_WithStackTrace_Works() {
+        // Arrange
+        var formatter = new ExceptionFormatter();
+        formatter.ShowHighlight = false;
+        Exception? ex = null;
+        try {
+            ThrowException();
+        } catch (Exception e) {
+            ex = e;
+        }
+
+        // Act
+        var result = formatter.Format(ex!);
+
+        // Assert
+        // System.Console.WriteLine(result);
+        Assert.Contains("ThrowException", result);
+        Assert.Contains("Format_WithStackTrace_Works", result);
+    }
+
+    [Fact]
+    public void Format_SystemException_DoesNotThrow() {
+        // Arrange
+        var formatter = new ExceptionFormatter();
+        Exception? ex = null;
+        try {
+            _ = int.Parse("not a number");
+        } catch (Exception e) {
+            ex = e;
+        }
+
+        // Act & Assert
+        var result = formatter.Format(ex!);
+        Assert.NotNull(result);
+    }
+
+    [Fact]
+    public void Format_WithStackTrace_HasCorrectLineCount() {
+        // Arrange
+        var formatter = new ExceptionFormatter();
+        formatter.ShowHighlight = false;
+        Exception? ex = null;
+        try {
+            ThrowException();
+        } catch (Exception e) {
+            ex = e;
+        }
+
+        // Act
+        var result = formatter.Format(ex!);
+        var lines = result.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+
+        // Assert
+        // Header line
+        // Stack trace entry (2 lines per entry if source is present)
+        // ...
+        Assert.True(lines.Length >= 3); 
+    }
+
+    [MethodImpl(MethodImplOptions.NoInlining)]
+    private void ThrowException() => throw new Exception("Error in method");
 }

@@ -1,5 +1,5 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 // This controls what schema location is used for the font definitions.
 // Valid values are: NKFONT_XML_RELEASE, NKFONT_XML_SNAPSHOT, NKFONT_XML_WIP.

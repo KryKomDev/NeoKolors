@@ -1,5 +1,5 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 using System.Text;
 
@@ -7,16 +7,14 @@ namespace NeoKolors.Tui.Rendering;
 
 public class NKCharScreen : NKCharCanvas, ICharScreen {
 
-    private List<SixelImageInfo> _prevImages = [];
+    private readonly List<SixelImageInfo> _prevImages = [];
     
     public NKCharScreen(int width, int height) : base(width, height) { }
     public NKCharScreen(Size size) : base(size.Width, size.Height) { }
     
     public void Render() {
         var isBehind   = true;
-        var lastFColor = NKColor.Default;
-        var lastBColor = NKColor.Default;
-        var lastStyle  = TextStyles.NONE;
+        var prevStyle = NKStyle.Default;
         
         for (int y = 0; y < Height; y++) {
             if (!NKConsole.TrySetCursorPosition(0, y)) 
@@ -42,20 +40,8 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
                 
                 isBehind = false;
 
-                if (lastFColor != nkStyle.FColor) {
-                    sb.Append(nkStyle.FColor.Text);
-                    lastFColor = nkStyle.FColor;
-                }
-
-                if (lastBColor != nkStyle.BColor) {
-                    sb.Append(nkStyle.BColor.Bckg);
-                    lastBColor = nkStyle.BColor;
-                }
-
-                if (lastStyle != nkStyle.Styles) {
-                    sb.Append((nkStyle.Styles ^ lastStyle).GetOvrEscSeq());
-                    lastStyle = nkStyle.Styles;
-                }
+                sb.Append(NKStyle.GetEscSeq(prevStyle, nkStyle));
+                prevStyle = nkStyle;
 
                 if (char.IsControl(c!.Value))
                     sb.Append(' ');

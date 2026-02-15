@@ -1,8 +1,9 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 using NeoKolors.Tui.Elements.Caching;
 using NeoKolors.Tui.Rendering;
+using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Properties;
 using NeoKolors.Tui.Styles.Values;
 
@@ -66,9 +67,10 @@ public class NamedDiv : Div {
             SetCanUseRenderCache();
         }
 
+        var sp = _style.Position;
         var pos = new Point(
-            Position.AbsoluteX ? Position.X.ToScalar(rect.Width) : rect.LowerX + Position.X.ToScalar(rect.Width), 
-            Position.AbsoluteY ? Position.Y.ToScalar(rect.Width) : rect.LowerY + Position.Y.ToScalar(rect.Height)
+            sp.AbsoluteX ? sp.X.ToScalar(rect.Width) : rect.LowerX + sp.X.ToScalar(rect.Width), 
+            sp.AbsoluteY ? sp.Y.ToScalar(rect.Width) : rect.LowerY + sp.Y.ToScalar(rect.Height)
         );
         
         var bw = el.Border.Width;

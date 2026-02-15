@@ -1,6 +1,6 @@
 ﻿//
 // NeoKolors.Test
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 //
 
 namespace NeoKolors.Tui.Events;

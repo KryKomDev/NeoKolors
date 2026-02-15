@@ -1,7 +1,8 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 using Implyzer;
+using NeoKolors.Tui.Elements;
 
 namespace NeoKolors.Tui.Dom;
 
@@ -16,6 +17,8 @@ public interface INode<T> : INode {
         else 
             throw new ArgumentException("Invalid child node type.");
     }
+    
+    public bool CanHaveChildren => typeof(IEnumerable<IElement>).IsAssignableFrom(typeof(T));
 }
 
 [IndirectImpl(typeof(INode<>))]

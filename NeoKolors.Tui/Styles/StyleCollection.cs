@@ -1,5 +1,5 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 using System.Collections;
 using NeoKolors.Tui.Events;
@@ -9,17 +9,37 @@ namespace NeoKolors.Tui.Styles;
 
 public class StyleCollection : IEnumerable<IStyleProperty> {
     
-    private readonly Dictionary<Type, IStyleProperty> _styles = new();
-    public event StyleChangedHandler StyleChanged = _ => {};
+    private readonly Dictionary<Type, IStyleProperty> _styles;
+    public event StyleChangedHandler StyleChanged;
+    private readonly StyleCollection? _defaultValues;
+
+    public bool ReadOnly { get; set; }
+    
+    public StyleCollection(StyleCollection? defaultValues) {
+        _styles        = new Dictionary<Type, IStyleProperty>();
+        StyleChanged   = _ => { };
+        _defaultValues = defaultValues;
+    }
+
+    public StyleCollection() {
+        _styles        = new Dictionary<Type, IStyleProperty>();
+        StyleChanged   = _ => { };
+        _defaultValues = null;
+    }
 
     public IStyleProperty this[Type type] {
         get {
-            if (IStyleProperty.IsStyle(type))
+            if (IStyleProperty.TryIsStyle(type, out var s))
                 IStyleProperty.ThrowNotStyle(type);
+
+            if (IStyleProperty.TryIsPartial(s!, out var partial))
+                return partial.Extract(this[partial.BaseType]);
             
-            return _styles.TryGetValue(type, out var style) ? style : IStyleProperty.Create(type);
+            return _styles.TryGetValue(type, out var style) ? style : GetDefault(type);
         }
         set {
+            if (ReadOnly) return;
+         
             if (value.GetType() != type)
                 throw new ArgumentException($"Type '{type}' is not the same as the stored expected type '{value.GetType()}'.");
             
@@ -43,6 +63,8 @@ public class StyleCollection : IEnumerable<IStyleProperty> {
             return style is null ? throw new ArgumentException($"No style with name '{name}' found.") : this[style];
         }
         set {
+            if (ReadOnly) return;
+            
             var style = IStyleProperty.GetByName(name);
             
             if (style is null) throw new ArgumentException($"No style with name '{name}' found.");
@@ -52,9 +74,17 @@ public class StyleCollection : IEnumerable<IStyleProperty> {
     }
 
     public T Get<T>(T coalesce) where T : IStyleProperty, new() {
-        if (!_styles.ContainsKey(typeof(T))) 
-            return coalesce;
-        
+        if (!_styles.ContainsKey(typeof(T))) {
+            if (_defaultValues is null || 
+                !_defaultValues._styles.TryGetValue(typeof(T), out var style) || 
+                style is not T d) 
+            {
+                return coalesce;
+            }
+
+            return d;
+        }
+
         var s = _styles[typeof(T)];
         if (s is T t) 
             return t;
@@ -64,7 +94,13 @@ public class StyleCollection : IEnumerable<IStyleProperty> {
     
     public T Get<T>() where T : IStyleProperty, new() => Get(new T());
 
+    /// <summary>
+    /// Sets the inputted style within the style collection.
+    /// </summary>
+    /// <param name="style">The style to be set.</param>
     public void Set(IStyleProperty style) {
+        if (ReadOnly) return;
+       
         if (IStyleProperty.TryIsPartial(style, out var partial)) {
             if (_styles.TryGetValue(partial.BaseType, out var value)) {
                 _styles[partial.BaseType] = partial.Combine(value);
@@ -85,12 +121,24 @@ public class StyleCollection : IEnumerable<IStyleProperty> {
         StyleChanged.Invoke(style);
     }
 
-    public void Set(StyleCollection other) {
+    /// <summary>
+    /// Applies the styles from the provided <see cref="StyleCollection"/> to the current collection.
+    /// </summary>
+    /// <param name="other">The <see cref="StyleCollection"/> containing the styles to be applied.</param>
+    /// <returns>The current <see cref="StyleCollection"/> with the applied styles.</returns>
+    public StyleCollection Apply(StyleCollection other) {
+        if (ReadOnly) return this;
+
         foreach (var style in other) {
             Set(style);
         }
+
+        return this;
     }
     
     public IEnumerator<IStyleProperty> GetEnumerator() => _styles.Values.GetEnumerator();
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    private IStyleProperty GetDefault(Type type) 
+        => _defaultValues is null ? IStyleProperty.Create(type) : _defaultValues[type];
 }

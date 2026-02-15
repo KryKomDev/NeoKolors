@@ -1,15 +1,16 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 using NeoKolors.Tui.Global;
 using NeoKolors.Tui.Rendering;
+using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Properties;
 using NeoKolors.Tui.Styles.Values;
 using SkiaSharp;
 
 namespace NeoKolors.Tui.Elements;
 
-public class Image : UniversalElement<SKBitmap> {
+public class Image : AbstractElement<SKBitmap> {
 
     private SKBitmap _image;
     
@@ -26,32 +27,6 @@ public class Image : UniversalElement<SKBitmap> {
             _image = SKBitmap.Decode(path);
         }
     }
-    
-    public ImageDisplayType ImageDisplayType {
-        get => _style.Get(new ImageDisplayProperty(ImageDisplayType.FIT)).Value;
-        set => _style.Set(new ImageDisplayProperty(value));
-    }
-
-    protected virtual ImageDisplayType DefaultImageDisplayType => ImageDisplayType.FIT;
-
-    public ViewSize ImageSize {
-        get => _style.Get(new ImageSizeProperty(DefaultImageSize)).Value;
-        set => _style.Set(new ImageSizeProperty(value));
-    }
-
-    protected virtual ViewSize DefaultImageSize => new(Dimension.Auto, Dimension.Auto);
-
-    public Align ImageAlign {
-        get => _style.Get(new ImageAlignProperty(DefaultImageAlign)).Value;
-        set => _style.Set(new ImageAlignProperty(value));
-    }
-    
-    protected virtual Align DefaultImageAlign => Align.Center;
-    
-    public string ImageSource {
-        get => _style.Get(new ImageSourceProperty(string.Empty)).Value;
-        set => _style.Set(new ImageSourceProperty(value));
-    }
 
     public Image(SKBitmap image, ElementInfo info) {
         _image = image;
@@ -64,25 +39,25 @@ public class Image : UniversalElement<SKBitmap> {
     public Image(SKBitmap image) : this(image, ElementInfo.Default) {}
     
     public override void Render(ICharCanvas canvas, Rectangle rect) {
-        if (!Visible) return;
+        if (!_style.Visible) return;
         
         var layout = ComputeRenderLayout(rect);
         
         var pos = new Point(
-            Position.AbsoluteX ? Position.X.ToScalar(rect.Width) : rect.LowerX + Position.X.ToScalar(rect.Width), 
-            Position.AbsoluteY ? Position.Y.ToScalar(rect.Width) : rect.LowerY + Position.Y.ToScalar(rect.Height)
+            _style.Position.AbsoluteX ? _style.Position.X.ToScalar(rect.Width) : rect.LowerX + _style.Position.X.ToScalar(rect.Width), 
+            _style.Position.AbsoluteY ? _style.Position.Y.ToScalar(rect.Width) : rect.LowerY + _style.Position.Y.ToScalar(rect.Height)
         );
         
-        if (!BackgroundColor.IsInherit) {
+        if (!_style.BackgroundColor.IsInherit) {
             canvas.Fill(layout.Border - Size.Two + pos + Point.One, ' ');
         }
         
-        if (!Border.IsBorderless) {
-            canvas.StyleBackground(layout.Border - Size.Two + pos + Point.One, BackgroundColor);
-            canvas.PlaceRectangle(layout.Border + pos, Border);
+        if (!_style.Border.IsBorderless) {
+            canvas.StyleBackground(layout.Border - Size.Two + pos + Point.One, _style.BackgroundColor);
+            canvas.PlaceRectangle(layout.Border + pos, _style.Border);
         }
         else {
-            canvas.StyleBackground(layout.Border + pos, BackgroundColor);
+            canvas.StyleBackground(layout.Border + pos, _style.BackgroundColor);
         }
 
         var checker = _style.Get<CheckerBckgProperty>().Value;
@@ -93,14 +68,14 @@ public class Image : UniversalElement<SKBitmap> {
 
         var imgSize = ComputeImageSize(new Size(_image.Width, _image.Height), layout.Content, rect.Size);
 
-        var xo = ImageAlign.Horizontal switch {
+        var xo = _style.ImageAlign.Horizontal switch {
             HorizontalAlign.LEFT   => 0,
             HorizontalAlign.CENTER => (layout.Content.Width - imgSize.Ch.Width) / 2,
             HorizontalAlign.RIGHT  =>  layout.Content.Width - imgSize.Ch.Width,
             _ => throw new ArgumentOutOfRangeException()
         };
 
-        var yo = ImageAlign.Vertical switch {
+        var yo = _style.ImageAlign.Vertical switch {
             VerticalAlign.TOP    => 0,
             VerticalAlign.CENTER => (layout.Content.Height - imgSize.Ch.Height) / 2,
             VerticalAlign.BOTTOM => layout.Content.Height - imgSize.Ch.Height,
@@ -112,7 +87,7 @@ public class Image : UniversalElement<SKBitmap> {
             pos + layout.Content.Lower + new Point(xo, yo), 
             imgSize.Px,
             imgSize.Ch,
-            ZIndex
+            _style.ZIndex
         );
     }
 
@@ -143,14 +118,14 @@ public class Image : UniversalElement<SKBitmap> {
     private (Size Px, Size Ch) ComputeImageSize(Size image, Size content, Size parent) {
         var img = PixelsToChars(image);
         
-        var size = ImageDisplayType switch {
+        var size = _style.ImageDisplayType switch {
             ImageDisplayType.FIT     => ComputeImageSize_Fit(img, content),
             ImageDisplayType.STRETCH => ComputeImageSize_Stretch(content),
-            _ => throw new ArgumentOutOfRangeException(nameof(ImageDisplayType), ImageDisplayType, null)
+            _ => throw new ArgumentOutOfRangeException(nameof(ImageDisplayType),_style. ImageDisplayType, null)
         };
 
-        if (ImageSize.Horizontal.IsNumber) size = size with { Width  = ImageSize.Horizontal.ToScalar(parent.Width)  };
-        if (ImageSize.Vertical  .IsNumber) size = size with { Height = ImageSize.Vertical  .ToScalar(parent.Height) };
+        if (_style.ImageSize.Horizontal.IsNumber) size = size with { Width  = _style.ImageSize.Horizontal.ToScalar(parent.Width)  };
+        if (_style.ImageSize.Vertical  .IsNumber) size = size with { Height = _style.ImageSize.Vertical  .ToScalar(parent.Height) };
 
         return (CharsToPixels(size), size);
     }
@@ -175,11 +150,22 @@ public class Image : UniversalElement<SKBitmap> {
     }
 
     protected ElementLayout ComputeMinLayout(Size parent) {
-        var content = IElement.ComputeLayout(
-            parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        var content = IElement.ComputeLayoutFromBounds(
+            parent, 
+            _style.Margin,    _style.Border, _style.Padding, 
+            _style.Width,     _style.Height, 
+            _style.MinWidth,  _style.MaxWidth, 
+            _style.MinHeight, _style.MaxHeight
+        );
         
-        return IElement.ComputeLayout(ComputeImageSize(new Size(_image.Width, _image.Height), content.Content, parent).Ch,
-            parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        return IElement.ComputeLayoutFromContent(
+            ComputeImageSize(new Size(_image.Width, _image.Height), content.Content, parent).Ch,
+            parent,
+            _style.Margin,    _style.Border, _style.Padding, 
+            _style.Width,     _style.Height, 
+            _style.MinWidth,  _style.MaxWidth, 
+            _style.MinHeight, _style.MaxHeight
+        );
     }
 
     public override Size GetMaxSize(Size parent) {
@@ -195,11 +181,22 @@ public class Image : UniversalElement<SKBitmap> {
     }
     
     protected ElementLayout ComputeMaxLayout(Size parent) {
-        var content = IElement.ComputeLayout(
-            parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        var content = IElement.ComputeLayoutFromBounds(
+            parent, 
+            _style.Margin,    _style.Border, _style.Padding, 
+            _style.Width,     _style.Height, 
+            _style.MinWidth,  _style.MaxWidth, 
+            _style.MinHeight, _style.MaxHeight
+        );
         
-        return IElement.ComputeLayout(ComputeImageSize(new Size(_image.Width, _image.Height), content.Content, parent).Ch,
-            parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        return IElement.ComputeLayoutFromContent(
+            ComputeImageSize(new Size(_image.Width, _image.Height), content.Content, parent).Ch,
+            parent,
+            _style.Margin,    _style.Border, _style.Padding,
+            _style.Width,     _style.Height,
+            _style.MinWidth,  _style.MaxWidth, 
+            _style.MinHeight, _style.MaxHeight
+        );
     }
     
     public override Size GetRenderSize(Size parent) {
@@ -215,11 +212,22 @@ public class Image : UniversalElement<SKBitmap> {
     }
     
     protected ElementLayout ComputeRenderLayout(Size parent) {
-        var content = IElement.ComputeLayout(
-            parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        var content = IElement.ComputeLayoutFromBounds(
+            parent, 
+            _style.Margin,    _style.Border, _style.Padding, 
+            _style.Width,     _style.Height, 
+            _style.MinWidth,  _style.MaxWidth, 
+            _style.MinHeight, _style.MaxHeight
+        );
         
-        return IElement.ComputeLayout(ComputeImageSize(new Size(_image.Width, _image.Height), content.Content, parent).Ch,
-            parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        return IElement.ComputeLayoutFromContent(
+            ComputeImageSize(new Size(_image.Width, _image.Height), content.Content, parent).Ch,
+            parent,
+            _style.Margin,    _style.Border, _style.Padding,
+            _style.Width,     _style.Height,
+            _style.MinWidth,  _style.MaxWidth, 
+            _style.MinHeight, _style.MaxHeight
+        );
     }
     
     public override event Action? OnElementUpdated;

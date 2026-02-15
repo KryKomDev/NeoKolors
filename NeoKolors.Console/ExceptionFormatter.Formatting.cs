@@ -31,7 +31,11 @@ public partial class ExceptionFormatter {
         if (!FormatUnhandled || args.ExceptionObject is not Exception e0) return;
 
         Stdio.Write(Format(e0));
-        Win32Exception.Mute();
+        
+        if (Environment.OSVersion.Platform == PlatformID.Win32NT) 
+            Win32Exception.Mute();
+        else
+            Stdio.SetError(TextWriter.Null);
     }
 
     /// <summary>
@@ -50,7 +54,7 @@ public partial class ExceptionFormatter {
         string help = e.HelpLink == null ? ""
             : "\nFor more information about this exception, see: {0}{1}".Format(format.HelpLinkStyle, e.HelpLink);
         
-        string s = "\0" + header + stackTrace + help;
+        string s = header + stackTrace + help;
 
         if (!format.ShowHighlight) return s;
 
@@ -64,10 +68,12 @@ public partial class ExceptionFormatter {
     }
 
     private static string FormatHeader(Exception e, ExceptionFormat format) {
-        string space = e.GetType().Namespace!.AddStyle(format.ExceptionNamespaceStyle);
+        string? ns = e.GetType().Namespace;
+        string space = ns?.AddStyle(format.ExceptionNamespaceStyle) ?? "";
+        string dot = string.IsNullOrEmpty(space) ? "" : ".";
         string type = e.GetType().Name.AddStyle(format.ExceptionTypeStyle).AddStyle(TextStyles.ITALIC);
         string message = e.Message.AddStyle(format.MessageStyle).AddStyle(TextStyles.BOLD);
-        return $"{space}.{type}: {message}\n";
+        return $"{space}{dot}{type}: {message}\n";
     }
 
     private static string FormatStackTrace(Exception e, ExceptionFormat format) {
@@ -83,46 +89,49 @@ public partial class ExceptionFormatter {
     }
 
     private static string FormatSingleSource(string s, ExceptionFormat format) {
-        
-        // find the method name
-        var m = Regex.Match(s, @"(?<=\.)[^.]*?(?=\()");
-        
-        // color the "at some.namespace.of.a.method" 
-        string output = s.Substring(0, 5).AddColor(DARK_GRAY) +
-                        s.InRange(5, m.Index).AddStyle(format.MethodSourceStyle);
-        
-        // color the method
-        output += m.Value.AddStyle(format.MethodStyle);
-        
-        // find the method end
-        int methodEnd = s.IndexOf(')');
-        
-        // color method arguments
-        output += s.InRange(m.Index + m.Length, methodEnd + 1).AddStyle(format.MethodArgumentsStyle) + "\n";
-        
-        // color the "in" part
-        output += "     " + s.Substring(methodEnd + 1, 3).AddColor(DARK_GRAY); 
-        
-        // find the at line
-        int line = s.IndexOf(".cs:line", StringComparison.InvariantCulture);
+        if (string.IsNullOrWhiteSpace(s)) return s;
 
-        // find the start of the filename
-        int filename = 0;
-        for (int i = line; i >= 0; i--) {
-            if (s[i] is not ('/' or '\\')) continue;
-            filename = i + 1;
-            break;
+        var match = Regex.Match(s, @"^(\s*at\s+)([^\(]+)(\(.*\))(?:(\s+in\s+)(.+):line\s+(\d+))?\s*$");
+        if (!match.Success) {
+            return s.TrimEnd() + "\n";
         }
 
-        // color the path to the source file
-        output += s.InRange(methodEnd + 4, filename).AddStyle(format.PathStyle);
+        string atPart = match.Groups[1].Value;
+        string methodPart = match.Groups[2].Value;
+        string argsPart = match.Groups[3].Value;
+
+        string output = atPart.AddColor(DARK_GRAY);
+
+        int lastDot = methodPart.LastIndexOf('.');
+        if (lastDot != -1) {
+            output += methodPart.Substring(0, lastDot + 1).AddStyle(format.MethodSourceStyle);
+            output += methodPart.Substring(lastDot + 1).AddStyle(format.MethodStyle);
+        }
+        else {
+            output += methodPart.AddStyle(format.MethodStyle);
+        }
+
+        output += argsPart.AddStyle(format.MethodArgumentsStyle);
+
+        if (!match.Groups[4].Success) 
+            return output + "\n";
         
-        // color the filename
-        output += s.InRange(filename, line + 3).AddStyle(format.FileNameStyle);
-        
-        // color the position
-        output += " at line".AddColor(DARK_GRAY) + s.Substring(line + 8).AddStyle(format.LineNumberStyle);
-        
-        return output;
+        string pathPart = match.Groups[5].Value;
+        string linePart = match.Groups[6].Value;
+
+        output += "\n     " + "in ".AddColor(DARK_GRAY);
+
+        int lastSlash = Math.Max(pathPart.LastIndexOf('/'), pathPart.LastIndexOf('\\'));
+        if (lastSlash != -1) {
+            output += pathPart.Substring(0, lastSlash + 1).AddStyle(format.PathStyle);
+            output += pathPart.Substring(lastSlash + 1).AddStyle(format.FileNameStyle);
+        }
+        else {
+            output += pathPart.AddStyle(format.FileNameStyle);
+        }
+
+        output += ":line ".AddColor(DARK_GRAY) + linePart.AddStyle(format.LineNumberStyle);
+
+        return output + "\n";
     }
 }

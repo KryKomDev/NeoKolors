@@ -1,12 +1,18 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
-using NeoKolors.Tui.Styles.Properties;
+using NeoKolors.Tui.Styles;
 
 namespace NeoKolors.Tui.Elements;
 
 public class Paragraph : Text {
-    public Paragraph(string text) : base(text) { }
+    
+    protected new static StyleCollection DefaultStyles { get; } = new(Text.DefaultStyles) {
+        Width = Dimension.Percent(100),
 
-    protected override WidthProperty DefaultWidth => new(Dimension.Percent(100));
+        ReadOnly = true,
+    };
+    
+    public Paragraph(string text) : base(text, DefaultStyles) { }
+    public Paragraph(string text, StyleCollection defaultStyles) : base(text, defaultStyles) { }
 }

@@ -1,15 +1,14 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 using NeoKolors.Tui.Elements.Caching;
 using NeoKolors.Tui.Rendering;
 using NeoKolors.Tui.Styles;
-using NeoKolors.Tui.Styles.Properties;
 using NeoKolors.Tui.Styles.Values;
 
 namespace NeoKolors.Tui.Elements;
 
-public class List : UniversalElement<IElement[]> {
+public class List : AbstractElement<IElement[]> {
     
     
     private readonly LayoutCacher _layoutCacher;
@@ -38,49 +37,22 @@ public class List : UniversalElement<IElement[]> {
     public override ElementInfo Info { get; }
     
     // ------------------------------------ STYLE -------------------------------------- //
-    
-    public virtual ListPointGenerator Point {
-        get => _style.Get(new ListPointProperty(DefaultPoint)).Value;
-        set => _style.Set(new ListPointProperty(value));
-    }
 
-    public virtual ListPointGenerator DefaultPoint => _ => "*";
-
-    public virtual NKStyle PointStyle {
-        get => _style.Get(new ListPointStyleProperty(DefaultPointStyle)).Value;
-        set => _style.Set(new ListPointStyleProperty(value));
-    }
-
-    public virtual NKStyle DefaultPointStyle => NKStyle.Default;
-
-    public virtual Dimension PointGap {
-        get => _style.Get(new ListPointGapProperty(DefaultPointGap)).Value;
-        set => _style.Set(new ListPointGapProperty(value));
-    }
-    
-    public virtual Dimension DefaultPointGap => Dimension.Chars(1);
-    
-    public virtual HorizontalAlign PointAlign {
-        get => _style.Get(new ListPointAlignProperty(DefaultPointAlign)).Value;
-        set => _style.Set(new ListPointAlignProperty(value));
-    }
-    
-    public virtual HorizontalAlign DefaultPointAlign => HorizontalAlign.RIGHT;
-
-    public virtual int PointOffset {
-        get => _style.Get(new ListPointOffsetProperty(DefaultPointOffset)).Value;
-        set => _style.Set(new ListPointOffsetProperty(value));
-    }
-
-    public virtual int DefaultPointOffset => 0;
+    public static StyleCollection DefaultStyle { get; } = new(AbstractContainerElement.DefaultStyle) {
+        ListPoint       = _ => "*",
+        ListPointStyle  = NKStyle.Default,
+        ListPointGap    = Dimension.Chars(1),
+        ListPointAlign  = HorizontalAlign.RIGHT,
+        ListPointOffset = 0,
+    };
     
     
     // ------------------------------------ CONSTRUCTOR ---------------------------------- //
     
-    public List(params IElement[] children) {
-        _children = new List<IElement>(children);
-        _style = new StyleCollection();
-        Info = new ElementInfo();
+    public List(params IElement[] children) : base(DefaultStyle) {
+        _children       = new List<IElement>(children);
+        _style          = new StyleCollection();
+        Info            = new ElementInfo();
         _layoutCacher   = new LayoutCacher        (CanUseMinCache, CanUseMaxCache, CanUseRenderCache);
         _childrenCacher = new ChildrenLayoutCacher(CanUseMinCache, CanUseMaxCache, CanUseRenderCache);
     }
@@ -88,7 +60,7 @@ public class List : UniversalElement<IElement[]> {
     // ------------------------------------ RENDER ------------------------------------- //
     
     public override void Render(ICharCanvas canvas, Rectangle rect) {
-        if (!Visible) return;
+        if (!_style.Visible) return;
 
         ElementLayout  el;
         ChildrenLayout cl;
@@ -112,20 +84,21 @@ public class List : UniversalElement<IElement[]> {
             SetCanUseRenderCache();
         }
         
-        if (!Border.IsBorderless) {
-            canvas.StyleBackground(el.Border + rect.Lower, BackgroundColor);
-            canvas.PlaceRectangle(el.Border + rect.Lower, Border);
+        if (!_style.Border.IsBorderless) {
+            canvas.StyleBackground(el.Border + rect.Lower, _style.BackgroundColor);
+            canvas.PlaceRectangle(el.Border + rect.Lower, _style.Border);
         }
         else {
-            canvas.StyleBackground(el.Border + rect.Lower, BackgroundColor);
+            canvas.StyleBackground(el.Border + rect.Lower, _style.BackgroundColor);
         }
 
+        var sp = _style.Position;
         var pos = new Point(
-            Position.AbsoluteX ? Position.X.ToScalar(rect.Width) : rect.LowerX + Position.X.ToScalar(rect.Width), 
-            Position.AbsoluteY ? Position.Y.ToScalar(rect.Width) : rect.LowerY + Position.Y.ToScalar(rect.Height)
+            sp.AbsoluteX ? sp.X.ToScalar(rect.Width) : rect.LowerX + sp.X.ToScalar(rect.Width), 
+            sp.AbsoluteY ? sp.Y.ToScalar(rect.Width) : rect.LowerY + sp.Y.ToScalar(rect.Height)
         );
         
-        var pg = Point;
+        var pg = _style.ListPoint;
         int mpw = 0;
 
         for (int i = 1; i < _children.Count + 1; i++) {
@@ -133,25 +106,25 @@ public class List : UniversalElement<IElement[]> {
             mpw = Math.Max(mpw, p.Length);
         }
         
-        var co = new Point(mpw + PointGap.ToScalar(rect.Width), 0);
+        var co = new Point(mpw + _style.ListPointGap.ToScalar(rect.Width), 0);
         
         for (int i = 0; i < _children.Count; i++) {
             var child = cl.Children[i];
 
-            if (child.Size != Size.Zero && child != Rectangle.Zero) {
-                var p = pg(i + 1);
-                canvas.PlaceString(
-                    p, 
-                    new Point(
-                        child.LowerX + pos.X + el.Content.LowerX, 
-                        child.LowerY + pos.Y + el.Content.LowerY + PointOffset
-                    ), 
-                    mpw, 
-                    PointAlign
-                );
+            if (child.Size == Size.Zero || child == Rectangle.Zero) continue;
+            
+            var p = pg(i + 1);
+            canvas.PlaceString(
+                p, 
+                new Point(
+                    child.LowerX + pos.X + el.Content.LowerX, 
+                    child.LowerY + pos.Y + el.Content.LowerY + _style.ListPointOffset
+                ), 
+                mpw, 
+                _style.ListPointAlign
+            );
                 
-                _children[i].Render(canvas, child + pos + co + el.Content.Lower);
-            }
+            _children[i].Render(canvas, child + pos + co + el.Content.Lower);
         }
     }
     
@@ -171,11 +144,11 @@ public class List : UniversalElement<IElement[]> {
     }
 
     private (ElementLayout, ChildrenLayout) ComputeMinLayout(Size parent) {
-        if (!Visible)
+        if (!_style.Visible)
             return (ElementLayout.Zero, ChildrenLayout.Empty);
 
         int maxPointWidth = 0;
-        var pg = Point;
+        var pg = _style.ListPoint;
         
         for (int i = 1; i < _children.Count + 1; i++) {
             var p = pg(i);
@@ -193,9 +166,15 @@ public class List : UniversalElement<IElement[]> {
             maxW = Math.Max(l.Width, maxW);
         }
         
-        var content = new Size(maxPointWidth + maxW + PointGap.ToScalar(parent.Width), y);
-        var el = IElement.ComputeLayout(
-            content, parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        var content = new Size(maxPointWidth + maxW + _style.ListPointGap.ToScalar(parent.Width), y);
+        var el = IElement.ComputeLayoutFromContent(
+            content, 
+            parent,
+            _style.Margin,    _style.Border, _style.Padding, 
+            _style.Width,     _style.Height, 
+            _style.MinWidth,  _style.MaxWidth,
+            _style.MinHeight, _style.MaxHeight
+        );
 
         return (el, new ChildrenLayout(r));
     }
@@ -216,11 +195,11 @@ public class List : UniversalElement<IElement[]> {
     }
 
     private (ElementLayout, ChildrenLayout) ComputeMaxLayout(Size parent) {
-        if (!Visible)
+        if (!_style.Visible)
             return (ElementLayout.Zero, ChildrenLayout.Empty);
 
         int maxPointWidth = 0;
-        var pg = Point;
+        var pg = _style.ListPoint;
         
         for (int i = 1; i < _children.Count + 1; i++) {
             var p = pg(i);
@@ -238,9 +217,15 @@ public class List : UniversalElement<IElement[]> {
             maxW = Math.Max(l.Width, maxW);
         }
         
-        var content = new Size(maxPointWidth + maxW + PointGap.ToScalar(parent.Width), y);
-        var el = IElement.ComputeLayout(
-            content, parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        var content = new Size(maxPointWidth + maxW + _style.ListPointGap.ToScalar(parent.Width), y);
+        var el = IElement.ComputeLayoutFromContent(
+            content, 
+            parent,
+            _style.Margin,    _style.Border, _style.Padding, 
+            _style.Width,     _style.Height, 
+            _style.MinWidth,  _style.MaxWidth,
+            _style.MinHeight, _style.MaxHeight
+        );
 
         return (el, new ChildrenLayout(r));
     }
@@ -261,14 +246,16 @@ public class List : UniversalElement<IElement[]> {
     }
 
     private (ElementLayout Element, ChildrenLayout Children) GetRenderLayout(Size rect) {
-        if (!Visible)
+        if (!_style.Visible)
             return (ElementLayout.Zero, ChildrenLayout.Empty);
 
-        var c = IElement.ComputeLayout
-            (rect, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        var c = IElement.ComputeLayoutFromBounds(
+            rect, _style.Margin, _style.Border, _style.Padding, 
+            _style.Width, _style.Height, _style.MinWidth, _style.MaxWidth, _style.MinHeight, _style.MaxHeight
+        );
         
         int mpw = 0;
-        var pg = Point;
+        var pg = _style.ListPoint;
         
         for (int i = 1; i < _children.Count + 1; i++) {
             var p = pg(i);
@@ -278,7 +265,7 @@ public class List : UniversalElement<IElement[]> {
         int y = 0;
         var r = new Rectangle[_children.Count];
         int maxW = 0;
-        int cw = c.Content.Width - mpw - PointGap.ToScalar(rect.Width);
+        int cw = c.Content.Width - mpw - _style.ListPointGap.ToScalar(rect.Width);
 
         for (int i = 0; i < _children.Count; i++) { 
             var l = _children[i].GetRenderSize(new Size(cw, c.Content.Height - y));
@@ -287,9 +274,14 @@ public class List : UniversalElement<IElement[]> {
             maxW = Math.Max(l.Width, maxW);
         }
         
-        var content = new Size(mpw + maxW + PointGap.ToScalar(rect.Width), y);
-        var el = IElement.ComputeLayout(
-            content, rect, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        var content = new Size(mpw + maxW + _style.ListPointGap.ToScalar(rect.Width), y);
+        var el = IElement.ComputeLayoutFromContent(
+            content, rect,
+            _style.Margin,    _style.Border, _style.Padding, 
+            _style.Width,     _style.Height, 
+            _style.MinWidth,  _style.MaxWidth,
+            _style.MinHeight, _style.MaxHeight
+        );
 
         return (el, new ChildrenLayout(r));
     }

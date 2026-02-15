@@ -1,5 +1,5 @@
 // NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 using System.Globalization;
 using System.Reflection;
@@ -7,7 +7,6 @@ using System.Xml.Linq;
 using NeoKolors.Tui.Elements;
 using NeoKolors.Tui.Fonts;
 using NeoKolors.Tui.Styles.Properties;
-using NeoKolors.Tui.Styles.Values;
 
 namespace NeoKolors.Tui.Dom;
 
@@ -124,51 +123,54 @@ public class XmlDomLoader {
             return;
         }
         
-        var prop = element.GetType().GetProperty(name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+        // var prop = element.GetType().GetProperty(name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+        //
+        // if (prop != null && prop.CanWrite) {
+        //     try {
+        //        var convertedValue = ConvertValue(value, prop.PropertyType);
+        //        prop.SetValue(element, convertedValue);
+        //     } 
+        //     catch (Exception e) {
+        //         LOGGER.Error(e);
+        //     }
+        //
+        //     return;
+        // }
+
+        if (!IStyleProperty.TryGetByName(name, out var type)) return;
         
-        if (prop != null && prop.CanWrite) {
-            try {
-               var convertedValue = ConvertValue(value, prop.PropertyType);
-               prop.SetValue(element, convertedValue);
-            } 
-            catch (Exception e) {
-                LOGGER.Error(e);
-            }
-        }
-        else if (IStyleProperty.TryGetByName(name, out var type)) {
-            try {
-                Type target;
+        try {
+            Type target;
 
-                if (IStyleProperty.IsPartial(type)) {
-                    var partial = (IPartialStyleProperty?)Activator.CreateInstance(type);
+            if (IStyleProperty.IsPartial(type)) {
+                var partial = (IPartialStyleProperty?)Activator.CreateInstance(type);
 
-                    if (partial == null) {
-                        LOGGER.Error("Construction of a partial property failed.");
-                        return;
-                    }
-                    
-                    target = partial.ValueType;
+                if (partial == null) {
+                    LOGGER.Error("Construction of a partial property failed.");
+                    return;
                 }
-                else {
-                    var full = (IStyleProperty?)Activator.CreateInstance(type);
-
-                    if (full == null) {
-                        LOGGER.Error("Construction of a property failed.");
-                        return;
-                    }
                     
-                    target = full.ValueType;
-                }
-                
-                var convertedValue = ConvertValue(value, target);
-                var property = (IStyleProperty?)Activator.CreateInstance(type, convertedValue);
-                
-                if (property != null)
-                    element.Style.Set(property);
-            } 
-            catch (Exception e) {
-                LOGGER.Error(e);
+                target = partial.ValueType;
             }
+            else {
+                var full = (IStyleProperty?)Activator.CreateInstance(type);
+
+                if (full == null) {
+                    LOGGER.Error("Construction of a property failed.");
+                    return;
+                }
+                    
+                target = full.ValueType;
+            }
+                
+            var convertedValue = ConvertValue(value, target);
+            var property = (IStyleProperty?)Activator.CreateInstance(type, convertedValue);
+                
+            if (property != null)
+                element.Style.Set(property);
+        } 
+        catch (Exception e) {
+            LOGGER.Error(e);
         }
     }
 

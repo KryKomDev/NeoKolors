@@ -1,6 +1,6 @@
 ﻿//
 // NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 //
 
 using System.Diagnostics.CodeAnalysis;
@@ -53,14 +53,14 @@ public struct BorderStyle : IParsableValue<BorderStyle> {
         TopLeft          = topLeft;
         BottomRight      = bottomRight;
         BottomLeft       = bottomLeft;
-        StyleTop         = styleTop         ?? new NKStyle(NKColor.Default, NKColor.Inherit, TextStyles.NONE);
-        StyleBottom      = styleBottom      ?? new NKStyle(NKColor.Default, NKColor.Inherit, TextStyles.NONE);
-        StyleLeft        = styleLeft        ?? new NKStyle(NKColor.Default, NKColor.Inherit, TextStyles.NONE);
-        StyleRight       = styleRight       ?? new NKStyle(NKColor.Default, NKColor.Inherit, TextStyles.NONE);
-        StyleTopLeft     = styleTopLeft     ?? new NKStyle(NKColor.Default, NKColor.Inherit, TextStyles.NONE);
-        StyleTopRight    = styleTopRight    ?? new NKStyle(NKColor.Default, NKColor.Inherit, TextStyles.NONE);
-        StyleBottomLeft  = styleBottomLeft  ?? new NKStyle(NKColor.Default, NKColor.Inherit, TextStyles.NONE);
-        StyleBottomRight = styleBottomRight ?? new NKStyle(NKColor.Default, NKColor.Inherit, TextStyles.NONE);
+        StyleTop         = styleTop         ?? new NKStyle(NKColor.Default, NKColor.Inherit);
+        StyleBottom      = styleBottom      ?? new NKStyle(NKColor.Default, NKColor.Inherit);
+        StyleLeft        = styleLeft        ?? new NKStyle(NKColor.Default, NKColor.Inherit);
+        StyleRight       = styleRight       ?? new NKStyle(NKColor.Default, NKColor.Inherit);
+        StyleTopLeft     = styleTopLeft     ?? new NKStyle(NKColor.Default, NKColor.Inherit);
+        StyleTopRight    = styleTopRight    ?? new NKStyle(NKColor.Default, NKColor.Inherit);
+        StyleBottomLeft  = styleBottomLeft  ?? new NKStyle(NKColor.Default, NKColor.Inherit);
+        StyleBottomRight = styleBottomRight ?? new NKStyle(NKColor.Default, NKColor.Inherit);
         IsBorderless     = false;
     }
     
@@ -87,14 +87,14 @@ public struct BorderStyle : IParsableValue<BorderStyle> {
         TopLeft          = topLeft;
         BottomRight      = bottomRight;
         BottomLeft       = bottomLeft;
-        StyleTop         = new NKStyle(colorTop         ?? NKColor.Default, background ?? NKColor.Inherit, TextStyles.NONE);
-        StyleBottom      = new NKStyle(colorBottom      ?? NKColor.Default, background ?? NKColor.Inherit, TextStyles.NONE);
-        StyleLeft        = new NKStyle(colorLeft        ?? NKColor.Default, background ?? NKColor.Inherit, TextStyles.NONE);
-        StyleRight       = new NKStyle(colorRight       ?? NKColor.Default, background ?? NKColor.Inherit, TextStyles.NONE);
-        StyleTopLeft     = new NKStyle(colorTopLeft     ?? NKColor.Default, background ?? NKColor.Inherit, TextStyles.NONE);
-        StyleTopRight    = new NKStyle(colorTopRight    ?? NKColor.Default, background ?? NKColor.Inherit, TextStyles.NONE);
-        StyleBottomLeft  = new NKStyle(colorBottomLeft  ?? NKColor.Default, background ?? NKColor.Inherit, TextStyles.NONE);
-        StyleBottomRight = new NKStyle(colorBottomRight ?? NKColor.Default, background ?? NKColor.Inherit, TextStyles.NONE);
+        StyleTop         = new NKStyle(colorTop         ?? NKColor.Default, background ?? NKColor.Inherit);
+        StyleBottom      = new NKStyle(colorBottom      ?? NKColor.Default, background ?? NKColor.Inherit);
+        StyleLeft        = new NKStyle(colorLeft        ?? NKColor.Default, background ?? NKColor.Inherit);
+        StyleRight       = new NKStyle(colorRight       ?? NKColor.Default, background ?? NKColor.Inherit);
+        StyleTopLeft     = new NKStyle(colorTopLeft     ?? NKColor.Default, background ?? NKColor.Inherit);
+        StyleTopRight    = new NKStyle(colorTopRight    ?? NKColor.Default, background ?? NKColor.Inherit);
+        StyleBottomLeft  = new NKStyle(colorBottomLeft  ?? NKColor.Default, background ?? NKColor.Inherit);
+        StyleBottomRight = new NKStyle(colorBottomRight ?? NKColor.Default, background ?? NKColor.Inherit);
         IsBorderless     = false;
     }
 
@@ -114,14 +114,14 @@ public struct BorderStyle : IParsableValue<BorderStyle> {
         TopLeft          = topLeft;
         BottomRight      = bottomRight;
         BottomLeft       = bottomLeft;
-        StyleTop         = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit, TextStyles.NONE);
-        StyleBottom      = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit, TextStyles.NONE);
-        StyleLeft        = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit, TextStyles.NONE);
-        StyleRight       = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit, TextStyles.NONE);
-        StyleTopLeft     = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit, TextStyles.NONE);
-        StyleTopRight    = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit, TextStyles.NONE);
-        StyleBottomLeft  = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit, TextStyles.NONE);
-        StyleBottomRight = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit, TextStyles.NONE);
+        StyleTop         = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit);
+        StyleBottom      = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit);
+        StyleLeft        = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit);
+        StyleRight       = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit);
+        StyleTopLeft     = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit);
+        StyleTopRight    = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit);
+        StyleBottomLeft  = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit);
+        StyleBottomRight = new NKStyle(textColor ?? NKColor.Default, backgroundColor ?? NKColor.Inherit);
         IsBorderless     = false;
     }
 

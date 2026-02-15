@@ -1,5 +1,5 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 using System.Reflection;
 using NeoKolors.Tui.Styles.Properties;
@@ -15,7 +15,7 @@ namespace NeoKolors.Tui.Global;
 /// It maintains a static collection of styles and provides a method to retrieve them.
 /// Logging support for the class is facilitated by the <c>NKLogger</c>.
 /// </remarks>
-public class StyleManager {
+public static class StyleManager {
     private static readonly NKLogger LOGGER = NKDebug.GetLogger(nameof(StyleManager));
     
     private static readonly HashSet<NameTypeTuple> STYLES = new(new NameTypeTupleComparer());

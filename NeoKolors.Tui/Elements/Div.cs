@@ -1,5 +1,5 @@
 ﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
 
 using System.Diagnostics.Contracts;
 using NeoKolors.Console.Mouse;
@@ -12,7 +12,7 @@ using static NeoKolors.Tui.Styles.Values.Direction;
 
 namespace NeoKolors.Tui.Elements;
 
-public class Div : ContainerElement, IInteractableElement<IElement[]> {
+public class Div : AbstractContainerElement, IMouseInteractableElement<IElement[]> {
     
     protected readonly LayoutCacher _layoutCacher;
     protected readonly ChildrenLayoutCacher _childrenCacher;
@@ -36,6 +36,8 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
         _updateCache = CacheUpdateFlags.NONE;
         OnElementUpdated?.Invoke();
     }
+    
+    private void InvokeElementUpdated(IStyleProperty _) => InvokeElementUpdated();
     
     public override ElementInfo Info { get; }
     
@@ -74,13 +76,12 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
         AppEventBus.SubscribeToMouseEvent(InvokeMouseAction);
     }
     
-    public Div(params IElement[] children) {
+    public Div(StyleCollection defaultStyle, params IElement[] children) : base(defaultStyle) {
         _children       = children.ToList();
         Info            = new ElementInfo();
-        _style          = new StyleCollection();
         _layoutCacher   = new LayoutCacher(CanUseMinCache, CanUseMaxCache, CanUseRenderCache);
         _childrenCacher = new ChildrenLayoutCacher(CanUseMinCache, CanUseMaxCache, CanUseRenderCache);
-        OnStyleAccess  += InvokeElementUpdated;
+        _style.StyleChanged += InvokeElementUpdated;
 
         foreach (var c in children) {
             c.OnElementUpdated += InvokeElementUpdated;
@@ -88,9 +89,11 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
         
         SubscribeMouseEvents();
     }
-    
+
+    public Div(params IElement[] children) : this(DefaultStyle, children) { }
+
     public override void Render(ICharCanvas canvas, Rectangle rect) {
-        if (!Visible) return;
+        if (!_style.Visible) return;
 
         #if NK_ENABLE_CACHING
         
@@ -121,22 +124,23 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
         var (el, cl) = GetRenderLayout(rect);
 
         #endif
-        
+
+        var sp = _style.Position;
         var pos = new Point(
-            Position.AbsoluteX ? Position.X.ToScalar(rect.Width) : rect.LowerX + Position.X.ToScalar(rect.Width), 
-            Position.AbsoluteY ? Position.Y.ToScalar(rect.Width) : rect.LowerY + Position.Y.ToScalar(rect.Height)
+            sp.AbsoluteX ? sp.X.ToScalar(rect.Width) : rect.LowerX + sp.X.ToScalar(rect.Width), 
+            sp.AbsoluteY ? sp.Y.ToScalar(rect.Width) : rect.LowerY + sp.Y.ToScalar(rect.Height)
         );
         
-        if (!BackgroundColor.IsInherit) {
+        if (!_style.BackgroundColor.IsInherit) {
             canvas.Fill(el.Border - Size.Two + pos + Point.One, ' ');
         }
         
-        if (!Border.IsBorderless) {
-            canvas.StyleBackground(el.Border - Size.Two + pos + Point.One, BackgroundColor);
-            canvas.PlaceRectangle(el.Border + pos, Border);
+        if (!_style.Border.IsBorderless) {
+            canvas.StyleBackground(el.Border - Size.Two + pos + Point.One, _style.BackgroundColor);
+            canvas.PlaceRectangle(el.Border + pos, _style.Border);
         }
         else {
-            canvas.StyleBackground(el.Border + pos, BackgroundColor);
+            canvas.StyleBackground(el.Border + pos, _style.BackgroundColor);
         }
         
         var checkerBckg = Style.Get<CheckerBckgProperty>().Value;
@@ -180,9 +184,9 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
 
     [Pure]
     protected (ElementLayout Element, ChildrenLayout Children) ComputeMinLayout(Size parent) {
-        return !Visible 
+        return !_style.Visible 
             ? (ElementLayout.Zero, ChildrenLayout.Empty) 
-            : EnableGrid 
+            : _style.EnableGrid 
                 ? ComputeMinGridLayout(parent) 
                 : ComputeMinNonGridLayout(parent);
     }
@@ -191,13 +195,13 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
     private (ElementLayout, ChildrenLayout) ComputeMinGridLayout(Size parent) {
         int w = 0;
         int h = 0;
-        int[] xs = new int[Grid.Columns.Length];
-        int[] xo = new int[Grid.Columns.Length];
-        int[] ys = new int[Grid.Rows.Length];
-        int[] yo = new int[Grid.Rows.Length];
+        int[] xs = new int[_style.Grid.Columns.Length];
+        int[] xo = new int[_style.Grid.Columns.Length];
+        int[] ys = new int[_style.Grid.Rows.Length];
+        int[] yo = new int[_style.Grid.Rows.Length];
 
-        for (int i = 0; i < Grid.Columns.Length; i++) {
-            var c = Grid.Columns[i];
+        for (int i = 0; i < _style.Grid.Columns.Length; i++) {
+            var c = _style.Grid.Columns[i];
             
             if (c.IsAuto) continue;
 
@@ -207,8 +211,8 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
             xo[i] = w;
         }
 
-        for (int i = 0; i < Grid.Rows.Length; i++) {
-            var r = Grid.Rows[i];
+        for (int i = 0; i < _style.Grid.Rows.Length; i++) {
+            var r = _style.Grid.Rows[i];
             
             if (r.IsAuto) continue;
 
@@ -220,8 +224,14 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
         
         var content = new Size(w, h);
 
-        var el = IElement.ComputeLayout(content, parent, Margin, Padding, Border,
-            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        var el = IElement.ComputeLayoutFromContent(
+            content,
+            parent,
+            _style.Margin,    _style.Border, _style.Padding,
+            _style.Width,     _style.Height, 
+            _style.MinWidth,  _style.MaxWidth, 
+            _style.MinHeight, _style.MaxHeight
+        );
 
         var cl = ComputeMinGridChildren(parent, xo, yo, xs, ys);
         
@@ -243,7 +253,7 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
 
     [Pure]
     private (ElementLayout, ChildrenLayout) ComputeMinNonGridLayout(Size parent) {
-        return Direction is TOP_TO_BOTTOM or BOTTOM_TO_TOP 
+        return _style.Direction is TOP_TO_BOTTOM or BOTTOM_TO_TOP 
             ? ComputeMinVerticalLayout(parent) 
             : ComputeMinHorizontalLayout(parent);
     }
@@ -265,8 +275,14 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
         
         var content = new Size(maxWidth, height);
 
-        var el = IElement.ComputeLayout(content, parent, Margin, Padding, Border,
-            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        var el = IElement.ComputeLayoutFromContent(
+            content,
+            parent, 
+            _style.Margin,    _style.Border, _style.Padding,
+            _style.Width,     _style.Height,
+            _style.MinWidth,  _style.MaxWidth,
+            _style.MinHeight, _style.MaxHeight
+        );
 
         var cl = new ChildrenLayout(r);
         
@@ -290,8 +306,14 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
         
         var content = new Size(width, maxHeight);
 
-        var el = IElement.ComputeLayout(content, parent, Margin, Padding, Border,
-            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        var el = IElement.ComputeLayoutFromContent(
+            content,
+            parent,
+            _style.Margin,    _style.Border, _style.Padding,
+            _style.Width,     _style.Height,
+            _style.MinWidth,  _style.MaxWidth,
+            _style.MinHeight, _style.MaxHeight
+        );
         
         var cl = new ChildrenLayout(r);
         
@@ -326,9 +348,9 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
     
     [Pure]
     protected ElementLayout ComputeMaxLayout(Size parent) {
-        return !Visible 
+        return !_style.Visible 
             ? ElementLayout.Zero
-            : EnableGrid 
+            : _style.EnableGrid 
                 ? ComputeMaxGridLayout(parent)
                 : ComputeMaxNonGridLayout(parent);
     }
@@ -340,8 +362,8 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
         int h   = 0;
         int hac = 0;
 
-        for (int i = 0; i < Grid.Columns.Length; i++) {
-            var c = Grid.Columns[i];
+        for (int i = 0; i < _style.Grid.Columns.Length; i++) {
+            var c = _style.Grid.Columns[i];
             
             if (c.IsAuto) {
                 wac++;
@@ -351,8 +373,8 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
             w += c.ToScalar(parent.Width);
         }
 
-        for (int i = 0; i < Grid.Rows.Length; i++) {
-            var r = Grid.Rows[i];
+        for (int i = 0; i < _style.Grid.Rows.Length; i++) {
+            var r = _style.Grid.Rows[i];
 
             if (r.IsAuto) {
                 hac++;
@@ -365,42 +387,72 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
         var winSize = new Size(Stdio.BufferWidth, Stdio.BufferHeight);
         
         var minContent = new Size(w, h);
-        var maxContent = IElement.ComputeLayout(winSize, Margin, Padding, Border,
-            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        var maxContent = IElement.ComputeLayoutFromBounds(winSize, _style.Margin, _style.Border, _style.Padding,
+            _style.Width, _style.Height, _style.MinWidth, _style.MaxWidth, _style.MinHeight, _style.MaxHeight);
 
-        if (wac == 0 && hac == 0) {
-            return IElement.ComputeLayout(minContent, parent, Margin, Padding, Border, 
-                Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        switch ((wac, hac)) {
+            case (0, 0): {
+                return IElement.ComputeLayoutFromContent(
+                    minContent,
+                    parent,
+                    _style.Margin,    _style.Border, _style.Padding, 
+                    _style.Width,     _style.Height, 
+                    _style.MinWidth,  _style.MaxWidth, 
+                    _style.MinHeight, _style.MaxHeight
+                );
+            }
+            case (0, var lh) when lh != 0: {
+                var content = new Size(minContent.Width, Math.Max(maxContent.Content.Height, minContent.Height));
+                return IElement.ComputeLayoutFromContent(
+                    content,
+                    parent,
+                    _style.Margin, _style.Border, _style.Padding,
+                    _style.Width, _style.Height,
+                    _style.MinWidth, _style.MaxWidth,
+                    _style.MinHeight, _style.MaxHeight
+                );
+            }
+            case (var lw, 0) when lw != 0: {
+                var content = new Size(Math.Max(maxContent.Content.Width, minContent.Width), minContent.Height);
+                return IElement.ComputeLayoutFromContent(
+                    content,
+                    parent,
+                    _style.Margin,    _style.Border, _style.Padding, 
+                    _style.Width,     _style.Height, 
+                    _style.MinWidth,  _style.MaxWidth, 
+                    _style.MinHeight, _style.MaxHeight
+                );
+            }
+            default: {
+                var content = Size.Max(maxContent.Content, minContent);
+                return IElement.ComputeLayoutFromContent(
+                    content, 
+                    parent, 
+                    _style.Margin,    _style.Border, _style.Padding, 
+                    _style.Width,     _style.Height,
+                    _style.MinWidth,  _style.MaxWidth, 
+                    _style.MinHeight, _style.MaxHeight
+                );
+            }
         }
-
-        if (wac == 0 && hac != 0) {
-            var content = new Size(minContent.Width, Math.Max(maxContent.Content.Height, minContent.Height));
-            return IElement.ComputeLayout(content, parent, Margin, Padding, Border, 
-                Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
-        }
-
-        if (wac != 0 && hac == 0) {
-            var content = new Size(Math.Max(maxContent.Content.Width, minContent.Width), minContent.Height);
-            return IElement.ComputeLayout(content, parent, Margin, Padding, Border, 
-                Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
-        }
-        
-        var cont = Size.Max(maxContent.Content, minContent);
-        return IElement.ComputeLayout(cont, parent, Margin, Padding, Border, 
-            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
     }
 
     [Pure]
     private ElementLayout ComputeMaxNonGridLayout(Size parent) {
-        return Direction is TOP_TO_BOTTOM or BOTTOM_TO_TOP 
+        return _style.Direction is TOP_TO_BOTTOM or BOTTOM_TO_TOP 
             ? ComputeMaxVerticalLayout(parent) 
             : ComputeMaxHorizontalLayout(parent);
     }
 
     [Pure]
     private ElementLayout ComputeMaxVerticalLayout(Size parent) {
-        var el = IElement.ComputeLayout(parent, Margin, Padding, Border, 
-            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        var el = IElement.ComputeLayoutFromBounds(
+            parent, 
+            _style.Margin,    _style.Border, _style.Padding, 
+            _style.Width,     _style.Height, 
+            _style.MinWidth,  _style.MaxWidth,
+            _style.MinHeight, _style.MaxHeight
+        );
         
         int height = 0;
         int maxWidth = 0;
@@ -413,14 +465,25 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
         
         var content = new Size(maxWidth, height);
         
-        return IElement.ComputeLayout(content, parent, Margin, Padding, Border, 
-            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        return IElement.ComputeLayoutFromContent(
+            content,
+            parent,
+            _style.Margin,    _style.Border, _style.Padding, 
+            _style.Width,     _style.Height,
+            _style.MinWidth,  _style.MaxWidth,
+            _style.MinHeight, _style.MaxHeight
+        );
     }
     
     [Pure]
     private ElementLayout ComputeMaxHorizontalLayout(Size parent) {
-        var el = IElement.ComputeLayout(parent, Margin, Padding, Border, 
-            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        var el = IElement.ComputeLayoutFromBounds(
+            parent,
+            _style.Margin,    _style.Border, _style.Padding, 
+            _style.Width,     _style.Height,
+            _style.MinWidth,  _style.MaxWidth,
+            _style.MinHeight, _style.MaxHeight
+        );
         
         int width = 0;
         int maxHeight = parent.Height;
@@ -433,8 +496,14 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
         
         var content = new Size(width, maxHeight);
         
-        return IElement.ComputeLayout(content, parent, Margin, Padding, Border, 
-            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        return IElement.ComputeLayoutFromContent(
+            content, 
+            parent,
+            _style.Margin,    _style.Border, _style.Padding, 
+            _style.Width,     _style.Height, 
+            _style.MinWidth,  _style.MaxWidth, 
+            _style.MinHeight, _style.MaxHeight
+        );
     }
 
     #endregion
@@ -468,9 +537,9 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
     
     [Pure]
     private (ElementLayout Element, ChildrenLayout Children) ComputeRenderLayout(Size parent) {
-        return !Visible 
+        return !_style.Visible 
             ? (ElementLayout.Zero, ChildrenLayout.Empty)
-            : EnableGrid
+            : _style.EnableGrid
                 ? ComputeRenderGridLayout(parent)
                 : ComputeRenderNonGridLayout(parent);
     }
@@ -485,66 +554,119 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
 
     [Pure]
     private ElementLayout ComputeRenderGridElementLayout(Size parent) {
+        
+        // precompute the layout as the content box dimensions
+        // will be used to calculate the column/row sizes
+        var l = IElement.ComputeLayoutFromBounds(
+            parent,
+            _style.Margin,
+            _style.Border,
+            _style.Padding,
+            _style.Width,
+            _style.Height,
+            _style.MinWidth,
+            _style.MaxWidth,
+            _style.MinHeight,
+            _style.MaxHeight
+        );
+        
         int w   = 0;
         int wac = 0;
         int h   = 0;
         int hac = 0;
 
-        for (int i = 0; i < Grid.Columns.Length; i++) {
-            var c = Grid.Columns[i];
+        // compute the width of the columns 
+        for (int i = 0; i < _style.Grid.Columns.Length; i++) {
+            var c = _style.Grid.Columns[i];
             
             if (c.IsAuto) {
                 wac++;
                 continue;
             }
             
-            w += c.ToScalar(parent.Width);
+            w += c.ToScalarX(l.Content.Width);
         }
 
-        for (int i = 0; i < Grid.Rows.Length; i++) {
-            var r = Grid.Rows[i];
+        // compute the height of the rows
+        for (int i = 0; i < _style.Grid.Rows.Length; i++) {
+            var r = _style.Grid.Rows[i];
 
             if (r.IsAuto) {
                 hac++;
                 continue;
             }
             
-            h += r.ToScalar(parent.Height);
+            h += r.ToScalarY(l.Content.Height);
         }
         
+        // create scenarios for:
+        // - auto-sized columns/rows have size 0 (minContent)
+        // - auto-sized columns/rows are a fraction of the remainder (maxContent)
         var minContent = new Size(w, h);
-        var maxContent = IElement.ComputeLayout(
-            parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
-
-        if (wac == 0 && hac == 0) {
-            return IElement.ComputeLayout(minContent, parent, Margin, Padding, Border, 
-                Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
-        }
-
-        if (wac == 0 && hac != 0) {
-            var content = new Size(minContent.Width, Math.Max(maxContent.Content.Height, minContent.Height));
-            return IElement.ComputeLayout(content, parent, Margin, Padding, Border, 
-                Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
-        }
-
-        if (wac != 0 && hac == 0) {
-            var content = new Size(Math.Max(maxContent.Content.Width, minContent.Width), minContent.Height);
-            return IElement.ComputeLayout(content, parent, Margin, Padding, Border, 
-                Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
-        }
+        var maxContent = IElement.ComputeLayoutFromBounds(
+            parent,
+            _style.Margin,    _style.Border, _style.Padding,
+            _style.Width,     _style.Height,
+            _style.MinWidth,  _style.MaxWidth,
+            _style.MinHeight, _style.MaxHeight
+        );
         
-        var cont = Size.Max(maxContent.Content, minContent);
-        return IElement.ComputeLayout(cont, parent, Margin, Padding, Border, 
-            Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        switch ((wac, hac)) {
+            
+            // no auto-sized columns/rows -> use minContent as it is the actual size
+            case (0, 0): {
+                return IElement.ComputeLayoutFromContent(
+                    minContent, 
+                    parent,
+                    _style.Margin, _style.Border, _style.Padding, 
+                    _style.Width, _style.Height,
+                    _style.MinWidth, _style.MaxWidth,
+                    _style.MinHeight, _style.MaxHeight
+                );
+            }
+            case (0, var lh) when lh != 0: {
+                var content = new Size(minContent.Width, Math.Max(maxContent.Content.Height, minContent.Height));
+                return IElement.ComputeLayoutFromContent(
+                    content, 
+                    parent,
+                    _style.Margin,    _style.Border, _style.Padding, 
+                    _style.Width,     _style.Height, 
+                    _style.MinWidth,  _style.MaxWidth,
+                    _style.MinHeight, _style.MaxHeight
+                );
+            }
+            case (var lw, 0) when lw != 0: {
+                var content = new Size(Math.Max(maxContent.Content.Width, minContent.Width), minContent.Height);
+                return IElement.ComputeLayoutFromContent(
+                    content, 
+                    parent,
+                    _style.Margin,    _style.Border, _style.Padding, 
+                    _style.Width,     _style.Height, 
+                    _style.MinWidth,  _style.MaxWidth, 
+                    _style.MinHeight, _style.MaxHeight
+                );
+            }
+            default: {
+                var content = Size.Max(maxContent.Content, minContent);
+                return IElement.ComputeLayoutFromContent(
+                    content, 
+                    parent,
+                    _style.Margin, _style.Border, _style.Padding, 
+                    _style.Width, _style.Height,
+                    _style.MinWidth, _style.MaxWidth,
+                    _style.MinHeight, _style.MaxHeight
+                );
+            }
+        }
     }
 
     [Pure]
     private ChildrenLayout ComputeRenderGridChildrenLayout(Size parent, Size content) {
-        int xAutoCount = Grid.Columns.Count(c => c.IsAuto);
-        int yAutoCount = Grid.Rows   .Count(c => c.IsAuto);
+        int xAutoCount = _style.Grid.Columns.Count(c => c.IsAuto);
+        int yAutoCount = _style.Grid.Rows   .Count(c => c.IsAuto);
 
-        var cc = Grid.Columns.Length;
-        var rc = Grid.Rows.Length;
+        var cc = _style.Grid.Columns.Length;
+        var rc = _style.Grid.Rows.Length;
 
         int[] xSteps = new int[cc];
         int[] ySteps = new int[rc];
@@ -552,7 +674,7 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
         int   height = 0;
         
         for (int x = 0; x < cc; x++) {
-            var c = Grid.Columns[x];
+            var c = _style.Grid.Columns[x];
             
             if (c.IsAuto) {
                 xSteps[x] = -1;
@@ -565,7 +687,7 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
         }
 
         for (int y = 0; y < rc; y++) {
-            var r = Grid.Rows[y];
+            var r = _style.Grid.Rows[y];
             
             if (r.IsAuto) {
                 ySteps[y] = -1;
@@ -638,15 +760,17 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
 
     [Pure]
     private (ElementLayout Element, ChildrenLayout Chlidren) ComputeRenderNonGridLayout(Size parent) {
-        return Direction is TOP_TO_BOTTOM or BOTTOM_TO_TOP
+        return _style.Direction is TOP_TO_BOTTOM or BOTTOM_TO_TOP
             ? ComputeRenderVerticalLayout(parent)
             : ComputeRenderHorizontalLayout(parent);
     }
 
     [Pure]
     private (ElementLayout, ChildrenLayout) ComputeRenderVerticalLayout(Size parent) {
-        var el = IElement.ComputeLayout(
-            parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        var el = IElement.ComputeLayoutFromBounds(
+            parent, _style.Margin, _style.Border, _style.Padding, 
+            _style.Width, _style.Height, _style.MinWidth, _style.MaxWidth, _style.MinHeight, _style.MaxHeight
+        );
 
         var content = el.Content;
         var cl = new Rectangle[_children.Count];
@@ -662,16 +786,27 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
         }
         
         content = Size.Min(content, new Size(maxX, y));
-        el = IElement.ComputeLayout(content, parent, 
-            Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        el = IElement.ComputeLayoutFromContent(
+            content, 
+            parent,
+            _style.Margin,    _style.Border, _style.Padding, 
+            _style.Width,     _style.Height, 
+            _style.MinWidth,  _style.MaxWidth,
+            _style.MinHeight, _style.MaxHeight
+        );
         
         return (el, new ChildrenLayout(cl));
     }
 
     [Pure]
     private (ElementLayout, ChildrenLayout) ComputeRenderHorizontalLayout(Size parent) {
-        var el = IElement.ComputeLayout(
-            parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        var el = IElement.ComputeLayoutFromBounds(
+            parent,
+            _style.Margin,    _style.Border, _style.Padding, 
+            _style.Width,     _style.Height, 
+            _style.MinWidth,  _style.MaxWidth, 
+            _style.MinHeight, _style.MaxHeight
+        );
         
         var content = el.Content;
         var cc = _children.Count;
@@ -691,8 +826,14 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
         // elements fit with max width
         if (maxXs <= content.Width) {
             var cs = new Size(maxXs, maxMaxY);
-            var fel = IElement.ComputeLayout(cs, parent,
-                Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+            var fel = IElement.ComputeLayoutFromContent(
+                cs,
+                parent,
+                _style.Margin,    _style.Border, _style.Padding, 
+                _style.Width,     _style.Height, 
+                _style.MinWidth,  _style.MaxWidth,
+                _style.MinHeight, _style.MaxHeight
+            );
 
             return (fel, new ChildrenLayout(maxR));
         }
@@ -712,8 +853,14 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
         // overflow
         if (minXs >= content.Width) {
             var cs = new Size(content.Width, minMaxY);
-            var fel = IElement.ComputeLayout(cs, parent,
-                Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+            var fel = IElement.ComputeLayoutFromContent(
+                cs,
+                parent,
+                _style.Margin,    _style.Border, _style.Padding,
+                _style.Width,     _style.Height, 
+                _style.MinWidth,  _style.MaxWidth, 
+                _style.MinHeight, _style.MaxHeight
+            );
 
             return (fel, new ChildrenLayout(minR));
         }
@@ -766,8 +913,14 @@ public class Div : ContainerElement, IInteractableElement<IElement[]> {
         }
         
         var rc = new Size(content.Width, rMaxY);
-        el = IElement.ComputeLayout(
-            rc, parent, Margin, Padding, Border, Width, Height, MinWidth, MaxWidth, MinHeight, MaxHeight);
+        el = IElement.ComputeLayoutFromContent(
+            rc, 
+            parent,
+            _style.Margin,    _style.Border, _style.Padding, 
+            _style.Width,     _style.Height, 
+            _style.MinWidth,  _style.MaxWidth, 
+            _style.MinHeight, _style.MaxHeight
+        );
 
         return (el, new ChildrenLayout(rr));
     }

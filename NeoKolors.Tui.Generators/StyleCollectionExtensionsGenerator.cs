@@ -1,7 +1,6 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-using System;
 using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
@@ -83,7 +82,7 @@ public class StyleCollectionExtensionsGenerator : IIncrementalGenerator {
 
         sb.AppendLine(
             """
-            #if NET_10_OR_GREATER
+            // #if NET10_0_OR_GREATER
             
                     extension(StyleCollection collection) {
             """
@@ -109,7 +108,7 @@ public class StyleCollectionExtensionsGenerator : IIncrementalGenerator {
             """
                     }
             
-            #endif
+            // #endif
             
                 }
             }
