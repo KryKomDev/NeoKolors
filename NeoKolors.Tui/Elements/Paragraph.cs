@@ -8,7 +8,7 @@ namespace NeoKolors.Tui.Elements;
 public class Paragraph : Text {
     
     protected new static StyleCollection DefaultStyles { get; } = new(Text.DefaultStyles) {
-        Width = Dimension.Percent(100),
+        Width = Dimension.Stretch,
 
         ReadOnly = true,
     };

@@ -17,13 +17,27 @@ class Program {
 
     private const string DEL = "DEL";
     
-    static void Main() {
-        for (int y = 0; y < 16; y++) {
-            for (int x = 0; x < 8; x++) {
-                int ch = x * 16 + y;
-                NKConsole.Write($"   {ch:000}", new NKStyle(ConsoleColor.Blue, TextStyles.FAINT));
-                NKConsole.Write($" {ch:x2}", new NKStyle(ConsoleColor.Magenta, TextStyles.FAINT));
-                NKConsole.Write($" {(ch < 33 ? UNPRINTABLE[ch] : ch == 127 ? DEL : (char)ch + "  ")}", new NKStyle(ConsoleColor.White, TextStyles.BOLD));
+    static void Main(string[] args) {
+        int layout = 4;
+        
+        if (args.Length == 1) {
+            try {
+                layout = int.Parse(args[0]);
+            }
+            catch (FormatException) {
+                NKConsole.WriteLine("Invalid layout number. Please enter a valid integer.", new NKStyle(ConsoleColor.Red));
+            }
+        }
+        
+        int rows = 2 << (layout - 1);
+        int cols = 2 << (6 - layout);
+        
+        for (int y = 0; y < rows; y++) {
+            for (int x = 0; x < cols; x++) {
+                int ch = x * rows + y;
+                NKConsole.Write($"   {ch:000}", new NKStyle(ConsoleColor.Blue, s: TextStyles.FAINT));
+                NKConsole.Write($" {ch:x2}", new NKStyle(ConsoleColor.Magenta, s: TextStyles.FAINT));
+                NKConsole.Write($" {(ch < 33 ? UNPRINTABLE[ch] : ch == 127 ? DEL : (char)ch + "  ")}", new NKStyle(s: TextStyles.BOLD));
             }
             
             Console.WriteLine();

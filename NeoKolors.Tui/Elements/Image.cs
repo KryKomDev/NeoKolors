@@ -144,7 +144,7 @@ public class Image : AbstractElement<SKBitmap> {
         
         #else
         
-        return ComputeMinLayout(parent).ElementSize;
+        return ComputeMinLayout(parent).Margin;
         
         #endif
     }
@@ -175,7 +175,7 @@ public class Image : AbstractElement<SKBitmap> {
         
         #else
         
-        return ComputeMaxLayout(parent).ElementSize;
+        return ComputeMaxLayout(parent).Margin;
         
         #endif
     }
@@ -206,7 +206,7 @@ public class Image : AbstractElement<SKBitmap> {
         
         #else
         
-        return ComputeRenderLayout(parent).ElementSize;
+        return ComputeRenderLayout(parent).Margin;
         
         #endif
     }

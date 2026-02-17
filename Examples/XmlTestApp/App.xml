@@ -1,0 +1,57 @@
+﻿<Body>
+    <Div Id="0" Class="Slide">
+        <Heading Width="stretch" MarginTop="50vh - 6ch" Font="Dummy1" TextAlign="bottom" TextColor="blue" Id="heading">NeoKolors</Heading>
+        <Paragraph Id="sub" Width="stretch" TextAlign="top" Padding="1ch">by KryKom</Paragraph>
+        <Image Padding="4ch" Id="logo" ImageSource="C:\Users\krystof\Documents\Gymlit-logo-dark-alpha-cp.png" ImageSize="16ch, 4ch" ImageAlign="top" Width="stretch"/>
+    </Div>
+    
+    <Div Id="1" Class="Slide" Visible="false">
+        <Heading>Slide 1</Heading>
+
+        <List>
+            <Text>Item 1</Text>
+            <Text>Item 2</Text>
+            <Text>Item 3</Text>
+            <Text>Item 4</Text>
+        </List>
+    </Div>
+
+    <Div Id="2" Class="Slide" Visible="false">
+        <Heading>Slide 2</Heading>
+
+        <List>
+            <Text>Item 5</Text>
+            <Text>Item 6</Text>
+            <Text>Item 7</Text>
+            <Text>Item 8</Text>
+        </List>
+    </Div>
+    
+    <Div Id="3" Class="Slide" Visible="false">
+        <Heading>Slide 3</Heading>
+        
+        <Div Id="Cols" Direction="left-to-right">
+            <Div PaddingRight="5ch">
+                <Text TextStyle="Bold, Underline">Sub a:</Text>
+                <List Id="Test">
+                    <Text>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam er</Text>
+                    <Text>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam </Text>
+                    <Text>Item 7</Text>
+                    <Text>Item 8</Text>
+                </List>
+            </Div>
+            <Div>
+                <Text TextStyle="Bold, Underline">Sub b:</Text>
+                <List>
+                    <Text>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam er</Text>
+                    <Text>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam </Text>
+                    <Text>Item 7</Text>
+                    <Text>Item 8</Text>
+                </List>
+            </Div>
+        </Div>
+        
+    </Div>
+    
+<!--    <Button Position="^100vw - 7ch, ^0ch" Color="black" BackgroundColor="red" Padding="1ch 0ch" Id="X">X</Button>-->
+</Body>

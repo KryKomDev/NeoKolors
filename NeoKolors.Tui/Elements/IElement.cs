@@ -377,7 +377,7 @@ public interface IElement : IRenderable, INode {
             maxC ??= computeMaxContent();
             c = c with { Height = maxC.Value.Height };
         }
-        else if (width.IsStretch) {
+        else if (height.IsStretch) {
             var h = parent.Height 
                 - margin .Top.ToScalarY(parent.Height) - margin .Bottom.ToScalarY(parent.Height) 
                 - padding.Top.ToScalarY(parent.Height) - padding.Bottom.ToScalarY(parent.Height) 

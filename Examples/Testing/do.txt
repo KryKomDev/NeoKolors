@@ -1,0 +1,18 @@
+﻿var lines = TEST.Split('\n');
+Console.Clear();
+
+Console.CursorVisible = false;
+
+UInt128 frm = 0;
+while (true) {
+    NKConsole.MoveCursor(^0, ^((Console.BufferHeight - lines.Length) / 5 * 2));
+    
+    for (int i = 0; i < lines.Length; i++) {
+        for (int j = 0; j < lines[i].Length; j++) {
+            NKConsole.Write("" + lines[i][j], ColorFormat.HsvToInt(j + (int)(frm % 360), 1, 1));
+        }
+        Console.WriteLine();
+    }
+    
+    frm += 4;
+}

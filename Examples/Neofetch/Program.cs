@@ -20,7 +20,7 @@ class Program {
                                "{2}⢠⣿⡿⠿⠛⠉⠉⠉⠛⠿⠀{3}⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⠁⠀⠀\n" +
                                "{2}⠘⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀ {3}⠻⢿⣿⣿⣿⣿⣿⠿⠛⠀⠀⠀{4}";
 
-    static void Main(string[] args) {
+    static void Main() {
         Console.OutputEncoding = Encoding.UTF8;
         Console.OpenStandardOutput();
         Console.WriteLine();

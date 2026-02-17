@@ -61,10 +61,12 @@ public class List : AbstractElement<IElement[]> {
     
     public override void Render(ICharCanvas canvas, Rectangle rect) {
         if (!_style.Visible) return;
-
+        
+        #if NK_ENABLE_CACHING
+        
         ElementLayout  el;
         ChildrenLayout cl;
-
+        
         if (CanUseRenderCache()) {
             el = _layoutCacher.GetRenderLayout();
             cl = _childrenCacher.GetRenderLayout();
@@ -83,6 +85,12 @@ public class List : AbstractElement<IElement[]> {
             _childrenCacher.SetRender(rect, cl);
             SetCanUseRenderCache();
         }
+        
+        #else
+
+        var (el, cl) = ComputeRenderLayout(rect);
+        
+        #endif
         
         if (!_style.Border.IsBorderless) {
             canvas.StyleBackground(el.Border + rect.Lower, _style.BackgroundColor);
@@ -132,6 +140,9 @@ public class List : AbstractElement<IElement[]> {
     // --------------------------------- MIN LAYOUT COMP --------------------------------- //
     
     public override Size GetMinSize(Size parent) {
+
+        #if NK_ENABLE_CACHING
+        
         if (CanUseMinCache())
             return _layoutCacher.GetMinLayout().ElementSize;
         
@@ -141,9 +152,15 @@ public class List : AbstractElement<IElement[]> {
         SetCanUseMinCache();
         
         return e.ElementSize;
+    
+        #else
+
+        return ComputeMinLayout(parent).Element.Margin;
+
+        #endif
     }
 
-    private (ElementLayout, ChildrenLayout) ComputeMinLayout(Size parent) {
+    private (ElementLayout Element, ChildrenLayout Children) ComputeMinLayout(Size parent) {
         if (!_style.Visible)
             return (ElementLayout.Zero, ChildrenLayout.Empty);
 
@@ -184,14 +201,14 @@ public class List : AbstractElement<IElement[]> {
     
     public override Size GetMaxSize(Size parent) {
         if (CanUseMaxCache())
-            return _layoutCacher.GetMaxLayout().ElementSize;
+            return _layoutCacher.GetMaxLayout().Margin;
         
         var (e, c) = ComputeMaxLayout(parent);
         _layoutCacher.SetMax(parent, e);
         _childrenCacher.SetMin(parent, c);
         SetCanUseMaxCache();
         
-        return e.ElementSize;
+        return e.Margin;
     }
 
     private (ElementLayout, ChildrenLayout) ComputeMaxLayout(Size parent) {
@@ -234,18 +251,27 @@ public class List : AbstractElement<IElement[]> {
     // -------------------------------- RENDER LAYOUT COMP ------------------------------- //
     
     public override Size GetRenderSize(Size parent) {
+
+        #if  NK_ENABLE_CACHING
+        
         if (CanUseRenderCache())
-            return _layoutCacher.GetRenderLayout().ElementSize;
+            return _layoutCacher.GetRenderLayout().Margin;
         
         var (e, c) = GetRenderLayout(parent);
         _layoutCacher.SetRender(parent, e);
         _childrenCacher.SetRender(parent, c);
         SetCanUseRenderCache();
 
-        return e.ElementSize;
+        return e.Margin;
+    
+        #else
+
+        return ComputeRenderLayout(parent).Element.Margin;
+        
+        #endif
     }
 
-    private (ElementLayout Element, ChildrenLayout Children) GetRenderLayout(Size rect) {
+    private (ElementLayout Element, ChildrenLayout Children) ComputeRenderLayout(Size rect) {
         if (!_style.Visible)
             return (ElementLayout.Zero, ChildrenLayout.Empty);
 
@@ -268,7 +294,7 @@ public class List : AbstractElement<IElement[]> {
         int cw = c.Content.Width - mpw - _style.ListPointGap.ToScalar(rect.Width);
 
         for (int i = 0; i < _children.Count; i++) { 
-            var l = _children[i].GetRenderSize(new Size(cw, c.Content.Height - y));
+            var l = _children[i].GetRenderSize(new Size(cw, c.Content.Height));
             r[i] = l + new Point(0, y);
             y += l.Height;
             maxW = Math.Max(l.Width, maxW);

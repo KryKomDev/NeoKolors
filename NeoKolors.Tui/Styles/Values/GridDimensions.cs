@@ -12,18 +12,26 @@ public readonly struct GridDimensions : IParsableValue<GridDimensions> {
     
     public GridDimensions(Dimension[] columns, Dimension[] rows) {
         Columns = columns;
-        Rows = rows;
+        Rows    = rows;
     }
     
     public GridDimensions() {
         Columns = [Dimension.Auto];
-        Rows = [Dimension.Auto];
+        Rows    = [Dimension.Auto];
     }
     
     public static GridDimensions Default => new();
 
     public static GridDimensions Parse(string s) => Parse(s, CultureInfo.InvariantCulture);
-    
+
+    /// <summary>
+    /// Parses a string representation of grid dimensions into a <see cref="GridDimensions"/> instance.
+    /// </summary>
+    /// <param name="s">The string containing the grid dimensions to parse.</param>
+    /// <param name="provider">An optional format provider to interpret the input string.</param>
+    /// <returns>A new <see cref="GridDimensions"/> instance parsed from the specified string.</returns>
+    /// <exception cref="ArgumentException">Thrown if the input string format is invalid.</exception>
+    /// <exception cref="FormatException">Thrown if parsing a dimension fails.</exception>
     public static GridDimensions Parse(string s, IFormatProvider? provider) {
         s = s.Trim();
         var rc = s.SubstringBetween('[', ']', true, true);

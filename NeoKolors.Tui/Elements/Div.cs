@@ -148,7 +148,7 @@ public class Div : AbstractContainerElement, IMouseInteractableElement<IElement[
             canvas.StyleCheckerBckg(el.Border + pos, checkerBckg);
         }
         
-        for (int i = 0; i < _children.Count; i++) {
+        for (int i = 0; i < cl.Count; i++) {
             var child = cl.Children[i];
             
             if (child.Size != Size.Zero && child != Rectangle.Zero)
@@ -177,7 +177,7 @@ public class Div : AbstractContainerElement, IMouseInteractableElement<IElement[
     
         #else
 
-        return ComputeMinLayout(parent).Element.ElementSize;
+        return ComputeMinLayout(parent).Element.Margin;
 
         #endif
     }
@@ -341,7 +341,7 @@ public class Div : AbstractContainerElement, IMouseInteractableElement<IElement[
     
         #else
 
-        return ComputeMaxLayout(parent).ElementSize;
+        return ComputeMaxLayout(parent).Margin;
 
         #endif
     }
@@ -513,7 +513,7 @@ public class Div : AbstractContainerElement, IMouseInteractableElement<IElement[
 
     #region RENDER LAYOUT COMP
 
-    public override Size GetRenderSize(Size parent) => GetRenderLayout(parent).Element.ElementSize;
+    public override Size GetRenderSize(Size parent) => GetRenderLayout(parent).Element.Margin;
 
     protected (ElementLayout Element, ChildrenLayout Children) GetRenderLayout(Size parent) {
         #if NK_ENABLE_CACHING

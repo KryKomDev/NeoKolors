@@ -297,7 +297,7 @@ public class Text : AbstractTextElement, INotifyOnRender, IMouseInteractableElem
         
         #else
 
-        return ComputeMinLayout(parent).ElementSize;
+        return ComputeMinLayout(parent).Margin;
 
         #endif
     }
@@ -338,7 +338,7 @@ public class Text : AbstractTextElement, INotifyOnRender, IMouseInteractableElem
 
         #else
         
-        return ComputeMaxLayout(parent).ElementSize;
+        return ComputeMaxLayout(parent).Margin;
         
         #endif
     }
@@ -379,26 +379,30 @@ public class Text : AbstractTextElement, INotifyOnRender, IMouseInteractableElem
     
         #else
         
-        return ComputeRenderLayout(parent).ElementSize;
+        return ComputeRenderLayout(parent).Margin;
         
         #endif
     }
     
     [Pure]
     protected ElementLayout ComputeRenderLayout(Size bounds) {
-        var compute = _style.Font.GetSize(Content);
-        return IElement.ComputeLayoutFromContent(
-            compute,
+        var inner = IElement.ComputeLayoutFromBounds(
             bounds,
-            _style.Margin,
-            _style.Border,
-            _style.Padding,
-            _style.Width,
-            _style.Height,
-            _style.MinWidth,
-            _style.MaxWidth,
-            _style.MinHeight,
-            _style.MaxHeight,
+            _style.Margin,    _style.Border, _style.Padding,
+            _style.Width,     _style.Height,
+            _style.MinWidth,  _style.MaxWidth,
+            _style.MinHeight, _style.MaxHeight
+        );
+        
+        var content = _style.Font.GetSize(Content, inner.Content.Width);
+        
+        return IElement.ComputeLayoutFromContent(
+            content,
+            bounds,
+            _style.Margin,    _style.Border, _style.Padding,
+            _style.Width,     _style.Height,
+            _style.MinWidth,  _style.MaxWidth,
+            _style.MinHeight, _style.MaxHeight,
             (w) => _style.Font.GetSize(_text, w).Height,
             ( ) => _style.Font.GetMinSize(_text),
             ( ) => _style.Font.GetSize(_text)

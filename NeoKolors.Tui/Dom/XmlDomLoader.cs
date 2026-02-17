@@ -113,40 +113,46 @@ public class XmlDomLoader {
     }
 
     private void SetProperty(IElement element, string name, string value) {
+        
+        // set class if the attribute is "class"
         if (name.Equals("Class", StringComparison.OrdinalIgnoreCase)) {
             element.Info.AddClass(value);
             return;
         }
 
+        // set id if the attribute is "id"
         if (name.Equals("Id", StringComparison.OrdinalIgnoreCase)) {
             element.Info.Id = value;
             return;
         }
         
-        // var prop = element.GetType().GetProperty(name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
-        //
-        // if (prop != null && prop.CanWrite) {
-        //     try {
-        //        var convertedValue = ConvertValue(value, prop.PropertyType);
-        //        prop.SetValue(element, convertedValue);
-        //     } 
-        //     catch (Exception e) {
-        //         LOGGER.Error(e);
-        //     }
-        //
-        //     return;
-        // }
+        // try to assign the attribute as an element property
+        var prop = element.GetType().GetProperty(name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+        
+        if (prop != null && prop.CanWrite) {
+            try {
+               var convertedValue = ConvertValue(value, prop.PropertyType);
+               prop.SetValue(element, convertedValue);
+            } 
+            catch (Exception e) {
+                LOGGER.Error(e);
+            }
+        
+            return;
+        }
 
+        // try to assign the attribute as a style 
         if (!IStyleProperty.TryGetByName(name, out var type)) return;
         
         try {
             Type target;
 
+            // get the type
             if (IStyleProperty.IsPartial(type)) {
                 var partial = (IPartialStyleProperty?)Activator.CreateInstance(type);
 
                 if (partial == null) {
-                    LOGGER.Error("Construction of a partial property failed.");
+                    LOGGER.Error($"Construction of partial property '{type.FullName}' failed.");
                     return;
                 }
                     
@@ -156,16 +162,18 @@ public class XmlDomLoader {
                 var full = (IStyleProperty?)Activator.CreateInstance(type);
 
                 if (full == null) {
-                    LOGGER.Error("Construction of a property failed.");
+                    LOGGER.Error($"Construction of style property '{type.FullName}' failed.");
                     return;
                 }
                     
                 target = full.ValueType;
             }
                 
+            // convert and assign the value to a style property
             var convertedValue = ConvertValue(value, target);
             var property = (IStyleProperty?)Activator.CreateInstance(type, convertedValue);
                 
+            // set the property
             if (property != null)
                 element.Style.Set(property);
         } 
