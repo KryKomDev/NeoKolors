@@ -11,6 +11,7 @@ jobs:
       Solution_Name: NeoKolors.slnx
       ProjectPath: NeoKolors.Extensions/NeoKolors.Extensions.csproj
       TestProjectPath: NeoKolors.Extensions.Tests/NeoKolors.Extensions.Tests.csproj
+      NugetOutputDir: ./output/
 
     steps:
     - name: Checkout code
