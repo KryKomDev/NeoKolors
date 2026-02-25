@@ -1,6 +1,7 @@
 ﻿// NeoKolors
 // Copyright (c) 2026 KryKom
 
+using NeoKolors.Console.Input;
 using NeoKolors.Tui.Events;
 using NeoKolors.Tui.Styles;
 
@@ -50,40 +51,40 @@ public class TextInput : Text, ISelectableElement<AnsiString> {
     private static string CreateText(string label, string placeholder, string? defaultValue) 
         => label + (defaultValue ?? placeholder);
 
-    private void HandleKey(ConsoleKeyInfo keyInfo) {
+    private void HandleKey(KeyEventArgs keyInfo) {
         switch (keyInfo.Key) {
-            case ConsoleKey.LeftArrow when keyInfo.HasCtrl: {
+            case KeyCode.ARROW_LEFT when keyInfo.Modifiers.GetHasCtrl(): {
                 JumpCursorLeft();
             } break;
-            case ConsoleKey.RightArrow when keyInfo.HasCtrl: {
+            case KeyCode.ARROW_RIGHT when keyInfo.Modifiers.GetHasCtrl(): {
                 JumpCursorRight();
             } break;
-            case ConsoleKey.LeftArrow: {
+            case KeyCode.ARROW_LEFT: {
                 MoveCursorLeft();
             } break;
-            case ConsoleKey.RightArrow: {
+            case KeyCode.ARROW_RIGHT: {
                 MoveCursorRight();
             } break;
-            case ConsoleKey.Home: {
+            case KeyCode.HOME: {
                 JumpHome();
             } break;
-            case ConsoleKey.End: {
+            case KeyCode.END: {
                 JumpEnd();
             } break;
-            case ConsoleKey.Backspace: {
-                Delete(false, keyInfo.HasCtrl);
+            case KeyCode.BACKSPACE: {
+                Delete(false, keyInfo.Modifiers.GetHasCtrl());
             } break;
-            case ConsoleKey.Delete: {
-                Delete(true, keyInfo.HasCtrl);
+            case KeyCode.DELETE: {
+                Delete(true, keyInfo.Modifiers.GetHasCtrl());
             } break;
-            case ConsoleKey.Enter: {
+            case KeyCode.ENTER: {
                 
             } break;
-            case ConsoleKey.Spacebar: {
+            case KeyCode.SPACE: {
                 AddKey(' ');
             } break;
-            case var _ when !char.IsControl(keyInfo.KeyChar): {
-                AddKey(keyInfo.KeyChar);
+            case var _ when !char.IsControl(keyInfo.Char): {
+                AddKey(keyInfo.Char);
             } break;
             default: { } break;
         }

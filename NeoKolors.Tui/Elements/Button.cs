@@ -7,9 +7,7 @@ namespace NeoKolors.Tui.Elements;
 
 public class Button : Text {
 
-    public new static StyleCollection DefaultStyles { get; } = new() {
-        Width = Dimension.MinContent,
-
+    public new static StyleCollection DefaultStyles { get; } = new(Text.DefaultStyles) {
         ReadOnly = true,
     };
     

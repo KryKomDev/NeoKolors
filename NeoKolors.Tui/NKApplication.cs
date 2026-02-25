@@ -4,7 +4,8 @@
 using NeoKolors.Console.Events;
 using NeoKolors.Tui.Events;
 using System.Diagnostics;
-using NeoKolors.Console.Mouse;
+using NeoKolors.Console.Ansi.Mouse;
+using NeoKolors.Console.Input;
 using NeoKolors.Tui.Extensions;
 using NeoKolors.Tui.Global;
 using NeoKolors.Tui.Rendering;
@@ -39,7 +40,7 @@ public class NKApplication : IMouseSupportingApplication {
     public event AppStopEventHandler  StopEvent;
     public event Action               OnRender;
 
-    private void InvokeKeyEvent(ConsoleKeyInfo k) => KeyEvent.Invoke(k);
+    private void InvokeKeyEvent(KeyEventArgs k) => KeyEvent.Invoke(k);
     private void InvokeMouseEvent(MouseEventArgs m) => MouseEvent.Invoke(m);
     private void InvokeResizeEvent(ResizeEventArgs r) => ResizeEvent.Invoke(r);
 
@@ -64,12 +65,12 @@ public class NKApplication : IMouseSupportingApplication {
         
         if (Config.PauseOnFocusLost) {
             NKConsole.ReportFocus    = true;
-            NKConsole.FocusOutEvent += Pause;
-            NKConsole.FocusInEvent  += Unpause;
+            NKConsole.FocusOut += Pause;
+            NKConsole.FocusIn  += Unpause;
         }
 
-        NKConsole.KeyEvent   += InvokeKeyEvent;
-        NKConsole.MouseEvent += InvokeMouseEvent;
+        NKConsole.Key   += InvokeKeyEvent;
+        NKConsole.Mouse += InvokeMouseEvent;
 
         Stdio.TreatControlCAsInput = !Config.CtrlCForceQuits;
 
@@ -85,7 +86,7 @@ public class NKApplication : IMouseSupportingApplication {
         IsRunning = true;
         StartEvent.Invoke(this, new AppStartEventArgs(Config.Rendering.IsLazy));
         
-        NKConsole.KeyEvent += CheckQuit;
+        NKConsole.Key += CheckQuit;
         
         if (Config.Rendering.IsLazy) 
             RunLazy();
@@ -107,12 +108,12 @@ public class NKApplication : IMouseSupportingApplication {
         
         if (Config.PauseOnFocusLost) {
             NKConsole.ReportFocus    = false;
-            NKConsole.FocusOutEvent -= Pause;
-            NKConsole.FocusInEvent  -= Unpause;
+            NKConsole.FocusOut -= Pause;
+            NKConsole.FocusIn  -= Unpause;
         }
 
-        NKConsole.KeyEvent   -= InvokeKeyEvent;
-        NKConsole.MouseEvent -= InvokeMouseEvent;
+        NKConsole.Key   -= InvokeKeyEvent;
+        NKConsole.Mouse -= InvokeMouseEvent;
 
         if (Config.KeepCursorDisabled) {
             NKConsole.ShowCursor();
@@ -121,23 +122,23 @@ public class NKApplication : IMouseSupportingApplication {
         NKConsole.DisableAltBuffer();
         NKConsole.StopInputInterception();
 
-        NKConsole.KeyEvent -= CheckQuit;
+        NKConsole.Key -= CheckQuit;
     }
 
     private void RunLazy() {
         
         // configure lazy 
         var semaphore = new SemaphoreSlim(0);
-        NKConsole.MouseEvent += SignalRender;
-        NKConsole.KeyEvent   += SignalRender;
+        NKConsole.Mouse += SignalRender;
+        NKConsole.Key   += SignalRender;
         
         while (IsRunning) {
             Render();
             semaphore.Wait();
         }
 
-        NKConsole.MouseEvent -= SignalRender;
-        NKConsole.KeyEvent   -= SignalRender;
+        NKConsole.Mouse -= SignalRender;
+        NKConsole.Key   -= SignalRender;
         
         return;
 
@@ -239,7 +240,7 @@ public class NKApplication : IMouseSupportingApplication {
         }
     }
 
-    private void CheckQuit(ConsoleKeyInfo keyInfo) {
+    private void CheckQuit(KeyEventArgs keyInfo) {
         if (keyInfo.Key       == Config.InterruptCombination.Key &&
             keyInfo.Modifiers == Config.InterruptCombination.Modifiers)
         {

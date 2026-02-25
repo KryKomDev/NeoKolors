@@ -3,4 +3,4 @@
 
 namespace NeoKolors.Tui.Styles.Values;
 
-public delegate string ListPointGenerator(int number);
+public delegate AnsiString ListPointGenerator(int number);

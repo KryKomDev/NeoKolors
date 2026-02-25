@@ -49,15 +49,17 @@ public class Image : AbstractElement<SKBitmap> {
         );
         
         if (!_style.BackgroundColor.IsInherit) {
-            canvas.Fill(layout.Border - Size.Two + pos + Point.One, ' ');
+            canvas.Fill(layout.Border - Size.Two + pos + Point.One, new AnsiChar(' ', new NKStyle()));
         }
         
         if (!_style.Border.IsBorderless) {
-            canvas.StyleBackground(layout.Border - Size.Two + pos + Point.One, _style.BackgroundColor);
+            if (!_style.BackgroundColor.IsInherit)
+                canvas.StyleBackground(layout.Border - Size.Two + pos + Point.One, _style.BackgroundColor);
             canvas.PlaceRectangle(layout.Border + pos, _style.Border);
         }
         else {
-            canvas.StyleBackground(layout.Border + pos, _style.BackgroundColor);
+            if (!_style.BackgroundColor.IsInherit)
+                canvas.StyleBackground(layout.Border + pos, _style.BackgroundColor);
         }
 
         var checker = _style.Get<CheckerBckgProperty>().Value;

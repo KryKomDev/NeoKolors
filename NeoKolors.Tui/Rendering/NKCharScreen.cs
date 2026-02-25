@@ -33,7 +33,7 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
                     continue;
                 }
 
-                cell.Changed = false;
+                cell.SetUpdated();
 
                 if (isBehind) 
                     NKConsole.TrySetCursorPosition(x, y);

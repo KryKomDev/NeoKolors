@@ -11,7 +11,7 @@
 
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
-        <Version>0.25.32</Version>
+        <Version>2026.1-alpha1</Version>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
@@ -33,7 +33,13 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="HasFlagExtension.Generator" Version="2.1.2">
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+            <_Parameter1>NeoKolors.Tui.Tests</_Parameter1>
+        </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="HasFlagExtension.Generator" Version="2.2.1">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -51,14 +57,14 @@
         <None Include="README.md" Pack="true" PackagePath="\"/>
     </ItemGroup>
     
-    <ItemGroup>
-        <EmbeddedResource Include="./Schemas/Fonts/V2/Font.Config.xsd"/>
-        <EmbeddedResource Include="./Schemas/Fonts/V2/Font.Map.xsd"/>
-    </ItemGroup>
+<!--    <ItemGroup>-->
+<!--        <EmbeddedResource Include="./Schemas/Fonts/V2/Font.Config.xsd"/>-->
+<!--        <EmbeddedResource Include="./Schemas/Fonts/V2/Font.Map.xsd"/>-->
+<!--    </ItemGroup>-->
     
     <ItemGroup>
-        <EmbeddedResource Include="./Fonts/Builtin/Bytesized.nkf"/>
-        <EmbeddedResource Include="./Fonts/Builtin/Dummy1.nkf"/>
-        <EmbeddedResource Include="./Fonts/Builtin/Future.nkf"/>
+        <EmbeddedResource Include="./Fonts/Builtin/Bytesized.nkf" LogicalName="NeoKolors.Tui.Fonts.Builtin.Bytesized.nkf"/>
+        <EmbeddedResource Include="./Fonts/Builtin/Dummy1.nkf" LogicalName="NeoKolors.Tui.Fonts.Builtin.Dummy1.nkf"/>
+        <EmbeddedResource Include="./Fonts/Builtin/Future.nkf" LogicalName="NeoKolors.Tui.Fonts.Builtin.Future.nkf"/>
     </ItemGroup>
 </Project>

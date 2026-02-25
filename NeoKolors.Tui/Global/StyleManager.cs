@@ -45,7 +45,9 @@ public static class StyleManager {
     public static Type[] GetStyles() => STYLES.Select(t => t.Type).ToArray();
     
     private class NameTypeTupleComparer : IEqualityComparer<NameTypeTuple> {
-        public bool Equals(NameTypeTuple x, NameTypeTuple y) => x.Name == y.Name;
-        public int GetHashCode(NameTypeTuple obj) => obj.Name.GetHashCode();
+        public bool Equals(NameTypeTuple x, NameTypeTuple y)
+            => string.Equals(x.Name, y.Name, StringComparison.OrdinalIgnoreCase);
+        
+        public int GetHashCode(NameTypeTuple obj) => obj.Name.ToLower().GetHashCode();
     }
 }

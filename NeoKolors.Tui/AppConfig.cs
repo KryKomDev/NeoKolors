@@ -3,7 +3,7 @@
 // Copyright (c) 2026 KryKom
 //
 
-using NeoKolors.Console.Mouse;
+using NeoKolors.Console.Ansi.Mouse;
 
 namespace NeoKolors.Tui;
 

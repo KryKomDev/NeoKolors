@@ -10,46 +10,46 @@ public struct ListPointProperty : IStyleProperty<ListPointGenerator, ListPointPr
     public ListPointGenerator Value { get; }
     
     public ListPointProperty(ListPointGenerator value) => Value = value;
-    public ListPointProperty(string point) => Value = _ => point;
-    public ListPointProperty() => Value = _ => "*";
+    public ListPointProperty(AnsiString point) => Value = _ => point;
+    public ListPointProperty() : this("*") { }
     
     public static implicit operator ListPointProperty(ListPointGenerator value) => new(value);
     public static implicit operator ListPointGenerator(ListPointProperty property) => property.Value;
     
     // =========================== UNORDERED =========================== //
     
-    public static ListPointProperty Asterisk                => new(_ => "*");
-    public static ListPointProperty Dash                    => new(_ => "-");
-    public static ListPointProperty AsciiCircle             => new(_ => "o");
-    public static ListPointProperty AsciiArow               => new(_ => "->");
-    public static ListPointProperty AsciiArowDouble         => new(_ => "=>");
-    public static ListPointProperty AsciiSimpleArrow        => new(_ => ">");
-    public static ListPointProperty Square                  => new(_ => "■");
-    public static ListPointProperty SquareEmpty             => new(_ => "□");
-    public static ListPointProperty Triangle                => new(_ => "▶");
-    public static ListPointProperty TriangleEmpty           => new(_ => "▷");
-    public static ListPointProperty Circle                  => new(_ => "●");
-    public static ListPointProperty CircleEmpty             => new(_ => "○");
-    public static ListPointProperty DottedCircle            => new(_ => "◌");
-    public static ListPointProperty FishEyeCircle           => new(_ => "◉");
-    public static ListPointProperty BullseyeCircle          => new(_ => "◎");
-    public static ListPointProperty Diamond                 => new(_ => "◆");
-    public static ListPointProperty DiamondEmpty            => new(_ => "◇");
-    public static ListPointProperty DiamondDouble           => new(_ => "◈");
-    public static ListPointProperty ArrowBasic              => new(_ => "⟶");
-    public static ListPointProperty ArrowTriangle           => new(_ => "►");
-    public static ListPointProperty ArrowTriangleEmpty      => new(_ => "▻");
-    public static ListPointProperty ArrowTriangleSmall      => new(_ => "▸");
-    public static ListPointProperty ArrowTriangleSmallEmpty => new(_ => "▹");
-    public static ListPointProperty ArrowBoldThick          => new(_ => "❱");
-    public static ListPointProperty ArrowBoldSimple         => new(_ => "❯");
-    public static ListPointProperty ArrowBracketSimple      => new(_ => "⟩");
-    public static ListPointProperty ArrowBracketDouble      => new(_ => "⟫");
-    public static ListPointProperty ArrowDoubleChevron      => new(_ => "»");
-    public static ListPointProperty ArrowSingleChevron      => new(_ => "›");
-    public static ListPointProperty Point                   => new(_ => "∙");
-    public static ListPointProperty PointEmpty              => new(_ => "◦");
-    public static ListPointProperty PointLarger             => new(_ => "•");
+    public static ListPointProperty Asterisk                => new("*");
+    public static ListPointProperty Dash                    => new("-");
+    public static ListPointProperty AsciiCircle             => new("o");
+    public static ListPointProperty AsciiArow               => new("->");
+    public static ListPointProperty AsciiArowDouble         => new("=>");
+    public static ListPointProperty AsciiSimpleArrow        => new(">");
+    public static ListPointProperty Square                  => new("■");
+    public static ListPointProperty SquareEmpty             => new("□");
+    public static ListPointProperty Triangle                => new("▶");
+    public static ListPointProperty TriangleEmpty           => new("▷");
+    public static ListPointProperty Circle                  => new("●");
+    public static ListPointProperty CircleEmpty             => new("○");
+    public static ListPointProperty DottedCircle            => new("◌");
+    public static ListPointProperty FishEyeCircle           => new("◉");
+    public static ListPointProperty BullseyeCircle          => new("◎");
+    public static ListPointProperty Diamond                 => new("◆");
+    public static ListPointProperty DiamondEmpty            => new("◇");
+    public static ListPointProperty DiamondDouble           => new("◈");
+    public static ListPointProperty ArrowBasic              => new("⟶");
+    public static ListPointProperty ArrowTriangle           => new("►");
+    public static ListPointProperty ArrowTriangleEmpty      => new("▻");
+    public static ListPointProperty ArrowTriangleSmall      => new("▸");
+    public static ListPointProperty ArrowTriangleSmallEmpty => new("▹");
+    public static ListPointProperty ArrowBoldThick          => new("❱");
+    public static ListPointProperty ArrowBoldSimple         => new("❯");
+    public static ListPointProperty ArrowBracketSimple      => new("⟩");
+    public static ListPointProperty ArrowBracketDouble      => new("⟫");
+    public static ListPointProperty ArrowDoubleChevron      => new("»");
+    public static ListPointProperty ArrowSingleChevron      => new("›");
+    public static ListPointProperty Point                   => new("∙");
+    public static ListPointProperty PointEmpty              => new("◦");
+    public static ListPointProperty PointLarger             => new("•");
     
     
     // ============================ ORDERED ============================ //

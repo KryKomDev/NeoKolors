@@ -23,6 +23,7 @@ public static class NKFontSerializer {
     private const string CONF_SCHEMA_URL = NKFontSchema.SCHEMA_NAMESPACE;
     private const string MAP_SCHEMA_URL = NKFontSchema.SCHEMA_NAMESPACE;
     
+    /*
     // ReSharper disable NotAccessedField.Local
     private static XmlSchemaSet? CONFIG_SCHEMA;
     private static XmlSchemaSet? MAP_SCHEMA;
@@ -51,8 +52,8 @@ public static class NKFontSerializer {
 
     private static (XmlSchemaSet ConfigSchema, XmlSchemaSet MapSchema) InitSchemas() {
         var assembly = Assembly.GetExecutingAssembly();
-        const string configResource = "NeoKolors.Tui...Schemas.Fonts.V2.Font.Config.xsd";
-        const string mapResource    = "NeoKolors.Tui...Schemas.Fonts.V2.Font.Map.xsd";
+        const string configResource = "NeoKolors.Tui.Schemas.Fonts.V2.Font.Config.xsd";
+        const string mapResource    = "NeoKolors.Tui.Schemas.Fonts.V2.Font.Map.xsd";
         
         LOGGER.Info("Loading font XSDs...");
         
@@ -180,6 +181,7 @@ public static class NKFontSerializer {
         
         return mapSchema;
     }
+    */
     
 
     // ----------------------------------------------------------- //
@@ -345,7 +347,7 @@ public static class NKFontSerializer {
     /// <returns>The deserialized <see cref="NKFont"/> object if the embedded resource is found and successfully resolved;
     /// otherwise, null if the resource cannot be located.</returns>
     internal static NKFont? ReadInternal(string name)
-        => ReadEmbedded<NKFont>($"{typeof(NKFont).Assembly.GetName().Name}...Fonts.Builtin.{name}.nkf");
+        => ReadEmbedded<NKFont>($"{typeof(NKFont).Assembly.GetName()}.Fonts.Builtin.{name}.nkf");
 
     // --------------------- PRIVATE METHODS --------------------- //
     

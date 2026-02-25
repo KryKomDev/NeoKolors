@@ -4,12 +4,12 @@
 using NeoKolors.Tui.Elements.Caching;
 using NeoKolors.Tui.Rendering;
 using NeoKolors.Tui.Styles;
+using NeoKolors.Tui.Styles.Properties;
 using NeoKolors.Tui.Styles.Values;
 
 namespace NeoKolors.Tui.Elements;
 
 public class List : AbstractElement<IElement[]> {
-    
     
     private readonly LayoutCacher _layoutCacher;
     private readonly ChildrenLayoutCacher _childrenCacher;
@@ -92,19 +92,21 @@ public class List : AbstractElement<IElement[]> {
         
         #endif
         
-        if (!_style.Border.IsBorderless) {
-            canvas.StyleBackground(el.Border + rect.Lower, _style.BackgroundColor);
-            canvas.PlaceRectangle(el.Border + rect.Lower, _style.Border);
-        }
-        else {
-            canvas.StyleBackground(el.Border + rect.Lower, _style.BackgroundColor);
-        }
-
         var sp = _style.Position;
         var pos = new Point(
             sp.AbsoluteX ? sp.X.ToScalar(rect.Width) : rect.LowerX + sp.X.ToScalar(rect.Width), 
             sp.AbsoluteY ? sp.Y.ToScalar(rect.Width) : rect.LowerY + sp.Y.ToScalar(rect.Height)
         );
+        
+        if (!_style.Border.IsBorderless) {
+            if (!_style.BackgroundColor.IsInherit)
+                canvas.StyleBackground(el.Border + pos, _style.BackgroundColor);
+            canvas.PlaceRectangle(el.Border + pos, _style.Border);
+        }
+        else {
+            if (!_style.BackgroundColor.IsInherit)
+                canvas.StyleBackground(el.Border + pos, _style.BackgroundColor);
+        }
         
         var pg = _style.ListPoint;
         int mpw = 0;
@@ -114,7 +116,14 @@ public class List : AbstractElement<IElement[]> {
             mpw = Math.Max(mpw, p.Length);
         }
         
+        var checkerBckg = Style.Get<CheckerBckgProperty>().Value;
+        if (checkerBckg.Enabled) {
+            canvas.StyleCheckerBckg(el.Border + pos, checkerBckg);
+        }
+        
         var co = new Point(mpw + _style.ListPointGap.ToScalar(rect.Width), 0);
+        
+        canvas.ResetStyle(el.Border - Size.Two + Point.One + pos, el.Content + co + pos);
         
         for (int i = 0; i < _children.Count; i++) {
             var child = cl.Children[i];
@@ -122,7 +131,7 @@ public class List : AbstractElement<IElement[]> {
             if (child.Size == Size.Zero || child == Rectangle.Zero) continue;
             
             var p = pg(i + 1);
-            canvas.PlaceString(
+            canvas.Place(
                 p, 
                 new Point(
                     child.LowerX + pos.X + el.Content.LowerX, 

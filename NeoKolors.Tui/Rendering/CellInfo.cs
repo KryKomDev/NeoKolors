@@ -40,8 +40,10 @@ public sealed record CellInfo(char? Char, NKStyle Style, bool Changed, int ZInde
         }
     } = ZIndex;
 
-    public bool Changed { get; set; } = Changed;
+    public bool Changed { get; private set; } = Changed;
 
+    public void SetUpdated() => Changed = false;
+    
     public static CellInfo Default => GetDefault();
     public static CellInfo Null => GetNull(DEFAULT_Z);
 

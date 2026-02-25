@@ -6,8 +6,8 @@ using Metriks;
 namespace NeoKolors.Tui;
 
 public readonly struct Point {
-    public int X { get; }
-    public int Y { get; }
+    public int X { get; init; }
+    public int Y { get; init; }
     
     public Point(int x, int y) {
         X = x;

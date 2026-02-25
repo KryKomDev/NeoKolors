@@ -2,7 +2,7 @@
 // Copyright (c) 2026 KryKom
 
 using System.Diagnostics.Contracts;
-using NeoKolors.Console.Mouse;
+using NeoKolors.Console.Input;
 using NeoKolors.Tui.Elements.Caching;
 using NeoKolors.Tui.Events;
 using NeoKolors.Tui.Rendering;
@@ -132,15 +132,17 @@ public class Div : AbstractContainerElement, IMouseInteractableElement<IElement[
         );
         
         if (!_style.BackgroundColor.IsInherit) {
-            canvas.Fill(el.Border - Size.Two + pos + Point.One, ' ');
+            canvas.Fill(el.Border - Size.Two + pos + Point.One, new AnsiChar(' ', new NKStyle()));
         }
         
         if (!_style.Border.IsBorderless) {
-            canvas.StyleBackground(el.Border - Size.Two + pos + Point.One, _style.BackgroundColor);
+            if (!_style.BackgroundColor.IsInherit)
+                canvas.StyleBackground(el.Border - Size.Two + pos + Point.One, _style.BackgroundColor);
             canvas.PlaceRectangle(el.Border + pos, _style.Border);
         }
         else {
-            canvas.StyleBackground(el.Border + pos, _style.BackgroundColor);
+            if (!_style.BackgroundColor.IsInherit)
+                canvas.StyleBackground(el.Border + pos, _style.BackgroundColor);
         }
         
         var checkerBckg = Style.Get<CheckerBckgProperty>().Value;

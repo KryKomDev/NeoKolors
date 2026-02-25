@@ -76,6 +76,6 @@ public class NamedDiv : Div {
         var bw = el.Border.Width;
         int p = TitlePadding.ToScalar(el.Border.Width);
         
-        canvas.PlaceString(Name, pos + el.Border.Lower + new Point(p, 0), bw - p * 2, TitleAlign);
+        canvas.Place(Name, pos + el.Border.Lower + new Point(p, 0), bw - p * 2, TitleAlign);
     }
 }

@@ -841,6 +841,7 @@ resharper_use_object_or_collection_initializer_highlighting = hint
 resharper_web_config_module_not_resolved_highlighting = warning
 resharper_web_config_type_not_resolved_highlighting = warning
 resharper_web_config_wrong_module_highlighting = warning
+resharper_convert_to_auto_property_highlighting = hint
 
 # ReSharper inspection severities
 

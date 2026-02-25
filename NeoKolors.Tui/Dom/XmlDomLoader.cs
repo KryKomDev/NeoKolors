@@ -97,8 +97,10 @@ public class XmlDomLoader {
             if (element is not IElement<IElement[]> container)
                 return element;
             
-            var children = xmlElement.Elements().Select(ParseElement).ToList();
-            if (children.Count > 0) container.SetChildNode(children.ToArray());
+            var children = xmlElement.Elements().Select(ParseElement).ToArray();
+            
+            if (children.Length > 0) 
+                container.SetChildNode(children);
         } 
         else if (!string.IsNullOrEmpty(textContent)) {
             try {

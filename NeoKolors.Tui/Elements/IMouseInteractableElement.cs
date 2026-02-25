@@ -2,7 +2,7 @@
 // Copyright (c) 2026 KryKom
 
 using Implyzer;
-using NeoKolors.Console.Mouse;
+using NeoKolors.Console.Input;
 
 namespace NeoKolors.Tui.Elements;
 

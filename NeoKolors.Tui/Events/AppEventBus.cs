@@ -4,7 +4,7 @@
 //
 
 using NeoKolors.Console.Events;
-using NeoKolors.Console.Mouse;
+using NeoKolors.Console.Input;
 
 namespace NeoKolors.Tui.Events;
 
@@ -29,7 +29,7 @@ public static class AppEventBus {
     public static event AppStartEventHandler StartEvent  = delegate { };
     public static event AppStopEventHandler  StopEvent   = delegate { };
     
-    private static void InvokeKeyEvent(ConsoleKeyInfo k) => KeyEvent(k);
+    private static void InvokeKeyEvent(KeyEventArgs k) => KeyEvent(k);
     private static void InvokeMouseEvent(MouseEventArgs a) => MouseEvent(a);
     private static void InvokeResizeEvent(ResizeEventArgs a) => ResizeEvent(a);
     private static void InvokeStartEvent(IApplication sender, AppStartEventArgs args) => StartEvent(sender, args);

@@ -1,7 +1,8 @@
 ﻿// NeoKolors
 // Copyright (c) 2026 KryKom
 
-using NeoKolors.Console.Mouse;
+using NeoKolors.Console.Ansi.Mouse;
+using NeoKolors.Console.Input;
 
 namespace NeoKolors.Tui;
 
@@ -26,7 +27,7 @@ public readonly struct NKAppConfig {
     /// This property is configured to trigger a predefined action upon the specified key press,
     /// where the default combination is `Ctrl+C`.
     /// </summary>
-    public ConsoleKeyInfo InterruptCombination { get; }
+    public KeyEventArgs InterruptCombination { get; }
 
     /// <summary>
     /// Specifies the mouse reporting protocol used by the application for capturing
@@ -40,7 +41,7 @@ public readonly struct NKAppConfig {
     /// Specifies the level of mouse event reporting used within the application.
     /// This property allows customization of mouse event handling behavior,
     /// ranging from no events to comprehensive event tracking, as defined by
-    /// the <see cref="NeoKolors.Console.Mouse.MouseReportLevel"/> enumeration.
+    /// the <see cref="NeoKolors.Console.Ansi.Mouse.MouseReportLevel"/> enumeration.
     /// </summary>
     public MouseReportLevel MouseReportLevel { get; }
 
@@ -69,7 +70,7 @@ public readonly struct NKAppConfig {
     public NKAppConfig(
         RenderingConfig?    rendering            = null, 
         bool                ctrlCForceQuits      = false,
-        ConsoleKeyInfo?     interruptCombination = null, 
+        KeyEventArgs?       interruptCombination = null, 
         MouseReportProtocol mouseReportProtocol  = MouseReportProtocol.SGR,
         MouseReportLevel    mouseReportLevel     = MouseReportLevel.ALL, 
         bool                bracketedPaste       = false, 
@@ -78,7 +79,7 @@ public readonly struct NKAppConfig {
     {
         Rendering            = rendering ?? RenderingConfig.Limited(24);
         CtrlCForceQuits      = ctrlCForceQuits;
-        InterruptCombination = interruptCombination ?? new ConsoleKeyInfo('q', ConsoleKey.Q, false, false, true);
+        InterruptCombination = interruptCombination ?? new KeyEventArgs(KeyCode.Q, KeyModifiers.LEFT_CTRL, 'q');
         MouseReportProtocol  = mouseReportProtocol;
         MouseReportLevel     = mouseReportLevel;
         BracketedPaste       = bracketedPaste;
@@ -89,7 +90,7 @@ public readonly struct NKAppConfig {
     public NKAppConfig() {
         Rendering            = RenderingConfig.Limited(24);
         CtrlCForceQuits      = false;
-        InterruptCombination = new ConsoleKeyInfo('q', ConsoleKey.Q, false, false, true);
+        InterruptCombination = new KeyEventArgs(KeyCode.Q, KeyModifiers.LEFT_CTRL, 'q');
         MouseReportProtocol  = MouseReportProtocol.SGR;
         MouseReportLevel     = MouseReportLevel.ALL;
         BracketedPaste       = false;
@@ -99,7 +100,7 @@ public readonly struct NKAppConfig {
 
     public override string ToString() {
         return $"Rendering: {Rendering.ToString()}, " +
-               $"Interrupt: {InterruptCombination.AsString()}, " +
+               $"Interrupt: {InterruptCombination.ToString()}, " +
                $"Mouse Protocol: {MouseReportProtocol.ToString()}, " +
                $"Mouse Level: {MouseReportLevel.ToString()}" +
                (CtrlCForceQuits    ? ", Ctrl+C Force Quits"    : "Ctrl+C Is Input") +

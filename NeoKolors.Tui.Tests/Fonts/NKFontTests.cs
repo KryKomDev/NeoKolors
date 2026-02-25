@@ -132,11 +132,12 @@ public class NKFontTests {
         // skip spaces -> create SpaceToken
         // skip newlines -> create NewlineToken
         
-        Assert.Equal(4, tokens.Length);
+        Assert.Equal(5, tokens.Length);
         Assert.Equal(NKFontStringTokenizer.TokenType.SIMPLE, tokens[0].Type);
-        Assert.Equal(NKFontStringTokenizer.TokenType.NEWLINE, tokens[1].Type);
-        Assert.Equal(NKFontStringTokenizer.TokenType.SPACE, tokens[2].Type);
-        Assert.Equal(NKFontStringTokenizer.TokenType.SIMPLE, tokens[3].Type);
+        Assert.Equal(NKFontStringTokenizer.TokenType.SPACE, tokens[1].Type);
+        Assert.Equal(NKFontStringTokenizer.TokenType.NEWLINE, tokens[2].Type);
+        Assert.Equal(NKFontStringTokenizer.TokenType.SPACE, tokens[3].Type);
+        Assert.Equal(NKFontStringTokenizer.TokenType.SIMPLE, tokens[4].Type);
     }
     
     [Fact]

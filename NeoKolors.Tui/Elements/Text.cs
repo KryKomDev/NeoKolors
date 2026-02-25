@@ -2,7 +2,7 @@
 // Copyright (c) 2026 KryKom
 
 using System.Diagnostics.Contracts;
-using NeoKolors.Console.Mouse;
+using NeoKolors.Console.Input;
 using NeoKolors.Tui.Elements.Caching;
 using NeoKolors.Tui.Events;
 using NeoKolors.Tui.Rendering;

@@ -47,7 +47,6 @@ public static class CharCanvasExtensions {
             if (lx == ..^canvas.Width && ly == ..^canvas.Height) {
                 var cellInfo     = canvas[lx, ly];
                 cellInfo.Char    = topLeft;
-                cellInfo.Changed = true;
                 cellInfo.Style   = cellInfo.Style.Override(topLeftStyle);
             }
 
@@ -55,7 +54,6 @@ public static class CharCanvasExtensions {
             if (lx == ..^canvas.Width && hy == ..^canvas.Height) {
                 var cellInfo     = canvas[lx, hy];
                 cellInfo.Char    = bottomLeft;
-                cellInfo.Changed = true;
                 cellInfo.Style   = cellInfo.Style.Override(bottomLeftStyle);
             }
 
@@ -63,7 +61,6 @@ public static class CharCanvasExtensions {
             if (hx == ..^canvas.Width && ly == ..^canvas.Height) {
                 var cellInfo     = canvas[hx, ly];
                 cellInfo.Char    = topRight;
-                cellInfo.Changed = true;
                 cellInfo.Style   = cellInfo.Style.Override(topRightStyle);
             }
 
@@ -71,7 +68,6 @@ public static class CharCanvasExtensions {
             if (hx == ..^canvas.Width && hy == ..^canvas.Height) {
                 var cellInfo     = canvas[hx, hy];
                 cellInfo.Char    = bottomRight;
-                cellInfo.Changed = true;
                 cellInfo.Style   = cellInfo.Style.Override(bottomRightStyle);
             }
 
@@ -81,7 +77,6 @@ public static class CharCanvasExtensions {
                     var c = canvas[x, ly];
                     
                     c.Char    = horizontal;
-                    c.Changed = true;
                     c.Style   = c.Style.Override(topStyle);
                 }
             }
@@ -92,7 +87,6 @@ public static class CharCanvasExtensions {
                     var c = canvas[x, hy];
                     
                     c.Char    = horizontal;
-                    c.Changed = true;
                     c.Style   = c.Style.Override(bottomStyle);
                 }
             }
@@ -103,7 +97,6 @@ public static class CharCanvasExtensions {
                     var c = canvas[lx, y];
                 
                     c.Char    = vertical;
-                    c.Changed = true;
                     c.Style   = c.Style.Override(leftStyle);
                 }
             }
@@ -114,7 +107,6 @@ public static class CharCanvasExtensions {
                     var c = canvas[hx, y];
                 
                     c.Char    = vertical;
-                    c.Changed = true;
                     c.Style   = c.Style.Override(rightStyle);
                 }
             }
@@ -130,7 +122,6 @@ public static class CharCanvasExtensions {
                 for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
                     var cellInfo     = canvas[x, y];
                     cellInfo.Style   = cellInfo.Style.Override(style);
-                    cellInfo.Changed = true;
                 }
             }
         }
@@ -145,7 +136,6 @@ public static class CharCanvasExtensions {
                 for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
                     var cellInfo     = canvas[x, y];
                     cellInfo.Style   = cellInfo.Style.SafeSetBColor(color);
-                    cellInfo.Changed = true;
                 }
             }
         }
@@ -161,7 +151,6 @@ public static class CharCanvasExtensions {
                 for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
                     var cellInfo     = canvas[x, y];
                     cellInfo.Style   = style;
-                    cellInfo.Changed = true;
                 }
             }
         }
@@ -178,7 +167,6 @@ public static class CharCanvasExtensions {
                     var cellInfo     = canvas[x, y];
                     var s            = cellInfo.Style;
                     cellInfo.Style   = s with { BColor = color };
-                    cellInfo.Changed = true;
                 }
             }
         }
@@ -190,12 +178,11 @@ public static class CharCanvasExtensions {
                     
                     var cellInfo     = canvas[x, y];
                     cellInfo.Style   = cellInfo.Style.Override(style);
-                    cellInfo.Changed = true;
                 }
             }
         }
 
-        public void PlaceString(string s, Point offset, int window, HorizontalAlign align) {
+        public void Place(string s, Point offset, int window, HorizontalAlign align) {
             if (offset.Y != ..^canvas.Height) return;
 
             var xo = offset.X + align switch {
@@ -210,6 +197,19 @@ public static class CharCanvasExtensions {
             }
         }
         
+        public void Place(AnsiString s, Point offset, int window, HorizontalAlign align) {
+            if (offset.Y != ..^canvas.Height) return;
+
+            var xo = offset.X + align switch {
+                HorizontalAlign.LEFT   => 0,
+                HorizontalAlign.CENTER => (window - s.Length) / 2,
+                HorizontalAlign.RIGHT  => window - s.Length,
+                _                      => 0
+            };
+
+            canvas.Place(s, offset with { X = xo });
+        }
+        
         /// <summary>
         /// Applies the specified style to all characters within the defined rectangular region on the canvas.
         /// </summary>
@@ -220,7 +220,22 @@ public static class CharCanvasExtensions {
                 for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
                     var cellInfo     = canvas[x, y];
                     cellInfo.Char    = c;
-                    cellInfo.Changed = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Fills the specified rectangular region on the canvas with the given <see cref="AnsiChar"/>.
+        /// This method updates both the character and the style of each cell in the region.
+        /// </summary>
+        /// <param name="region">The rectangular area on the canvas to be filled.</param>
+        /// <param name="c">The AnsiChar containing the character and style to apply.</param>
+        public void Fill(Rectangle region, AnsiChar c) {
+            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
+                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
+                    var cellInfo     = canvas[x, y];
+                    cellInfo.Char    = c.Char;
+                    cellInfo.Style   = cellInfo.Style.Override(c.Style);
                 }
             }
         }
@@ -236,7 +251,22 @@ public static class CharCanvasExtensions {
                 for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
                     var cellInfo     = canvas[x, y];
                     cellInfo.Char    = c;
-                    cellInfo.Changed = true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Forces a fill of the specified rectangular region on the canvas with the given <see cref="AnsiChar"/>,
+        /// overwriting any existing styles.
+        /// </summary>
+        /// <param name="region">The area on the canvas to be forcefully filled.</param>
+        /// <param name="c">The AnsiChar containing the character and style to forcefully apply.</param>
+        public void ForceFill(Rectangle region, AnsiChar c) {
+            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
+                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
+                    var cellInfo     = canvas[x, y];
+                    cellInfo.Char    = c.Char;
+                    cellInfo.Style   = c.Style;
                 }
             }
         }
@@ -252,30 +282,32 @@ public static class CharCanvasExtensions {
 
             if (startX >= endX || startY >= endY) return;
 
-            bool xs = false;
-            
-            for (int x = startX; x < endX;) {
-                int w = Math.Min(cw, endX - x);
-                bool ys = false;
-
-                for (int y = startY; y < endY;) {
-                    int h = Math.Min(ch, endY - y);
+            for (int x = startX; x < endX; x++) {
+                bool xs = (x / cw) % 2 == 1;
+                for (int y = startY; y < endY; y++) {
+                    bool ys = (y / ch) % 2 == 1;
                     var color = (xs ^ ys) ? checker.C1 : checker.C2;
-
-                    for (int ix = 0; ix < w; ix++) {
-                        for (int iy = 0; iy < h; iy++) {
-                            var cellInfo     = canvas[x + ix, y + iy];
-                            cellInfo.Style   = cellInfo.Style with { BColor = color };
-                            cellInfo.Changed = true;
-                        }
-                    }
-
-                    y += h;
-                    ys = !ys;
+                    
+                    var cellInfo     = canvas[x, y];
+                    cellInfo.Char    = ' ';
+                    cellInfo.Style   = cellInfo.Style with { BColor = color, Styles = TextStyles.NONE };
                 }
+            }
+        }
 
-                x += w;
-                xs = !xs;
+        /// <summary>
+        /// Resets the style of cells within the specified region of the canvas to have no styles,
+        /// except for cells overlapping with the defined mask.
+        /// </summary>
+        /// <param name="region">The rectangular area on the canvas within which the styles will be reset.</param>
+        /// <param name="mask">The rectangular mask that specifies cells to exclude from the style reset operation.</param>
+        public void ResetStyle(Rectangle region, Rectangle mask) {
+            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
+                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
+                    if (mask.Contains(x, y)) continue;
+                    var cellInfo = canvas[x, y];
+                    cellInfo.Style = cellInfo.Style with { Styles = TextStyles.NONE };
+                }
             }
         }
     }
