@@ -5,6 +5,7 @@ using System.Collections;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using static NeoKolors.Extensions.Exception.ThrowHelper.ArgOutOfRange;
@@ -609,5 +610,15 @@ public static class String {
         }
 
         return result;
+    }
+
+    extension(StringBuilder sb) {
+        public void AppendIf(bool condition, string? value) {
+            if (condition) sb.Append(value);
+        }
+        
+        public void AppendLineIf(bool condition, string? value) {
+            if (condition) sb.AppendLine(value);
+        }
     }
 }
