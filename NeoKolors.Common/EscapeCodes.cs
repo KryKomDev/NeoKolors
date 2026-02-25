@@ -337,7 +337,7 @@ public static class EscapeCodes {
     /// <returns>A string containing the formatted DECREQ escape sequence.</returns>
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string GetDecReq(DecPrivateMode mode) => DECREQ_FORMAT.Format((int)mode);
+    public static string GetDecReq(DecMode mode) => DECREQ_FORMAT.Format((int)mode);
     
     #endregion
 
@@ -345,25 +345,25 @@ public static class EscapeCodes {
 
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string GetDecPm(DecPrivateMode mode, bool value) => $"\e[?{(int)mode}{(value ? 'h' : 'l')}";
+    public static string GetDecPm(DecMode mode, bool value) => $"\e[?{(int)mode}{(value ? 'h' : 'l')}";
 
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string GetDecSet(DecPrivateMode mode) => GetDecPm(mode, true);
+    public static string GetDecSet(DecMode mode) => GetDecPm(mode, true);
 
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string GetDecSet(params DecPrivateMode[] modes) 
+    public static string GetDecSet(params DecMode[] modes) 
         => $"\e[?{string.Join(';', modes.Select(m => (int)m))}h";
     
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string GetDecRst(DecPrivateMode mode) => GetDecPm(mode, false);
+    public static string GetDecRst(DecMode mode) => GetDecPm(mode, false);
     
     
     [Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string GetDecRst(params DecPrivateMode[] modes) 
+    public static string GetDecRst(params DecMode[] modes) 
         => $"\e[?{string.Join(';', modes.Select(m => (int)m))}l";
     
     public const string ENABLE_CURSOR_VISIBLE = "\e[?25h";
@@ -371,7 +371,7 @@ public static class EscapeCodes {
     
     #endregion
     
-    public enum DecPrivateMode {
+    public enum DecMode {
         REPORT_MOUSE_P = 9,
         REPORT_MOUSE_PR = 1000,
         REPORT_MOUSE_PRD = 1002,
@@ -384,8 +384,54 @@ public static class EscapeCodes {
         BRACKETED_PASTE_MODE = 2004,
         CURSOR_VISIBLE_MODE = 25,
     }
+    
+    #region OSC
 
+    public const string OSC_FORMAT = "\e]{0};{1}\a";
+    public const string OSC_REQ_FORMAT = "\e]{0};?\a";
+    public const string REDEFINE_COLOR_FORMAT = "\e]4;{0};{1}\a";
+
+    /// <summary>
+    /// Generates an OSC (Operating System Command) escape sequence to set both the
+    /// icon and window name of the terminal window to the specified value.
+    /// </summary>
+    /// <param name="name">The text to set as both the icon and window name of the terminal window.</param>
+    /// <returns>A string containing the formatted OSC escape sequence for setting the icon and window name.</returns>
+    public static string GetSetIconAndWindowName(string name) =>
+        OSC_FORMAT.Format((int)OscMode.SET_ICON_AND_WINDOW_NAME, name);
+
+    public static string GetSetIconName(string name) =>
+        OSC_FORMAT.Format((int)OscMode.SET_ICON_NAME, name);
+
+    public static string GetSetWindowName(string name) =>
+        OSC_FORMAT.Format((int)OscMode.SET_WINDOW_NAME, name);
+
+    public static string GetRedefineColor(NKConsoleColor redefined, uint redefining) =>
+        REDEFINE_COLOR_FORMAT.Format((int)redefined, $"#{redefining:x6}");
+
+    public static string GetReqColor(NKConsoleColor color) =>
+        REDEFINE_COLOR_FORMAT.Format((int)color, "?");
+    
     public enum OscMode {
+        SET_ICON_AND_WINDOW_NAME = 0,
+        SET_ICON_NAME = 1,
+        SET_WINDOW_NAME = 2,
         
+        REDEFINE_COLOR = 4,
+        REDEFINE_SPECIAL_COLOR = 5,
+        RESET_COLOR = 104,
+        RESET_SPECIAL_COLOR = 105,
+        
+        CHANGE_TEXT_FORG_COLOR = 10,
+        CHANGE_TEXT_BCKG_COLOR = 11,
+        CHANGE_TEXT_CURSOR_COLOR = 12,
+        CHANGE_POINTER_FORG_COLOR = 13,
+        CHANGE_POINTER_BCKG_COLOR = 14,
+        CHANGE_HIGHLIGHT_FORG_COLOR = 17,
+        CHANGE_HIGHLIGHT_BCKG_COLOR = 19,
     }
+
+    public static string GetOscReq(OscMode mode) => OSC_REQ_FORMAT.Format((int)mode);
+
+    #endregion
 }

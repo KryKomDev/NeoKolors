@@ -189,21 +189,21 @@ public static class StringEffects {
         /// <returns>text that when printed to console has styles</returns>
         [System.Diagnostics.Contracts.Pure]
         public string ApplyStyles() {
-            s = s.Replace("<b>", BOLD_START);
+            s = s.Replace("<b>",  BOLD_START);
             s = s.Replace("</b>", BOLD_END);
-            s = s.Replace("<i>", ITALIC_START);
+            s = s.Replace("<i>",  ITALIC_START);
             s = s.Replace("</i>", ITALIC_END);
-            s = s.Replace("<u>", UNDERLINE_START);
+            s = s.Replace("<u>",  UNDERLINE_START);
             s = s.Replace("</u>", UNDERLINE_END);
-            s = s.Replace("<f>", FAINT_START);
+            s = s.Replace("<f>",  FAINT_START);
             s = s.Replace("</f>", FAINT_END);
-            s = s.Replace("<l>", BLINK_START);
+            s = s.Replace("<l>",  BLINK_START);
             s = s.Replace("</l>", BLINK_END);
-            s = s.Replace("<n>", NEGATIVE_START);
+            s = s.Replace("<n>",  NEGATIVE_START);
             s = s.Replace("</n>", NEGATIVE_END);
-            s = s.Replace("<v>", INVISIBLE_START);
+            s = s.Replace("<v>",  INVISIBLE_START);
             s = s.Replace("</v>", INVISIBLE_END);
-            s = s.Replace("<s>", STRIKETHROUGH_START);
+            s = s.Replace("<s>",  STRIKETHROUGH_START);
             s = s.Replace("</s>", STRIKETHROUGH_END);
             return s;
         }
@@ -229,45 +229,70 @@ public static class StringEffects {
                 int i = int.Parse(hex, NumberStyles.HexNumber);
                 return i.ControlCharB();
             });
+            
+            s = Regex.Replace(s, "<u#.{6}>", match => {
+                string hex = match.Value.Substring(3, 6);
+                int i = int.Parse(hex, NumberStyles.HexNumber);
+                return i.ControlCharU();
+            });
 
-            s = s.Replace("<f-black>", PALETTE_COLOR_BLACK);
-            s = s.Replace("<f-dark-red>", PALETTE_COLOR_DARK_RED);
-            s = s.Replace("<f-dark-green>", PALETTE_COLOR_DARK_GREEN);
-            s = s.Replace("<f-dark-yellow>", PALETTE_COLOR_DARK_YELLOW);
-            s = s.Replace("<f-dark-blue>", PALETTE_COLOR_DARK_BLUE);
+            s = s.Replace("<f-black>",        PALETTE_COLOR_BLACK);
+            s = s.Replace("<f-dark-red>",     PALETTE_COLOR_DARK_RED);
+            s = s.Replace("<f-dark-green>",   PALETTE_COLOR_DARK_GREEN);
+            s = s.Replace("<f-dark-yellow>",  PALETTE_COLOR_DARK_YELLOW);
+            s = s.Replace("<f-dark-blue>",    PALETTE_COLOR_DARK_BLUE);
             s = s.Replace("<f-dark-magenta>", PALETTE_COLOR_DARK_MAGENTA);
-            s = s.Replace("<f-dark-cyan>", PALETTE_COLOR_DARK_CYAN);
-            s = s.Replace("<f-gray>", PALETTE_COLOR_GRAY);
-            s = s.Replace("<f-dark-gray>", PALETTE_COLOR_DARK_GRAY);
-            s = s.Replace("<f-red>", PALETTE_COLOR_RED);
-            s = s.Replace("<f-green>", PALETTE_COLOR_GREEN);
-            s = s.Replace("<f-yellow>", PALETTE_COLOR_YELLOW);
-            s = s.Replace("<f-blue>", PALETTE_COLOR_BLUE);
-            s = s.Replace("<f-magenta>", PALETTE_COLOR_MAGENTA);
-            s = s.Replace("<f-cyan>", PALETTE_COLOR_CYAN);
-            s = s.Replace("<f-white>", PALETTE_COLOR_WHITE);
-            s = s.Replace("</f-color>", TEXT_COLOR_RESET);
-            s = s.Replace("</f#>", TEXT_COLOR_RESET);
+            s = s.Replace("<f-dark-cyan>",    PALETTE_COLOR_DARK_CYAN);
+            s = s.Replace("<f-gray>",         PALETTE_COLOR_GRAY);
+            s = s.Replace("<f-dark-gray>",    PALETTE_COLOR_DARK_GRAY);
+            s = s.Replace("<f-red>",          PALETTE_COLOR_RED);
+            s = s.Replace("<f-green>",        PALETTE_COLOR_GREEN);
+            s = s.Replace("<f-yellow>",       PALETTE_COLOR_YELLOW);
+            s = s.Replace("<f-blue>",         PALETTE_COLOR_BLUE);
+            s = s.Replace("<f-magenta>",      PALETTE_COLOR_MAGENTA);
+            s = s.Replace("<f-cyan>",         PALETTE_COLOR_CYAN);
+            s = s.Replace("<f-white>",        PALETTE_COLOR_WHITE);
+            s = s.Replace("</f-color>",       TEXT_COLOR_RESET);
+            s = s.Replace("</f#>",            TEXT_COLOR_RESET);
         
-            s = s.Replace("<b-black>", PALETTE_BCKG_COLOR_BLACK);
-            s = s.Replace("<b-dark-red>", PALETTE_BCKG_COLOR_DARK_RED);
-            s = s.Replace("<b-dark-green>", PALETTE_BCKG_COLOR_DARK_GREEN);
-            s = s.Replace("<b-dark-yellow>", PALETTE_BCKG_COLOR_DARK_YELLOW);
-            s = s.Replace("<b-dark-blue>", PALETTE_BCKG_COLOR_DARK_BLUE);
+            s = s.Replace("<b-black>",        PALETTE_BCKG_COLOR_BLACK);
+            s = s.Replace("<b-dark-red>",     PALETTE_BCKG_COLOR_DARK_RED);
+            s = s.Replace("<b-dark-green>",   PALETTE_BCKG_COLOR_DARK_GREEN);
+            s = s.Replace("<b-dark-yellow>",  PALETTE_BCKG_COLOR_DARK_YELLOW);
+            s = s.Replace("<b-dark-blue>",    PALETTE_BCKG_COLOR_DARK_BLUE);
             s = s.Replace("<b-dark-magenta>", PALETTE_BCKG_COLOR_DARK_MAGENTA);
-            s = s.Replace("<b-dark-cyan>", PALETTE_BCKG_COLOR_DARK_CYAN);
-            s = s.Replace("<b-gray>", PALETTE_BCKG_COLOR_GRAY);
-            s = s.Replace("<b-dark-gray>", PALETTE_BCKG_COLOR_DARK_GRAY);
-            s = s.Replace("<b-red>", PALETTE_BCKG_COLOR_RED);
-            s = s.Replace("<b-green>", PALETTE_BCKG_COLOR_GREEN);
-            s = s.Replace("<b-yellow>", PALETTE_BCKG_COLOR_YELLOW);
-            s = s.Replace("<b-blue>", PALETTE_BCKG_COLOR_BLUE);
-            s = s.Replace("<b-magenta>", PALETTE_BCKG_COLOR_MAGENTA);
-            s = s.Replace("<b-cyan>", PALETTE_BCKG_COLOR_CYAN);
-            s = s.Replace("<b-white>", PALETTE_BCKG_COLOR_WHITE);
-            s = s.Replace("</b-color>", BCKG_COLOR_RESET);
-            s = s.Replace("</b#>", BCKG_COLOR_RESET);
+            s = s.Replace("<b-dark-cyan>",    PALETTE_BCKG_COLOR_DARK_CYAN);
+            s = s.Replace("<b-gray>",         PALETTE_BCKG_COLOR_GRAY);
+            s = s.Replace("<b-dark-gray>",    PALETTE_BCKG_COLOR_DARK_GRAY);
+            s = s.Replace("<b-red>",          PALETTE_BCKG_COLOR_RED);
+            s = s.Replace("<b-green>",        PALETTE_BCKG_COLOR_GREEN);
+            s = s.Replace("<b-yellow>",       PALETTE_BCKG_COLOR_YELLOW);
+            s = s.Replace("<b-blue>",         PALETTE_BCKG_COLOR_BLUE);
+            s = s.Replace("<b-magenta>",      PALETTE_BCKG_COLOR_MAGENTA);
+            s = s.Replace("<b-cyan>",         PALETTE_BCKG_COLOR_CYAN);
+            s = s.Replace("<b-white>",        PALETTE_BCKG_COLOR_WHITE);
+            s = s.Replace("</b-color>",       BCKG_COLOR_RESET);
+            s = s.Replace("</b#>",            BCKG_COLOR_RESET);
         
+            s = s.Replace("<u-black>",        PALETTE_UNDERLINE_COLOR_BLACK);
+            s = s.Replace("<u-dark-red>",     PALETTE_UNDERLINE_COLOR_DARK_RED);
+            s = s.Replace("<u-dark-green>",   PALETTE_UNDERLINE_COLOR_DARK_GREEN);
+            s = s.Replace("<u-dark-yellow>",  PALETTE_UNDERLINE_COLOR_DARK_YELLOW);
+            s = s.Replace("<u-dark-blue>",    PALETTE_UNDERLINE_COLOR_DARK_BLUE);
+            s = s.Replace("<u-dark-magenta>", PALETTE_UNDERLINE_COLOR_DARK_MAGENTA);
+            s = s.Replace("<u-dark-cyan>",    PALETTE_UNDERLINE_COLOR_DARK_CYAN);
+            s = s.Replace("<u-gray>",         PALETTE_UNDERLINE_COLOR_GRAY);
+            s = s.Replace("<u-dark-gray>",    PALETTE_UNDERLINE_COLOR_DARK_GRAY);
+            s = s.Replace("<u-red>",          PALETTE_UNDERLINE_COLOR_RED);
+            s = s.Replace("<u-green>",        PALETTE_UNDERLINE_COLOR_GREEN);
+            s = s.Replace("<u-yellow>",       PALETTE_UNDERLINE_COLOR_YELLOW);
+            s = s.Replace("<u-blue>",         PALETTE_UNDERLINE_COLOR_BLUE);
+            s = s.Replace("<u-magenta>",      PALETTE_UNDERLINE_COLOR_MAGENTA);
+            s = s.Replace("<u-cyan>",         PALETTE_UNDERLINE_COLOR_CYAN);
+            s = s.Replace("<u-white>",        PALETTE_UNDERLINE_COLOR_WHITE);
+            s = s.Replace("</u-color>",       UNDERLINE_COLOR_RESET);
+            s = s.Replace("</u#>",            UNDERLINE_COLOR_RESET);
+            
             return s;
         }
 
@@ -347,6 +372,7 @@ public static class StringEffects {
 
 
     extension(int color) {
+        
         /// <summary>
         /// returns string containing ansi escape sequence coloring the text
         /// </summary>
@@ -374,6 +400,7 @@ public static class StringEffects {
 
     extension(uint color) {
         /// <summary>
+        /// 
         /// returns string containing ansi escape sequence coloring the text
         /// </summary>
         [System.Diagnostics.Contracts.Pure]
@@ -461,16 +488,6 @@ public static class StringEffects {
         /// <param name="style">The <see cref="TextStyles"/> value specifying the styles
         /// to apply, such as bold, italic, or underline.</param>
         /// <returns>A new string with the specified text styles applied.</returns>
-        public string AddCStyle(TextStyles style) {
-            if (style.GetIsBold()) s = $"{BOLD_START}{s}";
-            if (style.GetIsItalic()) s = $"{ITALIC_START}{s}";
-            if (style.GetIsUnderline()) s = $"{UNDERLINE_START}{s}";
-            if (style.GetIsFaint()) s = $"{FAINT_START}{s}";
-            if (style.GetIsNegative()) s = $"{NEGATIVE_START}{s}";
-            if (style.GetIsStrikethrough()) s = $"{STRIKETHROUGH_START}{s}";
-            return s;
-        }
+        public string AddCStyle(TextStyles style) => $"{style.GetEscSeq()}{s}";
     }
-    
-    
 }
