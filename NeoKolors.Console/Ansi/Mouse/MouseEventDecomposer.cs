@@ -2,12 +2,15 @@
 // Copyright (c) 2025 KryKom
 
 using Metriks;
+using NeoKolors.Console.Input;
 using static System.ConsoleModifiers;
-using static NeoKolors.Console.Mouse.MouseEventType;
+using static NeoKolors.Console.Input.KeyModifiers;
+using static NeoKolors.Console.Ansi.Mouse.MouseEventType;
 
-namespace NeoKolors.Console.Mouse;
+namespace NeoKolors.Console.Ansi.Mouse;
 
 internal static class MouseEventDecomposer {
+    
     /// <summary>
     /// Decomposes raw UTF-8 encoded mouse event data into detailed mouse event arguments.
     /// </summary>
@@ -20,7 +23,7 @@ internal static class MouseEventDecomposer {
         var t = GetType(type - 32);
         var pos = new Point2D(x - 32, y - 32);
         
-        return new MouseEventArgs(t.Btn, t.Mods, t.Move, pos, t is { Btn: MouseButton.RELEASE, Move: false });
+        return new MouseEventArgs(t.Btn, t.Mods, pos, t.Move, t is { Btn: MouseButton.RELEASE, Move: false });
     }
 
     /// <summary>
@@ -35,7 +38,7 @@ internal static class MouseEventDecomposer {
         var t = GetType(type.KeyChar - 32);
         var pos = new Point2D(RemapCoordinate(x) - 1, RemapCoordinate(y) - 1);
         
-        return new MouseEventArgs(t.Btn, t.Mods, t.Move, pos, t is { Btn: MouseButton.RELEASE, Move: false });
+        return new MouseEventArgs(t.Btn, t.Mods, pos, t is { Btn: MouseButton.RELEASE, Move: false }, t.Move);
     }
 
     /// <summary>
@@ -52,7 +55,7 @@ internal static class MouseEventDecomposer {
         var pos = new Point2D(x, y);
         var rel = f == 'm';
 
-        return new MouseEventArgs(t.Btn, t.Mods, t.Move, pos, rel);
+        return new MouseEventArgs(t.Btn, t.Mods, pos, rel, t.Move);
     }
 
     /// <summary>
@@ -63,19 +66,19 @@ internal static class MouseEventDecomposer {
     /// <returns>A tuple containing the mouse button (<see cref="MouseButton"/>),
     /// modifiers (<see cref="ConsoleModifiers"/>), and a boolean indicating whether the event is a
     /// movement event.</returns>
-    private static (MouseButton Btn, ConsoleModifiers Mods, bool Move) GetType(int type) {
+    private static (MouseButton Btn, KeyModifiers Mods, bool Move) GetType(int type) {
         var flags = (MouseEventFlags)type;
         var shift = flags.GetHasShift();
-        var             alt   = flags.GetHasAlt();
-        var             ctrl  = flags.GetHasCtrl();
-        var             move  = flags.GetHasMove();
+        var alt   = flags.GetHasAlt();
+        var ctrl  = flags.GetHasCtrl();
+        var move  = flags.GetHasMove();
 
-        var cm = (shift ? Shift   : 0) | 
-                 (alt   ? Alt     : 0) | 
-                 (ctrl  ? Control : 0);
+        var km = (shift ? SHIFT     : 0) | 
+                 (alt   ? LEFT_ALT  : 0) | 
+                 (ctrl  ? LEFT_CTRL : 0);
         
         var button = (MouseButton)(type & ~(4 + 8 + 16 + 32));
-        return (button, cm, move);
+        return (button, km, move);
     }
 
     /// <summary>

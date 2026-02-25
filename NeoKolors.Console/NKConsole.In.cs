@@ -11,11 +11,10 @@ using NeoKolors.Common;
 using NeoKolors.Console.Driver;
 using NeoKolors.Console.Driver.DotNet;
 using NeoKolors.Console.Events;
-using NeoKolors.Console.Mouse;
+using NeoKolors.Console.Input;
 using OneOf;
 using static NeoKolors.Console.BoolStrings;
 using ArgumentException = System.ArgumentException;
-using ConsoleKeyInfo = System.ConsoleKeyInfo;
 using FormatException = System.FormatException;
 using InvalidOperationException = System.InvalidOperationException;
 using OverflowException = System.OverflowException;
@@ -24,7 +23,6 @@ using Std = System.Console;
 #if NK_ENABLE_NATIVE_INPUT
 using NeoKolors.Console.Driver.Linux;
 using NeoKolors.Console.Driver.Windows;
-using System.Runtime.InteropServices;
 #endif
 
 
@@ -287,18 +285,18 @@ public static partial class NKConsole {
     [JetBrains.Annotations.Pure]
     private static OneOf<bool, string> ParseBool(string s, BoolStrings b) {
         return s.ToLower() switch {
-            "true" => b.HasFlag(TRUE_FALSE) ? true : InvBoolMsg(b),
-            "false" => b.HasFlag(TRUE_FALSE) ? false : InvBoolMsg(b),
-            "yes" => b.HasFlag(YES_NO) ? true : InvBoolMsg(b),
-            "no" => b.HasFlag(YES_NO) ? false : InvBoolMsg(b),
-            "y" => b.HasFlag(Y_N) ? true : InvBoolMsg(b),
-            "n" => b.HasFlag(Y_N) ? false : InvBoolMsg(b),
-            "on" => b.HasFlag(ON_OFF) ? true : InvBoolMsg(b),
-            "off" => b.HasFlag(ON_OFF) ? false : InvBoolMsg(b),
-            "t" => b.HasFlag(T_F) ? true : InvBoolMsg(b),
-            "f" => b.HasFlag(T_F) ? false : InvBoolMsg(b),
-            "1" => b.HasFlag(ZERO_ONE) ? true : InvBoolMsg(b),
-            "0" => b.HasFlag(ZERO_ONE) ? false : InvBoolMsg(b),
+            "true"  => b.GetHasTrueFalse() ? true  : InvBoolMsg(b),
+            "false" => b.GetHasTrueFalse() ? false : InvBoolMsg(b),
+            "t"     => b.GetHasTF()        ? true  : InvBoolMsg(b),
+            "f"     => b.GetHasTF()        ? false : InvBoolMsg(b),
+            "yes"   => b.GetHasYesNo()     ? true  : InvBoolMsg(b),
+            "no"    => b.GetHasYesNo()     ? false : InvBoolMsg(b),
+            "y"     => b.GetHasYN()        ? true  : InvBoolMsg(b),
+            "n"     => b.GetHasYN()        ? false : InvBoolMsg(b),
+            "on"    => b.GetHasOnOff()     ? true  : InvBoolMsg(b),
+            "off"   => b.GetHasOnOff()     ? false : InvBoolMsg(b),
+            "1"     => b.GetHasZeroOne()   ? true  : InvBoolMsg(b),
+            "0"     => b.GetHasZeroOne()   ? false : InvBoolMsg(b),
             _ => InvBoolMsg(b)
         };
     }
@@ -316,11 +314,23 @@ public static partial class NKConsole {
     
     #region INPUT INTERCEPTION
 
-    private static readonly IInputDriver INPUT_DRIVER = 
+    private static readonly IInputDriver INPUT_DRIVER =
         #if NK_ENABLE_NATIVE_INPUT
-        RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? new WindowsInputDriver() :
-        RuntimeInformation.IsOSPlatform(OSPlatform.Linux) ? new LinuxInputDriver() : 
-        new DotNetInputDriver();
+        Environment.OSVersion.Platform switch {
+            PlatformID.Win32Windows or PlatformID.Win32NT or PlatformID.Win32S or PlatformID.WinCE => 
+                new WindowsInputDriver(new WinInputDriverConfig(
+                    reportFocus:     true, 
+                    mouseConfig:     ReportedMouseEvents.ALL, 
+                    reportResize:    true,
+                    refreshInterval: new TimeSpan(0, 0, 0, 0, 10),
+                    ctrlCForceQuits: true
+                )),
+            PlatformID.Unix =>
+                new LinuxInputDriver(),
+            PlatformID.MacOSX =>
+                new LinuxInputDriver(), // TODO: create a frickin MacOSX driver
+            _ => new DotNetInputDriver()
+        };
         #else
         new DotNetInputDriver();
         #endif
@@ -340,13 +350,12 @@ public static partial class NKConsole {
         InterceptInput = true;
         LOGGER.Info("Starting input interception...");
         
-        INPUT_DRIVER.Key += OnKey;
-        INPUT_DRIVER.Mouse += OnMouse;
-        INPUT_DRIVER.FocusIn += OnFocusIn;
+        INPUT_DRIVER.Key      += OnKey;
+        INPUT_DRIVER.Mouse    += OnMouse;
+        INPUT_DRIVER.FocusIn  += OnFocusIn;
         INPUT_DRIVER.FocusOut += OnFocusOut;
-        INPUT_DRIVER.Paste += OnPaste;
-        INPUT_DRIVER.WinOpsResponse += OnWinOpsResponse;
-        INPUT_DRIVER.DecReqResponse += OnDecReqResponse;
+        INPUT_DRIVER.Paste    += OnPaste;
+        INPUT_DRIVER.VTQuery  += OnVTQuery;
         
         INPUT_DRIVER.Start();
     }
@@ -362,22 +371,20 @@ public static partial class NKConsole {
         
         INPUT_DRIVER.Stop();
         
-        INPUT_DRIVER.Key -= OnKey;
-        INPUT_DRIVER.Mouse -= OnMouse;
-        INPUT_DRIVER.FocusIn -= OnFocusIn;
+        INPUT_DRIVER.Key      -= OnKey;
+        INPUT_DRIVER.Mouse    -= OnMouse;
+        INPUT_DRIVER.FocusIn  -= OnFocusIn;
         INPUT_DRIVER.FocusOut -= OnFocusOut;
-        INPUT_DRIVER.Paste -= OnPaste;
-        INPUT_DRIVER.WinOpsResponse -= OnWinOpsResponse;
-        INPUT_DRIVER.DecReqResponse -= OnDecReqResponse;
+        INPUT_DRIVER.Paste    -= OnPaste;
+        INPUT_DRIVER.VTQuery  -= OnVTQuery;
     }
 
-    private static void OnKey(ConsoleKeyInfo k) => KeyEvent(k);
-    private static void OnMouse(MouseEventArgs m) => MouseEvent(m);
-    private static void OnFocusIn() => FocusInEvent();
-    private static void OnFocusOut() => FocusOutEvent();
-    private static void OnPaste(string s) => PasteEvent(s);
-    private static void OnWinOpsResponse(WinOpsResponseArgs a) => WinOpsResponseEvent(a);
-    private static void OnDecReqResponse(DecReqResponseArgs a) => DecReqResponseEvent(a);
+    private static void OnKey(KeyEventArgs k)        => Key(k);
+    private static void OnMouse(MouseEventArgs m)    => Mouse(m);
+    private static void OnFocusIn()                  => FocusIn();
+    private static void OnFocusOut()                 => FocusOut();
+    private static void OnPaste(string s)            => Paste(s);
+    private static void OnVTQuery(VTQueryResponse r) => VTQueryResponse(r);
 
     #endregion
 
@@ -506,14 +513,17 @@ public static partial class NKConsole {
         
         var tcs = new TaskCompletionSource<bool>();
         
-        DecReqResponseEventHandler h = null!;
+        VTQueryResponseHandler? h = null;
+        
         h = a => {
-            if (a.Mode != 1049) return;
-            DecReqResponseEvent -= h;
-            tcs.SetResult(a.Response == DecReqResponseType.ENABLED);
+            if (a.Type != VTQueryResponseType.DEC || a.DecMode == EscapeCodes.DecMode.ALTERNATE_BUFFER) 
+                return;
+            
+            VTQueryResponse -= h;
+            tcs.SetResult(a.DecData == DecReqResponseType.ENABLED);
         };
 
-        DecReqResponseEvent += h;
+        VTQueryResponse += h;
 
         return await tcs.Task;
     }
@@ -539,7 +549,7 @@ public static partial class NKConsole {
     public static async Task<Size2D> GetScreenSizePxAsync() {
         Std.Write(EscapeCodes.REPORT_WINDOW_SIZE_PX);
         
-        // If multithreaded input interception is not enabled
+        // If input interception is not enabled
         if (!InterceptInput) {
             var res = ReadUntil('t', true);
             var split = res.Split(';');
@@ -548,14 +558,17 @@ public static partial class NKConsole {
         
         var tcs = new TaskCompletionSource<Size2D>();
         
-        WinOpsResponseEventHandler h = null!;
+        VTQueryResponseHandler? h = null;
+        
         h = a => {
-            if (a.Type != WinOpsResponseType.WIN_SIZE_PX) return;
-            WinOpsResponseEvent -= h;
-            tcs.SetResult(a.AsWinSizePx());
+            if (a.Type != VTQueryResponseType.WIN_SIZE_PX)
+                return;
+            
+            VTQueryResponse -= h;
+            tcs.SetResult(a.AsWinSizePx);
         };
 
-        WinOpsResponseEvent += h;
+        VTQueryResponse += h;
 
         return await tcs.Task;
     }

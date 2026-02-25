@@ -1,6 +1,8 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
+using NeoKolors.Console.Input;
+
 namespace NeoKolors.Console.Events;
 
-public delegate void KeyEventHandler(ConsoleKeyInfo keyInfo);
+public delegate void KeyEventHandler(KeyEventArgs keyInfo);

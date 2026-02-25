@@ -863,13 +863,13 @@ public static partial class NKConsole {
     /// Sets the specified DEC private modes for the terminal.
     /// </summary>
     /// <param name="modes">An array of DEC private modes to enable.</param>
-    public static void SetModes(params DecPrivateMode[] modes) => Stdio.Write(GetDecSet(modes));
+    public static void SetModes(params DecMode[] modes) => Stdio.Write(GetDecSet(modes));
 
     /// <summary>
     /// Resets the specified DEC Private Modes in the terminal.
     /// </summary>
     /// <param name="modes">An array of DEC Private Modes to reset.</param>
-    public static void ResetModes(params DecPrivateMode[] modes) => Stdio.Write(GetDecRst(modes));
+    public static void ResetModes(params DecMode[] modes) => Stdio.Write(GetDecRst(modes));
 
     /// <summary>
     /// Saves the current position of the console cursor.

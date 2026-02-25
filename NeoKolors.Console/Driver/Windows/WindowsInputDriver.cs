@@ -1,192 +1,189 @@
+﻿//
 // NeoKolors
-// Copyright (c) 2025 KryKom
+// Copyright (c) 2026 KryKom
+//
 
-#pragma warning disable CS0067
-
-#if NK_ENABLE_NATIVE_INPUT
-
+using System.Diagnostics;
 using Metriks;
+using NeoKolors.Common;
+using NeoKolors.Console.Ansi;
 using NeoKolors.Console.Events;
-using NeoKolors.Console.Mouse;
-using static NeoKolors.Console.Driver.Windows.NativeConsole;
+using NeoKolors.Console.Input;
 
 namespace NeoKolors.Console.Driver.Windows;
 
-public class WindowsInputDriver : IInputDriver {
+public sealed class WindowsInputDriver : IInputDriver {
+    
+    private static readonly NKLogger LOGGER = NKDebug.GetLogger(nameof(WindowsInputDriver));
 
-    public event MouseEventHandler? Mouse;
-    public event KeyEventHandler? Key;
-    public event FocusInEventHandler? FocusIn;
-    public event FocusOutEventHandler? FocusOut;
-    public event PasteEventHandler? Paste;
-    public event WinOpsResponseEventHandler? WinOpsResponse;
-    public event DecReqResponseEventHandler? DecReqResponse;
-
-    private bool _running;
-    private Thread? _inputThread;
-    private readonly IntPtr _hInput;
-    private uint _originalMode;
-    private readonly NKLogger _logger = NKDebug.GetLogger("WindowsInputDriver");
-
-    public WindowsInputDriver() {
-        _hInput = GetStdHandle(STD_INPUT_HANDLE);
+    public event MouseEventHandler?    Mouse    = (_) => { };
+    public event KeyEventHandler?      Key      = (_) => { };
+    public event FocusInEventHandler?  FocusIn  = ( ) => { };
+    public event FocusOutEventHandler? FocusOut = ( ) => { };
+    public event ResizeEventHandler?   Resize   = (_) => { };
+    public event PasteEventHandler?    Paste    = (_) => { };
+    
+    public event VTQueryResponseHandler? VTQuery {
+        add    => _parser.VTQuery += value;
+        remove => _parser.VTQuery -= value;
     }
+    
+    private          bool                 _useReadKey;
+    private          bool                 _disposed = false;
+    private          Thread?              _inputThread;
+    private readonly WindowsInput         _input;
+    private readonly AnsiInputParser      _parser;
+    private readonly WinInputDriverConfig _config;
 
-    public void Start() {
-        if (_running) return;
-        
-        // Setup Console Mode
-        if (GetConsoleMode(_hInput, out _originalMode)) {
-            uint newMode = (_originalMode | ENABLE_MOUSE_INPUT | ENABLE_WINDOW_INPUT | ENABLE_EXTENDED_FLAGS) & ~ENABLE_QUICK_EDIT_MODE;
-            // Determine if we should also disable line input/echo for true raw mode?
-            // Usually yes for TUI.
-            // newMode &= ~(ENABLE_LINE_INPUT | ENABLE_ECHO_INPUT); 
-            // Leaving them might be safer if we only want to add capabilities, but usually TUI wants control.
-            // For now, focus on Quick Edit and Mouse.
-            SetConsoleMode(_hInput, newMode);
-        } else {
-            _logger.Error("Failed to get console mode.");
+    private readonly Queue<EscapeCodes.DecMode> _decReqQueue = new();
+    private readonly Queue<EscapeCodes.OscMode> _oscReqQueue = new();
+    
+    public void RequestDecMode(EscapeCodes.DecMode mode) => _decReqQueue.Enqueue(mode);
+    public void RequestOscMode(EscapeCodes.OscMode mode) => _oscReqQueue.Enqueue(mode);
+
+    public bool IsRunning { get; private set; }
+
+    public WindowsInputDriver(WinInputDriverConfig config) {
+        _config = config;
+        _input  = new WindowsInput();
+        _parser = new AnsiInputParser(ReadNext, Invoke);
+
+        // enable ctrl+c force quit
+        if (_config.CtrlCForceQuits) {
+            Key += a => {
+                if (a is { Down: true, Key: KeyCode.C } && a.Modifiers.GetHasCtrl())
+                    Process.GetCurrentProcess().Kill();
+            };
         }
-
-        _running = true;
-        _inputThread = new Thread(Loop) {
+    }
+    
+    public void Start() {
+        if (IsRunning || _disposed) 
+            return;
+        
+        IsRunning    = true;
+        _inputThread = new Thread(Intercept) {
             IsBackground = true,
-            Priority = ThreadPriority.BelowNormal,
-            Name = "NeoKolors Windows Input Interceptor"
+            Priority     = ThreadPriority.BelowNormal,
+            Name         = "NeoKolors Win32 Input Interceptor"
         };
+        
         _inputThread.Start();
     }
 
     public void Stop() {
-        if (!_running) return;
-        _running = false;
-        
-        // Restore Console Mode
-        SetConsoleMode(_hInput, _originalMode);
+        IsRunning = false;
     }
 
-    public void Dispose() {
-        Stop();
-    }
-
-    private void Loop() {
-        var buffer = new INPUT_RECORD[10];
+    private void Intercept() {
+        var stopwatch = new Stopwatch();
         
-        while (_running) {
-            try {
-                // Wait for input events or timeout (to check _running flag)
-                uint waitResult = WaitForSingleObject(_hInput, 100);
+        while (IsRunning) {
+            stopwatch.Restart();
 
-                if (waitResult == WAIT_OBJECT_0) {
-                    // Input available
-                    if (GetNumberOfConsoleInputEvents(_hInput, out uint count) && count > 0) {
-                        if (ReadConsoleInput(_hInput, buffer, (uint)buffer.Length, out uint read)) {
-                            for (int i = 0; i < read; i++) {
-                                ProcessRecord(buffer[i]);
-                            }
-                        }
-                    }
+            if (_input.TryGetInput(out var records)) {
+                foreach (var r in records) {
+                    Decode(r);
                 }
-                else if (waitResult == WAIT_FAILED) {
-                    _logger.Error("WaitForSingleObject failed.");
-                    Thread.Sleep(100);
-                }
-            } catch (Exception e) {
-                _logger.Error($"Error in Windows input loop: {e.Message}");
-                Thread.Sleep(100);
             }
-        }
-    }
-
-    private void ProcessRecord(INPUT_RECORD record) {
-        switch (record.EventType) {
-            case KEY_EVENT:
-                HandleKey(record.KeyEvent);
-                break;
-            case MOUSE_EVENT:
-                HandleMouse(record.MouseEvent);
-                break;
-            case WINDOW_BUFFER_SIZE_EVENT:
-                HandleResize(record.WindowBufferSizeEvent);
-                break;
-            case FOCUS_EVENT:
-                HandleFocus(record.FocusEvent);
-                break;
-        }
-    }
-
-    private void HandleKey(KEY_EVENT_RECORD k) {
-        // We only care about KeyDown usually, unless we want KeyUp events?
-        // System.Console.ReadKey only fires on Down.
-        if (!k.bKeyDown) return;
-
-        // Map control keys
-        bool shift = (k.dwControlKeyState & 0x0010) != 0; // SHIFT_PRESSED
-        bool alt = (k.dwControlKeyState & 0x0001) != 0 || (k.dwControlKeyState & 0x0002) != 0; // LEFT_ALT or RIGHT_ALT
-        bool ctrl = (k.dwControlKeyState & 0x0004) != 0 || (k.dwControlKeyState & 0x0008) != 0; // LEFT_CTRL or RIGHT_CTRL
-
-        var keyInfo = new ConsoleKeyInfo(k.uChar, (ConsoleKey)k.wVirtualKeyCode, shift, alt, ctrl);
-        
-        _ = Task.Run(() => Key?.Invoke(keyInfo));
-    }
-
-    private void HandleMouse(MOUSE_EVENT_RECORD m) {
-        var x = m.dwMousePosition.X;
-        var y = m.dwMousePosition.Y;
-        
-        // Modifiers
-        ConsoleModifiers mods = 0;
-        if ((m.dwControlKeyState & 0x0010) != 0) mods |= ConsoleModifiers.Shift;
-        if ((m.dwControlKeyState & 0x0008) != 0 || (m.dwControlKeyState & 0x0004) != 0) mods |= ConsoleModifiers.Control;
-        if ((m.dwControlKeyState & 0x0002) != 0 || (m.dwControlKeyState & 0x0001) != 0) mods |= ConsoleModifiers.Alt;
-        
-        bool moved = (m.dwEventFlags & 0x0001) != 0; // MOUSE_MOVED
-        bool wheeled = (m.dwEventFlags & 0x0004) != 0; // MOUSE_WHEELED
-        
-        var btn = MouseButton.RELEASE;
-        bool release = false;
-        
-        if (wheeled) {
-            long delta = (short)((m.dwButtonState >> 16) & 0xFFFF);
-            btn = delta > 0 ? MouseButton.WHEEL_UP : MouseButton.WHEEL_DOWN;
-        }
-        else {
-            // Check buttons
-            if ((m.dwButtonState & 0x01) != 0) btn = MouseButton.LEFT;
-            else if ((m.dwButtonState & 0x04) != 0) btn = MouseButton.MIDDLE; // Note: Windows Middle is 0x04 usually? Left=1, Right=2, Middle=4.
-            else if ((m.dwButtonState & 0x02) != 0) btn = MouseButton.RIGHT;
             
-            if (btn == MouseButton.RELEASE && !moved) {
-                // If not moved and no button, it's a release (if event flags are 0)
-                release = true;
+            // DECREQ and OSCREQ
+            
+            var elapsed = stopwatch.Elapsed;
+
+            if (elapsed <= _config.RefreshInterval && !_input.HasInput()) {
+                Thread.Sleep(_config.RefreshInterval - elapsed);
             }
         }
-
-        var args = new MouseEventArgs(
-            button: btn,
-            modifiers: mods,
-            move: moved,
-            position: new Point2D(x, y),
-            release: release
-        );
-
-        _ = Task.Run(() => Mouse?.Invoke(args));
     }
 
-    private void HandleResize(WINDOW_BUFFER_SIZE_RECORD r) {
-        // Translate to WinOpsResponseArgs.WinSize?
-        // Or just let the native resize handler deal with it?
-        // NKConsole has WinOpsResponse event for explicit requests.
-        // But getting a free update is nice.
-        _ = Task.Run(() => WinOpsResponse?.Invoke(WinOpsResponseArgs.WinSize(new Size2D(r.dwSize.X, r.dwSize.Y))));
+    private void Decode(WinImports.WinInputRecord record) {
+        switch (record.Type) {
+            case WinImports.WinEventType.KEY:    { InvokeKey(record.Key);         } break;
+            case WinImports.WinEventType.MOUSE:  { InvokeMouse(record.Mouse);     } break;
+            case WinImports.WinEventType.RESIZE: { InvokeResize(record.Resize);   } break;
+            case WinImports.WinEventType.MENU:   { /* ignored, used internally */ } break;
+            case WinImports.WinEventType.FOCUS:  { InvokeFocus(record.Focus);     } break;
+            default:                             throw new ArgumentOutOfRangeException();
+        }
     }
 
-    private void HandleFocus(FOCUS_EVENT_RECORD f) {
-        if (f.bSetFocus)
-            _ = Task.Run(() => FocusIn?.Invoke());
-        else
-            _ = Task.Run(() => FocusOut?.Invoke());
+    private void InvokeKey(WinImports.WinKeyEvent keyEvent) {
+        Key?.Invoke(new KeyEventArgs(
+            (KeyCode)keyEvent.VirtualKeyCode, 
+            (KeyModifiers)keyEvent.Modifiers, 
+            keyEvent.Char,
+            keyEvent.Down
+        ));
+    }
+
+    private void InvokeResize(WinImports.WinResizeEvent resizeEvent) => 
+        Resize?.Invoke(new ResizeEventArgs(new Size2D(resizeEvent.Size.X, resizeEvent.Size.Y)));
+
+    private void InvokeMouse(WinImports.WinMouseEvent mouseEvent) {
+        var mb = mouseEvent.Button;
+        
+        // translate the key press
+        var button = mb switch {
+            _ when mouseEvent.Flags.GetHasWheel() => 
+                mouseEvent.Button < 0 
+                    ? MouseButton.WHEEL_DOWN 
+                    : MouseButton.WHEEL_UP,
+            _ when mb.GetHasLmb() => MouseButton.LEFT,
+            _ when mb.GetHasRmb() => MouseButton.RIGHT,
+            _ when mb.GetHasMb2() => MouseButton.MIDDLE,
+            _ when mb.GetHasMb3() => MouseButton.MB6,
+            _ when mb.GetHasMb4() => MouseButton.MB7,
+            0                     => MouseButton.RELEASE,
+            _                     => throw new InvalidOperationException()
+        };
+        
+        Mouse?.Invoke(new MouseEventArgs(
+            button,
+            (KeyModifiers)mouseEvent.Modifiers,
+            new Point2D(mouseEvent.Coord.X, mouseEvent.Coord.Y),
+            mb == 0,
+            mouseEvent.Flags.GetHasMoved()
+        ));
+    }
+
+    private void InvokeFocus(WinImports.WinFocusEvent focusEvent) {
+        if (focusEvent.FocusSet) 
+            FocusIn?.Invoke();
+        else 
+            FocusOut?.Invoke();
+    }
+
+    private ConsoleKeyInfo ReadNext() {
+        if (_useReadKey) {
+            try {
+                return Stdio.ReadKey(true);
+            }
+            catch (InvalidOperationException) {
+                _useReadKey = false;
+            }
+        }
+        
+        int c = Stdio.Read();
+        
+        return c == -1 
+            ? throw new EndOfStreamException() 
+            : new ConsoleKeyInfo((char)c, 0, false, false, false);
+    }
+
+    private void Invoke(Action action) {
+        Task.Run(() => {
+            if (IsRunning) action();
+        });
+    }
+    
+    public void Dispose() {
+        if (_disposed) 
+            return;
+        
+        Stop();
+        
+        _disposed = true;
+        _input.Dispose();
     }
 }
-
-#endif

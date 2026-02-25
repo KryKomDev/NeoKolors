@@ -1,10 +1,11 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
+using NeoKolors.Console.Ansi.Mouse;
 using NeoKolors.Console.Events;
-using NeoKolors.Console.Mouse;
+using NeoKolors.Console.Input;
 using static NeoKolors.Common.EscapeCodes;
-using static NeoKolors.Console.Mouse.MouseReportLevel;
+using static NeoKolors.Console.Ansi.Mouse.MouseReportLevel;
 using Std = System.Console;
 
 namespace NeoKolors.Console;
@@ -238,34 +239,27 @@ public partial class NKConsole {
     }
 
     // Events for input interception
-    public static event MouseEventHandler          MouseEvent          = delegate { };
-    public static event PasteEventHandler          PasteEvent          = delegate { };
-    public static event FocusInEventHandler        FocusInEvent        = delegate { };
-    public static event FocusOutEventHandler       FocusOutEvent       = delegate { };
-    public static event KeyEventHandler            KeyEvent            = delegate { };
-    public static event WinOpsResponseEventHandler WinOpsResponseEvent = delegate { };
-    public static event DecReqResponseEventHandler DecReqResponseEvent = delegate { };
+    public static event MouseEventHandler      Mouse           = delegate { };
+    public static event PasteEventHandler      Paste           = delegate { };
+    public static event FocusInEventHandler    FocusIn         = delegate { };
+    public static event FocusOutEventHandler   FocusOut        = delegate { };
+    public static event KeyEventHandler        Key             = delegate { };
+    public static event VTQueryResponseHandler VTQueryResponse = delegate { };
 
     private static Task InvokeMouseEvent(MouseEventArgs info) 
-        => Task.Run(() => MouseEvent(info));
+        => Task.Run(() => Mouse(info));
     
     private static Task InvokePasteEvent(string text) 
-        => Task.Run(() => PasteEvent(text));
+        => Task.Run(() => Paste(text));
     
     private static Task InvokeFocusInEvent() 
-        => Task.Run(() => FocusInEvent());
+        => Task.Run(() => FocusIn());
     
     private static Task InvokeFocusOutEvent() 
-        => Task.Run(() => FocusOutEvent());
+        => Task.Run(() => FocusOut());
     
-    private static Task InvokeKeyEvent(ConsoleKeyInfo info) 
-        => Task.Run(() => KeyEvent(info));
-
-    private static Task InvokeWinOpsResponseEvent(WinOpsResponseArgs args) 
-        => Task.Run(() => WinOpsResponseEvent(args));
-    
-    private static Task InvokeDecReqResponseEvent(DecReqResponseArgs args) 
-        => Task.Run(() => DecReqResponseEvent(args));
+    private static Task InvokeKeyEvent(KeyEventArgs info) 
+        => Task.Run(() => Key(info));
     
     /// <summary>
     /// Gets value indicating whether input from the terminal is intercepted by NKConsole.

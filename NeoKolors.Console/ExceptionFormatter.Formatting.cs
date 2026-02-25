@@ -5,9 +5,9 @@
 
 using System.Text.RegularExpressions;
 using NeoKolors.Common;
+using NeoKolors.Console.Driver.Windows;
 using NeoKolors.Extensions;
 using static NeoKolors.Common.NKConsoleColor;
-using Win32Exception = NeoKolors.Console.Native.Win32Exception;
 
 // disabled because of StringUtils.InRange(string, int, int) to make code cleaner
 
@@ -33,7 +33,7 @@ public partial class ExceptionFormatter {
         Stdio.Write(Format(e0));
         
         if (Environment.OSVersion.Platform == PlatformID.Win32NT) 
-            Win32Exception.Mute();
+            WinExceptionSuppressor.Mute();
         else
             Stdio.SetError(TextWriter.Null);
     }

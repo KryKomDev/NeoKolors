@@ -1,7 +1,7 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-using NeoKolors.Console.Mouse;
+using NeoKolors.Console.Input;
 
 namespace NeoKolors.Console.Events;
 

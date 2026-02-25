@@ -3,4 +3,4 @@
 
 namespace NeoKolors.Console.Events;
 
-public delegate void DecReqResponseEventHandler(DecReqResponseArgs args);
+public delegate void ResizeEventHandler(ResizeEventArgs args);

@@ -1,8 +1,6 @@
 // NeoKolors
 // Copyright (c) 2025 KryKom
 
-#if NK_ENABLE_NATIVE_INPUT
-
 using System.Runtime.InteropServices;
 // ReSharper disable InconsistentNaming
 
@@ -37,19 +35,19 @@ internal static class NativeConsole {
     public static extern IntPtr GetStdHandle(int nStdHandle);
 
     [DllImport("kernel32.dll", SetLastError = true)]
-    public static extern bool GetConsoleMode(IntPtr hConsoleHandle, out uint lpMode);
+    public static extern bool GetConsoleMode(nint hConsoleHandle, out uint lpMode);
 
     [DllImport("kernel32.dll", SetLastError = true)]
-    public static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
+    public static extern bool SetConsoleMode(nint hConsoleHandle, uint dwMode);
 
     [DllImport("kernel32.dll", SetLastError = true)]
-    public static extern uint WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
+    public static extern uint WaitForSingleObject(nint hHandle, uint dwMilliseconds);
 
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    public static extern bool ReadConsoleInput(IntPtr hConsoleInput, [Out] INPUT_RECORD[] lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
+    public static extern bool ReadConsoleInput(nint hConsoleInput, [Out] INPUT_RECORD[] lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
 
     [DllImport("kernel32.dll", SetLastError = true)]
-    public static extern bool GetNumberOfConsoleInputEvents(IntPtr hConsoleInput, out uint lpNumberOfEvents);
+    public static extern bool GetNumberOfConsoleInputEvents(nint hConsoleInput, out uint lpNumberOfEvents);
 
     [StructLayout(LayoutKind.Explicit)]
     public struct INPUT_RECORD {
@@ -100,5 +98,3 @@ internal static class NativeConsole {
         public short Y;
     }
 }
-
-#endif
