@@ -11,7 +11,7 @@
 
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
-        <Version>2026.1-alpha1</Version>
+        <Version>2026.1-alpha2</Version>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
@@ -27,7 +27,6 @@
     <ItemGroup>
         <ProjectReference Include="..\NeoKolors.Console\NeoKolors.Console.csproj" />
         <ProjectReference Include="..\NeoKolors.Common\NeoKolors.Common.csproj" />
-        <ProjectReference Include="..\NeoKolors.Settings\NeoKolors.Settings.csproj" />
         <ProjectReference Include="..\NeoKolors.Extensions\NeoKolors.Extensions.csproj" />
         <ProjectReference Include="..\NeoKolors.Tui.Generators\NeoKolors.Tui.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
     </ItemGroup>
