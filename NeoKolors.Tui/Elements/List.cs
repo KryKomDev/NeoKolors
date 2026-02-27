@@ -95,7 +95,7 @@ public class List : AbstractElement<IElement[]> {
         var sp = _style.Position;
         var pos = new Point(
             sp.AbsoluteX ? sp.X.ToScalar(rect.Width) : rect.LowerX + sp.X.ToScalar(rect.Width), 
-            sp.AbsoluteY ? sp.Y.ToScalar(rect.Width) : rect.LowerY + sp.Y.ToScalar(rect.Height)
+            sp.AbsoluteY ? sp.Y.ToScalar(rect.Height) : rect.LowerY + sp.Y.ToScalar(rect.Height)
         );
         
         if (!_style.Border.IsBorderless) {

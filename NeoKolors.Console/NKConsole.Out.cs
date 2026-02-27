@@ -765,7 +765,7 @@ public static partial class NKConsole {
     public static void SetCursorPosition(Index x, Index y) =>
         Std.SetCursorPosition(
             Math.Clamp(x.IsFromEnd ? Std.BufferWidth - x.Value : x.Value, 0, Std.BufferWidth - 1),
-            Math.Clamp(y.IsFromEnd ? Std.BufferHeight - y.Value : y.Value, 0, Std.BufferWidth - 1));
+            Math.Clamp(y.IsFromEnd ? Std.BufferHeight - y.Value : y.Value, 0, Std.BufferHeight - 1));
 
 
     // ===================================================================================== //
@@ -786,7 +786,10 @@ public static partial class NKConsole {
     /// <param name="image">The bitmap image to render.</param>
     /// <param name="x">The x-coordinate of the starting position.</param>
     /// <param name="y">The y-coordinate of the starting position.</param>
-    public static void WriteSixel(SKBitmap image, int x, int y) => WriteSixel(image, ^x, ^y);
+    public static void WriteSixel(SKBitmap image, int x, int y) {
+        if (x < 0 || y < 0) return;
+        WriteSixel(image, ^x, ^y);
+    }
 
     /// <summary>
     /// Renders a given bitmap image as a sixel graphic at a specified position in the console.
@@ -815,7 +818,7 @@ public static partial class NKConsole {
         int x,     int     y,
         int width, int     height,
         SKSamplingOptions? sampling = null)
-            => WriteSixel(image, ^x, ^y, width, height, sampling);
+            => WriteSixel(image, x < 0 ? 0 : ^x, y < 0 ? 0 : ^y, width, height, sampling);
 
     /// <summary>
     /// Renders a given image as a sixel graphic at the specified position in the console.
@@ -832,6 +835,8 @@ public static partial class NKConsole {
         int   width, int   height,
         SKSamplingOptions? sampling = null) 
     {
+        if (width <= 0 || height <= 0) return;
+        
         var bmp = new SKBitmap(width, height);
         image.ScalePixels(bmp, sampling ?? SKSamplingOptions.Default);
         

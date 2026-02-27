@@ -140,7 +140,18 @@ public class NKCharCanvas : ICharCanvas {
     
     public void PlaceSixel(SKBitmap image, Point2D offset, Size2D size, Size2D charSize, int zIndex = 0) {
         _images.Add(new SixelImageInfo(image, size, charSize, offset, zIndex));
-        _data.Fill(() => CellInfo.GetNull(zIndex), offset, charSize);
+
+        // calculate visible region
+        var startX = Math.Max(0, offset.X);
+        var startY = Math.Max(0, offset.Y);
+        var endX   = Math.Min(_data.XSize, offset.X + charSize.X);
+        var endY   = Math.Min(_data.YSize, offset.Y + charSize.Y);
+
+        var width  = endX - startX;
+        var height = endY - startY;
+
+        if (width > 0 && height > 0)
+            _data.Fill(() => CellInfo.GetNull(zIndex), new Point2D(startX, startY), new Size2D(width, height));
     }
 
     public ISixelImageInfo[] GetSixels() {

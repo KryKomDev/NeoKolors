@@ -87,6 +87,7 @@
     <AutoCompound Symbol="´" BaseId="accent">
         <Align>top-center</Align>
         <Applicable>
+            <Chars>aeiouyAEIOUY</Chars>
             <Group>vowels</Group>
         </Applicable>
     </AutoCompound>
@@ -94,7 +95,7 @@
     <AutoCompound Symbol="ˇ" BaseId="caron">
         <Align>top-center</Align>
         <Applicable>
-            <Chars>ertsdzcn</Chars>
+            <Chars>ertsdzcnERTSDZCN</Chars>
         </Applicable>
     </AutoCompound>
 

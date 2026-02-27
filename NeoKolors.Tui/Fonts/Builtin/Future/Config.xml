@@ -5,7 +5,7 @@
     <LineSpacing>1</LineSpacing>
     
     <Global>
-        <Mask>custom-forg,.</Mask>
+        <Mask>forg</Mask>
     </Global>
     
     <Variable>

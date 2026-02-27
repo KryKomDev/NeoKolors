@@ -273,7 +273,7 @@ public class NKFont : IFont {
 
             var xOffset = computeXOffset(lineData.Width, bounds.Width) + bounds.LowerX;
 
-            y += lineData.Height;
+            var lineBaseline = y + lineData.Baseline;
             int x = xOffset;
             
             for (int j = 0; j < lineTokens.Length; j++) {
@@ -286,7 +286,7 @@ public class NKFont : IFont {
                 
                 var glyph = GetGlyph(token);
 
-                var yp = y - glyph.BaselineOffset - glyph.Height;
+                var yp = lineBaseline - glyph.BaselineOffset - glyph.Height;
                 
                 canvas.Place(glyph.Glyph, new Point2D(x, yp));
                 canvas.Style(token.Style, new Point(x, yp), glyph.Glyph);
@@ -294,7 +294,7 @@ public class NKFont : IFont {
                 x += glyph.Width + charSpacing;
             }
             
-            y += lineSpacing;
+            y += lineData.Height + lineSpacing;
         }
     } 
 
@@ -333,7 +333,7 @@ public class NKFont : IFont {
 
             var xOffset = computeXOffset(lineData.Width, bounds.Width) + bounds.LowerX;
 
-            y += lineData.Height;
+            var lineBaseline = y + lineData.Baseline;
             int x = xOffset;
             
             for (int j = 0; j < lineTokens.Length; j++) {
@@ -347,13 +347,13 @@ public class NKFont : IFont {
 
                 x += lineData.Offsets[j];
                 
-                var idk = y - glyph.BaselineOffset - glyph.Height;
+                var yp = lineBaseline - glyph.BaselineOffset - glyph.Height;
                 
-                canvas.Place(glyph.Glyph, new Point2D(x, idk));
-                canvas.Style(token.Style, new Point(x, idk), glyph.Glyph);
+                canvas.Place(glyph.Glyph, new Point2D(x, yp));
+                canvas.Style(token.Style, new Point(x, yp), glyph.Glyph);
             }
             
-            y += lineSpacing;
+            y += lineData.Height + lineSpacing;
         }
     }
     
@@ -575,10 +575,10 @@ public class NKFont : IFont {
         if (tokens.Length == 0)
             return [];
         
-        // precompute widths and positions
+        // precompute dimensions relative to baseline
+        int[] up = new int[tokens.Length]; // distance from baseline to top
+        int[] dn = new int[tokens.Length]; // distance from baseline to bottom
         int[] widths = new int[tokens.Length];
-        int[] up     = new int[tokens.Length];
-        int[] dn     = new int[tokens.Length];
 
         for (int i = 0; i < tokens.Length; i++) {
             var t = tokens[i];
@@ -617,9 +617,12 @@ public class NKFont : IFont {
                     lastSpaceIndex = i;
                 } break;
                 case NEWLINE: {
+                    var lineUp = up.InRange(lineStart, i).Max();
+                    var lineDn = dn.InRange(lineStart, i).Min();
                     lines.Add(new LineData(
                         currentWidth, 
-                        up.InRange(lineStart, i).Max() - dn.InRange(lineStart, i).Min(),
+                        lineUp - lineDn,
+                        lineUp,
                         tokens.InRange(lineStart, i).ToArray()
                     ));
                     lineStart = i + 1;
@@ -631,10 +634,13 @@ public class NKFont : IFont {
             if (currentWidth > maxWidth) {
                 if (lastSpaceIndex.HasValue) {
                     var si = lastSpaceIndex.Value;
+                    var lineUp = up.InRange(lineStart, si).Max();
+                    var lineDn = dn.InRange(lineStart, si).Min();
                     
                     lines.Add(new LineData(
                         lastSpaceWidth,
-                        up.InRange(lineStart, si).Max() - dn.InRange(lineStart, si).Min(),
+                        lineUp - lineDn,
+                        lineUp,
                         tokens.InRange(lineStart, si).ToArray()
                     ));
 
@@ -646,15 +652,19 @@ public class NKFont : IFont {
                     lines.Add(new LineData(
                         currentWidth,
                         up[i] - dn[i],
+                        up[i],
                         [tokens[i]]
                     ));
 
                     lineStart++;
                 }
                 else {
+                    var lineUp = up.InRange(lineStart, i).Max();
+                    var lineDn = dn.InRange(lineStart, i).Min();
                     lines.Add(new LineData(
                         lastWidth, 
-                        up.InRange(lineStart, i).Max() - dn.InRange(lineStart, i).Min(), 
+                        lineUp - lineDn, 
+                        lineUp,
                         tokens.InRange(lineStart, i).ToArray()
                     ));
                 }
@@ -666,9 +676,12 @@ public class NKFont : IFont {
         }
 
         if (lineStart < tokens.Length) {
+            var lineUp = up.Skip(lineStart).Max();
+            var lineDn = dn.Skip(lineStart).Min();
             lines.Add(new LineData(
                 currentWidth,
-                up.Skip(lineStart).Max() - dn.Skip(lineStart).Min(),
+                lineUp - lineDn,
+                lineUp,
                 tokens.Skip(lineStart).ToArray()
             ));
         }
@@ -680,7 +693,7 @@ public class NKFont : IFont {
         if (tokens.Length == 0)
             return [];
         
-        // precompute offsets
+        // precompute dimensions relative to baseline
         int[] offsets = new int[tokens.Length];
         int[] widths  = new int[tokens.Length];
         int[] up      = new int[tokens.Length];
@@ -755,9 +768,12 @@ public class NKFont : IFont {
                     lastSpaceWidth = currentWidth;
                 } break;
                 case NEWLINE: {
+                    var lineUp = up.InRange(lineStart, i).Max();
+                    var lineDn = dn.InRange(lineStart, i).Min();
                     lines.Add(new LineData(
                         currentWidth, 
-                        up     .InRange(lineStart, i).Max() - dn.InRange(lineStart, i).Min(),
+                        lineUp - lineDn,
+                        lineUp,
                         tokens .InRange(lineStart, i).ToArray(),
                         offsets.InRange(lineStart, i).ToArray()
                     ));
@@ -773,10 +789,13 @@ public class NKFont : IFont {
             if (currentWidth > maxWidth) {
                 if (lastSpaceIndex.HasValue) {
                     var j = lastSpaceIndex.Value;
+                    var lineUp = up.InRange(lineStart, j).Max();
+                    var lineDn = dn.InRange(lineStart, j).Min();
                     
                     lines.Add(new LineData(
                         lastSpaceWidth,
-                        up     .InRange(lineStart, j).Max() - dn.InRange(lineStart, j).Min(),
+                        lineUp - lineDn,
+                        lineUp,
                         tokens .InRange(lineStart, j).ToArray(),
                         offsets.InRange(lineStart, j).ToArray()
                     ));
@@ -788,6 +807,7 @@ public class NKFont : IFont {
                     lines.Add(new LineData(
                         currentWidth,
                         up[i] - dn[i],
+                        up[i],
                         [tokens [i]],
                         [offsets[i]]
                     ));
@@ -795,9 +815,12 @@ public class NKFont : IFont {
                     lineStart++;
                 }
                 else {
+                    var lineUp = up.InRange(lineStart, i).Max();
+                    var lineDn = dn.InRange(lineStart, i).Min();
                     lines.Add(new LineData(
                         lastWidth,
-                        up     .InRange(lineStart, i).Max() - dn.InRange(lineStart, i).Min(),
+                        lineUp - lineDn,
+                        lineUp,
                         tokens .InRange(lineStart, i).ToArray(),
                         offsets.InRange(lineStart, i).ToArray()
                     ));
@@ -818,9 +841,12 @@ public class NKFont : IFont {
 
         // add remaining tokens
         if (lineStart < tokens.Length) {
+            var lineUp = up.Skip(lineStart).Max();
+            var lineDn = dn.Skip(lineStart).Min();
             lines.Add(new LineData(
                 currentOffset + widths[tokens.Length - 1],
-                up     .Skip(lineStart).Max() - dn.Skip(lineStart).Min(),
+                lineUp - lineDn,
+                lineUp,
                 tokens .Skip(lineStart).ToArray(),
                 offsets.Skip(lineStart).ToArray()
             ));
@@ -855,6 +881,11 @@ public class NKFont : IFont {
         public int Height { get; } = 0;
 
         /// <summary>
+        /// Represents the vertical position of the baseline relative to the top of the line box.
+        /// </summary>
+        public int Baseline { get; } = 0;
+
+        /// <summary>
         /// A collection of tokens representing glyphs for a line of text.
         /// </summary>
         /// <remarks>
@@ -880,21 +911,23 @@ public class NKFont : IFont {
             Tokens = tokens;
         }
         
-        public LineData(int width, int height, Token[] tokens) {
+        public LineData(int width, int height, int baseline, Token[] tokens) {
             Width = width;
             Height = height;
+            Baseline = baseline;
             Tokens = tokens;
         }
         
-        public LineData(int width, int height, Token[] tokens, int[] offsets) {
+        public LineData(int width, int height, int baseline, Token[] tokens, int[] offsets) {
             Width = width;
             Height = height;
+            Baseline = baseline;
             Tokens = tokens;
             Offsets = offsets;
         }
 
         public override string ToString() {
-            return $"LineData(Width: {Width}, Height: {Height}, Tokens: {Tokens.Length}, string: {
+            return $"LineData(Width: {Width}, Height: {Height}, Baseline: {Baseline}, Tokens: {Tokens.Length}, string: {
                 Tokens.Select(t => t.Type switch {
                     AUTO_COMPOUND => t.Data!.Value.AsT2.Main.ToString() + t.Data.Value.AsT2.Second,
                     INVALID => "\uf059", 
@@ -1004,8 +1037,14 @@ public class NKFont : IFont {
 
     #endregion
 
-    private IGlyph GetAutoCompoundGlyph(AutoCompoundToken token) 
-        => _autoCompoundGlyphs[token.Second].GetGlyph(_simpleGlyphs[token.Main].Glyph);
+    private IGlyph GetAutoCompoundGlyph(AutoCompoundToken token) {
+        var info = _autoCompoundGlyphs[token.Second];
+        var main = _simpleGlyphs[token.Main].Glyph;
+        
+        // The base character (main) should be the anchor ('first' in NKCompoundGlyph)
+        // and the diacritic (info.BaseGlyph) should be aligned relative to it.
+        return new NKCompoundGlyph(main, info.BaseGlyph, info.Alignment);
+    }
 
     private IGlyph GetGlyph(Token token) {
         return token.Type switch {

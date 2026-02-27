@@ -82,7 +82,7 @@ public struct Rectangle : IEquatable<Rectangle> {
     
     public Point Lower => new(_lowerX, _lowerY);
     public Point Higher => new(_higherX, _higherY);
-    public Range XRange => new(LowerX, HigherY);
+    public Range XRange => new(LowerX, HigherX);
     public Range YRange => new(LowerY, HigherY);
 
     public Rectangle(int lowerX, int lowerY, int higherX, int higherY) {

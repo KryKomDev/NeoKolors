@@ -1,14 +1,21 @@
 ﻿// NeoKolors
 // Copyright (c) 2026 KryKom
 
+using System.Reflection;
 using NeoKolors.Tui.Fonts.Serialization;
 
 namespace NeoKolors.Tui.Fonts;
 
 public static class FontAtlas {
+    private static readonly NKLogger LOGGER = NKDebug.GetLogger("FontAtlas");
+    
     private static readonly Dictionary<string, IFont> FONTS = new();
 
     static FontAtlas() {
+        foreach (var res in Assembly.GetCallingAssembly().GetManifestResourceNames()) {
+            LOGGER.Debug($"Found resource: '{res}'");
+        }
+        
         LoadBuiltin();
     }
     

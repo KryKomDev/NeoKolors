@@ -10,11 +10,11 @@ public static class CharExtensions {
     
     private static readonly HashSet<char> VOWELS_L = [
         'a', 'e', 'i', 'o', 'u', 'y',
-        'á', 'à', 'â', 'ä', 'ã', 'å', 'æ',
-        'é', 'è', 'ê', 'ë',
-        'í', 'ì', 'î', 'ï',
-        'ó', 'ò', 'ô', 'ö', 'õ', 'ø',
-        'ú', 'ù', 'û', 'ü',
+        'á', 'à', 'â', 'ä', 'ã', 'å', 'æ', 'ą', 'ă',
+        'é', 'è', 'ê', 'ë', 'ě', 'ę', 'ĕ',
+        'í', 'ì', 'î', 'ï', 'ĭ',
+        'ó', 'ò', 'ô', 'ö', 'õ', 'ø', 'ő',
+        'ú', 'ù', 'û', 'ü', 'ů', 'ű',
         'ý', 'ÿ'
     ];
 
@@ -24,8 +24,11 @@ public static class CharExtensions {
         ['\u0300'] = '`', // grave accent
         ['\u0301'] = '´', // acute accent
         ['\u0302'] = '^', // circumflex
+        ['\u0308'] = '¨', // diaeresis (umlaut)
         ['\u030C'] = 'ˇ', // caron
         ['\u0303'] = '~', // tilde
+        ['\u0327'] = '¸', // cedilla
+        ['\u030A'] = '˚', // ring above
     };
 
     extension(char) {
@@ -94,10 +97,14 @@ public static class CharExtensions {
             char? diacritics = null;
         
             foreach (char c in s) {
-                if (CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.NonSpacingMark)
+                if (CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.NonSpacingMark) {
+                    // we currently only support one diacritic in the TUI, 
+                    // so we take the last one (or first, but let's stick to simple logic for now)
                     diacritics = c;
-                else
+                }
+                else {
                     baseChar = c;
+                }
             }
 
             // remap diacritics if requested

@@ -553,7 +553,7 @@ public static partial class NKConsole {
         if (!InterceptInput) {
             var res = ReadUntil('t', true);
             var split = res.Split(';');
-            return new Size2D(int.Parse(split[1]), int.Parse(split[2]));
+            return new Size2D(int.Parse(split[2]), int.Parse(split[1]));
         }
         
         var tcs = new TaskCompletionSource<Size2D>();

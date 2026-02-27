@@ -122,11 +122,18 @@ public static class NKFontStringTokenizer {
                     success = true;
                 }
 
-                if (!success) continue;
+                if (success) {
+                    tokens.Add(token!.Value);
+                    i += 1;
+                    continue;
+                }
                 
-                tokens.Add(token!.Value);
-                i += 1;
-                continue;
+                // fallback to simple glyph if auto-compound fails
+                if (font.HasSimple(st)) {
+                    tokens.Add(Token.Simple(st, chars[i].Style));
+                    i += 1;
+                    continue;
+                }
             }
             
             tokens.Add(Token.Invalid(chars[i].Style));

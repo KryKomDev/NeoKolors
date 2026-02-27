@@ -24,7 +24,10 @@ public class Image : AbstractElement<SKBitmap> {
     
     private void UpdateImage(string path) {
         if (!string.IsNullOrEmpty(path) && File.Exists(path)) {
-            _image = SKBitmap.Decode(path);
+            var bmp = SKBitmap.Decode(path);
+            if (bmp != null) {
+                _image = bmp;
+            }
         }
     }
 
@@ -45,7 +48,7 @@ public class Image : AbstractElement<SKBitmap> {
         
         var pos = new Point(
             _style.Position.AbsoluteX ? _style.Position.X.ToScalar(rect.Width) : rect.LowerX + _style.Position.X.ToScalar(rect.Width), 
-            _style.Position.AbsoluteY ? _style.Position.Y.ToScalar(rect.Width) : rect.LowerY + _style.Position.Y.ToScalar(rect.Height)
+            _style.Position.AbsoluteY ? _style.Position.Y.ToScalar(rect.Height) : rect.LowerY + _style.Position.Y.ToScalar(rect.Height)
         );
         
         if (!_style.BackgroundColor.IsInherit) {
@@ -96,17 +99,23 @@ public class Image : AbstractElement<SKBitmap> {
     private static Size CharsToPixels(Size chars) {
         var px = ScreenSizeTracker.GetScreenSizePx();
         var ch = ScreenSizeTracker.GetScreenSizeCh();
-        var fx = (float)px.Width  / ch.Width;
-        var fy = (float)px.Height / ch.Height;
+        
+        // default 9x18 ratio if screen size is not available
+        var fx = (ch.Width  == 0 || px.Width  == 0) ? 9.0f  : (float)px.Width  / ch.Width;
+        var fy = (ch.Height == 0 || px.Height == 0) ? 18.0f : (float)px.Height / ch.Height;
+        
         return new Size((int)(fx * chars.Width), (int)(fy * chars.Height));
     }
 
     private static SizeF PixelsToChars(Size pixels) {
         var px = ScreenSizeTracker.GetScreenSizePx();
         var ch = ScreenSizeTracker.GetScreenSizeCh();
-        var fx = (float)ch.Width  / px.Width;
-        var fy = (float)ch.Height / px.Height;
-        return new SizeF((int)(fx * pixels.Width), (int)(fy * pixels.Height));
+        
+        // default 9x18 ratio if screen size is not available
+        var fx = (ch.Width  == 0 || px.Width  == 0) ? 1.0f / 9.0f  : (float)ch.Width  / px.Width;
+        var fy = (ch.Height == 0 || px.Height == 0) ? 1.0f / 18.0f : (float)ch.Height / px.Height;
+        
+        return new SizeF(fx * pixels.Width, fy * pixels.Height);
     }
 
     /// <summary>
@@ -133,6 +142,7 @@ public class Image : AbstractElement<SKBitmap> {
     }
 
     private static Size ComputeImageSize_Fit(SizeF image, Size content) {
+        if (image.Width <= 0 || image.Height <= 0) return Size.Zero;
         var f = MathF.Min(content.Width / image.Width, content.Height / image.Height);
         return new Size((int)(f * image.Width), (int)(f * image.Height));
     }
