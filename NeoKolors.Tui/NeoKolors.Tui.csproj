@@ -11,7 +11,7 @@
 
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
-        <Version>2026.1-alpha2</Version>
+        <Version>2026.1-alpha3</Version>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
@@ -62,8 +62,8 @@
 <!--    </ItemGroup>-->
     
     <ItemGroup>
-        <EmbeddedResource Include="./Fonts/Builtin/Bytesized.nkf" LogicalName="NeoKolors.Tui.Fonts.Builtin.Bytesized.nkf"/>
-        <EmbeddedResource Include="./Fonts/Builtin/Dummy1.nkf" LogicalName="NeoKolors.Tui.Fonts.Builtin.Dummy1.nkf"/>
-        <EmbeddedResource Include="./Fonts/Builtin/Future.nkf" LogicalName="NeoKolors.Tui.Fonts.Builtin.Future.nkf"/>
+        <EmbeddedResource Include="./Fonts/Builtin/Bytesized.nkf"/>
+        <EmbeddedResource Include="./Fonts/Builtin/Dummy1.nkf"/>
+        <EmbeddedResource Include="./Fonts/Builtin/Future.nkf"/>
     </ItemGroup>
 </Project>

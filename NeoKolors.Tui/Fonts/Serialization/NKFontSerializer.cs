@@ -347,7 +347,7 @@ public static class NKFontSerializer {
     /// <returns>The deserialized <see cref="NKFont"/> object if the embedded resource is found and successfully resolved;
     /// otherwise, null if the resource cannot be located.</returns>
     internal static NKFont? ReadInternal(string name)
-        => ReadEmbedded<NKFont>($"{typeof(NKFont).Assembly.GetName()}.Fonts.Builtin.{name}.nkf");
+        => ReadEmbedded<NKFont>($"{typeof(NKFont).Assembly.GetName().Name}.Fonts.Builtin.{name}.nkf");
 
     // --------------------- PRIVATE METHODS --------------------- //
     
