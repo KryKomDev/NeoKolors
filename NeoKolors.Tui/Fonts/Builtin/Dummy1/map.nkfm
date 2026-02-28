@@ -76,22 +76,38 @@
     
     <Component Symbol="¨" Id="umlaut" File="diacritics/umlaut.nkg" />
     <Component Symbol="´" Id="accent" File="diacritics/accent.nkg" />
+    <Component Symbol="ˇ" Id="grave" File="diacritics/grave.nkg" />
+    <Component Symbol="°" Id="circle" File="diacritics/circle.nkg" />
 
     <Ligature Symbol="->" Id="arr-right" File="ligatures/arr-right.nkg">
         <Baseline>0</Baseline>
         <AlignPointReplace>custom,r</AlignPointReplace>
     </Ligature>
     
-    <Compound Symbol="Ä" Id="A-umlaut">
-        <Main>A</Main>
-        <Secondary>umlaut</Secondary>
-        <Align>custom,+</Align>
-    </Compound>
+<!--    <Compound Symbol="Ä" Id="A-umlaut">-->
+<!--        <Main>A</Main>-->
+<!--        <Secondary>umlaut</Secondary>-->
+<!--        <Align>custom,+</Align>-->
+<!--    </Compound>-->
     
     <AutoCompound Symbol="´" BaseId="accent">
         <Align>custom,+</Align>
         <Applicable>
             <Group>vowels</Group>
+        </Applicable>
+    </AutoCompound>
+    
+    <AutoCompound Symbol="ˇ" BaseId="grave">
+        <Align>custom,+</Align>
+        <Applicable>
+            <Chars>cdenrstzCDENRSTZ</Chars>
+        </Applicable>
+    </AutoCompound>
+    
+    <AutoCompound Symbol="°" BaseId="circle">
+        <Align>custom,+</Align>
+        <Applicable>
+            <Chars>uUaAeEuU</Chars>
         </Applicable>
     </AutoCompound>
 </FontMap>
