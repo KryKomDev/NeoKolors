@@ -842,6 +842,7 @@ resharper_web_config_module_not_resolved_highlighting = warning
 resharper_web_config_type_not_resolved_highlighting = warning
 resharper_web_config_wrong_module_highlighting = warning
 resharper_convert_to_auto_property_highlighting = hint
+resharper_arrange_method_or_operator_body_highlighting = hint
 
 # ReSharper inspection severities
 
