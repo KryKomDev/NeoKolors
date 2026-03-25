@@ -5,6 +5,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using HasFlagExtension;
+using NeoKolors.Extensions;
 
 namespace NeoKolors.Console.Driver.Windows;
 
@@ -31,12 +33,16 @@ internal partial class WinImports {
 
     /// <seealso href="https://learn.microsoft.com/en-us/windows/console/key-event-record-str#members"/>
     [Flags]
+    [FlagGroup("Alt",  "Has")]
+    [FlagGroup("Ctrl", "Has")]
     internal enum WinKeyModifiers : uint {
         NONE        = 0x0000,
-        RIGHT_ALT   = 0x0001,
-        LEFT_ALT    = 0x0002,
-        RIGHT_CTRL  = 0x0004,
-        LEFT_CTRL   = 0x0008,
+        
+        [FlagGroup("Alt") ] RIGHT_ALT  = 0x0001,
+        [FlagGroup("Alt") ] LEFT_ALT   = 0x0002,
+        [FlagGroup("Ctrl")] RIGHT_CTRL = 0x0004,
+        [FlagGroup("Ctrl")] LEFT_CTRL  = 0x0008,
+        
         SHIFT       = 0x0010,
         NUMLOCK     = 0x0020,
         SCROLL_LOCK = 0x0040,
@@ -47,11 +53,11 @@ internal partial class WinImports {
     /// <seealso href="https://learn.microsoft.com/en-us/windows/console/key-event-record-str"/>
     [StructLayout(LayoutKind.Explicit, Size = 16, CharSet = CharSet.Unicode)]
     public readonly record struct WinKeyEvent(
-        bool           Down,
-        ushort         RepeatCount, 
+        bool              Down,
+        ushort            RepeatCount, 
         WinVirtualKeyCode VirtualKeyCode, 
-        ushort         VirtualScanCode,
-        char           Char,
+        ushort            VirtualScanCode,
+        char              Char,
         WinKeyModifiers   Modifiers)
     {
         [field: FieldOffset(0)]  
@@ -80,10 +86,10 @@ internal partial class WinImports {
         public override string ToString() 
             => $"KeyEvent(" +
                 $"{(Down ? "down" : "up")}, " +
-                $"{RepeatCount}, " +
+                $"{RepeatCount}x, " +
                 $"{VirtualKeyCode}, " +
                 $"{VirtualScanCode}, " +
-                $"{Char}, " +
+                $"{char.ToDisplay(Char)}, " +
                 $"{Modifiers})";
     }
     

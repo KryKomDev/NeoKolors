@@ -4,7 +4,7 @@
 using NeoKolors.Console.Events;
 using NeoKolors.Tui.Events;
 using System.Diagnostics;
-using NeoKolors.Console.Ansi.Mouse;
+using NeoKolors.Console.Driver;
 using NeoKolors.Console.Input;
 using NeoKolors.Tui.Extensions;
 using NeoKolors.Tui.Global;
@@ -59,8 +59,8 @@ public class NKApplication : IMouseSupportingApplication {
     public void Start() {
         
         // configure console
-        NKConsole.MouseReportProtocol = Config.MouseReportProtocol;
-        NKConsole.MouseReportLevel    = Config.MouseReportLevel;
+        // NKConsole.MouseReportProtocol = Config.MouseReportProtocol;
+        // NKConsole.MouseReportLevel    = Config.MouseReportLevel;
         NKConsole.BracketedPasteMode  = Config.BracketedPaste;
         
         if (Config.PauseOnFocusLost) {
@@ -79,7 +79,7 @@ public class NKApplication : IMouseSupportingApplication {
         }
         
         NKConsole.EnableAltBuffer();
-        NKConsole.EnableMouseEvents();
+        NKConsole.InputDriver.Config.MouseConfig = ReportedMouseEvents.ALL;
         NKConsole.StartInputInterception();
 
         // configure app
@@ -104,7 +104,7 @@ public class NKApplication : IMouseSupportingApplication {
     }
 
     private void FinalizeRun() {
-        NKConsole.MouseReportLevel = MouseReportLevel.NONE;
+        NKConsole.InputDriver.Config.MouseConfig = ReportedMouseEvents.NONE;
         
         if (Config.PauseOnFocusLost) {
             NKConsole.ReportFocus    = false;
@@ -198,9 +198,30 @@ public class NKApplication : IMouseSupportingApplication {
             }
         }
         
-        LOGGER.Info($"\nTotal frames delayed: {delayedCount}" +
-                    $"\nTotal delay: {totalDelay}" +
-                    $"\nAverage delay per frame: {totalDelay / delayedCount}");
+        LOGGER.Info(
+            $"\n  Total frames delayed:    {delayedCount}" +
+            $"\n  Total delay:             {totalDelay}" +
+            $"\n  Average delay per frame: {totalDelay / delayedCount}"
+        );
+
+        #if NK_RENDERING_PROFILING
+        LOGGER.Debug(
+            $"\n  Screen rendering:    {_screen.ScrTotalTime}" +
+            $"\n   ├ Writing time:     {_screen.WritingTime}" +
+            $"\n   ├ Positioning time: {_screen.PosTime}" +
+            $"\n   ├ Computation time: {_screen.CompTime}" +
+            $"\n   ┆  ├ Access time:   {_screen.AccessTime}" +
+            $"\n   ╵  └ EscSeq time:   {_screen.EscseqTime}" +
+            $"\n  Sixel time:          {_screen.SixelTime}" +
+            $"\n  Total time:          {_screen.ScrTotalTime + _screen.SixelTime}"
+        );
+        
+        LOGGER.Debug(
+            $"\n  Cursor positioning:" +
+            $"\n   ├ Bounds check: {NKConsole.CursorPosition_BoundsCheckTime}" +
+            $"\n   └ Position set: {NKConsole.CursorPosition_SetPosTime}"
+        );
+        #endif
     }
     
     private void Render() {
@@ -213,7 +234,7 @@ public class NKApplication : IMouseSupportingApplication {
             _lastSize = Stdio.BufferSize;
             _screen.Resize(_lastSize.Width, _lastSize.Height);
             InvokeResizeEvent(new ResizeEventArgs(_lastSize.Width, _lastSize.Height));
-            _lasPixelSize = NKConsole.GetScreenSizePx();
+            _lasPixelSize = NKConsole.GetBuffSizePx();
             ScreenSizeTracker.SetScreenSizeCh(_lastSize);
             ScreenSizeTracker.SetScreenSizePx(_lasPixelSize);
         }

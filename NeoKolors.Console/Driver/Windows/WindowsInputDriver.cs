@@ -5,14 +5,13 @@
 
 using System.Diagnostics;
 using Metriks;
-using NeoKolors.Common;
 using NeoKolors.Console.Ansi;
 using NeoKolors.Console.Events;
 using NeoKolors.Console.Input;
 
 namespace NeoKolors.Console.Driver.Windows;
 
-public sealed class WindowsInputDriver : IInputDriver {
+public sealed class WindowsInputDriver : IInputDriver<WinInputDriverConfig> {
     
     private static readonly NKLogger LOGGER = NKDebug.GetLogger(nameof(WindowsInputDriver));
 
@@ -22,31 +21,31 @@ public sealed class WindowsInputDriver : IInputDriver {
     public event FocusOutEventHandler? FocusOut = ( ) => { };
     public event ResizeEventHandler?   Resize   = (_) => { };
     public event PasteEventHandler?    Paste    = (_) => { };
-    
-    public event VTQueryResponseHandler? VTQuery {
-        add    => _parser.VTQuery += value;
-        remove => _parser.VTQuery -= value;
-    }
-    
-    private          bool                 _useReadKey;
-    private          bool                 _disposed = false;
-    private          Thread?              _inputThread;
-    private readonly WindowsInput         _input;
-    private readonly AnsiInputParser      _parser;
-    private readonly WinInputDriverConfig _config;
 
-    private readonly Queue<EscapeCodes.DecMode> _decReqQueue = new();
-    private readonly Queue<EscapeCodes.OscMode> _oscReqQueue = new();
+    public event VTQueryResponseHandler? VTQuery;
     
-    public void RequestDecMode(EscapeCodes.DecMode mode) => _decReqQueue.Enqueue(mode);
-    public void RequestOscMode(EscapeCodes.OscMode mode) => _oscReqQueue.Enqueue(mode);
+    private          bool                 _disposed     = false;
+    private          Thread?              _inputThread;
+    private          WinInputDriverConfig _config;
+    private          Size2D               _lastSize     = new();
+    private          bool                 _isStopped    = true;
+    private event    Action               _onStopped    = delegate { };
+    private readonly WindowsInput         _input;
+    private readonly WindowsAnsiParser    _parser;
+    private readonly LockObject           _queueLock    = new();
+    private readonly Queue<VTQuery>       _requestQueue = new();
 
     public bool IsRunning { get; private set; }
+    
+    public WinInputDriverConfig Config {
+        get => _config; 
+        set => _config = value;
+    }
 
-    public WindowsInputDriver(WinInputDriverConfig config) {
-        _config = config;
+    public WindowsInputDriver(WinInputDriverConfig? config = null) {
+        _config = config ?? new WinInputDriverConfig();
         _input  = new WindowsInput();
-        _parser = new AnsiInputParser(ReadNext, Invoke);
+        _parser = new WindowsAnsiParser(_input, Decode, _config.VTRequestTimeout, _config.RefreshInterval);
 
         // enable ctrl+c force quit
         if (_config.CtrlCForceQuits) {
@@ -56,7 +55,13 @@ public sealed class WindowsInputDriver : IInputDriver {
             };
         }
     }
-    
+
+    public void RequestVTQuery(VTQuery request) {
+        lock (_queueLock) {
+            _requestQueue.Enqueue(request);
+        }
+    }
+
     public void Start() {
         if (IsRunning || _disposed) 
             return;
@@ -77,34 +82,92 @@ public sealed class WindowsInputDriver : IInputDriver {
 
     private void Intercept() {
         var stopwatch = new Stopwatch();
+        _isStopped = false;
         
         while (IsRunning) {
-            stopwatch.Restart();
+            try {
+                stopwatch.Restart();
+                
+                if (_input.TryGetInputs(out var records)) {
+                    foreach (var r in records) {
+                        Decode(r);
+                    }
+                }
+                
+                // wait with processing ANSI requests until there is no input
+                if (_input.HasInput()) 
+                    continue;
+                
+                ProcessRequests();
 
-            if (_input.TryGetInput(out var records)) {
-                foreach (var r in records) {
-                    Decode(r);
+                var elapsed = stopwatch.Elapsed;
+
+                if (elapsed <= _config.RefreshInterval && !_input.HasInput()) {
+                    Thread.Sleep(_config.RefreshInterval - elapsed);
                 }
             }
-            
-            // DECREQ and OSCREQ
-            
-            var elapsed = stopwatch.Elapsed;
-
-            if (elapsed <= _config.RefreshInterval && !_input.HasInput()) {
-                Thread.Sleep(_config.RefreshInterval - elapsed);
+            catch (Exception e) {
+                LOGGER.Error($"Input interceptor error: {e.Message}");
+                Thread.Sleep(_config.RefreshInterval);
             }
+        }
+
+        _isStopped = true;
+    }
+
+    private void ProcessRequests() {
+        Queue<VTQuery>? currentRequests = null;
+        
+        // copy the queue
+        lock (_queueLock) {
+            if (_requestQueue.Count != 0) {
+                currentRequests = new Queue<VTQuery>(_requestQueue);
+                _requestQueue.Clear();
+            }
+        }
+        
+        // no requests
+        if (currentRequests == null) 
+            return;
+        
+        var failed = new List<VTQuery>();
+                    
+        // process individual requests
+        foreach (var request in currentRequests) {
+            NKConsole.Write(request.GetEscSeq());
+            
+            var parserResult = _parser.Parse(in request, out var response);
+                        
+            LOGGER.Debug(parserResult);
+            
+            // determine if the request should be repeated
+            if (parserResult == AnsiParser.ParserResult.SUCCESS)
+                VTQuery?.Invoke(response!.Value);
+            else
+                failed.Add(request);
+        }
+                    
+        if (failed.Count == 0)
+            return;
+        
+        // Enqueue back failed requests
+        lock (_queueLock) {
+            foreach (var f in failed) _requestQueue.Enqueue(f);
         }
     }
 
     private void Decode(WinImports.WinInputRecord record) {
         switch (record.Type) {
-            case WinImports.WinEventType.KEY:    { InvokeKey(record.Key);         } break;
-            case WinImports.WinEventType.MOUSE:  { InvokeMouse(record.Mouse);     } break;
+            case WinImports.WinEventType.KEY:    { InvokeKey   (record.Key   );   } break;
+            case WinImports.WinEventType.MOUSE:  { InvokeMouse (record.Mouse );   } break;
             case WinImports.WinEventType.RESIZE: { InvokeResize(record.Resize);   } break;
             case WinImports.WinEventType.MENU:   { /* ignored, used internally */ } break;
-            case WinImports.WinEventType.FOCUS:  { InvokeFocus(record.Focus);     } break;
-            default:                             throw new ArgumentOutOfRangeException();
+            case WinImports.WinEventType.FOCUS:  { InvokeFocus (record.Focus );   } break;
+            default: {
+                LOGGER.Error("Unexpected WinEventType: " + record.Type);
+                // throw new ArgumentOutOfRangeException(nameof(record.Type));
+                return;
+            }
         }
     }
 
@@ -117,8 +180,11 @@ public sealed class WindowsInputDriver : IInputDriver {
         ));
     }
 
-    private void InvokeResize(WinImports.WinResizeEvent resizeEvent) => 
-        Resize?.Invoke(new ResizeEventArgs(new Size2D(resizeEvent.Size.X, resizeEvent.Size.Y)));
+    private void InvokeResize(WinImports.WinResizeEvent resizeEvent) {
+        var s = new Size2D(resizeEvent.Size.X, resizeEvent.Size.Y);
+        _lastSize = s;
+        Resize?.Invoke(new ResizeEventArgs(s));
+    }
 
     private void InvokeMouse(WinImports.WinMouseEvent mouseEvent) {
         var mb = mouseEvent.Button;
@@ -154,36 +220,25 @@ public sealed class WindowsInputDriver : IInputDriver {
             FocusOut?.Invoke();
     }
 
-    private ConsoleKeyInfo ReadNext() {
-        if (_useReadKey) {
-            try {
-                return Stdio.ReadKey(true);
-            }
-            catch (InvalidOperationException) {
-                _useReadKey = false;
-            }
-        }
-        
-        int c = Stdio.Read();
-        
-        return c == -1 
-            ? throw new EndOfStreamException() 
-            : new ConsoleKeyInfo((char)c, 0, false, false, false);
-    }
+    public Size2D GetSize() => _lastSize;
 
-    private void Invoke(Action action) {
-        Task.Run(() => {
-            if (IsRunning) action();
-        });
-    }
-    
     public void Dispose() {
-        if (_disposed) 
+        if (_disposed)
             return;
+        
+        LOGGER.Info("Stopping Windows input interceptor...");
         
         Stop();
         
+        if (!_isStopped) {
+            var are = new AutoResetEvent(false);
+            var handler = void () => are.Set();
+
+            _onStopped += handler;
+            are.WaitOne();
+            _onStopped -= handler;
+        }
+        
         _disposed = true;
-        _input.Dispose();
     }
 }

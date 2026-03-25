@@ -62,7 +62,7 @@ should be inherited (something like transparent).
 
 ### NKConsoleColor
 
-Enum `NKConoleColor` contains 256 colors. It basically extends the `System.ConsoleColor` enum
+Enum `NKConsoleColor` contains 256 colors. It basically extends the `System.ConsoleColor` enum
 (although some values do not match). Apart from the basic 16 console colors, it also
 contains a 6x6x6 RGB color cube and 24 grayscale colors.
 

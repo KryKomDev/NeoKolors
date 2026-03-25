@@ -3,6 +3,7 @@
 // Copyright (c) 2026 KryKom
 //
 
+using NeoKolors.Console.Driver.Windows;
 using NeoKolors.Extensions;
 
 namespace NeoKolors.Console.Input;
@@ -12,10 +13,10 @@ namespace NeoKolors.Console.Input;
 /// and any active modifiers.
 /// </summary>
 public readonly record struct KeyEventArgs {
-    public KeyModifiers Modifiers { get; }
-    public KeyCode      Key       { get; }
-    public char         Char      { get; }
-    public bool         Down      { get; }
+    public KeyModifiers Modifiers { get; init; }
+    public KeyCode      Key       { get; init; }
+    public char         Char      { get; init; }
+    public bool         Down      { get; init; }
 
     public KeyEventArgs(KeyCode key, KeyModifiers modifiers, char c, bool down = true) {
         Modifiers = modifiers;
@@ -35,9 +36,14 @@ public readonly record struct KeyEventArgs {
     }
     
     public KeyEventArgs(ConsoleKeyInfo keyInfo) : this(keyInfo.Key, keyInfo.Modifiers, keyInfo.KeyChar) { }
-    
-    
-    
+
+    internal KeyEventArgs(WinImports.WinKeyEvent keyInfo) {
+        Modifiers = (KeyModifiers)keyInfo.Modifiers;
+        Key       = (KeyCode)keyInfo.VirtualKeyCode;
+        Char      = keyInfo.Char;
+        Down      = keyInfo.Down;
+    }
+
     public override string ToString() =>
         $"{(Modifiers != KeyModifiers.NONE ? $"{Modifiers.ToString()} + " : "")}{Key} -> {Char}";
 }

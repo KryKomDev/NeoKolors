@@ -2,6 +2,10 @@
 // Copyright (c) 2025 KryKom
 
 using NeoKolors.Console.Ansi.Mouse;
+using NeoKolors.Console.Driver;
+using NeoKolors.Console.Driver.Dotnet;
+using NeoKolors.Console.Driver.Linux;
+using NeoKolors.Console.Driver.Windows;
 using NeoKolors.Console.Events;
 using NeoKolors.Console.Input;
 using static NeoKolors.Common.EscapeCodes;
@@ -12,12 +16,107 @@ namespace NeoKolors.Console;
 
 public partial class NKConsole {
     
-    private static bool IS_ALT_BUFFER_ON;
-    private static MouseReportLevel MOUSE_REPORT_LEVEL = NONE;
-    private static bool REPORT_FOCUS;
-    private static bool BRACKETED_PASTE_MODE;
-
     private static readonly NKLogger LOGGER = NKDebug.GetLogger("NKConsole");
+    
+    private static bool             IS_ALT_BUFFER_ON;
+    private static MouseReportLevel MOUSE_REPORT_LEVEL = NONE;
+    private static bool             REPORT_FOCUS;
+    private static bool             BRACKETED_PASTE_MODE;
+
+    /// <summary>
+    /// Gets or sets the output driver responsible for handling all character-based output to the terminal.
+    /// </summary>
+    /// <remarks>
+    /// The output driver defines the mechanism through which text and formatted output
+    /// are rendered in the terminal. Depending on the environment or platform, different
+    /// implementations of the output driver may be used. For example,
+    /// - Windows systems may use <c>WindowsOutputDriver</c>.
+    /// - Unix-based a may use <c>LinuxOutputDriver</c>.
+    /// - Other platforms may fall back to <c>DotnetOutputDriver</c>.
+    /// This abstraction ensures that output operations are consistently handled across
+    /// various platforms, while providing flexibility for future extensions or custom implementations.
+    /// Modifying this property allows you to customize how the terminal output is generated.
+    /// </remarks>
+    /// <exception cref="System.InvalidOperationException">
+    /// Thrown if attempting to set the property while the current output driver is in use or disposed.
+    /// </exception>
+    public static IOutputDriver OutputDriver { get; set; } = GetDefaultOutput();
+
+    /// <summary>
+    /// Gets or sets the input driver responsible for processing console input events.
+    /// </summary>
+    /// <remarks>
+    /// The input driver serves as the mechanism for handling various types of input events
+    /// from a terminal or console, such as key presses, mouse interactions, focus changes,
+    /// and clipboard paste events. It acts as an abstraction layer that ensures input operations
+    /// are processed seamlessly across different platforms.
+    /// The default implementation of this property is platform-specific:
+    /// - For Windows environments, a <c>WindowsInputDriver</c> is used.
+    /// - For Unix-based systems, a <c>LinuxInputDriver</c> is employed.
+    /// - On other platforms, a generic implementation like <c>DotnetInputDriver</c> may be used.
+    /// This flexibility allows developers to customize input handling or extend functionality
+    /// by providing alternative driver implementations.
+    /// Changing this property during an active input session may lead to undesired behavior
+    /// or resource conflicts, as the driver manages its own lifecycle.
+    /// </remarks>
+    /// <exception cref="System.InvalidOperationException">
+    /// Thrown when attempting to modify this property while input interception is enabled or
+    /// the driver is actively processing input.
+    /// </exception>
+    public static IInputDriver InputDriver { get; set; } = GetDefaultInput();
+
+    private static IOutputDriver GetDefaultOutput() {
+        #if NK_ENABLE_NATIVE_IO
+        return Environment.OSVersion.Platform switch {
+            PlatformID.Win32Windows or PlatformID.Win32NT or PlatformID.Win32S or PlatformID.WinCE => 
+                new WindowsOutputDriver(),
+            PlatformID.Unix =>
+                new LinuxOutputDriver(),
+            PlatformID.MacOSX =>
+                new DotnetOutputDriver(), // TODO: create a frickin MacOSX driver
+            _ => new DotnetOutputDriver()
+        };
+        #else
+        return new DotnetOutputDriver();
+        #endif
+    }
+
+    private static IInputDriver GetDefaultInput() {
+        #if NK_ENABLE_NATIVE_IO
+        return Environment.OSVersion.Platform switch {
+            PlatformID.Win32Windows or PlatformID.Win32NT or PlatformID.Win32S or PlatformID.WinCE => 
+                new WindowsInputDriver(),
+            PlatformID.Unix =>
+                new LinuxInputDriver(),
+            PlatformID.MacOSX =>
+                new DotnetInputDriver(), // TODO: create a frickin MacOSX driver
+            _ => new DotnetInputDriver()
+        };
+        #else
+        return new DotnetInputDriver();
+        #endif
+    }
+
+    /// <summary>
+    /// Resets the input and output drivers to their default implementations
+    /// based on the operating system platform. This method is typically used
+    /// to restore the I/O drivers to their initial configurations after they
+    /// have been modified.
+    /// </summary>
+    public static void ResetIoDrivers() {
+        InputDriver  = GetDefaultInput ();
+        OutputDriver = GetDefaultOutput();
+    }
+
+    /// <summary>
+    /// Configures the console to use .NET-based input and output drivers. This method
+    /// replaces the current I/O drivers with instances of DotnetInputDriver and
+    /// DotnetOutputDriver, which are designed for compatibility with .NET platforms.
+    /// </summary>
+    public static void UseDotnetDrivers() {
+        InputDriver  = new DotnetInputDriver ();
+        OutputDriver = new DotnetOutputDriver();
+    }
 
     public static bool IsAltBufferOn {
         get => IS_ALT_BUFFER_ON;
@@ -49,109 +148,6 @@ public partial class NKConsole {
         IS_ALT_BUFFER_ON = false;
         LOGGER.Info($"Alt buffer set to {IS_ALT_BUFFER_ON}");
     }
-
-    /// <summary>
-    /// Gets or sets the current mouse reporting protocol for the terminal.
-    /// </summary>
-    /// <remarks>
-    /// The mouse reporting protocol determines the format in which mouse events are sent to the program through
-    /// the terminal. The available protocols are:
-    /// - X10: The legacy mouse reporting protocol.
-    /// - UTF8: A protocol that encodes mouse events using UTF-8.
-    /// - SGR: A modern protocol that includes more precise mouse information and extended functionality.
-    /// When the property is set to a specific protocol, the terminal will be configured to use that protocol
-    /// for later mouse events. Changing the protocol updates both the internal state and the terminal settings.
-    /// </remarks>
-    /// <exception cref="System.ArgumentOutOfRangeException">
-    /// Thrown when an unsupported value is assigned to this property.
-    /// </exception>
-    public static MouseReportProtocol MouseReportProtocol {
-        get;
-        set {
-            switch (field) {
-                case MouseReportProtocol.X10: break;
-                case MouseReportProtocol.UTF8: Std.Write(MOUSE_EV_UTF8_OFF); break;
-                case MouseReportProtocol.SGR: Std.Write(MOUSE_EV_SGR_OFF); break;
-                case MouseReportProtocol.SGR_PIXELS: Std.Write(MOUSE_EV_SGR_PIXELS_OFF); break;
-                default: throw new ArgumentOutOfRangeException(nameof(value), value, null);
-            }
-            switch (value) {
-                case MouseReportProtocol.X10: break;
-                case MouseReportProtocol.UTF8: Std.Write(MOUSE_EV_UTF8_ON); break;
-                case MouseReportProtocol.SGR: Std.Write(MOUSE_EV_SGR_ON); break;
-                case MouseReportProtocol.SGR_PIXELS: Std.Write(MOUSE_EV_SGR_PIXELS_ON); break;
-                default: throw new ArgumentOutOfRangeException(nameof(value), value, null);
-            }
-
-            field = value;
-            LOGGER.Info($"Mouse reporting protocol set to {value}");
-        }
-    } = MouseReportProtocol.X10;
-
-    /// <summary>
-    /// Gets or sets the mouse reporting level for the terminal.
-    /// </summary>
-    /// <remarks>
-    /// The mouse reporting level specifies the types of mouse events that the terminal reports to the program.
-    /// The possible levels are:
-    /// - NONE: Disable all mouse event reporting.
-    /// - PRESS: Report mouse button presses only.
-    /// - PRESS_RELEASE: Report mouse button presses and releases.
-    /// - DRAG: Report button presses, releases, and drag events.
-    /// - MOVE: Report all mouse events, including movement and all button interactions.
-    /// Changing the value of this property updates the terminal to reflect the selected reporting level.
-    /// </remarks>
-    /// <exception cref="System.ArgumentOutOfRangeException">
-    /// Thrown when an unsupported value is assigned to this property.
-    /// </exception>
-    public static MouseReportLevel MouseReportLevel {
-        get => MOUSE_REPORT_LEVEL;
-        set {
-            DisableCurrentMouseReport();
-            
-            switch (value) {
-                case NONE: break;
-                case PRESS: Std.Write(MOUSE_EV_ON_P_ON); break;
-                case PRESS_RELEASE: Std.Write(MOUSE_EV_ON_PR_ON); break;
-                case DRAG: Std.Write(MOUSE_EV_ON_PRD_ON); break;
-                case ALL: Std.Write(MOUSE_EV_ON_ALL_ON); break;
-                default: throw new ArgumentOutOfRangeException(nameof(value), value, null);
-            }
-
-            MOUSE_REPORT_LEVEL = value;
-            LOGGER.Info($"Mouse reporting level set to {value}");
-        }
-    }
-
-    private static void DisableCurrentMouseReport() {
-        switch (MOUSE_REPORT_LEVEL) {
-            case NONE: break;
-            case PRESS: Std.Write(MOUSE_EV_ON_P_OFF); break;
-            case PRESS_RELEASE: Std.Write(MOUSE_EV_ON_PR_OFF); break;
-            case DRAG: Std.Write(MOUSE_EV_ON_PRD_OFF); break;
-            case ALL: Std.Write(MOUSE_EV_ON_ALL_OFF); break;
-            default: throw new ArgumentOutOfRangeException(nameof(MOUSE_REPORT_LEVEL), MOUSE_REPORT_LEVEL, null);
-        }
-    }
-
-    /// <summary>
-    /// Enables mouse event tracking by activating the appropriate mouse handling mode.
-    /// Updates the internal state to reflect that mouse events, including movement, are being actively reported.
-    /// Commonly used for applications requiring interactive mouse inputs, such as terminal-based UI tools.
-    /// </summary>
-    public static void EnableMouseEvents() {
-        Std.Write(MOUSE_EV_ON_ALL_ON);
-        MOUSE_REPORT_LEVEL = ALL;
-        LOGGER.Info($"Mouse reporting level set to ALL");
-    }
-
-    /// <summary>
-    /// Disables mouse event tracking by deactivating the current mouse handling mode.
-    /// Updates the internal state to reflect that mouse events, including movement,
-    /// are no longer being reported. This is typically used when mouse interactivity
-    /// is no longer required in terminal-based applications.
-    /// </summary>
-    public static void DisableMouseEvents() => DisableCurrentMouseReport();
 
     /// <summary>
     /// Gets or sets a value indicating whether focus reporting is enabled for the terminal.

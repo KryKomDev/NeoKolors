@@ -19,9 +19,12 @@
         <PackageIcon>package-icon.png</PackageIcon>
 
         <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
-        
-        <DefineConstants>NK_ENABLE_CACHE_ANALYSIS</DefineConstants>
-<!--        <DefineConstants>NK_IMMEDIATE_RENDERING</DefineConstants>-->
+
+        <DefineConstants>
+            NK_ENABLE_CACHE_ANALYSIS;
+            NK_RENDERING_PROFILING;
+<!--            NK_IMMEDIATE_RENDERING-->
+        </DefineConstants>
     </PropertyGroup>
     
     <ItemGroup>
@@ -42,7 +45,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Implyzer" Version="1.3.0" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <PackageReference Include="Implyzer" Version="2026.1.0" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
         <PackageReference Include="Metriks" Version="1.1.8.1" />
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">

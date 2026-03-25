@@ -3,6 +3,11 @@
 // Copyright (c) 2025 KryKom
 //
 
+#if !(!DEBUG && NK_DISABLE_DEBUG_LOG_IN_RELEASE)
+#define NK_DDLIR
+#endif
+
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using JetBrains.Annotations;
@@ -13,6 +18,16 @@ using NeoKolors.Extensions;
 namespace NeoKolors.Console;
 
 public sealed partial class NKLogger : ILogger {
+
+    // TODO: make a single method with all the other dependant on that one
+    // TODO: make log labels configurable?
+    
+    private const string CRITICAL_LABEL = "CRITICAL";
+    private const string ERROR_LABEL    = "ERROR";
+    private const string WARNING_LABEL  = "warning";
+    private const string INFO_LABEL     = "info";
+    private const string TRACE_LABEL    = "trace";
+    private const string DEBUG_LABEL    = "debug";
     
     /// <summary>
     /// Logs a critical error message with optional event identifier and level formatting.
@@ -32,7 +47,11 @@ public sealed partial class NKLogger : ILogger {
         }
 
         sb.Append(SourceStr(id));
-        sb.Append(SimpleMessages ? "[ CRIT ] : " : "<b><n> CRIT </n></b> : ".ApplyStyles());
+        sb.Append(
+            SimpleMessages 
+                ? $"[ {CRITICAL_LABEL} ] : " 
+                : $"<b><n> {CRITICAL_LABEL} </n></b> : ".ApplyStyles()
+        );
         sb.Append(Indent(message));
 
         Output.WriteLine(!SimpleMessages ? sb.ToString().AddColor(FatalColor) : sb.ToString());
@@ -82,7 +101,11 @@ public sealed partial class NKLogger : ILogger {
         }
 
         sb.Append(SourceStr(id));
-        sb.Append(SimpleMessages ? "[ CRIT ] : " : "<b><n> FAIL </n></b> : ".ApplyStyles());
+        sb.Append(
+            SimpleMessages 
+                ? $"[ {ERROR_LABEL} ] : " 
+                : $"<b><n> {ERROR_LABEL} </n></b> : ".ApplyStyles()
+        );
         sb.Append(Indent(message));
 
         Output.WriteLine(!SimpleMessages ? sb.ToString().AddColor(ErrorColor) : sb.ToString());
@@ -132,7 +155,7 @@ public sealed partial class NKLogger : ILogger {
         }
 
         sb.Append(SourceStr(id));
-        sb.Append("[ WARN ] : ");
+        sb.Append($"[ {WARNING_LABEL} ] : ");
         sb.Append(Indent(message));
 
         Output.WriteLine(!SimpleMessages ? sb.ToString().AddColor(WarnColor) : sb.ToString());
@@ -182,7 +205,7 @@ public sealed partial class NKLogger : ILogger {
         }
 
         sb.Append(SourceStr(id));
-        sb.Append("[ INFO ] : ");
+        sb.Append($"[ {INFO_LABEL} ] : ");
         sb.Append(Indent(message));
 
         Output.WriteLine(!SimpleMessages ? sb.ToString().AddColor(InfoColor) : sb.ToString());
@@ -206,7 +229,7 @@ public sealed partial class NKLogger : ILogger {
     /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Info(object o, EventId? id = null) => Info(o.ToString()!, id);
-
+    
     /// <summary>
     /// Logs a debug-level message with optional event identifier, formatting and styling as per logger configuration.
     /// </summary>
@@ -214,6 +237,8 @@ public sealed partial class NKLogger : ILogger {
     /// <param name="id">An optional event identifier associated with the log entry.</param>
     /// <exception cref="ArgumentNullException">Thrown when the provided message is null.</exception>
     public void Debug(string message, EventId? id) {
+        #if NK_DDLIR
+        
         if (!Level.GetLogDebug()) return;
         if (message == null) throw new ArgumentNullException(nameof(message));
 
@@ -225,12 +250,14 @@ public sealed partial class NKLogger : ILogger {
         }
 
         sb.Append(SourceStr(id));
-        sb.Append("[ DEBUG ] : ");
+        sb.Append($"[ {DEBUG_LABEL} ] : ");
         sb.Append(Indent(message));
 
         Output.WriteLine(!SimpleMessages ? sb.ToString().AddColor(DebugColor) : sb.ToString());
 
         Output.Flush();
+ 
+        #endif
     }
     
     /// <summary>
@@ -268,7 +295,7 @@ public sealed partial class NKLogger : ILogger {
         }
 
         sb.Append(SourceStr(id));
-        sb.Append("[ TRCE ] : ");
+        sb.Append($"[ {TRACE_LABEL} ] : ");
         sb.Append(Indent(message));
 
         Output.WriteLine(!SimpleMessages ? sb.ToString().AddColor(TraceColor) : sb.ToString());

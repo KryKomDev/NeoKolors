@@ -34,22 +34,22 @@ public static class ConsoleKeyInfoExtensions {
     
             // Handle special characters and keys
             switch (c) {
-                case '\b':
+                case '\b': {
                     key = ConsoleKey.Backspace;
-                    break;
-                case '\t':
+                } break;
+                case '\t': {
                     key = ConsoleKey.Tab;
-                    break;
+                } break;
                 case '\r':
-                case '\n':
+                case '\n': {
                     key = ConsoleKey.Enter;
-                    break;
-                case '\u001b': // ESC
+                } break;
+                case '\e': { // ESC
                     key = ConsoleKey.Escape;
-                    break;
-                case ' ':
+                } break;
+                case ' ': {
                     key = ConsoleKey.Spacebar;
-                    break;
+                } break;
                 case '0': key = ConsoleKey.D0; break;
                 case '1': key = ConsoleKey.D1; break;
                 case '2': key = ConsoleKey.D2; break;
@@ -60,11 +60,12 @@ public static class ConsoleKeyInfoExtensions {
                 case '7': key = ConsoleKey.D7; break;
                 case '8': key = ConsoleKey.D8; break;
                 case '9': key = ConsoleKey.D9; break;
-                default:
+                default: {
+                    
                     // Handle letters
                     if (char.IsLetter(c)) {
                         char upperC = char.ToUpper(c);
-                        if (char.IsUpper(c) && char.IsLower(c) == false) {
+                        if (char.IsUpper(c) && !char.IsLower(c)) {
                             modifiers = ConsoleModifiers.Shift;
                         }
     
@@ -84,6 +85,7 @@ public static class ConsoleKeyInfoExtensions {
                     }
     
                     break;
+                }
             }
     
             return new ConsoleKeyInfo(c, key, modifiers.HasShift, modifiers.HasAlt, modifiers.HasCtrl);

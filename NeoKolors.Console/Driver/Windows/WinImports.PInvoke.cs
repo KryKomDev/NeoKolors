@@ -142,6 +142,60 @@ internal static partial class WinImports {
         out uint lpNumberOfEventsRead
     );
     #endif
+
+    /// <see href="https://learn.microsoft.com/en-us/windows/console/getnumberofconsoleinputevents"/>
+    #if NK_LIBIMPORT
+    [LibraryImport("kernel32.dll")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    internal static partial bool GetNumberOfConsoleInputEvents(nint hConsoleInput, out uint numberOfEvents);
+    #else
+    [DllImport("kernel32.dll")]
+    internal static extern bool GetNumberOfConsoleInputEvents(nint hConsoleInput, out uint numberOfEvents);
+    #endif
+
+    /// <see href="https://learn.microsoft.com/en-us/windows/console/writeconsole"/>
+    #if NK_LIBIMPORT
+    [LibraryImport("kernel32.dll", EntryPoint = "WriteConsoleW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static unsafe partial bool WriteConsole(
+        nint hConsoleOutput,
+        nint lpBuffer,
+        uint nNumberOfBytesToWrite,
+        out uint lpNumberOfCharsWritten,
+        void* lpReserved
+    ); 
+    #else
+    [DllImport("kernel32.dll", EntryPoint = "WriteConsoleW", SetLastError = true, CharSet = CharSet.Unicode)]
+    private static extern unsafe bool WriteConsole(
+        nint hConsoleOutput,
+        nint lpBuffer,
+        uint nNumberOfBytesToWrite,
+        out uint lpNumberOfCharsWritten,
+        void* lpReserved
+    ); 
+    #endif
+
+    /// <see href="https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile"/>
+    #if NK_LIBIMPORT
+    [LibraryImport("kernel32.dll", EntryPoint = "WriteFileW")]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool WriteFile(
+        nint hFile,
+        nint lpBuffer,
+        uint nNumberOfBytesToWrite,
+        out uint lpNumberOfCharsWritten,
+        nint lpOverlapped
+    ); 
+    #else
+    [DllImport("kernel32.dll", EntryPoint = "WriteFileW", CharSet = CharSet.Unicode)]
+    private static extern bool WriteFile(
+        nint hFile,
+        nint lpBuffer,
+        uint nNumberOfBytesToWrite,
+        out uint lpNumberOfCharsWritten,
+        nint lpOverlapped
+    ); 
+    #endif
     
     #endregion
     
@@ -185,6 +239,16 @@ internal static partial class WinImports {
 
     /// <seealso href="https://learn.microsoft.com/en-us/windows/console/setconsolemode"/>
     public static bool SetStdOutMode(nint handle, WinVtOutModes mode) => SetConsoleMode(handle, (uint)mode);
-    
-    
+
+    public static unsafe bool WriteConsole(nint handle, ReadOnlySpan<char> chars, out uint written) {
+        fixed (char* ptr = chars) {
+            
+            // not redirected
+            if (WriteConsole(handle, (nint)ptr, (uint)chars.Length, out written, (void*)IntPtr.Zero))
+                return true;
+            
+            // redirected
+            return WriteFile(handle, (nint)ptr, (uint)chars.Length * 2, out written, IntPtr.Zero);
+        }
+    }
 }

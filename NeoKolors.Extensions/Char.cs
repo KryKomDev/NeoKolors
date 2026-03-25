@@ -31,6 +31,12 @@ public static class CharExtensions {
         ['\u030A'] = '˚', // ring above
     };
 
+    private static readonly string[] UNPRINTABLE = [
+        "NUL", "SOH", "STX", "ETX", "EOT", "ENQ", "ACK", "BEL", "BS" , "HT", "LF" , "VT" , "FF", "CR", "SO", "SI",
+        "DLE", "DC1", "DC2", "DC3", "DC4", "NAK", "SYN", "ETB", "CAN", "EN", "SUB", "ESC", "FS", "GS", "RS", "US",
+        "SPC"
+    ];
+
     extension(char) {
         
         /// <summary>
@@ -122,5 +128,21 @@ public static class CharExtensions {
         /// <param name="c">The character to remap to its spacing equivalent.</param>
         /// <returns>The spacing equivalent of the character if one exists; otherwise, the original character.</returns>
         public static char RemapToSpacing(char c) => COMBINING_SPACING_MAP.GetValueOrDefault(c, c);
+
+        /// <summary>
+        /// Converts the specified character to its human-readable representation.
+        /// For unprintable characters, a descriptive name is returned.
+        /// For printable characters, the character itself is returned as a string.
+        /// </summary>
+        /// <param name="c">The character to convert to a displayable string.</param>
+        /// <returns>
+        /// A string representation of the character, or a descriptive name for unprintable characters.
+        /// </returns>
+        public static string ToDisplay(char c) => 
+            (int)c == ..' ' 
+                ? UNPRINTABLE[c] 
+                : c == '\xff' 
+                    ? "DEL" 
+                    : c.ToString();
     }
 }

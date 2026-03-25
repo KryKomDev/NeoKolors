@@ -1,10 +1,12 @@
-﻿# Drivers.md
+﻿# Drivers
 
 The NeoKolors.Console.Driver namespace contains the drivers for reading from and writing to the VT.
 
 ## Structure
 
 The drivers are separated into input drivers and output drivers.
+There shall be abstract classes working as a general implementation of the
+common part of the drivers.
 
 ### Input Drivers
 

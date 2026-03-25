@@ -5,7 +5,8 @@ using NeoKolors.Extensions;
 
 namespace NeoKolors.Console.Ansi.Mouse;
 
-public readonly struct MouseEventInfo {
+internal readonly struct MouseEventInfo {
+    
     public MouseEventType Type { get; }
     public ConsoleModifiers Modifiers { get; }
     public int X { get; }
@@ -18,5 +19,6 @@ public readonly struct MouseEventInfo {
         Y = y;
     }
     
-    public override string ToString() => $"{Type.ToString().EnumToSpace()}{(Modifiers != 0 ? $" with {Modifiers}" : "")} at ({X}, {Y})";
+    public override string ToString() =>
+        $"{Type.ToString().EnumToSpace()}{(Modifiers != 0 ? $" with {Modifiers}" : "")} at ({X}, {Y})";
 }

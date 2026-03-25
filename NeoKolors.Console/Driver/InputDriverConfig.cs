@@ -3,34 +3,17 @@
 // Copyright (c) 2026 KryKom
 //
 
-using HasFlagExtension;
-
 namespace NeoKolors.Console.Driver;
 
 public abstract class InputDriverConfig {
     
-    public ReportedMouseEvents MouseConfig { get; }
-    public bool ReportFocus { get; }
-    public bool ReportResize { get; }
+    public bool                ReportFocus  { get; set; }
+    public bool                ReportResize { get; set; }
+    public ReportedMouseEvents MouseConfig  { get; set; }
 
     protected InputDriverConfig(bool reportFocus, ReportedMouseEvents mouseConfig, bool reportResize) {
         ReportFocus  = reportFocus;
         MouseConfig  = mouseConfig;
         ReportResize = reportResize;
     }
-}
-
-[Flags]
-public enum ReportedMouseEvents {
-        
-    [ExcludeFlag]
-    NONE = 0,
-
-    DOWN    = 1 << 0,
-    RELEASE = 1 << 1,
-    DRAG    = 1 << 2,
-    MOVE    = 1 << 3,
-    
-    [ExcludeFlag]
-    ALL = DOWN | RELEASE | DRAG | MOVE
 }

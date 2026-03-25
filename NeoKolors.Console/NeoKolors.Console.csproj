@@ -7,6 +7,8 @@
         <TargetFrameworks>net5.0;net8.0;net9.0;netstandard2.1;net10.0</TargetFrameworks>
         <Platforms>AnyCPU</Platforms>
         <Configurations>Debug;Release;WIP</Configurations>
+        <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
@@ -19,11 +21,17 @@
         <PackageIcon>package-icon.png</PackageIcon>
         <Description>basic console / logging utilites</Description>
         
-<!--        <DefineConstants>NK_ENABLE_NATIVE_INPUT</DefineConstants>-->
+        <!-- define constants -->
+        <DefineConstants>
+            $(DefineConstants);
+            NK_ENABLE_NATIVE_IO;
+<!--            NK_DISABLE_DEBUG_LOG_IN_RELEASE;-->
+        </DefineConstants>
         
-        <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
-<!--        <AllowUnsafeBlocks Condition="$(NK_ENABLE_NATIVE_INPUT) == $(true)">true</AllowUnsafeBlocks>-->
-        <AllowUnsafeBlocks Condition="$([MSBuild]::VersionGreaterThanOrEquals('$([MSBuild]::GetTargetFrameworkVersion('$(TargetFramework)'))','6.0'))">true</AllowUnsafeBlocks>
+        <DefineConstants Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">
+            $(DefineConstants);
+            NK_LIBIMPORT;
+        </DefineConstants>
     </PropertyGroup>
     
     <ItemGroup>

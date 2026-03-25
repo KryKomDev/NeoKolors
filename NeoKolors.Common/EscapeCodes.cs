@@ -274,16 +274,16 @@ public static class EscapeCodes {
     #region WINDOW MANIPULATION
 
     /// <summary>
-    /// Escape code sequence used to iconify or minimize the current terminal window.
-    /// </summary>
-    public const string ICONIFY_WINDOW = "\e[2t";
-
-    /// <summary>
     /// Escape sequence to restore and deiconify a minimized window.
     /// Typically used in terminal applications to request the window to return to its
     /// normal, unminimized state.
     /// </summary>
     public const string DEICONIFY_WINDOW = "\e[1t";
+
+    /// <summary>
+    /// Escape code sequence used to iconify or minimize the current terminal window.
+    /// </summary>
+    public const string ICONIFY_WINDOW = "\e[2t";
 
     public const string MOVE_WINDOW_FORMAT = "\e[3;{0};{1}t";
     public const string RESIZE_WINDOW_PX_FORMAT = "\e[4;{0};{1}t";
@@ -292,14 +292,61 @@ public static class EscapeCodes {
     public const string LOWER_WINDOW = "\e[6t";
 
     /// <summary>
-    /// ANSI escape sequence used to report the current window position.
-    /// This sequence can be used to query the terminal for its cursor position
-    /// or other related spatial information in an active session.
+    /// ANSI escape sequence used to get the VT window state.
+    /// VT responds with '\e[1t' if not iconified / not minimized and with '\e[2t' if iconified / minimized.
+    /// </summary>
+    public const string REPORT_WINDOW_STATE = "\e[11t";
+    
+    /// <summary>
+    /// ANSI escape sequence used to get the VT window position.
+    /// VT responds with '\e[3;{y};{x}t'.
     /// </summary>
     public const string REPORT_WINDOW_POS = "\e[13t";
+    
+    /// <summary>
+    /// ANSI escape sequence used to get the VT text buffer position.
+    /// VT responds with '\e[3;{y};{x}t'.
+    /// </summary>
+    public const string REPORT_BUFF_POS = "\e[13;2t";
 
-    public const string REPORT_WINDOW_SIZE_PX = "\e[14t";
+    /// <summary>
+    /// ANSI escape sequence used to query the terminal for the dimensions of the text buffer in pixels.
+    /// VT responds with '\e[4;{y};{x}t'.
+    /// </summary>
+    public const string REPORT_BUFF_SIZE_PX = "\e[14t";
+    
+    /// <summary>
+    /// ANSI escape sequence used to query the terminal for the dimensions of the VT window in pixels.
+    /// VT responds with '\e[4;{y};{x}t'.
+    /// </summary>
+    public const string REPORT_WIN_SIZE_PX = "\e[14;2t";
 
+    /// <summary>
+    /// ANSI escape sequence used to query the terminal for the dimensions of a single character cell in pixels.
+    /// VT responds with '\e[6;{y};{x}t'.
+    /// </summary>
+    public const string REPORT_CHAR_CELL_SIZE_PX = "\e[16t";
+
+    /// <summary>
+    /// ANSI escape sequence used to query the terminal for the dimensions of the text buffer.
+    /// VT responds with '\e[8;{y};{x}t'.
+    /// </summary>
+    public const string REPORT_BUFF_SIZE_CH = "\e[18t";
+    
+
+    /// <summary>
+    /// Contains XTWINOPS sequence Ps parameters.
+    /// </summary>
+    public enum WinOpts {
+        WIN_STATE         = 11,
+        WIN_POS           = 13,
+        BUFF_SIZE_PX      = 14,
+        SCREEN_SIZE_PX    = 15,
+        CHAR_CELL_SIZE_PX = 16,
+        BUFF_SIZE_CH      = 18,
+        SCREEN_SIZE_CH    = 19,
+    }
+    
     #endregion
 
     #region OUTPUT
@@ -322,7 +369,7 @@ public static class EscapeCodes {
 
     #region DECREQ
 
-    public const string DECREQ_FORMAT = "\e[{0}$p";
+    public const string DECREQ_FORMAT = "\e[?{0}$p";
     
     /// <summary>
     /// Requests the state of the alternate buffer.

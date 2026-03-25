@@ -435,6 +435,21 @@ public static class String {
                     ? s
                     : s[..length];
         }
+
+        /// <summary>
+        /// Shortens the string to the specified length by truncating from the middle and replacing the
+        /// truncated portion with an ellipsis ('…').
+        /// </summary>
+        /// <param name="length">The desired maximum length of the string, including the ellipsis.</param>
+        /// <returns>A string shortened to the specified length with an ellipsis, or the original
+        /// string if its length is less than or equal to the specified length.</returns>
+        public string Shrink(int length) {
+            if (s.Length <= length)
+                return s;
+
+            int hl = length / 2;
+            return s[..(length - hl)] + "…" + s[^hl..];
+        }
     }
 
 

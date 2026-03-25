@@ -8,8 +8,7 @@ using System.Diagnostics.Contracts;
 using System.Text;
 using Metriks;
 using NeoKolors.Common;
-using NeoKolors.Console.Driver;
-using NeoKolors.Console.Driver.DotNet;
+using NeoKolors.Console.Ansi;
 using NeoKolors.Console.Events;
 using NeoKolors.Console.Input;
 using OneOf;
@@ -20,9 +19,7 @@ using InvalidOperationException = System.InvalidOperationException;
 using OverflowException = System.OverflowException;
 using Std = System.Console;
 
-#if NK_ENABLE_NATIVE_INPUT
-using NeoKolors.Console.Driver.Linux;
-using NeoKolors.Console.Driver.Windows;
+#if NK_ENABLE_NATIVE_IO
 #endif
 
 
@@ -313,28 +310,7 @@ public static partial class NKConsole {
 
     
     #region INPUT INTERCEPTION
-
-    private static readonly IInputDriver INPUT_DRIVER =
-        #if NK_ENABLE_NATIVE_INPUT
-        Environment.OSVersion.Platform switch {
-            PlatformID.Win32Windows or PlatformID.Win32NT or PlatformID.Win32S or PlatformID.WinCE => 
-                new WindowsInputDriver(new WinInputDriverConfig(
-                    reportFocus:     true, 
-                    mouseConfig:     ReportedMouseEvents.ALL, 
-                    reportResize:    true,
-                    refreshInterval: new TimeSpan(0, 0, 0, 0, 10),
-                    ctrlCForceQuits: true
-                )),
-            PlatformID.Unix =>
-                new LinuxInputDriver(),
-            PlatformID.MacOSX =>
-                new LinuxInputDriver(), // TODO: create a frickin MacOSX driver
-            _ => new DotNetInputDriver()
-        };
-        #else
-        new DotNetInputDriver();
-        #endif
-
+    
     /// <summary>
     /// Activates the input interception mechanism and initiates the input handling thread.
     /// Once initiated, the console will begin to listen for user inputs such as keys, mouse events,
@@ -350,14 +326,14 @@ public static partial class NKConsole {
         InterceptInput = true;
         LOGGER.Info("Starting input interception...");
         
-        INPUT_DRIVER.Key      += OnKey;
-        INPUT_DRIVER.Mouse    += OnMouse;
-        INPUT_DRIVER.FocusIn  += OnFocusIn;
-        INPUT_DRIVER.FocusOut += OnFocusOut;
-        INPUT_DRIVER.Paste    += OnPaste;
-        INPUT_DRIVER.VTQuery  += OnVTQuery;
+        InputDriver.Key      += OnKey;
+        InputDriver.Mouse    += OnMouse;
+        InputDriver.FocusIn  += OnFocusIn;
+        InputDriver.FocusOut += OnFocusOut;
+        InputDriver.Paste    += OnPaste;
+        InputDriver.VTQuery  += OnVTQuery;
         
-        INPUT_DRIVER.Start();
+        InputDriver.Start();
     }
 
     /// <summary>
@@ -369,14 +345,14 @@ public static partial class NKConsole {
         InterceptInput = false;
         LOGGER.Info("Stopping input interception...");
         
-        INPUT_DRIVER.Stop();
+        InputDriver.Stop();
         
-        INPUT_DRIVER.Key      -= OnKey;
-        INPUT_DRIVER.Mouse    -= OnMouse;
-        INPUT_DRIVER.FocusIn  -= OnFocusIn;
-        INPUT_DRIVER.FocusOut -= OnFocusOut;
-        INPUT_DRIVER.Paste    -= OnPaste;
-        INPUT_DRIVER.VTQuery  -= OnVTQuery;
+        InputDriver.Key      -= OnKey;
+        InputDriver.Mouse    -= OnMouse;
+        InputDriver.FocusIn  -= OnFocusIn;
+        InputDriver.FocusOut -= OnFocusOut;
+        InputDriver.Paste    -= OnPaste;
+        InputDriver.VTQuery  -= OnVTQuery;
     }
 
     private static void OnKey(KeyEventArgs k)        => Key(k);
@@ -384,7 +360,7 @@ public static partial class NKConsole {
     private static void OnFocusIn()                  => FocusIn();
     private static void OnFocusOut()                 => FocusOut();
     private static void OnPaste(string s)            => Paste(s);
-    private static void OnVTQuery(VTQueryResponse r) => VTQueryResponse(r);
+    private static void OnVTQuery(VTQuery r) => VTQueryResponse(r);
 
     #endregion
 
@@ -516,11 +492,11 @@ public static partial class NKConsole {
         VTQueryResponseHandler? h = null;
         
         h = a => {
-            if (a.Type != VTQueryResponseType.DEC || a.DecMode == EscapeCodes.DecMode.ALTERNATE_BUFFER) 
+            if (a.Type != VTQueryType.DEC || a.DecMode == EscapeCodes.DecMode.ALTERNATE_BUFFER) 
                 return;
             
             VTQueryResponse -= h;
-            tcs.SetResult(a.DecData == DecReqResponseType.ENABLED);
+            tcs.SetResult(a.DecResponse == DecReqResponseType.ENABLED);
         };
 
         VTQueryResponse += h;
@@ -536,7 +512,7 @@ public static partial class NKConsole {
     /// A tuple where the first value is the width in pixels and the second
     /// value is the height in pixels of the console window.
     /// </returns>
-    public static Size2D GetScreenSizePx() => GetScreenSizePxAsync().Result;
+    public static Size2D GetBuffSizePx() => GetBuffSizePxAsync().Result;
 
     /// <summary>
     /// Retrieves the current size of the console window in pixels as a tuple containing
@@ -546,26 +522,75 @@ public static partial class NKConsole {
     /// A tuple where the first value is the width in pixels and the second
     /// value is the height in pixels of the console window.
     /// </returns>
-    public static async Task<Size2D> GetScreenSizePxAsync() {
-        Std.Write(EscapeCodes.REPORT_WINDOW_SIZE_PX);
+    public static async Task<Size2D> GetBuffSizePxAsync() => 
+        await GetWinReqAsync(EscapeCodes.REPORT_BUFF_SIZE_PX, EscapeCodes.WinOpts.BUFF_SIZE_PX);
+
+    /// <summary>
+    /// Retrieves the current size of the console window in pixels as a tuple containing
+    /// the width and height.
+    /// </summary>
+    /// <returns>
+    /// A tuple where the first value is the width in pixels and the second
+    /// value is the height in pixels of the console window.
+    /// </returns>
+    public static Size2D GetCellSizePx() => GetCellSizePxAsync().Result;
+
+    /// <summary>
+    /// Retrieves the current size of the console window in pixels as a tuple containing
+    /// the width and height.
+    /// </summary>
+    /// <returns>
+    /// A tuple where the first value is the width in pixels and the second
+    /// value is the height in pixels of the console window.
+    /// </returns>
+    public static async Task<Size2D> GetCellSizePxAsync() => 
+        await GetWinReqAsync(EscapeCodes.REPORT_CHAR_CELL_SIZE_PX, EscapeCodes.WinOpts.CHAR_CELL_SIZE_PX);
+
+    /// <summary>
+    /// Retrieves the current size of the console window in pixels as a tuple containing
+    /// the width and height.
+    /// </summary>
+    /// <returns>
+    /// A tuple where the first value is the width in pixels and the second
+    /// value is the height in pixels of the console window.
+    /// </returns>
+    public static Size2D GetBuffSizeCh() => GetBuffSizeChAsync().Result;
+
+    /// <summary>
+    /// Retrieves the current size of the console window in pixels as a tuple containing
+    /// the width and height.
+    /// </summary>
+    /// <returns>
+    /// A tuple where the first value is the width in pixels and the second
+    /// value is the height in pixels of the console window.
+    /// </returns>
+    public static async Task<Size2D> GetBuffSizeChAsync() => 
+        await GetWinReqAsync(EscapeCodes.REPORT_BUFF_SIZE_CH, EscapeCodes.WinOpts.BUFF_SIZE_CH);
+
+    private static async Task<Size2D> GetWinReqAsync(string escSeq, EscapeCodes.WinOpts type) {
         
         // If input interception is not enabled
         if (!InterceptInput) {
+            OutputDriver.Write(escSeq);
             var res = ReadUntil('t', true);
             var split = res.Split(';');
             return new Size2D(int.Parse(split[2]), int.Parse(split[1]));
         }
+        
+        InputDriver.RequestVTQuery(VTQuery.RequestWin(type));
         
         var tcs = new TaskCompletionSource<Size2D>();
         
         VTQueryResponseHandler? h = null;
         
         h = a => {
-            if (a.Type != VTQueryResponseType.WIN_SIZE_PX)
+            if (a.Type != VTQueryType.WIN || a.WinMode != type)
                 return;
             
             VTQueryResponse -= h;
-            tcs.SetResult(a.AsWinSizePx);
+            
+            var res = a.WinResponse;
+            tcs.SetResult(new Size2D(res.X, res.Y));
         };
 
         VTQueryResponse += h;

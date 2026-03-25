@@ -16,7 +16,7 @@ namespace NeoKolors.Console.Input;
 /// <b>NOTE:</b> The enum's values are compliant to the values of <see cref="WinImports.WinKeyModifiers"/>.
 /// </summary>
 [Flags]
-[FlagGroup("Alt", "Has")]
+[FlagGroup("Alt",  "Has")]
 [FlagGroup("Ctrl", "Has")]
 public enum KeyModifiers {
     
