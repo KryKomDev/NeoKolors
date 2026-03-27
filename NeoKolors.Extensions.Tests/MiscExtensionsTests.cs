@@ -1,7 +1,6 @@
-namespace NeoKolors.Extensions.Tests;
-
 using System.Text;
-using NeoKolors.Extensions;
+
+namespace NeoKolors.Extensions.Tests;
 
 public class MiscExtensionsTests {
 
@@ -113,7 +112,7 @@ public class MiscExtensionsTests {
     [Fact]
     public void PadLinesLeft_PadsCorrectly() {
         string s = "line1\nline2\nline3";
-        string padded = s.PadLinesLeft(2, false);
+        string padded = s.PadLinesLeft(2);
         Assert.Equal("line1\n  line2\n  line3", padded);
 
         string paddedFirst = s.PadLinesLeft(2, true);

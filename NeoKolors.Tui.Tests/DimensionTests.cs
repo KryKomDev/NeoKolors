@@ -3,8 +3,6 @@
 // Copyright (c) 2025 KryKom
 //
 
-using System.Globalization;
-
 namespace NeoKolors.Tui.Tests;
 
 public class DimensionTests {
@@ -104,7 +102,7 @@ public class DimensionTests {
             
             Assert.Equal((int)(System.Console.BufferWidth * 0.5f), w);
             Assert.Equal((int)(System.Console.BufferHeight * 0.5f), h);
-        } catch (System.IO.IOException) {
+        } catch (IOException) {
             // Ignore IOException in headless environments
         }
     }

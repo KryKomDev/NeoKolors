@@ -6,7 +6,6 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using NeoKolors.Console.Input;
-using NeoKolors.Extensions;
 
 namespace NeoKolors.Console.Driver.Dotnet;
 

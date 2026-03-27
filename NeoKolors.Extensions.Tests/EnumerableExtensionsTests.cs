@@ -1,6 +1,6 @@
-﻿namespace NeoKolors.Extensions.Tests;
+﻿using Metriks;
 
-using Metriks;
+namespace NeoKolors.Extensions.Tests;
 
 public class EnumerableTests {
     

@@ -51,7 +51,7 @@ public class ConsoleKeyInfoTests {
     [InlineData('+', ConsoleKey.OemPlus, true)]
     [InlineData('=', ConsoleKey.OemPlus, false)]
     public void FromChar_ReturnsCorrectKeyInfo(char input, ConsoleKey expectedKey, bool expectedShift) {
-        var result = ConsoleKeyInfoExtensions.FromChar(input);
+        var result = ConsoleKeyInfo.FromChar(input);
         Assert.Equal(expectedKey, result.Key);
         Assert.Equal(expectedShift, result.Modifiers.HasFlag(ConsoleModifiers.Shift));
         Assert.Equal(input, result.KeyChar);

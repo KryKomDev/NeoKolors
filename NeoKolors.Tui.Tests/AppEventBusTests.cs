@@ -11,10 +11,10 @@ using NeoKolors.Tui.Events;
 
 namespace NeoKolors.Tui.Tests;
 
-public class MockApplication : IApplication, IMouseSupportingApplication {
+public class MockApplication : IMouseSupportingApplication {
     public IRenderable Base => null!;
-    public void Start() => StartEvent?.Invoke(this, new AppStartEventArgs(false));
-    public void Stop() => StopEvent?.Invoke(this);
+    public void Start() => StartEvent(this, new AppStartEventArgs(false));
+    public void Stop() => StopEvent(this);
 
     public event KeyEventHandler KeyEvent = delegate { };
     public event ResizeEventHandler ResizeEvent = delegate { };
@@ -22,9 +22,9 @@ public class MockApplication : IApplication, IMouseSupportingApplication {
     public event AppStopEventHandler StopEvent = delegate { };
     public event MouseEventHandler MouseEvent = delegate { };
 
-    public void TriggerKeyEvent(KeyEventArgs e) => KeyEvent?.Invoke(e);
-    public void TriggerMouseEvent(MouseEventArgs e) => MouseEvent?.Invoke(e);
-    public void TriggerResizeEvent(ResizeEventArgs e) => ResizeEvent?.Invoke(e);
+    public void TriggerKeyEvent(KeyEventArgs e) => KeyEvent(e);
+    public void TriggerMouseEvent(MouseEventArgs e) => MouseEvent(e);
+    public void TriggerResizeEvent(ResizeEventArgs e) => ResizeEvent(e);
 }
 
 public class AppEventBusTests {
@@ -44,7 +44,7 @@ public class AppEventBusTests {
         AppEventBus.SetSourceApplication(app);
         
         bool received = false;
-        KeyEventHandler handler = (e) => received = true;
+        KeyEventHandler handler = _ => received = true;
         
         AppEventBus.SubscribeToKeyEvent(handler);
         app.TriggerKeyEvent(new KeyEventArgs(KeyCode.A, KeyModifiers.NONE, 'a'));
@@ -64,7 +64,7 @@ public class AppEventBusTests {
         AppEventBus.SetSourceApplication(app);
         
         bool received = false;
-        MouseEventHandler handler = (e) => received = true;
+        MouseEventHandler handler = _ => received = true;
         
         AppEventBus.SubscribeToMouseEvent(handler);
         app.TriggerMouseEvent(new MouseEventArgs(MouseButton.LEFT, KeyModifiers.NONE, new Point2D(0, 0), false, false));
@@ -86,8 +86,8 @@ public class AppEventBusTests {
         bool started = false;
         bool stopped = false;
         
-        AppStartEventHandler startHandler = (s, e) => started = true;
-        AppStopEventHandler stopHandler = (s) => stopped = true;
+        AppStartEventHandler startHandler = (_, _) => started = true;
+        AppStopEventHandler stopHandler = _ => stopped = true;
         
         AppEventBus.SubscribeToStartEvent(startHandler);
         AppEventBus.SubscribeToStopEvent(stopHandler);

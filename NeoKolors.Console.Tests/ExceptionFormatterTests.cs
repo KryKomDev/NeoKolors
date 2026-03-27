@@ -1,5 +1,5 @@
-using NeoKolors.Common;
 using System.Runtime.CompilerServices;
+using NeoKolors.Common;
 
 namespace NeoKolors.Console.Tests;
 

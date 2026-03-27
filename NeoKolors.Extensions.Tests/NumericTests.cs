@@ -8,11 +8,11 @@ public class NumericTests {
     [Fact]
     public void Belongs_ReturnsCorrectValue() {
         // Standard inclusive range
-        Assert.True(0.Belongs(0..10));
-        Assert.True(10.Belongs(0..10));
-        Assert.True(5.Belongs(0..10));
-        Assert.False((-1).Belongs(0..10));
-        Assert.False(11.Belongs(0..10));
+        Assert.True(0.Belongs(..10));
+        Assert.True(10.Belongs(..10));
+        Assert.True(5.Belongs(..10));
+        Assert.False((-1).Belongs(..10));
+        Assert.False(11.Belongs(..10));
 
         // Range with "exclusive" start (simulated by FromEnd/^)
         // ^0 -> Start + 1. So ^0..10 becomes 1..10
@@ -22,21 +22,21 @@ public class NumericTests {
 
         // Range with "exclusive" end (simulated by FromEnd/^)
         // ^10 -> End - 1. So 0..^10 becomes 0..9
-        Assert.True(0.Belongs(0..^10));
-        Assert.True(9.Belongs(0..^10));
-        Assert.False(10.Belongs(0..^10));
+        Assert.True(0.Belongs(..^10));
+        Assert.True(9.Belongs(..^10));
+        Assert.False(10.Belongs(..^10));
     }
 
     [Fact]
     public void Operator_Equality_ReturnsCorrectValue() {
-        Assert.True(5 == (0..10));
-        Assert.False(11 == (0..10));
+        Assert.True(5 == (..10));
+        Assert.False(11 == (..10));
     }
 
     [Fact]
     public void Operator_Inequality_ReturnsCorrectValue() {
-        Assert.False(5 != (0..10));
-        Assert.True(11 != (0..10));
+        Assert.False(5 != (..10));
+        Assert.True(11 != (..10));
     }
 
     [Fact]

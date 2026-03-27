@@ -3,7 +3,6 @@
 
 // #define NK_DISABLE_ANSI_TIMEOUT
 
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using NeoKolors.Console.Events;

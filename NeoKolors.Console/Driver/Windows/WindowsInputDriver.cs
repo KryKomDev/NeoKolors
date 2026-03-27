@@ -113,6 +113,7 @@ public sealed class WindowsInputDriver : IInputDriver<WinInputDriverConfig> {
         }
 
         _isStopped = true;
+        _onStopped.Invoke();
     }
 
     private void ProcessRequests() {

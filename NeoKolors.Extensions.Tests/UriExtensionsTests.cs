@@ -14,6 +14,6 @@ public class UriExtensionsTests {
     [InlineData("ftp://server.com", false)]
     [InlineData("relative/path/to/file.txt", true)] // Treated as local
     public void IsLocal_ReturnsCorrectly(string path, bool expected) {
-        Assert.Equal(expected, UriExtensions.IsLocal(path));
+        Assert.Equal(expected, Uri.IsLocal(path));
     }
 }

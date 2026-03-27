@@ -161,7 +161,7 @@ public class NKColorTests {
         Assert.True(parsable.TryParse("#112233", null, out var result));
         Assert.Equal(0x112233u, result.AsRgb);
 
-        IParsableValue nonGeneric = (IParsableValue)parsable;
+        IParsableValue nonGeneric = parsable;
         Assert.True(nonGeneric.TryParse("#445566", null, out var objResult));
         Assert.Equal(0x445566u, ((NKColor)objResult!).AsRgb);
     }

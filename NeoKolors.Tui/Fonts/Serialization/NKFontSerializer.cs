@@ -5,8 +5,6 @@
 
 using System.IO.Compression;
 using System.Reflection;
-using System.Xml;
-using System.Xml.Schema;
 using System.Xml.Serialization;
 using NeoKolors.Tui.Fonts.Serialization.Xml;
 using NeoKolors.Tui.Fonts.Exceptions;

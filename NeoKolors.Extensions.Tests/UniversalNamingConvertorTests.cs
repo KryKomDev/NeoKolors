@@ -1,7 +1,5 @@
 namespace NeoKolors.Extensions.Tests;
 
-using NeoKolors.Extensions;
-
 public class UniversalNamingConvertorTests {
 
     [Theory]
