@@ -4,41 +4,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    
-    env:
-      Solution_Name: NeoKolors.slnx
-      ProjectPath: NeoKolors.Settings/NeoKolors.Settings.csproj
-      TestProjectPath: NeoKolors.Settings.Tests/NeoKolors.Settings.Tests.csproj
-      NugetOutputDir: ./output/
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '10.0.x'
-
-    - name: Restore dependencies
-      run: dotnet restore ${{ env.ProjectPath }}
-
-    - name: Build
-      run: dotnet build ${{ env.ProjectPath }} --configuration Release --no-restore
-  
-    - name: Test
-      run: dotnet test ${{ env.TestProjectPath }}
-
-    - name: Pack
-      run: dotnet pack ${{ env.ProjectPath }} --configuration Release --no-build --output ${{ env.NugetOutputDir }}
-
-    - name: Push to NuGet
-      run: |
-        Get-ChildItem ${{ env.NugetOutputDir }}*.nupkg | ForEach-Object {
-          dotnet nuget push $_.FullName --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
-        }
-      shell: pwsh
+  publish:
+    uses: ./.github/workflows/_publish_template.yml
+    with:
+      project_name: Settings
+      project_path: Src/Settings/NeoKolors.Settings.csproj
+      test_project_path: Src/Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj
+    secrets:
+      NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}

@@ -5,23 +5,20 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <LangVersion>14</LangVersion>
+        <LangVersion>latest</LangVersion>
         <Configurations>Debug;Release;WIP</Configurations>
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
     
     <ItemGroup>
-        <ProjectReference Include="..\..\NeoKolors.Common\NeoKolors.Common.csproj" />
-        <ProjectReference Include="..\..\NeoKolors.Console\NeoKolors.Console.csproj" />
-        <ProjectReference Include="..\..\NeoKolors.Settings\NeoKolors.Settings.csproj" />
-        <ProjectReference Include="..\..\NeoKolors.Tui\NeoKolors.Tui.csproj" />
+        <ProjectReference Include="..\..\Src\Common\NeoKolors.Common.csproj" />
+        <ProjectReference Include="..\..\Src\Console\NeoKolors.Console.csproj" />
+        <ProjectReference Include="..\..\Src\Settings\NeoKolors.Settings.csproj" />
+        <ProjectReference Include="..\..\Src\Tui\NeoKolors.Tui.csproj" />
     </ItemGroup>
     
     <ItemGroup>
       <PackageReference Include="Brigadier.NET" Version="2.0.15-beta" />
-      <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.2" />
-      <PackageReference Include="Microsoft.Extensions.Logging.Configuration" Version="10.0.2" />
-      <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="10.0.2" />
       <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
     </ItemGroup>
 

@@ -9,6 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="../../NeoKolors.Tui/NeoKolors.Tui.csproj"/>
+        <ProjectReference Include="../../Src/Tui/NeoKolors.Tui.csproj"/>
     </ItemGroup>
 </Project>

@@ -1,17 +1,18 @@
 ﻿using System.Text;
 using NeoKolors.Common;
 using NeoKolors.Console;
-using NeoKolors.Console.Mouse;
+using NeoKolors.Console.Ansi.Mouse;
+using NeoKolors.Console.Input;
 using NeoKolors.Tui;
 using NeoKolors.Tui.Dom;
 using NeoKolors.Tui.Elements;
 using NeoKolors.Tui.Extensions;
 using NeoKolors.Tui.Fonts.Serialization;
 using NeoKolors.Tui.Styles.Properties;
-using NeoKolors.Tui.Styles.Values;
 using static NeoKolors.Console.LoggerLevel;
 
 namespace XmlTestApp;
+
 
 internal static class Program {
     public static void Main(string[] args) {
@@ -25,7 +26,7 @@ internal static class Program {
         NKDebug.Logger.MessageHighlightLine = false;
         NKDebug.RedirectFatalToLog = true;
         NKDebug.EnableExceptionInterruption();
-
+        
         NKFontSerializer.CreateArchive(@"C:\Users\krystof\Desktop\projects\Libs\NeoKolors\NeoKolors.Tui\Fonts\Builtin\Dummy1", 
             @"C:\Users\krystof\Desktop\projects\Libs\NeoKolors\NeoKolors.Tui\Fonts\Builtin\Dummy1.nkf");
 
@@ -50,7 +51,7 @@ internal static class Program {
         
         int slide = 0;
         app.KeyEvent += k => {
-            if (k.Key is ConsoleKey.Spacebar or ConsoleKey.Enter or ConsoleKey.RightArrow) {
+            if (k.Key is KeyCode.SPACE or KeyCode.RETURN or KeyCode.ARROW_RIGHT) {
                 var ns = slide + 1;
                 
                 if (ns <= maxSlide) {
@@ -58,7 +59,7 @@ internal static class Program {
                     slide = ns;
                 }
             }
-            else if (k.Key is ConsoleKey.Backspace or ConsoleKey.LeftArrow) {
+            else if (k.Key is KeyCode.BACKSPACE or KeyCode.ARROW_LEFT) {
                 var ns = slide - 1;
                 
                 if (ns >= 0) {
@@ -88,16 +89,14 @@ internal static class Program {
         };
 
         dom.GetElementsByType(typeof(Text)).Apply(new PaddingProperty(0, 0, 0, 1));
-       
-        var logo = dom.GetElementById("logo");
-
-        logo?.Style.Set(new CheckerBckgProperty(new CheckerBckg(NKConsoleColor.RED, NKConsoleColor.BLUE, false)));
+        
+        // dom.BaseElement.Style.SetCheckerBckg(new CheckerBckg(NKConsoleColor.RED, NKConsoleColor.BLUE));
         
         dom.GetElementsByClass("Slide").Apply(
             new WidthProperty(Dimension.Stretch), 
             new HeightProperty(Dimension.Stretch),
             new PaddingProperty(4.Ch, 2.Ch),
-            new BackgroundColorProperty(NKColor.Default) 
+            new BackgroundColorProperty(NKColor.Inherit) 
             // new BorderProperty(BorderStyle.GetRounded())
         );
 

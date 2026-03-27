@@ -5,21 +5,27 @@
     </Configurations>
 
     <!--  Libs  -->
-    
-    <Project Path="NeoKolors.Extensions/NeoKolors.Extensions.csproj" />
-    <Project Path="NeoKolors.Common/NeoKolors.Common.csproj" />
-    <Project Path="NeoKolors.Console/NeoKolors.Console.csproj" />
-    <Project Path="NeoKolors.Settings/NeoKolors.Settings.csproj" />
-    <Project Path="NeoKolors.Tui/NeoKolors.Tui.csproj" />
-    
+
+    <Folder Name="/Src/">
+        
+        <Project Path="Src/Extensions/NeoKolors.Extensions.csproj" />
+        <Project Path="Src/Common/NeoKolors.Common.csproj" />
+        <Project Path="Src/Console/NeoKolors.Console.csproj" />
+        <Project Path="Src/Settings/NeoKolors.Settings.csproj" />
+        <Project Path="Src/Tui/NeoKolors.Tui.csproj" />
+        <Project Path="Src/Tui.Generators/NeoKolors.Tui.Generators.csproj"/>
+    </Folder>
+
     <!--  Tests  -->
     
-    <Project Path="NeoKolors.Extensions.Tests/NeoKolors.Extensions.Tests.csproj" />
-    <Project Path="NeoKolors.Common.Tests/NeoKolors.Common.Tests.csproj" />
-    <Project Path="NeoKolors.Console.Tests/NeoKolors.Console.Tests.csproj" />
-    <Project Path="NeoKolors.Settings.Tests/NeoKolors.Settings.Tests.csproj" />
-    <Project Path="NeoKolors.Tui.Generators/NeoKolors.Tui.Generators.csproj"/>
-    <Project Path="NeoKolors.Tui.Tests/NeoKolors.Tui.Tests.csproj" />
+    <Folder Name="/Src/Tests/">
+
+        <Project Path="Src/Tests/Extensions.Tests/NeoKolors.Extensions.Tests.csproj" />
+        <Project Path="Src/Tests/Common.Tests/NeoKolors.Common.Tests.csproj" />
+        <Project Path="Src/Tests/Console.Tests/NeoKolors.Console.Tests.csproj" />
+        <Project Path="Src/Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj" />
+        <Project Path="Src/Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj" />
+    </Folder>
 
     <!--  Examples  -->
     
@@ -34,4 +40,5 @@
     <Folder Name="/Tools/">
 
     </Folder>
+    
 </Solution>

@@ -3,42 +3,15 @@ name: Build NeoKolors.Settings
 on:
   push:
     paths:
-      - 'NeoKolors.Settings/**'
-      - 'NeoKolors.Settings.Tests/**'
+      - 'Src/Settings/**'
+      - 'Src/Tests/Settings.Tests/**'
       - '.github/workflows/build-settings.yml'
+      - '.github/workflows/_build_template.yml'
 
 jobs:
   build:
-    strategy:
-      matrix:
-        configuration: [Debug, Release]
-
-    runs-on: ubuntu-latest 
-
-    env:
-      SolutionName: NeoKolors.slnx
-      ProjectPath: NeoKolors.Settings/NeoKolors.Settings.csproj
-      TestProjectPath: NeoKolors.Settings.Tests/NeoKolors.Settings.Tests.csproj
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Install .NET Core
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 10.0.x
-
-    - name: Restore Projects
-      run: dotnet restore ${{ env.ProjectPath }}
-
-    - name: Build Projects
-      run: dotnet build ${{ env.ProjectPath }} --configuration ${{ matrix.configuration }} --no-restore
-
-    - name: Execute unit tests
-      run: dotnet test ${{ env.TestProjectPath }}
-
-    - name: Restore the application
-      run: dotnet restore ${{ env.ProjectPath }}
+    uses: ./.github/workflows/_build_template.yml
+    with:
+      project_name: Settings
+      project_path: Src/Settings/NeoKolors.Settings.csproj
+      test_project_path: Src/Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj

@@ -25,7 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\NeoKolors.Tui\NeoKolors.Tui.csproj" />
+        <ProjectReference Include="..\..\Tui\NeoKolors.Tui.csproj" />
     </ItemGroup>
     
     <ItemGroup>

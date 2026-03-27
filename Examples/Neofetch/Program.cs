@@ -35,7 +35,7 @@ class Program {
         NKConsole.MoveCursor(^28, 1);
         NKConsole.WriteF($"{{0}}Kernel{{1}}: {Environment.OSVersion.Platform}", BLUE, NKColor.Default);
         NKConsole.MoveCursor(^28, 1);
-        NKConsole.WriteF($"{{0}}DotNet{{1}}: {Environment.Version}", BLUE, NKColor.Default);
+        NKConsole.WriteF($"{{0}}Dotnet{{1}}: {Environment.Version}", BLUE, NKColor.Default);
         NKConsole.MoveCursor(^28, 1);
         NKConsole.WriteF($"{{0}}Arch{{1}}: {RuntimeInformation.ProcessArchitecture}", BLUE, NKColor.Default);
         NKConsole.MoveCursor(^28, 1);

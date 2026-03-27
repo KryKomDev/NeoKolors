@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\NeoKolors.Console\NeoKolors.Console.csproj" />
+    <ProjectReference Include="..\..\Src\Console\NeoKolors.Console.csproj" />
   </ItemGroup>
 
 </Project>

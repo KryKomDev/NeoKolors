@@ -53,5 +53,17 @@
         
     </Div>
     
+    <Div Class="Slide" Id="4" Visible="false">
+        <Heading>Idk</Heading>
+        
+        <Div>
+            <List>
+                <Text>Lorem</Text>
+                <Text>Ipsum</Text>
+            </List>
+            <Image ImageSource="C:\Users\krystof\Documents\Gymlit-logo-dark-alpha-cp.png"/>
+        </Div>
+    </Div>
+    
 <!--    <Button Position="^100vw - 7ch, ^0ch" Color="black" BackgroundColor="red" Padding="1ch 0ch" Id="X">X</Button>-->
 </Body>

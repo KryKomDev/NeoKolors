@@ -1,10 +1,13 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using NeoKolors.Common;
 using NeoKolors.Console;
-using NeoKolors.Console.Mouse;
-using NeoKolors.Extensions;
+using NeoKolors.Console.Ansi;
+using NeoKolors.Console.Driver.Windows;
+using NeoKolors.Console.Input;
+using NeoKolors.Console.Ansi.Mouse;
 using NeoKolors.Tui;
 using NeoKolors.Tui.Elements;
 using NeoKolors.Tui.Elements.Caching;
@@ -14,7 +17,6 @@ using NeoKolors.Tui.Fonts.Serialization;
 using NeoKolors.Tui.Rendering;
 using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Values;
-using static System.ConsoleModifiers;
 using static NeoKolors.Console.LoggerLevel;
 using Rectangle = NeoKolors.Tui.Rectangle;
 
@@ -58,9 +60,39 @@ public static class Program {
     static Program() {
         Console.OutputEncoding = Encoding.Unicode;
     }
+
+    private static void ConTest() {
+        Console.CursorVisible = false;
+        
+        var inp = new WindowsInput();
+        
+        while (true) {
+            if (!inp.TryGetInputs(out var r)) 
+                continue;
+        
+            foreach (var i in r) {
+                if (i is not { Type: WinImports.WinEventType.KEY, Key.Down: true }) goto Write;
+                
+                switch (i.Key.VirtualKeyCode) {
+                    case WinImports.WinVirtualKeyCode.F when i.Key.Modifiers.GetHasLeftCtrl(): {
+                        Console.Write("\e[16t");
+                        break;
+                    }
+                    case WinImports.WinVirtualKeyCode.C when i.Key.Modifiers.GetHasLeftCtrl(): {
+                        return;
+                    }
+                }
+                
+                Write:
+        
+                Console.WriteLine(i);
+            }
+        }
+    }
     
     [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
     public static void Main() {
+        Console.OutputEncoding = Encoding.Unicode;
         
         NKDebug.Logger.Level = CRITICAL | ERROR | WARNING | INFORMATION | DEBUG | TRACE;
         NKDebug.ExceptionFormatting = true;
@@ -70,8 +102,33 @@ public static class Program {
         NKDebug.Logger.IndentMessage = new LoggerConfig.InlineIndent();
         NKDebug.Logger.MessageHighlightLine = false;
 
-        var style = new NKStyle(NKColor.FromRgb(1, 2, 3), NKColor.Inherit, TextStyles.ALL);
-        Console.WriteLine(style.ToBitmapString());
+        var str = $"OS: {Environment.OSVersion.VersionString}, Platform: {Environment.OSVersion.Platform}";
+        
+        NKDebug.Debug(str);
+        NKDebug.Info($"Used I/O drivers: {NKConsole.InputDriver.GetType().Name}/{NKConsole.OutputDriver.GetType().Name}");
+        
+        // while (true) {
+        //     if (inp.HasInput()) {
+        //         var i = inp.ReadInput().First();
+        //         if (i is {
+        //                 Type: WinImports.EventType.KEY,
+        //                 Key.VirtualKeyCode: WinImports.VirtualKeyCode.C
+        //             }
+        //             && i.Key.Modifiers.GetHasLeftCtrl()
+        //         ) {
+        //             return;  
+        //         }
+        //
+        //         if (i.Type == WinImports.EventType.MOUSE) {
+        //             var (xc, yc) = i.Mouse.Coord;
+        //             Console.Clear();
+        //             NKConsole.SetCursorPosition(xc, yc);
+        //             Console.Write("x");
+        //         }
+        //     }
+        //     
+        //     Thread.Sleep(10);
+        // }
         
         NKFontSerializer.CreateArchive(@"C:\Users\krystof\Desktop\projects\Libs\NeoKolors\NeoKolors.Tui\Fonts\Builtin\Dummy1", 
             @"C:\Users\krystof\Desktop\projects\Libs\NeoKolors\NeoKolors.Tui\Fonts\Builtin\Dummy1.nkf");
@@ -84,8 +141,6 @@ public static class Program {
 
         var fut = NKFontSerializer.ReadDir(
             @"C:\Users\krystof\Desktop\projects\Libs\NeoKolors\NeoKolors.Tui\Fonts\Builtin\Future");
-        
-        Console.CursorVisible = false;
         
         var canv = new NKCharScreen(Console.WindowWidth, Console.WindowHeight);
         
@@ -105,7 +160,7 @@ public static class Program {
         AppEventBus.SetSourceApplication(app);
         
         var tt = new Text("Hello World How you doin?") {
-            Style = new StyleCollection() {
+            Style = new StyleCollection {
                 TextColor = NKConsoleColor.WHITE,
                 Border = BorderStyle.GetNormal(NKConsoleColor.GRAY, NKConsoleColor.DARK_GRAY),
                 BackgroundColor = NKConsoleColor.DARK_GRAY,
@@ -200,8 +255,8 @@ public static class Program {
                 Border = BorderStyle.GetThick(NKConsoleColor.BLACK, NKConsoleColor.GREEN),
                 BackgroundColor = NKConsoleColor.GREEN,
                 TextColor = NKConsoleColor.BLACK,
-                Margin = new (1.Ch, 1.Ch, 1.Ch, 0),
-                Padding = new(1.Ch, 0),
+                Margin = new Spacing(1.Ch, 1.Ch, 1.Ch, 0),
+                Padding = new Spacing(1.Ch, 0),
             }
         };
 
@@ -262,10 +317,10 @@ public static class Program {
         app.Base = body;
         
         app.MouseEvent += m => tt.Content = "ME: " + m;
-        app.KeyEvent   += k => tt.Content = "KE: " + k.AsString();
+        app.KeyEvent   += k => tt.Content = "KE: " + k;
         tt2.OnRender   += () => tt2.Content = DateTime.Now.ToString("O");
         app.KeyEvent   += k => {
-            if (k is { Key: ConsoleKey.Escape, Modifiers: Control }) app.Stop();
+            if (k is { Key: KeyCode.ESCAPE } && k.Modifiers.GetHasCtrl()) app.Stop();
         };
 
         // var p = new Point2D(0, 0);

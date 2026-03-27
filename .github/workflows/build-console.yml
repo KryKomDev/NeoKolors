@@ -3,42 +3,15 @@ name: Build NeoKolors.Console
 on:
   push:
     paths:
-      - 'NeoKolors.Console/**'
-      - 'NeoKolors.Console.Tests/**'
+      - 'Src/Console/**'
+      - 'Src/Tests/Console.Tests/**'
       - '.github/workflows/build-console.yml'
+      - '.github/workflows/_build_template.yml'
 
 jobs:
   build:
-    strategy:
-      matrix:
-        configuration: [Debug, Release]
-
-    runs-on: ubuntu-latest 
-
-    env:
-      SolutionName: NeoKolors.slnx
-      ProjectPath: NeoKolors.Console/NeoKolors.Console.csproj
-      TestProjectPath: NeoKolors.Console.Tests/NeoKolors.Console.Tests.csproj
-
-    steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-
-    - name: Install .NET Core
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 10.0.x
-
-    - name: Restore Projects
-      run: dotnet restore ${{ env.ProjectPath }}
-
-    - name: Build Projects
-      run: dotnet build ${{ env.ProjectPath }} --configuration ${{ matrix.configuration }} --no-restore
-
-    - name: Execute unit tests
-      run: dotnet test ${{ env.TestProjectPath }}
-
-    - name: Restore the application
-      run: dotnet restore ${{ env.ProjectPath }}
+    uses: ./.github/workflows/_build_template.yml
+    with:
+      project_name: Console
+      project_path: Src/Console/NeoKolors.Console.csproj
+      test_project_path: Src/Tests/Console.Tests/NeoKolors.Console.Tests.csproj

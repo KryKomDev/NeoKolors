@@ -10,8 +10,8 @@
     </PropertyGroup>
     
     <ItemGroup>
-        <ProjectReference Include="../../NeoKolors.Common/NeoKolors.Common.csproj"/>
-        <ProjectReference Include="../../NeoKolors.Console/NeoKolors.Console.csproj"/>
+        <ProjectReference Include="../../Src/Common/NeoKolors.Common.csproj"/>
+        <ProjectReference Include="../../Src/Console/NeoKolors.Console.csproj"/>
     </ItemGroup>
 
 </Project>

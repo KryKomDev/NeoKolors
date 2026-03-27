@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="../NeoKolors.Extensions/NeoKolors.Extensions.csproj" />
+        <ProjectReference Include="../../Extensions/NeoKolors.Extensions.csproj" />
     </ItemGroup>
     
     <ItemGroup>
