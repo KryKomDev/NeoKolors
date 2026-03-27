@@ -34,7 +34,7 @@ jobs:
         cache: true
 
     - name: Restore Projects
-      run: dotnet restore ${{ inputs.project_path }} --use-lock-file
+      run: dotnet restore ${{ inputs.project_path }}
 
     - name: Build Projects
       run: dotnet build ${{ inputs.project_path }} --configuration ${{ matrix.configuration }} --no-restore
