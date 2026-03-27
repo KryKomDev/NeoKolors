@@ -86,26 +86,83 @@ public class NKColorTests {
     }
 
     [Fact]
-    public void Equality_ShouldWorkCorrectly() {
-        var c1 = new NKColor(0x123456);
-        var c2 = new NKColor(0x123456);
-        var c3 = new NKColor(0x654321);
-        var c4 = NKColor.Default;
-        var c5 = NKColor.Default;
-        var c6 = NKColor.Inherit;
+    public void FromRgb_ShouldCreateCorrectColor() {
+        var c1 = NKColor.FromRgb(255, 128, 0);
+        Assert.True(c1.IsRgb);
+        Assert.Equal(0xff8000u, c1.AsRgb);
 
-        Assert.True(c1.Equals(c2));
-        Assert.True(c1 == c2);
-        Assert.False(c1 != c2);
-        
-        Assert.False(c1.Equals(c3));
-        Assert.False(c1 == c3);
-        
-        Assert.True(c4.Equals(c5));
-        Assert.False(c4.Equals(c6));
-        
-        Assert.Equal(c1.GetHashCode(), c2.GetHashCode());
-        Assert.NotEqual(c1.GetHashCode(), c3.GetHashCode());
-        Assert.Equal(c4.GetHashCode(), c5.GetHashCode());
+        var c2 = NKColor.FromRgb(0xabcdefu);
+        Assert.Equal(0xabcdefu, c2.AsRgb);
     }
-}
+
+    [Fact]
+    public void Match_ShouldExecuteCorrectFunc() {
+        var rgb = new NKColor(0x112233);
+        var res = rgb.Match(
+            _ => "default",
+            i => $"rgb {i:x6}",
+            _ => "palette",
+            _ => "inherit"
+        );
+        Assert.Equal("rgb 112233", res);
+
+        var pal = new NKColor(NKConsoleColor.BLUE);
+        res = pal.Match(
+            _ => "default",
+            _ => "rgb",
+            c => $"palette {c}",
+            _ => "inherit"
+        );
+        Assert.Equal("palette BLUE", res);
+    }
+
+    [Fact]
+    public void GetInverse_ShouldReturnInvertedColor() {
+        var c = NKColor.FromRgb(255, 0, 100);
+        var inv = c.GetInverse();
+        Assert.Equal(NKColor.FromRgb(0, 255, 155), inv);
+
+        var pal = new NKColor(NKConsoleColor.RED); // 9
+        var invPal = pal.GetInverse(); // (9+8)%16 = 1
+        Assert.Equal(NKConsoleColor.DARK_RED, invPal.AsPalette);
+    }
+
+    [Fact]
+    public void ToString_WithFormats_ShouldReturnExpectedStrings() {
+        var c = NKColor.FromRgb(0x123456);
+        Assert.Equal("123456", c.ToString("P"));
+        Assert.Equal("\e[38;2;18;52;86m", c.ToString("T"));
+        Assert.Equal("\e[48;2;18;52;86m", c.ToString("B"));
+
+        var pal = new NKColor(NKConsoleColor.RED);
+        Assert.Equal("RED", pal.ToString("P"));
+        Assert.Equal("\e[38;5;9m", pal.ToString("T"));
+    }
+
+    [Fact]
+    public void Parse_ShouldParseValidStrings() {
+        Assert.Equal(NKColor.FromRgb(0x123456), NKColor.Parse("#123456"));
+        Assert.Equal(NKColor.Default, NKColor.Parse("Default"));
+        Assert.Equal(NKColor.Inherit, NKColor.Parse("Inherit"));
+        Assert.Equal(new NKColor(NKConsoleColor.BLUE), NKColor.Parse("BLUE"));
+    }
+
+    [Fact]
+    public void TryParse_ShouldHandleInvalidStrings() {
+        Assert.True(NKColor.TryParse("#123456", null, out var c1));
+        Assert.Equal(NKColor.FromRgb(0x123456), c1);
+
+        Assert.False(NKColor.TryParse("invalid", null, out _));
+    }
+
+    [Fact]
+    public void IParsableValue_Interface_ShouldWork() {
+        IParsableValue<NKColor> parsable = new NKColor();
+        Assert.True(parsable.TryParse("#112233", null, out var result));
+        Assert.Equal(0x112233u, result.AsRgb);
+
+        IParsableValue nonGeneric = (IParsableValue)parsable;
+        Assert.True(nonGeneric.TryParse("#445566", null, out var objResult));
+        Assert.Equal(0x445566u, ((NKColor)objResult!).AsRgb);
+    }
+    }

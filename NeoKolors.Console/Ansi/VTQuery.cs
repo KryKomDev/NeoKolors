@@ -99,6 +99,11 @@ public readonly struct VTQuery {
             ? (EscapeCodes.WinOpts)_mode
             : throw new InvalidOperationException($"Cannot convert a {_type} query to an WinOpt query response.");
     
+    public PDAResponse? PrimaryDAResponse =>
+        Type == VTQueryType.PRIMARY_DA
+            ? (PDAResponse?)(Response ?? throw new InvalidOperationException("The query has no response."))
+            : throw new InvalidOperationException($"Cannot convert a {_type} query to a PrimaryDA query response.");
+
     
     public VTQuery() {
         _type     = VTQueryType.INVALID;

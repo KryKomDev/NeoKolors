@@ -12,7 +12,7 @@
 
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
-        <Version>2026.1-beta2</Version>
+        <Version>2026.2</Version>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicense>LICENSE</PackageLicense>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
@@ -22,16 +22,9 @@
         <Description>basic console / logging utilites</Description>
         
         <!-- define constants -->
-        <DefineConstants>
-            $(DefineConstants);
-            NK_ENABLE_NATIVE_IO;
-<!--            NK_DISABLE_DEBUG_LOG_IN_RELEASE;-->
-        </DefineConstants>
+        <DefineConstants>$(DefineConstants);NK_ENABLE_NATIVE_IO</DefineConstants>
         
-        <DefineConstants Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">
-            $(DefineConstants);
-            NK_LIBIMPORT;
-        </DefineConstants>
+        <DefineConstants Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">$(DefineConstants);NK_LIBIMPORT</DefineConstants>
     </PropertyGroup>
     
     <ItemGroup>

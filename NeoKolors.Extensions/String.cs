@@ -245,7 +245,7 @@ public static class String {
         /// <returns>A substring based on the specified start and count parameters, adjusted for safe boundary conditions.</returns>
         [System.Diagnostics.Contracts.Pure]
         public string SafeSubstring(int start, int count) {
-            start = start > s.Length - 1 ? s.Length - 1 : start < 0 ? 0 : start;
+            start = start >= s.Length ? s.Length : start < 0 ? 0 : start;
             count = count < 0 ? 0 : count + start >= s.Length ? s.Length - start : count;
             return s.Substring(start, count);
         }
@@ -328,7 +328,7 @@ public static class String {
         [System.Diagnostics.Contracts.Pure]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IsCapitalWord() =>
-            !s.IsWord() && s.FirstAndAll(char.IsUpper, char.IsLower);
+            s.IsWord() && s.FirstAndAll(char.IsUpper, char.IsLower);
 
         /// <summary>
         /// Pads each line of the given string to the left by the specified number of spaces.
@@ -375,40 +375,16 @@ public static class String {
             bool excludeStart = false,
             bool excludeEnd = false) 
         {
-            int start = -1;
-            int end = -1;
+            int start = s.IndexOf(startChar);
+            if (start == -1) return s;
 
-            for (int i = 0; i < s.Length; i++) {
-                if (s[i] != startChar) continue;
+            int end = s.IndexOf(endChar, start + 1);
+            if (end == -1) return s.Substring(start);
 
-                start = i;
-                break;
-            }
+            int actualStart = excludeStart ? start + 1 : start;
+            int actualEnd = excludeEnd ? end : end + 1;
 
-            if (start == -1) {
-                start = 0;
-            }
-            else if (excludeStart) {
-                if (start + 1 < s.Length)
-                    start++;
-            }
-
-            for (int i = start; i < s.Length; i++) {
-                if (s[i] != endChar) continue;
-
-                end = i;
-                break;
-            }
-
-            if (end == -1) {
-                end = 0;
-            }
-            else if (excludeEnd) {
-                if (end - 1 >= start)
-                    end--;
-            }
-
-            return s.Substring(start, end - start);
+            return s.Substring(actualStart, Math.Max(0, actualEnd - actualStart));
         }
 
         /// <summary>

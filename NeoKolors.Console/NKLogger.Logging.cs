@@ -24,10 +24,10 @@ public sealed partial class NKLogger : ILogger {
     
     private const string CRITICAL_LABEL = "CRITICAL";
     private const string ERROR_LABEL    = "ERROR";
-    private const string WARNING_LABEL  = "warning";
-    private const string INFO_LABEL     = "info";
-    private const string TRACE_LABEL    = "trace";
-    private const string DEBUG_LABEL    = "debug";
+    private const string WARNING_LABEL  = "WARNING";
+    private const string INFO_LABEL     = "INFO";
+    private const string TRACE_LABEL    = "TRACE";
+    private const string DEBUG_LABEL    = "DEBUG";
     
     /// <summary>
     /// Logs a critical error message with optional event identifier and level formatting.

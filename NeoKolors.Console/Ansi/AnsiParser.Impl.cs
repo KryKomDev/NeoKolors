@@ -83,7 +83,7 @@ public abstract partial class AnsiParser {
     /// or if no further input is available.
     /// </summary>
     /// <param name="result">When this method returns, contains the string of characters read from the input
-    /// source, excluding the terminator character, if successful; otherwise, contains <c>null</c>.</param>
+    /// source, INCLUDING the terminator character, if successful; otherwise, contains <c>null</c>.</param>
     /// <param name="terminator">An array of characters that indicate where to stop reading from the input source.</param>
     /// <returns>
     /// Returns <c>true</c> if characters were successfully read up to a terminator; otherwise, <c>false</c>.
@@ -103,7 +103,8 @@ public abstract partial class AnsiParser {
             result = null;
             return false;
         }
-        
+
+        sb.Append(read);
         result = sb.ToString();
         return true;
     }

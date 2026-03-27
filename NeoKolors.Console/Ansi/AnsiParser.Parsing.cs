@@ -89,7 +89,7 @@ public abstract partial class AnsiParser {
     }
 
     private AnsiRecord? ParsePrimaryAttr(string sequence) {
-        var parameters = sequence[..^2].Split(';');
+        var parameters = sequence[..^1].Split(';');
 
         if (parameters.Length == 0)
             return null;
@@ -116,7 +116,7 @@ public abstract partial class AnsiParser {
     }
 
     private AnsiRecord? ParseDecReq(string sequence) {
-        var parameters = sequence[..^3].Split(';');
+        var parameters = sequence[..^1].Split(';');
         
         if (parameters.Length != 2) 
             return null;
@@ -148,7 +148,7 @@ public abstract partial class AnsiParser {
         if (!TryReadUntil(out var seq, 'M', 'm'))
             return null;
 
-        var parameters = seq[..^2].Split(';');
+        var parameters = seq[..^1].Split(';');
 
         if (parameters.Length != 3)
             return null;

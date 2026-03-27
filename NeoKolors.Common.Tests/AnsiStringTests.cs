@@ -113,9 +113,58 @@ public class AnsiStringTests {
         foreach (var line in lines) {
             Assert.True(line.Length <= 11);
         }
+        
+        Assert.Equal("Hello world", lines[0].String);
+        Assert.Equal("this is a", lines[1].String);
+        Assert.Equal("test", lines[2].String);
+    }
 
-        // Reconstruct to see if content is preserved (ignoring potential newlines added or removed logic details for now)
-        // The Chop logic seems to consume spaces for breaks.
+    [Fact]
+    public void Chop_NoSpaces_SplitsAtWidth() {
+        var text = "1234567890";
+        var ansi = new AnsiString(text);
+        var lines = ansi.Chop(3);
+
+        Assert.Equal(4, lines.Length);
+        Assert.Equal("123", lines[0].String);
+        Assert.Equal("456", lines[1].String);
+        Assert.Equal("789", lines[2].String);
+        Assert.Equal("0", lines[3].String);
+    }
+
+    [Fact]
+    public void Chop_ExactlyAtWidth_Works() {
+        var text = "123 456";
+        var ansi = new AnsiString(text);
+        var lines = ansi.Chop(3);
+        
+        // i=0 '1' w=1
+        // i=1 '2' w=2
+        // i=2 '3' w=3
+        // i=3 ' ' w=3. lastSpace = 3. 
+        // w is NOT < 3. 
+        // lastSpace.HasValue (3) -> lines.Add(chars[0..3]) ("123"), i = 4, lastBreak = 4, lastSpace = null.
+        // i=4 '4' w=1
+        // i=5 '5' w=2
+        // i=6 '6' w=3
+        // loop ends.
+        // lastBreak != 7 -> lines.Add(chars[4..7]) ("456").
+        
+        Assert.Equal(2, lines.Length);
+        Assert.Equal("123", lines[0].String);
+        Assert.Equal("456", lines[1].String);
+    }
+    
+    [Fact]
+    public void Chop_PreservesStyles() {
+        var style = new NKStyle(NKConsoleColor.RED);
+        var ansi = new AnsiString("Hello World", style);
+        
+        var lines = ansi.Chop(5);
+        
+        Assert.Equal(2, lines.Length);
+        Assert.Contains("\e[", lines[0].ToString());
+        Assert.Contains("\e[", lines[1].ToString());
     }
 
     [Fact]

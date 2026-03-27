@@ -264,8 +264,9 @@ public sealed class AnsiString :
                 lastSpace = null;
             }
             else {
-                lines.Add(new AnsiString(chars[lastBreak..(i - 1)]));
-                lastBreak = i - 1;
+                lines.Add(new AnsiString(chars[lastBreak..i]));
+                lastBreak = i;
+                i--;
             }
 
             w = 0;

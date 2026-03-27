@@ -195,10 +195,43 @@ public class NKStyleTests {
     }
 
     [Fact]
-    public void SetStyles_Overwrite_ShouldWork() {
+    public void TestSetStyles_Overwrite_ShouldWork() {
         var s = new NKStyle(s: TextStyles.BOLD);
         s.SetStyles(TextStyles.FAINT); // Overwrite, not merge
         Assert.Equal(TextStyles.FAINT, s.Styles);
         Assert.False(s.Styles.HasFlag(TextStyles.BOLD));
     }
-}
+
+    [Fact]
+    public void Override_ShouldApplyNonInheritValues() {
+        var baseStyle = new NKStyle(NKConsoleColor.RED, NKConsoleColor.BLACK, TextStyles.BOLD);
+        var overrider = new NKStyle(NKConsoleColor.BLUE, NKColor.Inherit, TextStyles.ITALIC);
+
+        var result = baseStyle.Override(overrider);
+
+        Assert.Equal((NKColor)NKConsoleColor.BLUE, result.FColor);
+        Assert.Equal((NKColor)NKConsoleColor.BLACK, result.BColor);
+        Assert.Equal(TextStyles.ITALIC, result.Styles);
+    }
+
+    [Fact]
+    public void GetEscSeq_ShouldReturnDiff() {
+        var s1 = new NKStyle(NKConsoleColor.RED, NKConsoleColor.BLACK, TextStyles.BOLD);
+        var s2 = new NKStyle(NKConsoleColor.BLUE, NKConsoleColor.BLACK, TextStyles.BOLD | TextStyles.ITALIC);
+
+        var esc = NKStyle.GetEscSeq(s1, s2);
+
+        // s2 has BLUE instead of RED, and adds ITALIC
+        Assert.Contains("38;5;12", esc); // BLUE
+        Assert.Contains("3;", esc);      // ITALIC start
+        Assert.DoesNotContain("22;", esc); // BOLD should stay
+    }
+
+    [Fact]
+    public void ToString_WithFormats_ShouldReturnExpectedStrings() {
+        var style = new NKStyle(NKConsoleColor.RED, NKConsoleColor.BLACK, TextStyles.BOLD);
+
+        Assert.Contains("FColor: RED, BColor: BLACK, Bold", style.ToString("P", null));
+        Assert.StartsWith("\e[", style.ToAnsi());
+    }
+    }

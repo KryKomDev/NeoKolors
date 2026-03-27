@@ -10,7 +10,7 @@ public static class NKColorExtensions {
     }
 
     extension(uint value) {
-        public NKColor Rbg => NKColor.FromRgb(value);
+        public NKColor Rgb => NKColor.FromRgb(value);
     }
 
     extension(NKConsoleColor value) {

@@ -139,7 +139,7 @@ public static class CharExtensions {
         /// A string representation of the character, or a descriptive name for unprintable characters.
         /// </returns>
         public static string ToDisplay(char c) => 
-            (int)c == ..' ' 
+            (int)c <= ' ' 
                 ? UNPRINTABLE[c] 
                 : c == '\xff' 
                     ? "DEL" 

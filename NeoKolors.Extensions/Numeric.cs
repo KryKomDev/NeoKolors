@@ -60,7 +60,7 @@ public static class Numeric {
         /// <returns>True if the numeric value lies within the range according to the specified
         /// inclusivity/exclusivity; otherwise, false.</returns>
         public bool Belongs(int start, int end, bool leftOpen, bool rightOpen) {
-            return start + (leftOpen ? 0 : 1) <= value && value <= end - (rightOpen ? 0 : 1);
+            return start + (leftOpen ? 1 : 0) <= value && value <= end - (rightOpen ? 1 : 0);
         }
     }
 
