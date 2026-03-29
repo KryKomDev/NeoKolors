@@ -39,5 +39,11 @@ jobs:
     - name: Build Projects
       run: dotnet build ${{ inputs.project_path }} --configuration ${{ matrix.configuration }} --no-restore
 
+    - name: Restore Test Project 
+      run: dotnet restore ${{ inputs.test_project_path }}
+
+    - name: Build Test Project
+      run: dotnet build ${{ inputs.test_project_path }} --configuration ${{ matrix.configuration }} --no-restore
+
     - name: Execute unit tests
       run: dotnet test ${{ inputs.test_project_path }} --configuration ${{ matrix.configuration }} --no-build

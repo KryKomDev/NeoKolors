@@ -35,16 +35,22 @@ jobs:
         dotnet-version: '10.0.x'
         cache: false
 
-    - name: Restore dependencies
+    - name: Restore Target Project
       run: dotnet restore ${{ inputs.project_path }}
 
-    - name: Build
+    - name: Build Target Project
       run: dotnet build ${{ inputs.project_path }} --configuration Release --no-restore
+
+    - name: Restore Test Project
+      run: dotnet restore ${{ inputs.test_project_path }}
+
+    - name: Build Test Project
+      run: dotnet build ${{ inputs.test_project_path }} --configuration Release --no-restore
   
-    - name: Test
+    - name: Run Tests
       run: dotnet test ${{ inputs.test_project_path }} --configuration Release --no-build
 
-    - name: Pack
+    - name: Pack Target Project
       run: dotnet pack ${{ inputs.project_path }} --configuration Release --no-build --output ${{ env.NugetOutputDir }}
 
     - name: Push to NuGet
