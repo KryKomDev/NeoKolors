@@ -37,7 +37,8 @@
     </ItemGroup>
     
     <ItemGroup>
-        <None Include="../Assets/package-icon.png" Pack="true" PackagePath="\"/>
         <None Include="README.md" Pack="true" PackagePath="\"/>
+        <None Include="../../LICENSE" Pack="true" PackagePath="\"/>
+        <None Include="../../Assets/package-icon.png" Pack="true" PackagePath="\"/>
     </ItemGroup>
 </Project>
