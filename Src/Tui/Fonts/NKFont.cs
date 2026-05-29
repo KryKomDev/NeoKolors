@@ -1,6 +1,7 @@
 // NeoKolors
 // Copyright (c) krystof 2026
 
+using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using Metriks;
 using NeoKolors.Common;
@@ -117,11 +118,48 @@ public class NKFont : IExtendedAsciiFont {
     /// </summary>
     public string Name => _fontInfo.Name;
 
-    public Dictionary<NKGlyphSymbol, NKGlyph> Glyphs => _glyphs;
+    /// <summary>
+    /// Provides a collection of glyph mappings, where each glyph is associated with a specific symbol.
+    /// This property represents the immutable dictionary of symbols to their corresponding glyphs,
+    /// offering a way to retrieve the graphical representation of characters in the font.
+    /// </summary>
+    public ImmutableDictionary<NKGlyphSymbol, NKGlyph> Glyphs => _glyphs.ToImmutableDictionary();
+
+    /// <summary>
+    /// Gets the glyph used as a fallback when an unrecognized or unsupported
+    /// symbol is encountered. This glyph substitutes missing or unknown
+    /// characters, ensuring continuity in rendering text.
+    /// </summary>
     public NKGlyph UnknownSymbolGlyph => _unknownSymbolGlyph;
+
+    /// <summary>
+    /// Represents the glyph used for rendering strikethrough effects in text.
+    /// This glyph is used to draw a horizontal line through characters,
+    /// typically indicating deleted or irrelevant information. If no glyph is
+    /// assigned, the strikethrough effect may not be rendered.
+    /// </summary>
     public NKGlyph? StrikethroughGlyph => _strikethrough?.Glyph;
+
+    /// <summary>
+    /// Indicates whether the strikethrough effect is rendered above the letters.
+    /// If no specific value is set, this property defaults to true, meaning the
+    /// strikethrough will be placed above the letters by default.
+    /// </summary>
     public bool RenderStrikethroughAboveLetters => _strikethrough?.RenderAboveLetters ?? true;
+
+    /// <summary>
+    /// Represents the glyph used to render an underline effect within the font system.
+    /// This glyph is typically used to draw a visual line beneath text characters and
+    /// may vary based on font settings or design specifications.
+    /// </summary>
     public NKGlyph? UnderlineGlyph => _underline?.Glyph;
+
+    /// <summary>
+    /// Determines whether the underline is rendered above letters
+    /// in the text layout when using this font.
+    /// When set to true, the underline will be positioned above the glyphs,
+    /// otherwise, it will appear below them.
+    /// </summary>
     public bool RenderUnderlineAboveLetters => _underline?.RenderAboveLetters ?? true;
 
     #endregion
@@ -166,11 +204,15 @@ public class NKFont : IExtendedAsciiFont {
         }
         
         _maxLigatureLength = maxLigatureLength;
-        var standardGlyphs = glyphs.Where(g => g.Key.IsSimple && g.Key.Styles.Styles == TextStyles.NONE && 
-            ((g.Key.SimpleSymbol >= 'A' && g.Key.SimpleSymbol <= 'Z') || (g.Key.SimpleSymbol >= 'a' && g.Key.SimpleSymbol <= 'z')));
-        _fontBaseline = standardGlyphs.Any() 
-            ? standardGlyphs.Max(g => g.Value.BaselineOffset + g.Value.Height) 
-            : (glyphs.Count > 0 ? glyphs.Values.Max(g => g.BaselineOffset + g.Height) : 0);
+        var standardGlyphs = glyphs.Where(g => g.Key is {
+            IsSimple: true, Styles.Styles: TextStyles.NONE, SimpleSymbol: >= 'A' and <= 'Z' or >= 'a' and <= 'z'
+        });
+
+        var keyValuePairs = standardGlyphs as KeyValuePair<NKGlyphSymbol, NKGlyph>[] ?? standardGlyphs.ToArray();
+
+        _fontBaseline = keyValuePairs.Any() 
+            ? keyValuePairs.Max(g => g.Value.BaselineOffset + g.Value.Height) 
+            : glyphs.Count > 0 ? glyphs.Values.Max(g => g.BaselineOffset + g.Height) : 0;
     }
     
     #endregion
@@ -202,7 +244,10 @@ public class NKFont : IExtendedAsciiFont {
     
     public void PlaceString(AnsiString str, ICharCanvas canvas, int maxWidth) =>
         PlaceString(str, canvas, new Area2D(Point2D.Zero, new Point2D(maxWidth, int.MaxValue)));
-    
+
+    public void PlaceString(string str, ICharCanvas canvas, Area2D bounds, TextRenderingOptions options) => 
+        PlaceString(new AnsiString(str), canvas, bounds, options);
+
     public void PlaceString(
         AnsiString str,
         ICharCanvas canvas,
@@ -214,11 +259,7 @@ public class NKFont : IExtendedAsciiFont {
         var options = new TextRenderingOptions(horizontalAlign, verticalAlign, overflow);
         PlaceString(str, canvas, bounds, options);
     }
-    
-    public void PlaceString(string str, ICharCanvas canvas, Area2D bounds, TextRenderingOptions options) {
-        PlaceString(new AnsiString(str), canvas, bounds, options);
-    }
-    
+
     public void PlaceString(AnsiString str, ICharCanvas canvas, Area2D bounds, TextRenderingOptions options) {
         var tokens = Tokenize(str);
         if (tokens.Length == 0) return;
@@ -228,13 +269,20 @@ public class NKFont : IExtendedAsciiFont {
         
         var lines = ComputeLines(tokens, wrapWidth, wordWrap);
         if (lines.Length == 0) return;
-        
-        var totalHeight = lines.Length * _fontInfo.Leading;
-        
+
+        MeasureVisualSpan(lines, out int _, out int _, out int minY, out int maxY, out bool hasPixels);
+
+        int logicalHeight = lines.Length * _fontInfo.Leading;
+        int actualHeight = hasPixels 
+            ? Math.Max(logicalHeight, maxY) - Math.Min(0, minY)
+            : logicalHeight;
+
+        int yShift = hasPixels ? Math.Min(0, minY) : 0;
+
         var yOffset = options.VerticalAlign switch {
-            VerticalAlign.TOP => 0,
-            VerticalAlign.CENTER => Math.Max(0, (bounds.Size.Y - totalHeight) / 2),
-            VerticalAlign.BOTTOM => Math.Max(0, bounds.Size.Y - totalHeight),
+            VerticalAlign.TOP => -yShift,
+            VerticalAlign.CENTER => Math.Max(0, (bounds.Size.Y - actualHeight) / 2) - yShift,
+            VerticalAlign.BOTTOM => Math.Max(0, bounds.Size.Y - actualHeight) - yShift,
             _ => throw new ArgumentOutOfRangeException()
         } + bounds.LowerY;
         
@@ -276,19 +324,44 @@ public class NKFont : IExtendedAsciiFont {
                 var glyphStyles = token.Symbol?.Styles.Styles ?? TextStyles.NONE;
                 
                 // 1. Underline before
-                if (_underline != null && !_underline.RenderAboveLetters && token.FullStyle.Styles.HasFlag(TextStyles.UNDERLINE) && !glyphStyles.HasFlag(TextStyles.UNDERLINE)) {
-                    RenderEffect(canvas, _underline.Glyph!, x, glyph.Width, lineBaseline, token.FullStyle, bounds, options.Overflow);
+                if (_underline?.RenderAboveLetters == false && 
+                    token.FullStyle.Styles.GetIsUnderline() && 
+                    !glyphStyles          .GetIsUnderline()) 
+                {
+                    RenderEffect(
+                        canvas,
+                        _underline.Glyph,
+                        x,
+                        glyph.Width,
+                        lineBaseline,
+                        token.FullStyle,
+                        bounds,
+                        options.Overflow
+                    );
                 }
                 
                 // 2. Strikethrough before
-                if (_strikethrough != null && !_strikethrough.RenderAboveLetters && token.FullStyle.Styles.HasFlag(TextStyles.STRIKETHROUGH) && !glyphStyles.HasFlag(TextStyles.STRIKETHROUGH)) {
-                    RenderEffect(canvas, _strikethrough.Glyph!, x, glyph.Width, lineBaseline, token.FullStyle, bounds, options.Overflow);
+                if (_strikethrough?.RenderAboveLetters == false && 
+                    token.FullStyle.Styles.GetIsStrikethrough() && 
+                    !glyphStyles          .GetIsStrikethrough()) 
+                {
+                    RenderEffect(
+                        canvas,
+                        _strikethrough.Glyph,
+                        x,
+                        glyph.Width,
+                        lineBaseline,
+                        token.FullStyle,
+                        bounds,
+                        options.Overflow
+                    );
                 }
                 
                 // 3. Render the letter itself
                 if (shouldRender) {
                     var yp = lineBaseline - glyph.BaselineOffset - glyph.Height + 1;
                     var finalStyle = token.FullStyle;
+                    
                     if (glyphStyles.HasFlag(TextStyles.NEGATIVE)) {
                         finalStyle = finalStyle with { Styles = finalStyle.Styles & ~TextStyles.NEGATIVE };
                     }
@@ -300,7 +373,11 @@ public class NKFont : IExtendedAsciiFont {
                             int cy = yp + gy;
                             
                             if (!options.Overflow) {
-                                if (cx < bounds.LowerX || cx > bounds.HigherX || cy < bounds.LowerY || cy > bounds.HigherY) {
+                                if (cx < bounds.LowerX  || 
+                                    cx > bounds.HigherX ||
+                                    cy < bounds.LowerY  || 
+                                    cy > bounds.HigherY)
+                                {
                                     continue;
                                 }
                             }
@@ -328,13 +405,37 @@ public class NKFont : IExtendedAsciiFont {
                 }
                 
                 // 4. Underline after
-                if (_underline != null && _underline.RenderAboveLetters && token.FullStyle.Styles.HasFlag(TextStyles.UNDERLINE) && !glyphStyles.HasFlag(TextStyles.UNDERLINE)) {
-                    RenderEffect(canvas, _underline.Glyph!, x, glyph.Width, lineBaseline, token.FullStyle, bounds, options.Overflow);
+                if (_underline?.RenderAboveLetters == true  && 
+                    token.FullStyle.Styles.GetIsUnderline() && 
+                    !glyphStyles.GetIsUnderline()) 
+                {
+                    RenderEffect(
+                        canvas,
+                        _underline.Glyph,
+                        x,
+                        glyph.Width,
+                        lineBaseline,
+                        token.FullStyle,
+                        bounds,
+                        options.Overflow
+                    );
                 }
                 
                 // 5. Strikethrough after
-                if (_strikethrough != null && _strikethrough.RenderAboveLetters && token.FullStyle.Styles.HasFlag(TextStyles.STRIKETHROUGH) && !glyphStyles.HasFlag(TextStyles.STRIKETHROUGH)) {
-                    RenderEffect(canvas, _strikethrough.Glyph!, x, glyph.Width, lineBaseline, token.FullStyle, bounds, options.Overflow);
+                if (_strikethrough?.RenderAboveLetters == true  && 
+                    token.FullStyle.Styles.GetIsStrikethrough() && 
+                    !glyphStyles.GetIsStrikethrough()) 
+                {
+                    RenderEffect(
+                        canvas,
+                        _strikethrough.Glyph,
+                        x,
+                        glyph.Width,
+                        lineBaseline,
+                        token.FullStyle,
+                        bounds,
+                        options.Overflow
+                    );
                 }
             }
         }
@@ -416,16 +517,145 @@ public class NKFont : IExtendedAsciiFont {
 
     private Size2D GetSize(Token[] tokens, int maxWidth) {
         var lines = ComputeLines(tokens, maxWidth);
+        if (lines.Length == 0) return Size2D.Zero;
 
-        var w = 0;
+        var maxLineWidth = 0;
+        for (int i = 0; i < lines.Length; i++) {
+            maxLineWidth = Math.Max(maxLineWidth, lines[i].Width);
+        }
+
+        MeasureVisualSpan(lines, out int minX, out int maxX, out int minY, out int maxY, out bool hasPixels);
+
+        if (!hasPixels) {
+            return new Size2D(maxLineWidth, _fontInfo.Leading * lines.Length);
+        }
+
+        var finalWidth = Math.Max(maxLineWidth, maxX) - Math.Min(0, minX);
+        var finalHeight = Math.Max(_fontInfo.Leading * lines.Length, maxY) - Math.Min(0, minY);
+
+        return new Size2D(finalWidth, finalHeight);
+    }
+
+    private void MeasureVisualSpan(
+        RenderedLineInfo[] lines, 
+        out int            minX, 
+        out int            maxX, 
+        out int            minY, 
+        out int            maxY, 
+        out bool           hasPixels) 
+    {
+        int localMinX = int.MaxValue;
+        int localMaxX = int.MinValue;
+        int localMinY = int.MaxValue;
+        int localMaxY = int.MinValue;
+        bool localHasPixels = false;
 
         for (int i = 0; i < lines.Length; i++) {
-            var l = lines[i];
-            
-            w = Math.Max(w, l.Width);
+            var line = lines[i];
+            var lineBaseline = i * _fontInfo.Leading + _fontBaseline - 1;
+            var x = 0;
+
+            for (int j = 0; j < line.Tokens.Length; j++) {
+                var token = line.Tokens[j];
+                if (token.Type == SPACE) {
+                    continue;
+                }
+
+                var glyph = GetGlyphFromToken(token);
+                if (line.Offsets != null && j < line.Offsets.Length) {
+                    x += line.Offsets[j];
+                }
+
+                bool shouldRender = !token.FullStyle.Styles.HasFlag(TextStyles.INVISIBLE);
+                var glyphStyles = token.Symbol?.Styles.Styles ?? TextStyles.NONE;
+
+                // Process underline before
+                if (_underline?.RenderAboveLetters == false && 
+                    token.FullStyle.Styles.GetIsUnderline() && 
+                    !glyphStyles          .GetIsUnderline()) 
+                {
+                    var yp_u = lineBaseline - _underline.Glyph.BaselineOffset - _underline.Glyph.Height + 1;
+                    ProcessGlyphCells(_underline.Glyph, x, yp_u, isEffect: true, effectWidth: glyph.Width);
+                }
+
+                // Process strikethrough before
+                if (_strikethrough?.RenderAboveLetters == false && 
+                    token.FullStyle.Styles.GetIsStrikethrough() && 
+                    !glyphStyles          .GetIsStrikethrough()) 
+                {
+                    var yp_s = lineBaseline - _strikethrough.Glyph.BaselineOffset - _strikethrough.Glyph.Height + 1;
+                    ProcessGlyphCells(_strikethrough.Glyph, x, yp_s, isEffect: true, effectWidth: glyph.Width);
+                }
+
+                // Process the letter itself
+                if (shouldRender) {
+                    var yp = lineBaseline - glyph.BaselineOffset - glyph.Height + 1;
+                    ProcessGlyphCells(glyph, x, yp);
+                }
+
+                // Process underline after
+                if (_underline?.RenderAboveLetters == true && 
+                    token.FullStyle.Styles.GetIsUnderline() && 
+                    !glyphStyles          .GetIsUnderline()) 
+                {
+                    var yp_u = lineBaseline - _underline.Glyph.BaselineOffset - _underline.Glyph.Height + 1;
+                    ProcessGlyphCells(_underline.Glyph, x, yp_u, isEffect: true, effectWidth: glyph.Width);
+                }
+
+                // Process strikethrough after
+                if (_strikethrough?.RenderAboveLetters == true && 
+                    token.FullStyle.Styles.GetIsStrikethrough() && 
+                    !glyphStyles          .GetIsStrikethrough()) 
+                {
+                    var yp_s = lineBaseline - _strikethrough.Glyph.BaselineOffset - _strikethrough.Glyph.Height + 1;
+                    ProcessGlyphCells(_strikethrough.Glyph, x, yp_s, isEffect: true, effectWidth: glyph.Width);
+                }
+            }
         }
-        
-        return new Size2D(w, _fontInfo.Leading * lines.Length);
+
+        minX = localMinX;
+        maxX = localMaxX;
+        minY = localMinY;
+        maxY = localMaxY;
+        hasPixels = localHasPixels;
+
+        void ProcessGlyphCells(NKGlyph g, int startX, int startY, bool isEffect = false, int effectWidth = 0) {
+            if (isEffect) {
+                for (int dx = 0; dx < effectWidth; dx++) {
+                    int cx = startX + dx;
+                    int col = dx % g.Width;
+                    for (int gy = 0; gy < g.Height; gy++) {
+                        int cy = startY + gy;
+                        var cell = g.Glyph[col, gy];
+
+                        if (cell.Type == GlyphCellType.BACKGROUND) continue;
+
+                        localMinX = Math.Min(localMinX, cx);
+                        localMaxX = Math.Max(localMaxX, cx + 1);
+                        localMinY = Math.Min(localMinY, cy);
+                        localMaxY = Math.Max(localMaxY, cy + 1);
+                        localHasPixels = true;
+                    }
+                }
+            } 
+            else {
+                for (int gx = 0; gx < g.Width; gx++) {
+                    int cx = startX + gx;
+                    for (int gy = 0; gy < g.Height; gy++) {
+                        int cy = startY + gy;
+                        var cell = g.Glyph[gx, gy];
+
+                        if (cell.Type == GlyphCellType.BACKGROUND) continue;
+
+                        localMinX = Math.Min(localMinX, cx);
+                        localMaxX = Math.Max(localMaxX, cx + 1);
+                        localMinY = Math.Min(localMinY, cy);
+                        localMaxY = Math.Max(localMaxY, cy + 1);
+                        localHasPixels = true;
+                    }
+                }
+            }
+        }
     }
 
     private int ComputeLineWidth(Token[] tokens) {
@@ -433,7 +663,7 @@ public class NKFont : IExtendedAsciiFont {
             tokens, 
             _fontInfo.ProportionType switch {
                 MONOSPACED          => GetGlyphOffset_Mono,
-                VARIABLE | ~KERNING => GetGlyphOffset_Variable,
+                VARIABLE            => GetGlyphOffset_Variable,
                 VARIABLE |  KERNING => GetGlyphOffset_Kerning,
                 _                   => throw new ArgumentOutOfRangeException(nameof(_fontInfo.ProportionType))
             }
@@ -481,7 +711,7 @@ public class NKFont : IExtendedAsciiFont {
     private RenderedLineInfo[] ComputeLines(Token[] tokens, int maxWidth, WordWrapType wordWrap = WordWrapType.WORD) {
         return _fontInfo.ProportionType switch {
             MONOSPACED          => ComputeLines_Mono    (tokens, maxWidth, wordWrap),
-            VARIABLE | ~KERNING => ComputeLines_Variable(tokens, maxWidth, wordWrap),
+            VARIABLE            => ComputeLines_Variable(tokens, maxWidth, wordWrap),
             VARIABLE |  KERNING => ComputeLines_Kerning (tokens, maxWidth, wordWrap),
             _                   => throw new ArgumentOutOfRangeException()
         };
@@ -743,7 +973,7 @@ public class NKFont : IExtendedAsciiFont {
 
     #endregion
 
-    public readonly record struct RenderedLineInfo {
+    private readonly record struct RenderedLineInfo {
         public int     Width   { get; }
         public Token[] Tokens  { get; }
         public int[]?  Offsets { get; }

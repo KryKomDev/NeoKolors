@@ -1,0 +1,13 @@
+<FontConfig xmlns="https://krykomdev.github.io/NeoKolors/Schemas/Fonts/v3/">
+    <Name>{FONT_NAME}</Name>
+    <Ligatures>true</Ligatures>
+    <LetterSpacing>1</LetterSpacing>
+    <Leading>5</Leading>
+    <Variable>
+        <Kerning>true</Kerning>
+        <WordSpacing>4</WordSpacing>
+    </Variable>
+    <Defaults>
+        <AlignPointMarkers>+*</AlignPointMarkers>
+    </Defaults>
+</FontConfig>

@@ -279,6 +279,6 @@ internal static class NKFontSerializerHelper {
         // copy the glyph
         Array2D.Copy(glyph, new Point2D(rlx, rty), reduced, Point2D.Zero, new Size2D(rw, rh));
 
-        return new Success<(GlyphCell[,], Point2D)>((reduced, new Point2D(glyph.Len0 -  rlx, glyph.Len1 - rby)));
+        return new Success<(GlyphCell[,], Point2D)>((reduced, new Point2D(rlx, rty)));
     } 
 }

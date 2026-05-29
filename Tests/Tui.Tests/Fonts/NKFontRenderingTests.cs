@@ -161,4 +161,78 @@ public class NKFontRenderingTests {
         
         Assert.True(drawn, "Canvas should contain centered text.");
     }
+
+    [Fact]
+    public void PlaceString_ShouldRenderEWithCaron() {
+        var font = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        var canvas = new NKCharCanvas(10, 10);
+        
+        // Render ě with y-offset of 2 so the caron is not clipped off the top of the canvas
+        var bounds = new Metriks.Area2D(new Metriks.Point2D(0, 2), new Metriks.Point2D(10, 10));
+        font!.PlaceString("ě", canvas, bounds, new NKStyle());
+        
+        // Assert that 'ě' is drawn correctly row by row
+        // Row 2 should have the caron (\/) centered over the e
+        Assert.Equal(' ', canvas[0, 2].Char);
+        Assert.Equal('\\', canvas[1, 2].Char);
+        Assert.Equal('/', canvas[2, 2].Char);
+        Assert.Equal(' ', canvas[3, 2].Char);
+
+        // Row 3 should be the top of the 'e' character ( ___ )
+        Assert.Equal(' ', canvas[0, 3].Char);
+        Assert.Equal('_', canvas[1, 3].Char);
+        Assert.Equal('_', canvas[2, 3].Char);
+        Assert.Equal('_', canvas[3, 3].Char);
+        Assert.Equal(' ', canvas[4, 3].Char);
+
+        // Row 4 should be the middle of the 'e' character (/ -_)
+        Assert.Equal('/', canvas[0, 4].Char);
+        Assert.Equal(' ', canvas[1, 4].Char);
+        Assert.Equal('-', canvas[2, 4].Char);
+        Assert.Equal('_', canvas[3, 4].Char);
+        Assert.Equal(')', canvas[4, 4].Char);
+
+        // Row 5 should be the bottom of the 'e' character (\___|)
+        Assert.Equal('\\', canvas[0, 5].Char);
+        Assert.Equal('_', canvas[1, 5].Char);
+        Assert.Equal('_', canvas[2, 5].Char);
+        Assert.Equal('_', canvas[3, 5].Char);
+        Assert.Equal('|', canvas[4, 5].Char);
+    }
+
+    [Fact]
+    public void GetSize_ShouldHandleOverflowingGlyphs() {
+        var font = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        Assert.NotNull(font);
+        
+        // Assert that measuring works and returns correct dimensions
+        var sizeE = font.GetSize("e");
+        Assert.Equal(5, sizeE.X); // 'e' width is 5
+        Assert.Equal(5, sizeE.Y); // 'e' fits within standard Leading of 5
+
+        var sizeEmpty = font.GetSize("");
+        Assert.Equal(0, sizeEmpty.X);
+        Assert.Equal(0, sizeEmpty.Y);
+    }
+
+    [Fact]
+    public void PlaceString_ShouldPreventClippingByAutomaticallyShiftingDown() {
+        var font = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        var canvas = new NKCharCanvas(10, 10);
+        
+        // Render ě with y-offset of 0.
+        // Even with y-offset of 0, we verify that visual centering or TOP alignment correctly
+        // places 'ě' without vertical clipping.
+        var bounds = new Metriks.Area2D(new Metriks.Point2D(0, 0), new Metriks.Point2D(10, 10));
+        font!.PlaceString("ě", canvas, bounds, new NKStyle());
+        
+        // Assert that the caron is fully visible at y = 0
+        Assert.Equal('\\', canvas[1, 0].Char);
+        Assert.Equal('/', canvas[2, 0].Char);
+
+        // Assert that the top of 'e' is at y = 1
+        Assert.Equal('_', canvas[1, 1].Char);
+        Assert.Equal('_', canvas[2, 1].Char);
+        Assert.Equal('_', canvas[3, 1].Char);
+    }
 }

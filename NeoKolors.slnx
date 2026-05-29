@@ -9,6 +9,8 @@
         <Project Path="Src/Settings/NeoKolors.Settings.csproj" />
         <Project Path="Src/Tui/NeoKolors.Tui.csproj" />
     </Folder>
+    
+    <Folder Name="/Src/Tui/" />
 
     <Folder Name="/Src/Tui/Core/">
         <Project Path="Src/Tui/Core/NeoKolors.Tui.Core.csproj" />
@@ -34,6 +36,12 @@
         <Project Path="Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj" />
     </Folder>
 
+    <!--  Tools  -->
+    
+    <Folder Name="/Tools/">
+        <Project Path="Tools/NKFontTool/NKFontTool.csproj" />
+    </Folder>
+
     <!--  Examples  -->
     
     <Folder Name="/Examples/">
@@ -42,10 +50,6 @@
         <Project Path="Examples/Testing/Testing.csproj" />
         <Project Path="Examples/WeekNumber/WeekNumber.csproj" />
         <Project Path="Examples/XmlTestApp/XmlTestApp.csproj" />
-    </Folder>
-
-    <Folder Name="/Tools/">
-
     </Folder>
     
 </Solution>

@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) krystof 2026
 
 using System.Text;
@@ -73,25 +73,19 @@ public class NKGlyph : IGlyph {
 
         var transpositionVector = mainAlignPoint.Position - secondaryAlignPoint.Position;
 
-        var minCoords = Point2D.Min(Point2D.Zero,        transpositionVector - secondaryAlignPoint.Position);
-        var maxCoords = Point2D.Max(main.Size.ToPoint(), transpositionVector + secondaryAlignPoint.Position);
+        var minCoords = Point2D.Min(Point2D.Zero,        transpositionVector);
+        var maxCoords = Point2D.Max(main.Size.ToPoint(), transpositionVector + secondary.Size.ToPoint());
 
         var newSize  = (maxCoords - minCoords).ToSize();
         var newGlyph = new GlyphCell[newSize.X, newSize.Y];
 
-        var mainOffset      = Point2D.Max(Point2D.Zero, -transpositionVector);
-        var secondaryOffset = Point2D.Max(Point2D.Zero,  transpositionVector);
+        var mainOffset      = Point2D.Max(Point2D.Zero, -minCoords);
+        var secondaryOffset = Point2D.Max(Point2D.Zero, transpositionVector - minCoords);
 
         Array2D.Copy(main     .Glyph, Point2D.Zero, newGlyph, mainOffset,      main     .Size);
         Array2D.Copy(secondary.Glyph, Point2D.Zero, newGlyph, secondaryOffset, secondary.Size);
 
-        var newBaseline = main.BaselineOffset -
-            Math.Max(
-                0,
-                transpositionVector.Y
-                + secondary.Height
-                - main.Height
-            );
+        var newBaseline = main.BaselineOffset + main.Height + mainOffset.Y - newSize.Y;
 
         var newAlignPoints = new AlignPointCollection(main.AlignPoints);
         newAlignPoints.AddRange(secondary.AlignPoints);
@@ -127,8 +121,8 @@ public class NKGlyph : IGlyph {
         Array2D.Copy(main     .Glyph, Point2D.Zero, newGlyph, mainOffset,      main     .Size);
         Array2D.Copy(secondary.Glyph, Point2D.Zero, newGlyph, secondaryOffset, secondary.Size);
 
-        // Calculate the new baseline by taking the maximum of the adjusted baselines of both glyphs
-        var newBaseline = Math.Max(main.BaselineOffset + mainOffset.Y, secondary.BaselineOffset + secondaryOffset.Y);
+        // Calculate the new baseline by aligning it with the main glyph's baseline
+        var newBaseline = main.BaselineOffset + main.Height + mainOffset.Y - newSize.Y;
 
         var newAlignPoints = new AlignPointCollection(main.AlignPoints);
         newAlignPoints.AddRange(secondary.AlignPoints);

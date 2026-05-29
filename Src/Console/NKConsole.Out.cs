@@ -38,7 +38,11 @@ public static partial class NKConsole {
     /// <param name="args">An array of objects to write using the format string.</param>
     public static void Write([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object[] args) => 
         OutputDriver.Write(format, args);
-
+    
+    /// <summary>
+    /// Writes a newline to the output.
+    /// </summary>
+    public static void WriteLine() => OutputDriver.Write("\n");
     
     /// <summary>
     /// Writes the specified span of characters followed by a new line to the output.
@@ -124,6 +128,16 @@ public static partial class NKConsole {
     public static void Write(string s, NKColor c) => 
         Stdio.Write(s.AddColor(c));
 
+    
+    /// <summary>
+    /// prints a string colored by the universal <see cref="NKColor"/>
+    /// </summary>
+    /// <param name="s">string to print</param>
+    /// <param name="t">style</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Write(string s, TextStyles t) => 
+        Stdio.Write(s.AddStyle(t));
+    
 
     /// <summary>
     /// Writes a string to the console with the specified color applied.
@@ -188,6 +202,15 @@ public static partial class NKConsole {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void WriteLine(string s, NKColor c) => 
         Stdio.WriteLine(s.AddColor(c));
+    
+    /// <summary>
+    /// prints a string colored by the universal <see cref="NKColor"/>
+    /// </summary>
+    /// <param name="s">string to print</param>
+    /// <param name="t">style</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void WriteLine(string s, TextStyles t) => 
+        Stdio.WriteLine(s.AddStyle(t));
 
 
     /// <summary>

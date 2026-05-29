@@ -14,11 +14,15 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageIcon>package-icon.png</PackageIcon>
         
-        <DefineConstants>
-            NK_FONTS_ENABLE_AUTO_REGISTRATION
-        </DefineConstants>
+        <DefineConstants>NK_FONTS_ENABLE_AUTO_REGISTRATION</DefineConstants>
     </PropertyGroup>
 
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+        <None Include="../../LICENSE" Pack="true" PackagePath="\"/>
+        <None Include="../../Assets/package-icon.png" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+    
     <ItemGroup>
         <ProjectReference Include="../NeoKolors.Tui.Fonts.csproj" />
     </ItemGroup>

@@ -17,6 +17,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+        <None Include="../../LICENSE" Pack="true" PackagePath="\"/>
+        <None Include="../../Assets/package-icon.png" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+    
+    <ItemGroup>
         <ProjectReference Include="../../Extensions/NeoKolors.Extensions.csproj" />
         <ProjectReference Include="../../Common/NeoKolors.Common.csproj" />
         <ProjectReference Include="../Core/NeoKolors.Tui.Core.csproj" />

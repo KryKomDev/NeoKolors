@@ -596,7 +596,7 @@ public sealed class AnsiString :
             result += enumerator.Current;
         }
         
-        return result;
+        return result ?? throw new InvalidOperationException();
     }
 
     /// <summary>

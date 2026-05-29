@@ -708,8 +708,8 @@ public static partial class NKFontSerializer {
         NKFontSerializerHelper.Mask(
             glyph, 
             m.SpaceConf,
-            m.MapForg,
-            m.MapBckg
+            m.MapForg ?? Array.Empty<char>(),
+            m.MapBckg ?? Array.Empty<char>()
         );
 
         var rr = NKFontSerializerHelper.Reduce(glyph);
@@ -722,9 +722,12 @@ public static partial class NKFontSerializer {
         foreach (var ap in apc) {
             ap.SetPosition(ap.Position - offset);
         }
+
+        var bottomTrim = lines.Length - offset.Y - glyph.GetLength(1);
+        var newBaseline = baseline - bottomTrim;
         
         return new Success<(NKGlyph Glyph, string[] Warnings)>((
-            new NKGlyph(glyph, offset.Y + baseline, apc),
+            new NKGlyph(glyph, newBaseline, apc),
             warns.ToArray()
         ));
     }
@@ -747,8 +750,10 @@ public static partial class NKFontSerializer {
             return result.AsT1;
 
         var success = result.AsT0.Value;
+        var bottomTrim = lines.Length - success.Offset.Y - success.Glyph.GetLength(1);
+        var newBaseline = baseline - bottomTrim;
 
-        return new Success<NKGlyph>(new NKGlyph(success.Glyph, baseline + success.Offset.Y));
+        return new Success<NKGlyph>(new NKGlyph(success.Glyph, newBaseline));
     }
 
     private static OneOf<Success<GlyphDefNode>, Error<string>> ResolveReference(

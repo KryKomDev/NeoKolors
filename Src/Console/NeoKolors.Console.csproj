@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -16,20 +16,14 @@
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicense>LICENSE</PackageLicense>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageIcon>package-icon.png</PackageIcon>
         <Description>basic console / logging utilites</Description>
         
         <!-- define constants -->
-        <DefineConstants>
-            $(DefineConstants)
-            NK_ENABLE_NATIVE_IO
-        </DefineConstants>
+        <DefineConstants>$(DefineConstants);NK_ENABLE_NATIVE_IO</DefineConstants>
         
-        <DefineConstants Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">
-            $(DefineConstants);NK_LIBIMPORT
-        </DefineConstants>
+        <DefineConstants Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">$(DefineConstants);NK_LIBIMPORT</DefineConstants>
     </PropertyGroup>
     
     <ItemGroup>

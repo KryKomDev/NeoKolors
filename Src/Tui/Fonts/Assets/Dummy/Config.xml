@@ -8,7 +8,6 @@
         <WordSpacing>5</WordSpacing>
     </Variable>
     <Defaults>
-        <AlignPointMarkers>+*</AlignPointMarkers>
         <Mask>custom-bckg: 'b'</Mask>
     </Defaults>
 </FontConfig>

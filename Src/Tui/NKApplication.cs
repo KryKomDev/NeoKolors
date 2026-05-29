@@ -8,7 +8,6 @@ using Metriks;
 using NeoKolors.Console.Driver;
 using NeoKolors.Console.Driver.Dotnet;
 using NeoKolors.Console.Input;
-using NeoKolors.Tui.Extensions;
 using NeoKolors.Tui.Global;
 using NeoKolors.Tui.Core;
 

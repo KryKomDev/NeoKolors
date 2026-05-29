@@ -54,4 +54,35 @@ public class NKGlyphCombineTests {
         Assert.Equal('A', combined.Glyph[0, 0].Character);
         Assert.Equal('B', combined.Glyph[1, 1].Character);
     }
+
+    [Fact]
+    public void Combine_Bottom_BaselineShouldBeMainBaseline() {
+        var g1 = CreateGlyph('A'); // size 1x1, baseline 0
+        var g2 = CreateGlyph('B'); // size 1x1, baseline 0
+
+        var combined = NKGlyph.Combine(g1, g2, Drct.BOTTOM);
+
+        // A should be at (0,0), B at (0,1)
+        // The main glyph is A, which remains at y=0. Its bottom is 1 unit above the bottom of the combined glyph,
+        // so the combined glyph's bottom sits 1 unit below the baseline, making BaselineOffset = -1.
+        Assert.Equal(-1, combined.BaselineOffset);
+    }
+
+    [Fact]
+    public void Combine_CharAlign_BaselineShouldBeMainBaseline() {
+        var g1Glyph = new GlyphCell[1, 2];
+        g1Glyph[0, 0] = GlyphCell.Char('A');
+        g1Glyph[0, 1] = GlyphCell.Char('B');
+        var g1 = new NKGlyph(g1Glyph, 1, new[] { new AlignPoint('x', new Metriks.Point2D(0, 0)) });
+
+        var g2Glyph = new GlyphCell[1, 1];
+        g2Glyph[0, 0] = GlyphCell.Char('C');
+        var g2 = new NKGlyph(g2Glyph, 0, new[] { new AlignPoint('x', new Metriks.Point2D(0, 0)) });
+
+        var combined = NKGlyph.Combine(g1, g2, 'x');
+
+        Assert.NotNull(combined);
+        // The main glyph 'g1' is at y=0, so baseline should be main's baseline (1).
+        Assert.Equal(1, combined.BaselineOffset);
+    }
 }

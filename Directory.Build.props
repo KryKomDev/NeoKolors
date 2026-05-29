@@ -1,8 +1,6 @@
-﻿<Project>
+<Project>
     <PropertyGroup>
-        <DefineConstants>
-            $(DefineConstants)
-            NK_RENDERING_PROFILING
-        </DefineConstants>
+        <DefineConstants>$(DefineConstants);NK_RENDERING_PROFILING</DefineConstants>
+        <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
     </PropertyGroup>
 </Project>

@@ -16,13 +16,7 @@
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageIcon>package-icon.png</PackageIcon>
 
-        <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
-
-        <DefineConstants>
-            $(DefineConstants)
-            NK_ENABLE_CACHE_ANALYSIS
-<!--            NK_IMMEDIATE_RENDERING-->
-        </DefineConstants>
+        <DefineConstants>$(DefineConstants);NK_ENABLE_CACHE_ANALYSIS</DefineConstants>
 
         <DefaultItemExcludes>$(DefaultItemExcludes);Generators\**;Core\**;Fonts\**</DefaultItemExcludes>
     </PropertyGroup>

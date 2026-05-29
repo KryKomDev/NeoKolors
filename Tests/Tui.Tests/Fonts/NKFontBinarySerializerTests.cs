@@ -19,7 +19,7 @@ public class NKFontBinarySerializerTests {
 
         // 2. Serialize directly to a MemoryStream in binary format
         using var memoryStream = new MemoryStream();
-        NKFontSerializer.SerializeBinary(originalFont!, memoryStream);
+        NKFontSerializer.SerializeBinary(originalFont, memoryStream);
         memoryStream.Position = 0;
 
         // 3. Deserialize back into a new NKFont instance
@@ -27,7 +27,7 @@ public class NKFontBinarySerializerTests {
         Assert.NotNull(deserializedFont);
 
         // 4. Validate NKFontInfo metadata
-        Assert.Equal(originalFont.Info.Name, deserializedFont!.Info.Name);
+        Assert.Equal(originalFont.Info.Name, deserializedFont.Info.Name);
         Assert.Equal(originalFont.Info.Ligatures, deserializedFont.Info.Ligatures);
         Assert.Equal(originalFont.Info.Leading, deserializedFont.Info.Leading);
         Assert.Equal(originalFont.Info.LetterSpacing, deserializedFont.Info.LetterSpacing);

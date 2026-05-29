@@ -1,10 +1,7 @@
 // NeoKolors
 // Copyright (c) krystof 2026
 
-using System;
-using System.IO;
 using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
 using NeoKolors.Tui.Fonts.Serialization;
 
 namespace NeoKolors.Tui.Fonts.Build;

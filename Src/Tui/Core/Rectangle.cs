@@ -80,7 +80,7 @@ public struct Rectangle : IEquatable<Rectangle> {
         }
     }
     
-    public Core.Size Size => new(Width, Height);
+    public Size Size => new(Width, Height);
     
     public Point Lower => new(_lowerX, _lowerY);
     public Point Higher => new(_higherX, _higherY);
@@ -94,7 +94,7 @@ public struct Rectangle : IEquatable<Rectangle> {
         _higherY = Math.Max(lowerY, higherY);
     }
 
-    public Rectangle(Point p, Core.Size s) {
+    public Rectangle(Point p, Size s) {
         _lowerX = p.X;
         _lowerY = p.Y;
         _higherX = p.X + s.Width - 1;
@@ -128,10 +128,10 @@ public struct Rectangle : IEquatable<Rectangle> {
 
     public override string ToString() => $"[{LowerX}, {LowerY}]:[{HigherX}, {HigherY}] {Size.ToString()}";
     
-    public (Point Location, Core.Size Size) Decompose() => (Lower, Size);
+    public (Point Location, Size Size) Decompose() => (Lower, Size);
     
-    public static implicit operator (Point Location, Core.Size Size)(Rectangle r) => r.Decompose();
-    public static implicit operator Rectangle((Point Location, Core.Size Size) s) => new(s.Location, s.Size);
+    public static implicit operator (Point Location, Size Size)(Rectangle r) => r.Decompose();
+    public static implicit operator Rectangle((Point Location, Size Size) s) => new(s.Location, s.Size);
     
     public static Rectangle operator +(Rectangle r, Point p) 
         => new(r.LowerX + p.X, r.LowerY + p.Y, r.HigherX + p.X, r.HigherY + p.Y);
