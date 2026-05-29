@@ -2,7 +2,6 @@
 // Copyright (c) 2026 KryKom
 
 global using NeoKolors.Common;
-global using NeoKolors.Common.Util;
 global using NeoKolors.Console;
 global using NeoKolors.Extensions;
 global using NeoKolors.Tui.Exceptions;

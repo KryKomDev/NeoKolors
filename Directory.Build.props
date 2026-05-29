@@ -1,0 +1,8 @@
+﻿<Project>
+    <PropertyGroup>
+        <DefineConstants>
+            $(DefineConstants)
+            NK_RENDERING_PROFILING
+        </DefineConstants>
+    </PropertyGroup>
+</Project>

@@ -1,7 +1,7 @@
 ﻿// NeoKolors
 // Copyright (c) 2026 KryKom
 
-using NeoKolors.Tui.Styles.Values;
+using NeoKolors.Tui.Core;
 
 namespace NeoKolors.Tui.Styles.Properties;
 

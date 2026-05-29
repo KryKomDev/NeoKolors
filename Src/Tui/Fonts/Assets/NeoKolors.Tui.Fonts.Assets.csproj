@@ -1,0 +1,60 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFrameworks>net10.0;net8.0;net5.0;netstandard2.1</TargetFrameworks>
+        <LangVersion>14</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <Authors>KryKom</Authors>
+        <Company>KryKom</Company>
+        <Version>2026.2</Version>
+        <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>package-icon.png</PackageIcon>
+        
+        <DefineConstants>
+            NK_FONTS_ENABLE_AUTO_REGISTRATION
+        </DefineConstants>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../NeoKolors.Tui.Fonts.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Remove="CompileFontsTask.Code.cs" />
+        <None Include="CompileFontsTask.Code.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="Bytesized.nkf" />
+        <EmbeddedResource Include="Dummy.nkf" />
+        <EmbeddedResource Include="Future.nkf" />
+    </ItemGroup>
+
+    <!-- Inline C# Task for Font Compilation -->
+    <UsingTask TaskName="CompileFontsTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+        <ParameterGroup>
+            <SourceDir ParameterType="System.String" Required="true" />
+            <FontsAssemblyPath ParameterType="System.String" Required="true" />
+            <References ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+        </ParameterGroup>
+        <Task>
+            <Using Namespace="System" />
+            <Using Namespace="System.IO" />
+            <Using Namespace="System.Reflection" />
+            <Using Namespace="System.Collections.Generic" />
+            <Code Type="Fragment" Language="cs" Source="$(MSBuildProjectDirectory)\CompileFontsTask.Code.cs" />
+        </Task>
+    </UsingTask>
+
+    <Target Name="CompileBuiltinFonts" AfterTargets="ResolveReferences" BeforeTargets="PrepareResources">
+        <PropertyGroup>
+            <!-- Resolve the path to the referenced NeoKolors.Tui.Fonts.dll assembly -->
+            <FontsDllPath>..\bin\$(Configuration)\$(TargetFramework)\NeoKolors.Tui.Fonts.dll</FontsDllPath>
+        </PropertyGroup>
+        <CompileFontsTask SourceDir="$(ProjectDir)." FontsAssemblyPath="$(FontsDllPath)" References="@(ReferencePath)" />
+    </Target>
+</Project>

@@ -3,7 +3,7 @@
 // Copyright (c) 2026 KryKom
 //
 
-using NeoKolors.Tui.Rendering;
+using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Values;
 

@@ -15,4 +15,4 @@ jobs:
     with:
       project_name: Tui
       project_path: Src/Tui/NeoKolors.Tui.csproj
-      test_project_path: Src/Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
+      test_project_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj

@@ -2,10 +2,9 @@
 // Copyright (c) 2026 KryKom
 
 using NeoKolors.Tui.Elements.Caching;
-using NeoKolors.Tui.Rendering;
+using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Properties;
-using NeoKolors.Tui.Styles.Values;
 
 namespace NeoKolors.Tui.Elements;
 

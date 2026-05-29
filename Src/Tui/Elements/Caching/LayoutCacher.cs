@@ -1,6 +1,8 @@
 ﻿// NeoKolors
 // Copyright (c) 2026 KryKom
 
+using NeoKolors.Tui.Core;
+
 namespace NeoKolors.Tui.Elements.Caching;
 
 /// <summary>

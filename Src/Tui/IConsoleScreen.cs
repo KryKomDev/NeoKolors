@@ -5,7 +5,7 @@
 
 using NeoKolors.Console.Events;
 using NeoKolors.Tui.Fonts;
-using NeoKolors.Tui.Styles.Values;
+using NeoKolors.Tui.Core;
 using SkiaSharp;
 
 namespace NeoKolors.Tui;
@@ -56,7 +56,7 @@ public interface IConsoleScreen {
     /// <param name="y">y starting pos</param>
     /// <param name="font">the font of the string</param>
     /// <param name="style">the style of the string</param>
-    public void DrawText(string s, int x, int y, IFont font, NKStyle style);
+    public void DrawText(string s, int x, int y, IAsciiFont font, NKStyle style);
 
     /// <summary>
     /// writes a string to the console screen
@@ -69,7 +69,7 @@ public interface IConsoleScreen {
     /// <param name="vAlign">the vertical alignment of the string</param>
     /// <param name="enableTopOverflow">if true, renders the text that overflows at the top</param>
     /// <param name="enableBottomOverflow">if true, renders the text that overflows at the bottom</param>
-    public void DrawText(string s, Rectangle border, IFont font, NKStyle style = default,
+    public void DrawText(string s, Rectangle border, IAsciiFont font, NKStyle style = default,
         HorizontalAlign hAlign = HorizontalAlign.LEFT,
         VerticalAlign vAlign = VerticalAlign.TOP, 
         bool enableTopOverflow = true,

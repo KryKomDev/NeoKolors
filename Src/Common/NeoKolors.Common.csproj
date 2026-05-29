@@ -12,7 +12,6 @@
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicense>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicense>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageIcon>package-icon.png</PackageIcon>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -48,5 +47,9 @@
     
     <ItemGroup>
         <ProjectReference Include="../Extensions/NeoKolors.Extensions.csproj"/>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="Docs\" />
     </ItemGroup>
 </Project>

@@ -1,6 +1,8 @@
 ﻿// NeoKolors
 // Copyright (c) 2026 KryKom
 
+using NeoKolors.Tui.Core;
+
 namespace NeoKolors.Tui.Styles.Values;
 
 internal readonly record struct CheckerBckg : IParsableValue<CheckerBckg> {
@@ -8,6 +10,7 @@ internal readonly record struct CheckerBckg : IParsableValue<CheckerBckg> {
     public NKColor C2 { get; }
     public int Width { get; }
     public int Height { get; }
+    public Size FieldSize => new(Width, Height);
     
     public bool Enabled { get; }
 

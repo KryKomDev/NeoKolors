@@ -1,12 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>14</LangVersion>
         <TargetFrameworks>net5.0;net8.0;net9.0;netstandard2.1;net10.0</TargetFrameworks>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <Configurations>Debug;Release;WIP</Configurations>
         <Platforms>AnyCPU</Platforms>
 
         <Authors>KryKom</Authors>
@@ -21,23 +19,28 @@
         <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
 
         <DefineConstants>
-            NK_ENABLE_CACHE_ANALYSIS;
-            NK_RENDERING_PROFILING;
+            $(DefineConstants)
+            NK_ENABLE_CACHE_ANALYSIS
 <!--            NK_IMMEDIATE_RENDERING-->
         </DefineConstants>
+
+        <DefaultItemExcludes>$(DefaultItemExcludes);Generators\**;Core\**;Fonts\**</DefaultItemExcludes>
     </PropertyGroup>
     
     <ItemGroup>
         <ProjectReference Include="..\Console\NeoKolors.Console.csproj" />
         <ProjectReference Include="..\Common\NeoKolors.Common.csproj" />
         <ProjectReference Include="..\Extensions\NeoKolors.Extensions.csproj" />
-        <ProjectReference Include="..\Tui.Generators\NeoKolors.Tui.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-    </ItemGroup>
 
-    <ItemGroup>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-            <_Parameter1>NeoKolors.Tui.Tests</_Parameter1>
-        </AssemblyAttribute>
+        <!-- internal projects -->
+        <ProjectReference Include="./Fonts/NeoKolors.Tui.Fonts.csproj"/>
+        <ProjectReference Include="./Fonts/Assets/NeoKolors.Tui.Fonts.Assets.csproj"/>
+        <ProjectReference Include="./Core/NeoKolors.Tui.Core.csproj" />
+        <ProjectReference 
+            Include=".\Generators\NeoKolors.Tui.Generators.csproj" 
+            OutputItemType="Analyzer" 
+            ReferenceOutputAssembly="false" 
+        />
     </ItemGroup>
 
     <ItemGroup>
@@ -47,7 +50,7 @@
         </PackageReference>
         <PackageReference Include="Implyzer" Version="2026.1.0" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
-        <PackageReference Include="Metriks" Version="1.1.8.1" />
+        <PackageReference Include="Metriks" Version="2026.2.4.1" />
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -65,9 +68,4 @@
 <!--        <EmbeddedResource Include="./Schemas/Fonts/V2/Font.Map.xsd"/>-->
 <!--    </ItemGroup>-->
     
-    <ItemGroup>
-        <EmbeddedResource Include="./Fonts/Builtin/Bytesized.nkf"/>
-        <EmbeddedResource Include="./Fonts/Builtin/Dummy1.nkf"/>
-        <EmbeddedResource Include="./Fonts/Builtin/Future.nkf"/>
-    </ItemGroup>
 </Project>

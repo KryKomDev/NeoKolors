@@ -4,7 +4,7 @@
 using System.Diagnostics.Contracts;
 using Implyzer;
 using NeoKolors.Tui.Dom;
-using NeoKolors.Tui.Rendering;
+using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Values;
 namespace NeoKolors.Tui.Elements;

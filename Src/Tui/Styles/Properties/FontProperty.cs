@@ -5,14 +5,14 @@ using NeoKolors.Tui.Fonts;
 
 namespace NeoKolors.Tui.Styles.Properties;
 
-public struct FontProperty : IStyleProperty<IFont, FontProperty> {
-    public IFont Value { get; }
+public struct FontProperty : IStyleProperty<IAsciiFont, FontProperty> {
+    public IAsciiFont Value { get; }
     
-    public FontProperty(IFont value) {
+    public FontProperty(IAsciiFont value) {
         Value = value;
     }
 
     public FontProperty() {
-        Value = IFont.Default;
+        Value = IAsciiFont.Default;
     }
 }

@@ -4,11 +4,13 @@
 using NeoKolors.Console.Events;
 using NeoKolors.Tui.Events;
 using System.Diagnostics;
+using Metriks;
 using NeoKolors.Console.Driver;
+using NeoKolors.Console.Driver.Dotnet;
 using NeoKolors.Console.Input;
 using NeoKolors.Tui.Extensions;
 using NeoKolors.Tui.Global;
-using NeoKolors.Tui.Rendering;
+using NeoKolors.Tui.Core;
 
 namespace NeoKolors.Tui;
 
@@ -18,8 +20,8 @@ public class NKApplication : IMouseSupportingApplication {
     
     // --- Screen ---
     private readonly NKCharScreen _screen = new(Stdio.BufferSize);
-    private Size _lastSize     = Size.Zero;
-    private Size _lasPixelSize = Size.Zero;
+    private Size2D _lastSize     = Size2D.Zero;
+    private Size2D _lasPixelSize = Size2D.Zero;
 
     public NKCharScreen Screen => _screen;
     
@@ -205,6 +207,7 @@ public class NKApplication : IMouseSupportingApplication {
         );
 
         #if NK_RENDERING_PROFILING
+        
         LOGGER.Debug(
             $"\n  Screen rendering:    {_screen.ScrTotalTime}" +
             $"\n   ├ Writing time:     {_screen.WritingTime}" +
@@ -221,6 +224,7 @@ public class NKApplication : IMouseSupportingApplication {
             $"\n   ├ Bounds check: {NKConsole.CursorPosition_BoundsCheckTime}" +
             $"\n   └ Position set: {NKConsole.CursorPosition_SetPosTime}"
         );
+        
         #endif
     }
     
@@ -232,8 +236,8 @@ public class NKApplication : IMouseSupportingApplication {
         
         if (_lastSize != Stdio.BufferSize) {
             _lastSize = Stdio.BufferSize;
-            _screen.Resize(_lastSize.Width, _lastSize.Height);
-            InvokeResizeEvent(new ResizeEventArgs(_lastSize.Width, _lastSize.Height));
+            _screen.Resize(_lastSize.X, _lastSize.Y);
+            InvokeResizeEvent(new ResizeEventArgs(_lastSize.X, _lastSize.Y));
             _lasPixelSize = NKConsole.GetBuffSizePx();
             ScreenSizeTracker.SetScreenSizeCh(_lastSize);
             ScreenSizeTracker.SetScreenSizePx(_lasPixelSize);

@@ -288,9 +288,10 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
         
         if (s.StartsWith('#')) {
             var hex = s[1..];
-            if (uint.TryParse(hex, NumberStyles.HexNumber, null, out uint rgb)) {
-                return FromRgb(rgb);
-            }
+            
+            return uint.TryParse(hex, NumberStyles.HexNumber, null, out uint rgb) 
+                ? FromRgb(rgb)
+                : throw new FormatException($"Invalid color: {s}");
         }
         
         if (string.Equals(s, "Default", StringComparison.OrdinalIgnoreCase)) return Default;
@@ -320,6 +321,51 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
     NKColor IParsableValue<NKColor>.Parse(string s, IFormatProvider? provider) => Parse(s, provider);
     bool IParsableValue<NKColor>.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out NKColor result) => TryParse(s, provider, out result);
 
+    /// <summary>
+    /// Performs linear interpolation (Lerp) between two RGB colors based on a specified fraction.
+    /// </summary>
+    /// <param name="start">The starting color as an NKColor in RGB format.</param>
+    /// <param name="end">The ending color as an NKColor in RGB format.</param>
+    /// <param name="fraction">The interpolation factor, where 0 represents the start color and 1
+    /// represents the end color. Values outside the range [0, 1] will be clamped.</param>
+    /// <returns>The interpolated NKColor as an RGB value.</returns>
+    /// <exception cref="InvalidOperationException">Thrown when either the start or end color (or both) are
+    /// not in RGB format.</exception>
+    public static NKColor Lerp(NKColor start, NKColor end, float fraction) {
+        if (!start.IsRgb && !end.IsRgb)
+            throw new InvalidOperationException("Both colors must be RGB to use Linear Interpolation (Lerp).");
+
+        var s = start.AsRgb;
+        var e = end  .AsRgb;
+        
+        fraction = Math.Clamp(fraction, 0f, 1f);
+        byte r = (byte)(s.R + (e.R - s.R) * fraction);
+        byte g = (byte)(s.G + (e.G - s.G) * fraction);
+        byte b = (byte)(s.B + (e.B - s.B) * fraction);
+        return FromRgb(r, g, b);
+    }
+    
+    public static NKColor GetMultiStopColor(NKColor[] colors, float fraction) {
+        switch (colors.Length) {
+            case 0: return Default;
+            case 1: return colors[0];
+        }
+
+        fraction = Math.Clamp(fraction, 0f, 1f);
+
+        // If at the absolute end, return the last color
+        if (fraction >= 1f) return colors[^1];
+
+        // Determine which segment we are in
+        float segmentValue = fraction * (colors.Length - 1);
+        int segmentIndex = (int)Math.Floor(segmentValue);
+        
+        // Determine how far we are into that specific segment
+        float localFraction = segmentValue - segmentIndex;
+
+        return Lerp(colors[segmentIndex], colors[segmentIndex + 1], localFraction);
+    }
+    
 
     internal static void AppendInnerF(StringBuilder sb, NKColor prev, NKColor next) => AppendInner(sb, prev, next, 3);
     internal static void AppendInnerB(StringBuilder sb, NKColor prev, NKColor next) => AppendInner(sb, prev, next, 4);

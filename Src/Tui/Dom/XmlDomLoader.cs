@@ -191,7 +191,7 @@ public class XmlDomLoader {
          if (targetType == typeof(double)) return double.Parse(value);
          if (targetType == typeof(bool)) return bool.Parse(value);
          if (targetType.IsEnum) return ParseEnum(targetType, value);
-         if (targetType == typeof(IFont)) return ParseFont(value);
+         if (targetType == typeof(IAsciiFont)) return ParseFont(value);
          if (typeof(IParsableValue).IsAssignableFrom(targetType)) {
              var inst = (IParsableValue?)Activator.CreateInstance(targetType);
              
@@ -204,11 +204,11 @@ public class XmlDomLoader {
          throw new InvalidOperationException($"Unsupported type conversion: {targetType.Name}");
     }
 
-    private static IFont ParseFont(string name) {
+    private static IAsciiFont ParseFont(string name) {
         if (!FontAtlas.TryGet(name, out var res)) 
-            res = IFont.Default;
+            res = IAsciiFont.Default;
 
-        return res ?? IFont.Default;
+        return res ?? IAsciiFont.Default;
     }
 
     private static object? ParseEnum(Type targetType, string value) {

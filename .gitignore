@@ -404,6 +404,9 @@ FodyWeavers.xsd
 *.sln.iml
 .idea/
 
+# JetBrains Junie
+.junie
+
 ##
 ## Visual studio for Mac
 ##

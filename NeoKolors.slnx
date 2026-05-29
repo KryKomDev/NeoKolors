@@ -1,30 +1,37 @@
 <Solution>
-    <Configurations>
-        <BuildType Name="Debug" />
-        <BuildType Name="Release" />
-    </Configurations>
 
     <!--  Libs  -->
 
     <Folder Name="/Src/">
-        
         <Project Path="Src/Extensions/NeoKolors.Extensions.csproj" />
         <Project Path="Src/Common/NeoKolors.Common.csproj" />
         <Project Path="Src/Console/NeoKolors.Console.csproj" />
         <Project Path="Src/Settings/NeoKolors.Settings.csproj" />
         <Project Path="Src/Tui/NeoKolors.Tui.csproj" />
-        <Project Path="Src/Tui.Generators/NeoKolors.Tui.Generators.csproj"/>
+    </Folder>
+
+    <Folder Name="/Src/Tui/Core/">
+        <Project Path="Src/Tui/Core/NeoKolors.Tui.Core.csproj" />
+    </Folder>
+    
+    <Folder Name="/Src/Tui/Fonts/">
+        <Project Path="Src/Tui/Fonts/NeoKolors.Tui.Fonts.csproj" />
+        <Project Path="Src/Tui/Fonts/Assets/NeoKolors.Tui.Fonts.Assets.csproj" />
+    </Folder>
+    
+    <Folder Name="/Src/Tui/Generators/">
+        <Project Path="Src/Tui/Generators/NeoKolors.Tui.Generators.csproj" />
     </Folder>
 
     <!--  Tests  -->
     
-    <Folder Name="/Src/Tests/">
+    <Folder Name="/Tests/">
 
-        <Project Path="Src/Tests/Extensions.Tests/NeoKolors.Extensions.Tests.csproj" />
-        <Project Path="Src/Tests/Common.Tests/NeoKolors.Common.Tests.csproj" />
-        <Project Path="Src/Tests/Console.Tests/NeoKolors.Console.Tests.csproj" />
-        <Project Path="Src/Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj" />
-        <Project Path="Src/Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj" />
+        <Project Path="Tests/Extensions.Tests/NeoKolors.Extensions.Tests.csproj" />
+        <Project Path="Tests/Common.Tests/NeoKolors.Common.Tests.csproj" />
+        <Project Path="Tests/Console.Tests/NeoKolors.Console.Tests.csproj" />
+        <Project Path="Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj" />
+        <Project Path="Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj" />
     </Folder>
 
     <!--  Examples  -->

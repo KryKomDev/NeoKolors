@@ -550,4 +550,6 @@ public record struct NKStyle : IFormattable {
 
         return sb.ToString();
     }
+    
+    public static explicit operator NKStyle(TextStyles s) => new(NKColor.Default, NKColor.Default, s);
 }

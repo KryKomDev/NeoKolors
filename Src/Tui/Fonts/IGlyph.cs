@@ -1,41 +1,46 @@
 ﻿// NeoKolors
-// Copyright (c) 2026 KryKom
+// Copyright (c) krystof 2026
+
+using Metriks;
 
 namespace NeoKolors.Tui.Fonts;
 
 public interface IGlyph {
-    
+
     /// <summary>
-    /// Represents a two-dimensional character grid that defines the visual representation of a glyph in a font.
-    /// Null characters are used to represent transparent space within the glyph.
+    /// Represents a two-dimensional grid of <see cref="GlyphCell"/> objects defining
+    /// the visual structure of a glyph or character.
     /// </summary>
     /// <remarks>
-    /// The grid is of variable width and height and may include null characters
-    /// to represent transparent or empty space within the glyph.
+    /// The <c>Glyph</c> property serves as the primary representation for a glyph
+    /// within the NeoKolors.Tui framework. The top-left corner of the glyph has the
+    /// (0, 0) coordinate.
     /// </remarks>
-    public char?[,] Glyph { get; }
-
-    public int Width { get; }
-    public int Height { get; }
+    public GlyphCell[,] Glyph { get; }
+    
+    public int    Width  { get; }
+    public int    Height { get; }
+    public Size2D Size   { get; }
 
     /// <summary>
-    /// Represents the vertical offset of the baseline for a glyph relative to its visual representation.
+    /// Specifies the vertical offset of the baseline relative to the glyph's visual representation.
     /// </summary>
     /// <remarks>
-    /// The baseline offset is used to determine how a glyph aligns vertically within a line of text.
-    /// It affects the positioning of the glyph in relation to other glyphs and the overall text layout.
+    /// The <c>BaselineOffset</c> property is used to determine the vertical alignment of the glyph
+    /// when rendered in relation to other glyphs within the same font or graphical context.
+    /// It enables precise positioning by defining the number of units from the top of the glyph grid
+    /// to its baseline.
     /// </remarks>
     public int BaselineOffset { get; }
 
     /// <summary>
-    /// Represents a collection of alignment points for a glyph, used to define
-    /// specific character-position mappings within the glyph for alignment operations.
+    /// Provides a collection of <see cref="AlignPoint"/> instances used to define
+    /// alignment references within a glyph, allowing precise positioning and layout calculations.
     /// </summary>
     /// <remarks>
-    /// The alignment points are stored as a collection where each entry associates
-    /// a character with a specific <see cref="Point"/> in two-dimensional space. These
-    /// points enable complex glyph positioning and alignment operations, particularly
-    /// in scenarios involving compound or composite glyph assembly.
+    /// The <c>AlignPoints</c> property is a key part used for managing and accessing
+    /// alignment markers associated with a glyph, facilitating operations such as alignment
+    /// and combination of glyphs based on predefined reference points.
     /// </remarks>
-    public GlyphAlignmentPointCollection AlignPoints { get; }
+    public AlignPointCollection AlignPoints { get; }
 }

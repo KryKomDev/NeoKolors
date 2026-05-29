@@ -9,6 +9,6 @@ jobs:
     with:
       project_name: Extensions
       project_path: Src/Extensions/NeoKolors.Extensions.csproj
-      test_project_path: Src/Tests/Extensions.Tests/NeoKolors.Extensions.Tests.csproj
+      test_project_path: Tests/Extensions.Tests/NeoKolors.Extensions.Tests.csproj
     secrets:
       NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}

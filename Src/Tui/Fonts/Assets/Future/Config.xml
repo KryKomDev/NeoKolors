@@ -1,0 +1,13 @@
+<FontConfig xmlns="https://krykomdev.github.io/NeoKolors/Schemas/Fonts/v3/">
+    <Name>Future</Name>
+    <Ligatures>false</Ligatures>
+    <LetterSpacing>0</LetterSpacing>
+    <Leading>5</Leading>
+    <Variable>
+        <Kerning>false</Kerning>
+        <WordSpacing>3</WordSpacing>
+    </Variable>
+    <Defaults>
+        <Mask>forg</Mask>
+    </Defaults>
+</FontConfig>
