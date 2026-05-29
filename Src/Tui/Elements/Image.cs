@@ -2,7 +2,7 @@
 // Copyright (c) 2026 KryKom
 
 using NeoKolors.Tui.Global;
-using NeoKolors.Tui.Rendering;
+using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Properties;
 using NeoKolors.Tui.Styles.Values;
@@ -68,7 +68,7 @@ public class Image : AbstractElement<SKBitmap> {
         var checker = _style.Get<CheckerBckgProperty>().Value;
 
         if (checker.Enabled) {
-            canvas.StyleCheckerBckg(layout.Content + pos, checker);
+            canvas.StyleCheckerBckg(layout.Content + pos, checker.FieldSize, checker.C1, checker.C2);
         }
 
         var imgSize = ComputeImageSize(new Size(_image.Width, _image.Height), layout.Content, rect.Size);

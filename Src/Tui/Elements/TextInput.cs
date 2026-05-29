@@ -31,7 +31,7 @@ public class TextInput : Text, ISelectableElement<AnsiString> {
     public override AnsiString Content { 
         get => ComputeRenderedText();
         set {
-            _value = value.String;
+            _value = value.Plain;
             InvokeElementUpdated();
         }
     }
@@ -195,7 +195,7 @@ public class TextInput : Text, ISelectableElement<AnsiString> {
 
         if (!IsSelected) return a;
 
-        return a.Style(
+        return a.ApplyStyle(
             new NKStyle(NKColor.Inherit, NKColor.Inherit, TextStyles.NEGATIVE),
             (_cursor + Label.Length)..(_cursor + Label.Length + 1)
         );

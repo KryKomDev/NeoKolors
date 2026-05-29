@@ -5,7 +5,7 @@ using System.Diagnostics.Contracts;
 using NeoKolors.Console.Input;
 using NeoKolors.Tui.Elements.Caching;
 using NeoKolors.Tui.Events;
-using NeoKolors.Tui.Rendering;
+using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Properties;
 using StyleCollection = NeoKolors.Tui.Styles.StyleCollection;
@@ -25,7 +25,7 @@ public class Text : AbstractTextElement, INotifyOnRender, IMouseInteractableElem
                 _text = value;
             }
             else {
-                var v = value.Style(new NKStyle(_style.TextColor, _style.BackgroundColor, _style.TextStyle));
+                var v = value.ApplyStyle(new NKStyle(_style.TextColor, _style.BackgroundColor, _style.TextStyle));
 
                 if (v == _text) 
                     return;
@@ -188,18 +188,13 @@ public class Text : AbstractTextElement, INotifyOnRender, IMouseInteractableElem
     }
 
     private void OnStyleChanged(IStyleProperty changedProp) {
-        switch (changedProp) {
-            case TextColorProperty tc:
-                _text = _text.Restyle(new NKStyle(tc.Value, _style.BackgroundColor, _style.TextStyle));
-                break;
-            case BackgroundColorProperty bc:
-                _text = _text.Restyle(new NKStyle(_style.TextColor, bc.Value, _style.TextStyle));
-                break;
-            case TextStyleProperty ts:
-                _text = _text.Restyle(new NKStyle(_style.TextColor, _style.BackgroundColor, ts.Value));
-                break;
-        }
-        
+        _text = changedProp switch {
+            TextColorProperty tc       => _text.ApplyStyle(new NKStyle(tc.Value, _style.BackgroundColor, _style.TextStyle)),
+            BackgroundColorProperty bc => _text.ApplyStyle(new NKStyle(_style.TextColor, bc.Value, _style.TextStyle)),
+            TextStyleProperty ts       => _text.ApplyStyle(new NKStyle(_style.TextColor, _style.BackgroundColor, ts.Value)),
+            _                          => _text
+        };
+
         InvokeElementUpdated();
     }
     
@@ -317,7 +312,7 @@ public class Text : AbstractTextElement, INotifyOnRender, IMouseInteractableElem
             _style.MaxWidth,
             _style.MinHeight,
             _style.MaxHeight,
-            (w) => _style.Font.GetSize(_text, w).Height,
+            (w) => _style.Font.GetSize(_text, w).Y,
             ( ) => _style.Font.GetMinSize(_text),
             ( ) => _style.Font.GetSize(_text)
         );
@@ -358,7 +353,7 @@ public class Text : AbstractTextElement, INotifyOnRender, IMouseInteractableElem
             _style.MaxWidth,
             _style.MinHeight,
             _style.MaxHeight,
-            (w) => _style.Font.GetSize(_text, w).Height,
+            (w) => _style.Font.GetSize(_text, w).Y,
             ( ) => _style.Font.GetMinSize(_text),
             ( ) => _style.Font.GetSize(_text)
         );
@@ -403,7 +398,7 @@ public class Text : AbstractTextElement, INotifyOnRender, IMouseInteractableElem
             _style.Width,     _style.Height,
             _style.MinWidth,  _style.MaxWidth,
             _style.MinHeight, _style.MaxHeight,
-            (w) => _style.Font.GetSize(_text, w).Height,
+            (w) => _style.Font.GetSize(_text, w).Y,
             ( ) => _style.Font.GetMinSize(_text),
             ( ) => _style.Font.GetSize(_text)
         );

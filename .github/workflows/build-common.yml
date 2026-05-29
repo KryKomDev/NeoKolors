@@ -14,4 +14,4 @@ jobs:
     with:
       project_name: Common
       project_path: Src/Common/NeoKolors.Common.csproj
-      test_project_path: Src/Tests/Common.Tests/NeoKolors.Common.Tests.csproj
+      test_project_path: Tests/Common.Tests/NeoKolors.Common.Tests.csproj

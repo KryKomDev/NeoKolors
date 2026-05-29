@@ -42,10 +42,11 @@
       },
       "Metriks": {
         "type": "Transitive",
-        "resolved": "1.1.8.1",
-        "contentHash": "O7a5NztIK++WvJKNp3ImOGtXC+fXNHu7cWpROLGOtPPhaaG3hwYcuvb91WIjojqzP9p/+rfBRj3P6Y3rrpCW0A==",
+        "resolved": "2026.2.4.1",
+        "contentHash": "Ll8nkh6w9XX26o2LlY6DzDIFd05e95wv+tFQIGPZY3lIsZIoMcG2AKgOl5G+27enzEUO8evhKdUZjt+NQENHng==",
         "dependencies": {
-          "JetBrains.Annotations": "2025.2.4"
+          "JetBrains.Annotations": "2025.2.4",
+          "System.Runtime.CompilerServices.Unsafe": "6.1.2"
         }
       },
       "Microsoft.CodeAnalysis.Analyzers": {
@@ -90,10 +91,10 @@
       },
       "System.Collections.Immutable": {
         "type": "Transitive",
-        "resolved": "9.0.0",
-        "contentHash": "QhkXUl2gNrQtvPmtBTQHb0YsUrDiDQ2QS09YbtTTiSjGcf7NBqtYbrG/BE06zcBPCKEwQGzIv13IVdXNOSub2w==",
+        "resolved": "10.0.7",
+        "contentHash": "0Ti4Jv1ga3eurH5HaCVsPybcBl+08YfzM9smqAJzHvqV494xK+0pSbytGrMTWhph+zsyKIaoGNiR5u3by5bj+A==",
         "dependencies": {
-          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
+          "System.Runtime.CompilerServices.Unsafe": "6.1.2"
         }
       },
       "System.Reflection.Metadata": {
@@ -106,8 +107,8 @@
       },
       "System.Runtime.CompilerServices.Unsafe": {
         "type": "Transitive",
-        "resolved": "6.1.0",
-        "contentHash": "5o/HZxx6RVqYlhKSq8/zronDkALJZUT2Vz0hx43f0gwe8mwlM0y2nYlqdBwLMzr262Bwvpikeb/yEwkAa5PADg=="
+        "resolved": "6.1.2",
+        "contentHash": "2hBr6zdbIBTDE3EhK7NSVNdX58uTK6iHW/P/Axmm9sl1xoGSLqDvMtpecn226TNwHByFokYwJmt/aQQNlO5CRw=="
       },
       "System.Text.Encoding.CodePages": {
         "type": "Transitive",
@@ -121,7 +122,8 @@
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Metriks": "[1.1.8.1, )"
+          "Metriks": "[2026.2.4.1, )",
+          "System.Collections.Immutable": "[10.0.7, )"
         }
       }
     },
@@ -165,8 +167,8 @@
       },
       "Metriks": {
         "type": "Transitive",
-        "resolved": "1.1.8.1",
-        "contentHash": "O7a5NztIK++WvJKNp3ImOGtXC+fXNHu7cWpROLGOtPPhaaG3hwYcuvb91WIjojqzP9p/+rfBRj3P6Y3rrpCW0A==",
+        "resolved": "2026.2.4.1",
+        "contentHash": "Ll8nkh6w9XX26o2LlY6DzDIFd05e95wv+tFQIGPZY3lIsZIoMcG2AKgOl5G+27enzEUO8evhKdUZjt+NQENHng==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4"
         }
@@ -207,7 +209,7 @@
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Metriks": "[1.1.8.1, )"
+          "Metriks": "[2026.2.4.1, )"
         }
       }
     },
@@ -251,8 +253,8 @@
       },
       "Metriks": {
         "type": "Transitive",
-        "resolved": "1.1.8.1",
-        "contentHash": "O7a5NztIK++WvJKNp3ImOGtXC+fXNHu7cWpROLGOtPPhaaG3hwYcuvb91WIjojqzP9p/+rfBRj3P6Y3rrpCW0A==",
+        "resolved": "2026.2.4.1",
+        "contentHash": "Ll8nkh6w9XX26o2LlY6DzDIFd05e95wv+tFQIGPZY3lIsZIoMcG2AKgOl5G+27enzEUO8evhKdUZjt+NQENHng==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4"
         }
@@ -299,10 +301,10 @@
       },
       "System.Collections.Immutable": {
         "type": "Transitive",
-        "resolved": "9.0.0",
-        "contentHash": "QhkXUl2gNrQtvPmtBTQHb0YsUrDiDQ2QS09YbtTTiSjGcf7NBqtYbrG/BE06zcBPCKEwQGzIv13IVdXNOSub2w==",
+        "resolved": "10.0.7",
+        "contentHash": "0Ti4Jv1ga3eurH5HaCVsPybcBl+08YfzM9smqAJzHvqV494xK+0pSbytGrMTWhph+zsyKIaoGNiR5u3by5bj+A==",
         "dependencies": {
-          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
+          "System.Runtime.CompilerServices.Unsafe": "6.1.2"
         }
       },
       "System.Reflection.Metadata": {
@@ -315,8 +317,8 @@
       },
       "System.Runtime.CompilerServices.Unsafe": {
         "type": "Transitive",
-        "resolved": "6.1.0",
-        "contentHash": "5o/HZxx6RVqYlhKSq8/zronDkALJZUT2Vz0hx43f0gwe8mwlM0y2nYlqdBwLMzr262Bwvpikeb/yEwkAa5PADg=="
+        "resolved": "6.1.2",
+        "contentHash": "2hBr6zdbIBTDE3EhK7NSVNdX58uTK6iHW/P/Axmm9sl1xoGSLqDvMtpecn226TNwHByFokYwJmt/aQQNlO5CRw=="
       },
       "System.Text.Encoding.CodePages": {
         "type": "Transitive",
@@ -330,7 +332,8 @@
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Metriks": "[1.1.8.1, )"
+          "Metriks": "[2026.2.4.1, )",
+          "System.Collections.Immutable": "[10.0.7, )"
         }
       }
     },
@@ -374,8 +377,8 @@
       },
       "Metriks": {
         "type": "Transitive",
-        "resolved": "1.1.8.1",
-        "contentHash": "O7a5NztIK++WvJKNp3ImOGtXC+fXNHu7cWpROLGOtPPhaaG3hwYcuvb91WIjojqzP9p/+rfBRj3P6Y3rrpCW0A==",
+        "resolved": "2026.2.4.1",
+        "contentHash": "Ll8nkh6w9XX26o2LlY6DzDIFd05e95wv+tFQIGPZY3lIsZIoMcG2AKgOl5G+27enzEUO8evhKdUZjt+NQENHng==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4"
         }
@@ -418,8 +421,8 @@
       },
       "System.Collections.Immutable": {
         "type": "Transitive",
-        "resolved": "9.0.0",
-        "contentHash": "QhkXUl2gNrQtvPmtBTQHb0YsUrDiDQ2QS09YbtTTiSjGcf7NBqtYbrG/BE06zcBPCKEwQGzIv13IVdXNOSub2w=="
+        "resolved": "10.0.7",
+        "contentHash": "0Ti4Jv1ga3eurH5HaCVsPybcBl+08YfzM9smqAJzHvqV494xK+0pSbytGrMTWhph+zsyKIaoGNiR5u3by5bj+A=="
       },
       "System.Reflection.Metadata": {
         "type": "Transitive",
@@ -433,7 +436,8 @@
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Metriks": "[1.1.8.1, )"
+          "Metriks": "[2026.2.4.1, )",
+          "System.Collections.Immutable": "[10.0.7, )"
         }
       }
     },
@@ -477,8 +481,8 @@
       },
       "Metriks": {
         "type": "Transitive",
-        "resolved": "1.1.8.1",
-        "contentHash": "O7a5NztIK++WvJKNp3ImOGtXC+fXNHu7cWpROLGOtPPhaaG3hwYcuvb91WIjojqzP9p/+rfBRj3P6Y3rrpCW0A==",
+        "resolved": "2026.2.4.1",
+        "contentHash": "Ll8nkh6w9XX26o2LlY6DzDIFd05e95wv+tFQIGPZY3lIsZIoMcG2AKgOl5G+27enzEUO8evhKdUZjt+NQENHng==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4"
         }
@@ -515,11 +519,17 @@
         "resolved": "3.119.2",
         "contentHash": "uYe+da6+GXVgPKkCopzvIZ83DmC8SXXKeUAPrNcztJNsg0SjPQAxfKMOPZqmVjbzznrq/QUIjLUlJSZV/e0IPA=="
       },
+      "System.Collections.Immutable": {
+        "type": "Transitive",
+        "resolved": "10.0.7",
+        "contentHash": "0Ti4Jv1ga3eurH5HaCVsPybcBl+08YfzM9smqAJzHvqV494xK+0pSbytGrMTWhph+zsyKIaoGNiR5u3by5bj+A=="
+      },
       "neokolors.extensions": {
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Metriks": "[1.1.8.1, )"
+          "Metriks": "[2026.2.4.1, )",
+          "System.Collections.Immutable": "[10.0.7, )"
         }
       }
     }

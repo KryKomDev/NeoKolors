@@ -2,19 +2,19 @@
 // Copyright (c) 2026 KryKom
 
 using Metriks;
-using NeoKolors.Tui.Rendering;
-using NeoKolors.Tui.Styles.Values;
+using NeoKolors.Common;
+using NeoKolors.Extensions;
+using NeoKolors.Tui.Core;
+using Size = NeoKolors.Tui.Core.Size;
 
 namespace NeoKolors.Tui.Fonts;
 
 /// <summary>
 /// Represents a font that does not convert strings to any glyph form but simply places the string.
 /// </summary>
-public class DefaultFont : IFont {
+public class DefaultFont : IAsciiFont {
     
-    private static readonly DefaultFontInfo INFO = new();
-    
-    public IFontInfo Info => INFO;
+    public string Name => "Default";
     
     public void PlaceString(string str, ICharCanvas canvas) {
         string[] lines = str.Split('\n');
@@ -33,16 +33,16 @@ public class DefaultFont : IFont {
     }
 
     public void PlaceString(
-        string str, ICharCanvas canvas, Rectangle bounds, NKStyle style,
+        string str, ICharCanvas canvas, Area2D bounds, NKStyle style,
         HorizontalAlign horizontalAlign = HorizontalAlign.LEFT,
         VerticalAlign verticalAlign = VerticalAlign.TOP, bool overflow = false) 
     {
-        var lines = str.Chop(bounds.Width);
+        var lines = str.Chop(bounds.SizeX);
 
         int y = verticalAlign switch {
             VerticalAlign.TOP    => 0,
-            VerticalAlign.CENTER => Math.Max(0, bounds.Height - lines.Length) / 2,
-            VerticalAlign.BOTTOM => Math.Max(0, bounds.Height - lines.Length),
+            VerticalAlign.CENTER => Math.Max(0, bounds.SizeY - lines.Length + 1) / 2,
+            VerticalAlign.BOTTOM => Math.Max(0, bounds.SizeY - lines.Length + 1),
             _                    => throw new ArgumentOutOfRangeException(nameof(verticalAlign), verticalAlign, null)
         } + bounds.LowerY;
         
@@ -54,11 +54,11 @@ public class DefaultFont : IFont {
         };
         
         for (int l = 0; l < lines.Length; l++) {
-            if (!overflow && y != bounds.YRange)
+            if (!overflow && y != bounds.RangeY)
                 break;
             
             var s = lines[l];
-            var x = computeXOffset(bounds.Width, s.Length) + bounds.LowerX;
+            var x = computeXOffset(bounds.SizeX, s.Length) + bounds.LowerX;
             
             canvas.Place(s, new Point2D(x, y));
             canvas.Style(new Rectangle(new Point(x, y), new Size(s.Length, 1)), style);
@@ -83,7 +83,7 @@ public class DefaultFont : IFont {
     }
     
     public void PlaceString(AnsiString str, ICharCanvas canvas, int maxWidth) {
-        var lines = str.String.Chop(maxWidth);
+        var lines = str.Plain.Chop(maxWidth);
         var chars = str.ToArray();
 
         int i = 0;
@@ -99,17 +99,17 @@ public class DefaultFont : IFont {
     }
 
     public void PlaceString(
-        AnsiString str, ICharCanvas canvas, Rectangle bounds,
+        AnsiString str, ICharCanvas canvas, Area2D bounds,
         HorizontalAlign horizontalAlign = HorizontalAlign.LEFT,
         VerticalAlign   verticalAlign   = VerticalAlign.TOP,
         bool overflow = false) 
     {
-        var lines = str.Chop(bounds.Width);
+        var lines = str.Chop(bounds.SizeX);
 
         int y = verticalAlign switch {
             VerticalAlign.TOP    => 0,
-            VerticalAlign.CENTER => Math.Max(0, bounds.Height - lines.Length) / 2,
-            VerticalAlign.BOTTOM => Math.Max(0, bounds.Height - lines.Length),
+            VerticalAlign.CENTER => Math.Max(0, bounds.SizeY - lines.Length + 1) / 2,
+            VerticalAlign.BOTTOM => Math.Max(0, bounds.SizeY - lines.Length + 1),
             _ => throw new ArgumentOutOfRangeException(nameof(verticalAlign), verticalAlign, null)
         } + bounds.LowerY;
         
@@ -121,11 +121,11 @@ public class DefaultFont : IFont {
         };
         
         for (int l = 0; l < lines.Length; l++) {
-            if (!overflow && y != bounds.YRange)
+            if (!overflow && y != bounds.RangeY)
                 break;
             
             var s = lines[l];
-            var x = computeXOffset(bounds.Width, s.Length) + bounds.LowerX;
+            var x = computeXOffset(bounds.SizeX, s.Length) + bounds.LowerX;
             
             canvas.Place(s, new Point2D(x, y));
 
@@ -133,23 +133,23 @@ public class DefaultFont : IFont {
         }
     }
 
-    public Size GetMinSize(string str) {
+    public Size2D GetMinSize(string str) {
         int maxLength = str.Split(' ', '\n').Max(s => s.Length);
         int lineCount = str.Chop(maxLength).Length;
         
         return new Size(maxLength, lineCount);
     }
     
-    public Size GetSize(string str) => new(str.Length, 1);
-    public Size GetSize(string str, int maxWidth) {
+    public Size2D GetSize(string str) => new(str.Length, 1);
+    public Size2D GetSize(string str, int maxWidth) {
         var l = str.Chop(maxWidth);
         var w = l.Select(s => s.Length).Max();
         return new Size(w, l.Length);
     }
 
-    public Size GetMinSize(AnsiString str) => GetMinSize(str.String);
+    public Size2D GetMinSize(AnsiString str) => GetMinSize(str.Plain);
 
-    public Size GetSize(AnsiString str) => GetSize(str.String);
+    public Size2D GetSize(AnsiString str) => GetSize(str.Plain);
 
-    public Size GetSize(AnsiString str, int maxWidth) => GetSize(str.String, maxWidth);
+    public Size2D GetSize(AnsiString str, int maxWidth) => GetSize(str.Plain, maxWidth);
 }

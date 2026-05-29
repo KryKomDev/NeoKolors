@@ -1,0 +1,57 @@
+﻿<!--                             -->
+<!--  NeoKolors                  -->
+<!--  Copyright (c) 2026 KryKom  -->
+<!--                             -->
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="https://krykomdev.github.io/NeoKolors/Schemas/Fonts/v3/"
+            elementFormDefault="qualified">
+    
+    <xsd:simpleType name="Align">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="((top|bottom)(-left|-right)?|(left|right)(-top|-bottom)?|center|corner-(top-(left|right)|bottom-(left|right))|(custom: \S))"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:simpleType name="AlignPoints">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="\w\(\d+, ?\d+\)(?:, ?\w\(\d+, ?\d+\))*"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:simpleType name="Mask">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="(bckg|forg|space|(custom-(bckg|forg): \S))(?:, (bckg|forg|space|(custom-(bckg|forg): \S)))*"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:simpleType name="AlignPointReplace">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="(bckg|forg|none|.)"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:simpleType name="Char">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="\\['\\0abefnrtv]|\\x[0-9a-fA-F]{1,4}|\\u[0-9a-fA-F]{4}|\\U[0-9a-fA-F]{8}|[^\\]"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:simpleType name="String">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="(\\['\\0abefnrtv]|\\x[0-9a-fA-F]{1,4}|\\u[0-9a-fA-F]{4}|\\U[0-9a-fA-F]{8}|[^\\])+"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:simpleType name="Styles">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="(bold|italic|negative|faint|underline|strikethrough)(?:, (bold|italic|negative|faint|underline|strikethrough))*"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    
+    <xsd:simpleType name="Version">
+        <xsd:restriction base="xsd:string">
+            <xsd:pattern value="[0-9]+(?:.[0-9])*(?:.[0-9])*"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

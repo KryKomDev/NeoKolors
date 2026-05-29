@@ -1,17 +1,24 @@
 ﻿// NeoKolors
-// Copyright (c) 2026 KryKom
+// Copyright (c) krystof 2026
 
 namespace NeoKolors.Tui.Fonts;
 
-public class FontSpacingInfo : OneOfBase<MonospaceInfo, VariableInfo> {
-    protected FontSpacingInfo(OneOf<MonospaceInfo, VariableInfo> input) : base(input) { }
-
-    public static implicit operator FontSpacingInfo(MonospaceInfo m) => new(m);
-    public static implicit operator FontSpacingInfo(VariableInfo v) => new(v);
-
-    public bool IsMonospace => IsT0;
-    public bool IsVariable => IsT1;
+public record FontSpacingInfo {
     
-    public MonospaceInfo AsMonospace => AsT0;
-    public VariableInfo AsVariable => AsT1;
+    public bool Ligatures     { get; init; }
+    public int  Leading       { get; init; }
+    public int  LetterSpacing { get; init; }
+    public int  WordSpacing   { get; init; }
+
+    public FontSpacingInfo(
+        bool           ligatures     = false, 
+        int            leading       = 0,
+        int            letterSpacing = 0,
+        int            wordSpacing   = 0) 
+    {
+        Ligatures     = ligatures;
+        Leading       = leading;
+        LetterSpacing = letterSpacing;
+        WordSpacing   = wordSpacing;
+    }
 }

@@ -1,0 +1,316 @@
+﻿<!--                             -->
+<!--  NeoKolors                  -->
+<!--  Copyright (c) 2026 KryKom  -->
+<!--                             -->
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:nkc="https://krykomdev.github.io/NeoKolors/Schemas/Fonts/v3/"
+            xmlns:nk="https://krykomdev.github.io/NeoKolors/Schemas/Fonts/v3/"
+            targetNamespace="https://krykomdev.github.io/NeoKolors/Schemas/Fonts/v3/"
+            elementFormDefault="qualified">
+
+    <xsd:include schemaLocation="Font.Common.xsd"/>
+    
+    <xsd:element name="FontMap">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                    <xsd:element name="Component" type="nk:Component"/>
+                    <xsd:element name="Ligature" type="nk:Ligature"/>
+                    <xsd:element name="Compound" type="nk:Compound"/>
+                    <xsd:element name="AutoCompound" type="nk:AutoCompound"/>
+                    <xsd:element name="Strikethrough" type="nk:Effect"/>
+                    <xsd:element name="Underline" type="nk:Effect"/>
+                </xsd:choice>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    
+    <!-- Component -->
+    
+    <xsd:complexType name="Component">
+        <xsd:annotation>
+            <xsd:documentation>Defines a basic glyph.</xsd:documentation>
+        </xsd:annotation>
+        
+        <xsd:attribute name="Symbol" use="required">
+            <xsd:annotation>
+                <xsd:documentation>Single character specifying the meaning of the glyph.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="nkc:Char"/>
+            </xsd:simpleType>
+        </xsd:attribute>
+        
+        <xsd:attribute name="File" use="required">
+            <xsd:annotation>
+                <xsd:documentation>Defines the file the glyph is stored in.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:anyURI"/>
+            </xsd:simpleType>
+        </xsd:attribute>
+
+        <xsd:attribute name="Id" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Defines the ID of the symbol. For some values it is generated automatically, if not supplied.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        
+        <xsd:attribute name="AlignPoints" type="nkc:AlignPoints">
+            <xsd:annotation>
+                <xsd:documentation>Specifies a set of align-points.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        
+        <xsd:attribute name="AlignPointMarkers" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Specifies a set of characters interpreted as align-points.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        
+        <xsd:attribute name="AlignPointReplace" type="nkc:AlignPointReplace">
+            <xsd:annotation>
+                <xsd:documentation>Defines how will the align-points be replaced.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        
+        <xsd:attribute name="Mask" type="nkc:Mask">
+            <xsd:annotation>
+                <xsd:documentation>Defines how the glyph will be masked.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
+        <xsd:attribute name="Baseline" type="xsd:int">
+            <xsd:annotation>
+                <xsd:documentation>Defines the vertical offset of the glyph.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
+        <xsd:attribute name="Styles" type="xsd:int">
+            <xsd:annotation>
+                <xsd:documentation>Defines what styles does the glyph use.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <!-- Ligature -->
+    
+    <xsd:complexType name="Ligature">
+        <xsd:annotation>
+            <xsd:documentation>Defines a glyph for a ligature.</xsd:documentation>
+        </xsd:annotation>
+
+        <xsd:attribute name="Symbol" use="required">
+            <xsd:annotation>
+                <xsd:documentation>Single character specifying the meaning of the glyph.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="nkc:String"/>
+            </xsd:simpleType>
+        </xsd:attribute>
+
+        <xsd:attribute name="File" use="required">
+            <xsd:annotation>
+                <xsd:documentation>Defines the file the glyph is stored in.</xsd:documentation>
+            </xsd:annotation>
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:anyURI"/>
+            </xsd:simpleType>
+        </xsd:attribute>
+
+        <xsd:attribute name="Id" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Defines the ID of the symbol. For some values it is generated automatically, if not supplied.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
+        <xsd:attribute name="AlignPoints" type="nkc:AlignPoints">
+            <xsd:annotation>
+                <xsd:documentation>Specifies a set of align-points.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
+        <xsd:attribute name="AlignPointMarkers" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Specifies a set of characters interpreted as align-points.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
+        <xsd:attribute name="AlignPointReplace" type="nkc:AlignPointReplace">
+            <xsd:annotation>
+                <xsd:documentation>Defines how will the align-points be replaced.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
+        <xsd:attribute name="Mask" type="nkc:Mask">
+            <xsd:annotation>
+                <xsd:documentation>Defines how the glyph will be masked.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
+        <xsd:attribute name="Baseline" type="xsd:int">
+            <xsd:annotation>
+                <xsd:documentation>Defines the vertical offset of the glyph.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
+        <xsd:attribute name="Styles" type="xsd:int">
+            <xsd:annotation>
+                <xsd:documentation>Defines what styles does the glyph use.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <!-- Compound -->
+    
+    <xsd:complexType name="Compound">
+        <xsd:annotation>
+            <xsd:documentation>Defines a compound glyph.</xsd:documentation>
+        </xsd:annotation>
+
+        <xsd:attribute name="Symbol" type="nkc:Char" use="required">
+            <xsd:annotation>
+                <xsd:documentation>Defines the symbol the glyph represents.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
+        <xsd:attribute name="Main" type="nkc:String" use="required">
+            <xsd:annotation>
+                <xsd:documentation>ID of the main glyph.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        
+        <xsd:attribute name="Secondary" type="nkc:String" use="required">
+            <xsd:annotation>
+                <xsd:documentation>ID of the secondary glyph.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        
+        <xsd:attribute name="Id" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>Defines the ID of the symbol. For some values it is generated automatically, if not supplied.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        
+        <xsd:attribute name="Align" type="nkc:Align">
+            <xsd:annotation>
+                <xsd:documentation>Defines how the base glyphs should be aligned.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        
+        <xsd:attribute name="AlignPoints" type="nkc:AlignPoints">
+            <xsd:annotation>
+                <xsd:documentation>Specifies a set of align-points.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+
+    <!-- AutoCompound -->
+    
+    <xsd:complexType name="AutoCompound">
+        <xsd:annotation>
+            <xsd:documentation>Defines an automatically grouped compound glyph.</xsd:documentation>
+        </xsd:annotation>
+
+        <xsd:sequence>
+            <xsd:element name="ApplicableChars" minOccurs="0">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string"/>
+                </xsd:simpleType>
+            </xsd:element>
+            
+            <xsd:element name="ApplicableGroup" minOccurs="0" maxOccurs="unbounded">
+                <xsd:simpleType>
+                    <xsd:restriction base="xsd:string">
+                        <xsd:enumeration value="basic-vowels-upper"/>
+                        <xsd:enumeration value="basic-vowels-lower"/>
+                        <xsd:enumeration value="extended-vowels-upper"/>
+                        <xsd:enumeration value="extended-vowels-lower"/>
+                        <xsd:enumeration value="basic-consonants-upper"/>
+                        <xsd:enumeration value="basic-consonants-lower"/>
+                        <xsd:enumeration value="extended-consonants-upper"/>
+                        <xsd:enumeration value="extended-consonants-lower"/>
+                        <xsd:enumeration value="numbers"/>
+                        <xsd:enumeration value="basic-vowels"/>
+                        <xsd:enumeration value="extended-vowels"/>
+                        <xsd:enumeration value="vowels-upper"/>
+                        <xsd:enumeration value="vowels-lower"/>
+                        <xsd:enumeration value="vowels"/>
+                        <xsd:enumeration value="basic-consonants"/>
+                        <xsd:enumeration value="extended-consonants"/>
+                        <xsd:enumeration value="consonants-upper"/>
+                        <xsd:enumeration value="consonants-lower"/>
+                        <xsd:enumeration value="consonants"/>
+                        <xsd:enumeration value="letters-upper"/>
+                        <xsd:enumeration value="letters-lower"/>
+                        <xsd:enumeration value="letters"/>
+                    </xsd:restriction>
+                </xsd:simpleType>
+            </xsd:element>
+        </xsd:sequence>
+
+        <xsd:attribute name="Symbol" type="nkc:Char" use="required">
+            <xsd:annotation>
+                <xsd:documentation>Defines the symbol the glyph represents.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
+        <xsd:attribute name="Base" type="nkc:String" use="required">
+            <xsd:annotation>
+                <xsd:documentation>The id of one of the glyphs.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
+        <xsd:attribute name="Align" type="nkc:Align" use="required">
+            <xsd:annotation>
+                <xsd:documentation>Defines how the base glyphs should be aligned.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
+        <xsd:attribute name="IsBaseMain" type="xsd:boolean" default="false">
+            <xsd:annotation>
+                <xsd:documentation>Defines whether the specified base glyph is the main glyph.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        
+        <xsd:attribute name="BaseAfterSecondary" type="xsd:boolean">
+            <xsd:annotation>
+                <xsd:documentation>Defines whether the base character comes after the secondary character.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
+        <xsd:attribute name="AlignPoints" type="nkc:AlignPoints">
+            <xsd:annotation>
+                <xsd:documentation>Specifies a set of align-points.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+    
+    <xsd:complexType name="Effect">
+        <xsd:attribute name="File" type="xsd:anyURI" use="required">
+            <xsd:annotation>
+                <xsd:documentation>The path to the source file of the glyph.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
+        <xsd:attribute name="Baseline" type="xsd:int">
+            <xsd:annotation>
+                <xsd:documentation>Defines the vertical offset of the glyph.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+
+        <xsd:attribute name="Mask" type="nkc:Mask">
+            <xsd:annotation>
+                <xsd:documentation>Defines how the glyph will be masked.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        
+        <xsd:attribute name="AboveLetters" type="xsd:boolean">
+            <xsd:annotation>
+                <xsd:documentation>Defines whether the effect is placed on top of the letters or behind the letters.</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+    
+</xsd:schema>

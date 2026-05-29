@@ -8,7 +8,6 @@
 using System.Diagnostics;
 using Metriks;
 using NeoKolors.Common;
-using NeoKolors.Extensions;
 using static NeoKolors.Common.EscapeCodes;
 
 namespace NeoKolors.Console;

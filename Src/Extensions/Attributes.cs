@@ -122,6 +122,9 @@ namespace System.Runtime.CompilerServices {
 
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class IsExternalInit;
+    
+    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
+    public sealed class ModuleInitializerAttribute : Attribute;
 }
 
 #endif

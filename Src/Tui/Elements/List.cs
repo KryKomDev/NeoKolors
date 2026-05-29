@@ -2,10 +2,9 @@
 // Copyright (c) 2026 KryKom
 
 using NeoKolors.Tui.Elements.Caching;
-using NeoKolors.Tui.Rendering;
+using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Properties;
-using NeoKolors.Tui.Styles.Values;
 
 namespace NeoKolors.Tui.Elements;
 
@@ -118,7 +117,7 @@ public class List : AbstractElement<IElement[]> {
         
         var checkerBckg = Style.Get<CheckerBckgProperty>().Value;
         if (checkerBckg.Enabled) {
-            canvas.StyleCheckerBckg(el.Border + pos, checkerBckg);
+            canvas.StyleCheckerBckg(el.Border + pos, checkerBckg.FieldSize, checkerBckg.C1, checkerBckg.C2);
         }
         
         var co = new Point(mpw + _style.ListPointGap.ToScalar(rect.Width), 0);

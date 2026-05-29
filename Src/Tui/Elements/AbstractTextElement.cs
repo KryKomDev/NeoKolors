@@ -4,8 +4,8 @@
 //
 
 using NeoKolors.Tui.Fonts;
+using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Styles;
-using NeoKolors.Tui.Styles.Values;
 
 namespace NeoKolors.Tui.Elements;
 
@@ -16,7 +16,7 @@ namespace NeoKolors.Tui.Elements;
 public abstract class AbstractTextElement : AbstractElement<AnsiString> {
     
     public static StyleCollection DefaultStyles { get; } = new() {
-        Font            = IFont.Default,
+        Font            = IAsciiFont.Default,
         TextColor       = NKColor.Default,
         TextAlign       = new Align(HorizontalAlign.LEFT, VerticalAlign.TOP),
         BackgroundColor = NKColor.Inherit,

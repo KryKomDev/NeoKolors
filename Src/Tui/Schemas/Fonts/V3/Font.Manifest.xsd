@@ -1,0 +1,38 @@
+﻿<!--                             -->
+<!--  NeoKolors                  -->
+<!--  Copyright (c) 2026 KryKom  -->
+<!--                             -->
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:nk="https://krykomdev.github.io/NeoKolors/Schemas/Fonts/v3/"
+            targetNamespace="https://krykomdev.github.io/NeoKolors/Schemas/Fonts/v3/"
+            elementFormDefault="qualified"
+            attributeFormDefault="qualified">
+    
+    <xsd:include schemaLocation="Font.Common.xsd"/>
+    
+    <xsd:element name="FontManifest">
+        <xsd:complexType>
+            <xsd:all>
+                <xsd:element name="Version">
+                    <xsd:simpleType>
+                        <xsd:restriction base="nk:Version"/>
+                    </xsd:simpleType>
+                </xsd:element>
+                
+                <xsd:element name="Config">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:anyURI"/>
+                    </xsd:simpleType>
+                </xsd:element>                
+                
+                <xsd:element name="Map">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:anyURI"/>
+                    </xsd:simpleType>
+                </xsd:element>
+            </xsd:all>
+        </xsd:complexType>
+    </xsd:element>
+
+</xsd:schema>

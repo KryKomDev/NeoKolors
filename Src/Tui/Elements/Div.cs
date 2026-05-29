@@ -5,7 +5,7 @@ using System.Diagnostics.Contracts;
 using NeoKolors.Console.Input;
 using NeoKolors.Tui.Elements.Caching;
 using NeoKolors.Tui.Events;
-using NeoKolors.Tui.Rendering;
+using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Properties;
 using static NeoKolors.Tui.Styles.Values.Direction;
@@ -147,7 +147,7 @@ public class Div : AbstractContainerElement, IMouseInteractableElement<IElement[
         
         var checkerBckg = Style.Get<CheckerBckgProperty>().Value;
         if (checkerBckg.Enabled) {
-            canvas.StyleCheckerBckg(el.Border + pos, checkerBckg);
+            canvas.StyleCheckerBckg(el.Border + pos, checkerBckg.FieldSize, checkerBckg.C1, checkerBckg.C2);
         }
         
         for (int i = 0; i < cl.Count; i++) {

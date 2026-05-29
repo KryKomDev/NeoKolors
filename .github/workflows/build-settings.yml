@@ -14,4 +14,4 @@ jobs:
     with:
       project_name: Settings
       project_path: Src/Settings/NeoKolors.Settings.csproj
-      test_project_path: Src/Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj
+      test_project_path: Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj

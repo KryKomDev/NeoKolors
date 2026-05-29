@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net10.0;net8.0;net5.0;netstandard2.1</TargetFrameworks>
+        <LangVersion>14</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../../Extensions/NeoKolors.Extensions.csproj"/>
+        <ProjectReference Include="../../Common/NeoKolors.Common.csproj"/>
+        <ProjectReference Include="../../Console/NeoKolors.Console.csproj"/>
+    </ItemGroup>
+
+</Project>

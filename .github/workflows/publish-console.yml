@@ -9,6 +9,6 @@ jobs:
     with:
       project_name: Console
       project_path: Src/Console/NeoKolors.Console.csproj
-      test_project_path: Src/Tests/Console.Tests/NeoKolors.Console.Tests.csproj
+      test_project_path: Tests/Console.Tests/NeoKolors.Console.Tests.csproj
     secrets:
       NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}

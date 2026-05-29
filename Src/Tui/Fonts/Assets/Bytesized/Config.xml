@@ -1,0 +1,14 @@
+<FontConfig xmlns="https://krykomdev.github.io/NeoKolors/Schemas/Fonts/v3/">
+    <Name>Bytesized</Name>
+    <Ligatures>false</Ligatures>
+    <LetterSpacing>1</LetterSpacing>
+    <Leading>3</Leading>
+    <Monospace>
+        <LetterWidth>3</LetterWidth>
+        <LetterHeight>2</LetterHeight>
+    </Monospace>
+    <Defaults>
+        <Mask>custom-forg: '.'</Mask>
+        <AlignPointMarkers>+*</AlignPointMarkers>
+    </Defaults>
+</FontConfig>

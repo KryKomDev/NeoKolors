@@ -80,4 +80,7 @@ public sealed class FontSerializerException : Exception {
     
     public static FontSerializerException DeserializationError(string path, Exception inner) 
         => new($"An error occurred while reading font file {path}.", H_LINK, inner);
+
+    public static FontSerializerException ReferenceLoop(string ids)
+        => new($"A reference loop or missing reference was detected in glyph definitions: {ids}");
 }

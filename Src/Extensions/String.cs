@@ -351,6 +351,13 @@ public static class String {
         /// <returns>A new string containing only printable and visible characters.</returns>
         public string GetPlain() => Regex.Replace(s, @"\e\[[^m]*m", ""); // TODO: Add more non-printable characters
 
+        /// <summary>
+        /// Returns a substring from the beginning of the string up to (but not including) the first occurrence of the specified character.
+        /// If the character is not found, the entire string is returned.
+        /// </summary>
+        /// <param name="c">The character at which to stop extracting the substring.</param>
+        /// <returns>A substring that ends just before the specified character or the entire string if the character is not found.</returns>
+        [Pure]
         public string SubstringUntil(char c) {
             for (int i = 0; i < s.Length; i++) {
                 if (s[i] == c)
@@ -360,6 +367,12 @@ public static class String {
             return s;
         }
 
+        /// <summary>
+        /// Retrieves the substring that appears after the first occurrence of the specified character in the input string.
+        /// </summary>
+        /// <param name="c">The character to search for in the string.</param>
+        /// <returns>The substring starting from the first occurrence of the specified character, or the original string if the character is not found.</returns>
+        [Pure]
         public string SubstringAfter(char c) {
             for (int i = 0; i < s.Length; i++) {
                 if (s[i] == c)
@@ -369,6 +382,15 @@ public static class String {
             return s;
         }
 
+        /// <summary>
+        /// Extracts a substring located between two specified characters within the string.
+        /// </summary>
+        /// <param name="startChar">The character that denotes the starting boundary of the substring.</param>
+        /// <param name="endChar">The character that denotes the ending boundary of the substring.</param>
+        /// <param name="excludeStart">Determines whether the starting character should be excluded from the result.</param>
+        /// <param name="excludeEnd">Determines whether the ending character should be excluded from the result.</param>
+        /// <returns>A substring located between the specified start and end characters, or the original string if the boundary characters are not found.</returns>
+        [Pure]
         public string SubstringBetween(
             char startChar,
             char endChar,
@@ -376,10 +398,14 @@ public static class String {
             bool excludeEnd = false) 
         {
             int start = s.IndexOf(startChar);
-            if (start == -1) return s;
+            
+            if (start == -1) 
+                return s;
 
             int end = s.IndexOf(endChar, start + 1);
-            if (end == -1) return s.Substring(start);
+            
+            if (end == -1) 
+                return s[start..];
 
             int actualStart = excludeStart ? start + 1 : start;
             int actualEnd = excludeEnd ? end : end + 1;
@@ -425,6 +451,44 @@ public static class String {
 
             int hl = length / 2;
             return s[..(length - hl)] + "…" + s[^hl..];
+        }
+
+        /// <summary>
+        /// Unescapes the specified string by replacing escape sequences with their corresponding characters.
+        /// Supports standard escape sequences (e.g., \n, \t) and hexadecimal/Unicode escapes (\x, \u).
+        /// </summary>
+        /// <returns>A new string with all escape sequences replaced by their corresponding characters.</returns>
+        [Pure]
+        public string Unescape() {
+            if (string.IsNullOrEmpty(s)) 
+                return s;
+
+            StringBuilder sb = new(s.Length);
+            
+            for (int i = 0; i < s.Length; i++) {
+                if (s[i] == '\\' && i + 1 < s.Length) {
+                    bool success = false;
+                    
+                    // Try longest possible sequences first (max length for \x and \u is 6)
+                    for (int len = Math.Min(6, s.Length - i); len >= 2; len--) {
+                        if (!char.TryParseEsc(s.Substring(i, len), out char c)) 
+                            continue;
+
+                        sb.Append(c);
+                        i += len - 1;
+                        success = true;
+                        break;
+                    }
+
+                    if (!success)
+                        sb.Append(s[i]);
+                }
+                else {
+                    sb.Append(s[i]);
+                }
+            }
+
+            return sb.ToString();
         }
     }
 

@@ -4,6 +4,7 @@
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using Metriks;
+using NeoKolors.Tui.Core;
 
 namespace NeoKolors.Tui;
 
