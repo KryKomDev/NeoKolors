@@ -1,101 +1,101 @@
 name: Publish to NuGet
-  
-  on:
-    workflow_dispatch:
-      inputs:
+
+on:
+  workflow_dispatch:
+    inputs:
+      project:
+        description: 'Select the project to publish'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+          - all
+          - Common
+          - Console
+          - Extensions
+          - Settings
+          - Tui
+          - Tui.Fonts
+          - Tui.Fonts.Assets
+          - NKFontTool
+
+jobs:
+  publish:
+    name: Publish ${{ matrix.project.name }}
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
         project:
-          description: 'Select the project to publish'
-          required: true
-          default: 'all'
-          type: choice
-          options:
-            - all
-            - Common
-            - Console
-            - Extensions
-            - Settings
-            - Tui
-            - Tui.Fonts
-            - Tui.Fonts.Assets
-            - NKFontTool
-  
-  jobs:
-    publish:
-      name: Publish ${{ matrix.project.name }}
-      runs-on: ubuntu-latest
-      
-      strategy:
-        fail-fast: false
-        matrix:
-          project:
-            - name: Common
-              path: Src/Common/NeoKolors.Common.csproj
-              test_path: Tests/Common.Tests/NeoKolors.Common.Tests.csproj
-            - name: Console
-              path: Src/Console/NeoKolors.Console.csproj
-              test_path: Tests/Console.Tests/NeoKolors.Console.Tests.csproj
-            - name: Extensions
-              path: Src/Extensions/NeoKolors.Extensions.csproj
-              test_path: Tests/Extensions.Tests/NeoKolors.Extensions.Tests.csproj
-            - name: Settings
-              path: Src/Settings/NeoKolors.Settings.csproj
-              test_path: Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj
-            - name: Tui
-              path: Src/Tui/NeoKolors.Tui.csproj
-              test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
-            - name: Tui.Fonts
-              path: Src/Tui/Fonts/NeoKolors.Tui.Fonts.csproj
-              test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
-            - name: Tui.Fonts.Assets
-              path: Src/Tui/Fonts/Assets/NeoKolors.Tui.Fonts.Assets.csproj
-              test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
-            - name: NKFontTool
-              path: Tools/NKFontTool/NKFontTool.csproj
-              test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
-      
-      env:
-        NugetOutputDir: ./output/
-      
-      steps:
-        - name: Checkout code
-          if: ${{ github.event.inputs.project == 'all' || github.event.inputs.project == matrix.project.name }}
-          uses: actions/checkout@v4
-          with:
-            fetch-depth: 0
+          - name: Common
+            path: Src/Common/NeoKolors.Common.csproj
+            test_path: Tests/Common.Tests/NeoKolors.Common.Tests.csproj
+          - name: Console
+            path: Src/Console/NeoKolors.Console.csproj
+            test_path: Tests/Console.Tests/NeoKolors.Console.Tests.csproj
+          - name: Extensions
+            path: Src/Extensions/NeoKolors.Extensions.csproj
+            test_path: Tests/Extensions.Tests/NeoKolors.Extensions.Tests.csproj
+          - name: Settings
+            path: Src/Settings/NeoKolors.Settings.csproj
+            test_path: Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj
+          - name: Tui
+            path: Src/Tui/NeoKolors.Tui.csproj
+            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
+          - name: Tui.Fonts
+            path: Src/Tui/Fonts/NeoKolors.Tui.Fonts.csproj
+            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
+          - name: Tui.Fonts.Assets
+            path: Src/Tui/Fonts/Assets/NeoKolors.Tui.Fonts.Assets.csproj
+            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
+          - name: NKFontTool
+            path: Tools/NKFontTool/NKFontTool.csproj
+            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
+    
+    env:
+      NugetOutputDir: ./output/
+    
+    steps:
+      - name: Checkout code
+        if: ${{ github.event.inputs.project == 'all' || github.event.inputs.project == matrix.project.name }}
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-        - name: Setup .NET
-          if: ${{ github.event.inputs.project == 'all' || github.event.inputs.project == matrix.project.name }}
-          uses: actions/setup-dotnet@v4
-          with:
-            dotnet-version: '10.0.x'
-            cache: false
+      - name: Setup .NET
+        if: ${{ github.event.inputs.project == 'all' || github.event.inputs.project == matrix.project.name }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          cache: false
 
-        - name: Restore Target Project
-          if: ${{ github.event.inputs.project == 'all' || github.event.inputs.project == matrix.project.name }}
-          run: dotnet restore ${{ matrix.project.path }}
+      - name: Restore Target Project
+        if: ${{ github.event.inputs.project == 'all' || github.event.inputs.project == matrix.project.name }}
+        run: dotnet restore ${{ matrix.project.path }}
 
-        - name: Build Target Project
-          if: ${{ github.event.inputs.project == 'all' || github.event.inputs.project == matrix.project.name }}
-          run: dotnet build ${{ matrix.project.path }} --configuration Release --no-restore
+      - name: Build Target Project
+        if: ${{ github.event.inputs.project == 'all' || github.event.inputs.project == matrix.project.name }}
+        run: dotnet build ${{ matrix.project.path }} --configuration Release --no-restore
 
-        - name: Restore Test Project
-          if: ${{ github.event.inputs.project == 'all' || github.event.inputs.project == matrix.project.name }}
-          run: dotnet restore ${{ matrix.project.test_path }}
+      - name: Restore Test Project
+        if: ${{ github.event.inputs.project == 'all' || github.event.inputs.project == matrix.project.name }}
+        run: dotnet restore ${{ matrix.project.test_path }}
 
-        - name: Build Test Project
-          if: ${{ github.event.inputs.project == 'all' || github.event.inputs.project == matrix.project.name }}
-          run: dotnet build ${{ matrix.project.test_path }} --configuration Release --no-restore
+      - name: Build Test Project
+        if: ${{ github.event.inputs.project == 'all' || github.event.inputs.project == matrix.project.name }}
+        run: dotnet build ${{ matrix.project.test_path }} --configuration Release --no-restore
 
-        - name: Run Tests
-          if: ${{ github.event.inputs.project == 'all' || github.event.inputs.project == matrix.project.name }}
-          run: dotnet test ${{ matrix.project.test_path }} --configuration Release --no-build
+      - name: Run Tests
+        if: ${{ github.event.inputs.project == 'all' || github.event.inputs.project == matrix.project.name }}
+        run: dotnet test ${{ matrix.project.test_path }} --configuration Release --no-build
 
-        - name: Pack Target Project
-          if: ${{ github.event.inputs.project == 'all' || github.event.inputs.project == matrix.project.name }}
-          run: dotnet pack ${{ matrix.project.path }} --configuration Release --no-build --output ${{ env.NugetOutputDir }}
+      - name: Pack Target Project
+        if: ${{ github.event.inputs.project == 'all' || github.event.inputs.project == matrix.project.name }}
+        run: dotnet pack ${{ matrix.project.path }} --configuration Release --no-build --output ${{ env.NugetOutputDir }}
 
-        - name: Push to NuGet
-          if: ${{ github.event.inputs.project == 'all' || github.event.inputs.project == matrix.project.name }}
-          run: |
-            dotnet nuget push "${{ env.NugetOutputDir }}*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json -skip-duplicate
+      - name: Push to NuGet
+        if: ${{ github.event.inputs.project == 'all' || github.event.inputs.project == matrix.project.name }}
+        run: |
+          dotnet nuget push "${{ env.NugetOutputDir }}*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json -skip-duplicate
   shell: bash

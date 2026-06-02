@@ -90,10 +90,14 @@ if (executeMethod == null) {
     return false;
 }
 
+bool success = false;
 try {
-    return (bool)executeMethod.Invoke(taskInstance, null);
+    success = (bool)executeMethod.Invoke(taskInstance, null);
 } 
 catch (Exception ex) {
     Log.LogError("Critical Error executing CompileFontsTask: " + ex.Message + "\n" + ex.StackTrace);
+}
+
+if (!success) {
     return false;
 }
