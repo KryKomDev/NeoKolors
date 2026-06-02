@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFrameworks>net10.0;net8.0;net5.0;netstandard2.1</TargetFrameworks>
+        <TargetFramework>netstandard2.1</TargetFramework>
         <LangVersion>14</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
@@ -39,7 +39,7 @@
     </ItemGroup>
 
     <!-- Inline C# Task for Font Compilation -->
-    <UsingTask TaskName="CompileFontsTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <UsingTask TaskName="CompileFontsTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)/Microsoft.Build.Tasks.Core.dll">
         <ParameterGroup>
             <SourceDir ParameterType="System.String" Required="true" />
             <FontsAssemblyPath ParameterType="System.String" Required="true" />
@@ -50,14 +50,14 @@
             <Using Namespace="System.IO" />
             <Using Namespace="System.Reflection" />
             <Using Namespace="System.Collections.Generic" />
-            <Code Type="Fragment" Language="cs" Source="$(MSBuildProjectDirectory)\CompileFontsTask.Code.cs" />
+            <Code Type="Fragment" Language="cs" Source="$(MSBuildProjectDirectory)/CompileFontsTask.Code.cs" />
         </Task>
     </UsingTask>
 
     <Target Name="CompileBuiltinFonts" AfterTargets="ResolveReferences" BeforeTargets="PrepareResources">
         <PropertyGroup>
             <!-- Resolve the path to the referenced NeoKolors.Tui.Fonts.dll assembly -->
-            <FontsDllPath>..\bin\$(Configuration)\$(TargetFramework)\NeoKolors.Tui.Fonts.dll</FontsDllPath>
+            <FontsDllPath>../bin/$(Configuration)/$(TargetFramework)/NeoKolors.Tui.Fonts.dll</FontsDllPath>
         </PropertyGroup>
         <CompileFontsTask SourceDir="$(ProjectDir)." FontsAssemblyPath="$(FontsDllPath)" References="@(ReferencePath)" />
     </Target>

@@ -1,7 +1,6 @@
 // NeoKolors
 // Copyright (c) krystof 2026
 
-using System.Globalization;
 using Microsoft.Build.Framework;
 using NeoKolors.Tui.Fonts.Serialization;
 
@@ -26,27 +25,7 @@ public class CompileFontsTask : Microsoft.Build.Utilities.Task {
 
         string baseDir = Path.GetFullPath(SourceDir);
 
-        // Prevent parallel write conflicts during multi-targeting build
-        var lockFile = Path.Combine(baseDir, "compile.lock");
-        if (File.Exists(lockFile)) {
-            try {
-                var lastWrite = File.GetLastWriteTimeUtc(lockFile);
-                if ((DateTime.UtcNow - lastWrite).TotalSeconds < 3) {
-                    Log.LogMessage(MessageImportance.High, "[FontTask] Fonts compiled recently. Skipping parallel execution.");
-                    return true;
-                }
-            }
-            catch {
-                // Ignore lock file read/write issues and proceed
-            }
-        }
 
-        try {
-            File.WriteAllText(lockFile, DateTime.UtcNow.ToString(CultureInfo.InvariantCulture));
-        }
-        catch {
-            // Ignore lock file write issues and proceed
-        }
 
         void Compile(string xmlSubDir, string outputFileName) {
             string xmlDir = Path.Combine(baseDir, xmlSubDir);
