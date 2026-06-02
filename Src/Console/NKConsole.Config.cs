@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2025 KryKom
 
 using NeoKolors.Console.Ansi.Mouse;

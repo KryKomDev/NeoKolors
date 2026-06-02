@@ -1,98 +1,91 @@
-﻿# NeoKolors.Console
+# NeoKolors.Console
 
-![.NET Standard](https://img.shields.io/badge/.NET-Standard2.0-512bd4)
-![.NET 5](https://img.shields.io/badge/.NET-5.0-682a7b)
-[![NuGet](https://img.shields.io/nuget/v/NeoKolors.Console?color=a53c7a)](https://www.nuget.org/packages/NeoKolors.Console)
-![Downloads](https://img.shields.io/nuget/dt/NeoKolors.Console?color=a31c35)
+`NeoKolors.Console` is the primary output driver, input processor, log management framework, and exception formatter for the NeoKolors ecosystem. It provides low-level terminal controls combined with advanced diagnostics.
 
-This package has basic console utilities like colored text writing and fancy debugging functions.
+---
 
-## Contents
-* [ConsoleColors](#consolecolors)
-* [Debug](#debug)
-* [ConsoleProgressBar](#consoleprogressbar)
+## Key Features
 
-## ConsoleColors
-This class contains functions for writing colored text to console.
+- **Console Driver (`NKConsole`)**:
+  - Handles basic and styled writes ([NKConsole.Out.cs](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Console/NKConsole.Out.cs)) utilizing hexadecimal, [NKColor](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/NKColor.cs), and [NKStyle](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/NKStyle.cs).
+  - Controls virtual terminal states: alternate screen buffers, custom cursor visibility, bracketed paste mode, and multi-level mouse reporting.
+  - Monitors and captures user input events ([NKConsole.In.cs](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Console/NKConsole.In.cs)), wrapping low-level interop keys and focus transitions.
+- **Structured Logging (`NKLogger`)**:
+  - A highly performant logger supporting standard logging levels (`Trace`, `Debug`, `Info`, `Warn`, `Error`, `Crit`).
+  - Supports structured template parameters (`NKDebug.Info("Successfully created {Name}", fontName)`).
+  - Features configurable log file backends, including date-time file partitioning and automatic flushing on process exit.
+- **Exception Visualization (`ExceptionFormatter`)**:
+  - Automatically captures and reformats unhandled stack traces into visually descriptive blocks with highlighting.
+  - Can throw custom [FancyException](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Console/FancyException.cs) bounds, ensuring debugging errors display with clean UI layouts in the terminal.
 
-Example:
+---
+
+## Core Types
+
+### 1. NKConsole Writing
+Prints colored strings using styles, RGB values, or custom coloring codes:
+
 ```csharp
-string test = "Lorem ipsum dolor sit amet...";
-ConsoleColors.PrintlnColored(test, 0xff0000);
-```
-This code will print red text.
+using NeoKolors.Common;
+using NeoKolors.Console;
 
-## Debug
-Contains 5 functions for sending colored debug messages to console and a function for 
-printing fancy exception messages to console.
+// Write with Hex color
+NKConsole.WriteLine("Important Notice", 0xFF5555);
 
-### Debug message methods:
-* Fatal - fatal error. Program should end after calling this.
-* Error - non-fatal error. 
-* Warn - warning. Something wrong can happen.
-* Info - info. Something happened.
-* Msg - for debugging. Does not work when debug build mode is off.
-
-### Exception methods:
-* Throw - for throwing exceptions with fancy styles.
-* PrintException - for printing exceptions with fancy styles.
-
-Example of throwing a fancy exception:
-```csharp
-try 
-{
-    int i = 1 / 0; // this would throw a DivideByZeroException
-}
-catch (Exception e) 
-{
-    Debug.Throw(e);
-}
+// Write using a custom style
+var style = new NKStyle(NKColor.FromRgb(0, 255, 0), NKColor.Inherit, TextStyles.Bold);
+NKConsole.WriteLine("Success Output", style);
 ```
 
-> [!IMPORTANT]
-> When an exception is thrown using `Debug.Throw`, the exception itself is not thrown, the actual type is 
-> `FancyException<TException>` where the `TException` is the actual type of the exception.
+### 2. Low-Level Terminal Controls
+Allows configuring mouse reporting and window events:
 
-Example of catching a fancy exception:
 ```csharp
-try 
-{
-    // some code that throws a fancy exception (for example DivideByZeroException)
-}
-catch (FancyException<DivideByZeroException> e) 
-{
-    // some things to do when the exception is caught
-}
+using NeoKolors.Console;
+using NeoKolors.Console.Ansi.Mouse;
+
+// Hide the blinking hardware cursor
+NKConsole.HideCursor();
+
+// Open secondary buffer
+NKConsole.EnableAltBuffer();
+
+// Listen to mouse actions
+NKConsole.Mouse += mouseEvent => {
+    NKConsole.WriteLine($"Mouse clicked at: {mouseEvent.Position}");
+};
 ```
 
-> [!TIP] 
-> A lot of things in this class can be customized. For example, you can change the colors
-> of the debug messages or the exception messages. Go to [Debug.Settings](Debug.Settings.cs) for more information.
+### 3. Static Debug Diagnostics & Logger
+Static wrappers around the diagnostic backend:
 
-## ConsoleProgressBar
-Prints an interactive progress bar to the console, that updates as a task is being completed.
-
-### Usage:
 ```csharp
-public static event EventHandler Event;
+using NeoKolors.Console;
 
-public static void Main() 
-{
-    int start = 0;
-    int end = 4000;
-    
-    ConsoleProgressBar bar = new ConsoleProgressBar(start, end, 40, ConsoleProgressBar.BarStyle.MODERN);
-        
-    Event += bar.OnProgressUpdate;
-        
-    for (int i = start; i < end; i++) 
-    {
-        var g = new ImageGenerator(400, 400, i);
-        var bmp = g.GenerateImage();
-        bmp.Save($@".\{SeedFormat.WordFromSeed(i)}.png", ImageFormat.Png);
-        Event.Invoke(null, EventArgs.Empty);
-    }
-}
+// Initialize datetime file logger
+NKDebug.Logger.FileConfig = LogFileConfig.NewDatetime("./logs/{0}.log");
+
+// Log diagnostics
+NKDebug.Info("Application initialized.");
+NKDebug.Warn("Configuration value '{Key}' is missing, using defaults", "Interval");
 ```
 
-This will make a progress bar that updates when a new image is generated and saved.
+### 4. Intercepting Exceptions
+You can override standard unhandled crash logs with clean colored formats:
+
+```csharp
+using NeoKolors.Console;
+
+// Enable pretty stack traces globally
+NKDebug.EnableExceptionInterruption();
+
+try
+{
+    throw new InvalidOperationException("Failed to load settings file.");
+}
+catch (Exception ex)
+{
+    // Beautiful formatted output in the terminal
+    NKDebug.Formatter.PrintException(ex);
+}
+```
