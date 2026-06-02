@@ -98,4 +98,3 @@ jobs:
         if: ${{ github.event.inputs.project == 'all' || github.event.inputs.project == matrix.project.name }}
         run: |
           dotnet nuget push "${{ env.NugetOutputDir }}*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json -skip-duplicate
-  shell: bash
