@@ -22,15 +22,30 @@ public static class FontAtlas {
     
     private static void LoadBuiltin() {
         Add("Default", IAsciiFont.Default);
+        Add("Jitter",  new JitterFont());
     }
 
     private static void AddInternal(string name) => Add(name, NKFontSerializer.ReadInternal(name) ?? IAsciiFont.Default);
 
-    public static void Add(string key, IAsciiFont value) => FONTS.Add(key, value);
+    public static void Add(string key, IAsciiFont value) {
+        LOGGER.Info($"Adding '{key}'.");
+        FONTS.Add(key, value);
+    }
+
     public static IAsciiFont Get(string key) => FONTS[key];
     public static bool ContainsFont(string key) => FONTS.ContainsKey(key);
     public static bool ContainsValue(IAsciiFont value) => FONTS.ContainsValue(value);
-    public static bool TryAdd(string key, IAsciiFont value) => FONTS.TryAdd(key, value);
+    
+    public static bool TryAdd(string key, IAsciiFont value) {
+        if (FONTS.TryAdd(key, value)) {
+            LOGGER.Info($"Added '{key}'.");
+            return true;
+        }
+
+        LOGGER.Warn($"Could not add '{key}'.");
+        return false;
+    }
+
     public static bool TryGet(string key, out IAsciiFont? value) => FONTS.TryGetValue(key, out value);
 
     public static int Count => FONTS.Count;

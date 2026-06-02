@@ -4,6 +4,7 @@
 using System.CommandLine;
 using NeoKolors.Common;
 using NeoKolors.Console;
+using NeoKolors.Extensions;
 using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Fonts;
 using NeoKolors.Tui.Fonts.Serialization;
@@ -13,8 +14,13 @@ using NeoKolors.Tui.Fonts.Assets;
 namespace NKFontTool;
 
 internal static class Program {
+
+    static Program() {
+        NKDebug.Logger.FileConfig = LogFileConfig.NewDatetime("./{0}.log");
+    }
     
     static int Main(string[] args) {
+        
         // Support UTF-8 encoding for smooth unicode characters
         Console.OutputEncoding = System.Text.Encoding.UTF8;
 
@@ -80,16 +86,23 @@ internal static class Program {
             Arity = ArgumentArity.ZeroOrOne
         };
 
+        var allAsciiOption = new Option<bool>("--all-ascii") {
+            Description = "Add all printable ASCII characters to the blank font structure."
+        };
+        allAsciiOption.Aliases.Add("-a");
+
         var createCommand = new Command("create", "Create a new blank XML nkfont definition folder structure.");
         createCommand.Arguments.Add(outputDirArg);
         createCommand.Arguments.Add(fontNameArg);
+        createCommand.Options.Add(allAsciiOption);
 
         createCommand.Aliases.Add("new");
 
         createCommand.SetAction(parseResult => {
             string outputDir = parseResult.GetValue(outputDirArg) ?? string.Empty;
             string? fontName = parseResult.GetValue(fontNameArg);
-            HandleCreate(outputDir, fontName);
+            bool allAscii = parseResult.GetValue(allAsciiOption);
+            HandleCreate(outputDir, fontName, allAscii);
         });
 
         // 4. list command
@@ -202,7 +215,15 @@ internal static class Program {
             return;
         }
 
-        var size = font.GetSize(text, maxWidth: NKConsole.WindowSize.X);
+        text = text.Unescape();
+        
+        if (!AnsiString.TryParse(text, out var ansiString)) {
+            PrintError($"Could not parse text '{text}'.");
+            
+            return;
+        }
+
+        var size = font.GetSize(ansiString, maxWidth: NKConsole.WindowSize.X);
 
         if (size.X == 0 || size.Y == 0) {
             NKConsole.WriteLine("Warning: Rendered text has zero width or height.", ConsoleColor.Yellow);
@@ -211,8 +232,12 @@ internal static class Program {
         }
 
         var canvas = new NKCharCanvas(size.X, size.Y);
-        font.PlaceString(text, canvas);
+        font.PlaceString(ansiString, canvas, maxWidth: NKConsole.WindowSize.X);
 
+        NKConsole.WriteLine();
+        NKConsole.WriteLine($"Text size: {size}", ConsoleColor.Yellow);
+        NKConsole.WriteLine();
+        
         // Render cell by cell to console using NeoKolors styles
         for (int y = 0; y < canvas.Height; y++) {
             for (int x = 0; x < canvas.Width; x++) {
@@ -222,9 +247,11 @@ internal static class Program {
 
             Console.WriteLine();
         }
+        
+        NKConsole.WriteLine();
     }
 
-    static void HandleCreate(string outputDir, string? fontName) {
+    static void HandleCreate(string outputDir, string? fontName, bool allAscii = false) {
         string fullOutputDir = Path.GetFullPath(outputDir);
 
         if (string.IsNullOrWhiteSpace(fontName)) {
@@ -245,19 +272,110 @@ internal static class Program {
 
         try {
             Directory.CreateDirectory(fullOutputDir);
-            Directory.CreateDirectory(Path.Combine(fullOutputDir, "lowercase"));
 
-            // Read templates
             string manifestContent = ReadTemplate("manifest.nkfont");
             string configContent = ReadTemplate("Config.xml").Replace("{FONT_NAME}", fontName);
-            string mapContent = ReadTemplate("Map.xml");
-            string aNkgContent = ReadTemplate("a.nkg");
+            string mapContent;
 
-            // Write files
+            if (allAscii) {
+                // Directories
+                Directory.CreateDirectory(Path.Combine(fullOutputDir, "lowercase"));
+                Directory.CreateDirectory(Path.Combine(fullOutputDir, "uppercase"));
+                Directory.CreateDirectory(Path.Combine(fullOutputDir, "digits"));
+                Directory.CreateDirectory(Path.Combine(fullOutputDir, "special"));
+
+                // Special characters mapping dictionary
+                var specialChars = new Dictionary<char, string> {
+                    { '!', "exclamation" },
+                    { '"', "quote" },
+                    { '#', "hash" },
+                    { '$', "dollar" },
+                    { '%', "percent" },
+                    { '&', "ampersand" },
+                    { '\'', "apostrophe" },
+                    { '(', "lparen" },
+                    { ')', "rparen" },
+                    { '*', "asterisk" },
+                    { '+', "plus" },
+                    { ',', "comma" },
+                    { '-', "dash" },
+                    { '.', "dot" },
+                    { '/', "slash" },
+                    { ':', "colon" },
+                    { ';', "semicolon" },
+                    { '<', "lt" },
+                    { '=', "equal" },
+                    { '>', "gt" },
+                    { '?', "question" },
+                    { '@', "at" },
+                    { '[', "lbracket" },
+                    { '\\', "backslash" },
+                    { ']', "rbracket" },
+                    { '^', "caret" },
+                    { '_', "underscore" },
+                    { '`', "backtick" },
+                    { '{', "lbrace" },
+                    { '|', "pipe" },
+                    { '}', "rbrace" },
+                    { '~', "tilde" }
+                };
+
+                var mapLines = new List<string> {
+                    "<FontMap xmlns=\"https://krykomdev.github.io/NeoKolors/Schemas/Fonts/v3/\">"
+                };
+
+                // Helper to format XML Symbol
+                string GetXmlSymbol(char c) {
+                    return c switch {
+                        '&' => "\\x26",
+                        '<' => "\\x3c",
+                        '>' => "\\x3e",
+                        '"' => "\\x22",
+                        '\\' => "\\\\",
+                        _ => c.ToString()
+                    };
+                }
+
+                // Lowercase letters (a-z)
+                for (char c = 'a'; c <= 'z'; c++) {
+                    File.WriteAllText(Path.Combine(fullOutputDir, "lowercase", $"{c}.nkg"), ".", System.Text.Encoding.UTF8);
+                    mapLines.Add($"    <Component Symbol=\"{c}\" File=\"lowercase/{c}.nkg\"/>");
+                }
+
+                // Uppercase letters (A-Z)
+                for (char c = 'A'; c <= 'Z'; c++) {
+                    File.WriteAllText(Path.Combine(fullOutputDir, "uppercase", $"{c}.nkg"), ".", System.Text.Encoding.UTF8);
+                    mapLines.Add($"    <Component Symbol=\"{c}\" File=\"uppercase/{c}.nkg\"/>");
+                }
+
+                // Digits (0-9)
+                for (char c = '0'; c <= '9'; c++) {
+                    File.WriteAllText(Path.Combine(fullOutputDir, "digits", $"{c}.nkg"), ".", System.Text.Encoding.UTF8);
+                    mapLines.Add($"    <Component Symbol=\"{c}\" File=\"digits/{c}.nkg\"/>");
+                }
+
+                // Special characters
+                foreach (var kvp in specialChars) {
+                    char symbol = kvp.Key;
+                    string name = kvp.Value;
+                    File.WriteAllText(Path.Combine(fullOutputDir, "special", $"{name}.nkg"), ".", System.Text.Encoding.UTF8);
+                    mapLines.Add($"    <Component Symbol=\"{GetXmlSymbol(symbol)}\" File=\"special/{name}.nkg\"/>");
+                }
+
+                mapLines.Add("</FontMap>");
+                mapContent = string.Join(Environment.NewLine, mapLines);
+            }
+            else {
+                Directory.CreateDirectory(Path.Combine(fullOutputDir, "lowercase"));
+                mapContent = ReadTemplate("Map.xml");
+                string aNkgContent = ReadTemplate("a.nkg");
+                File.WriteAllText(Path.Combine(fullOutputDir, "lowercase", "a.nkg"), aNkgContent, System.Text.Encoding.UTF8);
+            }
+
+            // Write common files
             File.WriteAllText(Path.Combine(fullOutputDir, "manifest.nkfont"), manifestContent, System.Text.Encoding.UTF8);
             File.WriteAllText(Path.Combine(fullOutputDir, "Config.xml"), configContent, System.Text.Encoding.UTF8);
             File.WriteAllText(Path.Combine(fullOutputDir, "Map.xml"), mapContent, System.Text.Encoding.UTF8);
-            File.WriteAllText(Path.Combine(fullOutputDir, "lowercase", "a.nkg"), aNkgContent, System.Text.Encoding.UTF8);
 
             PrintSuccess($"Successfully created blank XML font definition '{fontName}' at '{fullOutputDir}'!");
             PrintSuccess("You can compile it using: nkfont compile <path-to-folder> <output-file.nkf>");

@@ -6,16 +6,22 @@ namespace NeoKolors.Console.Tests;
 [Collection("ConsoleTests")]
 public class NKConsoleOutTests : IDisposable {
     private readonly TextWriter _originalOut;
+    private readonly TextWriter _originalLogOut;
     private readonly StringWriter _stringWriter;
 
     public NKConsoleOutTests() {
         _originalOut = System.Console.Out;
+        _originalLogOut = NKDebug.GetOutput();
         _stringWriter = new StringWriter();
         System.Console.SetOut(_stringWriter);
+        NKDebug.SetOutput(_stringWriter);
+        NKConsole.UseDotnetDrivers();
     }
 
     public void Dispose() {
+        NKConsole.ResetIoDrivers();
         System.Console.SetOut(_originalOut);
+        NKDebug.SetOutput(_originalLogOut);
         _stringWriter.Dispose();
     }
 

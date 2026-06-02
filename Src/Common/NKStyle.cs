@@ -1,4 +1,4 @@
-﻿//
+//
 // NeoKolors
 // Copyright (c) 2025 KryKom
 //
@@ -409,7 +409,7 @@ public record struct NKStyle : IFormattable {
     /// <summary>
     /// safely overwrites the contents of this instance with the contents of the other instance
     /// </summary>
-    public NKStyle Override(NKStyle other) {
+    public NKStyle OverrideWith(NKStyle other) {
         var n = new NKStyle(_raw);
         if (!other.IsFColorInherit) n = n.SetFColor(other.GetFColor());
         if (!other.IsBColorInherit) n = n.SetBColor(other.GetBColor());
@@ -478,20 +478,20 @@ public record struct NKStyle : IFormattable {
     public string ToBitmapString() {
         var sb = new StringBuilder();
 
-        sb.Append($"{$"{(_raw >> 56 & 0xFF):b8}"    .AddColor(NKConsoleColor.RED)}_");
-        sb.Append($"{$"{(_raw >> 50 & 0b111111):b6}".AddColor(NKConsoleColor.RED)}");
-        sb.Append($"{$"{(_raw >> 49 & 0b1):b1}"     .AddColor(NKConsoleColor.YELLOW)}");
-        sb.Append($"{$"{(_raw >> 48 & 0b1):b1}"     .AddColor(NKConsoleColor.GREEN)}_");
-        sb.Append($"{$"{(_raw >> 40 & 0xFF):b8}"    .AddColor(NKConsoleColor.RED)}_");
+        sb.Append($"{$"{_raw >> 56 & 0xFF:b8}"    .AddColor(NKConsoleColor.RED)}_");
+        sb.Append($"{$"{_raw >> 50 & 0b111111:b6}".AddColor(NKConsoleColor.RED)}");
+        sb.Append($"{$"{_raw >> 49 & 0b1:b1}"     .AddColor(NKConsoleColor.YELLOW)}");
+        sb.Append($"{$"{_raw >> 48 & 0b1:b1}"     .AddColor(NKConsoleColor.GREEN)}_");
+        sb.Append($"{$"{_raw >> 40 & 0xFF:b8}"    .AddColor(NKConsoleColor.RED)}_");
 
-        sb.Append($"{$"{(_raw >> 32 & 0xFF):b8}"    .AddColor(NKConsoleColor.BLUE)}_");
-        sb.Append($"{$"{(_raw >> 26 & 0b111111):b6}".AddColor(NKConsoleColor.BLUE)}");
-        sb.Append($"{$"{(_raw >> 25 & 0b1):b1}"     .AddColor(NKConsoleColor.MAGENTA)}");
-        sb.Append($"{$"{(_raw >> 24 & 0b1):b1}"     .AddColor(NKConsoleColor.CYAN)}_");
-        sb.Append($"{$"{(_raw >> 16 & 0xFF):b8}"    .AddColor(NKConsoleColor.BLUE)}_");
+        sb.Append($"{$"{_raw >> 32 & 0xFF:b8}"    .AddColor(NKConsoleColor.BLUE)}_");
+        sb.Append($"{$"{_raw >> 26 & 0b111111:b6}".AddColor(NKConsoleColor.BLUE)}");
+        sb.Append($"{$"{_raw >> 25 & 0b1:b1}"     .AddColor(NKConsoleColor.MAGENTA)}");
+        sb.Append($"{$"{_raw >> 24 & 0b1:b1}"     .AddColor(NKConsoleColor.CYAN)}_");
+        sb.Append($"{$"{_raw >> 16 & 0xFF:b8}"    .AddColor(NKConsoleColor.BLUE)}_");
 
-        sb.Append($"{$"{(_raw >> 8 & 0xFF):b8}".AddColor(NKConsoleColor.WHITE)}_");
-        sb.Append($"{$"{(_raw >> 0 & 0xFF):b8}".AddColor(NKConsoleColor.DARK_GRAY)}");
+        sb.Append($"{$"{_raw >> 8 & 0xFF:b8}".AddColor(NKConsoleColor.WHITE)}_");
+        sb.Append($"{$"{_raw >> 0 & 0xFF:b8}".AddColor(NKConsoleColor.DARK_GRAY)}");
 
         return sb.ToString();
     }
@@ -525,8 +525,7 @@ public record struct NKStyle : IFormattable {
     /// <param name="overrider">The NKStyle instance providing the overriding properties.</param>
     /// <returns>The resulting NKStyle instance after applying the overrides.</returns>
     public static NKStyle operator <<(NKStyle overriden, NKStyle overrider) {
-        overriden.Override(overrider);
-        return overriden;
+        return overriden.OverrideWith(overrider);
     }
 
     public static NKStyle Default => new(NKColor.Default, NKColor.Default);

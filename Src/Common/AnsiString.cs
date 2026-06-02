@@ -2,6 +2,7 @@
 // Copyright (c) 2025 KryKom
 
 using System.Collections;
+using System.Collections.Immutable;
 using System.Text;
 
 namespace NeoKolors.Common;
@@ -28,6 +29,13 @@ public sealed class AnsiString :
     /// Gets the plain text value without ANSI escape sequences.
     /// </summary>
     public string Plain => _text;
+
+    /// <summary>
+    /// Gets an immutable array containing style markers applied to the text.
+    /// Each style marker represents a specific style, including its start
+    /// and end positions within the text.
+    /// </summary>
+    public ImmutableArray<StyleMarker> Styles => [.._styles];
 
     /// <summary>
     /// Gets the number of characters in the string.
@@ -107,8 +115,12 @@ public sealed class AnsiString :
         _styles = [new StyleMarker(0, style)];
     }
 
-    private AnsiString(string text, List<StyleMarker> styles) {
-        _text   = text;
+    /// <summary>
+    /// Represents a styled string with ANSI-compatible formatting.
+    /// Provides mechanisms to manage, manipulate, and render styled text.
+    /// </summary>
+    public AnsiString(string text, List<StyleMarker> styles) {
+        _text = text;
         _styles = styles;
     }
 
@@ -793,7 +805,17 @@ public sealed class AnsiString :
     }
 
     private static bool TryParseMarker(string content, ref NKStyle style) {
+        bool isNegated = false;
+        if (content.StartsWith('!')) {
+            isNegated = true;
+            content = content[1..];
+            if (string.IsNullOrEmpty(content)) {
+                return false;
+            }
+        }
+
         if (content.StartsWith("f#")) {
+            if (isNegated) return false;
             string colorStr = content[2..];
             
             if (!TryParseColor(colorStr, out var color))
@@ -804,6 +826,7 @@ public sealed class AnsiString :
         }
         
         if (content.StartsWith("b#")) {
+            if (isNegated) return false;
             string colorStr = content[2..];
             
             if (!TryParseColor(colorStr, out var color))
@@ -829,7 +852,11 @@ public sealed class AnsiString :
             }
         }
         
-        style = style.SetStyles(flags);
+        if (isNegated) {
+            style = style.SetStyles(style.Styles & ~flags);
+        } else {
+            style = style.SetStyles(flags);
+        }
         return true;
     }
 
@@ -1019,7 +1046,7 @@ public sealed class AnsiString :
 
     #region Markers
     
-    private class StyleMarker {
+    public class StyleMarker {
         public int     Index { get; }
         public NKStyle Style { get; }
 

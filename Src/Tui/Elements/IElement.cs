@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2026 KryKom
 
 using System.Diagnostics.Contracts;
@@ -7,9 +7,10 @@ using NeoKolors.Tui.Dom;
 using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Values;
+
 namespace NeoKolors.Tui.Elements;
 
-public interface IElement<T> : IElement, INode<T> { }
+public interface IElement<T> : IElement, INode<T>;
 
 [IndirectImpl(typeof(IElement<>))]
 public interface IElement : IRenderable, INode {
@@ -35,42 +36,19 @@ public interface IElement : IRenderable, INode {
     public ElementInfo Info { get; }
 
     /// <summary>
-    /// Renders the element onto the specified canvas within the defined rectangular region.
+    /// Renders the element onto the canvas using its pre-calculated layout and bounds.
     /// </summary>
-    /// <param name="canvas">The drawing surface where the element will be rendered.</param>
-    /// <param name="rect">The rectangular area within the canvas
-    /// that defines the bounds for rendering the element.</param>
-    public void Render(ICharCanvas canvas, Rectangle rect);
+    public new void Render(ICharCanvas canvas);
 
     /// <summary>
     /// Renders the content onto the specified canvas within the full dimensions of the canvas.
     /// </summary>
     /// <param name="canvas">The drawing surface on which the content will be rendered.</param>
-    void IRenderable.Render(ICharCanvas canvas)
-        => Render(canvas, new Rectangle(0, 0, canvas.Width - 1, canvas.Height - 1));
-
-    /// <summary>
-    /// Calculates the minimum layout size required by the element based on the provided parent size.
-    /// </summary>
-    /// <param name="parent">The size of the parent container, used as a basis for determining relative sizes.</param>
-    /// <returns>A <see cref="Size"/> struct representing the minimum width and its corresponding height required
-    /// by the element.</returns>
-    public Size GetMinSize(Size parent);
-
-    /// <summary>
-    /// Calculates the maximum layout size required by the element based on the provided parent size.
-    /// </summary>
-    /// <param name="parent">The size of the parent container, used as a basis for determining relative sizes.</param>
-    /// <returns>A <see cref="Size"/> struct representing the maximum width and its corresponding height required
-    /// by the element.</returns>
-    public Size GetMaxSize(Size parent);
-
-    /// <summary>
-    /// Computes the render layout size of an element based on the given bounding size.
-    /// </summary>
-    /// <param name="parent">The bounding size within which the element's render layout is calculated.</param>
-    /// <returns>A <see cref="Size"/> struct representing the computed width and height of the render layout.</returns>
-    public Size GetRenderSize(Size parent);
+    void IRenderable.Render(ICharCanvas canvas) {
+        Measure(new Size(canvas.Width, canvas.Height));
+        Arrange(new Rectangle(0, 0, canvas.Width - 1, canvas.Height - 1));
+        Render(canvas);
+    }
 
     /// <summary>
     /// Event triggered whenever the state of an element is updated.
@@ -80,6 +58,61 @@ public interface IElement : IRenderable, INode {
     /// allowing additional actions to be performed in response to those updates.
     /// </remarks>
     public event Action OnElementUpdated;
+
+    /// <summary>
+    /// Gets the size that this element calculated during the measure pass of the layout process.
+    /// </summary>
+    public Size DesiredSize { get; }
+
+    /// <summary>
+    /// Gets the final render bounds of this element relative to its container.
+    /// </summary>
+    public Rectangle RenderBounds { get; }
+
+    /// <summary>
+    /// Gets the computed element layout (margin, border, content boxes) of this element.
+    /// </summary>
+    public ElementLayout RenderLayout { get; }
+
+    /// <summary>
+    /// Updates the DesiredSize of the element based on the available constraints.
+    /// </summary>
+    public void Measure(Size availableSize);
+
+    /// <summary>
+    /// Positions child elements and determines the final rendering size and position.
+    /// </summary>
+    public void Arrange(Rectangle finalRect);
+
+    /// <summary>
+    /// Invalidates the measurement state (layout) for the element.
+    /// </summary>
+    public void InvalidateMeasure();
+
+    /// <summary>
+    /// Invalidates the arrange state (layout) for the element.
+    /// </summary>
+    public void InvalidateArrange();
+
+    /// <summary>
+    /// Gets or sets whether the element is focused.
+    /// </summary>
+    public bool IsFocused { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether the mouse cursor is hovering over the element.
+    /// </summary>
+    public bool IsHovered { get; set; }
+
+    /// <summary>
+    /// Gets or sets the list of style triggers for this element.
+    /// </summary>
+    public List<TriggerBase> Triggers { get; set; }
+
+    /// <summary>
+    /// Evaluates all active triggers and updates element styling.
+    /// </summary>
+    public void EvaluateTriggers();
     
     // -------------------------------------------------------------- //
     //                       LAYOUT COMPUTATION                       //

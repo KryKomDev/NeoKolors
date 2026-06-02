@@ -23,12 +23,23 @@ public interface IOutputDriver : IDisposable {
     public void Write(string value) => Write(value.AsSpan());
 
     /// <summary>
+    /// Writes the specified character value to the output.
+    /// </summary>
+    /// <param name="value">The character to write.</param>
+    public void Write(char value) => Write(value.ToString());
+
+    /// <summary>
     /// Writes the specified formatted string along with its arguments to the output.
     /// </summary>
     /// <param name="format">The composite format string.</param>
     /// <param name="args">An array of objects to write using the format string.</param>
-    public void Write([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object[] args) => 
+    public void Write([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args) => 
         Write(string.Format(format, args));
+
+    /// <summary>
+    /// Writes a line terminator to the output.
+    /// </summary>
+    public void WriteLine() => Write(Environment.NewLine);
 
     /// <summary>
     /// Writes the specified span of characters followed by a new line to the output.

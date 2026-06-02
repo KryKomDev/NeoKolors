@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2026 KryKom
 
 using NeoKolors.Console.Events;
@@ -32,6 +32,7 @@ public class NKApplication : IMouseSupportingApplication {
     public bool IsRunning { get; private set; }
     public bool IsPaused { get; private set; }
     private readonly SemaphoreSlim _pausedSignal = new(0);
+    private readonly MouseCascadeController _mouseCascade;
     
     // --- Events ---
     public event KeyEventHandler      KeyEvent;
@@ -42,12 +43,16 @@ public class NKApplication : IMouseSupportingApplication {
     public event Action               OnRender;
 
     private void InvokeKeyEvent(KeyEventArgs k) => KeyEvent.Invoke(k);
-    private void InvokeMouseEvent(MouseEventArgs m) => MouseEvent.Invoke(m);
+    private void InvokeMouseEvent(MouseEventArgs m) {
+        _mouseCascade.HandleMouseEvent(m);
+        MouseEvent.Invoke(m);
+    }
     private void InvokeResizeEvent(ResizeEventArgs r) => ResizeEvent.Invoke(r);
 
     public NKApplication(NKAppConfig config, IRenderable @base) {
         Config = config;
         Base   = @base;
+        _mouseCascade = new MouseCascadeController(this);
 
         KeyEvent    +=  _     => { };
         MouseEvent  +=  _     => { };
@@ -85,6 +90,7 @@ public class NKApplication : IMouseSupportingApplication {
 
         // configure app
         IsRunning = true;
+        AppEventBus.SetSourceApplication(this);
         StartEvent.Invoke(this, new AppStartEventArgs(Config.Rendering.IsLazy));
         
         NKConsole.Key += CheckQuit;
@@ -220,8 +226,10 @@ public class NKApplication : IMouseSupportingApplication {
         
         LOGGER.Debug(
             $"\n  Cursor positioning:" +
-            $"\n   ├ Bounds check: {NKConsole.CursorPosition_BoundsCheckTime}" +
-            $"\n   └ Position set: {NKConsole.CursorPosition_SetPosTime}"
+            $"\n   ├ Bounds check total: {NKConsole.CursorPosition_BoundsCheckTime}" +
+            $"\n   ├ Position set total: {NKConsole.CursorPosition_BoundsCheckTime}" +
+            $"\n   ├ Bounds check avg: {NKConsole.CursorPosition_AvgBoundsCheckTime}" +
+            $"\n   └ Position set avg: {NKConsole.CursorPosition_AvgSetPosTime}"
         );
         
         #endif
@@ -265,8 +273,9 @@ public class NKApplication : IMouseSupportingApplication {
     }
 
     private void CheckQuit(KeyEventArgs keyInfo) {
-        if (keyInfo.Key       == Config.InterruptCombination.Key &&
-            keyInfo.Modifiers == Config.InterruptCombination.Modifiers)
+        if (keyInfo.Key       == Config.InterruptCombination.Key  &&
+            keyInfo.Down      == Config.InterruptCombination.Down &&
+            keyInfo.Modifiers.Matches(Config.InterruptCombination.Modifiers))
         {
             IsRunning = false;
             Stop();

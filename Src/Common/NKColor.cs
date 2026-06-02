@@ -1,4 +1,4 @@
-﻿//
+//
 // NeoKolors
 // Copyright (c) 2025 KryKom
 //
@@ -372,24 +372,19 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
     internal static void AppendInnerU(StringBuilder sb, NKColor prev, NKColor next) => AppendInner(sb, prev, next, 5);
 
     private static void AppendInner(StringBuilder sb, NKColor prev, NKColor next, int mode) {
-        if ((prev.IsInherit && next.IsInherit) || prev == next) return;
+        var prevIsDefault = prev.IsDefault || prev.IsInherit;
+        var nextIsDefault = next.IsDefault || next.IsInherit;
 
-        if (next.IsInherit) {
-            sb.Append(prev.IsDefault 
-                ? $"{mode}9;" 
-                : prev.IsPalette 
-                    ? $"{mode}8;5;{(byte)prev.AsPalette};" 
-                    : $"{mode}8;2;{prev.AsRgb.R};{prev.AsRgb.G};{prev.AsRgb.B};"
-            );
+        if ((prevIsDefault && nextIsDefault) || prev == next) return;
 
+        if (nextIsDefault) {
+            sb.Append($"{mode}9;");
             return;
         }
 
-        sb.Append(next.IsDefault 
-            ? $"{mode}9;" 
-            : next.IsPalette 
-                ? $"{mode}8;5;{(byte)next.AsPalette};" 
-                : $"{mode}8;2;{next.AsRgb.R};{next.AsRgb.G};{next.AsRgb.B};"
+        sb.Append(next.IsPalette 
+            ? $"{mode}8;5;{(byte)next.AsPalette};" 
+            : $"{mode}8;2;{next.AsRgb.R};{next.AsRgb.G};{next.AsRgb.B};"
         );
     }
     

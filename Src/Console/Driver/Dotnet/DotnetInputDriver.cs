@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2025 KryKom
 
 using Metriks;
@@ -49,7 +49,12 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
         _parser = new DotnetAnsiParser(HandleUnused);
         _config = config ?? new DotnetInputDriverConfig();
 
-        Stdio.TreatControlCAsInput = !Config.CtrlCForceQuits;
+        try {
+            Stdio.TreatControlCAsInput = !Config.CtrlCForceQuits;
+        }
+        catch (Exception ex) {
+            LOGGER.Warn($"Failed to set TreatControlCAsInput: {ex.Message}");
+        }
     }
 
     private void HandleUnused(ConsoleKeyInfo[] keys) {

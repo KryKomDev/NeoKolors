@@ -1,4 +1,4 @@
-﻿// 
+// 
 // NeoKolors
 // Copyright (c) 2026 KryKom
 // 
@@ -177,22 +177,22 @@ internal static partial class WinImports {
 
     /// <see href="https://learn.microsoft.com/en-us/windows/win32/api/fileapi/nf-fileapi-writefile"/>
     #if NK_LIBIMPORT
-    [LibraryImport("kernel32.dll", EntryPoint = "WriteFileW")]
+    [LibraryImport("kernel32.dll", EntryPoint = "WriteFile")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static partial bool WriteFile(
         nint hFile,
         nint lpBuffer,
         uint nNumberOfBytesToWrite,
-        out uint lpNumberOfCharsWritten,
+        out uint lpNumberOfBytesWritten,
         nint lpOverlapped
     ); 
     #else
-    [DllImport("kernel32.dll", EntryPoint = "WriteFileW", CharSet = CharSet.Unicode)]
+    [DllImport("kernel32.dll", EntryPoint = "WriteFile", CharSet = CharSet.Unicode)]
     private static extern bool WriteFile(
         nint hFile,
         nint lpBuffer,
         uint nNumberOfBytesToWrite,
-        out uint lpNumberOfCharsWritten,
+        out uint lpNumberOfBytesWritten,
         nint lpOverlapped
     ); 
     #endif
@@ -248,7 +248,9 @@ internal static partial class WinImports {
                 return true;
             
             // redirected
-            return WriteFile(handle, (nint)ptr, (uint)chars.Length * 2, out written, IntPtr.Zero);
+            var success = WriteFile(handle, (nint)ptr, (uint)chars.Length * 2, out written, IntPtr.Zero);
+            written /= 2;
+            return success;
         }
     }
 }

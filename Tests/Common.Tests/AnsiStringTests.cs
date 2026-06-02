@@ -409,4 +409,36 @@ public class AnsiStringTests {
         Assert.False(AnsiString.TryParse("Hello } World", out _));
         Assert.False(AnsiString.TryParse("Hello {:f#invalid} World", out _));
     }
+
+    [Fact]
+    public void Parse_WithNegatedStyleFlags_NegatesActiveStyles() {
+        var parsed = AnsiString.Parse("Hello {:b}World{:!b}!");
+        Assert.Equal("Hello World!", parsed.Plain);
+        Assert.Equal(NKStyle.Default, parsed.GetStyleAt(0)); // "Hello "
+        Assert.True(parsed.GetStyleAt(6).Styles.HasFlag(TextStyles.BOLD)); // "World"
+        Assert.False(parsed.GetStyleAt(11).Styles.HasFlag(TextStyles.BOLD)); // "!"
+    }
+
+    [Fact]
+    public void Parse_WithCombinedStyleFlagsAndNegation_NegatesOnlySpecified() {
+        // First set BOLD and ITALIC, then negate only BOLD
+        var parsed = AnsiString.Parse("Hello {:bi}World{:!b}!");
+        Assert.Equal("Hello World!", parsed.Plain);
+        Assert.Equal(NKStyle.Default, parsed.GetStyleAt(0));
+        
+        var worldStyle = parsed.GetStyleAt(6);
+        Assert.True(worldStyle.Styles.HasFlag(TextStyles.BOLD));
+        Assert.True(worldStyle.Styles.HasFlag(TextStyles.ITALIC));
+
+        var exclamStyle = parsed.GetStyleAt(11);
+        Assert.False(exclamStyle.Styles.HasFlag(TextStyles.BOLD));
+        Assert.True(exclamStyle.Styles.HasFlag(TextStyles.ITALIC));
+    }
+
+    [Fact]
+    public void TryParse_InvalidNegationFormat_ReturnsFalse() {
+        Assert.False(AnsiString.TryParse("Hello {:!} World", out _));
+        Assert.False(AnsiString.TryParse("Hello {:!f#red} World", out _));
+        Assert.False(AnsiString.TryParse("Hello {:!b#blue} World", out _));
+    }
 }

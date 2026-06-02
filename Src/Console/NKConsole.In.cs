@@ -1,4 +1,4 @@
-﻿//
+//
 // NeoKolors
 // Copyright (c) 2025 KryKom
 //
@@ -479,7 +479,7 @@ public static partial class NKConsole {
     /// Returns true if the alternate console buffer is enabled.
     /// </summary>
     public static async Task<bool> GetAltBufStateAsync() {
-        Std.Write(EscapeCodes.REQUEST_ALTBUF_STATE);
+        OutputDriver.Write(EscapeCodes.REQUEST_ALTBUF_STATE);
         
         // If multithreaded input interception is not enabled
         if (!InterceptInput) {

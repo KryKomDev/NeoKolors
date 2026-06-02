@@ -10,22 +10,22 @@
       },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
-        "requested": "[18.3.0, )",
-        "resolved": "18.3.0",
-        "contentHash": "xW3kXuWRQtgoxJp4J+gdhHSQyK+6Wb/AZDSd7lMvuMRYlZ1tnpkojyfZlWilB5G4dmZ0Y0ZxU/M23TlubndNkw==",
+        "requested": "[18.6.0, )",
+        "resolved": "18.6.0",
+        "contentHash": "kAIBt0MsYR0o2RULmlW5BhQ1ha50aGEgLKG4f1p0kePBGLJCprqs3S+NxRrYN8UH7mSQRPKpeiH9mwPMEKUObQ==",
         "dependencies": {
-          "Microsoft.CodeCoverage": "18.3.0",
-          "Microsoft.TestPlatform.TestHost": "18.3.0"
+          "Microsoft.CodeCoverage": "18.6.0",
+          "Microsoft.TestPlatform.TestHost": "18.6.0"
         }
       },
       "SkiaSharp": {
         "type": "Direct",
-        "requested": "[3.119.2, )",
-        "resolved": "3.119.2",
-        "contentHash": "nmy2dOFWPvQKMglfpjz8+/xQQcSrL9jzul3cUyzCJVSwrmSAw+6B1sEgU7jt6NZBptwGq2k/V0kjyu2GizMFtg==",
+        "requested": "[3.119.4, )",
+        "resolved": "3.119.4",
+        "contentHash": "53NOSUZ1Us+91Sm0uCkIivh/k7jOowRErZT2sIWwPFN9mLUvdxnE6rS4sWo4255+Rd2MWUSF+j0NMZHD6Cke+Q==",
         "dependencies": {
-          "SkiaSharp.NativeAssets.Win32": "3.119.2",
-          "SkiaSharp.NativeAssets.macOS": "3.119.2"
+          "SkiaSharp.NativeAssets.Win32": "3.119.4",
+          "SkiaSharp.NativeAssets.macOS": "3.119.4"
         }
       },
       "xunit": {
@@ -52,28 +52,28 @@
       },
       "Metriks": {
         "type": "Transitive",
-        "resolved": "2026.2.4.1",
-        "contentHash": "Ll8nkh6w9XX26o2LlY6DzDIFd05e95wv+tFQIGPZY3lIsZIoMcG2AKgOl5G+27enzEUO8evhKdUZjt+NQENHng==",
+        "resolved": "2026.2.5",
+        "contentHash": "6Il7IaSVY+Syl2fax3Jlkix2dGJ/PiyMX/JeBzIVd36vcge6Jyr+CjQd5vG2DZUXzM1/MLWjjXcRIZ9d4znStQ==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4"
         }
       },
       "Microsoft.CodeCoverage": {
         "type": "Transitive",
-        "resolved": "18.3.0",
-        "contentHash": "23BNy/vziREC20Wwhb50K7+kZe0m07KlLWDQv4qjJ9tt3QjpDpDIqJFrhYHmMEo9xDkuSp55U/8h4bMF7MiB+g=="
+        "resolved": "18.6.0",
+        "contentHash": "bkmCXn/65Cd0LdO2zTb/ValGAJ1H8y/CgYOiBb3jsDyHI3Y1ljKx6RBvhvn3e5D/4R4I00RRwLf+Bd2Sn6bJjA=="
       },
       "Microsoft.TestPlatform.ObjectModel": {
         "type": "Transitive",
-        "resolved": "18.3.0",
-        "contentHash": "AEIEX2aWdPO9XbtR96eBaJxmXRD9vaI9uQ1T/JbPEKlTAZwYx0ZrMzKyULMdh/HH9Sg03kXCoN7LszQ90o6nPQ=="
+        "resolved": "18.6.0",
+        "contentHash": "gQTW4BIfM2ZLxixo9ITXoulLKjn20FiiHtqTsx9PENqTrX7368ZeJ5L0QZJyReXDWORPRV8jXwZR6Aar8JOyaA=="
       },
       "Microsoft.TestPlatform.TestHost": {
         "type": "Transitive",
-        "resolved": "18.3.0",
-        "contentHash": "twmsoelXnp1uWMU3VGip9f0Jr1mZ0PZqgJdF35CIrdYgYrkHIJMV1m8uKyhcdjLdsQDESHAgkR7KhS9i1qpJag==",
+        "resolved": "18.6.0",
+        "contentHash": "em1eLz5Q46+hsCtAXdXggWAPd9gQyT4ngdsQ7k1eWvQgpsjtS/wAOJ/5TteieFdiAvrEq1iVn00LtusAxRaVmQ==",
         "dependencies": {
-          "Microsoft.TestPlatform.ObjectModel": "18.3.0",
+          "Microsoft.TestPlatform.ObjectModel": "18.6.0",
           "Newtonsoft.Json": "13.0.3"
         }
       },
@@ -89,13 +89,13 @@
       },
       "SkiaSharp.NativeAssets.macOS": {
         "type": "Transitive",
-        "resolved": "3.119.2",
-        "contentHash": "I2jMGQ/26KOnc6iAoR+Mxh9vSJJ2vioJyj9aJ9OL5yEZyXothXJxf4vBMqnSaiXMqiiU1scG7KqtT0CLkmMmWA=="
+        "resolved": "3.119.4",
+        "contentHash": "fgBOWEqbY012x7gMfJU4ezgz6dfhJb30Z6YdW35h85Zoe39+a8YNbAAwL29ihPfWoppg5AjvyKNzD1oCvlqWwA=="
       },
       "SkiaSharp.NativeAssets.Win32": {
         "type": "Transitive",
-        "resolved": "3.119.2",
-        "contentHash": "uYe+da6+GXVgPKkCopzvIZ83DmC8SXXKeUAPrNcztJNsg0SjPQAxfKMOPZqmVjbzznrq/QUIjLUlJSZV/e0IPA=="
+        "resolved": "3.119.4",
+        "contentHash": "XOpbx/4CReO2wYsq2s6rbvdauc6dntG4Zv499sHGTJ87bwZaFXszFkwql3+FIZMc8kUPeaj3Mx2ezIJmo8a1Kg=="
       },
       "xunit.abstractions": {
         "type": "Transitive",
@@ -144,14 +144,14 @@
           "JetBrains.Annotations": "[2025.2.4, )",
           "NeoKolors.Extensions": "[2026.2.0, )",
           "OneOf": "[3.0.271, )",
-          "SkiaSharp": "[3.119.2, )"
+          "SkiaSharp": "[3.119.4, )"
         }
       },
       "neokolors.extensions": {
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Metriks": "[2026.2.4.1, )"
+          "Metriks": "[2026.2.5, )"
         }
       }
     }

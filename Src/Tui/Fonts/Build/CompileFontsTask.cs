@@ -1,6 +1,7 @@
 // NeoKolors
 // Copyright (c) krystof 2026
 
+using System.Globalization;
 using Microsoft.Build.Framework;
 using NeoKolors.Tui.Fonts.Serialization;
 
@@ -41,7 +42,7 @@ public class CompileFontsTask : Microsoft.Build.Utilities.Task {
         }
 
         try {
-            File.WriteAllText(lockFile, DateTime.UtcNow.ToString());
+            File.WriteAllText(lockFile, DateTime.UtcNow.ToString(CultureInfo.InvariantCulture));
         }
         catch {
             // Ignore lock file write issues and proceed

@@ -55,6 +55,10 @@
 
     <Component Symbol="!" File="special/excl.nkg"/>
     <Component Symbol="?" File="special/qm.nkg"/>
+    <Component Symbol=";" File="special/semicolon.nkg"/>
+    <Component Symbol=":" File="special/colon.nkg"/>
+    <Component Symbol="," File="special/comma.nkg"/>
+    <Component Symbol="." File="special/dot.nkg"/>
     
     <Component Symbol="ˇ" File="diacritics/grave.nkg"      Id="grave"/>
     <Component Symbol="´" File="diacritics/accent.nkg"     Id="accent"/>
@@ -78,4 +82,7 @@
     <Compound Symbol="Ů" Main="U" Secondary="circle"/>
     
     <Ligature Symbol="->" File="ligatures/arr-right.nkg"/>
+    
+    <Strikethrough File="effects/strikethrough.nkg" Baseline="1" AboveLetters="true"/>
+    <Underline     File="effects/underline.nkg"     Baseline="-1"/>
 </FontMap> 

@@ -1,10 +1,11 @@
-﻿//
+//
 // NeoKolors
 // Copyright (c) 2025 KryKom
 //
 
 namespace NeoKolors.Console.Tests;
 
+[Collection("ConsoleTests")]
 public class NKDebugTests : IDisposable {
     private readonly StringWriter _stringWriter;
     private readonly TextWriter _originalOutput;

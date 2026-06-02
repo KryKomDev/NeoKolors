@@ -28,7 +28,7 @@ public class VTQueryTests {
     public void PDAResponse_ConstructorWithInts_MapsCorrectly() {
         // 64 -> VT420
         // 4 -> SIXEL, 22 -> ANSI_COLOR
-        var response = new PDAResponse(64, new[] { 4, 22 });
+        var response = new PDAResponse(64, [4, 22]);
 
         Assert.Equal(VTType.VT420, response.Type);
         Assert.True(response.Capabilities!.Value.HasFlag(VTCapabilities.SIXEL));

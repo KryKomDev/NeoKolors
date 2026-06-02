@@ -225,7 +225,7 @@ public static partial class NKFontSerializer {
                 using var stream = entry.Open();
                 using var reader = new StreamReader(stream, Encoding.UTF8);
                 var text = await reader.ReadToEndAsync();
-                var lines = text.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
+                var lines = text.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
                 return (glyph, lines);
             }
 
@@ -708,8 +708,8 @@ public static partial class NKFontSerializer {
         NKFontSerializerHelper.Mask(
             glyph, 
             m.SpaceConf,
-            m.MapForg ?? Array.Empty<char>(),
-            m.MapBckg ?? Array.Empty<char>()
+            m.MapForg ?? [],
+            m.MapBckg ?? []
         );
 
         var rr = NKFontSerializerHelper.Reduce(glyph);

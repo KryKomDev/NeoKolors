@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2026 KryKom
 
 using NeoKolors.Tui.Elements;
@@ -20,7 +20,7 @@ public static class ElementLinq {
 
         public IEnumerable<IElement> OfClass(string className) {
             foreach (var element in elements) {
-                if (element.Info.Classes.Contains(className))
+                if (element.Info.IsOfClass(className))
                     yield return element;
             }
         }

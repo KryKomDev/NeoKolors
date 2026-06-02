@@ -53,7 +53,9 @@ public static class AssetsProvider {
     /// Registers the built-in font resources into the font atlas for later usage in the application.
     /// </summary>
     #if NK_FONTS_ENABLE_AUTO_REGISTRATION
+    #pragma warning disable CA2255
     [ModuleInitializer]
+    #pragma warning restore CA2255
     #endif
     public static void RegisterFonts() {
         RegisterFont("Bytesized", Bytesized);

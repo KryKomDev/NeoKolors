@@ -1,10 +1,7 @@
-﻿using System.ComponentModel;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using NeoKolors.Common;
 using NeoKolors.Console;
-using NeoKolors.Console.Ansi;
 using NeoKolors.Console.Driver.Windows;
 using NeoKolors.Console.Input;
 using NeoKolors.Console.Ansi.Mouse;
@@ -13,8 +10,9 @@ using NeoKolors.Tui.Elements;
 using NeoKolors.Tui.Elements.Caching;
 using NeoKolors.Tui.Events;
 using NeoKolors.Tui.Extensions;
-using NeoKolors.Tui.Fonts.Serialization;
-using NeoKolors.Tui.Rendering;
+using NeoKolors.Tui.Core;
+using NeoKolors.Tui.Fonts;
+using NeoKolors.Tui.Fonts.Assets;
 using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Values;
 using static NeoKolors.Console.LoggerLevel;
@@ -90,7 +88,6 @@ public static class Program {
         }
     }
     
-    [SuppressMessage("Interoperability", "CA1416:Validate platform compatibility")]
     public static void Main() {
         Console.OutputEncoding = Encoding.Unicode;
         
@@ -102,10 +99,10 @@ public static class Program {
         NKDebug.Logger.IndentMessage = new LoggerConfig.InlineIndent();
         NKDebug.Logger.MessageHighlightLine = false;
 
-        var str = $"OS: {Environment.OSVersion.VersionString}, Platform: {Environment.OSVersion.Platform}";
-        
-        NKDebug.Debug(str);
+        NKDebug.Debug($"OS: {Environment.OSVersion.VersionString}, Platform: {Environment.OSVersion.Platform}");
         NKDebug.Info($"Used I/O drivers: {NKConsole.InputDriver.GetType().Name}/{NKConsole.OutputDriver.GetType().Name}");
+        
+        AssetsProvider.RegisterFonts();
         
         // while (true) {
         //     if (inp.HasInput()) {
@@ -130,124 +127,102 @@ public static class Program {
         //     Thread.Sleep(10);
         // }
         
-        NKFontSerializer.CreateArchive(@"C:\Users\krystof\Desktop\projects\Libs\NeoKolors\NeoKolors.Tui\Fonts\Builtin\Dummy1", 
-            @"C:\Users\krystof\Desktop\projects\Libs\NeoKolors\NeoKolors.Tui\Fonts\Builtin\Dummy1.nkf");
-        
-        var res = NKFontSerializer.ReadDir(
-            @"C:\Users\krystof\Desktop\projects\Libs\NeoKolors\NeoKolors.Tui\Fonts\Builtin\Dummy1");
-
-        var res1 = NKFontSerializer.ReadDir(
-            @"C:\Users\krystof\Desktop\projects\Libs\NeoKolors\NeoKolors.Tui\Fonts\Builtin\Bytesized");
-
-        var fut = NKFontSerializer.ReadDir(
-            @"C:\Users\krystof\Desktop\projects\Libs\NeoKolors\NeoKolors.Tui\Fonts\Builtin\Future");
-        
-        var canv = new NKCharScreen(Console.WindowWidth, Console.WindowHeight);
-        
-        // res1.PlaceString("Hello World How you all doin tonight I am doing pretty damn good", canv,
-        //     new Rectangle(new Point(2, 2), new Size(canv.Width - 4, canv.Height - 4)));
-
         NKDebug.Info($"Console size: ({Console.WindowWidth}, {Console.WindowHeight})");
         
         var app = new NKApplication(
             new NKAppConfig(
                 rendering: RenderingConfig.Limited(144), 
-                mouseReportProtocol: MouseReportProtocol.UTF8
+                mouseReportProtocol: MouseReportProtocol.UTF8,
+                interruptCombination: new KeyEventArgs(KeyCode.Q, KeyModifiers.LEFT_CTRL, 'q')
             ), 
             null!
         );
         
         AppEventBus.SetSourceApplication(app);
         
-        var tt = new Text("Hello World How you doin?") {
+        var tt = new TextBlock("Hello World How you doin?") {
             Style = new StyleCollection {
                 TextColor = NKConsoleColor.WHITE,
                 Border = BorderStyle.GetNormal(NKConsoleColor.GRAY, NKConsoleColor.DARK_GRAY),
                 BackgroundColor = NKConsoleColor.DARK_GRAY,
-                Margin = new(2.Ch, 1.Ch),
-                Padding = new(2.Ch, 1.Ch),
+                Margin  = new Spacing(2.Ch, 1.Ch),
+                Padding = new Spacing(2.Ch, 1.Ch),
                 GridAlign = new Rectangle(0, 1, 0, 1),
                 Width = Dimension.Stretch,
                 Height = Dimension.Stretch,
             }
         };
         
-        var tt2 = new Text("Oi mae? wha a delighful weah, inni?") {
+        var tt2 = new TextBlock("Oi mae? wha a delighful weah, inni?") {
             Info = { Id = "tt2" },
             Style = new StyleCollection {
                 TextColor = NKConsoleColor.WHITE,
                 Border = BorderStyle.GetNormal(NKConsoleColor.GRAY, NKConsoleColor.DARK_GRAY),
                 BackgroundColor = NKConsoleColor.DARK_GRAY,
-                Margin = new(2.Ch, 1.Ch),
-                Padding = new(2.Ch, 1.Ch),
+                Margin = new Spacing(2.Ch, 1.Ch),
+                Padding = new Spacing(2.Ch, 1.Ch),
                 GridAlign = new Rectangle(1, 1, 1, 1),
                 Width = Dimension.Stretch,
                 Height = Dimension.Stretch,
             }
         };
         
-        var lt = new Text("Lorem ipsum dolor sit amet, consectetur adipisici elit") {
+        var lt = new TextBlock("Lorem ipsum dolor sit amet, consectetur adipisici elit") {
             Style = new StyleCollection {
                 TextColor = NKConsoleColor.WHITE,
                 Border = BorderStyle.GetNormal(NKConsoleColor.GRAY, NKConsoleColor.DARK_GRAY),
                 BackgroundColor = NKConsoleColor.DARK_GRAY,
-                Margin = new(2.Ch, 1.Ch),
-                Padding = new(2.Ch, 1.Ch),
+                Margin = new Spacing(2.Ch, 1.Ch),
+                Padding = new Spacing(2.Ch, 1.Ch),
                 GridAlign = new Rectangle(2, 0, 2, 1),
                 Width = Dimension.Stretch,
                 Height = Dimension.Stretch,
             }
         };
         
-        var vlt = new Text("Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat.") {
+        var vlt = new TextBlock("Lorem ipsum dolor sit amet, consectetur adipisici elit, sed eiusmod tempor incidunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquid ex ea commodi consequat.") {
             Info = { Id = "Tested" },
             Style = new StyleCollection {
                 TextColor = NKConsoleColor.WHITE,
                 Border = BorderStyle.GetNormal(NKConsoleColor.GRAY, NKConsoleColor.DARK_GRAY),
                 BackgroundColor = NKConsoleColor.DARK_GRAY,
-                Margin = new(2.Ch, 1.Ch),
-                Padding = new(2.Ch, 1.Ch),
+                Margin = new Spacing(2.Ch, 1.Ch),
+                Padding = new Spacing(2.Ch, 1.Ch),
                 GridAlign = new Rectangle(0, 0, 1, 0),
                 Width = Dimension.Stretch,
                 Height = Dimension.Stretch,
             }
         };
 
-        var fp = new Text("čus jak se máš!?") {
+        var fp = new TextBlock("čus jak se máš!?") {
             Style = new StyleCollection {
-                Font = fut,
+                Font = FontAtlas.Get("Future"),
                 TextColor = NKConsoleColor.BLUE,
-                Margin = new(2.Ch, 1.Ch),
-                Padding = new(2.Ch, 1.Ch),
+                Margin = new Spacing(2.Ch, 1.Ch),
+                Padding = new Spacing(2.Ch, 1.Ch),
                 // Border = BorderStyle.GetNormal(NKConsoleColor.DARK_GRAY),
                 // BackgroundColor = NKConsoleColor.BLACK,
                 TextAlign = new Align(HorizontalAlign.CENTER, VerticalAlign.TOP),
             }
         };
 
-        // var sd = new NamedDiv("NAMEEE", vlt, tt, lt, tt2) {
-        var sd = new Div(vlt, tt, lt, tt2) {
+        var sd = new Grid {
             Style = new StyleCollection {
                 BackgroundColor = NKConsoleColor.BLACK,
-                Direction = Direction.LEFT_TO_RIGHT,
                 Height = 50.Vh,
-                // TitlePadding = 2.Ch,
-                // TitleAlign = HorizontalAlign.RIGHT,
-                Grid = new GridDimensions(
-                    [Dimension.Percent(20), Dimension.Auto, Dimension.Percent(30)], 
-                    [Dimension.Percent(50), Dimension.Auto]
-                ),
-                EnableGrid = true,
             }
         };
+        
+        sd.ColumnDefinitions.Add(GridLength.Star(2.0)); // 20%
+        sd.ColumnDefinitions.Add(GridLength.Auto);
+        sd.ColumnDefinitions.Add(GridLength.Star(3.0)); // 30%
+        sd.RowDefinitions.Add(GridLength.Star(1.0)); // 50%
+        sd.RowDefinitions.Add(GridLength.Auto);
 
-        // var l = new List(vlt, tt, lt, tt2) {
-        //     BackgroundColor = NKConsoleColor.BLACK,
-        //     Point = ListPointProperty.PointLarger,
-        //     PointStyle = new NKStyle(TextStyles.BOLD),
-        //     PointOffset = 3,
-        //     Padding = new(2.Ch, 1.Ch),
-        // };
+        sd.AddChild(vlt, 0, 0, 1, 2);
+        sd.AddChild(tt, 1, 0, 2, 1);
+        sd.AddChild(tt2, 1, 1, 2, 2);
+        sd.AddChild(lt, 0, 2, 2, 3);
 
         var button = new Button("Click me") {
             Info = { Id = "Tested" },
@@ -260,21 +235,21 @@ public static class Program {
             }
         };
 
-        var counter = new Text("Click count: 0");
-        var stopwatch = new Text("Button not held...");
+        var counter = new TextBlock("Click count: 0");
+        var stopwatch = new TextBlock("Button not held...");
         
         var exit = new Button("EXIT") {
             Style = new StyleCollection {
             Border = BorderStyle.GetThick(NKConsoleColor.BLACK, NKConsoleColor.RED),
             BackgroundColor = NKConsoleColor.RED,
             TextColor = NKConsoleColor.BLACK,
-            Margin = new (1.Ch, 1.Ch, 1.Ch, 0),
-            Padding = new(1.Ch, 0),
+            Margin = new Spacing(1.Ch, 1.Ch, 1.Ch, 0),
+            Padding = new Spacing(1.Ch, 0),
         }};
 
         var x = new Button("X") {
             Style = new StyleCollection{
-            Padding = new(1.Ch, 0),
+            Padding = new Spacing(1.Ch, 0),
             BackgroundColor = NKConsoleColor.RED,
             Position = new Position(100.Vw - 5.Ch, 0.Ch),
             TextColor = NKConsoleColor.BLACK,
@@ -282,25 +257,32 @@ public static class Program {
 
         var min = new Button("_") {
             Style = new StyleCollection{
-            Padding = new(1.Ch, 0),
+            Padding = new Spacing(1.Ch, 0),
             BackgroundColor = NKConsoleColor.BLUE,
             Position = new Position(100.Vw - 8.Ch, 0.Ch),
             TextColor = NKConsoleColor.BLACK,
         }};
         
-        var info = new Div(counter, stopwatch) {
+        var info = new StackPanel {
             Style = new StyleCollection {
                 Padding = new Spacing(1.Ch),
             }
         };
+        info.AddChild(counter);
+        info.AddChild(stopwatch);
         
-        var buttons = new Div(button, info, exit) {
+        var buttons = new StackPanel(Orientation.HORIZONTAL) {
             Style = new StyleCollection {
                 Direction = Direction.LEFT_TO_RIGHT,
             }
         };
+        
+        buttons.AddChild(button);
+        buttons.AddChild(info);
+        buttons.AddChild(exit);
 
-        var input = new TextInput("label: ") {
+        var input = new TextBox("") {
+            Placeholder = "label: ",
             Info = { Id = "Input" },
             Style = {
                 Border = BorderStyle.GetNormal()
@@ -308,7 +290,7 @@ public static class Program {
         };
         input.Select();
         
-        var body = new Body(fp, sd, buttons, input, x, min) {
+        var body = new Page(fp, sd, buttons, input, x, min) {
             Style = {
                 Border = BorderStyle.GetNormal(NKConsoleColor.DARK_BLUE, NKColor.Default)
             }

@@ -10,7 +10,6 @@ using NeoKolors.Console.Events;
 using NeoKolors.Console.Input;
 using static NeoKolors.Common.EscapeCodes;
 using static NeoKolors.Console.Ansi.Mouse.MouseReportLevel;
-using Std = System.Console;
 
 namespace NeoKolors.Console;
 
@@ -67,15 +66,21 @@ public partial class NKConsole {
 
     private static IOutputDriver GetDefaultOutput() {
         #if NK_ENABLE_NATIVE_IO
-        return Environment.OSVersion.Platform switch {
-            PlatformID.Win32Windows or PlatformID.Win32NT or PlatformID.Win32S or PlatformID.WinCE => 
-                new WindowsOutputDriver(),
-            PlatformID.Unix =>
-                new LinuxOutputDriver(),
-            PlatformID.MacOSX =>
-                new DotnetOutputDriver(), // TODO: create a frickin MacOSX driver
-            _ => new DotnetOutputDriver()
-        };
+        try {
+            return Environment.OSVersion.Platform switch {
+                PlatformID.Win32Windows or PlatformID.Win32NT or PlatformID.Win32S or PlatformID.WinCE => 
+                    new WindowsOutputDriver(),
+                PlatformID.Unix =>
+                    new LinuxOutputDriver(),
+                PlatformID.MacOSX =>
+                    new DotnetOutputDriver(), // TODO: create a frickin MacOSX driver
+                _ => new DotnetOutputDriver()
+            };
+        }
+        catch (Exception ex) {
+            LOGGER.Warn($"Failed to create native output driver, falling back to dotnet driver: {ex.Message}");
+            return new DotnetOutputDriver();
+        }
         #else
         return new DotnetOutputDriver();
         #endif
@@ -83,15 +88,21 @@ public partial class NKConsole {
 
     private static IInputDriver GetDefaultInput() {
         #if NK_ENABLE_NATIVE_IO
-        return Environment.OSVersion.Platform switch {
-            PlatformID.Win32Windows or PlatformID.Win32NT or PlatformID.Win32S or PlatformID.WinCE => 
-                new WindowsInputDriver(),
-            PlatformID.Unix =>
-                new LinuxInputDriver(),
-            PlatformID.MacOSX =>
-                new DotnetInputDriver(), // TODO: create a frickin MacOSX driver
-            _ => new DotnetInputDriver()
-        };
+        try {
+            return Environment.OSVersion.Platform switch {
+                PlatformID.Win32Windows or PlatformID.Win32NT or PlatformID.Win32S or PlatformID.WinCE => 
+                    new WindowsInputDriver(),
+                PlatformID.Unix =>
+                    new LinuxInputDriver(),
+                PlatformID.MacOSX =>
+                    new DotnetInputDriver(), // TODO: create a frickin MacOSX driver
+                _ => new DotnetInputDriver()
+            };
+        }
+        catch (Exception ex) {
+            LOGGER.Warn($"Failed to create native input driver, falling back to dotnet driver: {ex.Message}");
+            return new DotnetInputDriver();
+        }
         #else
         return new DotnetInputDriver();
         #endif
@@ -121,7 +132,7 @@ public partial class NKConsole {
     public static bool IsAltBufferOn {
         get => IS_ALT_BUFFER_ON;
         set {
-            Std.Write(value ? ALT_BUFF_SC_ENABLE : ALT_BUFF_RC_DISABLE);
+            OutputDriver.Write(value ? ALT_BUFF_SC_ENABLE : ALT_BUFF_RC_DISABLE);
             IS_ALT_BUFFER_ON = value;
             LOGGER.Info($"Alt buffer set to {value}");
         }
@@ -133,7 +144,7 @@ public partial class NKConsole {
     /// contexts, such as fullscreen terminal applications or temporary rendering surfaces.
     /// </summary>
     public static void EnableAltBuffer() {
-        Std.Write(ALT_BUFF_SC_ENABLE);
+        OutputDriver.Write(ALT_BUFF_SC_ENABLE);
         IS_ALT_BUFFER_ON = true;
         LOGGER.Info($"Alt buffer set to {IS_ALT_BUFFER_ON}");
     }
@@ -144,7 +155,7 @@ public partial class NKConsole {
     /// terminal state, which includes switching back to the primary screen buffer.
     /// </summary>
     public static void DisableAltBuffer() {
-        Std.Write(ALT_BUFF_RC_DISABLE);
+        OutputDriver.Write(ALT_BUFF_RC_DISABLE);
         IS_ALT_BUFFER_ON = false;
         LOGGER.Info($"Alt buffer set to {IS_ALT_BUFFER_ON}");
     }
@@ -164,7 +175,7 @@ public partial class NKConsole {
     public static bool ReportFocus {
         get => REPORT_FOCUS;
         set {
-            Std.Write(value ? REPORT_FOCUS_ENABLE : REPORT_FOCUS_DISABLE); 
+            OutputDriver.Write(value ? REPORT_FOCUS_ENABLE : REPORT_FOCUS_DISABLE); 
             REPORT_FOCUS = value;
             LOGGER.Info($"Focus reporting set to {value}");
         }
@@ -176,7 +187,7 @@ public partial class NKConsole {
     /// allowing the application to respond appropriately to focus changes.
     /// </summary>
     public static void EnableFocusReporting() {
-        Std.Write(REPORT_FOCUS_ENABLE);
+        OutputDriver.Write(REPORT_FOCUS_ENABLE);
         REPORT_FOCUS = true;
         LOGGER.Info($"Focus reporting set to true");
     }
@@ -187,7 +198,7 @@ public partial class NKConsole {
     /// notifications for terminal focus gain or loss events.
     /// </summary>
     public static void DisableFocusReporting() {
-        Std.Write(REPORT_FOCUS_DISABLE);
+        OutputDriver.Write(REPORT_FOCUS_DISABLE);
         REPORT_FOCUS = false;
         LOGGER.Info($"Focus reporting set to false");
     }
@@ -209,7 +220,7 @@ public partial class NKConsole {
     public static bool BracketedPasteMode {
         get => BRACKETED_PASTE_MODE;
         set {
-            Std.Write(value ? ENABLE_BRACKETED_PASTE_MODE : DISABLE_BRACKETED_PASTE_MODE);
+            OutputDriver.Write(value ? ENABLE_BRACKETED_PASTE_MODE : DISABLE_BRACKETED_PASTE_MODE);
             BRACKETED_PASTE_MODE = value;
         }
     }
@@ -220,7 +231,7 @@ public partial class NKConsole {
     /// Updates the internal state to indicate that bracketed paste mode is active.
     /// </summary>
     public static void EnableBracketedPasteMode() {
-        Std.Write(ENABLE_BRACKETED_PASTE_MODE);
+        OutputDriver.Write(ENABLE_BRACKETED_PASTE_MODE);
         BRACKETED_PASTE_MODE = true;
     }
 
@@ -230,7 +241,7 @@ public partial class NKConsole {
     /// handling behavior in the terminal environment.
     /// </summary>
     public static void DisableBracketedPasteMode() {
-        Std.Write(DISABLE_BRACKETED_PASTE_MODE);
+        OutputDriver.Write(DISABLE_BRACKETED_PASTE_MODE);
         BRACKETED_PASTE_MODE = false;
     }
 

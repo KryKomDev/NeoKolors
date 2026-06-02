@@ -1,0 +1,39 @@
+<Page x:Class="LogViewer.MainView" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- <StackPanel> -->
+    <!--     <TextBlock Font="Dummy">LogViewer</TextBlock> -->
+    <!--     <TextBlock>Hello</TextBlock> -->
+    <!-- -->
+    <!--     <Button Padding="1ch" OnHover="FuckYou"> -->
+    <!--         <Button.Triggers> -->
+    <!--             <Trigger Property="IsHovered" Value="True"> -->
+    <!--                 <Setter Property="BackgroundColor" Value="Blue" /> -->
+    <!--             </Trigger> -->
+    <!--         </Button.Triggers> -->
+    <!--         <TextBlock OnClick="LogHello">Button</TextBlock> -->
+    <!--     </Button> -->
+    <!--      -->
+    <!--      -->
+    <!-- </StackPanel> -->
+    
+    <Grid x:name="G">
+        <TextBlock x:Name="Title"
+                   Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                   Width="stretch" Content="NeoKolors TUI Dashboard" />
+
+        <StackPanel x:Name="Sidebar"
+                    Grid.Row="1" Grid.Column="0">
+                
+            <Button Content="Home" />
+            <Button Content="Settings" />
+                
+        </StackPanel>
+
+        <ScrollViewer x:Name="ContentArea"
+                      Grid.Row="1" Grid.Column="1">
+                
+            <TextBlock Content="Dashboard content goes here..." />
+                
+        </ScrollViewer>
+    </Grid>
+</Page>

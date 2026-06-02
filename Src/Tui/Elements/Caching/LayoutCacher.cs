@@ -15,17 +15,17 @@ namespace NeoKolors.Tui.Elements.Caching;
 /// </remarks>
 public sealed class LayoutCacher {
     
-    private Size          _max_Parent;
-    private ElementLayout _max_Layout;
-    private bool          _max_IsSet;
+    private Size          _max_parent;
+    private ElementLayout _max_layout;
+    private bool          _max_isSet;
     
-    private Size          _min_Parent;
-    private ElementLayout _min_Layout;
-    private bool          _min_IsSet;
+    private Size          _min_parent;
+    private ElementLayout _min_layout;
+    private bool          _min_isSet;
     
-    private Size          _render_Parent;
-    private ElementLayout _render_Layout;
-    private bool          _render_IsSet;
+    private Size          _render_parent;
+    private ElementLayout _render_layout;
+    private bool          _render_isSet;
 
     /// <summary>
     /// Gets or sets a delegate function used to validate the compute layout cache.
@@ -58,7 +58,7 @@ public sealed class LayoutCacher {
     public Func<bool> ValidateRender { get; set; }
 
     public bool IsMaxValid(Size parent) {
-        var res = _max_IsSet && _max_Parent == parent && ValidateMax();
+        var res = _max_isSet && _max_parent == parent && ValidateMax();
         
         #if NK_ENABLE_CACHE_ANALYSIS
         if (res) CacheAnalyzer.Hit();
@@ -69,7 +69,7 @@ public sealed class LayoutCacher {
     }
 
     public bool IsMinValid(Size parent) {
-        var res = _min_IsSet && _min_Parent == parent && ValidateMin();
+        var res = _min_isSet && _min_parent == parent && ValidateMin();
         
         #if NK_ENABLE_CACHE_ANALYSIS
         if (res) CacheAnalyzer.Hit();
@@ -80,7 +80,7 @@ public sealed class LayoutCacher {
     }
 
     public bool IsRenderValid(Size parent) {
-        var res = _render_IsSet && _render_Parent == parent && ValidateRender();
+        var res = _render_isSet && _render_parent == parent && ValidateRender();
         
         #if NK_ENABLE_CACHE_ANALYSIS
         if (res) CacheAnalyzer.Hit();
@@ -91,26 +91,26 @@ public sealed class LayoutCacher {
     }
 
     public void SetMax(Size parent, ElementLayout layout) {
-        _max_Parent = parent;
-        _max_Layout = layout;
-        _max_IsSet = true;
+        _max_parent = parent;
+        _max_layout = layout;
+        _max_isSet = true;
     }
 
     public void SetMin(Size parent, ElementLayout layout) {
-        _min_Parent = parent;
-        _min_Layout = layout;
-        _min_IsSet = true;
+        _min_parent = parent;
+        _min_layout = layout;
+        _min_isSet = true;
     }
 
     public void SetRender(Size parent, ElementLayout layout) {
-        _render_Parent = parent;
-        _render_Layout = layout;
-        _render_IsSet = true;
+        _render_parent = parent;
+        _render_layout = layout;
+        _render_isSet = true;
     }
 
-    public ElementLayout GetMaxLayout()    => _max_IsSet    ? _max_Layout    : throw LayoutCacherException.UnsetMax();
-    public ElementLayout GetMinLayout()    => _min_IsSet    ? _min_Layout    : throw LayoutCacherException.UnsetMin();
-    public ElementLayout GetRenderLayout() => _render_IsSet ? _render_Layout : throw LayoutCacherException.UnsetRender();
+    public ElementLayout GetMaxLayout()    => _max_isSet    ? _max_layout    : throw LayoutCacherException.UnsetMax();
+    public ElementLayout GetMinLayout()    => _min_isSet    ? _min_layout    : throw LayoutCacherException.UnsetMin();
+    public ElementLayout GetRenderLayout() => _render_isSet ? _render_layout : throw LayoutCacherException.UnsetRender();
 
     public LayoutCacher(Func<bool> validateMin, Func<bool> validateMax, Func<bool> validateRender) {
         ValidateMin    = validateMin;

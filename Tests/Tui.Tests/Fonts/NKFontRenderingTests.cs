@@ -235,4 +235,64 @@ public class NKFontRenderingTests {
         Assert.Equal('_', canvas[2, 1].Char);
         Assert.Equal('_', canvas[3, 1].Char);
     }
+
+    [Fact]
+    public void PlaceString_ShouldNotApplyUnderlineAndStrikethroughStylesToLettersIfCustomGlyphsAvailable() {
+        var font = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        Assert.NotNull(font);
+        Assert.NotNull(font.UnderlineGlyph);
+        Assert.NotNull(font.StrikethroughGlyph);
+
+        var canvas = new NKCharCanvas(10, 10);
+        var bounds = new Metriks.Area2D(new Metriks.Point2D(0, 0), new Metriks.Point2D(10, 10));
+        
+        var style = new NKStyle(s: TextStyles.UNDERLINE | TextStyles.STRIKETHROUGH);
+        font.PlaceString("e", canvas, bounds, style);
+
+        // Assert that every rendered cell (letters and effects) has underline and strikethrough styles suppressed
+        var renderedAny = false;
+        for (int x = 0; x < canvas.Width; x++) {
+            for (int y = 0; y < canvas.Height; y++) {
+                var c = canvas[x, y];
+                if (c.Char != null) {
+                    renderedAny = true;
+                    Assert.False(c.Style.Styles.HasFlag(TextStyles.UNDERLINE));
+                    Assert.False(c.Style.Styles.HasFlag(TextStyles.STRIKETHROUGH));
+                }
+            }
+        }
+        Assert.True(renderedAny);
+    }
+
+    [Fact]
+    public void PlaceString_ShouldApplyStylesAndEffectsToGaps() {
+        var font = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        Assert.NotNull(font);
+        Assert.NotNull(font.UnderlineGlyph);
+        Assert.NotNull(font.StrikethroughGlyph);
+
+        var canvas = new NKCharCanvas(20, 10);
+        var bounds = new Metriks.Area2D(new Metriks.Point2D(0, 0), new Metriks.Point2D(20, 10));
+        
+        var style = new NKStyle(s: TextStyles.UNDERLINE | TextStyles.STRIKETHROUGH);
+        font.PlaceString("e e", canvas, bounds, style);
+
+        // Ensure that the gap has custom underline and strikethrough glyphs ('-') rendered at correct vertical offsets in canvas
+        Assert.Equal('-', canvas[5, 4].Char);
+        Assert.Equal('-', canvas[5, 2].Char);
+
+        // Ensure style suppression applies in the gap as well
+        Assert.False(canvas[5, 1].Style.Styles.HasFlag(TextStyles.UNDERLINE));
+        Assert.False(canvas[5, 1].Style.Styles.HasFlag(TextStyles.STRIKETHROUGH));
+
+        // Now render a partially styled string where the space is not underlined/strikethrough: "{:u}e{:!u} e"
+        var canvas2 = new NKCharCanvas(20, 10);
+        var ansiStr = AnsiString.Parse("{:u}e{:!u} e");
+        font.PlaceString(ansiStr!, canvas2, bounds, new NKStyle());
+
+        // Column 5 represents the space/gap in "e e", which is NOT underlined or strikethrough.
+        // Ensure that the gap does NOT have custom underline or strikethrough cells rendered (they remain ' ').
+        Assert.Equal(' ', canvas2[5, 4].Char);
+        Assert.Equal(' ', canvas2[5, 2].Char);
+    }
 }

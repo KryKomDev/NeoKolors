@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2026 KryKom
 
 using Metriks;
@@ -109,7 +109,7 @@ public class NKCharCanvas : ICharCanvas {
             var cellInfo = _data[x, offset.Y];
             if (cellInfo.ZIndex <= zIndex) {
                 cellInfo.Char  = chars[xi].Char;
-                cellInfo.Style = cellInfo.Style.Override(chars[xi].Style);
+                cellInfo.Style = cellInfo.Style.OverrideWith(chars[xi].Style);
             }
 
             xi++;
@@ -126,7 +126,7 @@ public class NKCharCanvas : ICharCanvas {
             return;
         
         cellInfo.Char  = c.Char;
-        cellInfo.Style = cellInfo.Style.Override(c.Style);
+        cellInfo.Style = cellInfo.Style.OverrideWith(c.Style);
     }
 
     public void Restyle(NKStyle[,] styles, Point2D offset = default, int zIndex = 0) {
@@ -165,7 +165,16 @@ public class NKCharCanvas : ICharCanvas {
     }
 
     public void Clean() {
-        _data.Fill(CellInfo.GetDefault);
+        for (int x = 0; x < Width; x++) {
+            for (int y = 0; y < Height; y++) {
+                var cell = _data[x, y];
+                if (cell != null) {
+                    cell.Char = ' ';
+                    cell.Style = NKStyle.Default;
+                    cell.ZIndex = int.MinValue;
+                }
+            }
+        }
     }
     
     public void Clear() {

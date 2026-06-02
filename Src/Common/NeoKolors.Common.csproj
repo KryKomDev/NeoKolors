@@ -3,7 +3,7 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>2026.2</Version>
+        <Version>2026.2-rc1</Version>
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
         <LangVersion>14</LangVersion>
@@ -32,7 +32,7 @@
         <PackageReference Include="Implyzer" Version="2026.1.0" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
         <PackageReference Include="OneOf" Version="3.0.271" />
-        <PackageReference Include="SkiaSharp" Version="3.119.2" />
+        <PackageReference Include="SkiaSharp" Version="3.119.4" />
     </ItemGroup>
     
     <ItemGroup Condition="$([MSBuild]::IsOsPlatform('Linux'))">

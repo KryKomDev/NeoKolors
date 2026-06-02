@@ -10,7 +10,7 @@
 
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
-        <Version>2026.2</Version>
+        <Version>2026.2-rc1</Version>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
@@ -28,12 +28,12 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
-        <PackageReference Include="Metriks" Version="2026.2.4.1" />
+        <PackageReference Include="Metriks" Version="2026.2.5" />
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="System.Collections.Immutable" Version="10.0.7" />
+        <PackageReference Include="System.Collections.Immutable" Version="10.0.8" />
     </ItemGroup>
     
     <ItemGroup>

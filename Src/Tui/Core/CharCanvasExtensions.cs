@@ -47,28 +47,28 @@ public static class CharCanvasExtensions {
             if (lx == ..^canvas.Width && ly == ..^canvas.Height) {
                 var cellInfo   = canvas[lx, ly];
                 cellInfo.Char  = topLeft;
-                cellInfo.Style = cellInfo.Style.Override(topLeftStyle);
+                cellInfo.Style = cellInfo.Style.OverrideWith(topLeftStyle);
             }
 
             // bottom left corner
             if (lx == ..^canvas.Width && hy == ..^canvas.Height) {
                 var cellInfo   = canvas[lx, hy];
                 cellInfo.Char  = bottomLeft;
-                cellInfo.Style = cellInfo.Style.Override(bottomLeftStyle);
+                cellInfo.Style = cellInfo.Style.OverrideWith(bottomLeftStyle);
             }
 
             // top right corner
             if (hx == ..^canvas.Width && ly == ..^canvas.Height) {
                 var cellInfo   = canvas[hx, ly];
                 cellInfo.Char  = topRight;
-                cellInfo.Style = cellInfo.Style.Override(topRightStyle);
+                cellInfo.Style = cellInfo.Style.OverrideWith(topRightStyle);
             }
 
             // bottom right corner
             if (hx == ..^canvas.Width && hy == ..^canvas.Height) {
                 var cellInfo   = canvas[hx, hy];
                 cellInfo.Char  = bottomRight;
-                cellInfo.Style = cellInfo.Style.Override(bottomRightStyle);
+                cellInfo.Style = cellInfo.Style.OverrideWith(bottomRightStyle);
             }
 
             // top
@@ -77,7 +77,7 @@ public static class CharCanvasExtensions {
                     var c = canvas[x, ly];
                     
                     c.Char  = horizontal;
-                    c.Style = c.Style.Override(topStyle);
+                    c.Style = c.Style.OverrideWith(topStyle);
                 }
             }
 
@@ -87,7 +87,7 @@ public static class CharCanvasExtensions {
                     var c = canvas[x, hy];
                     
                     c.Char  = horizontal;
-                    c.Style = c.Style.Override(bottomStyle);
+                    c.Style = c.Style.OverrideWith(bottomStyle);
                 }
             }
 
@@ -97,7 +97,7 @@ public static class CharCanvasExtensions {
                     var c = canvas[lx, y];
                 
                     c.Char  = vertical;
-                    c.Style = c.Style.Override(leftStyle);
+                    c.Style = c.Style.OverrideWith(leftStyle);
                 }
             }
 
@@ -107,7 +107,7 @@ public static class CharCanvasExtensions {
                     var c = canvas[hx, y];
                 
                     c.Char  = vertical;
-                    c.Style = c.Style.Override(rightStyle);
+                    c.Style = c.Style.OverrideWith(rightStyle);
                 }
             }
         }
@@ -121,7 +121,7 @@ public static class CharCanvasExtensions {
             for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
                 for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
                     var cellInfo   = canvas[x, y];
-                    cellInfo.Style = cellInfo.Style.Override(style);
+                    cellInfo.Style = cellInfo.Style.OverrideWith(style);
                 }
             }
         }
@@ -177,7 +177,7 @@ public static class CharCanvasExtensions {
                     if (mask[x - offset.X, y - offset.Y] == null) continue;
                     
                     var cellInfo   = canvas[x, y];
-                    cellInfo.Style = cellInfo.Style.Override(style);
+                    cellInfo.Style = cellInfo.Style.OverrideWith(style);
                 }
             }
         }
@@ -235,7 +235,7 @@ public static class CharCanvasExtensions {
                 for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
                     var cellInfo   = canvas[x, y];
                     cellInfo.Char  = c.Char;
-                    cellInfo.Style = cellInfo.Style.Override(c.Style);
+                    cellInfo.Style = cellInfo.Style.OverrideWith(c.Style);
                 }
             }
         }

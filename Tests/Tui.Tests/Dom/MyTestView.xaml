@@ -1,0 +1,4 @@
+<Grid x:Class="NeoKolors.Tui.Tests.Dom.MyTestView" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Button x:Name="SubmitButton" Content="Submit" />
+    <TextBlock x:Name="StatusLabel" Content="Ready" />
+</Grid>

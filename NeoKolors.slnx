@@ -46,6 +46,7 @@
     
     <Folder Name="/Examples/">
         <Project Path="Examples/Ascii/Ascii.csproj" />
+        <Project Path="Examples/LogViewer/LogViewer.csproj" />
         <Project Path="Examples/Neofetch/Neofetch.csproj" />
         <Project Path="Examples/Testing/Testing.csproj" />
         <Project Path="Examples/WeekNumber/WeekNumber.csproj" />

@@ -1,4 +1,4 @@
-﻿// //
+// //
 // NeoKolors
 // Copyright (c) 2026 KryKom
 // //
@@ -18,12 +18,12 @@ public static partial class NKConsole {
     /// <summary>
     /// Minimizes the console window by sending an escape sequence to iconify the window.
     /// </summary>
-    public static void Minimize() => Stdio.Write(ICONIFY_WINDOW);
+    public static void Minimize() => OutputDriver.Write(ICONIFY_WINDOW);
 
     /// <summary>
     /// Restores the console window from a minimized state to its normal size.
     /// </summary>
-    public static void Maximize() => Stdio.Write(DEICONIFY_WINDOW);
+    public static void Maximize() => OutputDriver.Write(DEICONIFY_WINDOW);
 
     #endregion
 
@@ -33,43 +33,46 @@ public static partial class NKConsole {
     /// Sets the specified DEC private modes for the terminal.
     /// </summary>
     /// <param name="modes">An array of DEC private modes to enable.</param>
-    public static void SetModes(params DecMode[] modes) => Stdio.Write(GetDecSet(modes));
+    public static void SetModes(params DecMode[] modes) => OutputDriver.Write(GetDecSet(modes));
 
     /// <summary>
     /// Resets the specified DEC Private Modes in the terminal.
     /// </summary>
     /// <param name="modes">An array of DEC Private Modes to reset.</param>
-    public static void ResetModes(params DecMode[] modes) => Stdio.Write(GetDecRst(modes));
+    public static void ResetModes(params DecMode[] modes) => OutputDriver.Write(GetDecRst(modes));
 
     /// <summary>
     /// Saves the current position of the console cursor.
     /// The cursor's state can be restored later using a corresponding restore method.
     /// </summary>
-    public static void SaveCursor() => Stdio.Write(SAVE_CURSOR_STATE);
+    public static void SaveCursor() => OutputDriver.Write(SAVE_CURSOR_STATE);
 
     /// <summary>
     /// Restores the cursor to its previously saved position in the console.
     /// </summary>
-    public static void RestoreCursor() => Stdio.Write(RESTORE_CURSOR_STATE);
+    public static void RestoreCursor() => OutputDriver.Write(RESTORE_CURSOR_STATE);
 
     /// <summary>
     /// Hides the cursor in the console window.
     /// </summary>
-    public static void HideCursor() => Stdio.Write(DISABLE_CURSOR_VISIBLE);
+    public static void HideCursor() => OutputDriver.Write(DISABLE_CURSOR_VISIBLE);
 
     /// <summary>
     /// Enables the visibility of the cursor in the console.
     /// </summary>
-    public static void ShowCursor() => Stdio.Write(ENABLE_CURSOR_VISIBLE);
+    public static void ShowCursor() => OutputDriver.Write(ENABLE_CURSOR_VISIBLE);
 
     #endregion
     
     #if NK_NKCONSOLE_PROFILING
-    private static readonly Stopwatch CURPOS_BOUNDS = new();
-    private static readonly Stopwatch CURPOS_SET    = new();
+    private static          ulong     CSR_POS_COUNT  = 0;
+    private static readonly Stopwatch CSR_POS_BOUNDS = new();
+    private static readonly Stopwatch CSR_POS_SET    = new();
 
-    public static TimeSpan CursorPosition_BoundsCheckTime => CURPOS_BOUNDS.Elapsed;
-    public static TimeSpan CursorPosition_SetPosTime      => CURPOS_SET.Elapsed;
+    public static TimeSpan CursorPosition_BoundsCheckTime    => CSR_POS_BOUNDS.Elapsed;
+    public static TimeSpan CursorPosition_SetPosTime         => CSR_POS_SET   .Elapsed;
+    public static TimeSpan CursorPosition_AvgBoundsCheckTime => CSR_POS_BOUNDS.Elapsed / CSR_POS_COUNT;
+    public static TimeSpan CursorPosition_AvgSetPosTime      => CSR_POS_SET   .Elapsed / CSR_POS_COUNT;
     #endif
     
     /// <summary>
@@ -81,7 +84,8 @@ public static partial class NKConsole {
     public static bool TrySetCursorPosition(int x, int y) {
 
         #if NK_NKCONSOLE_PROFILING
-        CURPOS_BOUNDS.Start();
+        CSR_POS_COUNT++;
+        CSR_POS_BOUNDS.Start();
         #endif
 
         var s = InputDriver.GetSize();
@@ -89,8 +93,8 @@ public static partial class NKConsole {
             return false;
 
         #if NK_NKCONSOLE_PROFILING
-        CURPOS_BOUNDS.Stop();
-        CURPOS_SET.Start();
+        CSR_POS_BOUNDS.Stop();
+        CSR_POS_SET.Start();
         #endif
         
         try {
@@ -102,7 +106,7 @@ public static partial class NKConsole {
         }
 
         #if NK_NKCONSOLE_PROFILING
-        CURPOS_SET.Stop();
+        CSR_POS_SET.Stop();
         #endif
         
         return true;

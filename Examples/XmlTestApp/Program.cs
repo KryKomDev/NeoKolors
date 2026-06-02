@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using NeoKolors.Common;
 using NeoKolors.Console;
 using NeoKolors.Console.Ansi.Mouse;
@@ -7,12 +7,10 @@ using NeoKolors.Tui;
 using NeoKolors.Tui.Dom;
 using NeoKolors.Tui.Elements;
 using NeoKolors.Tui.Extensions;
-using NeoKolors.Tui.Fonts.Serialization;
 using NeoKolors.Tui.Styles.Properties;
 using static NeoKolors.Console.LoggerLevel;
 
 namespace XmlTestApp;
-
 
 internal static class Program {
     public static void Main(string[] args) {
@@ -27,27 +25,16 @@ internal static class Program {
         NKDebug.RedirectFatalToLog = true;
         NKDebug.EnableExceptionInterruption();
         
-        NKFontSerializer.CreateArchive(@"C:\Users\krystof\Desktop\projects\Libs\NeoKolors\NeoKolors.Tui\Fonts\Builtin\Dummy1", 
-            @"C:\Users\krystof\Desktop\projects\Libs\NeoKolors\NeoKolors.Tui\Fonts\Builtin\Dummy1.nkf");
-
-        NKFontSerializer.CreateArchive(@"C:\Users\krystof\Desktop\projects\Libs\NeoKolors\NeoKolors.Tui\Fonts\Builtin\Future", 
-            @"C:\Users\krystof\Desktop\projects\Libs\NeoKolors\NeoKolors.Tui\Fonts\Builtin\Future.nkf");
-
-        NKFontSerializer.CreateArchive(@"C:\Users\krystof\Desktop\projects\Libs\NeoKolors\NeoKolors.Tui\Fonts\Builtin\Bytesized", 
-            @"C:\Users\krystof\Desktop\projects\Libs\NeoKolors\NeoKolors.Tui\Fonts\Builtin\Bytesized.nkf");
-
-        
-        var loader = new XmlDomLoader();
-        var dom = loader.LoadFromFile(@"C:\Users\krystof\Desktop\projects\Libs\NeoKolors\Examples\XmlTestApp\App.xml");
+        var mainView = new MainView();
+        var dom = new NKDom(mainView);
         
         var app = new NKApplication(new NKAppConfig(
             mouseReportProtocol: MouseReportProtocol.SGR,
             mouseReportLevel: MouseReportLevel.ALL,
             rendering: RenderingConfig.Limited(144)
-            // rendering: RenderingConfig.Lazy()
-        ), dom.BaseElement);
+        ), mainView);
 
-        const int maxSlide = 3;
+        const int maxSlide = 4;
         
         int slide = 0;
         app.KeyEvent += k => {
@@ -88,28 +75,18 @@ internal static class Program {
             }
         };
 
-        dom.GetElementsByType(typeof(Text)).Apply(new PaddingProperty(0, 0, 0, 1));
-        
-        // dom.BaseElement.Style.SetCheckerBckg(new CheckerBckg(NKConsoleColor.RED, NKConsoleColor.BLUE));
+        dom.GetElementsByType(typeof(TextBlock)).Apply(new PaddingProperty(0, 0, 0, 1));
         
         dom.GetElementsByClass("Slide").Apply(
             new WidthProperty(Dimension.Stretch), 
             new HeightProperty(Dimension.Stretch),
             new PaddingProperty(4.Ch, 2.Ch),
             new BackgroundColorProperty(NKColor.Inherit) 
-            // new BorderProperty(BorderStyle.GetRounded())
         );
 
-        dom.GetElementsByType(typeof(Heading)).Apply(
+        dom.GetElementsByClass("Heading").Apply(
             new MarginBottomProperty(2.Ch)
         );
-
-        dom.GetElementsByType(typeof(List)).Apply(
-            ListPointProperty.PointLarger
-        );
-
-        // var x = (Button)dom.GetElementById("X")!;
-        // x.OnClick += _ => app.Stop();
         
         app.Start();
     }

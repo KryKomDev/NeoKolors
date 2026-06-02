@@ -1,4 +1,4 @@
-﻿//
+//
 // NeoKolors
 // Copyright (c) 2026 KryKom
 //
@@ -29,7 +29,6 @@ public class DotnetOutputDriver : IOutputDriver {
             return;
 
         _disposed = true;
-        Stdio.Out.Close();
         GC.SuppressFinalize(this);
     }
 }

@@ -1,6 +1,10 @@
 <Project>
     <PropertyGroup>
         <DefineConstants>$(DefineConstants);NK_RENDERING_PROFILING</DefineConstants>
+        <DefineConstants Condition="'$(MSBuildProjectName)' != 'NeoKolors.Common'">$(DefineConstants);IMPLYZER_DISABLE_ATTRIBUTES</DefineConstants>
         <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
+        <NoWarn>$(NoWarn);CS0436</NoWarn>
+        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+        <CompilerGeneratedFilesOutputPath>obj\Generated</CompilerGeneratedFilesOutputPath>
     </PropertyGroup>
 </Project>

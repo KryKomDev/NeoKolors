@@ -1,4 +1,4 @@
-﻿//
+//
 // NeoKolors
 // Copyright (c) 2026 KryKom
 //
@@ -46,6 +46,13 @@ public sealed class WindowsInputDriver : IInputDriver<WinInputDriverConfig> {
         _config = config ?? new WinInputDriverConfig();
         _input  = new WindowsInput();
         _parser = new WindowsAnsiParser(_input, Decode, _config.VTRequestTimeout, _config.RefreshInterval);
+        
+        try {
+            _lastSize = new Size2D(Stdio.BufferWidth, Stdio.BufferHeight);
+        }
+        catch {
+            _lastSize = new Size2D(80, 25);
+        }
 
         // enable ctrl+c force quit
         if (_config.CtrlCForceQuits) {

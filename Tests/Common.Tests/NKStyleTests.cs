@@ -207,7 +207,7 @@ public class NKStyleTests {
         var baseStyle = new NKStyle(NKConsoleColor.RED, NKConsoleColor.BLACK, TextStyles.BOLD);
         var overrider = new NKStyle(NKConsoleColor.BLUE, NKColor.Inherit, TextStyles.ITALIC);
 
-        var result = baseStyle.Override(overrider);
+        var result = baseStyle.OverrideWith(overrider);
 
         Assert.Equal((NKColor)NKConsoleColor.BLUE, result.FColor);
         Assert.Equal((NKColor)NKConsoleColor.BLACK, result.BColor);

@@ -298,7 +298,14 @@ public class NKFont : IExtendedAsciiFont {
             var xOffset = computeXOffset(line.Width, bounds.Size.X) + bounds.LowerX;
             var lineBaseline = yOffset + i * _fontInfo.Leading + _fontBaseline - 1;
             
+            int yStart = yOffset + i * _fontInfo.Leading;
+            int yEnd = yStart + _fontInfo.Leading - 1;
+            
             int x = xOffset;
+            
+            int lastX = -1;
+            int lastWidth = 0;
+            int lastTokenIndex = -1;
             
             for (int j = 0; j < line.Tokens.Length; j++) {
                 var token = line.Tokens[j];
@@ -307,141 +314,122 @@ public class NKFont : IExtendedAsciiFont {
                     continue;
                 }
                 
-                var glyph = GetGlyphFromToken(token);
-                
                 if (line.Offsets != null && j < line.Offsets.Length) {
                     x += line.Offsets[j];
                 }
                 
-                bool shouldRender = !token.FullStyle.Styles.HasFlag(TextStyles.INVISIBLE);
+                var glyph = GetGlyphFromToken(token);
+                int tokenWidth = glyph.Width;
+                
+                if (lastX != -1) {
+                    int gapWidth = x - (lastX + lastWidth);
+                    if (gapWidth > 0) {
+                        var gapToken = line.Tokens[lastTokenIndex + 1];
+                        ProcessColumns(lastX + lastWidth, gapWidth, gapToken, null);
+                    }
+                }
+                
+                ProcessColumns(x, tokenWidth, token, glyph);
+                
+                lastX = x;
+                lastWidth = tokenWidth;
+                lastTokenIndex = j;
+            }
 
-                if (token.FullStyle.Styles.HasFlag(TextStyles.BLINK)) {
+            void ProcessColumns(int startCol, int colWidth, Token t, NKGlyph? g) {
+                var activeStyle = t.FullStyle;
+                var glyphStyles = t.Symbol?.Styles.Styles ?? TextStyles.NONE;
+                
+                bool shouldRender = !activeStyle.Styles.GetIsInvisible();
+                if (activeStyle.Styles.GetIsBlink()) {
                     if (DateTime.Now.Second % 2 != 0) {
                         shouldRender = false;
                     }
                 }
                 
-                var glyphStyles = token.Symbol?.Styles.Styles ?? TextStyles.NONE;
+                bool hasUnderline = _underline != null && activeStyle.Styles.GetIsUnderline() && !glyphStyles.GetIsUnderline();
+                bool hasStrikethrough = _strikethrough != null && activeStyle.Styles.GetIsStrikethrough() && !glyphStyles.GetIsStrikethrough();
                 
-                // 1. Underline before
-                if (_underline?.RenderAboveLetters == false && 
-                    token.FullStyle.Styles.GetIsUnderline() && 
-                    !glyphStyles          .GetIsUnderline()) 
-                {
-                    RenderEffect(
-                        canvas,
-                        _underline.Glyph,
-                        x,
-                        glyph.Width,
-                        lineBaseline,
-                        token.FullStyle,
-                        bounds,
-                        options.Overflow
-                    );
-                }
+                var yp_u = _underline != null ? lineBaseline - _underline.Glyph.BaselineOffset - _underline.Glyph.Height + 1 : 0;
+                var yp_s = _strikethrough != null ? lineBaseline - _strikethrough.Glyph.BaselineOffset - _strikethrough.Glyph.Height + 1 : 0;
+                var yp = g != null ? lineBaseline - g.BaselineOffset - g.Height + 1 : 0;
                 
-                // 2. Strikethrough before
-                if (_strikethrough?.RenderAboveLetters == false && 
-                    token.FullStyle.Styles.GetIsStrikethrough() && 
-                    !glyphStyles          .GetIsStrikethrough()) 
-                {
-                    RenderEffect(
-                        canvas,
-                        _strikethrough.Glyph,
-                        x,
-                        glyph.Width,
-                        lineBaseline,
-                        token.FullStyle,
-                        bounds,
-                        options.Overflow
-                    );
-                }
-                
-                // 3. Render the letter itself
-                if (shouldRender) {
-                    var yp = lineBaseline - glyph.BaselineOffset - glyph.Height + 1;
-                    var finalStyle = token.FullStyle;
+                for (int dx = 0; dx < colWidth; dx++) {
+                    int cx = startCol + dx;
                     
-                    if (glyphStyles.HasFlag(TextStyles.NEGATIVE)) {
-                        finalStyle = finalStyle with { Styles = finalStyle.Styles & ~TextStyles.NEGATIVE };
-                    }
-                    
-                    for (int gx = 0; gx < glyph.Width; gx++) {
-                        int cx = x + gx;
+                    for (int cy = yStart; cy <= yEnd; cy++) {
+                        if (!options.Overflow) {
+                            if (cx < bounds.LowerX  || 
+                                cx > bounds.HigherX ||
+                                cy < bounds.LowerY  || 
+                                cy > bounds.HigherY)
+                            {
+                                continue;
+                            }
+                        }
                         
-                        for (int gy = 0; gy < glyph.Height; gy++) {
-                            int cy = yp + gy;
-                            
-                            if (!options.Overflow) {
-                                if (cx < bounds.LowerX  || 
-                                    cx > bounds.HigherX ||
-                                    cy < bounds.LowerY  || 
-                                    cy > bounds.HigherY)
-                                {
-                                    continue;
+                        if (cx < 0 || cx >= canvas.Width || cy < 0 || cy >= canvas.Height) {
+                            continue;
+                        }
+                        
+                        char? cellChar = null;
+                        var cellStyle = activeStyle;
+                        
+                        if (hasUnderline && _underline != null && cy >= yp_u && cy < yp_u + _underline.Glyph.Height) {
+                            int col = cx % _underline.Glyph.Width;
+                            int row = cy - yp_u;
+                            var cell = _underline.Glyph.Glyph[col, row];
+                            if (cell.Type != GlyphCellType.BACKGROUND) {
+                                cellChar = cell.Type == GlyphCellType.CHARACTER ? cell.Character : ' ';
+                            }
+                        }
+                        
+                        if (hasStrikethrough && _strikethrough != null && cy >= yp_s && cy < yp_s + _strikethrough.Glyph.Height) {
+                            int col = cx % _strikethrough.Glyph.Width;
+                            int row = cy - yp_s;
+                            var cell = _strikethrough.Glyph.Glyph[col, row];
+                            if (cell.Type != GlyphCellType.BACKGROUND) {
+                                cellChar = cell.Type == GlyphCellType.CHARACTER ? cell.Character : ' ';
+                            }
+                        }
+                        
+                        if (shouldRender && g != null && cy >= yp && cy < yp + g.Height) {
+                            int col = cx - startCol;
+                            int row = cy - yp;
+                            var cell = g.Glyph[col, row];
+                            if (cell.Type != GlyphCellType.BACKGROUND) {
+                                cellChar = cell.Type == GlyphCellType.CHARACTER ? cell.Character : ' ';
+                                
+                                if (glyphStyles.GetIsNegative()) {
+                                    cellStyle = cellStyle with { Styles = cellStyle.Styles & ~TextStyles.NEGATIVE };
                                 }
                             }
-                            
-                            if (cx < 0 || cx >= canvas.Width || cy < 0 || cy >= canvas.Height) {
-                                continue;
-                            }
-                            
-                            var cell = glyph.Glyph[gx, gy];
-                            if (cell.Type == GlyphCellType.BACKGROUND) {
-                                continue;
-                            }
-                            
-                            char? cellChar = cell.Type switch {
-                                GlyphCellType.FOREGROUND => ' ',
-                                GlyphCellType.CHARACTER => cell.Character,
-                                _ => null
-                            };
-                            
-                            var canvasCell = canvas[cx, cy];
-                            canvasCell.Char = cellChar;
-                            canvasCell.Style = canvasCell.Style.Override(finalStyle);
                         }
+                        
+                        if (_underline != null && cellStyle.Styles.GetIsUnderline()) {
+                            cellStyle = cellStyle with {
+                                Styles = cellStyle.Styles & ~TextStyles.UNDERLINE
+                            };
+                        }
+                        
+                        if (_strikethrough != null && cellStyle.Styles.GetIsStrikethrough()) {
+                            cellStyle = cellStyle with {
+                                Styles = cellStyle.Styles & ~TextStyles.STRIKETHROUGH
+                            };
+                        }
+                        
+                        var canvasCell = canvas[cx, cy];
+                        if (cellChar != null) {
+                            canvasCell.Char = cellChar;
+                        }
+                        canvasCell.Style = canvasCell.Style.OverrideWith(cellStyle);
                     }
-                }
-                
-                // 4. Underline after
-                if (_underline?.RenderAboveLetters == true  && 
-                    token.FullStyle.Styles.GetIsUnderline() && 
-                    !glyphStyles.GetIsUnderline()) 
-                {
-                    RenderEffect(
-                        canvas,
-                        _underline.Glyph,
-                        x,
-                        glyph.Width,
-                        lineBaseline,
-                        token.FullStyle,
-                        bounds,
-                        options.Overflow
-                    );
-                }
-                
-                // 5. Strikethrough after
-                if (_strikethrough?.RenderAboveLetters == true  && 
-                    token.FullStyle.Styles.GetIsStrikethrough() && 
-                    !glyphStyles.GetIsStrikethrough()) 
-                {
-                    RenderEffect(
-                        canvas,
-                        _strikethrough.Glyph,
-                        x,
-                        glyph.Width,
-                        lineBaseline,
-                        token.FullStyle,
-                        bounds,
-                        options.Overflow
-                    );
                 }
             }
         }
     }
     
-    private void RenderEffect(
+    private static void RenderEffect(
         ICharCanvas canvas, 
         NKGlyph effectGlyph, 
         int startX, 
@@ -452,6 +440,19 @@ public class NKFont : IExtendedAsciiFont {
         bool overflow) 
     {
         var yp = lineBaseline - effectGlyph.BaselineOffset - effectGlyph.Height + 1;
+        
+        var finalStyle = style;
+        if (finalStyle.Styles.GetIsUnderline()) {
+            finalStyle = finalStyle with {
+                Styles = finalStyle.Styles & ~TextStyles.UNDERLINE
+            };
+        }
+        
+        if (finalStyle.Styles.GetIsStrikethrough()) {
+            finalStyle = finalStyle with {
+                Styles = finalStyle.Styles & ~TextStyles.STRIKETHROUGH
+            };
+        }
         
         for (int dx = 0; dx < width; dx++) {
             int cx = startX + dx;
@@ -479,7 +480,7 @@ public class NKFont : IExtendedAsciiFont {
                 
                 var canvasCell = canvas[cx, cy];
                 canvasCell.Char = cellChar;
-                canvasCell.Style = canvasCell.Style.Override(style);
+                canvasCell.Style = canvasCell.Style.OverrideWith(finalStyle);
             }
         }
     }
@@ -566,7 +567,7 @@ public class NKFont : IExtendedAsciiFont {
                     x += line.Offsets[j];
                 }
 
-                bool shouldRender = !token.FullStyle.Styles.HasFlag(TextStyles.INVISIBLE);
+                bool shouldRender = !token.FullStyle.Styles.GetIsInvisible();
                 var glyphStyles = token.Symbol?.Styles.Styles ?? TextStyles.NONE;
 
                 // Process underline before
@@ -792,8 +793,8 @@ public class NKFont : IExtendedAsciiFont {
             var t = tokens[i];
             switch (t.Type) {
                 case INVALID or LETTER or LIGATURE: {
-                    currentWidth = currentOffset + widths[i];
                     currentOffset += offsets[i];
+                    currentWidth = currentOffset + widths[i];
                 } break;
                 case SPACE: {
                     lastSpaceIndex = i;
@@ -807,6 +808,9 @@ public class NKFont : IExtendedAsciiFont {
                     ));
                     
                     lineStart = i + 1;
+                    if (lineStart < tokens.Length) {
+                        offsets[lineStart] = 0;
+                    }
                     currentOffset = 0;
                     currentWidth  = 0;
                 } break;
@@ -845,6 +849,10 @@ public class NKFont : IExtendedAsciiFont {
                     
                     lineStart = i;
                     i -= 1;
+                }
+
+                if (lineStart < tokens.Length) {
+                    offsets[lineStart] = 0;
                 }
 
                 lastSpaceIndex = null;

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -13,13 +13,11 @@
     <ItemGroup>
         <ProjectReference Include="..\..\Src\Common\NeoKolors.Common.csproj" />
         <ProjectReference Include="..\..\Src\Console\NeoKolors.Console.csproj" />
-        <ProjectReference Include="..\..\Src\Settings\NeoKolors.Settings.csproj" />
         <ProjectReference Include="..\..\Src\Tui\NeoKolors.Tui.csproj" />
     </ItemGroup>
     
     <ItemGroup>
       <PackageReference Include="Brigadier.NET" Version="2.0.15-beta" />
-      <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
     </ItemGroup>
 
 </Project>

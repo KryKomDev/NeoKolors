@@ -1,4 +1,4 @@
-﻿using Metriks;
+using Metriks;
 
 namespace NeoKolors.Extensions.Tests;
 
@@ -389,5 +389,58 @@ public class EnumerableTests {
         Assert.Equal(new[] { "First: 1", "2", "3", "Last: 4" }, result);
     }
     
+    #endregion
+
+    #region Split Tests
+
+    [Fact]
+    public void Split_StandardSequence_SplitsCorrectly() {
+        var numbers = new[] { 1, 2, 0, 3, 4, 0, 5 };
+        var result = numbers.Split(x => x == 0).Select(x => x.ToArray()).ToArray();
+        
+        Assert.Equal(3, result.Length);
+        Assert.Equal(new[] { 1, 2 }, result[0]);
+        Assert.Equal(new[] { 3, 4 }, result[1]);
+        Assert.Equal(new[] { 5 }, result[2]);
+    }
+
+    [Fact]
+    public void Split_SingleElementNoMatch_ReturnsSingleElementSequence() {
+        var numbers = new[] { 5 };
+        var result = numbers.Split(x => x == 0).Select(x => x.ToArray()).ToArray();
+        
+        Assert.Single(result);
+        Assert.Equal(new[] { 5 }, result[0]);
+    }
+
+    [Fact]
+    public void Split_EmptySequence_ReturnsEmptySequenceInside() {
+        var numbers = new int[0];
+        var result = numbers.Split(x => x == 0).Select(x => x.ToArray()).ToArray();
+        
+        Assert.Single(result);
+        Assert.Empty(result[0]);
+    }
+
+    [Fact]
+    public void Split_TrailingDelimiter_ReturnsTrailingEmptySequence() {
+        var numbers = new[] { 1, 2, 0 };
+        var result = numbers.Split(x => x == 0).Select(x => x.ToArray()).ToArray();
+        
+        Assert.Equal(2, result.Length);
+        Assert.Equal(new[] { 1, 2 }, result[0]);
+        Assert.Empty(result[1]);
+    }
+
+    [Fact]
+    public void Split_LeadingDelimiter_ReturnsLeadingEmptySequence() {
+        var numbers = new[] { 0, 1, 2 };
+        var result = numbers.Split(x => x == 0).Select(x => x.ToArray()).ToArray();
+        
+        Assert.Equal(2, result.Length);
+        Assert.Empty(result[0]);
+        Assert.Equal(new[] { 1, 2 }, result[1]);
+    }
+
     #endregion
 }

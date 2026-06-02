@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2025 KryKom
 
 using System.Diagnostics;
@@ -133,6 +133,8 @@ public static class Enumerable {
                 yield return array[lastIndex..i];
                 lastIndex = i + 1;
             }
+
+            yield return array[lastIndex..];
         }
     }
 
@@ -411,6 +413,8 @@ public static class Enumerable {
             list.Add(array[lastIndex..i]);
             lastIndex = i + 1;
         }
+
+        list.Add(array[lastIndex..]);
         
         return list.ToArray();
     }

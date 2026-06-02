@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2026 KryKom
 
 using Metriks;
@@ -14,9 +14,9 @@ namespace NeoKolors.Tui.Fonts;
 /// </summary>
 public class DefaultFont : IAsciiFont {
     
-    public string Name => "Default";
+    public virtual string Name => "Default";
     
-    public void PlaceString(string str, ICharCanvas canvas) {
+    public virtual void PlaceString(string str, ICharCanvas canvas) {
         string[] lines = str.Split('\n');
 
         for (int y = 0; y < lines.Length; y++) {
@@ -24,7 +24,7 @@ public class DefaultFont : IAsciiFont {
         }
     }
     
-    public void PlaceString(string str, ICharCanvas canvas, int maxWidth) {
+    public virtual void PlaceString(string str, ICharCanvas canvas, int maxWidth) {
         var lines = str.Chop(maxWidth);
         
         for (int y = 0; y < lines.Length; y++) {
@@ -32,7 +32,7 @@ public class DefaultFont : IAsciiFont {
         }
     }
 
-    public void PlaceString(
+    public virtual void PlaceString(
         string str, ICharCanvas canvas, Area2D bounds, NKStyle style,
         HorizontalAlign horizontalAlign = HorizontalAlign.LEFT,
         VerticalAlign verticalAlign = VerticalAlign.TOP, bool overflow = false) 
@@ -54,7 +54,7 @@ public class DefaultFont : IAsciiFont {
         };
         
         for (int l = 0; l < lines.Length; l++) {
-            if (!overflow && y != bounds.RangeY)
+            if (!overflow && (y < bounds.LowerY || y > bounds.HigherY))
                 break;
             
             var s = lines[l];
@@ -67,7 +67,7 @@ public class DefaultFont : IAsciiFont {
         }
     }
 
-    public void PlaceString(AnsiString str, ICharCanvas canvas) {
+    public virtual void PlaceString(AnsiString str, ICharCanvas canvas) {
         int x = 0, y = 0;
         var chars = str.ToArray();
         
@@ -82,7 +82,7 @@ public class DefaultFont : IAsciiFont {
         }
     }
     
-    public void PlaceString(AnsiString str, ICharCanvas canvas, int maxWidth) {
+    public virtual void PlaceString(AnsiString str, ICharCanvas canvas, int maxWidth) {
         var lines = str.Plain.Chop(maxWidth);
         var chars = str.ToArray();
 
@@ -98,7 +98,7 @@ public class DefaultFont : IAsciiFont {
         }
     }
 
-    public void PlaceString(
+    public virtual void PlaceString(
         AnsiString str, ICharCanvas canvas, Area2D bounds,
         HorizontalAlign horizontalAlign = HorizontalAlign.LEFT,
         VerticalAlign   verticalAlign   = VerticalAlign.TOP,
@@ -121,7 +121,7 @@ public class DefaultFont : IAsciiFont {
         };
         
         for (int l = 0; l < lines.Length; l++) {
-            if (!overflow && y != bounds.RangeY)
+            if (!overflow && (y < bounds.LowerY || y > bounds.HigherY))
                 break;
             
             var s = lines[l];

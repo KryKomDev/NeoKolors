@@ -4,7 +4,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Implyzer;
 using NeoKolors.Tui.Global;
-using BindingFlags = System.Reflection.BindingFlags;
 
 namespace NeoKolors.Tui.Styles.Properties;
 
@@ -46,12 +45,12 @@ public interface IStyleProperty {
         if (!IsStyle(style))
             ThrowNotStyle(style);
 
-        var c = style.GetConstructor(BindingFlags.Public | BindingFlags.Instance, null, Type.EmptyTypes, null);
-        
-        if (c == null) 
-            throw new ArgumentException("No default constructor found!");
-        
-        return (IStyleProperty)c.Invoke(null);
+        try {
+            return (IStyleProperty)Activator.CreateInstance(style)!;
+        }
+        catch (Exception e) {
+            throw new ArgumentException($"Failed to create instance of style property '{style.Name}': {e.Message}");
+        }
     }
 
     /// <summary>

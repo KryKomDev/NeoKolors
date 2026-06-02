@@ -48,10 +48,10 @@ public class StyleCollection : IEnumerable<IStyleProperty> {
     /// <exception cref="ArgumentException">The set style type is different from the specified type.</exception>
     public IStyleProperty this[Type type] {
         get {
-            if (IStyleProperty.TryIsStyle(type, out var s))
+            if (!IStyleProperty.TryIsStyle(type, out var s))
                 IStyleProperty.ThrowNotStyle(type);
 
-            if (IStyleProperty.TryIsPartial(s!, out var partial))
+            if (IStyleProperty.TryIsPartial(s, out var partial))
                 return partial.Extract(this[partial.BaseType]);
             
             return _styles.TryGetValue(type, out var style) ? style : GetDefault(type);
@@ -63,7 +63,7 @@ public class StyleCollection : IEnumerable<IStyleProperty> {
                 throw new ArgumentException(
                     $"Type '{type}' is not the same as the stored expected type '{value.GetType()}'.");
             
-            if (IStyleProperty.IsStyle(type))
+            if (!IStyleProperty.IsStyle(type))
                 IStyleProperty.ThrowNotStyle(type);
 
             if (IStyleProperty.TryIsPartial(value, out var partial)) {

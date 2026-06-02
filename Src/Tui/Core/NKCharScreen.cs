@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2026 KryKom
 
 using System.Text;
@@ -45,6 +45,7 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
         #endif
 
         _sb.Clear();
+        _sb.Append("\e[0m");
         
         for (int y = 0; y < Height; y++) {
             prevStyle = RenderLine(y, prevStyle);
@@ -93,14 +94,14 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
                 
             var (c, nkStyle, changed, _) = cell;
                 
-            if (!changed || cell.Char is null) {
+            if (!changed) {
                 if (_sb.Length > 0) {
                     
                     #if NK_RENDERING_PROFILING
                     _writingTime.Start();
                     #endif
                         
-                    Stdio.Write(_sb.ToString());
+                    NKConsole.Write(_sb.ToString());
                     _sb.Clear();
                         
                     #if NK_RENDERING_PROFILING
@@ -140,10 +141,11 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
             
             prevStyle = nkStyle;
 
-            if (char.IsControl(c!.Value))
+            var actualChar = c ?? ' ';
+            if (char.IsControl(actualChar))
                 _sb.Append(' ');
             else
-                _sb.Append(c);
+                _sb.Append(actualChar);
         }
 
         if (_sb.Length <= 0) 
@@ -153,7 +155,7 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
         _writingTime.Start();
         #endif
                     
-        Stdio.Write(_sb.ToString());
+        NKConsole.Write(_sb.ToString());
         _sb.Clear();
                     
         #if NK_RENDERING_PROFILING

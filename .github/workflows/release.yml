@@ -1,0 +1,117 @@
+name: Create GitHub Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Tag name for the release (e.g. v1.0.0)'
+        required: true
+        type: string
+
+jobs:
+  build-and-pack:
+    name: Pack ${{ matrix.project.name }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        project:
+          - name: Common
+            path: Src/Common/NeoKolors.Common.csproj
+            test_path: Tests/Common.Tests/NeoKolors.Common.Tests.csproj
+          - name: Console
+            path: Src/Console/NeoKolors.Console.csproj
+            test_path: Tests/Console.Tests/NeoKolors.Console.Tests.csproj
+          - name: Extensions
+            path: Src/Extensions/NeoKolors.Extensions.csproj
+            test_path: Tests/Extensions.Tests/NeoKolors.Extensions.Tests.csproj
+          - name: Settings
+            path: Src/Settings/NeoKolors.Settings.csproj
+            test_path: Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj
+          - name: Tui
+            path: Src/Tui/NeoKolors.Tui.csproj
+            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
+          - name: Tui.Fonts
+            path: Src/Tui/Fonts/NeoKolors.Tui.Fonts.csproj
+            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
+          - name: Tui.Fonts.Assets
+            path: Src/Tui/Fonts/Assets/NeoKolors.Tui.Fonts.Assets.csproj
+            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
+          - name: NKFontTool
+            path: Tools/NKFontTool/NKFontTool.csproj
+            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+        cache: false
+
+    - name: Restore Target Project
+      run: dotnet restore ${{ matrix.project.path }}
+
+    - name: Build Target Project
+      run: dotnet build ${{ matrix.project.path }} --configuration Release --no-restore
+
+    - name: Restore Test Project
+      run: dotnet restore ${{ matrix.project.test_path }}
+
+    - name: Build Test Project
+      run: dotnet build ${{ matrix.project.test_path }} --configuration Release --no-restore
+  
+    - name: Run Tests
+      run: dotnet test ${{ matrix.project.test_path }} --configuration Release --no-build
+
+    - name: Pack Target Project
+      run: dotnet pack ${{ matrix.project.path }} --configuration Release --no-build --output ./output/
+
+    - name: Upload Package Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: nuget-package-${{ matrix.project.name }}
+        path: ./output/*.nupkg
+        if-no-files-found: error
+
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: build-and-pack
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set Release Tag
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "RELEASE_TAG=${{ github.event.inputs.tag_name }}" >> $GITHUB_ENV
+        else
+          echo "RELEASE_TAG=${{ github.ref_name }}" >> $GITHUB_ENV
+        fi
+      shell: bash
+
+    - name: Download all Package Artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: ./packages/
+        pattern: nuget-package-*
+        merge-multiple: true
+
+    - name: Create Release and Upload Assets
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release create "$RELEASE_TAG" ./packages/*.nupkg --generate-notes --title "Release $RELEASE_TAG"
+      shell: bash

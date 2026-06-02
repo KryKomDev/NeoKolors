@@ -8,7 +8,7 @@
 
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
-        <Version>2026.2</Version>
+        <Version>2026.2-rc1</Version>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
@@ -42,12 +42,16 @@
         <PackageReference Include="Implyzer" Version="2026.1.0" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
         <PackageReference Include="MessagePack" Version="3.1.6" />
-        <PackageReference Include="Metriks" Version="2026.2.4.1" />
+        <PackageReference Include="Metriks" Version="2026.2.5" />
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Build.Framework" Version="17.8.3" PrivateAssets="All" ExcludeAssets="runtime" />
-        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.8.3" PrivateAssets="All" ExcludeAssets="runtime" />
+        <PackageReference Include="Microsoft.Build.Framework" Version="18.6.3" PrivateAssets="all" ExcludeAssets="runtime">
+          <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.6.3" PrivateAssets="all" ExcludeAssets="runtime">
+          <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 </Project>

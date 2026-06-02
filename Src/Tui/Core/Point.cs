@@ -6,7 +6,7 @@ using NeoKolors.Tui.Core;
 
 namespace NeoKolors.Tui;
 
-public readonly struct Point {
+public readonly struct Point : IEquatable<Point> {
     public int X { get; init; }
     public int Y { get; init; }
     
@@ -37,4 +37,14 @@ public readonly struct Point {
         x = X;
         y = Y;
     }
+
+    public bool Equals(Point other) => X == other.X && Y == other.Y;
+
+    public override bool Equals(object? obj) => obj is Point other && Equals(other);
+
+    public override int GetHashCode() => HashCode.Combine(X, Y);
+
+    public static bool operator ==(Point left, Point right) => left.Equals(right);
+
+    public static bool operator !=(Point left, Point right) => !left.Equals(right);
 }

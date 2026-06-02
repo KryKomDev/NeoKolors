@@ -1,0 +1,73 @@
+name: Build and Test
+
+on:
+  push:
+    paths:
+      - 'Src/**'
+      - 'Tests/**'
+      - '.github/workflows/build.yml'
+  pull_request:
+    paths:
+      - 'Src/**'
+      - 'Tests/**'
+      - '.github/workflows/build.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build & Test ${{ matrix.project.name }} (${{ matrix.configuration }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        project:
+          - name: Common
+            path: Src/Common/NeoKolors.Common.csproj
+            test_path: Tests/Common.Tests/NeoKolors.Common.Tests.csproj
+          - name: Console
+            path: Src/Console/NeoKolors.Console.csproj
+            test_path: Tests/Console.Tests/NeoKolors.Console.Tests.csproj
+          - name: Extensions
+            path: Src/Extensions/NeoKolors.Extensions.csproj
+            test_path: Tests/Extensions.Tests/NeoKolors.Extensions.Tests.csproj
+          - name: Settings
+            path: Src/Settings/NeoKolors.Settings.csproj
+            test_path: Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj
+          - name: Tui
+            path: Src/Tui/NeoKolors.Tui.csproj
+            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
+          - name: Tui.Fonts
+            path: Src/Tui/Fonts/NeoKolors.Tui.Fonts.csproj
+            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
+          - name: Tui.Fonts.Assets
+            path: Src/Tui/Fonts/Assets/NeoKolors.Tui.Fonts.Assets.csproj
+            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
+        configuration: [Debug, Release]
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '10.0.x'
+        cache: false
+
+    - name: Restore Project
+      run: dotnet restore ${{ matrix.project.path }}
+
+    - name: Build Project
+      run: dotnet build ${{ matrix.project.path }} --configuration ${{ matrix.configuration }} --no-restore
+
+    - name: Restore Test Project 
+      run: dotnet restore ${{ matrix.project.test_path }}
+
+    - name: Build Test Project
+      run: dotnet build ${{ matrix.project.test_path }} --configuration ${{ matrix.configuration }} --no-restore
+
+    - name: Execute unit tests
+      run: dotnet test ${{ matrix.project.test_path }} --configuration ${{ matrix.configuration }} --no-build
