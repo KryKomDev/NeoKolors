@@ -66,4 +66,24 @@ public class NKFontBinarySerializerTests {
             }
         }
     }
+
+    [Fact]
+    public void DeserializeXml_WithRelativePath_DoesNotThrowInvalidOperationException() {
+        // Calling DeserializeXml with a relative path should gracefully return null (or resolve it),
+        // rather than throwing "This operation is not supported for a relative URI."
+        var exception = Record.Exception(() => NKFontSerializer.DeserializeXml("some/relative/path/to/font"));
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void TryDeserializeXml_ReturnsErrorsAndWarningsAsValues() {
+        // Calling TryDeserializeXml with a non-existent path should return a failed result 
+        // with error messages instead of executing a side-effect or throwing.
+        var result = NKFontSerializer.TryDeserializeXml("some/relative/path/to/font");
+        Assert.NotNull(result);
+        Assert.False(result.Success);
+        Assert.Null(result.Font);
+        Assert.NotEmpty(result.Errors);
+        Assert.Contains(result.Errors, err => err.Contains("Cannot resolve path") || err.Contains("does not exist"));
+    }
 }

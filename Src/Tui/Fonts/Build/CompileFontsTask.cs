@@ -38,12 +38,23 @@ public class CompileFontsTask : Microsoft.Build.Utilities.Task {
 
             Log.LogMessage(MessageImportance.High, $"[FontTask] Compiling XML Font directory '{xmlDir}' -> '{outputPath}'...");
             
-            var font = NKFontSerializer.DeserializeXml(xmlDir);
-            if (font == null) {
+            var result = NKFontSerializer.TryDeserializeXml(xmlDir);
+
+            foreach (var info in result.Infos) {
+                Log.LogMessage(MessageImportance.Normal, "[FontTask] " + info);
+            }
+            foreach (var warning in result.Warnings) {
+                Log.LogWarning("[FontTask] " + warning);
+            }
+            foreach (var error in result.Errors) {
+                Log.LogError("[FontTask] " + error);
+            }
+
+            if (!result.Success || result.Font == null) {
                 throw new InvalidOperationException("Failed to deserialize font from directory: " + xmlDir);
             }
 
-            NKFontSerializer.SerializeBinary(font, outputPath);
+            NKFontSerializer.SerializeBinary(result.Font, outputPath);
             Log.LogMessage(MessageImportance.High, "[FontTask] Successfully compiled font: " + outputPath);
         }
 

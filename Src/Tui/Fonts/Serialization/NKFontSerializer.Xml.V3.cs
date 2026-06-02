@@ -6,9 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Xml;
 using System.Xml.Serialization;
-using Microsoft.Extensions.Logging;
 using NeoKolors.Common;
-using NeoKolors.Console;
 using NeoKolors.Extensions;
 using NeoKolors.Tui.Fonts.Exceptions;
 using NeoKolors.Tui.Fonts.Serialization.Xml;
@@ -21,7 +19,7 @@ namespace NeoKolors.Tui.Fonts.Serialization;
 
 public static partial class NKFontSerializer {
 
-    internal static readonly NKLogger LOGGER = NKDebug.GetLogger("NKFontSerializer");
+    internal static readonly FontSerializerLogger LOGGER = new();
     
     private static readonly HttpClient HTTP = new();
     
@@ -40,22 +38,23 @@ public static partial class NKFontSerializer {
             return null;
         }
 
-        if (stream.CanSeek) {
-            var startPos = stream.Position;
-            if (stream.Length >= 4) {
-                var buffer = new byte[4];
-                int read = stream.Read(buffer, 0, 4);
-                stream.Position = startPos;
-                if (read == 4) {
-                    uint magic = (uint)(buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24));
-                    if (magic == BINARY_MAGIC) {
-                        return DeserializeBinary(stream);
-                    }
-                }
-            }
-        }
+        if (!stream.CanSeek) return DeserializeXmlArchive(stream);
 
-        return DeserializeXmlArchive(stream);
+        var startPos = stream.Position;
+
+        if (stream.Length < 4) return DeserializeXmlArchive(stream);
+
+        var buffer = new byte[4];
+        int read = stream.Read(buffer, 0, 4);
+        stream.Position = startPos;
+
+        if (read != 4) return DeserializeXmlArchive(stream);
+
+        uint magic = (uint)(buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24));
+        
+        return magic == BINARY_MAGIC 
+            ? DeserializeBinary(stream)
+            : DeserializeXmlArchive(stream);
     }
 
     /// <summary>
@@ -96,9 +95,22 @@ public static partial class NKFontSerializer {
             return null;
         }
 
-        if (uri.IsFile) {
-            string localPath = uri.LocalPath;
+        string? localPath = null;
+        bool isWeb = false;
 
+        if (uri.IsAbsoluteUri) {
+            if (uri.IsFile) {
+                localPath = uri.LocalPath;
+            }
+            else if (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps) {
+                isWeb = true;
+            }
+        }
+        else {
+            localPath = path;
+        }
+
+        if (localPath != null) {
             if (Directory.Exists(localPath)) {
                 LOGGER.Info($"Deserializing unpackaged XML-based font from '{localPath}'.");
                 return await DeserializeXmlDir(localPath);
@@ -110,7 +122,7 @@ public static partial class NKFontSerializer {
                 return await DeserializeXmlArchiveAsync(fileStream);
             }
         }
-        else if (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps) {
+        else if (isWeb) {
             LOGGER.Info($"Deserializing packaged XML-based font from web URI '{uri}'.");
             var webStream = await HTTP.GetStreamAsync(uri);
             return await DeserializeXmlArchiveAsync(webStream);
@@ -140,13 +152,12 @@ public static partial class NKFontSerializer {
         ZipArchiveEntry? configEntry;
         ZipArchiveEntry? mapEntry; 
         
-        var zip = new ZipArchive(archive);
+        using var zip = new ZipArchive(archive);
 
         var manifestEntry = zip.GetEntry(MANIFEST_FILE_NAME);
         
         if (manifestEntry != null) {
-            var manifestStream = manifestEntry.Open();
-
+            await using var manifestStream = manifestEntry.Open();
             var manifest = await DeserializeManifestAsync(manifestStream);
 
             configEntry = zip.GetEntry(manifest.Config);
@@ -167,38 +178,26 @@ public static partial class NKFontSerializer {
             return null;
         }
 
-        var configTask = DeserializeConfigAsync(configEntry.Open());
-        var mapTask    = DeserializeMapAsync   (mapEntry   .Open());
-        
-        var map = await mapTask;
+        // De-serialize sequentially to prevent concurrent ZipArchive stream access violations
+        var config = await DeserializeConfigAsync(configEntry.Open());
+        var map    = await DeserializeMapAsync   (mapEntry   .Open());
 
-        var glyphTasks = new List<Task<(XmlGlyphDef Def, string[]? Lines)>>();
-        var failed     = false;
+        var glyphs = new (XmlGlyphDef Def, string[]? Lines)[map.Glyphs.Length];
         
         for (var i = 0; i < map.Glyphs.Length; i++) {
             var glyph = map.Glyphs[i];
-
-            var glyphLoadingTask = LoadGlyph(glyph);
-
-            if (glyphLoadingTask.IsFaulted) {
-                failed = true;
-                continue;
+            try {
+                glyphs[i] = await LoadGlyph(zip, glyph);
             }
-            
-            glyphTasks.Add(glyphLoadingTask);
+            catch (Exception) {
+                LOGGER.Error("One or more glyphs could not be loaded.");
+                return null;
+            }
         }
-
-        if (failed) {
-            LOGGER.Error("One or more glyphs could not be loaded.");
-            return null;
-        }
-
-        var glyphs = await Task.WhenAll(glyphTasks);
-        var config = await configTask;
         
         return AssembleFont(config, glyphs);
 
-        async Task<(XmlGlyphDef, string[]?)> LoadGlyph(XmlGlyphDef glyph) {
+        async Task<(XmlGlyphDef, string[]?)> LoadGlyph(ZipArchive zipArchive, XmlGlyphDef glyph) {
             var filePath = glyph switch {
                 XmlComponentGlyphDef     c => c.File,
                 XmlLigatureGlyphDef      l => l.File,
@@ -211,9 +210,9 @@ public static partial class NKFontSerializer {
                 return (glyph, null);
 
             var normalizedPath = filePath.Replace('\\', '/');
-            var entry = zip.GetEntry(normalizedPath) ?? zip.GetEntry(filePath);
+            var entry = zipArchive.GetEntry(normalizedPath) ?? zipArchive.GetEntry(filePath);
             if (entry == null) {
-                foreach (var e in zip.Entries) {
+                foreach (var e in zipArchive.Entries) {
                     if (e.FullName.Replace('\\', '/').Equals(normalizedPath, StringComparison.OrdinalIgnoreCase)) {
                         entry = e;
                         break;
@@ -222,7 +221,7 @@ public static partial class NKFontSerializer {
             }
 
             if (entry != null) {
-                using var stream = entry.Open();
+                await using var stream = entry.Open();
                 using var reader = new StreamReader(stream, Encoding.UTF8);
                 var text = await reader.ReadToEndAsync();
                 var lines = text.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
@@ -230,7 +229,7 @@ public static partial class NKFontSerializer {
             }
 
             LOGGER.Error($"The glyph file entry path '{filePath}' cannot be resolved inside the archive.");
-            return await Task.FromException<(XmlGlyphDef, string[])>(new FileNotFoundException(filePath));
+            throw new FileNotFoundException(filePath);
         }
     }
 
@@ -247,7 +246,7 @@ public static partial class NKFontSerializer {
         string mapPath;
         
         if (File.Exists(manifestPath)) {
-            var manifestStream = File.Open(manifestPath, FileMode.Open);
+            await using var manifestStream = File.Open(manifestPath, FileMode.Open);
 
             var manifest = await DeserializeManifestAsync(manifestStream);
 
@@ -265,38 +264,25 @@ public static partial class NKFontSerializer {
         }
         
         if (!File.Exists(mapPath)) {
-            LOGGER.Error($"The font map file path '{configPath}' does not exist.");
+            LOGGER.Error($"The font map file path '{mapPath}' does not exist.");
             return null;
         }
 
-        var configTask = DeserializeConfigAsync(File.Open(configPath, FileMode.Open));
-        var mapTask    = DeserializeMapAsync   (File.Open(mapPath,    FileMode.Open));
-        
-        var map = await mapTask;
+        var config = await DeserializeConfigAsync(File.Open(configPath, FileMode.Open));
+        var map    = await DeserializeMapAsync   (File.Open(mapPath,    FileMode.Open));
 
-        var glyphTasks = new List<Task<(XmlGlyphDef Def, string[]? Lines)>>();
-        var failed     = false;
+        var glyphs = new (XmlGlyphDef Def, string[]? Lines)[map.Glyphs.Length];
         
         for (var i = 0; i < map.Glyphs.Length; i++) {
             var glyph = map.Glyphs[i];
-
-            var glyphLoadingTask = LoadGlyph(glyph);
-
-            if (glyphLoadingTask.IsFaulted) {
-                failed = true;
-                continue;
+            try {
+                glyphs[i] = await LoadGlyph(glyph);
             }
-            
-            glyphTasks.Add(glyphLoadingTask);
+            catch (Exception) {
+                LOGGER.Error("One or more glyphs could not be loaded.");
+                return null;
+            }
         }
-
-        if (failed) {
-            LOGGER.Error("One or more glyphs could not be loaded.");
-            return null;
-        }
-
-        var glyphs = await Task.WhenAll(glyphTasks);
-        var config = await configTask;
         
         return AssembleFont(config, glyphs);
 
@@ -318,15 +304,10 @@ public static partial class NKFontSerializer {
                 return (glyph, await File.ReadAllLinesAsync(glyphPath));
 
             LOGGER.Error($"The glyph file path '{filePath}' cannot be resolved.");
-            return await Task.FromException<(XmlGlyphDef, string[])>(new FileNotFoundException());
+            throw new FileNotFoundException(filePath);
         }
     }
 
-    private static readonly EventId GLYPH_ASSEMBLY_EVENT_ID = new(
-        HashCode.Combine("NKGlyphAssembly", ""),
-        "NKGlyphAssembly"
-    );
-    
     /// <summary>
     /// Combines the specified font configuration and glyph definitions into a single NKFont object.
     /// </summary>
