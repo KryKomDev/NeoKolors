@@ -36,6 +36,7 @@
         <EmbeddedResource Include="Bytesized.nkf" />
         <EmbeddedResource Include="Dummy.nkf" />
         <EmbeddedResource Include="Future.nkf" />
+        <EmbeddedResource Include="Figlet/*.flf" />
     </ItemGroup>
 
     <!-- Inline C# Task for Font Compilation -->

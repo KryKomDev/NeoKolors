@@ -23,6 +23,10 @@ public static class AssetsProvider {
     private static NKFont? BYTESIZED;
     private static NKFont? FUTURE;
     private static NKFont? DUMMY;
+    private static NKFont? STANDARD;
+    private static NKFont? SLANT;
+    private static NKFont? SHADOW;
+    private static NKFont? BLOCK;
 
     /// <summary>
     /// Gets the pre-compiled Bytesized font.
@@ -38,6 +42,26 @@ public static class AssetsProvider {
     /// Gets the pre-compiled Dummy font.
     /// </summary>
     public static NKFont? Dummy => DUMMY ??= LoadFont("Dummy");
+
+    /// <summary>
+    /// Gets the built-in Standard FIGlet font.
+    /// </summary>
+    public static NKFont? Standard => STANDARD ??= LoadFigletFont("standard");
+
+    /// <summary>
+    /// Gets the built-in Slant FIGlet font.
+    /// </summary>
+    public static NKFont? Slant => SLANT ??= LoadFigletFont("slant");
+
+    /// <summary>
+    /// Gets the built-in Shadow FIGlet font.
+    /// </summary>
+    public static NKFont? Shadow => SHADOW ??= LoadFigletFont("shadow");
+
+    /// <summary>
+    /// Gets the built-in Block FIGlet font.
+    /// </summary>
+    public static NKFont? Block => BLOCK ??= LoadFigletFont("block");
 
     /// <summary>
     /// Resolves and returns a Stream for the specified built-in font resource.
@@ -61,12 +85,16 @@ public static class AssetsProvider {
         RegisterFont("Bytesized", Bytesized);
         RegisterFont("Future",    Future);
         RegisterFont("Dummy",     Dummy);
+        RegisterFont("Standard",  Standard);
+        RegisterFont("Slant",     Slant);
+        RegisterFont("Shadow",    Shadow);
+        RegisterFont("Block",     Block);
     }
 
     private static void RegisterFont(string name, NKFont? font) {
         if (font is not null)
             FontAtlas.TryAdd(name, font);     
-        else 
+         else 
             LOGGER.Error($"The '{name}' font not found.");
     }
 
@@ -74,5 +102,12 @@ public static class AssetsProvider {
         using var stream = GetFontStream(name);
         if (stream == null) return null;
         return NKFontSerializer.DeserializeBinary(stream);
+    }
+
+    private static NKFont? LoadFigletFont(string name) {
+        var resourceName = $"NeoKolors.Tui.Fonts.Assets.{name}.flf";
+        using var stream = ASSEMBLY.GetManifestResourceStream(resourceName);
+        if (stream == null) return null;
+        return NKFontSerializer.DeserializeFiglet(stream, name);
     }
 }
