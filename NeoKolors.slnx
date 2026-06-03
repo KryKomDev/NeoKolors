@@ -39,7 +39,7 @@
     <!--  Tools  -->
     
     <Folder Name="/Tools/">
-        <Project Path="Tools/NKFontTool/NKFontTool.csproj" />
+        <Project Path="Tools/NKFont/NeoKolors.Tools.NKFont.csproj" />
     </Folder>
 
     <!--  Examples  -->

@@ -11,18 +11,30 @@ using NeoKolors.Tui.Fonts.Serialization;
 
 using NeoKolors.Tui.Fonts.Assets;
 
-namespace NKFontTool;
+namespace NeoKolors.Tools.NKFont;
 
 internal static class Program {
 
     static Program() {
-        NKDebug.Logger.FileConfig = LogFileConfig.NewDatetime("./{0}.log");
+        var installDir = AppContext.BaseDirectory;
+
+        if (!Directory.Exists(installDir))
+            Directory.CreateDirectory(installDir); 
+        
+        var logsDir = Path.Combine(installDir, "logs");
+        
+        if (!Directory.Exists(logsDir))
+            Directory.CreateDirectory(logsDir);
+        
+        NKDebug.Logger.FileConfig = LogFileConfig.NewDatetime($"{logsDir}/{{0}}.log");
+
+        NKDebug.Logger.SimpleMessages = true;
     }
     
     static int Main(string[] args) {
         
         // Support UTF-8 encoding for smooth unicode characters
-        Console.OutputEncoding = System.Text.Encoding.UTF8;
+        System.Console.OutputEncoding = System.Text.Encoding.UTF8;
 
         // Force-load and register built-in fonts
         AssetsProvider.RegisterFonts();
@@ -168,7 +180,7 @@ internal static class Program {
         }
 
         PrintInfo($"Reading and parsing XML font definition from '{fullXmlPath}'...");
-        NKFont? font;
+        Tui.Fonts.NKFont? font;
 
         try {
             font = NKFontSerializer.DeserializeXml(fullXmlPath);
@@ -245,7 +257,7 @@ internal static class Program {
                 NKConsole.Write(cell.Char ?? ' ', cell.Style);
             }
 
-            Console.WriteLine();
+            System.Console.WriteLine();
         }
         
         NKConsole.WriteLine();
@@ -387,7 +399,7 @@ internal static class Program {
 
     static string ReadTemplate(string name) {
         var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-        string resourceName = $"NKFontTool.Templates.{name}";
+        string resourceName = $"NeoKolors.Tools.NKFont.Templates.{name}";
         using var stream = assembly.GetManifestResourceStream(resourceName);
 
         if (stream == null) {
@@ -400,7 +412,7 @@ internal static class Program {
     }
 
     static void HandleList() {
-        Console.WriteLine();
+        System.Console.WriteLine();
         NKConsole.WriteLine("Available Built-in Fonts:", new NKStyle(ConsoleColor.Yellow, s: TextStyles.BOLD));
         NKConsole.WriteLine("─────────────────────────", ConsoleColor.DarkYellow);
 
@@ -409,7 +421,7 @@ internal static class Program {
             NKConsole.WriteLine($"({value.GetType().Name})", TextStyles.FAINT);
         }
         
-        Console.WriteLine();
+        System.Console.WriteLine();
     }
 
     static void HandleGlyphs(string fontKey) {
@@ -420,12 +432,12 @@ internal static class Program {
             return;
         }
 
-        if (font is not NKFont nkFont) {
+        if (font is not Tui.Fonts.NKFont nkFont) {
             PrintError($"Font '{fontKey}' of type '{font.GetType().Name}' does not support glyph listing.");
             return;
         }
 
-        Console.WriteLine();
+        System.Console.WriteLine();
         
         // Print Font Details Header
         NKConsole.WriteLine("Font Details:", new NKStyle(ConsoleColor.Yellow, s: TextStyles.BOLD));
@@ -451,12 +463,12 @@ internal static class Program {
         
         NKConsole.Write("  Total Glyphs:    ", ConsoleColor.Cyan);
         NKConsole.WriteLine(nkFont.Glyphs.Count.ToString(), new NKStyle(ConsoleColor.White, s: TextStyles.BOLD));
-        Console.WriteLine();
+        System.Console.WriteLine();
 
         // Print Table Header
         NKConsole.WriteLine("Glyphs Defined in Font:", new NKStyle(ConsoleColor.Yellow, s: TextStyles.BOLD));
         NKConsole.WriteLine("───────────────────────", ConsoleColor.DarkYellow);
-        Console.WriteLine();
+        System.Console.WriteLine();
         
         // Define Column Widths
         const int colSymbol = 14;
@@ -504,7 +516,7 @@ internal static class Program {
             NKConsole.WriteLine(stylesStr, symbol.Styles.Styles == TextStyles.NONE ? ConsoleColor.DarkGray : ConsoleColor.Blue);
         }
         
-        Console.WriteLine();
+        System.Console.WriteLine();
     }
 
     static void HandleInspect(string fontKey, string glyphInput) {
@@ -515,12 +527,12 @@ internal static class Program {
             return;
         }
 
-        if (font is not NKFont nkFont) {
+        if (font is not Tui.Fonts.NKFont nkFont) {
             PrintError($"Font '{fontKey}' of type '{font.GetType().Name}' does not support glyph inspection.");
             return;
         }
 
-        Console.WriteLine();
+        System.Console.WriteLine();
         
         // Search for the glyph in the font
         NKGlyphSymbol? matchedSymbol = null;
@@ -620,7 +632,7 @@ internal static class Program {
             NKConsole.WriteLine("None", ConsoleColor.DarkGray);
         }
 
-        Console.WriteLine();
+        System.Console.WriteLine();
 
         // Visual Representation
         NKConsole.WriteLine("Visual Representation:", new NKStyle(ConsoleColor.Yellow, s: TextStyles.BOLD));
@@ -668,7 +680,7 @@ internal static class Program {
                 NKConsole.Write("  <-- Baseline", new NKStyle(ConsoleColor.Magenta, s: TextStyles.BOLD));
             }
             
-            Console.WriteLine();
+            System.Console.WriteLine();
         }
 
         // Bottom Border
@@ -688,7 +700,7 @@ internal static class Program {
             NKConsole.WriteLine($"Baseline is {rowsAbove} row(s) above the grid.", ConsoleColor.DarkGray);
         }
         
-        Console.WriteLine();
+        System.Console.WriteLine();
     }
 
     static string FormatSymbol(char c) {
