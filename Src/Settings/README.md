@@ -1,9 +1,6 @@
-﻿# NeoKolors.Settings
+# NeoKolors.Settings
 
-![.NET Standard](https://img.shields.io/badge/.NET-Standard2.0-512bd4)
-![.NET 5](https://img.shields.io/badge/.NET-5.0-682a7b)
-[![NuGet](https://img.shields.io/nuget/v/NeoKolors.Settings?color=a53c7a)](https://www.nuget.org/packages/NeoKolors.Settings)
-![Downloads](https://img.shields.io/nuget/dt/NeoKolors.Settings?color=a31c35)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/build.yml?style=for-the-badge&labelColor=%236c7086&color=%2389b4fa&label=build)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) [![Test Status](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/build.yml?style=for-the-badge&labelColor=%236c7086&color=%23f9e2af&label=tests)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Settings?style=for-the-badge&labelColor=%236c7086&color=%23f5c2e7)](https://www.nuget.org/packages/NeoKolors.Settings) [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Settings?style=for-the-badge&labelColor=%236c7086&color=%23a6e3a1)](https://www.nuget.org/packages/NeoKolors.Settings) [![License](https://img.shields.io/github/license/KryKomDev/NeoKolors?style=for-the-badge&labelColor=%236c7086&color=%23fab387)](https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE)
 
 This package includes a settings building system for easier automation of instance building and settings communication
 between different parts of applications.

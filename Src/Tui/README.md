@@ -1,5 +1,7 @@
 # NeoKolors.Tui
 
+[![Build Status](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/build.yml?style=for-the-badge&labelColor=%236c7086&color=%2389b4fa&label=build)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) [![Test Status](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/build.yml?style=for-the-badge&labelColor=%236c7086&color=%23f9e2af&label=tests)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Tui?style=for-the-badge&labelColor=%236c7086&color=%23f5c2e7)](https://www.nuget.org/packages/NeoKolors.Tui) [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Tui?style=for-the-badge&labelColor=%236c7086&color=%23a6e3a1)](https://www.nuget.org/packages/NeoKolors.Tui) [![License](https://img.shields.io/github/license/KryKomDev/NeoKolors?style=for-the-badge&labelColor=%236c7086&color=%23fab387)](https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE)
+
 `NeoKolors.Tui` is a modern, web-inspired, and desktop-grade Text User Interface (TUI) framework for C#. Modelled with influence from UWP/WinUI, it features a Document Object Model (DOM), visual tree layout, CSS-like styling, reactive events, mouse support, and a high-performance rendering system for terminal screens.
 
 ---

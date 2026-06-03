@@ -1,5 +1,7 @@
 # NeoKolors.Extensions
 
+[![Build Status](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/build.yml?style=for-the-badge&labelColor=%236c7086&color=%2389b4fa&label=build)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) [![Test Status](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/build.yml?style=for-the-badge&labelColor=%236c7086&color=%23f9e2af&label=tests)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Extensions?style=for-the-badge&labelColor=%236c7086&color=%23f5c2e7)](https://www.nuget.org/packages/NeoKolors.Extensions) [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Extensions?style=for-the-badge&labelColor=%236c7086&color=%23a6e3a1)](https://www.nuget.org/packages/NeoKolors.Extensions) [![License](https://img.shields.io/github/license/KryKomDev/NeoKolors?style=for-the-badge&labelColor=%236c7086&color=%23fab387)](https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE)
+
 `NeoKolors.Extensions` is a high-performance productivity library providing utility extensions for standard .NET and C# types. Optimized for performance and readability, it utilizes modern C# language features (such as C# 14 Extension Types) to clean up codebases.
 
 ---

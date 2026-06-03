@@ -1,4 +1,6 @@
-# NKFontTool (`nkfont`)
+# NeoKolors.Tools.NKFont (`nkfont`)
+
+[![Build Status](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/build.yml?style=for-the-badge&labelColor=%236c7086&color=%2389b4fa&label=build)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) [![Test Status](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/build.yml?style=for-the-badge&labelColor=%236c7086&color=%23f9e2af&label=tests)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Tools.NKFont?style=for-the-badge&labelColor=%236c7086&color=%23f5c2e7)](https://www.nuget.org/packages/NeoKolors.Tools.NKFont) [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Tools.NKFont?style=for-the-badge&labelColor=%236c7086&color=%23a6e3a1)](https://www.nuget.org/packages/NeoKolors.Tools.NKFont) [![License](https://img.shields.io/github/license/KryKomDev/NeoKolors?style=for-the-badge&labelColor=%236c7086&color=%23fab387)](https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE)
 
 `NKFontTool` is a command-line interface (CLI) tool designed to manage, compile, display, inspect, and create custom TUI fonts for the NeoKolors framework.
 
