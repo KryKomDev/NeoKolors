@@ -13,7 +13,7 @@
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <Title>NeoKolors.Settings</Title>
-        <PackageIcon>Settings.png</PackageIcon>
+        <PackageIcon>package-icon.png</PackageIcon>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Configurations>Debug;Release;WIP</Configurations>
         <Platforms>AnyCPU</Platforms>
