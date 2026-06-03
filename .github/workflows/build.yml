@@ -43,6 +43,9 @@ jobs:
           - name: Tui.Fonts.Assets
             path: Src/Tui/Fonts/Assets/NeoKolors.Tui.Fonts.Assets.csproj
             test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
+          - name: Tools.NKFont
+            path: Tools/NKFont/NeoKolors.Tools.NKFont.csproj
+            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
         configuration: [Debug, Release]
 
     steps:
