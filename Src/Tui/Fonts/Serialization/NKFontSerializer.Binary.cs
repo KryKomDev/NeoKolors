@@ -282,7 +282,7 @@ public sealed class NKGlyphSymbolFormatter : IMessagePackFormatter<NKGlyphSymbol
 
 public sealed class NKFontInfoFormatter : IMessagePackFormatter<NKFontInfo> {
     public void Serialize(ref MessagePackWriter writer, NKFontInfo value, MessagePackSerializerOptions options) {
-        writer.WriteArrayHeader(9);
+        writer.WriteArrayHeader(13);
         writer.Write(value.Name);
         writer.Write(value.Ligatures);
         writer.Write(value.Leading);
@@ -303,12 +303,17 @@ public sealed class NKFontInfoFormatter : IMessagePackFormatter<NKFontInfo> {
             writer.Write(0);
             writer.Write(false);
         }
+
+        writer.Write(value.Author);
+        writer.Write(value.LicenseType);
+        writer.Write(value.LicenseFile);
+        writer.Write(value.LicenseContent);
     }
 
     public NKFontInfo Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options) {
         int count = reader.ReadArrayHeader();
 
-        if (count != 9) throw new MessagePackSerializationException("Invalid NKFontInfo array length.");
+        if (count != 9 && count != 11 && count != 13) throw new MessagePackSerializationException("Invalid NKFontInfo array length.");
 
         string name = reader.ReadString() ?? string.Empty;
         bool ligatures = reader.ReadBoolean();
@@ -318,21 +323,39 @@ public sealed class NKFontInfoFormatter : IMessagePackFormatter<NKFontInfo> {
 
         var propoType = (FontProportionsInfo.ProportionType)reader.ReadByte();
 
-        if (!propoType.HasFlag(FontProportionsInfo.ProportionType.VARIABLE)) {
+        bool isMono = !propoType.HasFlag(FontProportionsInfo.ProportionType.VARIABLE);
+        NKFontMonospacedConfig mono = default;
+        NKFontVariableConfig variable = default;
+
+        if (isMono) {
             int glyphWidth = reader.ReadInt32();
             int glyphHeight = reader.ReadInt32();
             bool alignToGrid = reader.ReadBoolean();
-            var mono = new NKFontMonospacedConfig(glyphWidth, glyphHeight, alignToGrid);
-
-            return new NKFontInfo(name, ligatures, leading, letterSpacing, wordSpacing, mono);
+            mono = new NKFontMonospacedConfig(glyphWidth, glyphHeight, alignToGrid);
+        }
+        else {
+            bool kerning = reader.ReadBoolean();
+            reader.ReadInt32(); // skip
+            reader.ReadBoolean(); // skip
+            variable = new NKFontVariableConfig(kerning);
         }
 
-        bool kerning = reader.ReadBoolean();
-        reader.ReadInt32(); // skip
-        reader.ReadBoolean(); // skip
-        var variable = new NKFontVariableConfig(kerning);
+        string? author = null;
+        string? licenseType = null;
+        string? licenseFile = null;
+        string? licenseContent = null;
+        if (count >= 11) {
+            author = reader.ReadString();
+            licenseType = reader.ReadString();
+        }
+        if (count >= 13) {
+            licenseFile = reader.ReadString();
+            licenseContent = reader.ReadString();
+        }
 
-        return new NKFontInfo(name, ligatures, leading, letterSpacing, wordSpacing, variable);
+        return isMono
+            ? new NKFontInfo(name, ligatures, leading, letterSpacing, wordSpacing, mono, author, licenseType, licenseFile, licenseContent)
+            : new NKFontInfo(name, ligatures, leading, letterSpacing, wordSpacing, variable, author, licenseType, licenseFile, licenseContent);
     }
 }
 

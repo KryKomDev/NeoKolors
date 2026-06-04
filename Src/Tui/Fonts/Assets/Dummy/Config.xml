@@ -1,5 +1,7 @@
 ﻿<FontConfig xmlns="https://krykomdev.github.io/NeoKolors/Schemas/Fonts/v3/">
     <Name>Dummy</Name>
+    <Author>KryKom (kry.k.kom@gmail.com)</Author>
+    <LicenseType>MIT</LicenseType>
     <Ligatures>true</Ligatures>
     <LetterSpacing>2</LetterSpacing>
     <Leading>5</Leading>

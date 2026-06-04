@@ -94,20 +94,20 @@ public static class AssetsProvider {
     private static void RegisterFont(string name, NKFont? font) {
         if (font is not null)
             FontAtlas.TryAdd(name, font);     
-         else 
+        else 
             LOGGER.Error($"The '{name}' font not found.");
     }
 
     private static NKFont? LoadFont(string name) {
         using var stream = GetFontStream(name);
-        if (stream == null) return null;
-        return NKFontSerializer.DeserializeBinary(stream);
+        
+        return stream == null ? null : NKFontSerializer.DeserializeBinary(stream);
     }
 
     private static NKFont? LoadFigletFont(string name) {
-        var resourceName = $"NeoKolors.Tui.Fonts.Assets.{name}.flf";
+        var resourceName = $"NeoKolors.Tui.Fonts.Assets.Figlet.{name}.flf";
         using var stream = ASSEMBLY.GetManifestResourceStream(resourceName);
-        if (stream == null) return null;
-        return NKFontSerializer.DeserializeFiglet(stream, name);
+        
+        return stream == null ? null : NKFontSerializer.DeserializeFiglet(stream, name);
     }
 }

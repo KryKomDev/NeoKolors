@@ -1,11 +1,10 @@
-// NeoKolors
-// Copyright (c) KryKom 2026
-
 using System.IO;
 using System.Text;
+using System.Xml.Serialization;
 using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Fonts;
 using NeoKolors.Tui.Fonts.Serialization;
+using NeoKolors.Tui.Fonts.Serialization.Xml.V3;
 
 namespace NeoKolors.Tui.Tests;
 
@@ -104,5 +103,91 @@ public class NKFontFigletSerializerTests {
         Assert.False(result.Success);
         Assert.Null(result.Font);
         Assert.NotEmpty(result.Errors);
+    }
+
+    [Fact]
+    public void XmlFontConfig_WithMetadata_ShouldDeserializeCorrectly() {
+        string xml = @"<FontConfig>
+            <Name>TestFont</Name>
+            <Author>Test Author</Author>
+            <LicenseType>MIT</LicenseType>
+            <LicenseFile>LICENSE.txt</LicenseFile>
+            <Ligatures>true</Ligatures>
+            <LetterSpacing>2</LetterSpacing>
+            <Leading>5</Leading>
+            <Variable>
+                <Kerning>true</Kerning>
+                <WordSpacing>5</WordSpacing>
+            </Variable>
+            <Defaults/>
+        </FontConfig>";
+
+        var serializer = new XmlSerializer(typeof(XmlFontConfig));
+        using var reader = new StringReader(xml);
+        var config = (XmlFontConfig)serializer.Deserialize(reader)!;
+
+        Assert.NotNull(config);
+        Assert.Equal("TestFont", config.Name);
+        Assert.Equal("Test Author", config.Author);
+        Assert.Equal("MIT", config.LicenseType);
+        Assert.Equal("LICENSE.txt", config.LicenseFile);
+    }
+
+    [Fact]
+    public void XmlFontConfig_WithoutMetadata_ShouldDeserializeCorrectly() {
+        string xml = @"<FontConfig>
+            <Name>TestFont</Name>
+            <Ligatures>true</Ligatures>
+            <LetterSpacing>2</LetterSpacing>
+            <Leading>5</Leading>
+            <Variable>
+                <Kerning>true</Kerning>
+                <WordSpacing>5</WordSpacing>
+            </Variable>
+            <Defaults/>
+        </FontConfig>";
+
+        var serializer = new XmlSerializer(typeof(XmlFontConfig));
+        using var reader = new StringReader(xml);
+        var config = (XmlFontConfig)serializer.Deserialize(reader)!;
+
+        Assert.NotNull(config);
+        Assert.Equal("TestFont", config.Name);
+        Assert.Null(config.Author);
+        Assert.Null(config.LicenseType);
+    }
+
+    [Fact]
+    public void DeserializeFiglet_WithMetadataInComments_ShouldParseCorrectly() {
+        var sb = new StringBuilder();
+        
+        // Header line: flf2a$, height=2, baseline=2, max_len=10, old_layout=15, comment_lines=3
+        sb.AppendLine("flf2a$ 2 2 10 15 3 0 0");
+        sb.AppendLine("by John Doe");
+        sb.AppendLine("License: Apache-2.0");
+        sb.AppendLine("Some other comment line");
+
+        // Helper to append a character block
+        void AppendChar(char top, char bottom) {
+            sb.AppendLine($"{top}@");
+            sb.AppendLine($"{bottom}@@");
+        }
+
+        // Standard ASCII characters 32 to 126 (95 characters)
+        for (int i = 32; i <= 126; i++) {
+            AppendChar((char)i, (char)i);
+        }
+
+        // German extended characters (127 to 133 in FIGlet order)
+        for (int i = 0; i < 7; i++) {
+            AppendChar('G', 'G');
+        }
+
+        using var reader = new StringReader(sb.ToString());
+        var font = NKFontSerializer.DeserializeFiglet(reader, "TestFigletWithMetadata");
+
+        Assert.NotNull(font);
+        Assert.Equal("John Doe", font.Info.Author);
+        Assert.Equal("Apache-2.0", font.Info.LicenseType);
     }
 }

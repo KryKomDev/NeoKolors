@@ -1,5 +1,7 @@
 <FontConfig xmlns="https://krykomdev.github.io/NeoKolors/Schemas/Fonts/v3/">
     <Name>Bytesized</Name>
+    <Author>KryKom (kry.k.kom@gmail.com)</Author>
+    <LicenseType>MIT</LicenseType>
     <Ligatures>false</Ligatures>
     <LetterSpacing>1</LetterSpacing>
     <Leading>3</Leading>

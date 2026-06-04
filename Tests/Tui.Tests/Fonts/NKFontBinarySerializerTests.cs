@@ -86,4 +86,33 @@ public class NKFontBinarySerializerTests {
         Assert.NotEmpty(result.Errors);
         Assert.Contains(result.Errors, err => err.Contains("Cannot resolve path") || err.Contains("does not exist"));
     }
+
+    [Fact]
+    public void SerializeAndDeserialize_WithMetadata_ShouldBePreserved() {
+        var info = new NKFontInfo(
+            "TestFont",
+            ligatures: true,
+            leading: 10,
+            letterSpacing: 1,
+            wordSpacing: 4,
+            variable: new NKFontVariableConfig(true),
+            author: "Alice",
+            licenseType: "Custom",
+            licenseFile: "LICENSE.txt",
+            licenseContent: "This is a custom license agreement."
+        );
+        var originalFont = new NKFont(info, new Dictionary<NKGlyphSymbol, NKGlyph>());
+
+        using var memoryStream = new MemoryStream();
+        NKFontSerializer.SerializeBinary(originalFont, memoryStream);
+        memoryStream.Position = 0;
+
+        var deserializedFont = NKFontSerializer.DeserializeBinary(memoryStream);
+        Assert.NotNull(deserializedFont);
+        Assert.Equal("TestFont", deserializedFont.Info.Name);
+        Assert.Equal("Alice", deserializedFont.Info.Author);
+        Assert.Equal("Custom", deserializedFont.Info.LicenseType);
+        Assert.Equal("LICENSE.txt", deserializedFont.Info.LicenseFile);
+        Assert.Equal("This is a custom license agreement.", deserializedFont.Info.LicenseContent);
+    }
 }

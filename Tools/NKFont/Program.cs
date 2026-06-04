@@ -460,32 +460,78 @@ internal static class Program {
 
     static void HandleList() {
         System.Console.WriteLine();
-        NKConsole.WriteLine("Available Built-in Fonts:", new NKStyle(ConsoleColor.Yellow, s: TextStyles.BOLD));
-        NKConsole.WriteLine("─────────────────────────", ConsoleColor.DarkYellow);
-
-        foreach (var value in FontAtlas.Values) {
-            NKConsole.Write($"  {value.Name} ", ConsoleColor.Cyan);
-            NKConsole.WriteLine($"({value.GetType().Name})", TextStyles.FAINT);
-        }
-        
+        NKConsole.WriteLine("Available Fonts:", new NKStyle(ConsoleColor.Yellow, s: TextStyles.BOLD));
+        NKConsole.WriteLine("────────────────", ConsoleColor.DarkYellow);
         System.Console.WriteLine();
 
+        var fontRows = new List<(string Name, string Author, string License, string Type, string Source)>();
+
+        // Collect built-in fonts
+        foreach (var value in FontAtlas.Values) {
+            string author = "-";
+            string license = "-";
+            if (value is Tui.Fonts.NKFont nkFont) {
+                author = nkFont.Info.Author ?? "-";
+                license = nkFont.Info.LicenseType ?? "-";
+            }
+            fontRows.Add((value.Name, author, license, value.GetType().Name, "Built-in"));
+        }
+
+        // Collect stored fonts
         if (Directory.Exists(FONTS_STORAGE_DIR)) {
             var files = Directory.EnumerateFiles(FONTS_STORAGE_DIR)
                 .Where(f => f.EndsWith(".flf", StringComparison.OrdinalIgnoreCase) || f.EndsWith(".nkf", StringComparison.OrdinalIgnoreCase))
                 .ToList();
-            if (files.Count > 0) {
-                NKConsole.WriteLine("Stored Fonts:", new NKStyle(ConsoleColor.Yellow, s: TextStyles.BOLD));
-                NKConsole.WriteLine("─────────────", ConsoleColor.DarkYellow);
-                foreach (var file in files) {
-                    string name = Path.GetFileNameWithoutExtension(file);
-                    string ext = Path.GetExtension(file).ToUpperInvariant();
-                    NKConsole.Write($"  {name} ", ConsoleColor.Cyan);
-                    NKConsole.WriteLine($"({ext} in internal storage)", TextStyles.FAINT);
+            foreach (var file in files) {
+                string name = Path.GetFileNameWithoutExtension(file);
+                string ext = Path.GetExtension(file).ToUpperInvariant();
+                string author = "-";
+                string license = "-";
+                var font = LoadFromFile(file);
+                if (font is Tui.Fonts.NKFont nkFont) {
+                    author = nkFont.Info.Author ?? "-";
+                    license = nkFont.Info.LicenseType ?? "-";
                 }
-                System.Console.WriteLine();
+                fontRows.Add((name, author, license, ext, "Stored"));
             }
         }
+
+        // Dynamically calculate column widths (at least as wide as headers)
+        int colName = Math.Max("FONT NAME".Length, fontRows.Count > 0 ? fontRows.Max(x => x.Name.Length) : 0) + 1;
+        int colAuthor = Math.Max("AUTHOR".Length, fontRows.Count > 0 ? fontRows.Max(x => x.Author.Length) : 0) + 1;
+        int colLicense = Math.Max("LICENSE".Length, fontRows.Count > 0 ? fontRows.Max(x => x.License.Length) : 0) + 1;
+        int colType = Math.Max("TYPE/FORMAT".Length, fontRows.Count > 0 ? fontRows.Max(x => x.Type.Length) : 0) + 1;
+        int colSource = Math.Max("SOURCE".Length, fontRows.Count > 0 ? fontRows.Max(x => x.Source.Length) : 0) + 1;
+
+        // Print table headers
+        NKConsole.Write("  " + "FONT NAME".PadRight(colName), new NKStyle(ConsoleColor.Cyan, s: TextStyles.BOLD));
+        NKConsole.Write("│ " + "AUTHOR".PadRight(colAuthor), new NKStyle(ConsoleColor.Cyan, s: TextStyles.BOLD));
+        NKConsole.Write("│ " + "LICENSE".PadRight(colLicense), new NKStyle(ConsoleColor.Cyan, s: TextStyles.BOLD));
+        NKConsole.Write("│ " + "TYPE/FORMAT".PadRight(colType), new NKStyle(ConsoleColor.Cyan, s: TextStyles.BOLD));
+        NKConsole.WriteLine("│ " + "SOURCE".PadRight(colSource), new NKStyle(ConsoleColor.Cyan, s: TextStyles.BOLD));
+
+        // Separator row
+        string sepLine = "  " + new string('─', colName) +
+                         "┼─" + new string('─', colAuthor) +
+                         "┼─" + new string('─', colLicense) +
+                         "┼─" + new string('─', colType) +
+                         "┼─" + new string('─', colSource);
+        NKConsole.WriteLine(sepLine, ConsoleColor.DarkGray);
+
+        // Render table rows
+        foreach (var r in fontRows.OrderBy(x => x.Source).ThenBy(x => x.Name)) {
+            NKConsole.Write("  " + r.Name.PadRight(colName), new NKStyle(ConsoleColor.Yellow, s: TextStyles.BOLD));
+            NKConsole.Write("│ ", ConsoleColor.DarkGray);
+            NKConsole.Write(r.Author.PadRight(colAuthor), ConsoleColor.White);
+            NKConsole.Write("│ ", ConsoleColor.DarkGray);
+            NKConsole.Write(r.License.PadRight(colLicense), ConsoleColor.Green);
+            NKConsole.Write("│ ", ConsoleColor.DarkGray);
+            NKConsole.Write(r.Type.PadRight(colType), ConsoleColor.Cyan);
+            NKConsole.Write("│ ", ConsoleColor.DarkGray);
+            NKConsole.WriteLine(r.Source.PadRight(colSource), r.Source == "Built-in" ? ConsoleColor.Magenta : ConsoleColor.Blue);
+        }
+
+        System.Console.WriteLine();
     }
 
     static void HandleGlyphs(string fontKey) {
@@ -509,6 +555,21 @@ internal static class Program {
         
         NKConsole.Write("  Name:            ", ConsoleColor.Cyan);
         NKConsole.WriteLine(nkFont.Name, new NKStyle(ConsoleColor.White, s: TextStyles.BOLD));
+
+        if (!string.IsNullOrEmpty(nkFont.Info.Author)) {
+            NKConsole.Write("  Author:          ", ConsoleColor.Cyan);
+            NKConsole.WriteLine(nkFont.Info.Author, ConsoleColor.White);
+        }
+
+        if (!string.IsNullOrEmpty(nkFont.Info.LicenseType)) {
+            NKConsole.Write("  License Type:    ", ConsoleColor.Cyan);
+            NKConsole.WriteLine(nkFont.Info.LicenseType, ConsoleColor.White);
+        }
+
+        if (!string.IsNullOrEmpty(nkFont.Info.LicenseFile)) {
+            NKConsole.Write("  License File:    ", ConsoleColor.Cyan);
+            NKConsole.WriteLine(nkFont.Info.LicenseFile, ConsoleColor.White);
+        }
         
         NKConsole.Write("  Proportions:     ", ConsoleColor.Cyan);
         NKConsole.WriteLine(nkFont.Info.ProportionType.ToString(), ConsoleColor.White);

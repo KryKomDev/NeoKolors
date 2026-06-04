@@ -1,4 +1,4 @@
-﻿// //
+// //
 // NeoKolors
 // Copyright (c) 2026 KryKom
 // //
@@ -21,6 +21,12 @@ public class XmlFontConfig {
     }
     
     public bool Ligatures     { get; set; }
+    public string? Author     { get; set; }
+    public string? LicenseType { get; set; }
+    public string? LicenseFile { get; set; }
+
+    [XmlIgnore]
+    public string? LicenseContent { get; set; }
     public int  Leading       { get; set; }
     public int  LetterSpacing { get; set; }
     

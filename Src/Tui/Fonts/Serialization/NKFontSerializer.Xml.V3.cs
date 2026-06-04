@@ -178,8 +178,29 @@ public static partial class NKFontSerializer {
             return null;
         }
 
-        // De-serialize sequentially to prevent concurrent ZipArchive stream access violations
         var config = await DeserializeConfigAsync(configEntry.Open());
+
+        if (!string.IsNullOrEmpty(config.LicenseFile)) {
+            var licenseEntry = zip.GetEntry(config.LicenseFile.Replace('\\', '/'));
+            if (licenseEntry == null) {
+                // Try case-insensitive lookup
+                foreach (var entry in zip.Entries) {
+                    if (entry.FullName.Replace('\\', '/').Equals(config.LicenseFile.Replace('\\', '/'), StringComparison.OrdinalIgnoreCase)) {
+                        licenseEntry = entry;
+                        break;
+                    }
+                }
+            }
+            if (licenseEntry != null) {
+                await using var stream = licenseEntry.Open();
+                using var reader = new StreamReader(stream, Encoding.UTF8);
+                config.LicenseContent = await reader.ReadToEndAsync();
+            }
+            else {
+                LOGGER.Error($"License file '{config.LicenseFile}' not found in archive.");
+            }
+        }
+
         var map    = await DeserializeMapAsync   (mapEntry   .Open());
 
         var glyphs = new (XmlGlyphDef Def, string[]? Lines)[map.Glyphs.Length];
@@ -269,6 +290,17 @@ public static partial class NKFontSerializer {
         }
 
         var config = await DeserializeConfigAsync(File.Open(configPath, FileMode.Open));
+
+        if (!string.IsNullOrEmpty(config.LicenseFile)) {
+            var licensePath = Path.IsPathRooted(config.LicenseFile) ? config.LicenseFile : Path.Combine(path, config.LicenseFile);
+            if (File.Exists(licensePath)) {
+                config.LicenseContent = await File.ReadAllTextAsync(licensePath);
+            }
+            else {
+                LOGGER.Error($"License file '{config.LicenseFile}' not found.");
+            }
+        }
+        
         var map    = await DeserializeMapAsync   (File.Open(mapPath,    FileMode.Open));
 
         var glyphs = new (XmlGlyphDef Def, string[]? Lines)[map.Glyphs.Length];
@@ -827,7 +859,11 @@ public static partial class NKFontSerializer {
                 config.Leading, 
                 config.LetterSpacing, 
                 config.LetterSpacing,
-                new NKFontMonospacedConfig(mono.LetterWidth, mono.LetterHeight, mono.AlignToGrid)
+                new NKFontMonospacedConfig(mono.LetterWidth, mono.LetterHeight, mono.AlignToGrid),
+                config.Author,
+                config.LicenseType,
+                config.LicenseFile,
+                config.LicenseContent
             ),
             XmlVariableFontConfig variable => new NKFontInfo(
                 config.Name, 
@@ -835,7 +871,11 @@ public static partial class NKFontSerializer {
                 config.Leading, 
                 config.LetterSpacing, 
                 variable.WordSpacing, 
-                new NKFontVariableConfig(variable.Kerning)
+                new NKFontVariableConfig(variable.Kerning),
+                config.Author,
+                config.LicenseType,
+                config.LicenseFile,
+                config.LicenseContent
             ),
             _ => throw FontSerializerException.InvalidSpacingInfo()
         };

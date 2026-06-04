@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) krystof 2026
 
 using static NeoKolors.Tui.Fonts.FontProportionsInfo;
@@ -11,6 +11,10 @@ public readonly record struct NKFontInfo {
     
     
     public string         Name           { get; init; }
+    public string?        Author         { get; init; }
+    public string?        LicenseType    { get; init; }
+    public string?        LicenseFile    { get; init; }
+    public string?        LicenseContent { get; init; }
     public bool           Ligatures      { get; init; }
     public int            Leading        { get; init; }
     public int            LetterSpacing  { get; init; }
@@ -19,12 +23,16 @@ public readonly record struct NKFontInfo {
     public ProportionType ProportionType => FontPropoInfo.Type;
 
     public NKFontInfo(
-        string name,
-        bool   ligatures,
-        int    leading,
-        int    letterSpacing,
-        int    wordSpacing,
-        VarCfg variable)
+        string  name,
+        bool    ligatures,
+        int     leading,
+        int     letterSpacing,
+        int     wordSpacing,
+        VarCfg  variable,
+        string? author = null,
+        string? licenseType = null,
+        string? licenseFile = null,
+        string? licenseContent = null)
     {
         Name           = name;
         Ligatures      = ligatures;
@@ -32,6 +40,10 @@ public readonly record struct NKFontInfo {
         LetterSpacing  = letterSpacing;
         WordSpacing    = wordSpacing;
         FontPropoInfo = new FontProportionsInfo(variable);
+        Author         = author;
+        LicenseType    = licenseType;
+        LicenseFile    = licenseFile;
+        LicenseContent = licenseContent;
     }
     
     public NKFontInfo(
@@ -40,19 +52,30 @@ public readonly record struct NKFontInfo {
         int     leading,
         int     letterSpacing,
         int     wordSpacing,
-        MonoCfg monospaced)
+        MonoCfg monospaced,
+        string? author = null,
+        string? licenseType = null,
+        string? licenseFile = null,
+        string? licenseContent = null)
     {
         Name           = name;
         Ligatures      = ligatures;
         Leading        = leading;
         LetterSpacing  = letterSpacing;
         WordSpacing    = wordSpacing;
-        FontPropoInfo = new FontProportionsInfo(monospaced);
+        FontPropoInfo  = new FontProportionsInfo(monospaced);
+        Author         = author;
+        LicenseType    = licenseType;
+        LicenseFile    = licenseFile;
+        LicenseContent = licenseContent;
     }
 
     public override string ToString() => 
         $"NKFontInfo {{ " +
         $"Name: '{Name}', " +
+        $"Author: '{Author}', " +
+        $"LicenseType: '{LicenseType ?? (LicenseFile != null ? "Custom" : "none")}', " +
+        $"LicenseFile: '{LicenseFile}', " +
         $"Ligatures: {Ligatures}, " +
         $"Leading: {Leading}, " +
         $"LetterSpacing: {LetterSpacing}, " +
