@@ -1,4 +1,4 @@
-name: Publish to NuGet
+﻿name: Publish to NuGet
 
 on:
   workflow_dispatch:
@@ -15,6 +15,7 @@ on:
           - Extensions
           - Settings
           - Tui
+          - Core
           - Tui.Fonts
           - Tui.Fonts.Assets
           - Tools.NKFont
@@ -42,6 +43,9 @@ jobs:
             test_path: Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj
           - name: Tui
             path: Src/Tui/NeoKolors.Tui.csproj
+            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
+          - name: Tui.Core
+            path: Src/Tui/Core/NeoKolors.Tui.Core.csproj
             test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
           - name: Tui.Fonts
             path: Src/Tui/Fonts/NeoKolors.Tui.Fonts.csproj
