@@ -5,7 +5,22 @@
         <LangVersion>14</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+
+        <Authors>KryKom</Authors>
+        <Company>KryKom</Company>
+        <Version>2026.2-rc1</Version>
+        <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>package-icon.png</PackageIcon>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+        <None Include="../../../LICENSE" Pack="true" PackagePath="\"/>
+        <None Include="../../../Assets/package-icon.png" Pack="true" PackagePath="\"/>
+    </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="../../Extensions/NeoKolors.Extensions.csproj"/>
