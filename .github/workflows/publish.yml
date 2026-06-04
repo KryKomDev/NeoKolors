@@ -15,7 +15,7 @@ on:
           - Extensions
           - Settings
           - Tui
-          - Core
+          - Tui.Core
           - Tui.Fonts
           - Tui.Fonts.Assets
           - Tools.NKFont
