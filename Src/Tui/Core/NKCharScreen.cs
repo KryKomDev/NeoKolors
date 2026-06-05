@@ -13,115 +13,119 @@ using System.Diagnostics;
 namespace NeoKolors.Tui.Core;
 
 public class NKCharScreen : NKCharCanvas, ICharScreen {
-
+    
     #if NK_RENDERING_PROFILING
+    
     private readonly Stopwatch _writingTime     = new();
     private readonly Stopwatch _screenTotalTime = new();
     private readonly Stopwatch _sixelTime       = new();
     private readonly Stopwatch _accessTime      = new();
     private readonly Stopwatch _positionTime    = new();
     private readonly Stopwatch _escseqTime      = new();
-    
-    public TimeSpan WritingTime => _writingTime.Elapsed;
-    public TimeSpan CompTime => _screenTotalTime.Elapsed - _writingTime.Elapsed;
+
+    public TimeSpan WritingTime  => _writingTime    .Elapsed;
+    public TimeSpan CompTime     => _screenTotalTime.Elapsed - _writingTime.Elapsed;
     public TimeSpan ScrTotalTime => _screenTotalTime.Elapsed;
-    public TimeSpan SixelTime => _sixelTime.Elapsed;
-    public TimeSpan AccessTime => _accessTime.Elapsed;
-    public TimeSpan PosTime => _positionTime.Elapsed;
-    public TimeSpan EscseqTime => _escseqTime.Elapsed;
+    public TimeSpan SixelTime    => _sixelTime      .Elapsed;
+    public TimeSpan AccessTime   => _accessTime     .Elapsed;
+    public TimeSpan PosTime      => _positionTime   .Elapsed;
+    public TimeSpan EscseqTime   => _escseqTime     .Elapsed;
+    
     #endif
-    
+
     private readonly List<SixelImageInfo> _prevImages = [];
-    private readonly StringBuilder        _sb         = new();
-    
+    private readonly StringBuilder        _sb = new();
+    private readonly object               _renderLock = new();
+
     public NKCharScreen(int width, int height) : base(width, height) { }
     public NKCharScreen(Size2D size) : base(size.X, size.Y) { }
-    
+
     public void Render() {
-        var prevStyle = NKStyle.Default;
+        lock (_renderLock) {
+            var prevStyle = NKStyle.Default;
 
-        #if NK_RENDERING_PROFILING
-        _screenTotalTime.Start();
-        #endif
-
-        _sb.Clear();
-        _sb.Append("\e[0m");
-        
-        for (int y = 0; y < Height; y++) {
-            prevStyle = RenderLine(y, prevStyle);
-        }
-
-        #if NK_RENDERING_PROFILING
-        _screenTotalTime.Stop();
-        #endif
-        
-        var ri = _images.Except(_prevImages).ToArray();
-        
-        for (int i = 0; i < ri.Length; i++) {
-            var b = ri[i];
-            
             #if NK_RENDERING_PROFILING
-            _sixelTime.Start();
+            _screenTotalTime.Start();
             #endif
-            
-            NKConsole.WriteSixel(b.Image, b.Offset.X, b.Offset.Y, b.Size.X, b.Size.Y);
-            
-            #if NK_RENDERING_PROFILING
-            _sixelTime.Stop();
-            #endif
-        }
 
-        _prevImages.Clear();
-        _prevImages.AddRange(_images);
-        _images.Clear();
+            _sb.Clear();
+            _sb.Append("\e[0m");
+
+            for (int y = 0; y < Height; y++) {
+                prevStyle = RenderLine(y, prevStyle);
+            }
+
+            #if NK_RENDERING_PROFILING
+            _screenTotalTime.Stop();
+            #endif
+
+            var ri = _images.Except(_prevImages).ToArray();
+
+            for (int i = 0; i < ri.Length; i++) {
+                var b = ri[i];
+
+                #if NK_RENDERING_PROFILING
+                _sixelTime.Start();
+                #endif
+
+                NKConsole.WriteSixel(b.Image, b.Offset.X, b.Offset.Y, b.Size.X, b.Size.Y);
+
+                #if NK_RENDERING_PROFILING
+                _sixelTime.Stop();
+                #endif
+            }
+
+            _prevImages.Clear();
+            _prevImages.AddRange(_images);
+            _images.Clear();
+        }
     }
 
     private NKStyle RenderLine(int y, NKStyle prevStyle) {
-        var isBehind  = true;
+        var isBehind = true;
 
         for (int x = 0; x < Width; x++) {
-            
             #if NK_RENDERING_PROFILING
             _accessTime.Start();
             #endif
-            
+
             // get the cell data
             var cell = _data[x, y];
 
             #if NK_RENDERING_PROFILING
             _accessTime.Stop();
             #endif
-                
+
             var (c, nkStyle, changed, _) = cell;
-                
+
             if (!changed) {
                 if (_sb.Length > 0) {
-                    
                     #if NK_RENDERING_PROFILING
                     _writingTime.Start();
                     #endif
-                        
+
                     NKConsole.Write(_sb.ToString());
                     _sb.Clear();
-                        
+
                     #if NK_RENDERING_PROFILING
                     _writingTime.Stop();
                     #endif
                 }
+
                 isBehind = true;
+
                 continue;
             }
 
             cell.SetUpdated();
 
             if (isBehind) {
-
                 #if NK_RENDERING_PROFILING
                 _positionTime.Start();
                 #endif
-                
+
                 NKConsole.TrySetCursorPosition(x, y);
-                
+
                 #if NK_RENDERING_PROFILING
                 _positionTime.Stop();
                 #endif
@@ -132,32 +136,29 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
             #if NK_RENDERING_PROFILING
             _escseqTime.Start();
             #endif
-            
+
             _sb.Append(NKStyle.GetEscSeq(prevStyle, nkStyle));
-            
+
             #if NK_RENDERING_PROFILING
             _escseqTime.Stop();
             #endif
-            
+
             prevStyle = nkStyle;
 
             var actualChar = c ?? ' ';
-            if (char.IsControl(actualChar))
-                _sb.Append(' ');
-            else
-                _sb.Append(actualChar);
+            _sb.Append(char.IsControl(actualChar) ? ' ' : actualChar);
         }
 
-        if (_sb.Length <= 0) 
+        if (_sb.Length <= 0)
             return prevStyle;
-            
+
         #if NK_RENDERING_PROFILING
         _writingTime.Start();
         #endif
-                    
+
         NKConsole.Write(_sb.ToString());
         _sb.Clear();
-                    
+
         #if NK_RENDERING_PROFILING
         _writingTime.Stop();
         #endif
@@ -165,7 +166,7 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
     }
 
     // ============================= TESTING OVERRIDE METHODS ============================= // 
-    
+
     #if NK_IMMEDIATE_RENDERING
     
     public new CellInfo this[int x, int y] {
@@ -206,15 +207,20 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
         Render();
     }
     
-    public new void Resize(int width, int height) {
-        base.Resize(width, height);
-        Render();
-    }
-    
     public new void Clear() {
         base.Clear();
         Render();
     }
-    
+
     #endif
+
+    public new void Resize(int width, int height) {
+        lock (_renderLock) {
+            base.Resize(width, height);
+            
+            #if NK_IMMEDIATE_RENDERING
+            Render();
+            #endif
+        }
+    }
 }
