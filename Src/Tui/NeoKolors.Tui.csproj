@@ -4,12 +4,12 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>14</LangVersion>
-        <TargetFrameworks>net5.0;net8.0;net9.0;netstandard2.1;net10.0</TargetFrameworks>
+        <TargetFrameworks>net5.0;net8.0;netstandard2.1;net10.0</TargetFrameworks>
         <Platforms>AnyCPU</Platforms>
 
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
-        <Version>2026.2-rc1</Version>
+        <Version>2026.2-rc2</Version>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
