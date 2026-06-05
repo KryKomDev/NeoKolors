@@ -1,0 +1,58 @@
+- name: Articles Overview
+  href: ../index.md
+- name: NeoKolors Common
+  items:
+    - name: Common Overview
+      href: ../../Src/Common/Docs/Common-Overview.md
+    - name: Ansi String Style Encoding
+      href: ../../Src/Common/Docs/Eng/Ansi-String.md
+- name: NeoKolors Console
+  items:
+    - name: Console Overview & Drivers
+      href: ../../Src/Console/Docs/Console-Overview.md
+    - name: Logging & Diagnostics
+      href: ../../Src/Console/Docs/Logging.md
+    - name: Exception Formatting
+      href: ../../Src/Console/Docs/Exception-Formatter.md
+- name: NeoKolors Extensions
+  items:
+    - name: Extensions Overview
+      href: ../../Src/Extensions/Docs/Extensions-Overview.md
+- name: NeoKolors Settings
+  items:
+    - name: Settings Overview
+      href: ../../Src/Settings/Docs/Settings-Overview.md
+- name: NeoKolors TUI
+  items:
+    - name: TUI Overview
+      href: ../../Src/Tui/Docs/Tui-Overview.md
+    - name: Elements Hierarchy
+      href: ../../Src/Tui/Docs/Elements/Type-Hierarchy.md
+    - name: Core Canvas & Screen
+      href: ../../Src/Tui/Docs/Core/Canvas-and-Screen.md
+    - name: Styling System
+      href: ../../Src/Tui/Docs/Styles/Styling-System.md
+    - name: Application Lifecycle
+      href: ../../Src/Tui/Docs/Application/Application-Lifecycle.md
+    - name: Layout Computation
+      items:
+        - name: Computation Methods
+          href: ../../Src/Tui/Docs/Layout/Layout-Computation-Methods.md
+        - name: Computation Phases
+          href: ../../Src/Tui/Docs/Layout/Layout-Computation-Phases.md
+    - name: Fonts Engine
+      items:
+        - name: Fonts Overview
+          href: ../../Src/Tui/Docs/Fonts/Fonts-Overview.md
+        - name: Builtin Font Compilation
+          href: ../../Src/Tui/Docs/Fonts/Engineering/Builtin-Font-Compilation.md
+        - name: Font Rendering
+          href: ../../Src/Tui/Docs/Fonts/Engineering/Font-Rendering.md
+        - name: String Tokenization
+          href: ../../Src/Tui/Docs/Fonts/Engineering/String-Tokenization.md
+        - name: Xml Font Definition Config
+          href: ../../Src/Tui/Docs/Fonts/Xml/Xml-Font-Definition-Config.md
+        - name: Xml Font Definition Mapping
+          href: ../../Src/Tui/Docs/Fonts/Xml/Xml-Font-Definition-Mapping.md
+        - name: Xml Glyph Definition Properties
+          href: ../../Src/Tui/Docs/Fonts/Xml/Xml-Glyph-Definition-Properties.md

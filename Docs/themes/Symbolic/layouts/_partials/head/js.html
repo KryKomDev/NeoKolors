@@ -1,5 +1,0 @@
-{{ $js := resources.Match "js/*.js" }}
-{{ range $js }}
-{{ $scripts := . | minify | fingerprint }}
-    <script src="{{ $scripts.Permalink }}"></script>
-{{ end }}

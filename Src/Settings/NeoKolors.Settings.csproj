@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
@@ -26,9 +26,7 @@
         <ProjectReference Include="..\Console\NeoKolors.Console.csproj"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="System.Buffers" Version="*"/>
-    </ItemGroup>
+
     
     <ItemGroup>
         <None Include="README.md" Pack="true" PackagePath="\"/>

@@ -1,0 +1,28 @@
+{{!Licensed to the .NET Foundation under one or more agreements. The .NET Foundation licenses this file to you under the MIT license.}}
+
+<h1 id="{{id}}" data-uid="{{uid}}" class="text-break">{{>partials/title}}</h1>
+<div class="markdown level0 summary">{{{summary}}}</div>
+<div class="markdown level0 conceptual">{{{conceptual}}}</div>
+<div class="markdown level0 remarks">{{{remarks}}}</div>
+
+{{#children}}
+  <h3 id="{{id}}">{{>partials/namespaceSubtitle}}</h3>
+  <div class="table-responsive">
+    <table class="table table-bordered table-striped table-condensed">
+      <thead>
+        <tr>
+          <th style="width: 30%">Name</th>
+          <th style="width: 70%">Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#children}}
+        <tr>
+          <td><xref uid="{{uid}}" altProperty="fullName" displayProperty="name"/></td>
+          <td>{{{summary}}}</td>
+        </tr>
+        {{/children}}
+      </tbody>
+    </table>
+  </div>
+{{/children}}

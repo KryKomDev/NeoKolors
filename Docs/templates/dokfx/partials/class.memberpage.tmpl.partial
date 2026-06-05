@@ -1,0 +1,43 @@
+{{!Licensed to the .NET Foundation under one or more agreements. The .NET Foundation licenses this file to you under the MIT license.}}
+
+{{>partials/class.header}}
+
+{{#children}}
+<h2 class="section" id="{{id}}">{{>partials/classSubtitle}}</h2>
+
+<div class="table-responsive">
+  <table class="table table-bordered table-striped table-condensed">
+    <thead>
+      <tr>
+        <th style="width: 30%">Name</th>
+        <th style="width: 70%">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#children}}
+      <tr>
+        <td><xref uid="{{uid}}" altProperty="fullName" displayProperty="name"/></td>
+        <td>{{{summary}}}</td>
+      </tr>
+      {{/children}}
+    </tbody>
+  </table>
+</div>
+
+{{/children}}
+
+{{#seealso.0}}
+<h2 id="seealso">{{__global.seealso}}</h2>
+<div class="seealso">
+{{/seealso.0}}
+{{#seealso}}
+  {{#isCref}}
+    <div>{{{type.specName.0.value}}}</div>
+  {{/isCref}}
+  {{^isCref}}
+    <div>{{{url}}}</div>
+  {{/isCref}}
+{{/seealso}}
+{{#seealso.0}}
+</div>
+{{/seealso.0}}
