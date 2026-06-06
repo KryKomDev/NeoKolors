@@ -95,6 +95,7 @@
     ],
     "globalMetadata": {
       "_appName": "NeoKolors",
+      "_gitRepo": "https://github.com/KryKomDev/NeoKolors",
       "_appTitle": "NeoKolors Documentation",
       "_appLogoPath": "assets/package-icon.png",
       "_appFaviconPath": "assets/package-icon.png",
