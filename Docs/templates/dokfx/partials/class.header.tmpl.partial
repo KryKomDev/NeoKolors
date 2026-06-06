@@ -136,29 +136,27 @@
 {{#isEnum}}
 {{#children}}
 <h2 id="{{id}}">{{>partials/classSubtitle}}</h2>
-<div class="table-responsive">
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th style="width: 30%">Name</th>
-        <th style="width: 70%">Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#children}}
-      <tr>
-        <td id="{{id}}"><code>{{syntax.content.0.value}}</code></td>
-        <td>
-          {{{summary}}}
-          {{#remarks}}
-          <div class="markdown level1 remarks">{{{remarks}}}</div>
-          {{/remarks}}
-        </td>
-      </tr>
-      {{/children}}
-    </tbody>
-  </table>
-</div>
+<table class="table table-bordered table-striped table-condensed">
+  <thead>
+    <tr>
+      <th style="width: 30%">Name</th>
+      <th style="width: 70%">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#children}}
+    <tr>
+      <td id="{{id}}"><code>{{syntax.content.0.value}}</code></td>
+      <td>
+        {{{summary}}}
+        {{#remarks}}
+        <div class="markdown level1 remarks">{{{remarks}}}</div>
+        {{/remarks}}
+      </td>
+    </tr>
+    {{/children}}
+  </tbody>
+</table>
 {{/children}}
 {{/isEnum}}
 

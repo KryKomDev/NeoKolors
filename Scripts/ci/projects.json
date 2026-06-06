@@ -1,0 +1,51 @@
+{
+  "Extensions": {
+    "path": "Src/Extensions/NeoKolors.Extensions.csproj",
+    "test_path": "Tests/Extensions.Tests/NeoKolors.Extensions.Tests.csproj",
+    "dependencies": []
+  },
+  "Common": {
+    "path": "Src/Common/NeoKolors.Common.csproj",
+    "test_path": "Tests/Common.Tests/NeoKolors.Common.Tests.csproj",
+    "dependencies": ["Extensions"]
+  },
+  "Console": {
+    "path": "Src/Console/NeoKolors.Console.csproj",
+    "test_path": "Tests/Console.Tests/NeoKolors.Console.Tests.csproj",
+    "dependencies": ["Common", "Extensions"]
+  },
+  "Settings": {
+    "path": "Src/Settings/NeoKolors.Settings.csproj",
+    "test_path": "Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj",
+    "dependencies": ["Common", "Console"]
+  },
+  "Tui.Core": {
+    "path": "Src/Tui/Core/NeoKolors.Tui.Core.csproj",
+    "test_path": "Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj",
+    "filter_key": "Tui_Core",
+    "dependencies": ["Extensions", "Common", "Console"]
+  },
+  "Tui.Fonts": {
+    "path": "Src/Tui/Fonts/NeoKolors.Tui.Fonts.csproj",
+    "test_path": "Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj",
+    "filter_key": "Tui_Fonts",
+    "dependencies": ["Extensions", "Common", "Tui.Core"]
+  },
+  "Tui.Fonts.Assets": {
+    "path": "Src/Tui/Fonts/Assets/NeoKolors.Tui.Fonts.Assets.csproj",
+    "test_path": "Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj",
+    "filter_key": "Tui_Fonts_Assets",
+    "dependencies": ["Tui.Fonts"]
+  },
+  "Tui": {
+    "path": "Src/Tui/NeoKolors.Tui.csproj",
+    "test_path": "Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj",
+    "dependencies": ["Console", "Common", "Extensions", "Tui.Fonts", "Tui.Fonts.Assets", "Tui.Core"]
+  },
+  "Tools.NKFont": {
+    "path": "Tools/NKFont/NeoKolors.Tools.NKFont.csproj",
+    "test_path": "Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj",
+    "filter_key": "Tools_NKFont",
+    "dependencies": ["Tui"]
+  }
+}

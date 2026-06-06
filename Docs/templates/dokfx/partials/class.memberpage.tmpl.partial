@@ -5,24 +5,22 @@
 {{#children}}
 <h2 class="section" id="{{id}}">{{>partials/classSubtitle}}</h2>
 
-<div class="table-responsive">
-  <table class="table table-bordered table-striped table-condensed">
-    <thead>
-      <tr>
-        <th style="width: 30%">Name</th>
-        <th style="width: 70%">Description</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{#children}}
-      <tr>
-        <td><xref uid="{{uid}}" altProperty="fullName" displayProperty="name"/></td>
-        <td>{{{summary}}}</td>
-      </tr>
-      {{/children}}
-    </tbody>
-  </table>
-</div>
+<table class="table table-bordered table-striped table-condensed">
+  <thead>
+    <tr>
+      <th style="width: 30%">Name</th>
+      <th style="width: 70%">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#children}}
+    <tr>
+      <td><xref uid="{{uid}}" altProperty="fullName" displayProperty="name"/></td>
+      <td>{{{summary}}}</td>
+    </tr>
+    {{/children}}
+  </tbody>
+</table>
 
 {{/children}}
 

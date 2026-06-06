@@ -30,136 +30,33 @@ jobs:
             Common:
               - 'Src/Common/**'
               - 'Tests/Common.Tests/**'
-              - 'Src/Extensions/**'
-              - 'Tests/Extensions.Tests/**'
             Console:
               - 'Src/Console/**'
               - 'Tests/Console.Tests/**'
-              - 'Src/Common/**'
-              - 'Tests/Common.Tests/**'
-              - 'Src/Extensions/**'
-              - 'Tests/Extensions.Tests/**'
             Extensions:
               - 'Src/Extensions/**'
               - 'Tests/Extensions.Tests/**'
             Settings:
               - 'Src/Settings/**'
               - 'Tests/Settings.Tests/**'
-              - 'Src/Console/**'
-              - 'Tests/Console.Tests/**'
-              - 'Src/Common/**'
-              - 'Tests/Common.Tests/**'
-              - 'Src/Extensions/**'
-              - 'Tests/Extensions.Tests/**'
             Tui:
               - 'Src/Tui/**'
               - 'Tests/Tui.Tests/**'
-              - 'Src/Console/**'
-              - 'Tests/Console.Tests/**'
-              - 'Src/Common/**'
-              - 'Tests/Common.Tests/**'
-              - 'Src/Extensions/**'
-              - 'Tests/Extensions.Tests/**'
             Tui_Core:
               - 'Src/Tui/Core/**'
-              - 'Tests/Tui.Tests/**'
-              - 'Src/Console/**'
-              - 'Tests/Console.Tests/**'
-              - 'Src/Common/**'
-              - 'Tests/Common.Tests/**'
-              - 'Src/Extensions/**'
-              - 'Tests/Extensions.Tests/**'
             Tui_Fonts:
               - 'Src/Tui/Fonts/**'
-              - 'Tests/Tui.Tests/**'
-              - 'Src/Tui/Core/**'
-              - 'Src/Console/**'
-              - 'Tests/Console.Tests/**'
-              - 'Src/Common/**'
-              - 'Tests/Common.Tests/**'
-              - 'Src/Extensions/**'
-              - 'Tests/Extensions.Tests/**'
             Tui_Fonts_Assets:
               - 'Src/Tui/Fonts/Assets/**'
-              - 'Tests/Tui.Tests/**'
-              - 'Src/Tui/Fonts/**'
-              - 'Src/Tui/Core/**'
-              - 'Src/Console/**'
-              - 'Tests/Console.Tests/**'
-              - 'Src/Common/**'
-              - 'Tests/Common.Tests/**'
-              - 'Src/Extensions/**'
-              - 'Tests/Extensions.Tests/**'
             Tools_NKFont:
               - 'Tools/NKFont/**'
-              - 'Src/Tui/**'
-              - 'Tests/Tui.Tests/**'
-              - 'Src/Tui/Fonts/Assets/**'
-              - 'Src/Tui/Fonts/**'
-              - 'Src/Tui/Core/**'
-              - 'Src/Console/**'
-              - 'Tests/Console.Tests/**'
-              - 'Src/Common/**'
-              - 'Tests/Common.Tests/**'
-              - 'Src/Extensions/**'
-              - 'Tests/Extensions.Tests/**'
 
       - name: Generate Matrix JSON
         id: set-matrix
-        run: |
-          declare -A paths
-          paths["Common"]="Src/Common/NeoKolors.Common.csproj|Tests/Common.Tests/NeoKolors.Common.Tests.csproj"
-          paths["Console"]="Src/Console/NeoKolors.Console.csproj|Tests/Console.Tests/NeoKolors.Console.Tests.csproj"
-          paths["Extensions"]="Src/Extensions/NeoKolors.Extensions.csproj|Tests/Extensions.Tests/NeoKolors.Extensions.Tests.csproj"
-          paths["Settings"]="Src/Settings/NeoKolors.Settings.csproj|Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj"
-          paths["Tui"]="Src/Tui/NeoKolors.Tui.csproj|Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj"
-          paths["Tui.Core"]="Src/Tui/Core/NeoKolors.Tui.Core.csproj|Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj"
-          paths["Tui.Fonts"]="Src/Tui/Fonts/NeoKolors.Tui.Fonts.csproj|Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj"
-          paths["Tui.Fonts.Assets"]="Src/Tui/Fonts/Assets/NeoKolors.Tui.Fonts.Assets.csproj|Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj"
-          paths["Tools.NKFont"]="Tools/NKFont/NeoKolors.Tools.NKFont.csproj|Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj"
-
-          declare -A filter_outputs
-          filter_outputs["Common"]="${{ steps.changes.outputs.Common }}"
-          filter_outputs["Console"]="${{ steps.changes.outputs.Console }}"
-          filter_outputs["Extensions"]="${{ steps.changes.outputs.Extensions }}"
-          filter_outputs["Settings"]="${{ steps.changes.outputs.Settings }}"
-          filter_outputs["Tui"]="${{ steps.changes.outputs.Tui }}"
-          filter_outputs["Tui.Core"]="${{ steps.changes.outputs.Tui_Core }}"
-          filter_outputs["Tui.Fonts"]="${{ steps.changes.outputs.Tui_Fonts }}"
-          filter_outputs["Tui.Fonts.Assets"]="${{ steps.changes.outputs.Tui_Fonts_Assets }}"
-          filter_outputs["Tools.NKFont"]="${{ steps.changes.outputs.Tools_NKFont }}"
-
-          matrix_json="[]"
-          projects=("Common" "Console" "Extensions" "Settings" "Tui" "Tui.Core" "Tui.Fonts" "Tui.Fonts.Assets" "Tools.NKFont")
-
-          for proj in "${projects[@]}"; do
-            is_active=false
-            if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${filter_outputs[$proj]}" = "true" ]; then
-              is_active=true
-            fi
-
-            if [ "$is_active" = "true" ]; then
-              IFS='|' read -r path test_path <<< "${paths[$proj]}"
-              item=$(jq -n -c \
-                --arg name "$proj" \
-                --arg path "$path" \
-                --arg test_path "$test_path" \
-                '{name: $name, path: $path, test_path: $test_path}')
-              matrix_json=$(echo "$matrix_json" | jq -c --argjson item "$item" '. + [$item]')
-            fi
-          done
-
-          echo "Generated matrix: $matrix_json"
-          
-          if [ "$matrix_json" = "[]" ]; then
-            echo "has_projects=false" >> "$GITHUB_OUTPUT"
-            echo "matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_projects=true" >> "$GITHUB_OUTPUT"
-            echo "matrix<<EOF" >> "$GITHUB_OUTPUT"
-            echo "{\"include\":$matrix_json}" >> "$GITHUB_OUTPUT"
-            echo "EOF" >> "$GITHUB_OUTPUT"
-          fi
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          FILTER_OUTPUTS: ${{ toJson(steps.changes.outputs) }}
+        run: bash Scripts/ci/generate-matrix.sh
 
   build_and_test:
     needs: filter
@@ -263,6 +160,9 @@ jobs:
     runs-on: ubuntu-latest
     if: always() && github.ref == 'refs/heads/main'
     steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+
     - name: Download all status artifacts
       uses: actions/download-artifact@v4
       with:
@@ -270,48 +170,7 @@ jobs:
         path: status-artifacts
 
     - name: Update Gist Badges
-      run: |
-        # Initialize an empty JSON object for files
-        files_json=$(jq -n '{}')
-
-        projects=("Common" "Console" "Extensions" "Settings" "Tui" "Tui.Core" "Tui.Fonts" "Tui.Fonts.Assets" "Tools.NKFont")
-
-        for proj in "${projects[@]}"; do
-          # Check if build artifact exists
-          if [ -d "status-artifacts/status-build-${proj}" ] && [ -f "status-artifacts/status-build-${proj}/build_status.txt" ]; then
-            status_val=$(cat "status-artifacts/status-build-${proj}/build_status.txt")
-            if [ "$status_val" = "passing" ]; then
-              color="brightgreen"
-            else
-              color="red"
-            fi
-            content="{\"schemaVersion\": 1, \"label\": \"build\", \"message\": \"$status_val\", \"color\": \"$color\"}"
-            files_json=$(echo "$files_json" | jq --arg proj "$proj" --arg content "$content" '. + {("build-" + $proj + ".json"): {content: $content}}')
-          fi
-
-          # Check if test artifact exists
-          if [ -d "status-artifacts/status-test-${proj}" ] && [ -f "status-artifacts/status-test-${proj}/test_status.txt" ]; then
-            status_val=$(cat "status-artifacts/status-test-${proj}/test_status.txt")
-            if [ "$status_val" = "passing" ]; then
-              color="brightgreen"
-            else
-              color="red"
-            fi
-            content="{\"schemaVersion\": 1, \"label\": \"tests\", \"message\": \"$status_val\", \"color\": \"$color\"}"
-            files_json=$(echo "$files_json" | jq --arg proj "$proj" --arg content "$content" '. + {("test-" + $proj + ".json"): {content: $content}}')
-          fi
-        done
-
-        # If files_json is not empty, construct full payload and send PATCH request
-        if [ "$files_json" != "{}" ]; then
-          payload=$(jq -n --argjson files "$files_json" '{files: $files}')
-          curl -L \
-            -X PATCH \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.GIST_TOKEN }}" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/gists/${{ secrets.GIST_ID }} \
-            -d "$payload"
-        else
-          echo "No active project runs to update."
-        fi
+      env:
+        GIST_ID: ${{ secrets.GIST_ID }}
+        GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+      run: bash Scripts/ci/update-gist-badges.sh
