@@ -347,6 +347,7 @@ public abstract class AbstractElement<T> : IElement<T> {
 
         if (!_style.BackgroundColor.IsInherit) {
             canvas.StyleBackground(RenderLayout.Border + pos, _style.BackgroundColor);
+            canvas.Fill(RenderLayout.Content + pos, ' ');
         }
 
         if (!_style.Border.IsBorderless) {

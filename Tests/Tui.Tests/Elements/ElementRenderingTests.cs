@@ -6,6 +6,7 @@ using NeoKolors.Tui.Elements;
 using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Values;
 using SkiaSharp;
+using NeoKolors.Common;
 
 namespace NeoKolors.Tui.Tests.Elements;
 
@@ -275,4 +276,74 @@ public class ElementRenderingTests {
         Assert.Contains("Hello", lines[0]);
         Assert.Contains("World", lines[1]);
     }
+
+    [Fact]
+    public void OverlappingElements_WithSolidBackground_ShouldOverwriteCharactersBeneath() {
+        var canvas = new NKCharCanvas(10, 5);
+
+        var rootCanvas = new Canvas();
+        rootCanvas.Style.Width = Dimension.Chars(10);
+        rootCanvas.Style.Height = Dimension.Chars(5);
+
+        // First child: bottom text "XXXXX" at y = 1
+        var bottomText = new TextBlock("XXXXX");
+        bottomText.Style.Position = new Position(Dimension.Chars(0), Dimension.Chars(1));
+        rootCanvas.AddChild(bottomText);
+
+        // Second child: top element at (1, 1), size 3x1, with non-Inherit background
+        var topBlock = new Canvas {
+            Style = new StyleCollection {
+                Position = new Position(Dimension.Chars(1), Dimension.Chars(1)),
+                Width = Dimension.Chars(3),
+                Height = Dimension.Chars(1),
+                BackgroundColor = NKColor.Default // non-inherit background
+            }
+        };
+        rootCanvas.AddChild(topBlock);
+
+        rootCanvas.Render(canvas);
+
+        // Since the top block has width 3 and is at x = 1, it covers x = 1, 2, 3.
+        // The background color is not Inherit, so it should overwrite the 'X' characters under its content box with ' '.
+        Assert.Equal('X', canvas[0, 1].Char); // x = 0 is not covered, should still be 'X'
+        Assert.Equal(' ', canvas[1, 1].Char); // x = 1 is covered, should be overwritten with ' '
+        Assert.Equal(' ', canvas[2, 1].Char); // x = 2 is covered, should be overwritten with ' '
+        Assert.Equal(' ', canvas[3, 1].Char); // x = 3 is covered, should be overwritten with ' '
+        Assert.Equal('X', canvas[4, 1].Char); // x = 4 is not covered, should still be 'X'
+    }
+
+    [Fact]
+    public void OverlappingElements_WithInheritBackground_ShouldNotOverwriteCharactersBeneath() {
+        var canvas = new NKCharCanvas(10, 5);
+
+        var rootCanvas = new Canvas();
+        rootCanvas.Style.Width = Dimension.Chars(10);
+        rootCanvas.Style.Height = Dimension.Chars(5);
+
+        // First child: bottom text "XXXXX" at y = 1
+        var bottomText = new TextBlock("XXXXX");
+        bottomText.Style.Position = new Position(Dimension.Chars(0), Dimension.Chars(1));
+        rootCanvas.AddChild(bottomText);
+
+        // Second child: top element at (1, 1), size 3x1, with Inherit background
+        var topBlock = new Canvas {
+            Style = new StyleCollection {
+                Position = new Position(Dimension.Chars(1), Dimension.Chars(1)),
+                Width = Dimension.Chars(3),
+                Height = Dimension.Chars(1),
+                BackgroundColor = NKColor.Inherit // inherit background
+            }
+        };
+        rootCanvas.AddChild(topBlock);
+
+        rootCanvas.Render(canvas);
+
+        // Since the top block has Inherit background, it should NOT overwrite the characters.
+        Assert.Equal('X', canvas[0, 1].Char);
+        Assert.Equal('X', canvas[1, 1].Char);
+        Assert.Equal('X', canvas[2, 1].Char);
+        Assert.Equal('X', canvas[3, 1].Char);
+        Assert.Equal('X', canvas[4, 1].Char);
+    }
 }
+

@@ -1,22 +1,131 @@
-﻿name: Build and Test
+name: Build and Test
 
 on:
   push:
     paths:
       - 'Src/**'
       - 'Tests/**'
+      - 'Tools/**'
       - '.github/workflows/build.yml'
   pull_request:
     paths:
       - 'Src/**'
       - 'Tests/**'
+      - 'Tools/**'
       - '.github/workflows/build.yml'
   workflow_dispatch:
 
 jobs:
-  build:
-    name: Build & Test ${{ matrix.project.name }} (${{ matrix.configuration }})
+  filter:
     runs-on: ubuntu-latest
+    outputs:
+      Common: ${{ steps.changes.outputs.Common }}
+      Console: ${{ steps.changes.outputs.Console }}
+      Extensions: ${{ steps.changes.outputs.Extensions }}
+      Settings: ${{ steps.changes.outputs.Settings }}
+      Tui: ${{ steps.changes.outputs.Tui }}
+      Tui_Core: ${{ steps.changes.outputs.Tui_Core }}
+      Tui_Fonts: ${{ steps.changes.outputs.Tui_Fonts }}
+      Tui_Fonts_Assets: ${{ steps.changes.outputs.Tui_Fonts_Assets }}
+      Tools_NKFont: ${{ steps.changes.outputs.Tools_NKFont }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: changes
+        with:
+          filters: |
+            Common:
+              - 'Src/Common/**'
+              - 'Tests/Common.Tests/**'
+              - 'Src/Extensions/**'
+              - 'Tests/Extensions.Tests/**'
+            Console:
+              - 'Src/Console/**'
+              - 'Tests/Console.Tests/**'
+              - 'Src/Common/**'
+              - 'Tests/Common.Tests/**'
+              - 'Src/Extensions/**'
+              - 'Tests/Extensions.Tests/**'
+            Extensions:
+              - 'Src/Extensions/**'
+              - 'Tests/Extensions.Tests/**'
+            Settings:
+              - 'Src/Settings/**'
+              - 'Tests/Settings.Tests/**'
+              - 'Src/Console/**'
+              - 'Tests/Console.Tests/**'
+              - 'Src/Common/**'
+              - 'Tests/Common.Tests/**'
+              - 'Src/Extensions/**'
+              - 'Tests/Extensions.Tests/**'
+            Tui:
+              - 'Src/Tui/**'
+              - 'Tests/Tui.Tests/**'
+              - 'Src/Console/**'
+              - 'Tests/Console.Tests/**'
+              - 'Src/Common/**'
+              - 'Tests/Common.Tests/**'
+              - 'Src/Extensions/**'
+              - 'Tests/Extensions.Tests/**'
+            Tui_Core:
+              - 'Src/Tui/Core/**'
+              - 'Tests/Tui.Tests/**'
+              - 'Src/Console/**'
+              - 'Tests/Console.Tests/**'
+              - 'Src/Common/**'
+              - 'Tests/Common.Tests/**'
+              - 'Src/Extensions/**'
+              - 'Tests/Extensions.Tests/**'
+            Tui_Fonts:
+              - 'Src/Tui/Fonts/**'
+              - 'Tests/Tui.Tests/**'
+              - 'Src/Tui/Core/**'
+              - 'Src/Console/**'
+              - 'Tests/Console.Tests/**'
+              - 'Src/Common/**'
+              - 'Tests/Common.Tests/**'
+              - 'Src/Extensions/**'
+              - 'Tests/Extensions.Tests/**'
+            Tui_Fonts_Assets:
+              - 'Src/Tui/Fonts/Assets/**'
+              - 'Tests/Tui.Tests/**'
+              - 'Src/Tui/Fonts/**'
+              - 'Src/Tui/Core/**'
+              - 'Src/Console/**'
+              - 'Tests/Console.Tests/**'
+              - 'Src/Common/**'
+              - 'Tests/Common.Tests/**'
+              - 'Src/Extensions/**'
+              - 'Tests/Extensions.Tests/**'
+            Tools_NKFont:
+              - 'Tools/NKFont/**'
+              - 'Src/Tui/**'
+              - 'Tests/Tui.Tests/**'
+              - 'Src/Tui/Fonts/Assets/**'
+              - 'Src/Tui/Fonts/**'
+              - 'Src/Tui/Core/**'
+              - 'Src/Console/**'
+              - 'Tests/Console.Tests/**'
+              - 'Src/Common/**'
+              - 'Tests/Common.Tests/**'
+              - 'Src/Extensions/**'
+              - 'Tests/Extensions.Tests/**'
+
+  build_and_test:
+    needs: filter
+    name: Build & Test ${{ matrix.project.name }}
+    runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (matrix.project.name == 'Common' && needs.filter.outputs.Common == 'true') ||
+      (matrix.project.name == 'Console' && needs.filter.outputs.Console == 'true') ||
+      (matrix.project.name == 'Extensions' && needs.filter.outputs.Extensions == 'true') ||
+      (matrix.project.name == 'Settings' && needs.filter.outputs.Settings == 'true') ||
+      (matrix.project.name == 'Tui' && needs.filter.outputs.Tui == 'true') ||
+      (matrix.project.name == 'Tui.Core' && needs.filter.outputs.Tui_Core == 'true') ||
+      (matrix.project.name == 'Tui.Fonts' && needs.filter.outputs.Tui_Fonts == 'true') ||
+      (matrix.project.name == 'Tui.Fonts.Assets' && needs.filter.outputs.Tui_Fonts_Assets == 'true') ||
+      (matrix.project.name == 'Tools.NKFont' && needs.filter.outputs.Tools_NKFont == 'true')
 
     strategy:
       fail-fast: false
@@ -49,7 +158,6 @@ jobs:
           - name: Tools.NKFont
             path: Tools/NKFont/NeoKolors.Tools.NKFont.csproj
             test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
-        configuration: [Debug, Release]
 
     steps:
     - name: Checkout
@@ -64,16 +172,135 @@ jobs:
         cache: false
 
     - name: Restore Project
+      id: restore_proj
       run: dotnet restore ${{ matrix.project.path }}
 
-    - name: Build Project
-      run: dotnet build ${{ matrix.project.path }} --configuration ${{ matrix.configuration }} --no-restore
-
     - name: Restore Test Project 
+      id: restore_test
       run: dotnet restore ${{ matrix.project.test_path }}
 
-    - name: Build Test Project
-      run: dotnet build ${{ matrix.project.test_path }} --configuration ${{ matrix.configuration }} --no-restore
+    # Debug Build
+    - name: Build Project (Debug)
+      id: build_debug
+      run: dotnet build ${{ matrix.project.path }} --configuration Debug --no-restore
 
-    - name: Execute unit tests
-      run: dotnet test ${{ matrix.project.test_path }} --configuration ${{ matrix.configuration }} --no-build
+    - name: Build Test Project (Debug)
+      id: build_test_debug
+      run: dotnet build ${{ matrix.project.test_path }} --configuration Debug --no-restore
+
+    # Release Build
+    - name: Build Project (Release)
+      id: build_release
+      run: dotnet build ${{ matrix.project.path }} --configuration Release --no-restore
+
+    - name: Build Test Project (Release)
+      id: build_test_release
+      run: dotnet build ${{ matrix.project.test_path }} --configuration Release --no-restore
+
+    - name: Determine Build Status
+      id: build_status
+      if: always()
+      run: |
+        if [ "${{ steps.build_debug.outcome }}" = "success" ] && \
+           [ "${{ steps.build_test_debug.outcome }}" = "success" ] && \
+           [ "${{ steps.build_release.outcome }}" = "success" ] && \
+           [ "${{ steps.build_test_release.outcome }}" = "success" ]; then
+          echo "passing" > build_status.txt
+        else
+          echo "failing" > build_status.txt
+        fi
+
+    - name: Upload Build Status Artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: status-build-${{ matrix.project.name }}
+        path: build_status.txt
+
+    # Debug Test
+    - name: Execute unit tests (Debug)
+      id: test_debug
+      if: steps.restore_proj.outcome == 'success' && steps.build_debug.outcome == 'success'
+      run: dotnet test ${{ matrix.project.test_path }} --configuration Debug --no-build
+
+    # Release Test
+    - name: Execute unit tests (Release)
+      id: test_release
+      if: steps.restore_proj.outcome == 'success' && steps.build_release.outcome == 'success'
+      run: dotnet test ${{ matrix.project.test_path }} --configuration Release --no-build
+
+    - name: Determine Test Status
+      id: test_status
+      if: always()
+      run: |
+        if [ "${{ steps.test_debug.outcome }}" = "success" ] && \
+           [ "${{ steps.test_release.outcome }}" = "success" ]; then
+          echo "passing" > test_status.txt
+        else
+          echo "failing" > test_status.txt
+        fi
+
+    - name: Upload Test Status Artifact
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: status-test-${{ matrix.project.name }}
+        path: test_status.txt
+
+  update_gist:
+    needs: [filter, build_and_test]
+    runs-on: ubuntu-latest
+    if: always() && github.ref == 'refs/heads/main'
+    steps:
+    - name: Download all status artifacts
+      uses: actions/download-artifact@v4
+      with:
+        pattern: status-*
+        path: status-artifacts
+
+    - name: Update Gist Badges
+      run: |
+        # Initialize an empty JSON object for files
+        files_json=$(jq -n '{}')
+
+        projects=("Common" "Console" "Extensions" "Settings" "Tui" "Tui.Core" "Tui.Fonts" "Tui.Fonts.Assets" "Tools.NKFont")
+
+        for proj in "${projects[@]}"; do
+          # Check if build artifact exists
+          if [ -d "status-artifacts/status-build-${proj}" ] && [ -f "status-artifacts/status-build-${proj}/build_status.txt" ]; then
+            status_val=$(cat "status-artifacts/status-build-${proj}/build_status.txt")
+            if [ "$status_val" = "passing" ]; then
+              color="brightgreen"
+            else
+              color="red"
+            fi
+            content="{\"schemaVersion\": 1, \"label\": \"build\", \"message\": \"$status_val\", \"color\": \"$color\"}"
+            files_json=$(echo "$files_json" | jq --arg proj "$proj" --arg content "$content" '. + {("build-" + $proj + ".json"): {content: $content}}')
+          fi
+
+          # Check if test artifact exists
+          if [ -d "status-artifacts/status-test-${proj}" ] && [ -f "status-artifacts/status-test-${proj}/test_status.txt" ]; then
+            status_val=$(cat "status-artifacts/status-test-${proj}/test_status.txt")
+            if [ "$status_val" = "passing" ]; then
+              color="brightgreen"
+            else
+              color="red"
+            fi
+            content="{\"schemaVersion\": 1, \"label\": \"tests\", \"message\": \"$status_val\", \"color\": \"$color\"}"
+            files_json=$(echo "$files_json" | jq --arg proj "$proj" --arg content "$content" '. + {("test-" + $proj + ".json"): {content: $content}}')
+          fi
+        done
+
+        # If files_json is not empty, construct full payload and send PATCH request
+        if [ "$files_json" != "{}" ]; then
+          payload=$(jq -n --argjson files "$files_json" '{files: $files}')
+          curl -L \
+            -X PATCH \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GIST_TOKEN }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/gists/${{ secrets.GIST_ID }} \
+            -d "$payload"
+        else
+          echo "No active project runs to update."
+        fi
