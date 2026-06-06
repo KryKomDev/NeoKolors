@@ -35,30 +35,33 @@ MATRIX_JSON=$(jq -c \
   --arg event_name "$EVENT_NAME" \
   --argjson filter_outputs "$FILTER_OUTPUTS" \
   '
-  # 1. Map each project with direct_active status
-  map_values(
-    . + {
+  # 1. Convert projects map to an array of project objects with name and direct_active status
+  to_entries | map(
+    .key as $name |
+    .value + {
+      name: $name,
       direct_active: (
         $event_name == "workflow_dispatch" or
-        ($filter_outputs[.filter_key // key] | (. == true or . == "true"))
+        ($filter_outputs[.value.filter_key // $name] | (. == true or . == "true"))
       )
     }
-  ) as $map |
+  ) as $projects |
 
   # 2. Get list of directly active project names
-  [ $map | to_entries[] | select(.value.direct_active) | .key ] as $start |
+  [ $projects[] | select(.direct_active) | .name ] as $start |
 
-  # 3. Recursive function to find transitive closure
+  # 3. Recursive function to find transitive closure of names
   def get_active($active):
     [
-      $map | to_entries[] |
+      $projects[] |
       select(
+        .name as $n |
         # Not already in the active set
-        ($active | index(.key) == null) and
+        ($active | index($n) == null) and
         # Has at least one dependency in the active set
-        any(.value.dependencies[]; . as $dep | $active | index($dep) != null)
+        any(.dependencies[]; . as $dep | $active | index($dep) != null)
       ) |
-      .key
+      .name
     ] as $new_active |
     if ($new_active | length) > 0 then
       get_active($active + $new_active)
@@ -69,14 +72,14 @@ MATRIX_JSON=$(jq -c \
   # Compute final active list
   get_active($start) as $final_active |
 
-  # 4. Map back to the required list of objects
+  # 4. Map back to the required list of matrix objects
   [
-    to_entries[] |
-    select(.key as $k | $final_active | index($k) != null) |
+    $projects[] |
+    select(.name as $n | $final_active | index($n) != null) |
     {
-      name: .key,
-      path: .value.path,
-      test_path: .value.test_path
+      name: .name,
+      path: .path,
+      test_path: .test_path
     }
   ]
   ' "$PROJECTS_JSON")

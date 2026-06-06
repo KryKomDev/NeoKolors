@@ -69,6 +69,17 @@
           "images/**",
           "assets/**"
         ]
+      },
+      {
+        "files": [
+          "Font.xsd",
+          "Font.Common.xsd",
+          "Font.Config.xsd",
+          "Font.Manifest.xsd",
+          "Font.Map.xsd"
+        ],
+        "src": "../Src/Tui/Schemas/Fonts/V3",
+        "dest": "Schemas/Fonts/v3/"
       }
     ],
     "sitemap": {
