@@ -5,6 +5,7 @@ using NeoKolors.Console.Input;
 using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Events;
 using NeoKolors.Tui.Styles;
+using NeoKolors.Tui.Global;
 
 namespace NeoKolors.Tui.Elements;
 
@@ -12,7 +13,7 @@ namespace NeoKolors.Tui.Elements;
 /// A secured stateful editable single-line input control.
 /// Displays mask characters (e.g. •) for entered text.
 /// </summary>
-public class PasswordBox : Control<string>, ISelectableElement<string> {
+public class PasswordBox : Control<string>, ISelectableElement<string>, IMouseInteractableElement<string> {
     
     private string _password = string.Empty;
     private int _cursor;
@@ -51,7 +52,9 @@ public class PasswordBox : Control<string>, ISelectableElement<string> {
         ReadOnly = true
     };
 
-    public PasswordBox() : base(DefaultStyles) { }
+    public PasswordBox() : base(DefaultStyles) {
+        OnClick += HandleClick;
+    }
 
     protected override Size MeasureOverride(Size availableSize) {
         var length = Math.Max(_password.Length, Placeholder.Length);
@@ -61,14 +64,28 @@ public class PasswordBox : Control<string>, ISelectableElement<string> {
     protected override void RenderCore(ICharCanvas canvas) {
         var pos = RenderBounds.Lower;
 
-        string renderedText = _password.Length == 0 ? Placeholder : new string(PasswordChar, _password.Length);
+        // Clear NEGATIVE style from the content region first
+        for (int x = 0; x < RenderLayout.Content.Width; x++) {
+            var cp = pos + RenderLayout.Content.Lower + new Point(x, 0);
+            var relativeCp = cp - pos;
+            if (RenderLayout.Content.Contains(relativeCp.X, relativeCp.Y)) {
+                var cell = canvas[cp.X, cp.Y];
+                cell.Style = cell.Style with { Styles = cell.Style.Styles & ~NeoKolors.Common.TextStyles.NEGATIVE };
+            }
+        }
+
+        string renderedText = (_password.Length == 0 && !IsSelected) ? Placeholder : new string(PasswordChar, _password.Length);
         canvas.Place(renderedText, pos + RenderLayout.Content.Lower, RenderLayout.Content.Width, HorizontalAlign.LEFT);
 
         if (IsSelected) {
             var cursorPoint = pos + RenderLayout.Content.Lower + new Point(_cursor, 0);
             var relativeCursor = cursorPoint - pos;
             if (RenderLayout.Content.Contains(relativeCursor.X, relativeCursor.Y)) {
-                canvas.StyleBackground(new Rectangle(cursorPoint, Size.One), _style.TextColor);
+                var cell = canvas[cursorPoint.X, cursorPoint.Y];
+                if (cell.Char == null || cell.Char == '\0') {
+                    cell.Char = ' ';
+                }
+                cell.Style = cell.Style with { Styles = cell.Style.Styles | NeoKolors.Common.TextStyles.NEGATIVE };
             }
         }
     }
@@ -81,6 +98,10 @@ public class PasswordBox : Control<string>, ISelectableElement<string> {
         IsFocused = true;
         AppEventBus.KeyEvent += HandleKey;
         InvokeElementUpdated();
+
+        if (ElementManager.CurrentlySelected != this) {
+            ElementManager.CurrentlySelected = this;
+        }
     }
 
     public void Deselect() {
@@ -89,6 +110,10 @@ public class PasswordBox : Control<string>, ISelectableElement<string> {
         IsFocused = false;
         AppEventBus.KeyEvent -= HandleKey;
         InvokeElementUpdated();
+
+        if (ElementManager.CurrentlySelected == this) {
+            ElementManager.CurrentlySelected = null;
+        }
     }
 
     private void HandleKey(KeyEventArgs keyInfo) {
@@ -137,5 +162,20 @@ public class PasswordBox : Control<string>, ISelectableElement<string> {
 
     public override void SetChildNode(string childNode) {
         Password = childNode;
+    }
+
+    public event Action<MouseButton> OnClick = delegate { };
+    public event Action<MouseButton> OnRelease = delegate { };
+    public event Action OnHover = delegate { };
+    public event Action OnHoverOut = delegate { };
+
+    public void Click(MouseButton button) => OnClick(button);
+    public void Release(MouseButton button) => OnRelease(button);
+    public void Hover() => OnHover();
+    public void HoverOut() => OnHoverOut();
+
+    private void HandleClick(MouseButton button) {
+        if (!IsEnabled) return;
+        Select();
     }
 }

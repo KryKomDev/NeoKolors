@@ -26,6 +26,8 @@
                 
             <Button Content="Home" />
             <Button Content="Settings" />
+            <TextBox Placeholder="Hello"/>
+            <TextBox Placeholder="World"/>
                 
         </StackPanel>
 

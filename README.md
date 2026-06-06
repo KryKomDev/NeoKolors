@@ -1,9 +1,10 @@
 <div align="center">
 
-<h1>Neokolors</h1>
+<h1>NeoKolors</h1>
 
 [![License](https://img.shields.io/github/license/KryKomDev/NeoKolors?style=for-the-badge&labelColor=%232a313c&color=%2358a6ff)](https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE)
-[![Latest Release](https://img.shields.io/github/v/release/KryKomDev/NeoKolors?include_prereleases&sort=semver&style=for-the-badge&labelColor=2a313c&color=e051c6)](https://img.shields.io/github/v/release/KryKomDev/NeoKolors?include_prereleases&sort=semver&style=for-the-badge&labelColor=2a313c&color=e051c6)
+[![Latest Stable](https://img.shields.io/github/v/release/KryKomDev/NeoKolors?sort=semver&style=for-the-badge&label=Latest%20Stable&labelColor=2a313c&color=e051c6)](https://img.shields.io/github/v/release/KryKomDev/NeoKolors?sort=semver&style=for-the-badge&label=Latest%20Stable&labelColor=2a313c&color=e051c6)
+[![Latest](https://img.shields.io/github/v/release/KryKomDev/NeoKolors?include_prereleases&sort=semver&style=for-the-badge&label=Latest&labelColor=2a313c&color=e051c6)](https://img.shields.io/github/v/release/KryKomDev/NeoKolors?include_prereleases&sort=semver&style=for-the-badge&label=Latest&labelColor=2a313c&color=e051c6)
 [![Commits per month](https://img.shields.io/github/commit-activity/m/KryKomDev/NeoKolors/main?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://img.shields.io/github/commit-activity/m/KryKomDev/NeoKolors/main?style=for-the-badge&labelColor=%232a313c&color=%2358a6ff)
 
 </div>

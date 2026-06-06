@@ -5,6 +5,7 @@ using NeoKolors.Console.Input;
 using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Events;
 using NeoKolors.Tui.Styles;
+using NeoKolors.Tui.Global;
 
 namespace NeoKolors.Tui.Elements;
 
@@ -12,7 +13,7 @@ namespace NeoKolors.Tui.Elements;
 /// A stateful editable single-line input control.
 /// Replaces the legacy TextInput element.
 /// </summary>
-public class TextBox : Control<string>, ISelectableElement<string> {
+public class TextBox : Control<string>, ISelectableElement<string>, IMouseInteractableElement<string> {
     
     private string _text = string.Empty;
     private int _cursor;
@@ -41,11 +42,14 @@ public class TextBox : Control<string>, ISelectableElement<string> {
         ReadOnly = true
     };
 
-    public TextBox() : base(DefaultStyles) { }
+    public TextBox() : base(DefaultStyles) {
+        OnClick += HandleClick;
+    }
 
-    public TextBox(string initialText) : base(DefaultStyles) {
+    public TextBox(string? initialText) : base(DefaultStyles) {
         _text = initialText ?? string.Empty;
         _cursor = _text.Length;
+        OnClick += HandleClick;
     }
 
     protected override Size MeasureOverride(Size availableSize) {
@@ -56,16 +60,33 @@ public class TextBox : Control<string>, ISelectableElement<string> {
     protected override void RenderCore(ICharCanvas canvas) {
         var pos = RenderBounds.Lower;
 
-        var renderedText = _text.Length == 0 ? Placeholder : _text;
-        canvas.Place(renderedText, pos + RenderLayout.Content.Lower, RenderLayout.Content.Width, HorizontalAlign.LEFT);
-
-        if (IsSelected) {
-            var cursorPoint = pos + RenderLayout.Content.Lower + new Point(_cursor, 0);
-            var relativeCursor = cursorPoint - pos;
-            if (RenderLayout.Content.Contains(relativeCursor.X, relativeCursor.Y)) {
-                canvas.StyleBackground(new Rectangle(cursorPoint, Size.One), _style.TextColor);
+        // Clear NEGATIVE style from the content region first
+        for (int x = 0; x < RenderLayout.Content.Width; x++) {
+            var cp = pos + RenderLayout.Content.Lower + new Point(x, 0);
+            var relativeCp = cp - pos;
+            if (RenderLayout.Content.Contains(relativeCp.X, relativeCp.Y)) {
+                var clearCell = canvas[cp.X, cp.Y];
+                clearCell.Style = clearCell.Style with { Styles = clearCell.Style.Styles & ~NeoKolors.Common.TextStyles.NEGATIVE };
             }
         }
+
+        var renderedText = (_text.Length == 0 && !IsSelected) ? Placeholder : _text;
+        canvas.Place(renderedText, pos + RenderLayout.Content.Lower, RenderLayout.Content.Width, HorizontalAlign.LEFT);
+
+        if (!IsSelected) return;
+
+        var cursorPoint = pos + RenderLayout.Content.Lower + new Point(_cursor, 0);
+        var relativeCursor = cursorPoint - pos;
+
+        if (!RenderLayout.Content.Contains(relativeCursor.X, relativeCursor.Y)) return;
+
+        var cursorCell = canvas[cursorPoint.X, cursorPoint.Y];
+                
+        if (cursorCell.Char is null or '\0') {
+            cursorCell.Char = ' ';
+        }
+                
+        cursorCell.Style = cursorCell.Style with { Styles = cursorCell.Style.Styles | TextStyles.NEGATIVE };
     }
 
     public void Select() {
@@ -74,6 +95,10 @@ public class TextBox : Control<string>, ISelectableElement<string> {
         IsFocused = true;
         AppEventBus.KeyEvent += HandleKey;
         InvokeElementUpdated();
+
+        if (ElementManager.CurrentlySelected != this) {
+            ElementManager.CurrentlySelected = this;
+        }
     }
 
     public void Deselect() {
@@ -82,9 +107,16 @@ public class TextBox : Control<string>, ISelectableElement<string> {
         IsFocused = false;
         AppEventBus.KeyEvent -= HandleKey;
         InvokeElementUpdated();
+
+        if (ElementManager.CurrentlySelected == this) {
+            ElementManager.CurrentlySelected = null;
+        }
     }
 
     private void HandleKey(KeyEventArgs keyInfo) {
+        if (keyInfo.Up)
+            return;
+        
         switch (keyInfo.Key) {
             case KeyCode.ARROW_LEFT:
                 if (_cursor > 0) _cursor--;
@@ -118,6 +150,7 @@ public class TextBox : Control<string>, ISelectableElement<string> {
                 }
                 break;
         }
+        
         InvokeElementUpdated();
     }
 
@@ -132,5 +165,20 @@ public class TextBox : Control<string>, ISelectableElement<string> {
 
     public override void SetChildNode(string childNode) {
         Text = childNode;
+    }
+
+    public event Action<MouseButton> OnClick = delegate { };
+    public event Action<MouseButton> OnRelease = delegate { };
+    public event Action OnHover = delegate { };
+    public event Action OnHoverOut = delegate { };
+
+    public void Click(MouseButton button) => OnClick(button);
+    public void Release(MouseButton button) => OnRelease(button);
+    public void Hover() => OnHover();
+    public void HoverOut() => OnHoverOut();
+
+    private void HandleClick(MouseButton button) {
+        if (!IsEnabled) return;
+        Select();
     }
 }

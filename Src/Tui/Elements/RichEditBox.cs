@@ -5,13 +5,14 @@ using NeoKolors.Console.Input;
 using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Events;
 using NeoKolors.Tui.Styles;
+using NeoKolors.Tui.Global;
 
 namespace NeoKolors.Tui.Elements;
 
 /// <summary>
 /// A comprehensive stateful interactive multi-line text editing control.
 /// </summary>
-public class RichEditBox : Control<string>, ISelectableElement<string> {
+public class RichEditBox : Control<string>, ISelectableElement<string>, IMouseInteractableElement<string> {
     
     private readonly List<string> _lines = [string.Empty];
     private int _cursorX;
@@ -49,7 +50,9 @@ public class RichEditBox : Control<string>, ISelectableElement<string> {
         ReadOnly = true
     };
 
-    public RichEditBox() : base(DefaultStyles) { }
+    public RichEditBox() : base(DefaultStyles) {
+        OnClick += HandleClick;
+    }
 
     protected override Size MeasureOverride(Size availableSize) {
         int maxLen = Placeholder.Length;
@@ -65,7 +68,19 @@ public class RichEditBox : Control<string>, ISelectableElement<string> {
         var contentWidth = RenderLayout.Content.Width;
         var contentHeight = RenderLayout.Content.Height;
 
-        if (_lines.Count == 1 && _lines[0].Length == 0 && !string.IsNullOrEmpty(Placeholder)) {
+        // Clear NEGATIVE style from the entire content region first
+        for (int y = 0; y < contentHeight; y++) {
+            for (int x = 0; x < contentWidth; x++) {
+                var cp = contentPos + new Point(x, y);
+                var relativeCp = cp - pos;
+                if (RenderLayout.Content.Contains(relativeCp.X, relativeCp.Y)) {
+                    var cell = canvas[cp.X, cp.Y];
+                    cell.Style = cell.Style with { Styles = cell.Style.Styles & ~NeoKolors.Common.TextStyles.NEGATIVE };
+                }
+            }
+        }
+
+        if (_lines.Count == 1 && _lines[0].Length == 0 && !string.IsNullOrEmpty(Placeholder) && !IsSelected) {
             canvas.Place(Placeholder, contentPos, contentWidth, HorizontalAlign.LEFT);
         }
         else {
@@ -78,7 +93,11 @@ public class RichEditBox : Control<string>, ISelectableElement<string> {
             var cursorPoint = contentPos + new Point(_cursorX, _cursorY);
             var relativeCursor = cursorPoint - pos;
             if (RenderLayout.Content.Contains(relativeCursor.X, relativeCursor.Y)) {
-                canvas.StyleBackground(new Rectangle(cursorPoint, Size.One), _style.TextColor);
+                var cell = canvas[cursorPoint.X, cursorPoint.Y];
+                if (cell.Char == null || cell.Char == '\0') {
+                    cell.Char = ' ';
+                }
+                cell.Style = cell.Style with { Styles = cell.Style.Styles | NeoKolors.Common.TextStyles.NEGATIVE };
             }
         }
     }
@@ -89,6 +108,10 @@ public class RichEditBox : Control<string>, ISelectableElement<string> {
         IsFocused = true;
         AppEventBus.KeyEvent += HandleKey;
         InvokeElementUpdated();
+
+        if (ElementManager.CurrentlySelected != this) {
+            ElementManager.CurrentlySelected = this;
+        }
     }
 
     public void Deselect() {
@@ -97,6 +120,10 @@ public class RichEditBox : Control<string>, ISelectableElement<string> {
         IsFocused = false;
         AppEventBus.KeyEvent -= HandleKey;
         InvokeElementUpdated();
+
+        if (ElementManager.CurrentlySelected == this) {
+            ElementManager.CurrentlySelected = null;
+        }
     }
 
     private void HandleKey(KeyEventArgs keyInfo) {
@@ -191,5 +218,20 @@ public class RichEditBox : Control<string>, ISelectableElement<string> {
 
     public override void SetChildNode(string childNode) {
         Text = childNode;
+    }
+
+    public event Action<MouseButton> OnClick = delegate { };
+    public event Action<MouseButton> OnRelease = delegate { };
+    public event Action OnHover = delegate { };
+    public event Action OnHoverOut = delegate { };
+
+    public void Click(MouseButton button) => OnClick(button);
+    public void Release(MouseButton button) => OnRelease(button);
+    public void Hover() => OnHover();
+    public void HoverOut() => OnHoverOut();
+
+    private void HandleClick(MouseButton button) {
+        if (!IsEnabled) return;
+        Select();
     }
 }

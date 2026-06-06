@@ -166,4 +166,31 @@ public class ControlTests {
         Assert.True(valChangedFired);
         Assert.Equal(10, newValue);
     }
+
+    [Fact]
+    public void SelectableElements_SelectionTransition_ShouldWorkCorrectly() {
+        var tb1 = new TextBox();
+        var tb2 = new TextBox();
+
+        // Initially not selected
+        Assert.False(tb1.IsSelected);
+        Assert.False(tb2.IsSelected);
+
+        // Click tb1 to select
+        tb1.Click(NeoKolors.Console.Input.MouseButton.LEFT);
+        Assert.True(tb1.IsSelected);
+        Assert.False(tb2.IsSelected);
+        Assert.Equal(tb1, NeoKolors.Tui.Global.ElementManager.CurrentlySelected);
+
+        // Click tb2 to select, should automatically deselect tb1
+        tb2.Click(NeoKolors.Console.Input.MouseButton.LEFT);
+        Assert.False(tb1.IsSelected);
+        Assert.True(tb2.IsSelected);
+        Assert.Equal(tb2, NeoKolors.Tui.Global.ElementManager.CurrentlySelected);
+
+        // Deselect tb2 directly
+        tb2.Deselect();
+        Assert.False(tb2.IsSelected);
+        Assert.Null(NeoKolors.Tui.Global.ElementManager.CurrentlySelected);
+    }
 }

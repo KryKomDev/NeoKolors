@@ -44,6 +44,8 @@ public readonly record struct KeyEventArgs {
         Down      = keyInfo.Down;
     }
 
+    public bool Up => !Down;
+    
     public override string ToString() =>
         $"{(Modifiers != KeyModifiers.NONE ? $"{Modifiers.ToString()} + " : "")}{Key} -> {Char}";
 }
