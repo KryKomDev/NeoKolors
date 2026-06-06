@@ -19,15 +19,8 @@ jobs:
   filter:
     runs-on: ubuntu-latest
     outputs:
-      Common: ${{ steps.changes.outputs.Common }}
-      Console: ${{ steps.changes.outputs.Console }}
-      Extensions: ${{ steps.changes.outputs.Extensions }}
-      Settings: ${{ steps.changes.outputs.Settings }}
-      Tui: ${{ steps.changes.outputs.Tui }}
-      Tui_Core: ${{ steps.changes.outputs.Tui_Core }}
-      Tui_Fonts: ${{ steps.changes.outputs.Tui_Fonts }}
-      Tui_Fonts_Assets: ${{ steps.changes.outputs.Tui_Fonts_Assets }}
-      Tools_NKFont: ${{ steps.changes.outputs.Tools_NKFont }}
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+      has_projects: ${{ steps.set-matrix.outputs.has_projects }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -111,53 +104,69 @@ jobs:
               - 'Src/Extensions/**'
               - 'Tests/Extensions.Tests/**'
 
+      - name: Generate Matrix JSON
+        id: set-matrix
+        run: |
+          declare -A paths
+          paths["Common"]="Src/Common/NeoKolors.Common.csproj|Tests/Common.Tests/NeoKolors.Common.Tests.csproj"
+          paths["Console"]="Src/Console/NeoKolors.Console.csproj|Tests/Console.Tests/NeoKolors.Console.Tests.csproj"
+          paths["Extensions"]="Src/Extensions/NeoKolors.Extensions.csproj|Tests/Extensions.Tests/NeoKolors.Extensions.Tests.csproj"
+          paths["Settings"]="Src/Settings/NeoKolors.Settings.csproj|Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj"
+          paths["Tui"]="Src/Tui/NeoKolors.Tui.csproj|Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj"
+          paths["Tui.Core"]="Src/Tui/Core/NeoKolors.Tui.Core.csproj|Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj"
+          paths["Tui.Fonts"]="Src/Tui/Fonts/NeoKolors.Tui.Fonts.csproj|Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj"
+          paths["Tui.Fonts.Assets"]="Src/Tui/Fonts/Assets/NeoKolors.Tui.Fonts.Assets.csproj|Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj"
+          paths["Tools.NKFont"]="Tools/NKFont/NeoKolors.Tools.NKFont.csproj|Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj"
+
+          declare -A filter_outputs
+          filter_outputs["Common"]="${{ steps.changes.outputs.Common }}"
+          filter_outputs["Console"]="${{ steps.changes.outputs.Console }}"
+          filter_outputs["Extensions"]="${{ steps.changes.outputs.Extensions }}"
+          filter_outputs["Settings"]="${{ steps.changes.outputs.Settings }}"
+          filter_outputs["Tui"]="${{ steps.changes.outputs.Tui }}"
+          filter_outputs["Tui.Core"]="${{ steps.changes.outputs.Tui_Core }}"
+          filter_outputs["Tui.Fonts"]="${{ steps.changes.outputs.Tui_Fonts }}"
+          filter_outputs["Tui.Fonts.Assets"]="${{ steps.changes.outputs.Tui_Fonts_Assets }}"
+          filter_outputs["Tools.NKFont"]="${{ steps.changes.outputs.Tools_NKFont }}"
+
+          matrix_json="[]"
+          projects=("Common" "Console" "Extensions" "Settings" "Tui" "Tui.Core" "Tui.Fonts" "Tui.Fonts.Assets" "Tools.NKFont")
+
+          for proj in "${projects[@]}"; do
+            is_active=false
+            if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "${filter_outputs[$proj]}" = "true" ]; then
+              is_active=true
+            fi
+
+            if [ "$is_active" = "true" ]; then
+              IFS='|' read -r path test_path <<< "${paths[$proj]}"
+              item=$(jq -n \
+                --arg name "$proj" \
+                --arg path "$path" \
+                --arg test_path "$test_path" \
+                '{name: $name, path: $path, test_path: $test_path}')
+              matrix_json=$(echo "$matrix_json" | jq --argjson item "$item" '. + [$item]')
+            fi
+          done
+
+          echo "Generated matrix: $matrix_json"
+          
+          if [ "$matrix_json" = "[]" ]; then
+            echo "has_projects=false" >> "$GITHUB_OUTPUT"
+            echo "matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_projects=true" >> "$GITHUB_OUTPUT"
+            echo "matrix={\"include\":$matrix_json}" >> "$GITHUB_OUTPUT"
+          fi
+
   build_and_test:
     needs: filter
-    name: Build & Test ${{ matrix.project.name }}
+    name: Build & Test ${{ matrix.name }}
     runs-on: ubuntu-latest
-    if: |
-      github.event_name == 'workflow_dispatch' ||
-      (matrix.project.name == 'Common' && needs.filter.outputs.Common == 'true') ||
-      (matrix.project.name == 'Console' && needs.filter.outputs.Console == 'true') ||
-      (matrix.project.name == 'Extensions' && needs.filter.outputs.Extensions == 'true') ||
-      (matrix.project.name == 'Settings' && needs.filter.outputs.Settings == 'true') ||
-      (matrix.project.name == 'Tui' && needs.filter.outputs.Tui == 'true') ||
-      (matrix.project.name == 'Tui.Core' && needs.filter.outputs.Tui_Core == 'true') ||
-      (matrix.project.name == 'Tui.Fonts' && needs.filter.outputs.Tui_Fonts == 'true') ||
-      (matrix.project.name == 'Tui.Fonts.Assets' && needs.filter.outputs.Tui_Fonts_Assets == 'true') ||
-      (matrix.project.name == 'Tools.NKFont' && needs.filter.outputs.Tools_NKFont == 'true')
-
+    if: needs.filter.outputs.has_projects == 'true'
     strategy:
       fail-fast: false
-      matrix:
-        project:
-          - name: Common
-            path: Src/Common/NeoKolors.Common.csproj
-            test_path: Tests/Common.Tests/NeoKolors.Common.Tests.csproj
-          - name: Console
-            path: Src/Console/NeoKolors.Console.csproj
-            test_path: Tests/Console.Tests/NeoKolors.Console.Tests.csproj
-          - name: Extensions
-            path: Src/Extensions/NeoKolors.Extensions.csproj
-            test_path: Tests/Extensions.Tests/NeoKolors.Extensions.Tests.csproj
-          - name: Settings
-            path: Src/Settings/NeoKolors.Settings.csproj
-            test_path: Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj
-          - name: Tui
-            path: Src/Tui/NeoKolors.Tui.csproj
-            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
-          - name: Tui.Core
-            path: Src/Tui/Core/NeoKolors.Tui.Core.csproj
-            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
-          - name: Tui.Fonts
-            path: Src/Tui/Fonts/NeoKolors.Tui.Fonts.csproj
-            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
-          - name: Tui.Fonts.Assets
-            path: Src/Tui/Fonts/Assets/NeoKolors.Tui.Fonts.Assets.csproj
-            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
-          - name: Tools.NKFont
-            path: Tools/NKFont/NeoKolors.Tools.NKFont.csproj
-            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
+      matrix: ${{ fromJSON(needs.filter.outputs.matrix) }}
 
     steps:
     - name: Checkout
@@ -173,29 +182,29 @@ jobs:
 
     - name: Restore Project
       id: restore_proj
-      run: dotnet restore ${{ matrix.project.path }}
+      run: dotnet restore ${{ matrix.path }}
 
     - name: Restore Test Project 
       id: restore_test
-      run: dotnet restore ${{ matrix.project.test_path }}
+      run: dotnet restore ${{ matrix.test_path }}
 
     # Debug Build
     - name: Build Project (Debug)
       id: build_debug
-      run: dotnet build ${{ matrix.project.path }} --configuration Debug --no-restore
+      run: dotnet build ${{ matrix.path }} --configuration Debug --no-restore
 
     - name: Build Test Project (Debug)
       id: build_test_debug
-      run: dotnet build ${{ matrix.project.test_path }} --configuration Debug --no-restore
+      run: dotnet build ${{ matrix.test_path }} --configuration Debug --no-restore
 
     # Release Build
     - name: Build Project (Release)
       id: build_release
-      run: dotnet build ${{ matrix.project.path }} --configuration Release --no-restore
+      run: dotnet build ${{ matrix.path }} --configuration Release --no-restore
 
     - name: Build Test Project (Release)
       id: build_test_release
-      run: dotnet build ${{ matrix.project.test_path }} --configuration Release --no-restore
+      run: dotnet build ${{ matrix.test_path }} --configuration Release --no-restore
 
     - name: Determine Build Status
       id: build_status
@@ -214,20 +223,20 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: status-build-${{ matrix.project.name }}
+        name: status-build-${{ matrix.name }}
         path: build_status.txt
 
     # Debug Test
     - name: Execute unit tests (Debug)
       id: test_debug
       if: steps.restore_proj.outcome == 'success' && steps.build_debug.outcome == 'success'
-      run: dotnet test ${{ matrix.project.test_path }} --configuration Debug --no-build
+      run: dotnet test ${{ matrix.test_path }} --configuration Debug --no-build
 
     # Release Test
     - name: Execute unit tests (Release)
       id: test_release
       if: steps.restore_proj.outcome == 'success' && steps.build_release.outcome == 'success'
-      run: dotnet test ${{ matrix.project.test_path }} --configuration Release --no-build
+      run: dotnet test ${{ matrix.test_path }} --configuration Release --no-build
 
     - name: Determine Test Status
       id: test_status
@@ -244,7 +253,7 @@ jobs:
       if: always()
       uses: actions/upload-artifact@v4
       with:
-        name: status-test-${{ matrix.project.name }}
+        name: status-test-${{ matrix.name }}
         path: test_status.txt
 
   update_gist:
