@@ -1,17 +1,25 @@
-# NeoKolors
+<div align="center">
 
-[![Build Status](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/build.yml?style=for-the-badge&labelColor=%232a313c&label=build)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) 
-[![Test Status](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/build.yml?style=for-the-badge&labelColor=%232a313c&label=tests)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) 
+<h1>Neokolors</h1>
+
 [![License](https://img.shields.io/github/license/KryKomDev/NeoKolors?style=for-the-badge&labelColor=%232a313c&color=%2358a6ff)](https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE)
-[![Commits per month](https://img.shields.io/github/commit-activity/m/KryKomDev/NeoKolors/main?style=for-the-badge)](https://img.shields.io/github/commit-activity/m/KryKomDev/NeoKolors/main?style=for-the-badge)
+[![Latest Release](https://img.shields.io/github/v/release/KryKomDev/NeoKolors?include_prereleases&sort=semver&style=for-the-badge&labelColor=2a313c&color=e051c6)](https://img.shields.io/github/v/release/KryKomDev/NeoKolors?include_prereleases&sort=semver&style=for-the-badge&labelColor=2a313c&color=e051c6)
+[![Commits per month](https://img.shields.io/github/commit-activity/m/KryKomDev/NeoKolors/main?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://img.shields.io/github/commit-activity/m/KryKomDev/NeoKolors/main?style=for-the-badge&labelColor=%232a313c&color=%2358a6ff)
+
+</div>
+
+## About
 
 NeoKolors is a C# library ecosystem with a number of color utilities, console graphics 
 classes, and a modern, web-inspired Text User Interface (TUI) framework.
+
 ---
 
 ## Build status
 
-| Project          | Build status  | Test status |
+### Projects
+
+| Project name     | Build status  | Test status |
 |:-----------------|:--------------|:------------|
 | Common           | [![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Common.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) | [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Common.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) |
 | Console          | [![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Console.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) | [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Console.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) |
@@ -20,14 +28,21 @@ classes, and a modern, web-inspired Text User Interface (TUI) framework.
 | Tui.Core         | [![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Tui.Core.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) | [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Tui.Core.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) |
 | Tui.Fonts        | [![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Tui.Fonts.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) | [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Tui.Fonts.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) |
 | Tui.Fonts.Assets | [![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Tui.Fonts.Assets.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) | [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Tui.Fonts.Assets.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) |
-| Tools.NKFont     | [![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Tools.NKFont.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) | [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Tools.NKFont.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) |
+
+### Tools
+
+| Tool name | Build status  | Test status |
+|:----------|:--------------|:------------|
+| NKFont    | [![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Tools.NKFont.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) | [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Tools.NKFont.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) |
+
+### Docs
+
+[![Deploy](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/deploy-docs.yml?style=for-the-badge&labelColor=2a313c)](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/deploy-docs.yml?style=for-the-badge&labelColor=2a313c)
 
 ---
 
 ## NeoKolors.Common
 
-[![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Common.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) 
-[![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Common.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) 
 [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Common?style=for-the-badge&labelColor=%232a313c&color=%23e051c6)](https://www.nuget.org/packages/NeoKolors.Common) 
 [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Common?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://www.nuget.org/packages/NeoKolors.Common) 
 
@@ -39,8 +54,6 @@ optimized primitives, and Sixel graphics support.
 
 ## NeoKolors.Extensions
 
-[![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Extensions.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) 
-[![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Extensions.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) 
 [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Extensions?style=for-the-badge&labelColor=%232a313c&color=%23e051c6)](https://www.nuget.org/packages/NeoKolors.Extensions) 
 [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Extensions?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://www.nuget.org/packages/NeoKolors.Extensions) 
 
@@ -53,8 +66,6 @@ transformations (`NamingCase`).
 
 ## NeoKolors.Console
 
-[![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Console.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) 
-[![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Console.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) 
 [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Console?style=for-the-badge&labelColor=%232a313c&color=%23e051c6)](https://www.nuget.org/packages/NeoKolors.Console) 
 [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Console?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://www.nuget.org/packages/NeoKolors.Console) 
 
@@ -72,8 +83,6 @@ One of the most basic features is output text styling.
 
 ## NeoKolors.Settings
 
-[![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Settings.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) 
-[![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Settings.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) 
 [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Settings?style=for-the-badge&labelColor=%232a313c&color=%23e051c6)](https://www.nuget.org/packages/NeoKolors.Settings) 
 [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Settings?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://www.nuget.org/packages/NeoKolors.Settings) 
 
@@ -95,8 +104,6 @@ var result = builder.GetResult();
 
 ## NeoKolors.Tui
 
-[![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Tui.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) 
-[![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Tui.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) 
 [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Tui?style=for-the-badge&labelColor=%232a313c&color=%23e051c6)](https://www.nuget.org/packages/NeoKolors.Tui) 
 [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Tui?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://www.nuget.org/packages/NeoKolors.Tui) 
 
@@ -120,8 +127,6 @@ Markdown files. This feature is, however, still in the works.
 
 ## NeoKolors.Tui.Fonts
 
-[![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Tui.Fonts.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) 
-[![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Tui.Fonts.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) 
 [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Tui.Fonts?style=for-the-badge&labelColor=%232a313c&color=%23e051c6)](https://www.nuget.org/packages/NeoKolors.Tui.Fonts) 
 [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Tui.Fonts?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://www.nuget.org/packages/NeoKolors.Tui.Fonts) 
 
@@ -132,8 +137,6 @@ parsing, serializing, measuring, and rendering capabilities for stylized ASCII a
 
 ## NeoKolors.Tui.Fonts.Assets
 
-[![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Tui.Fonts.Assets.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) 
-[![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Tui.Fonts.Assets.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) 
 [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Tui.Fonts.Assets?style=for-the-badge&labelColor=%232a313c&color=%23e051c6)](https://www.nuget.org/packages/NeoKolors.Tui.Fonts.Assets) 
 [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Tui.Fonts.Assets?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://www.nuget.org/packages/NeoKolors.Tui.Fonts.Assets) 
 
@@ -145,8 +148,6 @@ them as embedded resources.
 
 ## NeoKolors.Tools.NKFont
 
-[![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Tools.NKFont.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) 
-[![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Tools.NKFont.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) 
 [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Tools.NKFont?style=for-the-badge&labelColor=%232a313c&color=%23e051c6)](https://www.nuget.org/packages/NeoKolors.Tools.NKFont) 
 [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Tools.NKFont?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://www.nuget.org/packages/NeoKolors.Tools.NKFont) 
 
