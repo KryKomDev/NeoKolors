@@ -140,12 +140,12 @@ jobs:
 
             if [ "$is_active" = "true" ]; then
               IFS='|' read -r path test_path <<< "${paths[$proj]}"
-              item=$(jq -n \
+              item=$(jq -n -c \
                 --arg name "$proj" \
                 --arg path "$path" \
                 --arg test_path "$test_path" \
                 '{name: $name, path: $path, test_path: $test_path}')
-              matrix_json=$(echo "$matrix_json" | jq --argjson item "$item" '. + [$item]')
+              matrix_json=$(echo "$matrix_json" | jq -c --argjson item "$item" '. + [$item]')
             fi
           done
 
@@ -156,7 +156,9 @@ jobs:
             echo "matrix={\"include\":[]}" >> "$GITHUB_OUTPUT"
           else
             echo "has_projects=true" >> "$GITHUB_OUTPUT"
-            echo "matrix={\"include\":$matrix_json}" >> "$GITHUB_OUTPUT"
+            echo "matrix<<EOF" >> "$GITHUB_OUTPUT"
+            echo "{\"include\":$matrix_json}" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
           fi
 
   build_and_test:
