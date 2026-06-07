@@ -35,9 +35,9 @@ for proj in "${projects[@]}"; do
   if [ -f "$build_file" ]; then
     status_val=$(cat "$build_file")
     if [ "$status_val" = "passing" ]; then
-      color="brightgreen"
+      color="3fb950"
     else
-      color="red"
+      color="da3633"
     fi
     content="{\"schemaVersion\": 1, \"label\": \"build\", \"message\": \"$status_val\", \"color\": \"$color\"}"
     files_json=$(echo "$files_json" | jq --arg proj "$proj" --arg content "$content" '. + {("build-" + $proj + ".json"): {content: $content}}')
@@ -48,9 +48,9 @@ for proj in "${projects[@]}"; do
   if [ -f "$test_file" ]; then
     status_val=$(cat "$test_file")
     if [ "$status_val" = "passing" ]; then
-      color="brightgreen"
+      color="3fb950"
     else
-      color="red"
+      color="da3633"
     fi
     content="{\"schemaVersion\": 1, \"label\": \"tests\", \"message\": \"$status_val\", \"color\": \"$color\"}"
     files_json=$(echo "$files_json" | jq --arg proj "$proj" --arg content "$content" '. + {("test-" + $proj + ".json"): {content: $content}}')
