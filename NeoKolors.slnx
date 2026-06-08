@@ -39,6 +39,7 @@
     <!--  Tools  -->
     
     <Folder Name="/Tools/">
+        <Project Path="Tools/NKChess/NeoKolors.Tools.NKChess.csproj" />
         <Project Path="Tools/NKFont/NeoKolors.Tools.NKFont.csproj" />
     </Folder>
 

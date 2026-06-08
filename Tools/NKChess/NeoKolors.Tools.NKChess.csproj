@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <PackAsTool>true</PackAsTool>
+        <ToolCommandName>nkchess</ToolCommandName>
+
+        <Authors>KryKom</Authors>
+        <Company>KryKom</Company>
+        <Version>2026.2-alpha1</Version>
+        <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>package-icon.png</PackageIcon>
+        <RootNamespace>NeoKolors.Tools.NKChess</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+        <None Include="../../LICENSE" Pack="true" PackagePath="\"/>
+        <None Include="../../Assets/package-icon.png" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../../Src/Tui/NeoKolors.Tui.csproj" />
+    </ItemGroup>
+    
+</Project>
