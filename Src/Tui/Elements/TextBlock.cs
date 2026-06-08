@@ -26,7 +26,9 @@ public class TextBlock : Control<AnsiString>, IMouseInteractableElement<AnsiStri
     public virtual AnsiString Content {
         get => _text.Clone();
         set {
-            if (_text == value) return;
+            if (_text == value) 
+                return;
+            
             _text = value;
             InvokeElementUpdated();
         }

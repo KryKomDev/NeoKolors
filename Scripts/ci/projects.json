@@ -47,5 +47,11 @@
     "test_path": "Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj",
     "filter_key": "Tools_NKFont",
     "dependencies": ["Tui"]
+  },
+  "Tools.NKChess": {
+    "path": "Tools/NKChess/NeoKolors.Tools.NKChess.csproj",
+    "test_path": "Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj",
+    "filter_key": "Tools_NKChess",
+    "dependencies": ["Tui"]
   }
 }

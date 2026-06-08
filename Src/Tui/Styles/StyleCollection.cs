@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2026 KryKom
 
 using System.Collections;
@@ -67,7 +67,17 @@ public class StyleCollection : IEnumerable<IStyleProperty> {
                 IStyleProperty.ThrowNotStyle(type);
 
             if (IStyleProperty.TryIsPartial(value, out var partial)) {
-                _styles[type] = partial.Combine(_styles[type]);
+                IStyleProperty updated;
+                if (_styles.TryGetValue(partial.BaseType, out var existingBase)) {
+                    updated = partial.Combine(existingBase);
+                    _styles[partial.BaseType] = updated;
+                }
+                else {
+                    var created = IStyleProperty.Create(partial.BaseType);
+                    updated = partial.Combine(created);
+                    _styles[partial.BaseType] = updated;
+                }
+                StyleChanged.Invoke(updated);
                 return;
             }
             
@@ -107,14 +117,11 @@ public class StyleCollection : IEnumerable<IStyleProperty> {
     /// <returns>The retrieved style property of the specified type, or the default value if not found.</returns>
     public T Get<T>(T coalesce) where T : IStyleProperty, new() {
         if (!_styles.ContainsKey(typeof(T))) {
-            if (_defaultValues is null || 
-                !_defaultValues._styles.TryGetValue(typeof(T), out var style) || 
-                style is not T d) 
-            {
+            if (_defaultValues is null) {
                 return coalesce;
             }
 
-            return d;
+            return _defaultValues.Get<T>(coalesce);
         }
 
         var s = _styles[typeof(T)];
@@ -140,14 +147,18 @@ public class StyleCollection : IEnumerable<IStyleProperty> {
         if (ReadOnly) return;
        
         if (IStyleProperty.TryIsPartial(style, out var partial)) {
+            IStyleProperty updated;
             if (_styles.TryGetValue(partial.BaseType, out var value)) {
-                _styles[partial.BaseType] = partial.Combine(value);
+                updated = partial.Combine(value);
+                _styles[partial.BaseType] = updated;
             }
             else {
                 var created = IStyleProperty.Create(partial.BaseType);
-                _styles[partial.BaseType] = partial.Combine(created);
+                updated = partial.Combine(created);
+                _styles[partial.BaseType] = updated;
             }
             
+            StyleChanged.Invoke(updated);
             return;
         }
         

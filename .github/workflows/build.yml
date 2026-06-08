@@ -44,12 +44,16 @@ jobs:
               - 'Tests/Tui.Tests/**'
             Tui_Core:
               - 'Src/Tui/Core/**'
+            Tui_Generators:
+              - 'Src/Tui/Generators/**'
             Tui_Fonts:
               - 'Src/Tui/Fonts/**'
             Tui_Fonts_Assets:
               - 'Src/Tui/Fonts/Assets/**'
             Tools_NKFont:
               - 'Tools/NKFont/**'
+            Tools_NKChess:
+              - 'Tools/NKChess/**'
 
       - name: Generate Matrix JSON
         id: set-matrix

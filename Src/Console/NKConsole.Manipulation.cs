@@ -71,8 +71,8 @@ public static partial class NKConsole {
 
     public static TimeSpan CursorPosition_BoundsCheckTime    => CSR_POS_BOUNDS.Elapsed;
     public static TimeSpan CursorPosition_SetPosTime         => CSR_POS_SET   .Elapsed;
-    public static TimeSpan CursorPosition_AvgBoundsCheckTime => CSR_POS_BOUNDS.Elapsed / CSR_POS_COUNT;
-    public static TimeSpan CursorPosition_AvgSetPosTime      => CSR_POS_SET   .Elapsed / CSR_POS_COUNT;
+    public static TimeSpan CursorPosition_AvgBoundsCheckTime => CSR_POS_COUNT == 0 ? TimeSpan.Zero : CSR_POS_BOUNDS.Elapsed / CSR_POS_COUNT;
+    public static TimeSpan CursorPosition_AvgSetPosTime      => CSR_POS_COUNT == 0 ? TimeSpan.Zero : CSR_POS_SET.Elapsed / CSR_POS_COUNT;
     #endif
     
     /// <summary>
@@ -98,7 +98,7 @@ public static partial class NKConsole {
         #endif
         
         try {
-            Stdio.SetCursorPosition(x, y);
+            OutputDriver.Write($"\e[{y + 1};{x + 1}H");
         }
         catch (Exception) {
             LOGGER.Error("Tried to set cursor position outside of bounds.");

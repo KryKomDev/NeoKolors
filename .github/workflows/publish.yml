@@ -16,9 +16,11 @@ on:
           - Settings
           - Tui
           - Tui.Core
+          - Tui.Generators
           - Tui.Fonts
           - Tui.Fonts.Assets
           - Tools.NKFont
+          - Tools.NKChess
 
 jobs:
   publish:
@@ -47,6 +49,9 @@ jobs:
           - name: Tui.Core
             path: Src/Tui/Core/NeoKolors.Tui.Core.csproj
             test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
+          - name: Tui.Generators
+            path: Src/Tui/Generators/NeoKolors.Tui.Generators.csproj
+            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
           - name: Tui.Fonts
             path: Src/Tui/Fonts/NeoKolors.Tui.Fonts.csproj
             test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
@@ -55,6 +60,9 @@ jobs:
             test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
           - name: Tools.NKFont
             path: Tools/NKFont/NeoKolors.Tools.NKFont.csproj
+            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
+          - name: Tools.NKChess
+            path: Tools/NKChess/NeoKolors.Tools.NKCess.csproj
             test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
     
     env:

@@ -27,7 +27,16 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="../../Src/Tui/NeoKolors.Tui.csproj" />
+        <ProjectReference Include="../../Src/Tui/NeoKolors.Tui.csproj"/>
+        <ProjectReference
+                Include="../../Src/Tui/Generators/NeoKolors.Tui.Generators.csproj"
+                OutputItemType="Analyzer"
+                ReferenceOutputAssembly="false"
+        />
+    </ItemGroup>
+
+    <ItemGroup>
+        <AdditionalFiles Include="Main.xaml" />
     </ItemGroup>
     
 </Project>

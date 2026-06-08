@@ -40,8 +40,8 @@
       },
       "Metriks": {
         "type": "Transitive",
-        "resolved": "2026.2.5",
-        "contentHash": "6Il7IaSVY+Syl2fax3Jlkix2dGJ/PiyMX/JeBzIVd36vcge6Jyr+CjQd5vG2DZUXzM1/MLWjjXcRIZ9d4znStQ==",
+        "resolved": "2026.2.6",
+        "contentHash": "XBs3C6mj6FN477YQ0/elgk5dpXdFXuHE+OSG8OhyNnxR2rqlEXXDrBlvKOxUp97CLnuVjKbLSnAz1wi6n95Scg==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4",
           "System.Runtime.CompilerServices.Unsafe": "6.1.2"
@@ -149,7 +149,7 @@
         "dependencies": {
           "Implyzer": "[2026.1.0, )",
           "JetBrains.Annotations": "[2025.2.4, )",
-          "NeoKolors.Extensions": "[2026.2.0, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc1, )",
           "OneOf": "[3.0.271, )",
           "SkiaSharp": "[3.119.4, )"
         }
@@ -158,7 +158,7 @@
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Metriks": "[2026.2.5, )",
+          "Metriks": "[2026.2.6, )",
           "System.Collections.Immutable": "[10.0.8, )"
         }
       }
@@ -201,8 +201,8 @@
       },
       "Metriks": {
         "type": "Transitive",
-        "resolved": "2026.2.5",
-        "contentHash": "6Il7IaSVY+Syl2fax3Jlkix2dGJ/PiyMX/JeBzIVd36vcge6Jyr+CjQd5vG2DZUXzM1/MLWjjXcRIZ9d4znStQ==",
+        "resolved": "2026.2.6",
+        "contentHash": "XBs3C6mj6FN477YQ0/elgk5dpXdFXuHE+OSG8OhyNnxR2rqlEXXDrBlvKOxUp97CLnuVjKbLSnAz1wi6n95Scg==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4"
         }
@@ -263,7 +263,7 @@
         "dependencies": {
           "Implyzer": "[2026.1.0, )",
           "JetBrains.Annotations": "[2025.2.4, )",
-          "NeoKolors.Extensions": "[2026.2.0, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc1, )",
           "OneOf": "[3.0.271, )",
           "SkiaSharp": "[3.119.4, )"
         }
@@ -272,7 +272,7 @@
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Metriks": "[2026.2.5, )"
+          "Metriks": "[2026.2.6, )"
         }
       }
     },
@@ -315,8 +315,8 @@
       },
       "Metriks": {
         "type": "Transitive",
-        "resolved": "2026.2.5",
-        "contentHash": "6Il7IaSVY+Syl2fax3Jlkix2dGJ/PiyMX/JeBzIVd36vcge6Jyr+CjQd5vG2DZUXzM1/MLWjjXcRIZ9d4znStQ==",
+        "resolved": "2026.2.6",
+        "contentHash": "XBs3C6mj6FN477YQ0/elgk5dpXdFXuHE+OSG8OhyNnxR2rqlEXXDrBlvKOxUp97CLnuVjKbLSnAz1wi6n95Scg==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4"
         }
@@ -423,7 +423,7 @@
         "dependencies": {
           "Implyzer": "[2026.1.0, )",
           "JetBrains.Annotations": "[2025.2.4, )",
-          "NeoKolors.Extensions": "[2026.2.0, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc1, )",
           "OneOf": "[3.0.271, )",
           "SkiaSharp": "[3.119.4, )"
         }
@@ -432,7 +432,7 @@
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Metriks": "[2026.2.5, )",
+          "Metriks": "[2026.2.6, )",
           "System.Collections.Immutable": "[10.0.8, )"
         }
       }
@@ -476,8 +476,8 @@
       },
       "Metriks": {
         "type": "Transitive",
-        "resolved": "2026.2.5",
-        "contentHash": "6Il7IaSVY+Syl2fax3Jlkix2dGJ/PiyMX/JeBzIVd36vcge6Jyr+CjQd5vG2DZUXzM1/MLWjjXcRIZ9d4znStQ==",
+        "resolved": "2026.2.6",
+        "contentHash": "XBs3C6mj6FN477YQ0/elgk5dpXdFXuHE+OSG8OhyNnxR2rqlEXXDrBlvKOxUp97CLnuVjKbLSnAz1wi6n95Scg==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4"
         }
@@ -560,7 +560,7 @@
         "dependencies": {
           "Implyzer": "[2026.1.0, )",
           "JetBrains.Annotations": "[2025.2.4, )",
-          "NeoKolors.Extensions": "[2026.2.0, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc1, )",
           "OneOf": "[3.0.271, )",
           "SkiaSharp": "[3.119.4, )"
         }
@@ -569,7 +569,7 @@
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Metriks": "[2026.2.5, )",
+          "Metriks": "[2026.2.6, )",
           "System.Collections.Immutable": "[10.0.8, )"
         }
       }
@@ -613,8 +613,8 @@
       },
       "Metriks": {
         "type": "Transitive",
-        "resolved": "2026.2.5",
-        "contentHash": "6Il7IaSVY+Syl2fax3Jlkix2dGJ/PiyMX/JeBzIVd36vcge6Jyr+CjQd5vG2DZUXzM1/MLWjjXcRIZ9d4znStQ==",
+        "resolved": "2026.2.6",
+        "contentHash": "XBs3C6mj6FN477YQ0/elgk5dpXdFXuHE+OSG8OhyNnxR2rqlEXXDrBlvKOxUp97CLnuVjKbLSnAz1wi6n95Scg==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4"
         }
@@ -685,7 +685,7 @@
         "dependencies": {
           "Implyzer": "[2026.1.0, )",
           "JetBrains.Annotations": "[2025.2.4, )",
-          "NeoKolors.Extensions": "[2026.2.0, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc1, )",
           "OneOf": "[3.0.271, )",
           "SkiaSharp": "[3.119.4, )"
         }
@@ -694,7 +694,7 @@
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Metriks": "[2026.2.5, )",
+          "Metriks": "[2026.2.6, )",
           "System.Collections.Immutable": "[10.0.8, )"
         }
       }

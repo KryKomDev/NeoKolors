@@ -7,6 +7,10 @@ using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Values;
 using SkiaSharp;
 using NeoKolors.Common;
+using NeoKolors.Console.Input;
+using NeoKolors.Tui.Events;
+using Metriks;
+using NeoKolors.Console;
 
 namespace NeoKolors.Tui.Tests.Elements;
 
@@ -85,6 +89,50 @@ public class ElementRenderingTests {
         var canvas = CreateCanvas();
         element.Render(canvas);
         Assert.True(element.DesiredSize.Width > 0);
+    }
+
+    [Fact]
+    public void Slider_WithCustomUnit_ShouldRenderCorrectLabel() {
+        var slider = new Slider { Minimum = 0, Maximum = 100, Value = 50, Unit = "px" };
+        slider.Measure(new Size(20, 1));
+        slider.Arrange(new Rectangle(0, 0, 20, 1));
+        var canvas = CreateCanvas(20, 1);
+        slider.Render(canvas);
+
+        string result = "";
+        for (int x = 0; x < 20; x++) {
+            result += canvas[x, 0].Char ?? ' ';
+        }
+
+        Assert.Contains("50px", result);
+    }
+
+    [Fact]
+    public void Slider_MouseInteraction_ShouldUpdateValue() {
+        var app = new MockApplication();
+        AppEventBus.SetSourceApplication(app);
+
+        var slider = new Slider { Minimum = 0, Maximum = 100, Value = 0, Unit = "%" };
+        slider.Measure(new Size(20, 1));
+        slider.Arrange(new Rectangle(0, 0, 20, 1));
+
+        // Click the slider to select/activate it
+        slider.Click(MouseButton.LEFT);
+
+        // Start dragging by clicking near the middle (X = 10)
+        app.TriggerMouseEvent(new MouseEventArgs(MouseButton.LEFT, KeyModifiers.NONE, new Point2D(10, 0), released: false, moved: false));
+
+        Assert.True(slider.IsSelected);
+        Assert.True(slider.Value > 0);
+        
+        // Drag to another position (X = 5)
+        app.TriggerMouseEvent(new MouseEventArgs(MouseButton.LEFT, KeyModifiers.NONE, new Point2D(5, 0), released: false, moved: true));
+        
+        // Verify value has changed accordingly
+        Assert.True(slider.Value > 0);
+
+        // Release dragging
+        app.TriggerMouseEvent(new MouseEventArgs(MouseButton.RELEASE, KeyModifiers.NONE, new Point2D(5, 0), released: true, moved: false));
     }
 
     [Fact]
@@ -344,6 +392,149 @@ public class ElementRenderingTests {
         Assert.Equal('X', canvas[2, 1].Char);
         Assert.Equal('X', canvas[3, 1].Char);
         Assert.Equal('X', canvas[4, 1].Char);
+    }
+
+    [Fact]
+    public void Place_MenuDropdownOverlay_ShouldPreserveChessBoardBackground() {
+        var canvas = new NKCharCanvas(10, 10);
+
+        var topLevelGrid = new Grid();
+        topLevelGrid.Style.Width = Dimension.Chars(10);
+        topLevelGrid.Style.Height = Dimension.Chars(10);
+        topLevelGrid.RowDefinitions.Add(GridLength.Chars(1)); // Row 0: Menu Bar
+        topLevelGrid.RowDefinitions.Add(GridLength.Chars(2)); // Row 1: Toolbar
+        topLevelGrid.RowDefinitions.Add(GridLength.Star(1));   // Row 2: Body (Board)
+
+        // Add a board button in row 2
+        var boardBtn = new Button(" ");
+        boardBtn.Style.Set(new NeoKolors.Tui.Styles.Properties.BackgroundColorProperty(NKColor.FromRgb(255, 0, 0))); // Red board square
+        topLevelGrid.AddChild(boardBtn, 2, 0, 1, 1);
+
+        // Add the dropdown menu overlay in row 1, rowSpan 2
+        var overlay = new Grid();
+        var dismissPanel = new Button("");
+        dismissPanel.Style.Set(new NeoKolors.Tui.Styles.Properties.BackgroundColorProperty(NKColor.Inherit));
+        dismissPanel.Style.Set(new NeoKolors.Tui.Styles.Properties.BorderProperty(BorderStyle.GetBorderless()));
+        overlay.AddChild(dismissPanel, 0, 0, 3, 1);
+
+        topLevelGrid.AddChild(overlay, 1, 0, 2, 1);
+
+        // Render the tree
+        topLevelGrid.Render(canvas);
+
+        // Check if the board button cell's background is still Red (not default/black)
+        var cell = canvas[0, 3];
+        Assert.Equal(NKColor.FromRgb(255, 0, 0), cell.Style.GetBColor());
+    }
+
+    [Fact]
+    public void Render_ElementWithTextColor_ShouldStyleAllCellsForeground() {
+        var canvas = new NKCharCanvas(5, 5);
+
+        var btn = new Button("");
+        btn.Style.Width = Dimension.Chars(5);
+        btn.Style.Height = Dimension.Chars(5);
+        btn.Style.Set(new NeoKolors.Tui.Styles.Properties.TextColorProperty(NKColor.FromRgb(0, 0, 255))); // Blue text
+        btn.Style.Set(new NeoKolors.Tui.Styles.Properties.BackgroundColorProperty(NKColor.FromRgb(255, 0, 0))); // Red bg
+
+        btn.Render(canvas);
+
+        // Check if all cells have blue text color
+        for (int x = 0; x < 5; x++) {
+            for (int y = 0; y < 5; y++) {
+                Assert.Equal(NKColor.FromRgb(0, 0, 255), canvas[x, y].Style.GetFColor());
+            }
+        }
+    }
+
+    [Fact]
+    public void TextBox_ShouldScrollContent_WhenCursorMovesOut() {
+        var textBox = new TextBox { Text = "1234567890" }; // Length 10
+        textBox.Style.Width = Dimension.Chars(5);
+        textBox.Measure(new Size(5, 1));
+        textBox.Arrange(new Rectangle(0, 0, 5, 1));
+
+        var app = new MockApplication();
+        AppEventBus.SetSourceApplication(app);
+
+        textBox.Select();
+
+        // Move cursor to the end (END key)
+        app.TriggerKeyEvent(new KeyEventArgs(KeyCode.END, KeyModifiers.NONE, '\0', down: true));
+
+        // Render and inspect the canvas.
+        var canvas = CreateCanvas(5, 1);
+        textBox.Render(canvas);
+
+        string result = "";
+        for (int x = 0; x < 5; x++) {
+            result += canvas[x, 0].Char ?? ' ';
+        }
+
+        // maxScroll = 10 - 5 + 1 = 6.
+        // With cursor at 10, scrollOffset = 6.
+        // Visible characters should be from index 6 to 9: "7890" plus a space for the cursor
+        Assert.Equal("7890 ", result);
+
+        // Move cursor to the beginning (HOME key)
+        app.TriggerKeyEvent(new KeyEventArgs(KeyCode.HOME, KeyModifiers.NONE, '\0', down: true));
+
+        canvas = CreateCanvas(5, 1);
+        textBox.Render(canvas);
+
+        result = "";
+        for (int x = 0; x < 5; x++) {
+            result += canvas[x, 0].Char ?? ' ';
+        }
+
+        // With cursor at 0: scrollOffset = 0.
+        // Visible characters: "12345"
+        Assert.Equal("12345", result);
+    }
+
+    [Fact]
+    public void PasswordBox_ShouldScrollContent_WhenCursorMovesOut() {
+        var passwordBox = new PasswordBox { Password = "1234567890", PasswordChar = '*' }; // Length 10
+        passwordBox.Style.Width = Dimension.Chars(5);
+        passwordBox.Measure(new Size(5, 1));
+        passwordBox.Arrange(new Rectangle(0, 0, 5, 1));
+
+        var app = new MockApplication();
+        AppEventBus.SetSourceApplication(app);
+
+        passwordBox.Select();
+
+        // Move cursor to the end (END key)
+        app.TriggerKeyEvent(new KeyEventArgs(KeyCode.END, KeyModifiers.NONE, '\0', down: true));
+
+        // Render and inspect.
+        var canvas = CreateCanvas(5, 1);
+        passwordBox.Render(canvas);
+
+        string result = "";
+        for (int x = 0; x < 5; x++) {
+            result += canvas[x, 0].Char ?? ' ';
+        }
+
+        // maxScroll = 10 - 5 + 1 = 6.
+        // With cursor at 10, scrollOffset = 6.
+        // Visible characters should be 4 password chars plus 1 empty cell for the cursor: "**** "
+        Assert.Equal("**** ", result);
+
+        // Move cursor to the beginning (HOME key)
+        app.TriggerKeyEvent(new KeyEventArgs(KeyCode.HOME, KeyModifiers.NONE, '\0', down: true));
+
+        canvas = CreateCanvas(5, 1);
+        passwordBox.Render(canvas);
+
+        result = "";
+        for (int x = 0; x < 5; x++) {
+            result += canvas[x, 0].Char ?? ' ';
+        }
+
+        // With cursor at 0: scrollOffset = 0.
+        // Visible characters: 5 password chars: "*****"
+        Assert.Equal("*****", result);
     }
 }
 

@@ -350,6 +350,10 @@ public abstract class AbstractElement<T> : IElement<T> {
             canvas.Fill(RenderLayout.Content + pos, ' ');
         }
 
+        if (!_style.TextColor.IsInherit) {
+            canvas.StyleTextColor(RenderLayout.Border + pos, _style.TextColor);
+        }
+
         if (!_style.Border.IsBorderless) {
             canvas.PlaceRectangle(RenderLayout.Border + pos, _style.Border);
         }

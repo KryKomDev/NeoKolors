@@ -18,8 +18,11 @@ public class NKCharCanvas : ICharCanvas {
     public int Width   => _data.XSize;
     public int Height  => _data.YSize;
     public Size2D Size => _data.Size;
-    
-    public CellInfo this[int x, int y] { get => _data[x, y]; set => _data[x, y] = value; }
+
+    public CellInfo this[int x, int y] {
+        get => _data[x, y];
+        set => _data[x, y] = value;
+    }
     
     public NKCharCanvas(int width, int height, bool resize = false) {
         _data = new List2D<CellInfo>(width, height);
@@ -38,15 +41,54 @@ public class NKCharCanvas : ICharCanvas {
     }
     
     public void Place(ICharCanvas canvas, Point2D offset = default) {
-        _data.Place(canvas.GetCellsArray(), (t, p) => t.ZIndex <= p.ZIndex, offset, _resize);
+        Place(canvas.GetCellsArray(), offset);
     }
 
     public void Place(NKCharCanvas canvas, Point2D offset = default) {
-        _data.Place(canvas._data, (t, p) => t.ZIndex <= p.ZIndex, offset, _resize);
+        Place(canvas.GetCellsArray(), offset);
     }
     
     public void Place(CellInfo[,] cells, Point2D offset = default) {
-        _data.Place(cells, (t, p) => t.ZIndex <= p.ZIndex, offset, _resize);
+        var sx = cells.GetLength(0) + offset.X;
+        var sy = cells.GetLength(1) + offset.Y;
+        
+        if (_resize && (sx > _data.XSize || sy > _data.YSize))
+            _data.Expand(Math.Max(sx, _data.XSize), Math.Max(sy, _data.YSize), CellInfo.GetDefault);
+
+        int srcW = cells.GetLength(0);
+        int srcH = cells.GetLength(1);
+
+        for (int x = 0; x < srcW; x++) {
+            int tx = x + offset.X;
+            if (tx < 0 || tx >= _data.XSize) continue;
+
+            for (int y = 0; y < srcH; y++) {
+                int ty = y + offset.Y;
+                if (ty < 0 || ty >= _data.YSize) continue;
+
+                var p = cells[x, y];
+                if (p == null) continue;
+
+                // Skip default untouched cells or visually transparent empty cells from the source canvas
+                if ((p.Char == ' ' && p.Style == NKStyle.Default && p.ZIndex == int.MinValue) ||
+                    ((p.Char == null || p.Char == ' ') && p.Style.IsBColorInherit))
+                {
+                    continue;
+                }
+
+                var t = _data[tx, ty];
+
+                if (t.ZIndex <= p.ZIndex) {
+                    if (p.Style.IsBColorInherit) {
+                        t.Char = p.Char ?? t.Char;
+                    } else {
+                        t.Char = p.Char;
+                    }
+                    t.Style = t.Style.OverrideWith(p.Style);
+                    t.ZIndex = p.ZIndex;
+                }
+            }
+        }
     }
 
     public void Place(char?[,] chars, Point2D offset = default, int zIndex = 0) {
@@ -60,8 +102,10 @@ public class NKCharCanvas : ICharCanvas {
             for (int y = offset.Y; y < Math.Min(chars.Len1 + offset.Y, _data.YSize); y++) {
                 var cellInfo = _data[x, y];
                 
-                if (cellInfo.ZIndex <= zIndex)
+                if (cellInfo.ZIndex <= zIndex) {
                     cellInfo.Char = chars[x - offset.X, y - offset.Y];
+                    cellInfo.ZIndex = zIndex;
+                }
             }
         }
     }
@@ -77,8 +121,10 @@ public class NKCharCanvas : ICharCanvas {
             for (int y = offset.Y; y < Math.Min(chars.Len1 + offset.Y, _data.YSize); y++) {
                 var cellInfo = _data[x, y];
                 
-                if (cellInfo.ZIndex <= zIndex)
+                if (cellInfo.ZIndex <= zIndex) {
                     cellInfo.Char = chars[x - offset.X, y - offset.Y];
+                    cellInfo.ZIndex = zIndex;
+                }
             }
         }
     }
@@ -92,6 +138,7 @@ public class NKCharCanvas : ICharCanvas {
         for (int x = Math.Clamp(offset.X, 0, Width); x < Math.Clamp(offset.X + str.Length, 0, Width); x++) {
             if (_data[x, offset.Y].ZIndex <= zIndex) {
                 _data[x, offset.Y].Char = str[xi];
+                _data[x, offset.Y].ZIndex = zIndex;
             }
 
             xi++;
@@ -110,6 +157,7 @@ public class NKCharCanvas : ICharCanvas {
             if (cellInfo.ZIndex <= zIndex) {
                 cellInfo.Char  = chars[xi].Char;
                 cellInfo.Style = cellInfo.Style.OverrideWith(chars[xi].Style);
+                cellInfo.ZIndex = zIndex;
             }
 
             xi++;
@@ -127,6 +175,7 @@ public class NKCharCanvas : ICharCanvas {
         
         cellInfo.Char  = c.Char;
         cellInfo.Style = cellInfo.Style.OverrideWith(c.Style);
+        cellInfo.ZIndex = zIndex;
     }
 
     public void Restyle(NKStyle[,] styles, Point2D offset = default, int zIndex = 0) {
@@ -134,8 +183,10 @@ public class NKCharCanvas : ICharCanvas {
             for (int y = offset.Y; y < Math.Min(styles.Len1 + offset.Y, _data.YSize); y++) {
                 var cellInfo = _data[x, y];
                 
-                if (cellInfo.ZIndex <= zIndex)
+                if (cellInfo.ZIndex <= zIndex) {
                     cellInfo.Style = styles[x - offset.X, y - offset.Y];
+                    cellInfo.ZIndex = zIndex;
+                }
             }
         }
     }

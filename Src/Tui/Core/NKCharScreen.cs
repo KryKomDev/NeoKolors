@@ -55,6 +55,19 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
                 prevStyle = RenderLine(y, prevStyle);
             }
 
+            if (_sb.Length > 0) {
+                #if NK_RENDERING_PROFILING
+                _writingTime.Start();
+                #endif
+
+                NKConsole.Write(_sb.ToString());
+                _sb.Clear();
+
+                #if NK_RENDERING_PROFILING
+                _writingTime.Stop();
+                #endif
+            }
+
             #if NK_RENDERING_PROFILING
             _screenTotalTime.Stop();
             #endif
@@ -99,21 +112,7 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
             var (c, nkStyle, changed, _) = cell;
 
             if (!changed) {
-                if (_sb.Length > 0) {
-                    #if NK_RENDERING_PROFILING
-                    _writingTime.Start();
-                    #endif
-
-                    NKConsole.Write(_sb.ToString());
-                    _sb.Clear();
-
-                    #if NK_RENDERING_PROFILING
-                    _writingTime.Stop();
-                    #endif
-                }
-
                 isBehind = true;
-
                 continue;
             }
 
@@ -124,7 +123,7 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
                 _positionTime.Start();
                 #endif
 
-                NKConsole.TrySetCursorPosition(x, y);
+                _sb.Append($"\e[{y + 1};{x + 1}H");
 
                 #if NK_RENDERING_PROFILING
                 _positionTime.Stop();
@@ -149,19 +148,6 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
             _sb.Append(char.IsControl(actualChar) ? ' ' : actualChar);
         }
 
-        if (_sb.Length <= 0)
-            return prevStyle;
-
-        #if NK_RENDERING_PROFILING
-        _writingTime.Start();
-        #endif
-
-        NKConsole.Write(_sb.ToString());
-        _sb.Clear();
-
-        #if NK_RENDERING_PROFILING
-        _writingTime.Stop();
-        #endif
         return prevStyle;
     }
 

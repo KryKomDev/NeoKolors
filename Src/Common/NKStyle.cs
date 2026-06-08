@@ -209,7 +209,8 @@ public record struct NKStyle : IFormattable {
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public NKStyle SetFColor(NKConsoleColor color) {
-        _raw = _raw &        ~(BMP_24  << (64 - FORG_COL_OFFSET - FORG_COL_SIZE))
+        _raw = _raw & ~(BMP_24  << (64 - FORG_COL_OFFSET - FORG_COL_SIZE))
+                    & ~(1ul     << (64 - FORG_CSW_OFFSET - FORG_CSW_SIZE))
             | (((ulong)color & BMP_24) << (64 - FORG_COL_OFFSET - FORG_COL_SIZE))
             & ~(0b11ul         << (64 - FORG_USW_OFFSET - FORG_USW_SIZE))
             | (COL_TYP_CONSOLE << (64 - FORG_USW_OFFSET - FORG_USW_SIZE));
@@ -223,6 +224,7 @@ public record struct NKStyle : IFormattable {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public NKStyle SetFColor() {
         _raw = _raw & ~(BMP_24 << (64 - FORG_COL_OFFSET - FORG_COL_SIZE))
+                    & ~(1ul    << (64 - FORG_CSW_OFFSET - FORG_CSW_SIZE))
             & ~(0b11ul         << (64 - FORG_USW_OFFSET - FORG_USW_SIZE))
             | (COL_TYP_DEFAULT << (64 - FORG_USW_OFFSET - FORG_USW_SIZE));
 
@@ -241,6 +243,7 @@ public record struct NKStyle : IFormattable {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public NKStyle SetFColor(InheritColor _) {
         _raw = _raw & ~(BMP_24 << (64 - FORG_COL_OFFSET - FORG_COL_SIZE))
+                    & ~(1ul    << (64 - FORG_CSW_OFFSET - FORG_CSW_SIZE))
             | (0b11ul          << (64 - FORG_USW_OFFSET - FORG_USW_SIZE))
             & (COL_TYP_INHERIT << (64 - FORG_USW_OFFSET - FORG_USW_SIZE));
 
@@ -291,6 +294,7 @@ public record struct NKStyle : IFormattable {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public NKStyle SetBColor(NKConsoleColor color) {
         _raw = _raw & ~(BMP_24         << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE))
+                    & ~(1ul            << (64 - BCKG_CSW_OFFSET - BCKG_CSW_SIZE))
             | (((ulong)color & BMP_24) << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE))
             & ~(0b11ul         << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE))
             | (COL_TYP_CONSOLE << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE));
@@ -304,6 +308,7 @@ public record struct NKStyle : IFormattable {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public NKStyle SetBColor() {
         _raw = _raw & ~(BMP_24 << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE))
+                    & ~(1ul    << (64 - BCKG_CSW_OFFSET - BCKG_CSW_SIZE))
             & ~(0b11ul         << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE))
             | (COL_TYP_DEFAULT << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE));
 
@@ -322,6 +327,7 @@ public record struct NKStyle : IFormattable {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public NKStyle SetBColor(InheritColor _) {
         _raw = _raw & ~(BMP_24 << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE))
+                    & ~(1ul    << (64 - BCKG_CSW_OFFSET - BCKG_CSW_SIZE))
             | (0b11ul          << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE))
             & (COL_TYP_INHERIT << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE));
 
@@ -412,7 +418,7 @@ public record struct NKStyle : IFormattable {
     public NKStyle OverrideWith(NKStyle other) {
         var n = new NKStyle(_raw);
         if (!other.IsFColorInherit) n = n.SetFColor(other.GetFColor());
-        if (!other.IsBColorInherit) n = n.SetBColor(other.GetBColor());
+        if (!other.IsBColorInherit && !other.IsBColorDefault) n = n.SetBColor(other.GetBColor());
         n = n.SetStyles(other.GetStyles());
 
         return n;

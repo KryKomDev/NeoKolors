@@ -4,6 +4,7 @@
 //
 
 using NeoKolors.Tui.Core;
+using NeoKolors.Common;
 
 namespace NeoKolors.Tui.Tests;
 
@@ -84,5 +85,63 @@ public class NKCharCanvasTests {
         
         Assert.Equal(0, canvas.Width);
         Assert.Equal(0, canvas.Height);
+    }
+
+    [Fact]
+    public void Place_OverlappingCanvasWithInheritStyle_ShouldMergeStylesAndPreserveCharacters() {
+        // Arrange: Bottom canvas with colored background
+        var bottom = new NKCharCanvas(3, 3);
+        bottom.StyleBackground(new Rectangle(0, 0, 2, 2), NKColor.FromRgb(255, 0, 0));
+        bottom.Place("abc", new Point(0, 0));
+
+        // Top canvas with transparent background (inherit) and white bold character
+        var top = new NKCharCanvas(3, 3);
+        top.ForceStyleBackground(new Rectangle(0, 0, 2, 2), NKColor.Inherit);
+        var styledPiece = new AnsiString("X", new NKStyle(
+            NKColor.FromRgb(255, 255, 255),
+            NKColor.Inherit,
+            TextStyles.BOLD
+        ));
+        top.Place(styledPiece, new Point(1, 0));
+
+        // Act: Place top canvas onto bottom canvas
+        bottom.Place(top);
+
+        // Assert:
+        // Position (0, 0) should remain 'a' with red background
+        var cellA = bottom[0, 0];
+        Assert.Equal('a', cellA.Char);
+        Assert.Equal(NKColor.FromRgb(255, 0, 0), cellA.Style.GetBColor());
+
+        // Position (1, 0) should have 'X' with white text color, bold style, AND red background from the bottom!
+        var cellX = bottom[1, 0];
+        Assert.Equal('X', cellX.Char);
+        Assert.Equal(NKColor.FromRgb(255, 255, 255), cellX.Style.GetFColor());
+        Assert.True(cellX.Style.GetStyles().GetIsBold());
+        Assert.Equal(NKColor.FromRgb(255, 0, 0), cellX.Style.GetBColor());
+        
+        // Ensure Changed flag is set to true on modified cells
+        Assert.True(cellX.Changed);
+    }
+
+    [Fact]
+    public void Place_OverlappingCanvasWithDefaultStyle_ShouldPreserveTrueColorBackground() {
+        // Arrange: Bottom canvas with colored background
+        var bottom = new NKCharCanvas(3, 3);
+        bottom.StyleBackground(new Rectangle(0, 0, 2, 2), NKColor.FromRgb(255, 0, 0));
+        bottom.Place("abc", new Point(0, 0));
+
+        // Top canvas with default background (not inherit) and character 'X'
+        var top = new NKCharCanvas(3, 3);
+        top.Place("X", new Point(1, 0));
+
+        // Act: Place top canvas onto bottom canvas
+        bottom.Place(top);
+
+        // Assert:
+        // Position (1, 0) should have 'X' and preserve the red background from bottom
+        var cellX = bottom[1, 0];
+        Assert.Equal('X', cellX.Char);
+        Assert.Equal(NKColor.FromRgb(255, 0, 0), cellX.Style.GetBColor());
     }
 }

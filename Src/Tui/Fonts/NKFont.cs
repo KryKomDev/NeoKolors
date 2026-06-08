@@ -419,10 +419,13 @@ public class NKFont : IExtendedAsciiFont {
                         }
                         
                         var canvasCell = canvas[cx, cy];
-                        if (cellChar != null) {
-                            canvasCell.Char = cellChar;
+                        if (canvasCell.ZIndex <= 0) {
+                            if (cellChar != null) {
+                                canvasCell.Char = cellChar;
+                            }
+                            canvasCell.Style = canvasCell.Style.OverrideWith(cellStyle);
+                            canvasCell.ZIndex = 0;
                         }
-                        canvasCell.Style = canvasCell.Style.OverrideWith(cellStyle);
                     }
                 }
             }
@@ -479,8 +482,11 @@ public class NKFont : IExtendedAsciiFont {
                 var cellChar = cell.Type == GlyphCellType.CHARACTER ? cell.Character : ' ';
                 
                 var canvasCell = canvas[cx, cy];
-                canvasCell.Char = cellChar;
-                canvasCell.Style = canvasCell.Style.OverrideWith(finalStyle);
+                if (canvasCell.ZIndex <= 0) {
+                    canvasCell.Char = cellChar;
+                    canvasCell.Style = canvasCell.Style.OverrideWith(finalStyle);
+                    canvasCell.ZIndex = 0;
+                }
             }
         }
     }

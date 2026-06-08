@@ -387,6 +387,24 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
             : $"{mode}8;2;{next.AsRgb.R};{next.AsRgb.G};{next.AsRgb.B};"
         );
     }
+
+
+    public static NKColor White { get; } = new(NKConsoleColor.WHITE);
+    public static NKColor Black { get; } = new(NKConsoleColor.BLACK);
+    public static NKColor Red { get; } = new(NKConsoleColor.RED);
+    public static NKColor Green { get; } = new(NKConsoleColor.GREEN);
+    public static NKColor Blue { get; } = new(NKConsoleColor.BLUE);
+    public static NKColor Yellow { get; } = new(NKConsoleColor.YELLOW);
+    public static NKColor Magenta { get; } = new(NKConsoleColor.MAGENTA);
+    public static NKColor Cyan { get; } = new(NKConsoleColor.CYAN);
+    public static NKColor DarkBlue { get; } = new(NKConsoleColor.DARK_BLUE);
+    public static NKColor DarkGreen { get; } = new(NKConsoleColor.DARK_GREEN);
+    public static NKColor DarkRed { get; } = new(NKConsoleColor.DARK_RED);
+    public static NKColor DarkYellow { get; }  = new(NKConsoleColor.DARK_YELLOW);
+    public static NKColor DarkMagenta { get; } = new(NKConsoleColor.DARK_MAGENTA);
+    public static NKColor DarkCyan { get; } = new(NKConsoleColor.DARK_CYAN);
+    public static NKColor DarkGray { get; } = new(NKConsoleColor.DARK_GRAY);
+    public static NKColor Gray { get; } = new(NKConsoleColor.GRAY);
     
     public enum ColorType : byte {
         DEFAULT       = 0,

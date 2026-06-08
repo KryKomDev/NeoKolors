@@ -19,9 +19,9 @@
       },
       "Metriks": {
         "type": "Direct",
-        "requested": "[2026.2.5, )",
-        "resolved": "2026.2.5",
-        "contentHash": "6Il7IaSVY+Syl2fax3Jlkix2dGJ/PiyMX/JeBzIVd36vcge6Jyr+CjQd5vG2DZUXzM1/MLWjjXcRIZ9d4znStQ==",
+        "requested": "[2026.2.6, )",
+        "resolved": "2026.2.6",
+        "contentHash": "XBs3C6mj6FN477YQ0/elgk5dpXdFXuHE+OSG8OhyNnxR2rqlEXXDrBlvKOxUp97CLnuVjKbLSnAz1wi6n95Scg==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4",
           "System.Runtime.CompilerServices.Unsafe": "6.1.2"
@@ -120,9 +120,9 @@
       },
       "Metriks": {
         "type": "Direct",
-        "requested": "[2026.2.5, )",
-        "resolved": "2026.2.5",
-        "contentHash": "6Il7IaSVY+Syl2fax3Jlkix2dGJ/PiyMX/JeBzIVd36vcge6Jyr+CjQd5vG2DZUXzM1/MLWjjXcRIZ9d4znStQ==",
+        "requested": "[2026.2.6, )",
+        "resolved": "2026.2.6",
+        "contentHash": "XBs3C6mj6FN477YQ0/elgk5dpXdFXuHE+OSG8OhyNnxR2rqlEXXDrBlvKOxUp97CLnuVjKbLSnAz1wi6n95Scg==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4"
         }
@@ -188,9 +188,9 @@
       },
       "Metriks": {
         "type": "Direct",
-        "requested": "[2026.2.5, )",
-        "resolved": "2026.2.5",
-        "contentHash": "6Il7IaSVY+Syl2fax3Jlkix2dGJ/PiyMX/JeBzIVd36vcge6Jyr+CjQd5vG2DZUXzM1/MLWjjXcRIZ9d4znStQ==",
+        "requested": "[2026.2.6, )",
+        "resolved": "2026.2.6",
+        "contentHash": "XBs3C6mj6FN477YQ0/elgk5dpXdFXuHE+OSG8OhyNnxR2rqlEXXDrBlvKOxUp97CLnuVjKbLSnAz1wi6n95Scg==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4"
         }
@@ -288,9 +288,9 @@
       },
       "Metriks": {
         "type": "Direct",
-        "requested": "[2026.2.5, )",
-        "resolved": "2026.2.5",
-        "contentHash": "6Il7IaSVY+Syl2fax3Jlkix2dGJ/PiyMX/JeBzIVd36vcge6Jyr+CjQd5vG2DZUXzM1/MLWjjXcRIZ9d4znStQ==",
+        "requested": "[2026.2.6, )",
+        "resolved": "2026.2.6",
+        "contentHash": "XBs3C6mj6FN477YQ0/elgk5dpXdFXuHE+OSG8OhyNnxR2rqlEXXDrBlvKOxUp97CLnuVjKbLSnAz1wi6n95Scg==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4"
         }
@@ -368,9 +368,9 @@
       },
       "Metriks": {
         "type": "Direct",
-        "requested": "[2026.2.5, )",
-        "resolved": "2026.2.5",
-        "contentHash": "6Il7IaSVY+Syl2fax3Jlkix2dGJ/PiyMX/JeBzIVd36vcge6Jyr+CjQd5vG2DZUXzM1/MLWjjXcRIZ9d4znStQ==",
+        "requested": "[2026.2.6, )",
+        "resolved": "2026.2.6",
+        "contentHash": "XBs3C6mj6FN477YQ0/elgk5dpXdFXuHE+OSG8OhyNnxR2rqlEXXDrBlvKOxUp97CLnuVjKbLSnAz1wi6n95Scg==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4"
         }

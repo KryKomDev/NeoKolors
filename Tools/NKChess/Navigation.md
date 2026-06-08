@@ -94,7 +94,7 @@ Opens a dialogue for adding and removing engines.
 
 ### Running games tab
 
-A tab selector with all of the currently running games.
+A tab selector with all the currently running games.
 
 ### Game board
 

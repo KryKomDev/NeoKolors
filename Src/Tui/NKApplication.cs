@@ -18,11 +18,16 @@ public class NKApplication : IMouseSupportingApplication {
     private static readonly NKLogger LOGGER = NKDebug.GetLogger<NKApplication>();
     
     // --- Screen ---
-    private readonly NKCharScreen _screen = new(Stdio.BufferSize);
+    private readonly NKCharScreen _screen = new(NKConsole.BufferSize);
     private Size2D _lastSize     = Size2D.Zero;
     private Size2D _lasPixelSize = Size2D.Zero;
 
     public NKCharScreen Screen => _screen;
+    
+    /// <summary>
+    /// Gets the object that can be used to synchronize access to the TUI thread, element tree, and rendering.
+    /// </summary>
+    public object SyncRoot { get; } = new();
     
     // --- IApp impl ---
     public IRenderable Base { get; set; }
@@ -42,12 +47,22 @@ public class NKApplication : IMouseSupportingApplication {
     public event AppStopEventHandler  StopEvent;
     public event Action               OnRender;
 
-    private void InvokeKeyEvent(KeyEventArgs k) => KeyEvent.Invoke(k);
-    private void InvokeMouseEvent(MouseEventArgs m) {
-        _mouseCascade.HandleMouseEvent(m);
-        MouseEvent.Invoke(m);
+    private void InvokeKeyEvent(KeyEventArgs k) {
+        lock (SyncRoot) {
+            KeyEvent.Invoke(k);
+        }
     }
-    private void InvokeResizeEvent(ResizeEventArgs r) => ResizeEvent.Invoke(r);
+    private void InvokeMouseEvent(MouseEventArgs m) {
+        lock (SyncRoot) {
+            _mouseCascade.HandleMouseEvent(m);
+            MouseEvent.Invoke(m);
+        }
+    }
+    private void InvokeResizeEvent(ResizeEventArgs r) {
+        lock (SyncRoot) {
+            ResizeEvent.Invoke(r);
+        }
+    }
 
     public NKApplication(NKAppConfig config, IRenderable @base) {
         Config = config;
@@ -208,7 +223,7 @@ public class NKApplication : IMouseSupportingApplication {
         LOGGER.Info(
             $"\n  Total frames delayed:    {delayedCount}" +
             $"\n  Total delay:             {totalDelay}" +
-            $"\n  Average delay per frame: {totalDelay / delayedCount}"
+            $"\n  Average delay per frame: {(delayedCount == 0 ? TimeSpan.Zero : totalDelay / delayedCount)}"
         );
 
         #if NK_RENDERING_PROFILING
@@ -236,27 +251,29 @@ public class NKApplication : IMouseSupportingApplication {
     }
     
     private void Render() {
-        if (!Config.KeepCursorDisabled) {
-            NKConsole.HideCursor();
-            NKConsole.SaveCursor();
-        }
-        
-        if (_lastSize != Stdio.BufferSize) {
-            _lastSize = Stdio.BufferSize;
-            _screen.Resize(_lastSize.X, _lastSize.Y);
-            InvokeResizeEvent(new ResizeEventArgs(_lastSize.X, _lastSize.Y));
-            _lasPixelSize = NKConsole.GetBuffSizePx();
-            ScreenSizeTracker.SetScreenSizeCh(_lastSize);
-            ScreenSizeTracker.SetScreenSizePx(_lasPixelSize);
-        }
-        
-        OnRender.Invoke();
-        Base.Render(_screen);
-        _screen.Render();
-        
-        if (!Config.KeepCursorDisabled) {
-            NKConsole.RestoreCursor();
-            NKConsole.ShowCursor();
+        lock (SyncRoot) {
+            if (!Config.KeepCursorDisabled) {
+                NKConsole.HideCursor();
+                NKConsole.SaveCursor();
+            }
+            
+            if (_lastSize != NKConsole.BufferSize) {
+                _lastSize = NKConsole.BufferSize;
+                _screen.Resize(_lastSize.X, _lastSize.Y);
+                InvokeResizeEvent(new ResizeEventArgs(_lastSize.X, _lastSize.Y));
+                _lasPixelSize = NKConsole.GetBuffSizePx();
+                ScreenSizeTracker.SetScreenSizeCh(_lastSize);
+                ScreenSizeTracker.SetScreenSizePx(_lasPixelSize);
+            }
+            
+            OnRender.Invoke();
+            Base.Render(_screen);
+            _screen.Render();
+            
+            if (!Config.KeepCursorDisabled) {
+                NKConsole.RestoreCursor();
+                NKConsole.ShowCursor();
+            }
         }
     }
 

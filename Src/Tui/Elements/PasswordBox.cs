@@ -17,6 +17,7 @@ public class PasswordBox : Control<string>, ISelectableElement<string>, IMouseIn
     
     private string _password = string.Empty;
     private int _cursor;
+    private int _scrollOffset;
     private char _passwordChar = '•';
 
     public string Password {
@@ -61,31 +62,66 @@ public class PasswordBox : Control<string>, ISelectableElement<string>, IMouseIn
         return new Size(length, 1);
     }
 
+    private void KeepCursorInView(int contentWidth) {
+        if (contentWidth <= 0) {
+            _scrollOffset = 0;
+            return;
+        }
+
+        if (_cursor < _scrollOffset) {
+            _scrollOffset = _cursor;
+        }
+        else if (_cursor >= _scrollOffset + contentWidth) {
+            _scrollOffset = _cursor - contentWidth + 1;
+        }
+
+        var maxScroll = Math.Max(0, _password.Length - contentWidth + 1);
+        _scrollOffset = Math.Clamp(_scrollOffset, 0, maxScroll);
+    }
+
     protected override void RenderCore(ICharCanvas canvas) {
         var pos = RenderBounds.Lower;
+        var contentWidth = RenderLayout.Content.Width;
+
+        KeepCursorInView(contentWidth);
 
         // Clear NEGATIVE style from the content region first
-        for (int x = 0; x < RenderLayout.Content.Width; x++) {
+        for (int x = 0; x < contentWidth; x++) {
             var cp = pos + RenderLayout.Content.Lower + new Point(x, 0);
             var relativeCp = cp - pos;
             if (RenderLayout.Content.Contains(relativeCp.X, relativeCp.Y)) {
-                var cell = canvas[cp.X, cp.Y];
-                cell.Style = cell.Style with { Styles = cell.Style.Styles & ~NeoKolors.Common.TextStyles.NEGATIVE };
+                if (cp.X >= 0 && cp.X < canvas.Width && cp.Y >= 0 && cp.Y < canvas.Height) {
+                    var cell = canvas[cp.X, cp.Y];
+                    cell.Style = cell.Style with { Styles = cell.Style.Styles & ~NeoKolors.Common.TextStyles.NEGATIVE };
+                }
             }
         }
 
-        string renderedText = (_password.Length == 0 && !IsSelected) ? Placeholder : new string(PasswordChar, _password.Length);
-        canvas.Place(renderedText, pos + RenderLayout.Content.Lower, RenderLayout.Content.Width, HorizontalAlign.LEFT);
+        string renderedText;
+        if (_password.Length == 0 && !IsSelected) {
+            renderedText = Placeholder;
+        } else {
+            int start = Math.Clamp(_scrollOffset, 0, _password.Length);
+            int length = Math.Min(contentWidth, _password.Length - start);
+            renderedText = length > 0 ? new string(PasswordChar, length) : string.Empty;
+        }
 
-        if (IsSelected) {
-            var cursorPoint = pos + RenderLayout.Content.Lower + new Point(_cursor, 0);
+        canvas.Place(renderedText, pos + RenderLayout.Content.Lower, contentWidth, HorizontalAlign.LEFT);
+
+        if (!IsSelected) return;
+
+        int relativeCursorX = _cursor - _scrollOffset;
+        if (relativeCursorX >= 0 && relativeCursorX < contentWidth) {
+            var cursorPoint = pos + RenderLayout.Content.Lower + new Point(relativeCursorX, 0);
             var relativeCursor = cursorPoint - pos;
             if (RenderLayout.Content.Contains(relativeCursor.X, relativeCursor.Y)) {
-                var cell = canvas[cursorPoint.X, cursorPoint.Y];
-                if (cell.Char == null || cell.Char == '\0') {
-                    cell.Char = ' ';
+                if (cursorPoint.X >= 0 && cursorPoint.X < canvas.Width && cursorPoint.Y >= 0 && cursorPoint.Y < canvas.Height) {
+                    var cell = canvas[cursorPoint.X, cursorPoint.Y];
+                    if (cell.Char == null || cell.Char == '\0') {
+                        cell.Char = ' ';
+                    }
+                    cell.Style = cell.Style with { Styles = cell.Style.Styles | NeoKolors.Common.TextStyles.NEGATIVE };
                 }
-                cell.Style = cell.Style with { Styles = cell.Style.Styles | NeoKolors.Common.TextStyles.NEGATIVE };
             }
         }
     }

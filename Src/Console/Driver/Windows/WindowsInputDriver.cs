@@ -104,7 +104,7 @@ public sealed class WindowsInputDriver : IInputDriver<WinInputDriverConfig> {
                 // wait with processing ANSI requests until there is no input
                 if (_input.HasInput()) 
                     continue;
-                
+
                 ProcessRequests();
 
                 var elapsed = stopwatch.Elapsed;
@@ -114,7 +114,7 @@ public sealed class WindowsInputDriver : IInputDriver<WinInputDriverConfig> {
                 }
             }
             catch (Exception e) {
-                LOGGER.Error($"Input interceptor error: {e.Message}");
+                LOGGER.Error($"Input interceptor error: \n{e}");
                 Thread.Sleep(_config.RefreshInterval);
             }
         }
@@ -165,17 +165,21 @@ public sealed class WindowsInputDriver : IInputDriver<WinInputDriverConfig> {
     }
 
     private void Decode(WinImports.WinInputRecord record) {
-        switch (record.Type) {
-            case WinImports.WinEventType.KEY:    { InvokeKey   (record.Key   );   } break;
-            case WinImports.WinEventType.MOUSE:  { InvokeMouse (record.Mouse );   } break;
-            case WinImports.WinEventType.RESIZE: { InvokeResize(record.Resize);   } break;
-            case WinImports.WinEventType.MENU:   { /* ignored, used internally */ } break;
-            case WinImports.WinEventType.FOCUS:  { InvokeFocus (record.Focus );   } break;
-            default: {
-                LOGGER.Error("Unexpected WinEventType: " + record.Type);
-                // throw new ArgumentOutOfRangeException(nameof(record.Type));
-                return;
+        try {
+            switch (record.Type) {
+                case WinImports.WinEventType.KEY:    { InvokeKey   (record.Key   );   } return;
+                case WinImports.WinEventType.MOUSE:  { InvokeMouse (record.Mouse );   } return;
+                case WinImports.WinEventType.RESIZE: { InvokeResize(record.Resize);   } return;
+                case WinImports.WinEventType.MENU:   { /* ignored, used internally */ } return;
+                case WinImports.WinEventType.FOCUS:  { InvokeFocus (record.Focus );   } return;
+                default: {
+                    LOGGER.Error("Unexpected WinEventType: " + record.Type);
+                    return;
+                }
             }
+        }
+        catch (Exception e) {
+            LOGGER.Error("A VTInput listener threw an error: \n" + e);
         }
     }
 

@@ -1,8 +1,11 @@
 // NeoKolors
 // Copyright (c) 2026 KryKom
 
+using System;
+using System.Collections.Generic;
 using NeoKolors.Console.Input;
 using NeoKolors.Tui.Core;
+using NeoKolors.Tui.Events;
 using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Values;
 
@@ -17,12 +20,20 @@ public class ComboBox : ItemsControl, IMouseInteractableElement<IReadOnlyList<IE
     private bool _isDropDownOpen;
     private int _selectedIndex = -1;
     private object? _selectedItem;
+    private bool _justOpened;
 
     public bool IsDropDownOpen {
         get => _isDropDownOpen;
         set {
             if (_isDropDownOpen == value) return;
             _isDropDownOpen = value;
+            if (_isDropDownOpen) {
+                AppEventBus.MouseEvent += HandleGlobalMouseEvent;
+                _justOpened = true;
+            } else {
+                AppEventBus.MouseEvent -= HandleGlobalMouseEvent;
+            }
+            InvalidateArrange();
             InvokeElementUpdated();
         }
     }
@@ -75,6 +86,47 @@ public class ComboBox : ItemsControl, IMouseInteractableElement<IReadOnlyList<IE
     public void Release(MouseButton button) => OnRelease(button);
     public void Hover() => OnHover();
     public void HoverOut() => OnHoverOut();
+
+    private void HandleGlobalMouseEvent(MouseEventArgs m) {
+        if (_justOpened) {
+            _justOpened = false;
+            return;
+        }
+        if (!IsEnabled || !_style.Visible) return;
+        if (!m.IsPress) return;
+
+        var baseBounds = RenderBounds;
+        var dropdownHeight = ItemsPanel != null ? Math.Min(10, ItemsPanel.Children.Count) : 0;
+
+        int triggerY = baseBounds.LowerY;
+        int triggerXMin = baseBounds.LowerX;
+        int triggerXMax = baseBounds.HigherX;
+
+        bool isOverTrigger = m.Position.Y == triggerY && m.Position.X >= triggerXMin && m.Position.X <= triggerXMax;
+
+        if (isOverTrigger) {
+            IsDropDownOpen = !IsDropDownOpen;
+            return;
+        }
+
+        if (IsDropDownOpen) {
+            int dropdownMinY = triggerY + 1;
+            int dropdownMaxY = triggerY + 1 + dropdownHeight + 1;
+            bool isOverDropdown = m.Position.X >= triggerXMin && m.Position.X <= triggerXMax &&
+                                  m.Position.Y >= dropdownMinY && m.Position.Y <= dropdownMaxY;
+
+            if (isOverDropdown) {
+                int itemIndex = m.Position.Y - (triggerY + 2);
+                if (ItemsPanel != null && itemIndex >= 0 && itemIndex < ItemsPanel.Children.Count) {
+                    SelectedIndex = itemIndex;
+                }
+                IsDropDownOpen = false;
+            }
+            else {
+                IsDropDownOpen = false;
+            }
+        }
+    }
 
     protected override void OnItemsSourceChanged() {
         if (ItemsPanel == null) {
@@ -137,7 +189,7 @@ public class ComboBox : ItemsControl, IMouseInteractableElement<IReadOnlyList<IE
         if (ItemsPanel != null) {
             var contentWidth = RenderLayout.Content.Width;
             var dropdownHeight = Math.Min(10, ItemsPanel.Children.Count);
-            var dropdownPos = RenderBounds.Lower + RenderLayout.Content.Lower + new Point(0, 1);
+            var dropdownPos = RenderBounds.Lower + new Point(RenderLayout.Content.Lower.X, (int)finalSize.Height);
             var dropdownInnerRect = new Rectangle(dropdownPos + new Point(1, 1), new Size(contentWidth - 2, dropdownHeight));
 
             int offset = 0;
@@ -172,7 +224,7 @@ public class ComboBox : ItemsControl, IMouseInteractableElement<IReadOnlyList<IE
         if (IsDropDownOpen && ItemsPanel != null && ItemsPanel.Children.Count > 0) {
             var dropdownHeight = Math.Min(10, ItemsPanel.Children.Count);
             var dropdownSize = new Size(contentWidth, dropdownHeight + 2);
-            var dropdownPos = contentPos + new Point(0, 1);
+            var dropdownPos = pos + new Point(RenderLayout.Content.Lower.X, 1);
             var dropdownRect = new Rectangle(dropdownPos, dropdownSize);
 
             canvas.StyleBackground(dropdownRect, NKColor.Default);
@@ -192,6 +244,26 @@ public class ComboBox : ItemsControl, IMouseInteractableElement<IReadOnlyList<IE
 
                 child.Render(canvas);
                 offset++;
+            }
+
+            for (int x = Math.Max(0, dropdownRect.LowerX); x <= Math.Min(canvas.Width - 1, dropdownRect.HigherX); x++) {
+                for (int y = Math.Max(0, dropdownRect.LowerY); y <= Math.Min(canvas.Height - 1, dropdownRect.HigherY); y++) {
+                    canvas[x, y].ZIndex = 10;
+                }
+            }
+        }
+        else if (ItemsPanel != null) {
+            var dropdownHeight = Math.Min(10, ItemsPanel.Children.Count);
+            var dropdownSize = new Size(contentWidth, dropdownHeight + 2);
+            var dropdownPos = pos + new Point(RenderLayout.Content.Lower.X, 1);
+            var dropdownRect = new Rectangle(dropdownPos, dropdownSize);
+
+            for (int x = Math.Max(0, dropdownRect.LowerX); x <= Math.Min(canvas.Width - 1, dropdownRect.HigherX); x++) {
+                for (int y = Math.Max(0, dropdownRect.LowerY); y <= Math.Min(canvas.Height - 1, dropdownRect.HigherY); y++) {
+                    if (canvas[x, y].ZIndex == 10) {
+                        canvas[x, y].ZIndex = int.MinValue;
+                    }
+                }
             }
         }
     }

@@ -17,6 +17,7 @@ public class TextBox : Control<string>, ISelectableElement<string>, IMouseIntera
     
     private string _text = string.Empty;
     private int _cursor;
+    private int _scrollOffset;
 
     public string Text {
         get => _text;
@@ -57,36 +58,69 @@ public class TextBox : Control<string>, ISelectableElement<string>, IMouseIntera
         return new Size(length, 1);
     }
 
-    protected override void RenderCore(ICharCanvas canvas) {
-        var pos = RenderBounds.Lower;
-
-        // Clear NEGATIVE style from the content region first
-        for (int x = 0; x < RenderLayout.Content.Width; x++) {
-            var cp = pos + RenderLayout.Content.Lower + new Point(x, 0);
-            var relativeCp = cp - pos;
-            if (RenderLayout.Content.Contains(relativeCp.X, relativeCp.Y)) {
-                var clearCell = canvas[cp.X, cp.Y];
-                clearCell.Style = clearCell.Style with { Styles = clearCell.Style.Styles & ~NeoKolors.Common.TextStyles.NEGATIVE };
-            }
+    private void KeepCursorInView(int contentWidth) {
+        if (contentWidth <= 0) {
+            _scrollOffset = 0;
+            return;
         }
 
-        var renderedText = (_text.Length == 0 && !IsSelected) ? Placeholder : _text;
-        canvas.Place(renderedText, pos + RenderLayout.Content.Lower, RenderLayout.Content.Width, HorizontalAlign.LEFT);
+        if (_cursor < _scrollOffset) {
+            _scrollOffset = _cursor;
+        }
+        else if (_cursor >= _scrollOffset + contentWidth) {
+            _scrollOffset = _cursor - contentWidth + 1;
+        }
+
+        var maxScroll = Math.Max(0, _text.Length - contentWidth + 1);
+        _scrollOffset = Math.Clamp(_scrollOffset, 0, maxScroll);
+    }
+
+    protected override void RenderCore(ICharCanvas canvas) {
+        var pos = RenderBounds.Lower;
+        var contentWidth = RenderLayout.Content.Width;
+
+        KeepCursorInView(contentWidth);
+
+        // Clear NEGATIVE style from the content region first
+        for (int x = 0; x < contentWidth; x++) {
+            var cp = pos + RenderLayout.Content.Lower + new Point(x, 0);
+            var relativeCp = cp - pos;
+
+            if (!RenderLayout.Content.Contains(relativeCp.X, relativeCp.Y)) continue;
+            if (cp.X < 0 || cp.X >= canvas.Width || cp.Y < 0 || cp.Y >= canvas.Height) continue;
+
+            var clearCell = canvas[cp.X, cp.Y];
+            clearCell.Style = clearCell.Style with { Styles = clearCell.Style.Styles & ~TextStyles.NEGATIVE };
+        }
+
+        string renderedText;
+        if (_text.Length == 0 && !IsSelected) {
+            renderedText = Placeholder;
+        } else {
+            int start = Math.Clamp(_scrollOffset, 0, _text.Length);
+            int length = Math.Min(contentWidth, _text.Length - start);
+            renderedText = length > 0 ? _text.Substring(start, length) : string.Empty;
+        }
+
+        canvas.Place(renderedText, pos + RenderLayout.Content.Lower, contentWidth, HorizontalAlign.LEFT);
 
         if (!IsSelected) return;
 
-        var cursorPoint = pos + RenderLayout.Content.Lower + new Point(_cursor, 0);
-        var relativeCursor = cursorPoint - pos;
+        int relativeCursorX = _cursor - _scrollOffset;
+        if (relativeCursorX >= 0 && relativeCursorX < contentWidth) {
+            var cursorPoint = pos + RenderLayout.Content.Lower + new Point(relativeCursorX, 0);
+            var relativeCursor = cursorPoint - pos;
 
-        if (!RenderLayout.Content.Contains(relativeCursor.X, relativeCursor.Y)) return;
-
-        var cursorCell = canvas[cursorPoint.X, cursorPoint.Y];
-                
-        if (cursorCell.Char is null or '\0') {
-            cursorCell.Char = ' ';
+            if (RenderLayout.Content.Contains(relativeCursor.X, relativeCursor.Y)) {
+                if (cursorPoint.X >= 0 && cursorPoint.X < canvas.Width && cursorPoint.Y >= 0 && cursorPoint.Y < canvas.Height) {
+                    var cursorCell = canvas[cursorPoint.X, cursorPoint.Y];
+                    if (cursorCell.Char is null or '\0') {
+                        cursorCell.Char = ' ';
+                    }
+                    cursorCell.Style = cursorCell.Style with { Styles = cursorCell.Style.Styles | TextStyles.NEGATIVE };
+                }
+            }
         }
-                
-        cursorCell.Style = cursorCell.Style with { Styles = cursorCell.Style.Styles | TextStyles.NEGATIVE };
     }
 
     public void Select() {
@@ -112,43 +146,97 @@ public class TextBox : Control<string>, ISelectableElement<string>, IMouseIntera
             ElementManager.CurrentlySelected = null;
         }
     }
-
+    
     private void HandleKey(KeyEventArgs keyInfo) {
         if (keyInfo.Up)
             return;
         
         switch (keyInfo.Key) {
-            case KeyCode.ARROW_LEFT:
+            case KeyCode.ARROW_LEFT when keyInfo.Modifiers.GetHasCtrl(): {
+                if (_cursor > 0 && _text[_cursor - 1] == ' ') {
+                    while (_cursor > 0 && _text[_cursor - 1] == ' ') 
+                        _cursor--;
+                    
+                    break;
+                }
+                
+                while (_cursor > 0 && _text[_cursor - 1] != ' ') 
+                    _cursor--;
+                
+                break;
+            }
+            case KeyCode.ARROW_LEFT: {
                 if (_cursor > 0) _cursor--;
                 break;
-            case KeyCode.ARROW_RIGHT:
+            }
+            case KeyCode.ARROW_RIGHT when keyInfo.Modifiers.GetHasCtrl(): {
+                if (_cursor < _text.Length && _text[_cursor + 1] == ' ') {
+                    while (_cursor == _text.Length - 1 || (_cursor < _text.Length && _text[_cursor + 1] == ' ')) 
+                        _cursor++;
+                    
+                    break;
+                }
+                
+                while (_cursor == _text.Length - 1 || (_cursor < _text.Length && _text[_cursor + 1] != ' ')) 
+                    _cursor++;
+
+                break;
+            }
+            case KeyCode.ARROW_RIGHT: {
                 if (_cursor < _text.Length) _cursor++;
                 break;
-            case KeyCode.HOME:
+            }
+            case KeyCode.HOME: {
                 _cursor = 0;
                 break;
-            case KeyCode.END:
+            }
+            case KeyCode.END: {
                 _cursor = _text.Length;
                 break;
-            case KeyCode.BACKSPACE:
+            }
+            case KeyCode.BACKSPACE when keyInfo.Modifiers.GetHasCtrl(): {
+                NKDebug.Debug("Backspace!");
+
+                var i = _cursor;
+                
+                if (i > 0 && _text[i - 1] == ' ') {
+                    while (i > 0 && _text[i - 1] == ' ') 
+                        i--;
+                }
+                else {
+                    while (i > 0 && _text[i - 1] != ' ') 
+                        i--;
+                }
+                
+                _text = _text.Remove(i, _cursor - i);
+                _cursor = i;
+                
+                break;
+            }
+            case KeyCode.BACKSPACE: {
                 if (_cursor > 0 && _text.Length > 0) {
                     _text = _text.Remove(_cursor - 1, 1);
                     _cursor--;
                 }
+                
                 break;
-            case KeyCode.DELETE:
+            }
+            case KeyCode.DELETE: {
                 if (_cursor < _text.Length && _text.Length > 0) {
                     _text = _text.Remove(_cursor, 1);
                 }
                 break;
-            case KeyCode.SPACE:
+            }
+            case KeyCode.SPACE: {
                 AddChar(' ');
                 break;
-            default:
+            }
+            default: {
                 if (!char.IsControl(keyInfo.Char)) {
                     AddChar(keyInfo.Char);
                 }
                 break;
+            }
         }
         
         InvokeElementUpdated();

@@ -47,6 +47,9 @@ jobs:
           - name: Tools.NKFont
             path: Tools/NKFont/NeoKolors.Tools.NKFont.csproj
             test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
+          - name: Tools.NKChess
+            path: Tools/NKChess/NeoKolors.Tools.NKCess.csproj
+            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
 
     steps:
     - name: Checkout code

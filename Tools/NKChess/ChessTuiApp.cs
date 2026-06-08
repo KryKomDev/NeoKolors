@@ -183,8 +183,8 @@ public class ChessTuiApp : Page {
         _addedEngines = prefs.AddedEngines;
 
         if (_addedEngines.Count > 0) {
-            if (!_addedEngines.Any(e => e.Path == _tourneyEngineA)) _tourneyEngineA = _addedEngines[0].Path;
-            if (!_addedEngines.Any(e => e.Path == _tourneyEngineB)) _tourneyEngineB = _addedEngines[0].Path;
+            if (_addedEngines.All(e => e.Path != _tourneyEngineA)) _tourneyEngineA = _addedEngines[0].Path;
+            if (_addedEngines.All(e => e.Path != _tourneyEngineB)) _tourneyEngineB = _addedEngines[0].Path;
         }
 
         _whiteTimeLimit = prefs.WhiteTimeLimit;

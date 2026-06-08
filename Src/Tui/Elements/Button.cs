@@ -3,6 +3,7 @@
 
 using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Styles;
+using NeoKolors.Common;
 
 namespace NeoKolors.Tui.Elements;
 
@@ -45,8 +46,13 @@ public class Button : ButtonBase {
         }
         else if (Content != null) {
             var text = Content.ToString() ?? string.Empty;
+            var styledText = new AnsiString(text, new NKStyle(
+                _style.TextColor,
+                _style.BackgroundColor,
+                _style.TextStyle
+            ));
             canvas.Place(
-                text,
+                styledText,
                 pos + RenderLayout.Content.Lower,
                 RenderLayout.Content.Width,
                 HorizontalAlign.CENTER

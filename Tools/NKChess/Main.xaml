@@ -1,0 +1,303 @@
+﻿<Page x:Class="NKChess.MainView" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Grid x:name="MainGrid">
+        <StackPanel x:Name="TopNav"
+                    Orientation="HORIZONTAL"
+                    Grid.Row="0"
+                    Grid.Column="0"
+                    Grid.ColumnSpan="4">
+
+            <TextBlock Content="NKChess"
+                       TextColor="red"
+                       PaddingRight="1ch"
+                       PaddingLeft="1ch" />
+
+            <Button x:name="GameButton"
+                    Content="Game"
+                    PaddingRight="1ch"
+                    PaddingLeft="1ch" />
+
+            <Button x:name="TournamentButton"
+                    Content="Tournament"
+                    PaddingRight="1ch"
+                    PaddingLeft="1ch" />
+
+            <Button x:name="EditButton"
+                    Content="Edit"
+                    PaddingRight="1ch"
+                    PaddingLeft="1ch" />
+
+            <Button x:name="HelpButton"
+                    Content="Help"
+                    PaddingRight="1ch"
+                    PaddingLeft="1ch" />
+
+        </StackPanel>
+
+        <Grid x:name="GameGrid"
+              Grid.Row="1"
+              Grid.Column="0"
+              Margin="1ch">
+
+            <TextBlock x:name="WhiteName"
+                       Grid.Row="0"
+                       Grid.Column="0"
+                       Content="White"
+                       TextAlign="center" />
+
+            <TextBlock x:name="BlackName"
+                       Grid.Row="0"
+                       Grid.Column="2"
+                       Content="Black"
+                       TextAlign="center" />
+
+            <TextBlock x:name="WhiteTime"
+                       Grid.Row="1"
+                       Grid.Column="0"
+                       Content="infinite"
+                       TextAlign="center" />
+
+            <TextBlock x:name="BlackTime"
+                       Grid.Row="1"
+                       Grid.Column="2"
+                       Content="infinite"
+                       TextAlign="center" />
+
+            <TextBlock x:name="Result"
+                       Grid.Row="0"
+                       Grid.Column="1"
+                       Content="0:0"
+                       TextAlign="center" />
+
+            <StackPanel x:name="ChessBoardPanel"
+                        Grid.Row="2"
+                        Grid.Column="0"
+                        Grid.ColumnSpan="3"
+                        Margin="1ch">
+
+                <Grid x:name="ChessBoard" />
+
+            </StackPanel>
+
+        </Grid>
+
+        <StackPanel x:name="MovesPanel"
+                    Grid.Row="1"
+                    Grid.Column="1">
+
+            <TextBlock x:name="Moves" />
+
+        </StackPanel>
+
+        <Grid x:name="WhiteInfoPanel"
+              Grid.Row="1"
+              Grid.Column="2">
+
+            <!-- Labels -->
+            
+            <TextBlock x:name="WLabel_NPS" 
+                       Content="NPS:" 
+                       Grid.Row="0"
+                       Grid.Column="0"/>
+            
+            <TextBlock x:name="WLabel_Depth" 
+                       Content="Depth:" 
+                       Grid.Row="1"
+                       Grid.Column="0"/>
+            
+            <TextBlock x:name="WLabel_Hash" 
+                       Content="Hash:" 
+                       Grid.Row="2"
+                       Grid.Column="0"/>
+            
+            <TextBlock x:name="WLabel_Time" 
+                       Content="Time:" 
+                       Grid.Row="3"
+                       Grid.Column="0"/>
+            
+            <TextBlock x:name="WLabel_Ponder" 
+                       Content="Ponder:" 
+                       Grid.Row="0"
+                       Grid.Column="2"/>
+            
+            <TextBlock x:name="WLabel_Nodes" 
+                       Content="Nodes:" 
+                       Grid.Row="1"
+                       Grid.Column="2"/>
+            
+            <TextBlock x:name="WLabel_TB" 
+                       Content="TB:" 
+                       Grid.Row="2"
+                       Grid.Column="2"/>
+            
+            <TextBlock x:name="WLabel_Score" 
+                       Content="Score:" 
+                       Grid.Row="3"
+                       Grid.Column="2"/>
+            
+            <TextBlock x:name="WLabel_PV" 
+                       Content="PV:" 
+                       Grid.Row="4"
+                       Grid.Column="0"/>
+            
+            <TextBlock x:name="WLabel_Log" 
+                       Content="Log:" 
+                       Grid.Row="5"
+                       Grid.Column="0"/>
+            
+            <!-- Info -->
+            
+            <TextBlock x:name="W_NPS" 
+                       Content="-" 
+                       Grid.Row="0"
+                       Grid.Column="1"/>
+            
+            <TextBlock x:name="W_Depth" 
+                       Content="-" 
+                       Grid.Row="1"
+                       Grid.Column="1"/>
+            
+            <TextBlock x:name="W_Hash" 
+                       Content="-" 
+                       Grid.Row="2"
+                       Grid.Column="1"/>
+            
+            <TextBlock x:name="W_Time" 
+                       Content="-" 
+                       Grid.Row="3"
+                       Grid.Column="1"/>
+            
+            <TextBlock x:name="W_Ponder" 
+                       Content="-" 
+                       Grid.Row="0"
+                       Grid.Column="3"/>
+            
+            <TextBlock x:name="W_Nodes" 
+                       Content="-" 
+                       Grid.Row="1"
+                       Grid.Column="3"/>
+            
+            <TextBlock x:name="W_TB" 
+                       Content="-" 
+                       Grid.Row="2"
+                       Grid.Column="3"/>
+            
+            <TextBlock x:name="W_Score" 
+                       Content="-" 
+                       Grid.Row="3"
+                       Grid.Column="3"/>
+            
+            <TextBlock x:name="W_PV" 
+                       Content="-" 
+                       Grid.Row="4"
+                       Grid.Column="1"/>
+            
+        </Grid>
+
+        <Grid x:name="BlackInfoPanel"
+              Grid.Row="1"
+              Grid.Column="3">
+
+             <!-- Labels -->
+            
+            <TextBlock x:name="BLabel_NPS" 
+                       Content="NPS:" 
+                       Grid.Row="0"
+                       Grid.Column="0"/>
+            
+            <TextBlock x:name="BLabel_Depth" 
+                       Content="Depth:" 
+                       Grid.Row="1"
+                       Grid.Column="0"/>
+            
+            <TextBlock x:name="BLabel_Hash" 
+                       Content="Hash:" 
+                       Grid.Row="2"
+                       Grid.Column="0"/>
+            
+            <TextBlock x:name="BLabel_Time" 
+                       Content="Time:" 
+                       Grid.Row="3"
+                       Grid.Column="0"/>
+            
+            <TextBlock x:name="BLabel_Ponder" 
+                       Content="Ponder:" 
+                       Grid.Row="0"
+                       Grid.Column="2"/>
+            
+            <TextBlock x:name="BLabel_Nodes" 
+                       Content="Nodes:" 
+                       Grid.Row="1"
+                       Grid.Column="2"/>
+            
+            <TextBlock x:name="BLabel_TB" 
+                       Content="TB:" 
+                       Grid.Row="2"
+                       Grid.Column="2"/>
+            
+            <TextBlock x:name="BLabel_Score" 
+                       Content="Score:" 
+                       Grid.Row="3"
+                       Grid.Column="2"/>
+            
+            <TextBlock x:name="BLabel_PV" 
+                       Content="PV:" 
+                       Grid.Row="4"
+                       Grid.Column="0"/>
+            
+            <TextBlock x:name="BLabel_Log" 
+                       Content="Log:" 
+                       Grid.Row="5"
+                       Grid.Column="0"/>
+            
+            <!-- Info -->
+            
+            <TextBlock x:name="B_NPS" 
+                       Content="-" 
+                       Grid.Row="0"
+                       Grid.Column="1"/>
+            
+            <TextBlock x:name="B_Depth" 
+                       Content="-" 
+                       Grid.Row="1"
+                       Grid.Column="1"/>
+            
+            <TextBlock x:name="B_Hash" 
+                       Content="-" 
+                       Grid.Row="2"
+                       Grid.Column="1"/>
+            
+            <TextBlock x:name="B_Time" 
+                       Content="-" 
+                       Grid.Row="3"
+                       Grid.Column="1"/>
+            
+            <TextBlock x:name="B_Ponder" 
+                       Content="-" 
+                       Grid.Row="0"
+                       Grid.Column="3"/>
+            
+            <TextBlock x:name="B_Nodes" 
+                       Content="-" 
+                       Grid.Row="1"
+                       Grid.Column="3"/>
+            
+            <TextBlock x:name="B_TB" 
+                       Content="-" 
+                       Grid.Row="2"
+                       Grid.Column="3"/>
+            
+            <TextBlock x:name="B_Score" 
+                       Content="-" 
+                       Grid.Row="3"
+                       Grid.Column="3"/>
+            
+            <TextBlock x:name="B_PV" 
+                       Content="-" 
+                       Grid.Row="4"
+                       Grid.Column="1"/>
+            
+        </Grid>
+    </Grid>
+
+</Page>

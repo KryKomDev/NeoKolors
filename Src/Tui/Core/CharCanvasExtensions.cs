@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2026 KryKom
 
 using Metriks;
@@ -14,7 +14,7 @@ public static class CharCanvasExtensions {
     
     extension(ICharCanvas canvas) {
         
-        public void PlaceRectangle(Rectangle rectangle, BorderStyle borderStyle) {
+        public void PlaceRectangle(Rectangle rectangle, BorderStyle borderStyle, int zIndex = 0) {
             if (borderStyle.IsBorderless)
                 return;
             
@@ -26,7 +26,8 @@ public static class CharCanvasExtensions {
                 borderStyle.StyleTopLeft,    borderStyle.StyleTopRight, 
                 borderStyle.StyleBottomLeft, borderStyle.StyleBottomRight,
                 borderStyle.StyleTopLeft,    borderStyle.StyleTopRight, 
-                borderStyle.StyleBottomLeft, borderStyle.StyleBottomRight
+                borderStyle.StyleBottomLeft, borderStyle.StyleBottomRight,
+                zIndex
             );
         }
 
@@ -36,7 +37,8 @@ public static class CharCanvasExtensions {
             char topRight,    char topLeft,
             char bottomRight, char bottomLeft,
             NKStyle topStyle,     NKStyle bottomStyle,   NKStyle leftStyle,       NKStyle rightStyle,
-            NKStyle topLeftStyle, NKStyle topRightStyle, NKStyle bottomLeftStyle, NKStyle bottomRightStyle) 
+            NKStyle topLeftStyle, NKStyle topRightStyle, NKStyle bottomLeftStyle, NKStyle bottomRightStyle,
+            int zIndex = 0) 
         {
             var lx = rectangle.LowerX;
             var ly = rectangle.LowerY;
@@ -46,38 +48,52 @@ public static class CharCanvasExtensions {
             // top left corner
             if (lx == ..^canvas.Width && ly == ..^canvas.Height) {
                 var cellInfo   = canvas[lx, ly];
-                cellInfo.Char  = topLeft;
-                cellInfo.Style = cellInfo.Style.OverrideWith(topLeftStyle);
+                if (cellInfo.ZIndex <= zIndex) {
+                    cellInfo.Char  = topLeft;
+                    cellInfo.Style = cellInfo.Style.OverrideWith(topLeftStyle);
+                    cellInfo.ZIndex = zIndex;
+                }
             }
 
             // bottom left corner
             if (lx == ..^canvas.Width && hy == ..^canvas.Height) {
                 var cellInfo   = canvas[lx, hy];
-                cellInfo.Char  = bottomLeft;
-                cellInfo.Style = cellInfo.Style.OverrideWith(bottomLeftStyle);
+                if (cellInfo.ZIndex <= zIndex) {
+                    cellInfo.Char  = bottomLeft;
+                    cellInfo.Style = cellInfo.Style.OverrideWith(bottomLeftStyle);
+                    cellInfo.ZIndex = zIndex;
+                }
             }
 
             // top right corner
             if (hx == ..^canvas.Width && ly == ..^canvas.Height) {
                 var cellInfo   = canvas[hx, ly];
-                cellInfo.Char  = topRight;
-                cellInfo.Style = cellInfo.Style.OverrideWith(topRightStyle);
+                if (cellInfo.ZIndex <= zIndex) {
+                    cellInfo.Char  = topRight;
+                    cellInfo.Style = cellInfo.Style.OverrideWith(topRightStyle);
+                    cellInfo.ZIndex = zIndex;
+                }
             }
 
             // bottom right corner
             if (hx == ..^canvas.Width && hy == ..^canvas.Height) {
                 var cellInfo   = canvas[hx, hy];
-                cellInfo.Char  = bottomRight;
-                cellInfo.Style = cellInfo.Style.OverrideWith(bottomRightStyle);
+                if (cellInfo.ZIndex <= zIndex) {
+                    cellInfo.Char  = bottomRight;
+                    cellInfo.Style = cellInfo.Style.OverrideWith(bottomRightStyle);
+                    cellInfo.ZIndex = zIndex;
+                }
             }
 
             // top
             if (ly == ..^canvas.Height) {
                 for (int x = Math.Clamp(lx + 1, 0, canvas.Width); x < Math.Clamp(hx, 0, canvas.Width); x++) {
                     var c = canvas[x, ly];
-                    
-                    c.Char  = horizontal;
-                    c.Style = c.Style.OverrideWith(topStyle);
+                    if (c.ZIndex <= zIndex) {
+                        c.Char  = horizontal;
+                        c.Style = c.Style.OverrideWith(topStyle);
+                        c.ZIndex = zIndex;
+                    }
                 }
             }
 
@@ -85,9 +101,11 @@ public static class CharCanvasExtensions {
             if (hy == ..^canvas.Height) {
                 for (int x = Math.Clamp(lx + 1, 0, canvas.Width); x < Math.Clamp(hx, 0, canvas.Width); x++) {
                     var c = canvas[x, hy];
-                    
-                    c.Char  = horizontal;
-                    c.Style = c.Style.OverrideWith(bottomStyle);
+                    if (c.ZIndex <= zIndex) {
+                        c.Char  = horizontal;
+                        c.Style = c.Style.OverrideWith(bottomStyle);
+                        c.ZIndex = zIndex;
+                    }
                 }
             }
 
@@ -95,9 +113,11 @@ public static class CharCanvasExtensions {
             if (lx == ..^canvas.Width) {
                 for (int y = Math.Clamp(ly + 1, 0, canvas.Height); y < Math.Clamp(hy, 0, canvas.Height); y++) {
                     var c = canvas[lx, y];
-                
-                    c.Char  = vertical;
-                    c.Style = c.Style.OverrideWith(leftStyle);
+                    if (c.ZIndex <= zIndex) {
+                        c.Char  = vertical;
+                        c.Style = c.Style.OverrideWith(leftStyle);
+                        c.ZIndex = zIndex;
+                    }
                 }
             }
 
@@ -105,9 +125,11 @@ public static class CharCanvasExtensions {
             if (hx == ..^canvas.Width) {
                 for (int y = Math.Clamp(ly + 1, 0, canvas.Height); y < Math.Clamp(hy, 0, canvas.Height); y++) {
                     var c = canvas[hx, y];
-                
-                    c.Char  = vertical;
-                    c.Style = c.Style.OverrideWith(rightStyle);
+                    if (c.ZIndex <= zIndex) {
+                        c.Char  = vertical;
+                        c.Style = c.Style.OverrideWith(rightStyle);
+                        c.ZIndex = zIndex;
+                    }
                 }
             }
         }
@@ -117,25 +139,38 @@ public static class CharCanvasExtensions {
         /// </summary>
         /// <param name="region">The rectangular area on the canvas where the style will be applied.</param>
         /// <param name="style">The style to be applied to each character within the region.</param>
-        public void Style(Rectangle region, NKStyle style) {
+        public void Style(Rectangle region, NKStyle style, int zIndex = 0) {
             for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
                 for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
                     var cellInfo   = canvas[x, y];
-                    cellInfo.Style = cellInfo.Style.OverrideWith(style);
+                    if (cellInfo.ZIndex <= zIndex) {
+                        cellInfo.Style = cellInfo.Style.OverrideWith(style);
+                        cellInfo.ZIndex = zIndex;
+                    }
                 }
             }
         }
 
-        /// <summary>
-        /// Sets the background color for all characters within the specified rectangular region on the canvas.
-        /// </summary>
-        /// <param name="region">The rectangular region within which the background color will be applied.</param>
-        /// <param name="color">The background color to apply to each character in the region.</param>
-        public void StyleBackground(Rectangle region, NKColor color) {
+        public void StyleBackground(Rectangle region, NKColor color, int zIndex = 0) {
             for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
                 for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
                     var cellInfo   = canvas[x, y];
-                    cellInfo.Style = cellInfo.Style.SafeSetBColor(color);
+                    if (cellInfo.ZIndex <= zIndex) {
+                        cellInfo.Style = cellInfo.Style.SafeSetBColor(color);
+                        cellInfo.ZIndex = zIndex;
+                    }
+                }
+            }
+        }
+
+        public void StyleTextColor(Rectangle region, NKColor color, int zIndex = 0) {
+            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
+                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
+                    var cellInfo   = canvas[x, y];
+                    if (cellInfo.ZIndex <= zIndex) {
+                        cellInfo.Style = cellInfo.Style.SafeSetFColor(color);
+                        cellInfo.ZIndex = zIndex;
+                    }
                 }
             }
         }
@@ -215,11 +250,14 @@ public static class CharCanvasExtensions {
         /// </summary>
         /// <param name="region">The rectangular area on the canvas where the style will be applied.</param>
         /// <param name="c">The character to be used when filling the region.</param>
-        public void Fill(Rectangle region, char c) {
+        public void Fill(Rectangle region, char c, int zIndex = 0) {
             for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
                 for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
                     var cellInfo  = canvas[x, y];
-                    cellInfo.Char = c;
+                    if (cellInfo.ZIndex <= zIndex) {
+                        cellInfo.Char = c;
+                        cellInfo.ZIndex = zIndex;
+                    }
                 }
             }
         }
@@ -230,12 +268,15 @@ public static class CharCanvasExtensions {
         /// </summary>
         /// <param name="region">The rectangular area on the canvas to be filled.</param>
         /// <param name="c">The AnsiChar containing the character and style to apply.</param>
-        public void Fill(Rectangle region, AnsiChar c) {
+        public void Fill(Rectangle region, AnsiChar c, int zIndex = 0) {
             for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
                 for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
                     var cellInfo   = canvas[x, y];
-                    cellInfo.Char  = c.Char;
-                    cellInfo.Style = cellInfo.Style.OverrideWith(c.Style);
+                    if (cellInfo.ZIndex <= zIndex) {
+                        cellInfo.Char  = c.Char;
+                        cellInfo.Style = cellInfo.Style.OverrideWith(c.Style);
+                        cellInfo.ZIndex = zIndex;
+                    }
                 }
             }
         }

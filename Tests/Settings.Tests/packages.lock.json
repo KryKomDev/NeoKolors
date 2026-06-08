@@ -41,8 +41,8 @@
       },
       "Metriks": {
         "type": "Transitive",
-        "resolved": "2026.2.5",
-        "contentHash": "6Il7IaSVY+Syl2fax3Jlkix2dGJ/PiyMX/JeBzIVd36vcge6Jyr+CjQd5vG2DZUXzM1/MLWjjXcRIZ9d4znStQ==",
+        "resolved": "2026.2.6",
+        "contentHash": "XBs3C6mj6FN477YQ0/elgk5dpXdFXuHE+OSG8OhyNnxR2rqlEXXDrBlvKOxUp97CLnuVjKbLSnAz1wi6n95Scg==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4"
         }
@@ -111,11 +111,6 @@
         "type": "Transitive",
         "resolved": "3.119.4",
         "contentHash": "XOpbx/4CReO2wYsq2s6rbvdauc6dntG4Zv499sHGTJ87bwZaFXszFkwql3+FIZMc8kUPeaj3Mx2ezIJmo8a1Kg=="
-      },
-      "System.Buffers": {
-        "type": "Transitive",
-        "resolved": "4.6.1",
-        "contentHash": "N8GXpmiLMtljq7gwvyS+1QvKT/W2J8sNAvx+HVg4NGmsG/H+2k/y9QI23auLJRterrzCiDH+IWAw4V/GPwsMlw=="
       },
       "System.Collections.Immutable": {
         "type": "Transitive",
@@ -199,7 +194,7 @@
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Metriks": "[2026.2.5, )",
+          "Metriks": "[2026.2.6, )",
           "System.Collections.Immutable": "[10.0.8, )"
         }
       },
@@ -207,8 +202,7 @@
         "type": "Project",
         "dependencies": {
           "NeoKolors.Common": "[2026.2.0-rc1, )",
-          "NeoKolors.Console": "[2026.2.0-rc1, )",
-          "System.Buffers": "[*, )"
+          "NeoKolors.Console": "[2026.2.0-rc1, )"
         }
       }
     }
