@@ -52,7 +52,7 @@ internal static class MouseEventDecomposer {
     /// modifiers, movement status, position, and release status.</returns>
     internal static MouseEventArgs DecomposeSGR(int type, int x, int y, char f) {
         var t = GetType(type);
-        var pos = new Point2D(x, y);
+        var pos = new Point2D(x - 1, y - 1);
         var rel = f == 'm';
 
         return new MouseEventArgs(t.Btn, t.Mods, pos, rel, t.Move);

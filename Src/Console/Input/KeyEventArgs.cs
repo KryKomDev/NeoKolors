@@ -33,6 +33,7 @@ public readonly record struct KeyEventArgs {
         
         Key  = (KeyCode)key;
         Char = c;
+        Down = true;
     }
     
     public KeyEventArgs(ConsoleKeyInfo keyInfo) : this(keyInfo.Key, keyInfo.Modifiers, keyInfo.KeyChar) { }

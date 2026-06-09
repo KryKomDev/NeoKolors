@@ -7,9 +7,9 @@ namespace NeoKolors.Console.Driver;
 
 public abstract class InputDriverConfig {
     
-    public bool                ReportFocus  { get; set; }
-    public bool                ReportResize { get; set; }
-    public ReportedMouseEvents MouseConfig  { get; set; }
+    public bool                        ReportFocus  { get; set; }
+    public bool                        ReportResize { get; set; }
+    public virtual ReportedMouseEvents MouseConfig  { get; set; }
 
     protected InputDriverConfig(bool reportFocus, ReportedMouseEvents mouseConfig, bool reportResize) {
         ReportFocus  = reportFocus;
