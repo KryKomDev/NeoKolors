@@ -1,0 +1,77 @@
+<Page x:Class="XmlTestApp.MainView" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StackPanel Id="0" Class="Slide">
+        <TextBlock
+            Width="stretch" 
+            MarginTop="50vh - 6ch" 
+            Font="Dummy" 
+            TextAlign="bottom" 
+            TextColor="blue"
+            Id="heading"
+            Class="Heading"
+            BackgroundColor="red"
+            Content="NeoKolors"/>
+        
+        <TextBlock Id="sub" Class="Paragraph" Width="stretch" TextAlign="top" Padding="1ch">by KryKom</TextBlock>
+        <SixelImage Padding="4ch" Id="logo" Source="C:\Users\krystof\Documents\Gymlit-logo-dark-alpha-cp.png" Width="16ch"/>
+    </StackPanel>
+    
+    <StackPanel Id="1" Class="Slide" Visible="false">
+        <TextBlock Class="Heading">Slide 1</TextBlock>
+
+        <ListView>
+            <TextBlock>Item 1</TextBlock>
+            <TextBlock>Item 2</TextBlock>
+            <TextBlock>Item 3</TextBlock>
+            <TextBlock>Item 4</TextBlock>
+        </ListView>
+    </StackPanel>
+
+    <StackPanel Id="2" Class="Slide" Visible="false">
+        <TextBlock Class="Heading">Slide 2</TextBlock>
+
+        <ListView>
+            <TextBlock>Item 5</TextBlock>
+            <TextBlock>Item 6</TextBlock>
+            <TextBlock>Item 7</TextBlock>
+            <TextBlock>Item 8</TextBlock>
+        </ListView>
+    </StackPanel>
+    
+    <StackPanel Id="3" Class="Slide" Visible="false">
+        <TextBlock Class="Heading">Slide 3</TextBlock>
+        
+        <StackPanel Id="Cols" Orientation="Horizontal">
+            <StackPanel PaddingRight="5ch">
+                <TextBlock TextStyle="Bold, Underline">Sub a:</TextBlock>
+                <ListView Id="Test">
+                    <TextBlock>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam er</TextBlock>
+                    <TextBlock>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam </TextBlock>
+                    <TextBlock>Item 7</TextBlock>
+                    <TextBlock>Item 8</TextBlock>
+                </ListView>
+            </StackPanel>
+            <StackPanel>
+                <TextBlock TextStyle="Bold, Underline">Sub b:</TextBlock>
+                <ListView>
+                    <TextBlock>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam er</TextBlock>
+                    <TextBlock>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam </TextBlock>
+                    <TextBlock>Item 7</TextBlock>
+                    <TextBlock>Item 8</TextBlock>
+                </ListView>
+            </StackPanel>
+        </StackPanel>
+        
+    </StackPanel>
+    
+    <StackPanel Class="Slide" Id="4" Visible="false">
+        <TextBlock Class="Heading">Idk</TextBlock>
+        
+        <StackPanel>
+            <ListView>
+                <TextBlock>Lorem</TextBlock>
+                <TextBlock>Ipsum</TextBlock>
+            </ListView>
+            <SixelImage Source="C:\Users\krystof\Documents\Gymlit-logo-dark-alpha-cp.png"/>
+        </StackPanel>
+    </StackPanel>
+</Page>

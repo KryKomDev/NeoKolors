@@ -6,7 +6,9 @@
 using System.Data;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Text;
 using JetBrains.Annotations;
+using Metriks;
 using NeoKolors.Common;
 using NeoKolors.Extensions;
 using SkiaSharp;
@@ -653,6 +655,7 @@ public static partial class NKConsole {
             for (int j = 0; j < cols; j++) {
                 OutputDriver.Write($"{vSeparator} {rows[i][j].VisiblePadRight(maxWidths[j])} ");
             }
+            
             OutputDriver.WriteLine(vSeparator);
         }
     }
@@ -802,6 +805,226 @@ public static partial class NKConsole {
         if (displayName) h.Insert(0, "Name");
         
         WriteTable(h.ToArray(), rows, style);
+    }
+
+    public readonly record struct TableStyle {
+        public char VLineChar { get; init; }
+        public char HLineChar { get; init; }
+        public char RightTChar { get; init; }
+        public char LeftTChar { get; init; }
+        public char CrossChar { get; init; }
+        public NKStyle HeaderTextStyle { get; init; }
+        public NKStyle DataTextStyle { get; init; }
+        public NKStyle VLineStyle { get; init; }
+        public NKStyle HLineStyle { get; init; }
+        public NKStyle RightTLineStyle { get; init; }
+        public NKStyle LeftTLineStyle { get; init; }
+        public NKStyle CrossTLineStyle { get; init; }
+        public bool DisableHeaderLine { get; init; }
+        public bool DisableBorderLines { get; init; }
+
+        public TableStyle(
+            char vLineChar,
+            char hLineChar,
+            char rightTChar,
+            char leftTChar,
+            char crossChar,
+            NKStyle headerTextStyle = default,
+            NKStyle dataTextStyle = default,
+            NKStyle vLineStyle = default,
+            NKStyle hLineStyle = default,
+            NKStyle rightTLineStyle = default,
+            NKStyle leftTLineStyle = default,
+            NKStyle crossTLineStyle = default,
+            bool disableHeaderLine = default,
+            bool disableBorderLines = default) 
+        {
+            VLineChar = vLineChar;
+            HLineChar = hLineChar;
+            RightTChar = rightTChar;
+            LeftTChar = leftTChar;
+            CrossChar = crossChar;
+            HeaderTextStyle = headerTextStyle;
+            DataTextStyle = dataTextStyle;
+            VLineStyle = vLineStyle;
+            HLineStyle = hLineStyle;
+            RightTLineStyle = rightTLineStyle;
+            LeftTLineStyle = leftTLineStyle;
+            CrossTLineStyle = crossTLineStyle;
+            DisableHeaderLine = disableHeaderLine;
+            DisableBorderLines = disableBorderLines;
+        }
+
+        public static TableStyle Ascii(
+            NKStyle headerTextStyle = default,
+            NKStyle dataTextStyle = default,
+            NKStyle vLineStyle = default,
+            NKStyle hLineStyle = default,
+            NKStyle rightTLineStyle = default,
+            NKStyle leftTLineStyle = default,
+            NKStyle crossTLineStyle = default,
+            bool disableHeaderLine = default,
+            bool disableBorderLines = default) 
+        {
+            return new TableStyle(
+                '|',
+                '-',
+                '|',
+                '|',
+                '+',
+                headerTextStyle,
+                dataTextStyle,
+                vLineStyle,
+                hLineStyle,
+                rightTLineStyle,
+                leftTLineStyle,
+                crossTLineStyle,
+                disableHeaderLine,
+                disableBorderLines
+            );
+        }
+        
+        public static TableStyle Normal(
+            NKStyle headerTextStyle = default,
+            NKStyle dataTextStyle = default,
+            NKStyle vLineStyle = default,
+            NKStyle hLineStyle = default,
+            NKStyle rightTLineStyle = default,
+            NKStyle leftTLineStyle = default,
+            NKStyle crossTLineStyle = default,
+            bool disableHeaderLine = default,
+            bool disableBorderLines = default) 
+        {
+            return new TableStyle(
+                '│',
+                '─',
+                '┤',
+                '├',
+                '┼',
+                headerTextStyle,
+                dataTextStyle,
+                vLineStyle,
+                hLineStyle,
+                rightTLineStyle,
+                leftTLineStyle,
+                crossTLineStyle,
+                disableHeaderLine,
+                disableBorderLines
+            );
+        }
+        
+        public static TableStyle Normal_DoubleHeaderLine(
+            NKStyle headerTextStyle = default,
+            NKStyle dataTextStyle = default,
+            NKStyle vLineStyle = default,
+            NKStyle hLineStyle = default,
+            NKStyle rightTLineStyle = default,
+            NKStyle leftTLineStyle = default,
+            NKStyle crossTLineStyle = default,
+            bool disableHeaderLine = default,
+            bool disableBorderLines = default) 
+        {
+            return new TableStyle(
+                '│',
+                '═',
+                '╡',
+                '╞',
+                '╪',
+                headerTextStyle,
+                dataTextStyle,
+                vLineStyle,
+                hLineStyle,
+                rightTLineStyle,
+                leftTLineStyle,
+                crossTLineStyle,
+                disableHeaderLine,
+                disableBorderLines
+            );
+        }
+        
+        public static TableStyle Borderless(
+            NKStyle headerTextStyle = default,
+            NKStyle dataTextStyle = default,
+            NKStyle vLineStyle = default,
+            NKStyle hLineStyle = default,
+            NKStyle rightTLineStyle = default,
+            NKStyle leftTLineStyle = default,
+            NKStyle crossTLineStyle = default,
+            bool disableHeaderLine = default,
+            bool disableBorderLines = default) 
+        {
+            return new TableStyle(
+                ' ',
+                ' ',
+                ' ',
+                ' ',
+                ' ',
+                headerTextStyle,
+                dataTextStyle,
+                vLineStyle,
+                hLineStyle,
+                rightTLineStyle,
+                leftTLineStyle,
+                crossTLineStyle,
+                disableHeaderLine,
+                disableBorderLines
+            );
+        }
+    }
+
+    public static void WriteTable<T>(AnsiString[] header, T[,] data, TableStyle style) {
+        if (header.Length != data.GetLen1()) {
+            throw new ArgumentException("Header and data lengths do not match.");
+        }
+        
+        var sData = new string[data.GetLen0(), data.GetLen1()];
+
+        for (int r = 0; r < data.GetLen0(); r++) {
+            for (int c = 0; c < data.GetLen1(); c++) {
+                sData[r, c] = data[r, c]?.ToString() ?? "";
+            }
+        }
+        
+        WriteTable(header, sData, style);
+    }
+
+    public static void WriteTable(AnsiString[] header, string[,] data, TableStyle style) {
+        if (header.Length != data.GetLen1()) {
+            throw new ArgumentException("Header and data lengths do not match.");
+        }
+        
+        var widths = new int[header.Length];
+
+        for (int c = 0; c < header.Length; c++) {
+            widths[c] = header[c]?.Length ?? 0;
+
+            for (int r = 0; r < data.Len0; r++) {
+                widths[c] = Math.Max(widths[c], data[r, c]?.PlainLength ?? 0);
+            }
+
+            widths[c] += 2;
+        }
+        
+        WriteRow(header, widths, true, style);
+    }
+
+    private static void WriteRow(AnsiString[] row, int[] widths, bool isHeader, TableStyle style) {
+        var sb = new StringBuilder();
+
+        if (!style.DisableBorderLines)
+            sb.Append(style.VLineChar.AddStyle(style.VLineStyle));
+
+        for (int i = 0; i < row.Length; i++) {
+            sb.Append(' ');
+            sb.Append(row[i].PadRight(widths[i]).AddStyle(style.HeaderTextStyle));
+            sb.Append(' ');
+            
+            if (i != row.Length - 1 || !style.DisableBorderLines) {
+                sb.Append(style.VLineChar.AddStyle(style.VLineStyle));
+            }
+        }
+        
+        Write(sb.ToString());
     }
     
     /// <summary>
