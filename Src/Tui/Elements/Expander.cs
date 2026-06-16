@@ -54,7 +54,7 @@ public class Expander : HeaderedContentControl, IMouseInteractableElement<IEleme
     public void Hover() => OnHover();
     public void HoverOut() => OnHoverOut();
 
-    protected override Size MeasureOverride(Size availableSize) {
+    protected override Size2D MeasureOverride(Size2D availableSize) {
         var headerText = Header?.ToString() ?? string.Empty;
         int width = headerText.Length + 4;
         int height = 1;
@@ -62,17 +62,17 @@ public class Expander : HeaderedContentControl, IMouseInteractableElement<IEleme
         if (IsExpanded && Content is IElement element) {
             element.Measure(availableSize);
             var childSize = element.DesiredSize;
-            width = Math.Max(width, childSize.Width + 2);
-            height += childSize.Height;
+            width = Math.Max(width, childSize.X + 2);
+            height += childSize.Y;
         }
 
-        return new Size(width, height);
+        return new Size2D(width, height);
     }
 
-    protected override Size ArrangeOverride(Size finalSize) {
+    protected override Size2D ArrangeOverride(Size2D finalSize) {
         if (IsExpanded && Content is IElement element) {
             var contentPos = RenderBounds.Lower + RenderLayout.Content.Lower;
-            element.Arrange(new Rectangle(contentPos + new Point(2, 1), new Size(Math.Max(0, RenderLayout.Content.Width - 2), Math.Max(0, RenderLayout.Content.Height - 1))));
+            element.Arrange(new Area2D(contentPos + new Point2D(2, 1), new Size2D(Math.Max(0, RenderLayout.Content.SizeX - 2), Math.Max(0, RenderLayout.Content.SizeY - 1))));
         }
         return finalSize;
     }
@@ -80,7 +80,7 @@ public class Expander : HeaderedContentControl, IMouseInteractableElement<IEleme
     protected override void RenderCore(ICharCanvas canvas) {
         var pos = RenderBounds.Lower;
         var contentPos = pos + RenderLayout.Content.Lower;
-        var contentWidth = RenderLayout.Content.Width;
+        var contentWidth = RenderLayout.Content.SizeX;
 
         string symbol = IsExpanded ? "▼ " : "► ";
         string headerText = Header?.ToString() ?? string.Empty;

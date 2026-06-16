@@ -42,6 +42,9 @@ public class XamlElementLoader {
 
         RegisterElements(typeof(IElement).Assembly);
 
+        _elementMap["Trigger"] = typeof(Styles.Trigger);
+        _elementMap["Setter"] = typeof(Styles.Setter);
+
         foreach (var a in assemblies) {
             RegisterElements(a);
         }
@@ -65,11 +68,12 @@ public class XamlElementLoader {
     private class ParserFrame {
         public object Instance { get; }
         public XamlType Type { get; }
-        public List<IElement> Children { get; } = new();
+        public List<object> Children { get; } = new();
         public XamlMember? CurrentMember { get; set; }
         public string? CurrentMemberName { get; set; }
         public object? MemberValue { get; set; }
         public string? InitializationText { get; set; }
+        public object? GetObjectValue { get; set; }
 
         public ParserFrame(object instance, XamlType type) {
             Instance = instance;
@@ -99,6 +103,10 @@ public class XamlElementLoader {
             switch (xamlReader.NodeType) {
                 case XamlNodeType.StartObject: {
                     var xamlType = xamlReader.Type;
+                    if (xamlType == null) {
+                        throw new InvalidOperationException("XAML element type is null.");
+                    }
+
                     var type = xamlType.UnderlyingType;
 
                     if (type == null) {
@@ -119,6 +127,34 @@ public class XamlElementLoader {
                     }
 
                     var newFrame = new ParserFrame(instance, xamlType);
+                    stack.Push(newFrame);
+
+                    break;
+                }
+
+                case XamlNodeType.GetObject: {
+                    if (stack.Count == 0) break;
+
+                    var frame = stack.Peek();
+                    var member = frame.CurrentMember;
+                    var memberName = frame.CurrentMemberName;
+                    object? val = null;
+
+                    if (member != null && memberName != null) {
+                        var prop = frame.Instance.GetType().GetProperty(memberName, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
+                        if (prop != null) {
+                            val = prop.GetValue(frame.Instance);
+                        }
+                    }
+
+                    if (val == null) {
+                        val = xamlReader.Type?.UnderlyingType != null 
+                            ? Activator.CreateInstance(xamlReader.Type.UnderlyingType) 
+                            : new object();
+                    }
+
+                    var memberType = xamlReader.Type ?? frame.CurrentMember?.Type;
+                    var newFrame = new ParserFrame(val!, memberType!);
                     stack.Push(newFrame);
 
                     break;
@@ -228,7 +264,17 @@ public class XamlElementLoader {
 
                     // Perform children assembly
                     if (instance is IElement element) {
-                        AssembleElement(element, poppedFrame.Children);
+                        AssembleElement(element, poppedFrame.Children.OfType<IElement>().ToList());
+                    }
+                    else if (instance is System.Collections.IList list) {
+                        foreach (var child in poppedFrame.Children) {
+                            if (child != null && !list.Contains(child)) {
+                                list.Add(child);
+                            }
+                        }
+                    }
+                    else if (poppedFrame.Children.Count > 0) {
+                        poppedFrame.GetObjectValue = poppedFrame.Children[0];
                     }
 
                     if (stack.Count == 0) {
@@ -247,17 +293,20 @@ public class XamlElementLoader {
                                 parentFrame.CurrentMember == XamlLanguage.Items ||
                                 parentFrame.CurrentMember == XamlLanguage.UnknownContent ||
                                 isMemberTagAnElement) {
-                                if (instance is IElement el) {
-                                    parentFrame.Children.Add(el);
-                                }
+                                parentFrame.Children.Add(instance);
                             }
                             else {
-                                ApplyMemberValue(parentFrame.Instance, parentFrame.CurrentMember, parentFrame.CurrentMemberName, instance);
+                                var valueToApply = poppedFrame.GetObjectValue ?? poppedFrame.MemberValue ?? instance;
+                                ApplyMemberValue(parentFrame.Instance, parentFrame.CurrentMember, parentFrame.CurrentMemberName, valueToApply);
                             }
                         }
                         else {
-                            if (instance is IElement el) {
-                                parentFrame.Children.Add(el);
+                            if (parentFrame.Instance is System.Collections.IList list) {
+                                list.Add(instance);
+                            }
+                            else {
+                                parentFrame.GetObjectValue = instance;
+                                parentFrame.Children.Add(instance);
                             }
                         }
                     }
@@ -340,7 +389,7 @@ public class XamlElementLoader {
         }
 
         if (hasGridProps) {
-            element.Style.Set(new GridAlignProperty(new Rectangle(gridCol, gridRow, gridColSpan, gridRowSpan)));
+            element.Style.Set(new GridAlignProperty(new Area2D(gridCol, gridRow, gridColSpan, gridRowSpan)));
         }
 
         if (childrenList.Count > 0) {
@@ -417,6 +466,11 @@ public class XamlElementLoader {
         var prop = element.GetType().GetProperty(name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
         if (prop != null) {
             try {
+                var currentValue = prop.GetValue(element);
+                if (ReferenceEquals(currentValue, value)) {
+                    return;
+                }
+
                 if (typeof(System.Collections.IList).IsAssignableFrom(prop.PropertyType)) {
                     var list = prop.GetValue(element) as System.Collections.IList;
                     if (list != null) {
@@ -441,6 +495,11 @@ public class XamlElementLoader {
         var prop = instance.GetType().GetProperty(name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
         if (prop != null) {
             try {
+                var currentValue = prop.GetValue(instance);
+                if (ReferenceEquals(currentValue, value)) {
+                    return;
+                }
+
                 if (typeof(System.Collections.IList).IsAssignableFrom(prop.PropertyType)) {
                     var list = prop.GetValue(instance) as System.Collections.IList;
                     if (list != null) {

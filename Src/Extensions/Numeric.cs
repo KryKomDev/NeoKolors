@@ -56,6 +56,8 @@ public static class Numeric {
         /// <param name="max">The upper bound.</param>
         /// <returns>The clamped integer value.</returns>
         public int Clamp(int min, int max) => Math.Clamp(val, min, max);
+
+        public Index Index => new(val);
     }
 
     extension(Math) {

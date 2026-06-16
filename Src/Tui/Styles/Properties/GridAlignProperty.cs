@@ -3,14 +3,14 @@
 
 namespace NeoKolors.Tui.Styles.Properties;
 
-public struct GridAlignProperty : IStyleProperty<Rectangle, GridAlignProperty> {
-    public Rectangle Value { get; }
+public struct GridAlignProperty : IStyleProperty<Area2D, GridAlignProperty> {
+    public Area2D Value { get; }
     
-    public GridAlignProperty(Rectangle value) {
+    public GridAlignProperty(Area2D value) {
         Value = value;
     }
     
     public GridAlignProperty() {
-        Value = new Rectangle(0, 0, 0, 0);
+        Value = new Area2D(0, 0, 0, 0);
     }
 }

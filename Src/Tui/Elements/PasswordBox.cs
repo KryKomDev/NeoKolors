@@ -14,19 +14,21 @@ namespace NeoKolors.Tui.Elements;
 /// Displays mask characters (e.g. •) for entered text.
 /// </summary>
 public class PasswordBox : Control<string>, ISelectableElement<string>, IMouseInteractableElement<string> {
-    
     private string _password = string.Empty;
-    private int _cursor;
-    private int _scrollOffset;
-    private char _passwordChar = '•';
+    private int    _cursor;
+    private int    _scrollOffset;
+    private char   _passwordChar = '•';
 
     public string Password {
         get => _password;
         set {
             var val = value ?? string.Empty;
-            if (_password == val) return;
+
+            if (_password == val)
+                return;
+
             _password = val;
-            _cursor = Math.Clamp(_cursor, 0, _password.Length);
+            _cursor   = Math.Clamp(_cursor, 0, _password.Length);
             InvokeElementUpdated();
         }
     }
@@ -34,7 +36,9 @@ public class PasswordBox : Control<string>, ISelectableElement<string>, IMouseIn
     public char PasswordChar {
         get => _passwordChar;
         set {
-            if (_passwordChar == value) return;
+            if (_passwordChar == value)
+                return;
+
             _passwordChar = value;
             InvokeElementUpdated();
         }
@@ -47,24 +51,25 @@ public class PasswordBox : Control<string>, ISelectableElement<string>, IMouseIn
     public bool IsSelectable => true;
 
     public static StyleCollection DefaultStyles { get; } = new(AbstractElement.DefaultStyle) {
-        Width = Dimension.Chars(20),
-        Height = Dimension.Chars(1),
+        Width           = Dimension.Chars(20),
         BackgroundColor = NKColor.Default,
-        ReadOnly = true
+        ReadOnly        = true
     };
 
     public PasswordBox() : base(DefaultStyles) {
         OnClick += HandleClick;
     }
 
-    protected override Size MeasureOverride(Size availableSize) {
+    protected override Size2D MeasureOverride(Size2D availableSize) {
         var length = Math.Max(_password.Length, Placeholder.Length);
-        return new Size(length, 1);
+
+        return new Size2D(length, 1);
     }
 
     private void KeepCursorInView(int contentWidth) {
         if (contentWidth <= 0) {
             _scrollOffset = 0;
+
             return;
         }
 
@@ -80,58 +85,73 @@ public class PasswordBox : Control<string>, ISelectableElement<string>, IMouseIn
     }
 
     protected override void RenderCore(ICharCanvas canvas) {
-        var pos = RenderBounds.Lower;
-        var contentWidth = RenderLayout.Content.Width;
+        var pos          = RenderBounds.Lower;
+        var contentWidth = RenderLayout.Content.SizeX;
 
         KeepCursorInView(contentWidth);
 
         // Clear NEGATIVE style from the content region first
         for (int x = 0; x < contentWidth; x++) {
-            var cp = pos + RenderLayout.Content.Lower + new Point(x, 0);
-            var relativeCp = cp - pos;
-            if (RenderLayout.Content.Contains(relativeCp.X, relativeCp.Y)) {
-                if (cp.X >= 0 && cp.X < canvas.Width && cp.Y >= 0 && cp.Y < canvas.Height) {
-                    var cell = canvas[cp.X, cp.Y];
-                    cell.Style = cell.Style with { Styles = cell.Style.Styles & ~NeoKolors.Common.TextStyles.NEGATIVE };
-                }
-            }
+            var cp         = pos + RenderLayout.Content.Lower + new Point2D(x, 0);
+            var relativeCp = cp  - pos;
+
+            if (!RenderLayout.Content.ContainsIn(relativeCp.X, relativeCp.Y))
+                continue;
+
+            if (cp.X < 0 || cp.X >= canvas.Width || cp.Y < 0 || cp.Y >= canvas.Height)
+                continue;
+
+            var c = canvas[cp.X, cp.Y];
+            c.Style = c.Style with { Styles = c.Style.Styles & ~TextStyles.NEGATIVE };
         }
 
-        string renderedText;
+        AnsiString renderedText;
+
         if (_password.Length == 0 && !IsSelected) {
-            renderedText = Placeholder;
-        } else {
-            int start = Math.Clamp(_scrollOffset, 0, _password.Length);
+            renderedText = new AnsiString(Placeholder, _style.GetPlaceholderTextStyle());
+        }
+        else {
+            int start  = Math.Clamp(_scrollOffset, 0, _password.Length);
             int length = Math.Min(contentWidth, _password.Length - start);
             renderedText = length > 0 ? new string(PasswordChar, length) : string.Empty;
         }
 
         canvas.Place(renderedText, pos + RenderLayout.Content.Lower, contentWidth, HorizontalAlign.LEFT);
 
-        if (!IsSelected) return;
+        if (!IsSelected)
+            return;
 
         int relativeCursorX = _cursor - _scrollOffset;
-        if (relativeCursorX >= 0 && relativeCursorX < contentWidth) {
-            var cursorPoint = pos + RenderLayout.Content.Lower + new Point(relativeCursorX, 0);
-            var relativeCursor = cursorPoint - pos;
-            if (RenderLayout.Content.Contains(relativeCursor.X, relativeCursor.Y)) {
-                if (cursorPoint.X >= 0 && cursorPoint.X < canvas.Width && cursorPoint.Y >= 0 && cursorPoint.Y < canvas.Height) {
-                    var cell = canvas[cursorPoint.X, cursorPoint.Y];
-                    if (cell.Char == null || cell.Char == '\0') {
-                        cell.Char = ' ';
-                    }
-                    cell.Style = cell.Style with { Styles = cell.Style.Styles | NeoKolors.Common.TextStyles.NEGATIVE };
-                }
-            }
+
+        if (relativeCursorX < 0 || relativeCursorX >= contentWidth)
+            return;
+
+        var cursorPoint    = pos         + RenderLayout.Content.Lower + new Point2D(relativeCursorX, 0);
+        var relativeCursor = cursorPoint - pos;
+
+        if (!RenderLayout.Content.ContainsIn(relativeCursor.X, relativeCursor.Y))
+            return;
+
+        if (cursorPoint.X < 0 || cursorPoint.X >= canvas.Width || cursorPoint.Y < 0 || cursorPoint.Y >= canvas.Height)
+            return;
+
+        var cell = canvas[cursorPoint.X, cursorPoint.Y];
+
+        if (cell.Char is null or '\0') {
+            cell.Char = ' ';
         }
+
+        cell.Style = cell.Style with { Styles = cell.Style.Styles | TextStyles.NEGATIVE };
     }
 
     public override ElementInfo Info { get; } = new();
 
     public void Select() {
-        if (IsSelected) return;
-        IsSelected = true;
-        IsFocused = true;
+        if (IsSelected)
+            return;
+
+        IsSelected           =  true;
+        IsFocused            =  true;
         AppEventBus.KeyEvent += HandleKey;
         InvokeElementUpdated();
 
@@ -141,9 +161,11 @@ public class PasswordBox : Control<string>, ISelectableElement<string>, IMouseIn
     }
 
     public void Deselect() {
-        if (!IsSelected) return;
-        IsSelected = false;
-        IsFocused = false;
+        if (!IsSelected)
+            return;
+
+        IsSelected           =  false;
+        IsFocused            =  false;
         AppEventBus.KeyEvent -= HandleKey;
         InvokeElementUpdated();
 
@@ -153,39 +175,77 @@ public class PasswordBox : Control<string>, ISelectableElement<string>, IMouseIn
     }
 
     private void HandleKey(KeyEventArgs keyInfo) {
+        if (keyInfo.Up)
+            return;
+
         switch (keyInfo.Key) {
-            case KeyCode.ARROW_LEFT:
-                if (_cursor > 0) _cursor--;
+            case KeyCode.ESCAPE: {
+                Deselect();
+
                 break;
-            case KeyCode.ARROW_RIGHT:
-                if (_cursor < _password.Length) _cursor++;
+            }
+            case KeyCode.ARROW_LEFT: {
+                if (_cursor > 0)
+                    _cursor--;
+
                 break;
-            case KeyCode.HOME:
+            }
+            case KeyCode.ARROW_RIGHT: {
+                if (_cursor < _password.Length)
+                    _cursor++;
+
+                break;
+            }
+            case KeyCode.HOME: {
                 _cursor = 0;
+
                 break;
-            case KeyCode.END:
+            }
+            case KeyCode.END: {
                 _cursor = _password.Length;
+
                 break;
-            case KeyCode.BACKSPACE:
+            }
+            case KeyCode.BACKSPACE when keyInfo.Modifiers.GetHasCtrl(): {
+                _password = _password.Remove(0, _cursor);
+                _cursor   = 0;
+
+                break;
+            }
+            case KeyCode.BACKSPACE: {
                 if (_cursor > 0 && _password.Length > 0) {
                     _password = _password.Remove(_cursor - 1, 1);
                     _cursor--;
                 }
+
                 break;
-            case KeyCode.DELETE:
+            }
+            case KeyCode.DELETE when keyInfo.Modifiers.GetHasCtrl(): {
+                _password = _password.Remove(_cursor, _password.Length - _cursor);
+
+                break;
+            }
+            case KeyCode.DELETE: {
                 if (_cursor < _password.Length && _password.Length > 0) {
                     _password = _password.Remove(_cursor, 1);
                 }
+
                 break;
-            case KeyCode.SPACE:
+            }
+            case KeyCode.SPACE: {
                 AddChar(' ');
+
                 break;
-            default:
+            }
+            default: {
                 if (!char.IsControl(keyInfo.Char)) {
                     AddChar(keyInfo.Char);
                 }
+
                 break;
+            }
         }
+
         InvokeElementUpdated();
     }
 
@@ -200,18 +260,20 @@ public class PasswordBox : Control<string>, ISelectableElement<string>, IMouseIn
         Password = childNode;
     }
 
-    public event Action<MouseButton> OnClick = delegate { };
-    public event Action<MouseButton> OnRelease = delegate { };
-    public event Action OnHover = delegate { };
-    public event Action OnHoverOut = delegate { };
+    public event Action<MouseButton> OnClick    = delegate { };
+    public event Action<MouseButton> OnRelease  = delegate { };
+    public event Action              OnHover    = delegate { };
+    public event Action              OnHoverOut = delegate { };
 
-    public void Click(MouseButton button) => OnClick(button);
+    public void Click(MouseButton   button) => OnClick(button);
     public void Release(MouseButton button) => OnRelease(button);
-    public void Hover() => OnHover();
-    public void HoverOut() => OnHoverOut();
+    public void Hover()                     => OnHover();
+    public void HoverOut()                  => OnHoverOut();
 
     private void HandleClick(MouseButton button) {
-        if (!IsEnabled) return;
+        if (!IsEnabled)
+            return;
+
         Select();
     }
 }

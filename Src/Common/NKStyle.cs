@@ -5,6 +5,7 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
+using System.Linq;
 using System.Text;
 
 namespace NeoKolors.Common;
@@ -14,8 +15,7 @@ namespace NeoKolors.Common;
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = sizeof(ulong))]
 [SuppressMessage("ReSharper", "ShiftExpressionZeroLeftOperand")]
-public record struct NKStyle : IFormattable {
-    
+public record struct NKStyle : IFormattable, IParsableValue<NKStyle> {
     //
     // Layout (0 is most significant):
     // (this may not be up to date, check offset constants for more info)
@@ -46,28 +46,28 @@ public record struct NKStyle : IFormattable {
 
     private const byte FORG_COL_SIZE = 24;
     private const byte BCKG_COL_SIZE = 24;
-    private const byte STYLES_SIZE = 8;
+    private const byte STYLES_SIZE   = 8;
     private const byte FORG_CSW_SIZE = 1;
     private const byte BCKG_CSW_SIZE = 1;
 
     // 0-based offsets from the left
     private const byte FORG_COL_OFFSET = 0;
     private const byte BCKG_COL_OFFSET = FORG_COL_OFFSET + FORG_COL_SIZE;
-    private const byte STYLES_OFFSET = BCKG_COL_OFFSET + BCKG_COL_SIZE;
-    private const byte FORG_CSW_OFFSET = STYLES_OFFSET + STYLES_SIZE;
+    private const byte STYLES_OFFSET   = BCKG_COL_OFFSET + BCKG_COL_SIZE;
+    private const byte FORG_CSW_OFFSET = STYLES_OFFSET   + STYLES_SIZE;
     private const byte BCKG_CSW_OFFSET = FORG_CSW_OFFSET + FORG_CSW_SIZE;
 
     private const byte FORG_USW_OFFSET = FORG_COL_OFFSET + 14;
-    private const byte FORG_USW_SIZE = 2;
+    private const byte FORG_USW_SIZE   = 2;
     private const byte BCKG_USW_OFFSET = BCKG_COL_OFFSET + 14;
-    private const byte BCKG_USW_SIZE = 2;
+    private const byte BCKG_USW_SIZE   = 2;
 
     private const ulong COL_TYP_DEFAULT = 0b00;
     private const ulong COL_TYP_CONSOLE = 0b01;
     private const ulong COL_TYP_INHERIT = 0b10;
 
-    private const byte TOTAL_SIZE = FORG_COL_SIZE + BCKG_COL_SIZE + STYLES_SIZE + FORG_CSW_SIZE + BCKG_CSW_SIZE;
-    private const int UNUSED_SIZE = sizeof(ulong) * 8 - TOTAL_SIZE;
+    private const byte TOTAL_SIZE  = FORG_COL_SIZE     + BCKG_COL_SIZE + STYLES_SIZE + FORG_CSW_SIZE + BCKG_CSW_SIZE;
+    private const int  UNUSED_SIZE = sizeof(ulong) * 8 - TOTAL_SIZE;
 
     private const ulong BMP_24 = 0x00_00_00_00_00_ff_ff_fful;
     private const ulong BMP_08 = 0x00_00_00_00_00_00_00_fful;
@@ -197,7 +197,7 @@ public record struct NKStyle : IFormattable {
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public NKStyle SetFColor(uint color) {
-        _raw = _raw & ~(BMP_24  << (64 - FORG_COL_OFFSET - FORG_COL_SIZE))
+        _raw = _raw & ~(BMP_24 << (64 - FORG_COL_OFFSET - FORG_COL_SIZE))
             | ((color & BMP_24) << (64 - FORG_COL_OFFSET - FORG_COL_SIZE))
             | (1ul              << (64 - FORG_CSW_OFFSET - FORG_CSW_SIZE));
 
@@ -209,10 +209,10 @@ public record struct NKStyle : IFormattable {
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public NKStyle SetFColor(NKConsoleColor color) {
-        _raw = _raw & ~(BMP_24  << (64 - FORG_COL_OFFSET - FORG_COL_SIZE))
-                    & ~(1ul     << (64 - FORG_CSW_OFFSET - FORG_CSW_SIZE))
+        _raw = _raw & ~(BMP_24 << (64 - FORG_COL_OFFSET - FORG_COL_SIZE))
+            & ~(1ul            << (64 - FORG_CSW_OFFSET - FORG_CSW_SIZE))
             | (((ulong)color & BMP_24) << (64 - FORG_COL_OFFSET - FORG_COL_SIZE))
-            & ~(0b11ul         << (64 - FORG_USW_OFFSET - FORG_USW_SIZE))
+            & ~(0b11ul << (64 - FORG_USW_OFFSET - FORG_USW_SIZE))
             | (COL_TYP_CONSOLE << (64 - FORG_USW_OFFSET - FORG_USW_SIZE));
 
         return this;
@@ -224,7 +224,7 @@ public record struct NKStyle : IFormattable {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public NKStyle SetFColor() {
         _raw = _raw & ~(BMP_24 << (64 - FORG_COL_OFFSET - FORG_COL_SIZE))
-                    & ~(1ul    << (64 - FORG_CSW_OFFSET - FORG_CSW_SIZE))
+            & ~(1ul            << (64 - FORG_CSW_OFFSET - FORG_CSW_SIZE))
             & ~(0b11ul         << (64 - FORG_USW_OFFSET - FORG_USW_SIZE))
             | (COL_TYP_DEFAULT << (64 - FORG_USW_OFFSET - FORG_USW_SIZE));
 
@@ -243,7 +243,7 @@ public record struct NKStyle : IFormattable {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public NKStyle SetFColor(InheritColor _) {
         _raw = _raw & ~(BMP_24 << (64 - FORG_COL_OFFSET - FORG_COL_SIZE))
-                    & ~(1ul    << (64 - FORG_CSW_OFFSET - FORG_CSW_SIZE))
+            & ~(1ul            << (64 - FORG_CSW_OFFSET - FORG_CSW_SIZE))
             | (0b11ul          << (64 - FORG_USW_OFFSET - FORG_USW_SIZE))
             & (COL_TYP_INHERIT << (64 - FORG_USW_OFFSET - FORG_USW_SIZE));
 
@@ -281,7 +281,7 @@ public record struct NKStyle : IFormattable {
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public NKStyle SetBColor(uint color) {
-        _raw = _raw & ~(BMP_24  << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE))
+        _raw = _raw & ~(BMP_24 << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE))
             | ((color & BMP_24) << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE))
             | (1ul              << (64 - BCKG_CSW_OFFSET - BCKG_CSW_SIZE));
 
@@ -293,10 +293,10 @@ public record struct NKStyle : IFormattable {
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public NKStyle SetBColor(NKConsoleColor color) {
-        _raw = _raw & ~(BMP_24         << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE))
-                    & ~(1ul            << (64 - BCKG_CSW_OFFSET - BCKG_CSW_SIZE))
+        _raw = _raw & ~(BMP_24 << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE))
+            & ~(1ul            << (64 - BCKG_CSW_OFFSET - BCKG_CSW_SIZE))
             | (((ulong)color & BMP_24) << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE))
-            & ~(0b11ul         << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE))
+            & ~(0b11ul << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE))
             | (COL_TYP_CONSOLE << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE));
 
         return this;
@@ -308,7 +308,7 @@ public record struct NKStyle : IFormattable {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public NKStyle SetBColor() {
         _raw = _raw & ~(BMP_24 << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE))
-                    & ~(1ul    << (64 - BCKG_CSW_OFFSET - BCKG_CSW_SIZE))
+            & ~(1ul            << (64 - BCKG_CSW_OFFSET - BCKG_CSW_SIZE))
             & ~(0b11ul         << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE))
             | (COL_TYP_DEFAULT << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE));
 
@@ -327,7 +327,7 @@ public record struct NKStyle : IFormattable {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public NKStyle SetBColor(InheritColor _) {
         _raw = _raw & ~(BMP_24 << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE))
-                    & ~(1ul    << (64 - BCKG_CSW_OFFSET - BCKG_CSW_SIZE))
+            & ~(1ul            << (64 - BCKG_CSW_OFFSET - BCKG_CSW_SIZE))
             | (0b11ul          << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE))
             & (COL_TYP_INHERIT << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE));
 
@@ -389,7 +389,7 @@ public record struct NKStyle : IFormattable {
             COL_TYP_INHERIT => NKColor.Inherit,
             COL_TYP_DEFAULT => NKColor.Default,
             COL_TYP_CONSOLE => new NKColor((NKConsoleColor)_bCol_console),
-            _ => throw new InvalidColorCastException($"Unknown background color switch '{_bCol_switches}'.")
+            _               => throw new InvalidColorCastException($"Unknown background color switch '{_bCol_switches}'.")
         };
     }
 
@@ -399,7 +399,7 @@ public record struct NKStyle : IFormattable {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public NKStyle SetStyles(TextStyles styles) {
         _raw = _raw & ~(BMP_08 << (64 - STYLES_OFFSET - STYLES_SIZE)) |
-            ((ulong)styles     << (64 - STYLES_OFFSET - STYLES_SIZE));
+            ((ulong)styles << (64 - STYLES_OFFSET - STYLES_SIZE));
 
         return this;
     }
@@ -409,16 +409,20 @@ public record struct NKStyle : IFormattable {
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [Pure]
-    public TextStyles GetStyles() =>
-        (TextStyles)(_raw >> (64 - STYLES_OFFSET - STYLES_SIZE) & BMP_08);
+    public TextStyles GetStyles() => (TextStyles)(_raw >> (64 - STYLES_OFFSET - STYLES_SIZE) & BMP_08);
 
     /// <summary>
     /// safely overwrites the contents of this instance with the contents of the other instance
     /// </summary>
     public NKStyle OverrideWith(NKStyle other) {
         var n = new NKStyle(_raw);
-        if (!other.IsFColorInherit) n = n.SetFColor(other.GetFColor());
-        if (!other.IsBColorInherit && !other.IsBColorDefault) n = n.SetBColor(other.GetBColor());
+
+        if (!other.IsFColorInherit)
+            n = n.SetFColor(other.GetFColor());
+
+        if (!other.IsBColorInherit && !other.IsBColorDefault)
+            n = n.SetBColor(other.GetBColor());
+
         n = n.SetStyles(other.GetStyles());
 
         return n;
@@ -461,8 +465,7 @@ public record struct NKStyle : IFormattable {
 
     private NKStyle(ulong raw) => _raw = raw;
 
-    public NKStyle(NKColor f = default, NKColor b = default, TextStyles s = TextStyles.NONE)
-        => _raw = Init(f, b, s);
+    public NKStyle(NKColor f = default, NKColor b = default, TextStyles s = TextStyles.NONE) => _raw = Init(f, b, s);
 
     public NKStyle() {
         _raw = 0;
@@ -471,9 +474,11 @@ public record struct NKStyle : IFormattable {
     public string ToDbgString() => $"FColor: {FColor:p}, BColor: {BColor:p}{StylesToString()}";
 
     public override string ToString() => ToString(null, null);
-    
+
     public string ToString(string? format, IFormatProvider? formatProvider) {
-        if (string.IsNullOrEmpty(format)) return ToAnsi();
+        if (string.IsNullOrEmpty(format))
+            return ToAnsi();
+
         return format switch {
             "p" or "P"     => ToDbgString(),
             "bmp" or "BMP" => ToBitmapString(),
@@ -484,17 +489,17 @@ public record struct NKStyle : IFormattable {
     public string ToBitmapString() {
         var sb = new StringBuilder();
 
-        sb.Append($"{$"{_raw >> 56 & 0xFF:b8}"    .AddColor(NKConsoleColor.RED)}_");
+        sb.Append($"{$"{_raw >> 56 & 0xFF:b8}".AddColor(NKConsoleColor.RED)}_");
         sb.Append($"{$"{_raw >> 50 & 0b111111:b6}".AddColor(NKConsoleColor.RED)}");
-        sb.Append($"{$"{_raw >> 49 & 0b1:b1}"     .AddColor(NKConsoleColor.YELLOW)}");
-        sb.Append($"{$"{_raw >> 48 & 0b1:b1}"     .AddColor(NKConsoleColor.GREEN)}_");
-        sb.Append($"{$"{_raw >> 40 & 0xFF:b8}"    .AddColor(NKConsoleColor.RED)}_");
+        sb.Append($"{$"{_raw >> 49 & 0b1:b1}".AddColor(NKConsoleColor.YELLOW)}");
+        sb.Append($"{$"{_raw >> 48 & 0b1:b1}".AddColor(NKConsoleColor.GREEN)}_");
+        sb.Append($"{$"{_raw >> 40 & 0xFF:b8}".AddColor(NKConsoleColor.RED)}_");
 
-        sb.Append($"{$"{_raw >> 32 & 0xFF:b8}"    .AddColor(NKConsoleColor.BLUE)}_");
+        sb.Append($"{$"{_raw >> 32 & 0xFF:b8}".AddColor(NKConsoleColor.BLUE)}_");
         sb.Append($"{$"{_raw >> 26 & 0b111111:b6}".AddColor(NKConsoleColor.BLUE)}");
-        sb.Append($"{$"{_raw >> 25 & 0b1:b1}"     .AddColor(NKConsoleColor.MAGENTA)}");
-        sb.Append($"{$"{_raw >> 24 & 0b1:b1}"     .AddColor(NKConsoleColor.CYAN)}_");
-        sb.Append($"{$"{_raw >> 16 & 0xFF:b8}"    .AddColor(NKConsoleColor.BLUE)}_");
+        sb.Append($"{$"{_raw >> 25 & 0b1:b1}".AddColor(NKConsoleColor.MAGENTA)}");
+        sb.Append($"{$"{_raw >> 24 & 0b1:b1}".AddColor(NKConsoleColor.CYAN)}_");
+        sb.Append($"{$"{_raw >> 16 & 0xFF:b8}".AddColor(NKConsoleColor.BLUE)}_");
 
         sb.Append($"{$"{_raw >> 8 & 0xFF:b8}".AddColor(NKConsoleColor.WHITE)}_");
         sb.Append($"{$"{_raw >> 0 & 0xFF:b8}".AddColor(NKConsoleColor.DARK_GRAY)}");
@@ -509,20 +514,35 @@ public record struct NKStyle : IFormattable {
         var output = new List<string>();
         var styles = GetStyles();
 
-        if (styles.GetIsBold())          output.Add("Bold");
-        if (styles.GetIsItalic())        output.Add("Italic");
-        if (styles.GetIsUnderline())     output.Add("Underline");
-        if (styles.GetIsStrikethrough()) output.Add("Strikethrough");
-        if (styles.GetIsFaint())         output.Add("Faint");
-        if (styles.GetIsNegative())      output.Add("Negative");
-        if (styles.GetIsInvisible())     output.Add("Invisible");
-        if (styles.GetIsBlink())         output.Add("Blink");
+        if (styles.GetIsBold())
+            output.Add("Bold");
+
+        if (styles.GetIsItalic())
+            output.Add("Italic");
+
+        if (styles.GetIsUnderline())
+            output.Add("Underline");
+
+        if (styles.GetIsStrikethrough())
+            output.Add("Strikethrough");
+
+        if (styles.GetIsFaint())
+            output.Add("Faint");
+
+        if (styles.GetIsNegative())
+            output.Add("Negative");
+
+        if (styles.GetIsInvisible())
+            output.Add("Invisible");
+
+        if (styles.GetIsBlink())
+            output.Add("Blink");
 
         return output.Count != 0 ? $", {string.Join(", ", output.ToArray())}" : "";
     }
 
-    public bool Equals(NKStyle other) => _raw == other._raw;
-    public override int GetHashCode() => _raw.GetHashCode();
+    public          bool Equals(NKStyle other) => _raw == other._raw;
+    public override int  GetHashCode()         => _raw.GetHashCode();
 
     /// <summary>
     /// Overrides the properties of the first NKStyle instance with those of the second NKStyle instance and returns the updated instance.
@@ -538,10 +558,11 @@ public record struct NKStyle : IFormattable {
 
     [JBPure]
     public static string GetEscSeq(NKStyle prev, NKStyle next) {
-        if (prev == next) return string.Empty;
+        if (prev == next)
+            return string.Empty;
 
-        var off = prev.Styles & ~next.Styles;
-        var on = ~prev.Styles & next.Styles;
+        var off = prev.Styles  & ~next.Styles;
+        var on  = ~prev.Styles & next.Styles;
 
         var sb = new StringBuilder("\e[");
 
@@ -555,6 +576,124 @@ public record struct NKStyle : IFormattable {
 
         return sb.ToString();
     }
-    
+
     public static explicit operator NKStyle(TextStyles s) => new(NKColor.Default, NKColor.Default, s);
+
+    public static NKStyle Parse(string s) => Parse(s, null);
+
+    public static NKStyle Parse(string s, IFormatProvider? provider) {
+        if (s == null)
+            throw new ArgumentNullException(nameof(s));
+
+        if (TryParse(s, provider, out var result)) {
+            return result;
+        }
+
+        throw new FormatException($"Invalid style format: '{s}'");
+    }
+
+    public static bool TryParse([NotNullWhen(true)] string? s, out NKStyle result) => TryParse(s, null, out result);
+
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out NKStyle result) {
+        if (s == null) {
+            result = default;
+
+            return false;
+        }
+
+        var        style      = new NKStyle();
+        var        parts      = s.Split([';', ','], StringSplitOptions.RemoveEmptyEntries);
+        TextStyles textStyles = TextStyles.NONE;
+
+        foreach (var rawPart in parts) {
+            var part = rawPart.Trim();
+
+            if (part.Length == 0)
+                continue;
+
+            if (part.StartsWith("f#", StringComparison.OrdinalIgnoreCase)) {
+                var colorStr = part[2..];
+
+                if (!TryParseStyleColor(colorStr, out var color)) {
+                    result = default;
+
+                    return false;
+                }
+
+                style = style.SetFColor(color);
+            }
+            else if (part.StartsWith("b#", StringComparison.OrdinalIgnoreCase)) {
+                var colorStr = part[2..];
+
+                if (!TryParseStyleColor(colorStr, out var color)) {
+                    result = default;
+
+                    return false;
+                }
+
+                style = style.SetBColor(color);
+            }
+            else if (TryParseTextStyle(part, out var ts)) {
+                textStyles |= ts;
+            }
+            else {
+                result = default;
+
+                return false;
+            }
+        }
+
+        if (textStyles != TextStyles.NONE) {
+            style = style.SetStyles(textStyles);
+        }
+
+        result = style;
+
+        return true;
+    }
+
+    bool IParsableValue<NKStyle>.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out NKStyle result) 
+        => TryParse(s, provider, out result);
+
+    private static bool TryParseStyleColor(string val, out NKColor color) {
+        val = val.Trim();
+        string normalized = val.StartsWith('#') ? val : val.Replace('-', '_');
+
+        if (NKColor.TryParse(normalized, null, out color)) {
+            return true;
+        }
+
+        if (!normalized.StartsWith('#') && 
+            normalized.Length > 0 && 
+            normalized.All(c => "0123456789abcdefABCDEF".Contains(c))) 
+        {
+            if (NKColor.TryParse("#" + normalized, null, out color)) {
+                return true;
+            }
+        }
+
+        color = default;
+
+        return false;
+    }
+
+    private static bool TryParseTextStyle(string s, out TextStyles style) {
+        var normalized = s.Replace('-', '_').ToLowerInvariant();
+
+        (style, var ret) = normalized switch {
+            "bold"          => (TextStyles.BOLD,          true),
+            "faint"         => (TextStyles.FAINT,         true),
+            "italic"        => (TextStyles.ITALIC,        true),
+            "underline"     => (TextStyles.UNDERLINE,     true),
+            "blink"         => (TextStyles.BLINK,         true),
+            "negative"      => (TextStyles.NEGATIVE,      true),
+            "invisible"     => (TextStyles.INVISIBLE,     true),
+            "strikethrough" => (TextStyles.STRIKETHROUGH, true),
+            "none"          => (TextStyles.NONE,          true),
+            "all"           => (TextStyles.ALL,           true),
+            _               => (TextStyles.NONE,          false)
+        };
+
+        return ret;
+    }
 }

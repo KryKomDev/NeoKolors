@@ -3,8 +3,6 @@
 // Copyright (c) 2025 KryKom
 
 using NeoKolors.Tui.Fonts.Serialization;
-using NeoKolors.Common;
-using NeoKolors.Tui.Core;
 
 namespace NeoKolors.Tui.Tests;
 
@@ -137,7 +135,7 @@ public class NKFontRenderingTests {
         var canvas = new NKCharCanvas(50, 10);
         
         // Render centered
-        font!.PlaceString("Test", canvas, new Rectangle(0, 0, 49, 9), 
+        font!.PlaceString("Test", canvas, new Area2D(0, 0, 49, 9), 
             new NKStyle(), HorizontalAlign.CENTER, VerticalAlign.CENTER);
         
         // We expect the text NOT to be at (0,0)

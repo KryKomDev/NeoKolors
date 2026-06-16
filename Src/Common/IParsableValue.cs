@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2025 KryKom
 
 using System.Diagnostics.CodeAnalysis;
@@ -15,28 +15,20 @@ public interface IParsableValue<TSelf> : IParsableValue where TSelf : IParsableV
     /// <exception cref="ArgumentNullException"><paramref name="s" /> is <c>null</c>.</exception>
     /// <exception cref="FormatException"><paramref name="s" /> is not in the correct format.</exception>
     /// <exception cref="OverflowException"><paramref name="s" /> is not representable by <typeparamref name="TSelf" />.</exception>
-    public new TSelf Parse(string s, IFormatProvider? provider);
+    public new TSelf Parse(string s, IFormatProvider? provider) {
+        if (s == null) throw new ArgumentNullException(nameof(s));
+        if (TryParse(s, provider, out var result)) {
+            return result;
+        }
+        throw new FormatException($"Failed to parse '{s}' as {typeof(TSelf).Name}.");
+    }
 
     /// <summary>Tries to parse a string into a value.</summary>
     /// <param name="s">The string to parse.</param>
     /// <param name="provider">An object that provides culture-specific formatting information about <paramref name="s" />.</param>
     /// <param name="result">On return, contains the result of successfully parsing <paramref name="s" /> or an undefined value on failure.</param>
     /// <returns><c>true</c> if <paramref name="s" /> was successfully parsed; otherwise, <c>false</c>.</returns>
-    public bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out TSelf result) {
-        if (s == null) {
-            result = new TSelf();
-            return false;
-        }
-        
-        try {
-            result = Parse(s, provider);
-            return true;
-        }
-        catch {
-            result = new TSelf();
-            return false;
-        }
-    }
+    public bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out TSelf result);
     
     object IParsableValue.Parse(string s, IFormatProvider? provider) => Parse(s, provider);
 

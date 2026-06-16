@@ -3,6 +3,7 @@
 // Copyright (c) 2026 KryKom
 //
 
+using System.Reflection;
 using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Values;
@@ -27,7 +28,8 @@ public abstract class AbstractElement<T> : IElement<T> {
     public virtual bool IsFocused {
         get => _isFocused;
         set {
-            if (_isFocused == value) return;
+            if (_isFocused == value)
+                return;
 
             _isFocused = value;
             EvaluateTriggers();
@@ -40,7 +42,8 @@ public abstract class AbstractElement<T> : IElement<T> {
     public virtual bool IsHovered {
         get => _isHovered;
         set {
-            if (_isHovered == value) return;
+            if (_isHovered == value)
+                return;
 
             _isHovered = value;
             EvaluateTriggers();
@@ -50,8 +53,8 @@ public abstract class AbstractElement<T> : IElement<T> {
 
     public List<TriggerBase> Triggers { get; set; } = new();
 
-    private readonly Dictionary<string, object?> _originalValues = new();
-    private readonly HashSet<string> _activeTriggerProperties = new();
+    private readonly Dictionary<string, object?> _originalValues          = new();
+    private readonly HashSet<string>             _activeTriggerProperties = new();
 
     public void EvaluateTriggers() {
         _activeTriggerProperties.Clear();
@@ -59,13 +62,15 @@ public abstract class AbstractElement<T> : IElement<T> {
 
         if (Triggers != null) {
             foreach (var trigger in Triggers) {
-                if (trigger.IsActive(this)) {
-                    foreach (var setter in trigger.Setters) {
-                        if (!string.IsNullOrEmpty(setter.Property)) {
-                            settersToApply[setter.Property] = setter.Value;
-                            _activeTriggerProperties.Add(setter.Property);
-                        }
-                    }
+                if (!trigger.IsActive(this))
+                    continue;
+
+                foreach (var setter in trigger.Setters) {
+                    if (string.IsNullOrEmpty(setter.Property))
+                        continue;
+
+                    settersToApply[setter.Property] = setter.Value;
+                    _activeTriggerProperties.Add(setter.Property);
                 }
             }
         }
@@ -100,29 +105,31 @@ public abstract class AbstractElement<T> : IElement<T> {
 
     private object? GetPropertyValue(string name) {
         var prop = GetType()
-            .GetProperty(name,
-                System.Reflection.BindingFlags.IgnoreCase |
-                System.Reflection.BindingFlags.Public     |
-                System.Reflection.BindingFlags.Instance);
+            .GetProperty(
+                name,
+                BindingFlags.IgnoreCase |
+                BindingFlags.Public     |
+                BindingFlags.Instance
+            );
 
         if (prop != null && prop.CanRead) {
             return prop.GetValue(this);
         }
 
-        if (!Styles.Properties.IStyleProperty.TryGetByName(name, out var type)) 
+        if (!Styles.Properties.IStyleProperty.TryGetByName(name, out var type))
             return null;
 
         var styleProp = Style[type];
 
         return styleProp.Value;
-
     }
 
     private void SetPropertyValue(string name, object? value) {
-        if (value == null) return;
+        if (value == null)
+            return;
 
         // 1. Try public C# property on the element class
-        var prop = GetType().GetProperty(name, System.Reflection.BindingFlags.IgnoreCase | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+        var prop = GetType().GetProperty(name, BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance);
 
         if (prop != null && prop.CanWrite) {
             try {
@@ -171,29 +178,29 @@ public abstract class AbstractElement<T> : IElement<T> {
     }
 
     protected AbstractElement(StyleCollection defaultStyle) {
-        _style = new StyleCollection(defaultStyle);
+        _style              =  new StyleCollection(defaultStyle);
         _style.StyleChanged += _ => InvokeElementUpdated();
     }
 
     protected AbstractElement() {
-        _style = new StyleCollection(AbstractElement.DefaultStyle);
+        _style              =  new StyleCollection(AbstractElement.DefaultStyle);
         _style.StyleChanged += _ => InvokeElementUpdated();
     }
 
     // Cache for layout computations
-    private Size? _cachedMinParent;
-    private Size? _cachedMinContent;
+    private Size2D?        _cachedMinParent;
+    private Size2D?        _cachedMinContent;
     private ElementLayout? _cachedMinLayout;
 
-    private Size? _cachedRenderLayoutParent;
+    private Size2D?        _cachedRenderLayoutParent;
     private ElementLayout? _cachedRenderLayout;
 
-    public Size DesiredSize { get; protected set; } = Size.Zero;
-    public Rectangle RenderBounds { get; protected set; } = Rectangle.Zero;
+    public Size2D DesiredSize  { get; protected set; } = Size2D.Zero;
+    public Area2D RenderBounds { get; protected set; } = default;
 
     public ElementLayout RenderLayout {
         get {
-            var bounds = RenderBounds != Rectangle.Zero ? RenderBounds.Size : Size.Zero;
+            var bounds = RenderBounds != default ? RenderBounds.Size : Size2D.Zero;
 
             return GetLayout(bounds);
         }
@@ -207,11 +214,11 @@ public abstract class AbstractElement<T> : IElement<T> {
     }
 
     public void InvalidateMeasure() {
-        _cachedMinParent = null;
-        _cachedMinContent = null;
-        _cachedMinLayout = null;
+        _cachedMinParent          = null;
+        _cachedMinContent         = null;
+        _cachedMinLayout          = null;
         _cachedRenderLayoutParent = null;
-        _cachedRenderLayout = null;
+        _cachedRenderLayout       = null;
 
         _isMeasureValid = false;
         _isArrangeValid = false;
@@ -219,18 +226,18 @@ public abstract class AbstractElement<T> : IElement<T> {
 
     public void InvalidateArrange() {
         _cachedRenderLayoutParent = null;
-        _cachedRenderLayout = null;
-        _isArrangeValid = false;
+        _cachedRenderLayout       = null;
+        _isArrangeValid           = false;
     }
 
-    private bool _isMeasureValid;
-    private Size _lastAvailableSize;
+    private bool   _isMeasureValid;
+    private Size2D _lastAvailableSize;
 
     private bool _isMeasuring;
 
-    public void Measure(Size availableSize) {
+    public void Measure(Size2D availableSize) {
         if (!_style.Visible) {
-            DesiredSize = Size.Zero;
+            DesiredSize     = Size2D.Zero;
             _isMeasureValid = true;
 
             return;
@@ -249,8 +256,8 @@ public abstract class AbstractElement<T> : IElement<T> {
         try {
             _lastAvailableSize = availableSize;
             var contentSize = MeasureOverride(availableSize);
-            var minLayout = GetMinLayout(availableSize, contentSize);
-            DesiredSize = minLayout.Margin;
+            var minLayout   = GetMinLayout(availableSize, contentSize);
+            DesiredSize     = minLayout.Margin;
             _isMeasureValid = true;
         }
         finally {
@@ -258,12 +265,12 @@ public abstract class AbstractElement<T> : IElement<T> {
         }
     }
 
-    private bool _isArrangeValid;
-    private Rectangle _lastFinalRect;
+    private bool   _isArrangeValid;
+    private Area2D _lastFinalRect;
 
-    public void Arrange(Rectangle finalRect) {
+    public void Arrange(Area2D finalRect) {
         if (!_style.Visible) {
-            RenderBounds = Rectangle.Zero;
+            RenderBounds    = default;
             _isArrangeValid = true;
 
             return;
@@ -273,15 +280,20 @@ public abstract class AbstractElement<T> : IElement<T> {
             return;
         }
 
-        RenderBounds = finalRect;
+        RenderBounds   = finalRect;
         _lastFinalRect = finalRect;
 
         _cachedRenderLayout = IElement.ComputeLayoutFromBounds(
             finalRect.Size,
-            _style.Margin, _style.Border, _style.Padding,
-            _style.Width, _style.Height,
-            _style.MinWidth, _style.MaxWidth,
-            _style.MinHeight, _style.MaxHeight
+            _style.Margin,
+            _style.Border,
+            _style.Padding,
+            _style.Width,
+            _style.Height,
+            _style.MinWidth,
+            _style.MaxWidth,
+            _style.MinHeight,
+            _style.MaxHeight
         );
 
         _cachedRenderLayoutParent = finalRect.Size;
@@ -291,26 +303,31 @@ public abstract class AbstractElement<T> : IElement<T> {
         _isArrangeValid = true;
     }
 
-    protected ElementLayout GetLayout(Size bounds) {
+    protected ElementLayout GetLayout(Size2D bounds) {
         if (_cachedRenderLayoutParent == bounds && _cachedRenderLayout != null) {
             return _cachedRenderLayout.Value;
         }
 
         var layout = IElement.ComputeLayoutFromBounds(
             bounds,
-            _style.Margin, _style.Border, _style.Padding,
-            _style.Width, _style.Height,
-            _style.MinWidth, _style.MaxWidth,
-            _style.MinHeight, _style.MaxHeight
+            _style.Margin,
+            _style.Border,
+            _style.Padding,
+            _style.Width,
+            _style.Height,
+            _style.MinWidth,
+            _style.MaxWidth,
+            _style.MinHeight,
+            _style.MaxHeight
         );
 
         _cachedRenderLayoutParent = bounds;
-        _cachedRenderLayout = layout;
+        _cachedRenderLayout       = layout;
 
         return layout;
     }
 
-    protected ElementLayout GetMinLayout(Size parent, Size content) {
+    protected ElementLayout GetMinLayout(Size2D parent, Size2D content) {
         if (_cachedMinParent == parent && _cachedMinContent == content && _cachedMinLayout != null) {
             return _cachedMinLayout.Value;
         }
@@ -318,36 +335,42 @@ public abstract class AbstractElement<T> : IElement<T> {
         var layout = IElement.ComputeLayoutFromContent(
             content,
             parent,
-            _style.Margin, _style.Border, _style.Padding,
-            _style.Width, _style.Height,
-            _style.MinWidth, _style.MaxWidth,
-            _style.MinHeight, _style.MaxHeight
+            _style.Margin,
+            _style.Border,
+            _style.Padding,
+            _style.Width,
+            _style.Height,
+            _style.MinWidth,
+            _style.MaxWidth,
+            _style.MinHeight,
+            _style.MaxHeight
         );
 
-        _cachedMinParent = parent;
+        _cachedMinParent  = parent;
         _cachedMinContent = content;
-        _cachedMinLayout = layout;
+        _cachedMinLayout  = layout;
 
         return layout;
     }
 
     public virtual void Render(ICharCanvas canvas) {
-        if (!_style.Visible) return;
+        if (!_style.Visible)
+            return;
 
         // Auto-measure and auto-arrange if not already completed (e.g. root elements)
         if (!_isMeasureValid) {
-            Measure(new Size(canvas.Width, canvas.Height));
+            Measure(new Size2D(canvas.Width, canvas.Height));
         }
 
         if (!_isArrangeValid) {
-            Arrange(RenderBounds != Rectangle.Zero ? RenderBounds : new Rectangle(0, 0, canvas.Width - 1, canvas.Height - 1));
+            Arrange(RenderBounds != default ? RenderBounds : new Area2D(0, 0, canvas.Width, canvas.Height));
         }
 
         var pos = RenderBounds.Lower;
 
         if (!_style.BackgroundColor.IsInherit) {
             canvas.StyleBackground(RenderLayout.Border + pos, _style.BackgroundColor);
-            canvas.Fill(RenderLayout.Content + pos, ' ');
+            canvas.Fill(RenderLayout.Content           + pos, ' ');
         }
 
         if (!_style.TextColor.IsInherit) {
@@ -361,17 +384,17 @@ public abstract class AbstractElement<T> : IElement<T> {
         RenderCore(canvas);
     }
 
-    protected virtual Size MeasureOverride(Size availableSize) {
+    protected virtual Size2D MeasureOverride(Size2D availableSize) {
         if (GetChildNode() is IElement childElement) {
             childElement.Measure(availableSize);
 
             return childElement.DesiredSize;
         }
 
-        return Size.Zero;
+        return Size2D.Zero;
     }
 
-    protected virtual Size ArrangeOverride(Size finalSize) {
+    protected virtual Size2D ArrangeOverride(Size2D finalSize) {
         if (GetChildNode() is IElement childElement) {
             childElement.Arrange(RenderLayout.Content + RenderBounds.Lower);
         }
@@ -384,27 +407,27 @@ public abstract class AbstractElement<T> : IElement<T> {
     // =========================== IELEMENT IMPLEMENTATION =========================== // 
 
     public abstract ElementInfo Info { get; }
-    public abstract T GetChildNode();
-    public abstract void SetChildNode(T childNode);
+    public abstract T           GetChildNode();
+    public abstract void        SetChildNode(T childNode);
 }
 
 public static class AbstractElement {
     public static StyleCollection DefaultStyle { get; } = new() {
-        Visible = true,
-        Padding = Spacing.Zero,
-        Margin = Spacing.Zero,
-        Position = new Position(),
-        Overflow = false,
-        GridAlign = new Rectangle(0, 0, 0, 0),
-        ZIndex = 0,
+        Visible         = true,
+        Padding         = Spacing.Zero,
+        Margin          = Spacing.Zero,
+        Position        = new Position(),
+        Overflow        = false,
+        GridAlign       = new Area2D(0, 0, 0, 0),
+        ZIndex          = 0,
         BackgroundColor = NKColor.Inherit,
-        Border = BorderStyle.Borderless,
-        Width = Dimension.Auto,
-        Height = Dimension.Auto,
-        MinWidth = Dimension.Auto,
-        MinHeight = Dimension.Auto,
-        MaxWidth = Dimension.Auto,
-        MaxHeight = Dimension.Auto,
+        Border          = BorderStyle.Borderless,
+        Width           = Dimension.Auto,
+        Height          = Dimension.Auto,
+        MinWidth        = Dimension.Auto,
+        MinHeight       = Dimension.Auto,
+        MaxWidth        = Dimension.Auto,
+        MaxHeight       = Dimension.Auto,
 
         ReadOnly = true
     };

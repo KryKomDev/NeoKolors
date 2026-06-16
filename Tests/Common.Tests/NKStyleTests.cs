@@ -1,4 +1,4 @@
-﻿// 
+// 
 // NeoKolors//
 
 namespace NeoKolors.Common.Tests;
@@ -234,4 +234,62 @@ public class NKStyleTests {
         Assert.Contains("FColor: RED, BColor: BLACK, Bold", style.ToString("P", null));
         Assert.StartsWith("\e[", style.ToAnsi());
     }
+
+    [Theory]
+    [InlineData("f#red", NKConsoleColor.RED, null, TextStyles.NONE)]
+    [InlineData("F#DARK-RED", NKConsoleColor.DARK_RED, null, TextStyles.NONE)]
+    [InlineData("b#blue; bold", null, NKConsoleColor.BLUE, TextStyles.BOLD)]
+    [InlineData("f#123456,b#654321;italic,bold", 0x123456, 0x654321, TextStyles.ITALIC | TextStyles.BOLD)]
+    [InlineData("strike-through; b#inherit; f#default", null, null, TextStyles.STRIKETHROUGH)]
+    [InlineData("italic, strike_through", null, null, TextStyles.ITALIC | TextStyles.STRIKETHROUGH)]
+    public void TestParse_ValidInputs(string input, object? expectedF, object? expectedB, TextStyles expectedStyles) {
+        var style = NKStyle.Parse(input);
+        Assert.Equal(expectedStyles, style.Styles);
+
+        if (expectedF is NKConsoleColor fConsole) {
+            Assert.Equal((NKColor)fConsole, style.FColor);
+        } else if (expectedF is int fInt) {
+            Assert.Equal((NKColor)fInt, style.FColor);
+        } else if (input.Contains("f#default")) {
+            Assert.True(style.IsFColorDefault);
+        }
+
+        if (expectedB is NKConsoleColor bConsole) {
+            Assert.Equal((NKColor)bConsole, style.BColor);
+        } else if (expectedB is int bInt) {
+            Assert.Equal((NKColor)bInt, style.BColor);
+        } else if (input.Contains("b#inherit")) {
+            Assert.True(style.IsBColorInherit);
+        }
     }
+
+    [Fact]
+    public void TestParse_EmptyString_ReturnsDefault() {
+        var style = NKStyle.Parse("");
+        Assert.Equal(NKStyle.Default, style);
+    }
+
+    [Theory]
+    [InlineData("invalid")]
+    [InlineData("f#")]
+    [InlineData("f#invalid-color")]
+    [InlineData("b#not-a-color")]
+    public void TestParse_InvalidInputs_ThrowsFormatException(string input) {
+        Assert.Throws<FormatException>(() => NKStyle.Parse(input));
+    }
+
+    [Fact]
+    public void TestTryParse_Success() {
+        var ok = NKStyle.TryParse("f#green; bold", out var style);
+        Assert.True(ok);
+        Assert.Equal((NKColor)NKConsoleColor.GREEN, style.FColor);
+        Assert.True(style.Styles.HasFlag(TextStyles.BOLD));
+    }
+
+    [Fact]
+    public void TestTryParse_Failure() {
+        var ok = NKStyle.TryParse("invalid-part", out var style);
+        Assert.False(ok);
+        Assert.Equal(default(NKStyle), style);
+    }
+}

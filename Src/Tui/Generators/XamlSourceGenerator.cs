@@ -275,7 +275,7 @@ public class XamlSourceGenerator : IIncrementalGenerator {
         ref int varCounter) 
     {
         var tag = element.Name.LocalName;
-        var typePrefix = (tag == "Trigger" || tag == "Setter") 
+        var typePrefix = tag is "Trigger" or "Setter" 
             ? "global::NeoKolors.Tui.Styles." 
             : "global::NeoKolors.Tui.Elements.";
 
@@ -315,7 +315,7 @@ public class XamlSourceGenerator : IIncrementalGenerator {
                 sb.AppendLine($"            global::NeoKolors.Tui.Dom.XamlElementLoader.SetAttachedProperty({currentVarName}, {ToLiteral(localName)}, {ToLiteral(attr.Value)});");
             }
             else {
-                if (tag == "Trigger" || tag == "Setter") {
+                if (tag is "Trigger" or "Setter") {
                     sb.AppendLine($"            {currentVarName}.{localName} = {ToLiteral(attr.Value)};");
                 }
                 else {
@@ -350,7 +350,7 @@ public class XamlSourceGenerator : IIncrementalGenerator {
 
                 // Parent/Assemble child to parent
                 var parentTag = element.Name.LocalName;
-                if (parentTag == "Trigger" || parentTag == "TriggerBase") {
+                if (parentTag is "Trigger" or "TriggerBase") {
                     sb.AppendLine($"            global::NeoKolors.Tui.Dom.XamlElementLoader.SetPropertyObject({currentVarName}, \"Setters\", {childVarName});");
                 }
                 else if (parentTag == "Grid") {
@@ -369,7 +369,7 @@ public class XamlSourceGenerator : IIncrementalGenerator {
                 else if (parentTag == "RelativePanel") {
                     sb.AppendLine($"            {currentVarName}.AddChild({childVarName});");
                 }
-                else if (parentTag == "StackPanel" || parentTag == "Canvas" || parentTag == "MenuBar" || parentTag == "Page") {
+                else if (parentTag is "StackPanel" or "Canvas" or "MenuBar" or "Page") {
                     sb.AppendLine($"            {currentVarName}.AddChild({childVarName});");
                 }
                 else {

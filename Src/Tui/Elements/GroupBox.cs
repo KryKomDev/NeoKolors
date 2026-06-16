@@ -24,15 +24,15 @@ public class GroupBox : HeaderedContentControl {
 
     public GroupBox() : base(DefaultStyles) { }
 
-    protected override Size MeasureOverride(Size availableSize) {
-        var contentSize = Size.Zero;
+    protected override Size2D MeasureOverride(Size2D availableSize) {
+        var contentSize = Size2D.Zero;
         if (Content is IElement element) {
             element.Measure(availableSize);
             contentSize = element.DesiredSize;
         }
         
         var headerText = Header?.ToString() ?? string.Empty;
-        contentSize = contentSize with { Width = Math.Max(contentSize.Width, headerText.Length + 6) };
+        contentSize = new Size2D(Math.Max(contentSize.X, headerText.Length + 6), contentSize.Y);
 
         return contentSize;
     }
@@ -50,8 +50,8 @@ public class GroupBox : HeaderedContentControl {
             int padding = 2;
             canvas.Place(
                 headerText,
-                pos + borderVal.Lower + new Point(padding, 0),
-                borderVal.Width - padding * 2,
+                pos + borderVal.Lower + new Point2D(padding, 0),
+                borderVal.SizeX - padding * 2,
                 HorizontalAlign.LEFT
             );
         }

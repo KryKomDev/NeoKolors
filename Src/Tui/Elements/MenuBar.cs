@@ -21,7 +21,7 @@ public class MenuBar : Panel {
 
     public MenuBar() : base(DefaultStyles) { }
 
-    protected override Size MeasureOverride(Size availableSize) {
+    protected override Size2D MeasureOverride(Size2D availableSize) {
         int width = 2;
         int height = 1;
 
@@ -29,14 +29,14 @@ public class MenuBar : Panel {
             if (child == null) continue;
             child.Measure(availableSize);
             var childSize = child.DesiredSize;
-            width += childSize.Width + 2;
-            height = Math.Max(height, childSize.Height);
+            width += childSize.X + 2;
+            height = Math.Max(height, childSize.Y);
         }
 
-        return new Size(width, height);
+        return new Size2D(width, height);
     }
 
-    protected override Size ArrangeOverride(Size finalSize) {
+    protected override Size2D ArrangeOverride(Size2D finalSize) {
         var pos = RenderBounds.Lower;
         int offset = 1;
 
@@ -44,10 +44,10 @@ public class MenuBar : Panel {
             if (child == null) continue;
 
             var childSize = child.DesiredSize;
-            var childPos = pos + RenderLayout.Content.Lower + new Point(offset, 0);
+            var childPos = pos + RenderLayout.Content.Lower + new Point2D(offset, 0);
 
-            child.Arrange(new Rectangle(childPos, childSize));
-            offset += childSize.Width + 2;
+            child.Arrange(new Area2D(childPos, childSize));
+            offset += childSize.X + 2;
         }
 
         return finalSize;
@@ -55,11 +55,11 @@ public class MenuBar : Panel {
 
     protected override void RenderCore(ICharCanvas canvas) {
         var pos = RenderBounds.Lower;
-        var fullBarRect = new Rectangle(pos, new Size(RenderBounds.Width, RenderLayout.Border.Height));
+        var fullBarRect = new Area2D(pos, new Size2D(RenderBounds.SizeX, RenderLayout.Border.SizeY));
         canvas.StyleBackground(fullBarRect, NKColor.Default);
         
-        for (int x = 0; x < RenderBounds.Width; x++) {
-            canvas.Place("─", new Point(pos.X + x, pos.Y + RenderLayout.Border.Height - 1));
+        for (int x = 0; x < RenderBounds.SizeX; x++) {
+            canvas.Place("─", new Point2D(pos.X + x, pos.Y + RenderLayout.Border.SizeY - 1));
         }
 
         foreach (var child in _children) {

@@ -3,7 +3,6 @@
 
 using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Styles;
-using NeoKolors.Common;
 
 namespace NeoKolors.Tui.Elements;
 
@@ -12,7 +11,6 @@ namespace NeoKolors.Tui.Elements;
 /// Replaces the legacy text-only Button.
 /// </summary>
 public class Button : ButtonBase {
-    
     public static StyleCollection DefaultStyles { get; } = new(AbstractElement.DefaultStyle) {
         Border = BorderStyle.Borderless,
         ReadOnly = true
@@ -28,14 +26,16 @@ public class Button : ButtonBase {
 
     public Button() : base(DefaultStyles) { }
 
-    protected override Size MeasureOverride(Size availableSize) {
+    protected override Size2D MeasureOverride(Size2D availableSize) {
         if (Content is IElement element) {
             element.Measure(availableSize);
+
             return element.DesiredSize;
         }
 
         var text = Content?.ToString() ?? string.Empty;
-        return new Size(text.Length, 1);
+
+        return new Size2D(text.Length, 1);
     }
 
     protected override void RenderCore(ICharCanvas canvas) {
@@ -46,15 +46,17 @@ public class Button : ButtonBase {
         }
         else if (Content != null) {
             var text = Content.ToString() ?? string.Empty;
+
             var styledText = new AnsiString(text, new NKStyle(
                 _style.TextColor,
                 _style.BackgroundColor,
                 _style.TextStyle
             ));
+
             canvas.Place(
                 styledText,
                 pos + RenderLayout.Content.Lower,
-                RenderLayout.Content.Width,
+                RenderLayout.Content.SizeX,
                 HorizontalAlign.CENTER
             );
         }

@@ -284,22 +284,11 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
     public static NKColor Parse(string s) => Parse(s, CultureInfo.InvariantCulture);
     
     public static NKColor Parse(string s, IFormatProvider? provider) {
-        s = s.Trim();
-        
-        if (s.StartsWith('#')) {
-            var hex = s[1..];
-            
-            return uint.TryParse(hex, NumberStyles.HexNumber, null, out uint rgb) 
-                ? FromRgb(rgb)
-                : throw new FormatException($"Invalid color: {s}");
+        if (s == null) throw new ArgumentNullException(nameof(s));
+        if (TryParse(s, provider, out var result)) {
+            return result;
         }
-        
-        if (string.Equals(s, "Default", StringComparison.OrdinalIgnoreCase)) return Default;
-        if (string.Equals(s, "Inherit", StringComparison.OrdinalIgnoreCase)) return Inherit;
-
-        return Enum.TryParse<NKConsoleColor>(s, true, out var nkc) 
-            ? new NKColor(nkc)
-            : throw new FormatException($"Invalid color: {s}");
+        throw new FormatException($"Invalid color: {s}");
     }
 
     public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out NKColor result) {
@@ -308,17 +297,36 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
             return true;
         }
 
-        try {
-            result = Parse(s, provider);
-            return true;
-        }
-        catch {
+        var trimmed = s.Trim();
+        
+        if (trimmed.StartsWith('#')) {
+            var hex = trimmed[1..];
+            if (uint.TryParse(hex, NumberStyles.HexNumber, null, out uint rgb)) {
+                result = FromRgb(rgb);
+                return true;
+            }
             result = Default;
             return false;
         }
+        
+        if (string.Equals(trimmed, "Default", StringComparison.OrdinalIgnoreCase)) {
+            result = Default;
+            return true;
+        }
+        if (string.Equals(trimmed, "Inherit", StringComparison.OrdinalIgnoreCase)) {
+            result = Inherit;
+            return true;
+        }
+
+        if (Enum.TryParse<NKConsoleColor>(trimmed, true, out var nkc)) {
+            result = new NKColor(nkc);
+            return true;
+        }
+
+        result = Default;
+        return false;
     }
     
-    NKColor IParsableValue<NKColor>.Parse(string s, IFormatProvider? provider) => Parse(s, provider);
     bool IParsableValue<NKColor>.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out NKColor result) => TryParse(s, provider, out result);
 
     /// <summary>

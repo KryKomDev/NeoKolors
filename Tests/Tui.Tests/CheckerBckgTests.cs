@@ -1,6 +1,3 @@
-
-using NeoKolors.Common;
-using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Styles.Values;
 
 namespace NeoKolors.Tui.Tests;
@@ -19,7 +16,7 @@ public class CheckerBckgTests {
         // xs starts false, ys starts false. So (false ^ false) is false -> C2 (Blue). Correct.
 
         // Test with region starting at (0,0)
-        canvas.StyleCheckerBckg(new Rectangle(0, 0, 4, 4), checker.FieldSize, checker.C1, checker.C2);
+        canvas.StyleCheckerBckg(new Area2D(0, 0, 4, 4), checker.FieldSize, checker.C1, checker.C2);
         
         Assert.Equal(new NKColor(ConsoleColor.Blue), canvas[0, 0].Style.BColor);
         Assert.Equal(new NKColor(ConsoleColor.Blue), canvas[1, 1].Style.BColor);
@@ -35,7 +32,7 @@ public class CheckerBckgTests {
         // (2,1) is still Red.
         // (1,2) is still Red.
         // (2,2) is still Blue.
-        canvas.StyleCheckerBckg(new Rectangle(1, 1, 3, 3), checker.FieldSize, checker.C1, checker.C2);
+        canvas.StyleCheckerBckg(new Area2D(1, 1, 3, 3), checker.FieldSize, checker.C1, checker.C2);
 
         Assert.Equal(new NKColor(ConsoleColor.Blue), canvas[1, 1].Style.BColor);
         Assert.Equal(new NKColor(ConsoleColor.Red), canvas[2, 1].Style.BColor);

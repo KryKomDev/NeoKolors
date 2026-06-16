@@ -5,7 +5,6 @@
 
 using System.Reflection;
 using NeoKolors.Tui.Global;
-using NeoKolors.Tui.Core;
 
 namespace NeoKolors.Tui.Tests;
 
@@ -53,8 +52,8 @@ public class GlobalManagerTests {
 
     [Fact]
     public void ScreenSizeTracker_ShouldStoreValues() {
-        var sizePx = new Size(1920, 1080);
-        var sizeCh = new Size(80, 24);
+        var sizePx = new Size2D(1920, 1080);
+        var sizeCh = new Size2D(80, 24);
         
         ScreenSizeTracker.SetScreenSizePx(sizePx);
         ScreenSizeTracker.SetScreenSizeCh(sizeCh);

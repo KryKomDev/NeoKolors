@@ -1,9 +1,7 @@
 // NeoKolors.Test
 // Copyright (c) 2026 KryKom
 
-using NeoKolors.Common;
 using NeoKolors.Tui.Dom;
-using NeoKolors.Tui.Elements;
 using NeoKolors.Tui.Styles;
 
 namespace NeoKolors.Tui.Tests.Dom;

@@ -74,37 +74,37 @@ public class ScrollViewer : ContentControl {
         Content = content;
     }
 
-    protected override Size MeasureOverride(Size availableSize) {
+    protected override Size2D MeasureOverride(Size2D availableSize) {
         var child = GetChildNode();
         if (child != null) {
             child.Measure(availableSize);
             return child.DesiredSize;
         }
-        return Size.One;
+        return Size2D.One;
     }
 
-    protected override Size ArrangeOverride(Size finalSize) {
+    protected override Size2D ArrangeOverride(Size2D finalSize) {
         var child = GetChildNode();
         if (child == null) return finalSize;
 
         var childSize = child.DesiredSize;
-        var contentWidth = RenderLayout.Content.Width;
-        var contentHeight = RenderLayout.Content.Height;
+        var contentWidth = RenderLayout.Content.SizeX;
+        var contentHeight = RenderLayout.Content.SizeY;
 
         bool showVertical = VerticalScrollBarVisibility == ScrollBarVisibility.Visible ||
-                            (VerticalScrollBarVisibility == ScrollBarVisibility.Auto && childSize.Height > contentHeight);
+                            (VerticalScrollBarVisibility == ScrollBarVisibility.Auto && childSize.Y > contentHeight);
 
         bool showHorizontal = HorizontalScrollBarVisibility == ScrollBarVisibility.Visible ||
-                              (HorizontalScrollBarVisibility == ScrollBarVisibility.Auto && childSize.Width > contentWidth);
+                              (HorizontalScrollBarVisibility == ScrollBarVisibility.Auto && childSize.X > contentWidth);
 
         int viewportWidth = contentWidth - (showVertical ? 1 : 0);
         int viewportHeight = contentHeight - (showHorizontal ? 1 : 0);
 
-        _scrollX = Math.Clamp(_scrollX, 0, Math.Max(0, childSize.Width - viewportWidth));
-        _scrollY = Math.Clamp(_scrollY, 0, Math.Max(0, childSize.Height - viewportHeight));
+        _scrollX = Math.Clamp(_scrollX, 0, Math.Max(0, childSize.X - viewportWidth));
+        _scrollY = Math.Clamp(_scrollY, 0, Math.Max(0, childSize.Y - viewportHeight));
 
         var contentPos = RenderBounds.Lower + RenderLayout.Content.Lower;
-        var renderRect = new Rectangle(contentPos - new Point(_scrollX, _scrollY), childSize);
+        var renderRect = new Area2D(contentPos - new Point2D(_scrollX, _scrollY), childSize);
         child.Arrange(renderRect);
 
         return finalSize;
@@ -116,14 +116,14 @@ public class ScrollViewer : ContentControl {
 
         var childSize = child.DesiredSize;
         var contentPos = RenderBounds.Lower + RenderLayout.Content.Lower;
-        var contentWidth = RenderLayout.Content.Width;
-        var contentHeight = RenderLayout.Content.Height;
+        var contentWidth = RenderLayout.Content.SizeX;
+        var contentHeight = RenderLayout.Content.SizeY;
 
         bool showVertical = VerticalScrollBarVisibility == ScrollBarVisibility.Visible ||
-                            (VerticalScrollBarVisibility == ScrollBarVisibility.Auto && childSize.Height > contentHeight);
+                            (VerticalScrollBarVisibility == ScrollBarVisibility.Auto && childSize.Y > contentHeight);
 
         bool showHorizontal = HorizontalScrollBarVisibility == ScrollBarVisibility.Visible ||
-                              (HorizontalScrollBarVisibility == ScrollBarVisibility.Auto && childSize.Width > contentWidth);
+                              (HorizontalScrollBarVisibility == ScrollBarVisibility.Auto && childSize.X > contentWidth);
 
         int viewportWidth = contentWidth - (showVertical ? 1 : 0);
         int viewportHeight = contentHeight - (showHorizontal ? 1 : 0);
@@ -135,18 +135,18 @@ public class ScrollViewer : ContentControl {
             var trackHeight = viewportHeight;
 
             for (int y = 0; y < trackHeight; y++) {
-                canvas.Place("░", new Point(scrollBarX, contentPos.Y + y));
+                canvas.Place("░", new Point2D(scrollBarX, contentPos.Y + y));
             }
 
-            if (childSize.Height > 0) {
-                double visibleRatio = (double)viewportHeight / childSize.Height;
+            if (childSize.Y > 0) {
+                double visibleRatio = (double)viewportHeight / childSize.Y;
                 int thumbHeight = Math.Max(1, (int)Math.Round(visibleRatio * trackHeight));
-                double scrollRatio = (double)_scrollY / Math.Max(1, childSize.Height - viewportHeight);
+                double scrollRatio = (double)_scrollY / Math.Max(1, childSize.Y - viewportHeight);
                 int thumbY = (int)Math.Round(scrollRatio * (trackHeight - thumbHeight));
                 thumbY = Math.Clamp(thumbY, 0, trackHeight - thumbHeight);
 
                 for (int y = 0; y < thumbHeight; y++) {
-                    canvas.Place("█", new Point(scrollBarX, contentPos.Y + thumbY + y));
+                    canvas.Place("█", new Point2D(scrollBarX, contentPos.Y + thumbY + y));
                 }
             }
         }
@@ -156,18 +156,18 @@ public class ScrollViewer : ContentControl {
             var trackWidth = viewportWidth;
 
             for (int x = 0; x < trackWidth; x++) {
-                canvas.Place("░", new Point(contentPos.X + x, scrollBarY));
+                canvas.Place("░", new Point2D(contentPos.X + x, scrollBarY));
             }
 
-            if (childSize.Width > 0) {
-                double visibleRatio = (double)viewportWidth / childSize.Width;
+            if (childSize.X > 0) {
+                double visibleRatio = (double)viewportWidth / childSize.X;
                 int thumbWidth = Math.Max(1, (int)Math.Round(visibleRatio * trackWidth));
-                double scrollRatio = (double)_scrollX / Math.Max(1, childSize.Width - viewportWidth);
+                double scrollRatio = (double)_scrollX / Math.Max(1, childSize.X - viewportWidth);
                 int thumbX = (int)Math.Round(scrollRatio * (trackWidth - thumbWidth));
                 thumbX = Math.Clamp(thumbX, 0, trackWidth - thumbWidth);
 
                 for (int x = 0; x < thumbWidth; x++) {
-                    canvas.Place("█", new Point(contentPos.X + thumbX + x, scrollBarY));
+                    canvas.Place("█", new Point2D(contentPos.X + thumbX + x, scrollBarY));
                 }
             }
         }

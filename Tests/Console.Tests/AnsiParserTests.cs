@@ -44,8 +44,8 @@ public class AnsiParserTests {
         Assert.NotNull(record);
         Assert.Equal(AnsiRecordType.MOUSE, record.Value.Type);
         Assert.Equal(MouseButton.LEFT, record.Value.Mouse.Button);
-        Assert.Equal(10, record.Value.Mouse.Position.X);
-        Assert.Equal(20, record.Value.Mouse.Position.Y);
+        Assert.Equal(9, record.Value.Mouse.Position.X);
+        Assert.Equal(19, record.Value.Mouse.Position.Y);
     }
 
     [Fact]

@@ -1,24 +1,22 @@
 ﻿// NeoKolors
 // Copyright (c) 2026 KryKom
 
-using NeoKolors.Tui.Core;
-
 namespace NeoKolors.Tui.Elements.Caching;
 
 public sealed class ChildrenLayoutCacher {
 
     private bool                _min_isSet;
-    private Size                _min_parentSize;
+    private Size2D                _min_parentSize;
     private ChildrenLayout      _min_layout;
     private readonly Func<bool> _min_layoutValidator;
     
     private bool                _max_isSet;
-    private Size                _max_parentSize;
+    private Size2D                _max_parentSize;
     private ChildrenLayout      _max_layout;
     private readonly Func<bool> _max_layoutValidator;
 
     private bool                _render_isSet;
-    private Size                _render_parentSize;
+    private Size2D                _render_parentSize;
     private ChildrenLayout      _render_layout;
     private readonly Func<bool> _render_layoutValidator;
 
@@ -40,7 +38,7 @@ public sealed class ChildrenLayoutCacher {
         _render_layoutValidator = renderLayoutValidator;
     }
 
-    public bool IsMinValid(Size parent) {
+    public bool IsMinValid(Size2D parent) {
         var res = _min_isSet && _min_parentSize == parent && _min_layoutValidator();
         
         #if NK_ENABLE_CACHE_ANALYSIS
@@ -51,7 +49,7 @@ public sealed class ChildrenLayoutCacher {
         return res;
     }
 
-    public bool IsMaxValid(Size parent) {
+    public bool IsMaxValid(Size2D parent) {
         var res = _max_isSet && _max_parentSize == parent && _max_layoutValidator();
 
         #if NK_ENABLE_CACHE_ANALYSIS
@@ -62,7 +60,7 @@ public sealed class ChildrenLayoutCacher {
         return res;
     }
 
-    public bool IsRenderValid(Size parent) {
+    public bool IsRenderValid(Size2D parent) {
         var res = _render_isSet && _render_parentSize == parent && _render_layoutValidator();
         
         #if NK_ENABLE_CACHE_ANALYSIS
@@ -73,19 +71,19 @@ public sealed class ChildrenLayoutCacher {
         return res;
     }
     
-    public void SetMin(Size parent, ChildrenLayout layout) {
+    public void SetMin(Size2D parent, ChildrenLayout layout) {
         _min_parentSize = parent;
         _min_layout     = layout;
         _min_isSet      = true;
     }
     
-    public void SetMax(Size parent, ChildrenLayout layout) {
+    public void SetMax(Size2D parent, ChildrenLayout layout) {
         _max_parentSize = parent;
         _max_layout     = layout;
         _max_isSet      = true;
     }
     
-    public void SetRender(Size parent, ChildrenLayout layout) {
+    public void SetRender(Size2D parent, ChildrenLayout layout) {
         _render_parentSize = parent;
         _render_layout     = layout;
         _render_isSet      = true;

@@ -1,8 +1,6 @@
 // NeoKolors.Test
 // Copyright (c) 2026 KryKom
 
-using NeoKolors.Tui.Core;
-using NeoKolors.Tui.Elements;
 using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Properties;
 
@@ -11,7 +9,7 @@ namespace NeoKolors.Tui.Tests.Elements;
 public class TriggerTests {
     private class DummyElement : Control<string> {
         protected override void RenderCore(ICharCanvas canvas) { }
-        protected override Size MeasureOverride(Size availableSize) => Size.Zero;
+        protected override Size2D MeasureOverride(Size2D availableSize) => Size2D.Zero;
         public override ElementInfo Info => ElementInfo.Default;
         public override string GetChildNode() => "";
         public override void SetChildNode(string child) { }

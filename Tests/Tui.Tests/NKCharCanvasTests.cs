@@ -3,9 +3,6 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Tui.Core;
-using NeoKolors.Common;
-
 namespace NeoKolors.Tui.Tests;
 
 public class NKCharCanvasTests {
@@ -34,7 +31,7 @@ public class NKCharCanvasTests {
         // Based on Point.cs: public static implicit operator Point2D(Point p) => new(p.X, p.Y);
         // So we can pass new Point(2, 2)
         
-        canvas.Place(text, new Point(2, 2));
+        canvas.Place(text, new Point2D(2, 2));
 
         for (int i = 0; i < text.Length; i++) {
             var cell = canvas[2 + i, 2];
@@ -52,7 +49,7 @@ public class NKCharCanvasTests {
         // x=4: 'l'
         // x=5: out of bounds (should not throw, just clip)
         
-        canvas.Place(text, new Point(2, 2));
+        canvas.Place(text, new Point2D(2, 2));
         
         // Check valid chars
         Assert.Equal('H', canvas[2, 2].Char);
@@ -66,7 +63,7 @@ public class NKCharCanvasTests {
     [Fact]
     public void Clear_ShouldResetCanvas() {
         var canvas = new NKCharCanvas(10, 5);
-        canvas.Place("Test", new Point(0, 0));
+        canvas.Place("Test", new Point2D(0, 0));
         
         canvas.Clear();
         
@@ -91,18 +88,18 @@ public class NKCharCanvasTests {
     public void Place_OverlappingCanvasWithInheritStyle_ShouldMergeStylesAndPreserveCharacters() {
         // Arrange: Bottom canvas with colored background
         var bottom = new NKCharCanvas(3, 3);
-        bottom.StyleBackground(new Rectangle(0, 0, 2, 2), NKColor.FromRgb(255, 0, 0));
-        bottom.Place("abc", new Point(0, 0));
+        bottom.StyleBackground(new Area2D(0, 0, 2, 2), NKColor.FromRgb(255, 0, 0));
+        bottom.Place("abc", new Point2D(0, 0));
 
         // Top canvas with transparent background (inherit) and white bold character
         var top = new NKCharCanvas(3, 3);
-        top.ForceStyleBackground(new Rectangle(0, 0, 2, 2), NKColor.Inherit);
+        top.ForceStyleBackground(new Area2D(0, 0, 2, 2), NKColor.Inherit);
         var styledPiece = new AnsiString("X", new NKStyle(
             NKColor.FromRgb(255, 255, 255),
             NKColor.Inherit,
             TextStyles.BOLD
         ));
-        top.Place(styledPiece, new Point(1, 0));
+        top.Place(styledPiece, new Point2D(1, 0));
 
         // Act: Place top canvas onto bottom canvas
         bottom.Place(top);
@@ -128,12 +125,12 @@ public class NKCharCanvasTests {
     public void Place_OverlappingCanvasWithDefaultStyle_ShouldPreserveTrueColorBackground() {
         // Arrange: Bottom canvas with colored background
         var bottom = new NKCharCanvas(3, 3);
-        bottom.StyleBackground(new Rectangle(0, 0, 2, 2), NKColor.FromRgb(255, 0, 0));
-        bottom.Place("abc", new Point(0, 0));
+        bottom.StyleBackground(new Area2D(0, 0, 2, 2), NKColor.FromRgb(255, 0, 0));
+        bottom.Place("abc", new Point2D(0, 0));
 
         // Top canvas with default background (not inherit) and character 'X'
         var top = new NKCharCanvas(3, 3);
-        top.Place("X", new Point(1, 0));
+        top.Place("X", new Point2D(1, 0));
 
         // Act: Place top canvas onto bottom canvas
         bottom.Place(top);

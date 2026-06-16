@@ -1,8 +1,6 @@
 // NeoKolors
 // Copyright (c) 2026 KryKom
 
-using System;
-using System.Collections.Generic;
 using NeoKolors.Console.Input;
 using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Events;
@@ -181,25 +179,25 @@ public class ComboBox : ItemsControl, IMouseInteractableElement<IReadOnlyList<IE
         _selectedIndex = -1;
     }
 
-    protected override Size MeasureOverride(Size availableSize) {
-        return new Size(25, 1);
+    protected override Size2D MeasureOverride(Size2D availableSize) {
+        return new Size2D(25, 1);
     }
 
-    protected override Size ArrangeOverride(Size finalSize) {
+    protected override Size2D ArrangeOverride(Size2D finalSize) {
         if (ItemsPanel != null) {
-            var contentWidth = RenderLayout.Content.Width;
+            var contentWidth = RenderLayout.Content.SizeX;
             var dropdownHeight = Math.Min(10, ItemsPanel.Children.Count);
-            var dropdownPos = RenderBounds.Lower + new Point(RenderLayout.Content.Lower.X, (int)finalSize.Height);
-            var dropdownInnerRect = new Rectangle(dropdownPos + new Point(1, 1), new Size(contentWidth - 2, dropdownHeight));
+            var dropdownPos = RenderBounds.Lower + new Point2D(RenderLayout.Content.Lower.X, finalSize.Y);
+            var dropdownInnerRect = new Area2D(dropdownPos + new Point2D(1, 1), new Size2D(contentWidth - 2, dropdownHeight));
 
             int offset = 0;
             for (int i = 0; i < ItemsPanel.Children.Count && offset < dropdownHeight; i++) {
                 var child = ItemsPanel.Children[i];
-                var childSize = new Size(contentWidth - 2, 1);
-                var childPos = dropdownInnerRect.Lower + new Point(0, offset);
+                var childSize = new Size2D(contentWidth - 2, 1);
+                var childPos = dropdownInnerRect.Lower + new Point2D(0, offset);
 
                 child.Measure(childSize);
-                child.Arrange(new Rectangle(childPos, childSize));
+                child.Arrange(new Area2D(childPos, childSize));
                 offset++;
             }
         }
@@ -209,7 +207,7 @@ public class ComboBox : ItemsControl, IMouseInteractableElement<IReadOnlyList<IE
     protected override void RenderCore(ICharCanvas canvas) {
         var pos = RenderBounds.Lower;
         var contentPos = pos + RenderLayout.Content.Lower;
-        var contentWidth = RenderLayout.Content.Width;
+        var contentWidth = RenderLayout.Content.SizeX;
 
         string displayText = SelectedItem?.ToString() ?? "Select option...";
         
@@ -223,43 +221,43 @@ public class ComboBox : ItemsControl, IMouseInteractableElement<IReadOnlyList<IE
 
         if (IsDropDownOpen && ItemsPanel != null && ItemsPanel.Children.Count > 0) {
             var dropdownHeight = Math.Min(10, ItemsPanel.Children.Count);
-            var dropdownSize = new Size(contentWidth, dropdownHeight + 2);
-            var dropdownPos = pos + new Point(RenderLayout.Content.Lower.X, 1);
-            var dropdownRect = new Rectangle(dropdownPos, dropdownSize);
+            var dropdownSize = new Size2D(contentWidth, dropdownHeight + 2);
+            var dropdownPos = pos + new Point2D(RenderLayout.Content.Lower.X, 1);
+            var dropdownRect = new Area2D(dropdownPos, dropdownSize);
 
             canvas.StyleBackground(dropdownRect, NKColor.Default);
             canvas.PlaceRectangle(dropdownRect, BorderStyle.GetNormal());
 
-            var dropdownInnerRect = new Rectangle(dropdownPos + new Point(1, 1), new Size(contentWidth - 2, dropdownHeight));
+            var dropdownInnerRect = new Area2D(dropdownPos + new Point2D(1, 1), new Size2D(contentWidth - 2, dropdownHeight));
             
             int offset = 0;
             for (int i = 0; i < ItemsPanel.Children.Count && offset < dropdownHeight; i++) {
                 var child = ItemsPanel.Children[i];
-                var childSize = new Size(contentWidth - 2, 1);
-                var childPos = dropdownInnerRect.Lower + new Point(0, offset);
+                var childSize = new Size2D(contentWidth - 2, 1);
+                var childPos = dropdownInnerRect.Lower + new Point2D(0, offset);
 
                 if (i == SelectedIndex) {
-                    canvas.StyleBackground(new Rectangle(childPos, childSize), NKColor.Inherit);
+                    canvas.StyleBackground(new Area2D(childPos, childSize), NKColor.Inherit);
                 }
 
                 child.Render(canvas);
                 offset++;
             }
 
-            for (int x = Math.Max(0, dropdownRect.LowerX); x <= Math.Min(canvas.Width - 1, dropdownRect.HigherX); x++) {
-                for (int y = Math.Max(0, dropdownRect.LowerY); y <= Math.Min(canvas.Height - 1, dropdownRect.HigherY); y++) {
+            for (int x = Math.Max(0, dropdownRect.LowerX); x < Math.Min(canvas.Width, dropdownRect.HigherX); x++) {
+                for (int y = Math.Max(0, dropdownRect.LowerY); y < Math.Min(canvas.Height, dropdownRect.HigherY); y++) {
                     canvas[x, y].ZIndex = 10;
                 }
             }
         }
         else if (ItemsPanel != null) {
             var dropdownHeight = Math.Min(10, ItemsPanel.Children.Count);
-            var dropdownSize = new Size(contentWidth, dropdownHeight + 2);
-            var dropdownPos = pos + new Point(RenderLayout.Content.Lower.X, 1);
-            var dropdownRect = new Rectangle(dropdownPos, dropdownSize);
+            var dropdownSize = new Size2D(contentWidth, dropdownHeight + 2);
+            var dropdownPos = pos + new Point2D(RenderLayout.Content.Lower.X, 1);
+            var dropdownRect = new Area2D(dropdownPos, dropdownSize);
 
-            for (int x = Math.Max(0, dropdownRect.LowerX); x <= Math.Min(canvas.Width - 1, dropdownRect.HigherX); x++) {
-                for (int y = Math.Max(0, dropdownRect.LowerY); y <= Math.Min(canvas.Height - 1, dropdownRect.HigherY); y++) {
+            for (int x = Math.Max(0, dropdownRect.LowerX); x < Math.Min(canvas.Width, dropdownRect.HigherX); x++) {
+                for (int y = Math.Max(0, dropdownRect.LowerY); y < Math.Min(canvas.Height, dropdownRect.HigherY); y++) {
                     if (canvas[x, y].ZIndex == 10) {
                         canvas[x, y].ZIndex = int.MinValue;
                     }

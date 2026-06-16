@@ -5,9 +5,9 @@ namespace NeoKolors.Tui.Elements.Caching;
 
 public struct ChildrenLayout {
     public int Count { get; }
-    public Rectangle[] Children { get; }
+    public Area2D[] Children { get; }
     
-    public ChildrenLayout(Rectangle[] children) {
+    public ChildrenLayout(Area2D[] children) {
         Count = children.Length;
         Children = children;
     }

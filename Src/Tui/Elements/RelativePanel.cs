@@ -42,20 +42,20 @@ public class RelativePanel : Panel {
         InvokeElementUpdated();
     }
 
-    protected override Size MeasureOverride(Size availableSize) {
+    protected override Size2D MeasureOverride(Size2D availableSize) {
         var resolved = ResolveLayouts(availableSize);
         int maxWidth = 0;
         int maxHeight = 0;
 
         foreach (var childRect in resolved.Values) {
-            maxWidth = Math.Max(maxWidth, childRect.LowerX + childRect.Width);
-            maxHeight = Math.Max(maxHeight, childRect.LowerY + childRect.Height);
+            maxWidth = Math.Max(maxWidth, childRect.LowerX + childRect.SizeX);
+            maxHeight = Math.Max(maxHeight, childRect.LowerY + childRect.SizeY);
         }
 
-        return new Size(maxWidth, maxHeight);
+        return new Size2D(maxWidth, maxHeight);
     }
 
-    protected override Size ArrangeOverride(Size finalSize) {
+    protected override Size2D ArrangeOverride(Size2D finalSize) {
         var pos = RenderBounds.Lower;
         var resolvedPositions = ResolveLayouts(RenderLayout.Content.Size);
 
@@ -63,7 +63,7 @@ public class RelativePanel : Panel {
             if (child == null) continue;
             if (resolvedPositions.TryGetValue(child, out var childRect)) {
                 var childPos = pos + RenderLayout.Content.Lower + childRect.Lower;
-                child.Arrange(new Rectangle(childPos, childRect.Size));
+                child.Arrange(new Area2D(childPos, childRect.Size));
             }
         }
         return finalSize;
@@ -75,8 +75,8 @@ public class RelativePanel : Panel {
         }
     }
 
-    private Dictionary<IElement, Rectangle> ResolveLayouts(Size viewport) {
-        var resolved = new Dictionary<IElement, Rectangle>();
+    private Dictionary<IElement, Area2D> ResolveLayouts(Size2D viewport) {
+        var resolved = new Dictionary<IElement, Area2D>();
         var visiting = new HashSet<IElement>();
 
         foreach (var child in _children) {
@@ -89,8 +89,8 @@ public class RelativePanel : Panel {
 
     private void ResolveChild(
         IElement child, 
-        Size viewport, 
-        Dictionary<IElement, Rectangle> resolved, 
+        Size2D viewport, 
+        Dictionary<IElement, Area2D> resolved, 
         HashSet<IElement> visiting) 
     {
         if (resolved.ContainsKey(child)) return;
@@ -99,7 +99,7 @@ public class RelativePanel : Panel {
         var size = child.DesiredSize;
 
         if (!visiting.Add(child)) {
-            resolved[child] = new Rectangle(Point.Zero, size);
+            resolved[child] = new Area2D(Point2D.Zero, size);
             return;
         }
 
@@ -109,30 +109,30 @@ public class RelativePanel : Panel {
         if (_rightOf.TryGetValue(child, out var rightOfTarget) && _children.Contains(rightOfTarget)) {
             ResolveChild(rightOfTarget, viewport, resolved, visiting);
             if (resolved.TryGetValue(rightOfTarget, out var targetRect)) {
-                x = targetRect.LowerX + targetRect.Width;
+                x = targetRect.LowerX + targetRect.SizeX;
             }
         }
         else if (_leftOf.TryGetValue(child, out var leftOfTarget) && _children.Contains(leftOfTarget)) {
             ResolveChild(leftOfTarget, viewport, resolved, visiting);
             if (resolved.TryGetValue(leftOfTarget, out var targetRect)) {
-                x = targetRect.LowerX - size.Width;
+                x = targetRect.LowerX - size.X;
             }
         }
 
         if (_below.TryGetValue(child, out var belowTarget) && _children.Contains(belowTarget)) {
             ResolveChild(belowTarget, viewport, resolved, visiting);
             if (resolved.TryGetValue(belowTarget, out var targetRect)) {
-                y = targetRect.LowerY + targetRect.Height;
+                y = targetRect.LowerY + targetRect.SizeY;
             }
         }
         else if (_above.TryGetValue(child, out var aboveTarget) && _children.Contains(aboveTarget)) {
             ResolveChild(aboveTarget, viewport, resolved, visiting);
             if (resolved.TryGetValue(aboveTarget, out var targetRect)) {
-                y = targetRect.LowerY - size.Height;
+                y = targetRect.LowerY - size.Y;
             }
         }
 
-        resolved[child] = new Rectangle(new Point(x, y), size);
+        resolved[child] = new Area2D(new Point2D(x, y), size);
         visiting.Remove(child);
     }
 

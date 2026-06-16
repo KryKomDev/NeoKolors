@@ -3,7 +3,6 @@
 // Copyright (c) 2025 KryKom
 
 using NeoKolors.Tui.Fonts;
-using NeoKolors.Tui.Core;
 
 namespace NeoKolors.Tui.Tests;
 

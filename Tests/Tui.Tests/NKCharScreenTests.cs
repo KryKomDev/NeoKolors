@@ -4,12 +4,9 @@
 //
 
 using System.Text;
-using Metriks;
-using NeoKolors.Common;
 using NeoKolors.Console;
 using NeoKolors.Console.Driver;
 using NeoKolors.Console.Driver.Dotnet;
-using NeoKolors.Tui.Core;
 
 namespace NeoKolors.Tui.Tests;
 
@@ -24,8 +21,8 @@ public class NKCharScreenTests {
 
     [Fact]
     public void Constructor_WithSize_ShouldInitializeCorrectly() {
-        // Size is from NeoKolors.Tui (struct Size : IEquatable<Size>)
-        var size = new Size(20, 10);
+        // Size2D is from Metriks
+        var size = new Size2D(20, 10);
         var screen = new NKCharScreen(size);
         Assert.Equal(20, screen.Width);
         Assert.Equal(10, screen.Height);

@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2026 KryKom
 
 using System.Diagnostics.CodeAnalysis;
@@ -32,37 +32,9 @@ public readonly struct Position : IParsableValue<Position> {
     public static Position Parse(string s) => Parse(s, null);
     
     public static Position Parse(string s, IFormatProvider? formatProvider) {
-        var a = s.Split(',').Select(p => p.Trim()).ToArray();
-
-        if (a.Length != 2) {
-            LOGGER.Error("Invalid position: {0}", s);
-            return new Position(Dimension.Zero, Dimension.Zero, true, true);
-        }
-        
-        var rx = a[0];
-        var ry = a[1];
-
-        bool xa = rx[0] == '^';
-        bool ya = ry[0] == '^';
-
-        Dimension x = 0;
-        Dimension y = 0;
-        
-        try {
-            x = Dimension.Parse(xa ? rx[1..] : rx);
-        }
-        catch {
-            LOGGER.Error("Invalid x-position: {0}", rx);
-        }
-        
-        try {
-            y = Dimension.Parse(ya ? ry[1..] : ry);
-        }
-        catch {
-            LOGGER.Error("Invalid y-position: {0}", ry);
-        }
-        
-        return new Position(x, y, !xa, !ya);
+        if (s == null) throw new ArgumentNullException(nameof(s));
+        if (TryParse(s, formatProvider, out var result)) return result;
+        throw new FormatException($"Invalid position: '{s}'");
     }
 
     public static bool TryParse(string? s, IFormatProvider? formatProvider, out Position result) {
@@ -72,7 +44,42 @@ public readonly struct Position : IParsableValue<Position> {
         }
 
         try {
-            result = Parse(s, formatProvider);
+            var a = s.Split(',').Select(p => p.Trim()).ToArray();
+
+            if (a.Length != 2) {
+                LOGGER.Error("Invalid position: {0}", s);
+                result = new Position(Dimension.Zero, Dimension.Zero, true, true);
+                return false;
+            }
+            
+            var rx = a[0];
+            var ry = a[1];
+
+            bool xa = rx[0] == '^';
+            bool ya = ry[0] == '^';
+
+            Dimension x = 0;
+            Dimension y = 0;
+            
+            try {
+                x = Dimension.Parse(xa ? rx[1..] : rx);
+            }
+            catch {
+                LOGGER.Error("Invalid x-position: {0}", rx);
+                result = default;
+                return false;
+            }
+            
+            try {
+                y = Dimension.Parse(ya ? ry[1..] : ry);
+            }
+            catch {
+                LOGGER.Error("Invalid y-position: {0}", ry);
+                result = default;
+                return false;
+            }
+            
+            result = new Position(x, y, !xa, !ya);
             return true;
         }
         catch {
@@ -81,7 +88,5 @@ public readonly struct Position : IParsableValue<Position> {
         }
     }
     
-    
-    Position IParsableValue<Position>.Parse(string s, IFormatProvider? provider) => Parse(s, provider);
     bool IParsableValue<Position>.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out Position result) => TryParse(s, provider, out result);
 }

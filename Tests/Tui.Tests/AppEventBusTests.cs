@@ -3,11 +3,12 @@
 // Copyright (c) 2026 KryKom
 //
 
-using Metriks;
 using NeoKolors.Console;
 using NeoKolors.Console.Events;
 using NeoKolors.Console.Input;
 using NeoKolors.Tui.Events;
+
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
 
 namespace NeoKolors.Tui.Tests;
 

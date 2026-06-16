@@ -45,8 +45,8 @@ public interface IElement : IRenderable, INode {
     /// </summary>
     /// <param name="canvas">The drawing surface on which the content will be rendered.</param>
     void IRenderable.Render(ICharCanvas canvas) {
-        Measure(new Size(canvas.Width, canvas.Height));
-        Arrange(new Rectangle(0, 0, canvas.Width - 1, canvas.Height - 1));
+        Measure(new Size2D(canvas.Width, canvas.Height));
+        Arrange(new Area2D(0, 0, canvas.Width, canvas.Height));
         Render(canvas);
     }
 
@@ -62,12 +62,12 @@ public interface IElement : IRenderable, INode {
     /// <summary>
     /// Gets the size that this element calculated during the measure pass of the layout process.
     /// </summary>
-    public Size DesiredSize { get; }
+    public Size2D DesiredSize { get; }
 
     /// <summary>
     /// Gets the final render bounds of this element relative to its container.
     /// </summary>
-    public Rectangle RenderBounds { get; }
+    public Area2D RenderBounds { get; }
 
     /// <summary>
     /// Gets the computed element layout (margin, border, content boxes) of this element.
@@ -77,12 +77,12 @@ public interface IElement : IRenderable, INode {
     /// <summary>
     /// Updates the DesiredSize of the element based on the available constraints.
     /// </summary>
-    public void Measure(Size availableSize);
+    public void Measure(Size2D availableSize);
 
     /// <summary>
     /// Positions child elements and determines the final rendering size and position.
     /// </summary>
-    public void Arrange(Rectangle finalRect);
+    public void Arrange(Area2D finalRect);
 
     /// <summary>
     /// Invalidates the measurement state (layout) for the element.
@@ -146,7 +146,7 @@ public interface IElement : IRenderable, INode {
     /// <returns>The computed layout of the element, including its size and positioning adjustments.</returns>
     [Pure]
     public static ElementLayout ComputeLayoutFromBounds(
-        Size           bounds,
+        Size2D           bounds,
         Spacing        margin,
         BorderStyle    border,
         Spacing        padding,
@@ -157,20 +157,20 @@ public interface IElement : IRenderable, INode {
         Dimension      minHeight,
         Dimension      maxHeight,
         Func<int, int> computeContent,
-        Func<Size>     computeMinContent,
-        Func<Size>     computeMaxContent) 
+        Func<Size2D>     computeMinContent,
+        Func<Size2D>     computeMaxContent) 
     {
         // margin
-        int ml = margin.Left  .ToScalarX(bounds.Width);
-        int mr = margin.Right .ToScalarX(bounds.Width);
-        int mt = margin.Top   .ToScalarY(bounds.Height);
-        int mb = margin.Bottom.ToScalarY(bounds.Height);
+        int ml = margin.Left  .ToScalarX(bounds.X);
+        int mr = margin.Right .ToScalarX(bounds.X);
+        int mt = margin.Top   .ToScalarY(bounds.Y);
+        int mb = margin.Bottom.ToScalarY(bounds.Y);
 
         // padding
-        int pl = padding.Left  .ToScalarX(bounds.Width);
-        int pr = padding.Right .ToScalarX(bounds.Width);
-        int pt = padding.Top   .ToScalarY(bounds.Height);
-        int pb = padding.Bottom.ToScalarY(bounds.Height);
+        int pl = padding.Left  .ToScalarX(bounds.X);
+        int pr = padding.Right .ToScalarX(bounds.X);
+        int pt = padding.Top   .ToScalarY(bounds.Y);
+        int pb = padding.Bottom.ToScalarY(bounds.Y);
         
         var c = ComputeLayoutFromBounds(bounds, (ml, mr, mt, mb), (pl, pr, pt, pb), border).Content.Size;
         
@@ -206,7 +206,7 @@ public interface IElement : IRenderable, INode {
     /// <returns>The computed layout of the element, including its size and positioning adjustments.</returns>
     [Pure]
     public static ElementLayout ComputeLayoutFromBounds(
-        Size           bounds,
+        Size2D           bounds,
         Spacing        margin,
         BorderStyle    border,
         Spacing        padding,
@@ -218,16 +218,16 @@ public interface IElement : IRenderable, INode {
         Dimension      maxHeight) 
     {
         // margin
-        int ml = margin.Left  .ToScalarX(bounds.Width);
-        int mr = margin.Right .ToScalarX(bounds.Width);
-        int mt = margin.Top   .ToScalarY(bounds.Height);
-        int mb = margin.Bottom.ToScalarY(bounds.Height);
+        int ml = margin.Left  .ToScalarX(bounds.X);
+        int mr = margin.Right .ToScalarX(bounds.X);
+        int mt = margin.Top   .ToScalarY(bounds.Y);
+        int mb = margin.Bottom.ToScalarY(bounds.Y);
 
         // padding
-        int pl = padding.Left  .ToScalarX(bounds.Width);
-        int pr = padding.Right .ToScalarX(bounds.Width);
-        int pt = padding.Top   .ToScalarY(bounds.Height);
-        int pb = padding.Bottom.ToScalarY(bounds.Height);
+        int pl = padding.Left  .ToScalarX(bounds.X);
+        int pr = padding.Right .ToScalarX(bounds.X);
+        int pt = padding.Top   .ToScalarY(bounds.Y);
+        int pb = padding.Bottom.ToScalarY(bounds.Y);
         
         var c = ComputeLayoutFromBounds(bounds, (ml, mr, mt, mb), (pl, pr, pt, pb), border).Content.Size;
         
@@ -264,8 +264,8 @@ public interface IElement : IRenderable, INode {
     /// <returns>The computed layout of the element, including its size and positioning adjustments.</returns>
     [Pure]
     public static ElementLayout ComputeLayoutFromContent(
-        Size           content,
-        Size           parent,
+        Size2D           content,
+        Size2D           parent,
         Spacing        margin,
         BorderStyle    border,
         Spacing        padding,
@@ -276,8 +276,8 @@ public interface IElement : IRenderable, INode {
         Dimension      minHeight,
         Dimension      maxHeight,
         Func<int, int> computeContent,
-        Func<Size>     computeMinContent,
-        Func<Size>     computeMaxContent) 
+        Func<Size2D>     computeMinContent,
+        Func<Size2D>     computeMaxContent) 
     {
         var c = content;
         
@@ -315,8 +315,8 @@ public interface IElement : IRenderable, INode {
     /// <returns>The computed layout of the element, including its size and positioning adjustments.</returns>
     [Pure]
     public static ElementLayout ComputeLayoutFromContent(
-        Size           content,
-        Size           parent,
+        Size2D           content,
+        Size2D           parent,
         Spacing        margin,
         BorderStyle    border,
         Spacing        padding,
@@ -342,9 +342,9 @@ public interface IElement : IRenderable, INode {
     }
 
     [Pure]
-    private static Size RecomputeContentBoxSize(
-        Size            content, 
-        Size            parent,
+    private static Size2D RecomputeContentBoxSize(
+        Size2D            content, 
+        Size2D            parent,
         Spacing         margin,
         BorderStyle     border,
         Spacing         padding,
@@ -355,76 +355,86 @@ public interface IElement : IRenderable, INode {
         Dimension       minHeight,
         Dimension       maxHeight,
         Func<int, int>? computeContent    = null,
-        Func<Size>?     computeMinContent = null,
-        Func<Size>?     computeMaxContent = null) 
+        Func<Size2D>?     computeMinContent = null,
+        Func<Size2D>?     computeMaxContent = null) 
     {
-        computeMinContent ??= ( ) => new Size(content.Width, content.Height);
-        computeMaxContent ??= ( ) => new Size(content.Width, content.Height);
-        computeContent    ??= (_) => content.Height;
+        computeMinContent ??= ( ) => new Size2D(content.X, content.Y);
+        computeMaxContent ??= ( ) => new Size2D(content.X, content.Y);
+        computeContent    ??= (_) => content.Y;
         
-        Size? minC = null;
-        Size? maxC = null;
+        Size2D? minC = null;
+        Size2D? maxC = null;
         var c = content;
+
+        int pl = padding.Left.ToScalarX(parent.X);
+        int pr = padding.Right.ToScalarX(parent.X);
+        int bdX = border.IsBorderless ? 0 : 2;
+        int borderPaddingW = pl + pr + bdX;
+
+        int pt = padding.Top.ToScalarY(parent.Y);
+        int pb = padding.Bottom.ToScalarY(parent.Y);
+        int bdY = border.IsBorderless ? 0 : 2;
+        int borderPaddingH = pt + pb + bdY;
 
         // recompute the width of the content box
         if (width.IsMinContent) {
             minC = computeMinContent();
-            c = c with { Width = minC.Value.Width };
+            c = new Size2D(minC.Value.X, c.Y);
         }
         else if (width.IsMaxContent) {
             maxC = computeMaxContent();
-            c = c with { Width = maxC.Value.Width };
+            c = new Size2D(maxC.Value.X, c.Y);
         }
         else if (width.IsStretch) {
-            var w = parent.Width 
-                - margin .Left.ToScalarX(parent.Width) - margin .Right.ToScalarX(parent.Width) 
-                - padding.Left.ToScalarX(parent.Width) - padding.Right.ToScalarX(parent.Width) 
+            var w = parent.X 
+                - margin .Left.ToScalarX(parent.X) - margin .Right.ToScalarX(parent.X) 
+                - padding.Left.ToScalarX(parent.X) - padding.Right.ToScalarX(parent.X) 
                 - (border.IsBorderless ? 0 : 2);
             
-            c = c with { Width = w };
+            c = new Size2D(w, c.Y);
         }
         else if (width.IsNumber) {
-            int w = width.ToScalarX(parent.Width);
+            int w = Math.Max(0, width.ToScalarX(parent.X) - borderPaddingW);
 
             // if the height is automatically computed, recompute it for the given width
             if (height.IsAuto) {
                 int h = computeContent(w);
-                c = new Size(width: w, height: h);   
+                c = new Size2D(w, h);   
             }
             else {
-                c = c with { Width = w };
+                c = new Size2D(w, c.Y);
             }
         }
         else {
-            var xw = maxWidth.IsNumber ? maxWidth.ToScalarX(parent.Width) : int.MaxValue;
-            var nw = minWidth.IsNumber ? minWidth.ToScalarX(parent.Width) : 0;
-            c = c with { Width = Math.DClamp(content.Width, xw, nw) };
+            var xw = maxWidth.IsNumber ? Math.Max(0, maxWidth.ToScalarX(parent.X) - borderPaddingW) : int.MaxValue;
+            var nw = minWidth.IsNumber ? Math.Max(0, minWidth.ToScalarX(parent.X) - borderPaddingW) : 0;
+            c = new Size2D(Math.DClamp(content.X, xw, nw), c.Y);
         }
 
         // recompute the height of the content box
         if (height.IsMinContent) {
             minC ??= computeMinContent();
-            c = c with { Height = minC.Value.Height };
+            c = new Size2D(c.X, minC.Value.Y);
         }
         else if (height.IsMaxContent) {
             maxC ??= computeMaxContent();
-            c = c with { Height = maxC.Value.Height };
+            c = new Size2D(c.X, maxC.Value.Y);
         }
         else if (height.IsStretch) {
-            var h = parent.Height 
-                - margin .Top.ToScalarY(parent.Height) - margin .Bottom.ToScalarY(parent.Height) 
-                - padding.Top.ToScalarY(parent.Height) - padding.Bottom.ToScalarY(parent.Height) 
+            var h = parent.Y 
+                - margin .Top.ToScalarY(parent.Y) - margin .Bottom.ToScalarY(parent.Y) 
+                - padding.Top.ToScalarY(parent.Y) - padding.Bottom.ToScalarY(parent.Y) 
                 - (border.IsBorderless ? 0 : 2);
             
-            c = c with { Height = h };
+            c = new Size2D(c.X, h);
         }
         else if (height.IsNumber) {
-            c = c with { Height = height.ToScalarY(parent.Height) };
+            c = new Size2D(c.X, Math.Max(0, height.ToScalarY(parent.Y) - borderPaddingH));
         }
         else {
-            var xh = maxHeight.IsNumber ? maxHeight.ToScalarY(parent.Height) : int.MaxValue;
-            var nh = minHeight.IsNumber ? minHeight.ToScalarY(parent.Height) : 0;
-            c = c with { Height = Math.DClamp(content.Height, xh, nh) };
+            var xh = maxHeight.IsNumber ? Math.Max(0, maxHeight.ToScalarY(parent.Y) - borderPaddingH) : int.MaxValue;
+            var nh = minHeight.IsNumber ? Math.Max(0, minHeight.ToScalarY(parent.Y) - borderPaddingH) : 0;
+            c = new Size2D(c.X, Math.DClamp(content.Y, xh, nh));
         }
 
         return c;
@@ -432,20 +442,20 @@ public interface IElement : IRenderable, INode {
 
     [Pure]
     private static ElementLayout ComputeLayoutFromContent(
-        Size        content,
+        Size2D        content,
         Spacing     margin,
         Spacing     padding,
         BorderStyle border) 
     {
-        var ml = margin.Left  .ToScalarX(content.Width);
-        var mr = margin.Right .ToScalarX(content.Width);
-        var mt = margin.Top   .ToScalarY(content.Height);
-        var mb = margin.Bottom.ToScalarY(content.Height);
+        var ml = margin.Left  .ToScalarX(content.X);
+        var mr = margin.Right .ToScalarX(content.X);
+        var mt = margin.Top   .ToScalarY(content.Y);
+        var mb = margin.Bottom.ToScalarY(content.Y);
         
-        var pl = padding.Left  .ToScalarX(content.Width);
-        var pr = padding.Right .ToScalarX(content.Width);
-        var pt = padding.Top   .ToScalarY(content.Height);
-        var pb = padding.Bottom.ToScalarY(content.Height);
+        var pl = padding.Left  .ToScalarX(content.X);
+        var pr = padding.Right .ToScalarX(content.X);
+        var pt = padding.Top   .ToScalarY(content.Y);
+        var pb = padding.Bottom.ToScalarY(content.Y);
 
         return ComputeLayoutFromContent(
             content,
@@ -457,7 +467,7 @@ public interface IElement : IRenderable, INode {
     
     [Pure]
     private static ElementLayout ComputeLayoutFromContent(
-        Size content,
+        Size2D content,
         (int L, int R, int T, int B) margin,
         (int L, int R, int T, int B) padding,
         BorderStyle border) 
@@ -476,20 +486,20 @@ public interface IElement : IRenderable, INode {
         int pt = padding.T;
         int pb = padding.B;
         
-        var e = new Size(content.Width + pl + pr + bd * 2 + ml + mr, content.Height + pt + pb + bd * 2 + mt + mb);
-        var c = new Rectangle(new Point(ml + pl + bd, mt + pt + bd), content);
+        var e = new Size2D(content.X + pl + pr + bd * 2 + ml + mr, content.Y + pt + pb + bd * 2 + mt + mb);
+        var c = new Area2D(new Point2D(ml + pl + bd, mt + pt + bd), content);
 
         // no border
-        if (bd == 0) return new ElementLayout(e, c, e);
+        if (bd == 0) return new ElementLayout(e, c, new Area2D(Point2D.Zero, e));
 
         // yes border :)
-        var b = new Rectangle(new Point(ml, mt), new Size(e.Width - ml - mr, e.Height - mt - mb));
+        var b = new Area2D(new Point2D(ml, mt), new Size2D(e.X - ml - mr, e.Y - mt - mb));
         return new ElementLayout(e, c, b);
     }
 
     [Pure]
     private static ElementLayout ComputeLayoutFromBounds(
-        Size bounds,
+        Size2D bounds,
         (int L, int R, int T, int B) margin,
         (int L, int R, int T, int B) padding,
         BorderStyle border) 
@@ -509,19 +519,19 @@ public interface IElement : IRenderable, INode {
         int pb = padding.B;
         
         var e = bounds;
-        var c = new Rectangle(
-            new Point(ml + pl + bd, mt + pt + bd), 
-            new Size(
-                bounds.Width  - (ml + mr + pl + pr + 2 * bd), 
-                bounds.Height - (mt + mb + pt + pb + 2 * bd)
+        var c = new Area2D(
+            new Point2D(ml + pl + bd, mt + pt + bd), 
+            new Size2D(
+                bounds.X  - (ml + mr + pl + pr + 2 * bd), 
+                bounds.Y - (mt + mb + pt + pb + 2 * bd)
             )
         );
 
         // no border
-        if (bd == 0) return new ElementLayout(e, c, e);
+        if (bd == 0) return new ElementLayout(e, c, new Area2D(Point2D.Zero, e));
 
         // yes border :)
-        var b = new Rectangle(new Point(ml, mt), new Size(e.Width - ml - mr, e.Height - mt - mb));
+        var b = new Area2D(new Point2D(ml, mt), new Size2D(e.X - ml - mr, e.Y - mt - mb));
         return new ElementLayout(e, c, b);
     } 
 }

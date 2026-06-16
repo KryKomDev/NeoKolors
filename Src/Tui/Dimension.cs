@@ -1,4 +1,4 @@
-﻿//
+//
 // NeoKolors
 // Copyright (c) 2026 KryKom
 //
@@ -188,25 +188,8 @@ public struct Dimension : IParsableValue<Dimension> {
     public static Dimension Parse(string s) => Parse(s, CultureInfo.InvariantCulture);
 
     public static Dimension Parse(string s, IFormatProvider? provider) {
-        s = s.Trim().ToLowerInvariant();
-        
-        if (s == "auto") return Auto;
-        if (s is "min-content" or "mincontent") return MinContent;
-        if (s is "max-content" or "maxcontent") return MaxContent;
-        if (s is "stretch") return Stretch;
-        
-        var ops = s.Split(' ');
-
-        if (ops.Length != 1) return ParseExpression(ops);
-        
-        if (s.EndsWith("px")) return Pixels(        int.Parse(s.Replace("px", "")));
-        if (s.EndsWith("ch")) return Chars(         int.Parse(s.Replace("ch", "")));
-        if (s.EndsWith('%'))  return Percent(       int.Parse(s.Replace("%",  "")));
-        if (s.EndsWith("vw")) return ViewportWidth( int.Parse(s.Replace("vw", "")));
-        if (s.EndsWith("vh")) return ViewportHeight(int.Parse(s.Replace("vh", "")));
-        
-        if (int.TryParse(s, out int val)) return Chars(val);
-        
+        if (s == null) throw new ArgumentNullException(nameof(s));
+        if (TryParse(s, provider, out var result)) return result;
         throw new FormatException($"Invalid dimension: {s}");
     }
 
@@ -244,8 +227,30 @@ public struct Dimension : IParsableValue<Dimension> {
         }
 
         try {
-            result = Parse(s, provider);
-            return true;
+            var trimmed = s.Trim().ToLowerInvariant();
+            
+            if (trimmed == "auto") { result = Auto; return true; }
+            if (trimmed is "min-content" or "mincontent") { result = MinContent; return true; }
+            if (trimmed is "max-content" or "maxcontent") { result = MaxContent; return true; }
+            if (trimmed is "stretch") { result = Stretch; return true; }
+            
+            var ops = trimmed.Split(' ');
+
+            if (ops.Length != 1) {
+                result = ParseExpression(ops);
+                return true;
+            }
+            
+            if (trimmed.EndsWith("px")) { result = Pixels(        int.Parse(trimmed.Replace("px", ""))); return true; }
+            if (trimmed.EndsWith("ch")) { result = Chars(         int.Parse(trimmed.Replace("ch", ""))); return true; }
+            if (trimmed.EndsWith('%'))  { result = Percent(       int.Parse(trimmed.Replace("%",  ""))); return true; }
+            if (trimmed.EndsWith("vw")) { result = ViewportWidth( int.Parse(trimmed.Replace("vw", ""))); return true; }
+            if (trimmed.EndsWith("vh")) { result = ViewportHeight(int.Parse(trimmed.Replace("vh", ""))); return true; }
+            
+            if (int.TryParse(trimmed, out int val)) { result = Chars(val); return true; }
+            
+            result = default;
+            return false;
         }
         catch {
             result = default;
@@ -254,7 +259,6 @@ public struct Dimension : IParsableValue<Dimension> {
     }
 
     bool IParsableValue<Dimension>.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out Dimension result) => TryParse(s, provider, out result);
-    Dimension IParsableValue<Dimension>.Parse(string s, IFormatProvider? provider) => Parse(s, provider);
 }
 
 /// <summary>

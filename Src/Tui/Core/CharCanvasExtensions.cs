@@ -14,7 +14,7 @@ public static class CharCanvasExtensions {
     
     extension(ICharCanvas canvas) {
         
-        public void PlaceRectangle(Rectangle rectangle, BorderStyle borderStyle, int zIndex = 0) {
+        public void PlaceRectangle(Area2D rectangle, BorderStyle borderStyle, int zIndex = 0) {
             if (borderStyle.IsBorderless)
                 return;
             
@@ -32,7 +32,7 @@ public static class CharCanvasExtensions {
         }
 
         public void PlaceRectangle(
-            Rectangle rectangle, 
+            Area2D rectangle, 
             char vertical,    char horizontal, 
             char topRight,    char topLeft,
             char bottomRight, char bottomLeft,
@@ -42,8 +42,8 @@ public static class CharCanvasExtensions {
         {
             var lx = rectangle.LowerX;
             var ly = rectangle.LowerY;
-            var hx = rectangle.HigherX;
-            var hy = rectangle.HigherY;
+            var hx = rectangle.HigherX - 1;
+            var hy = rectangle.HigherY - 1;
             
             // top left corner
             if (lx == ..^canvas.Width && ly == ..^canvas.Height) {
@@ -139,9 +139,9 @@ public static class CharCanvasExtensions {
         /// </summary>
         /// <param name="region">The rectangular area on the canvas where the style will be applied.</param>
         /// <param name="style">The style to be applied to each character within the region.</param>
-        public void Style(Rectangle region, NKStyle style, int zIndex = 0) {
-            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
-                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
+        public void Style(Area2D region, NKStyle style, int zIndex = 0) {
+            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX); x++) {
+                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY); y++) {
                     var cellInfo   = canvas[x, y];
                     if (cellInfo.ZIndex <= zIndex) {
                         cellInfo.Style = cellInfo.Style.OverrideWith(style);
@@ -151,9 +151,9 @@ public static class CharCanvasExtensions {
             }
         }
 
-        public void StyleBackground(Rectangle region, NKColor color, int zIndex = 0) {
-            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
-                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
+        public void StyleBackground(Area2D region, NKColor color, int zIndex = 0) {
+            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX); x++) {
+                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY); y++) {
                     var cellInfo   = canvas[x, y];
                     if (cellInfo.ZIndex <= zIndex) {
                         cellInfo.Style = cellInfo.Style.SafeSetBColor(color);
@@ -163,9 +163,9 @@ public static class CharCanvasExtensions {
             }
         }
 
-        public void StyleTextColor(Rectangle region, NKColor color, int zIndex = 0) {
-            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
-                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
+        public void StyleTextColor(Area2D region, NKColor color, int zIndex = 0) {
+            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX); x++) {
+                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY); y++) {
                     var cellInfo   = canvas[x, y];
                     if (cellInfo.ZIndex <= zIndex) {
                         cellInfo.Style = cellInfo.Style.SafeSetFColor(color);
@@ -181,9 +181,9 @@ public static class CharCanvasExtensions {
         /// </summary>
         /// <param name="region">The area on the canvas where the style will be forcefully applied.</param>
         /// <param name="style">The style to assign to each character within the specified region.</param>
-        public void ForceStyle(Rectangle region, NKStyle style) {
-            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
-                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
+        public void ForceStyle(Area2D region, NKStyle style) {
+            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX); x++) {
+                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY); y++) {
                     var cellInfo   = canvas[x, y];
                     cellInfo.Style = style;
                 }
@@ -196,9 +196,9 @@ public static class CharCanvasExtensions {
         /// </summary>
         /// <param name="region">The rectangular region on the canvas where the background color will be applied.</param>
         /// <param name="color">The background color to be applied to each character within the region.</param>
-        public void ForceStyleBackground(Rectangle region, NKColor color) {
-            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
-                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
+        public void ForceStyleBackground(Area2D region, NKColor color) {
+            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX); x++) {
+                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY); y++) {
                     var cellInfo   = canvas[x, y];
                     var s          = cellInfo.Style;
                     cellInfo.Style = s with { BColor = color };
@@ -206,7 +206,7 @@ public static class CharCanvasExtensions {
             }
         }
 
-        public void Style<T>(NKStyle style, Point offset, T?[,] mask) {
+        public void Style<T>(NKStyle style, Point2D offset, T?[,] mask) {
             for (int x = offset.X; x < Math.Min(mask.Len0 + offset.X, canvas.Width); x++) {
                 for (int y = offset.Y; y < Math.Min(mask.Len1 + offset.Y, canvas.Height); y++) {
                     if (mask[x - offset.X, y - offset.Y] == null) continue;
@@ -217,7 +217,7 @@ public static class CharCanvasExtensions {
             }
         }
 
-        public void Place(string s, Point offset, int window, HorizontalAlign align) {
+        public void Place(string s, Point2D offset, int window, HorizontalAlign align) {
             if (offset.Y != ..^canvas.Height) return;
 
             var xo = offset.X + align switch {
@@ -232,7 +232,7 @@ public static class CharCanvasExtensions {
             }
         }
         
-        public void Place(AnsiString s, Point offset, int window, HorizontalAlign align) {
+        public void Place(AnsiString s, Point2D offset, int window, HorizontalAlign align) {
             if (offset.Y != ..^canvas.Height) return;
 
             var xo = offset.X + align switch {
@@ -242,7 +242,7 @@ public static class CharCanvasExtensions {
                 _                      => 0
             };
 
-            canvas.Place(s, offset with { X = xo });
+            canvas.Place(s, new Point2D(xo, offset.Y));
         }
         
         /// <summary>
@@ -250,9 +250,9 @@ public static class CharCanvasExtensions {
         /// </summary>
         /// <param name="region">The rectangular area on the canvas where the style will be applied.</param>
         /// <param name="c">The character to be used when filling the region.</param>
-        public void Fill(Rectangle region, char c, int zIndex = 0) {
-            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
-                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
+        public void Fill(Area2D region, char c, int zIndex = 0) {
+            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX); x++) {
+                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY); y++) {
                     var cellInfo  = canvas[x, y];
                     if (cellInfo.ZIndex <= zIndex) {
                         cellInfo.Char = c;
@@ -268,9 +268,9 @@ public static class CharCanvasExtensions {
         /// </summary>
         /// <param name="region">The rectangular area on the canvas to be filled.</param>
         /// <param name="c">The AnsiChar containing the character and style to apply.</param>
-        public void Fill(Rectangle region, AnsiChar c, int zIndex = 0) {
-            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
-                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
+        public void Fill(Area2D region, AnsiChar c, int zIndex = 0) {
+            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX); x++) {
+                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY); y++) {
                     var cellInfo   = canvas[x, y];
                     if (cellInfo.ZIndex <= zIndex) {
                         cellInfo.Char  = c.Char;
@@ -287,9 +287,9 @@ public static class CharCanvasExtensions {
         /// </summary>
         /// <param name="region">The area on the canvas where the style will be forcefully applied.</param>
         /// <param name="c">The character to be used when filling the region.</param>
-        public void ForceFill(Rectangle region, char c) {
-            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
-                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
+        public void ForceFill(Area2D region, char c) {
+            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX); x++) {
+                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY); y++) {
                     var cellInfo  = canvas[x, y];
                     cellInfo.Char = c;
                 }
@@ -302,9 +302,9 @@ public static class CharCanvasExtensions {
         /// </summary>
         /// <param name="region">The area on the canvas to be forcefully filled.</param>
         /// <param name="c">The AnsiChar containing the character and style to forcefully apply.</param>
-        public void ForceFill(Rectangle region, AnsiChar c) {
-            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
-                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
+        public void ForceFill(Area2D region, AnsiChar c) {
+            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX); x++) {
+                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY); y++) {
                     var cellInfo   = canvas[x, y];
                     cellInfo.Char  = c.Char;
                     cellInfo.Style = c.Style;
@@ -312,14 +312,14 @@ public static class CharCanvasExtensions {
             }
         }
 
-        internal void StyleCheckerBckg(Rectangle region, Size fieldSize, NKColor c0, NKColor c1) {
-            int cw = Math.Max(1, fieldSize.Width);
-            int ch = Math.Max(1, fieldSize.Height);
+        internal void StyleCheckerBckg(Area2D region, Size2D fieldSize, NKColor c0, NKColor c1) {
+            int cw = Math.Max(1, fieldSize.X);
+            int ch = Math.Max(1, fieldSize.Y);
 
             int startX = Math.Max(0, region.LowerX);
-            int endX   = Math.Min(canvas.Width, region.HigherX + 1);
+            int endX   = Math.Min(canvas.Width, region.HigherX);
             int startY = Math.Max(0, region.LowerY);
-            int endY   = Math.Min(canvas.Height, region.HigherY + 1);
+            int endY   = Math.Min(canvas.Height, region.HigherY);
 
             if (startX >= endX || startY >= endY) 
                 return;
@@ -344,10 +344,10 @@ public static class CharCanvasExtensions {
         /// </summary>
         /// <param name="region">The rectangular area on the canvas within which the styles will be reset.</param>
         /// <param name="mask">The rectangular mask that specifies cells to exclude from the style reset operation.</param>
-        public void ResetStyle(Rectangle region, Rectangle mask) {
-            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX + 1); x++) {
-                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY + 1); y++) {
-                    if (mask.Contains(x, y)) continue;
+        public void ResetStyle(Area2D region, Area2D mask) {
+            for (int x = Math.Max(0, region.LowerX); x < Math.Min(canvas.Width, region.HigherX); x++) {
+                for (int y = Math.Max(0, region.LowerY); y < Math.Min(canvas.Height, region.HigherY); y++) {
+                    if (mask.ContainsEx(x, y)) continue;
                     var cellInfo = canvas[x, y];
                     cellInfo.Style = cellInfo.Style with { Styles = TextStyles.NONE };
                 }

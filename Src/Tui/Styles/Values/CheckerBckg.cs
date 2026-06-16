@@ -1,7 +1,7 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2026 KryKom
 
-using NeoKolors.Tui.Core;
+using System.Diagnostics.CodeAnalysis;
 
 namespace NeoKolors.Tui.Styles.Values;
 
@@ -10,7 +10,7 @@ internal readonly record struct CheckerBckg : IParsableValue<CheckerBckg> {
     public NKColor C2 { get; }
     public int Width { get; }
     public int Height { get; }
-    public Size FieldSize => new(Width, Height);
+    public Size2D FieldSize => new(Width, Height);
     
     public bool Enabled { get; }
 
@@ -24,10 +24,32 @@ internal readonly record struct CheckerBckg : IParsableValue<CheckerBckg> {
 
 
     public CheckerBckg Parse(string s, IFormatProvider? provider) {
-        var c = s.Split(' ');
-        if (c.Length != 2) 
-            throw new FormatException();
+        if (s == null) throw new ArgumentNullException(nameof(s));
+        var self = this;
+        if (((IParsableValue<CheckerBckg>)self).TryParse(s, provider, out var result)) {
+            return result;
+        }
+        throw new FormatException();
+    }
 
-        return new CheckerBckg(NKColor.Parse(c[0]), NKColor.Parse(c[1]));
+    bool IParsableValue<CheckerBckg>.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out CheckerBckg result) {
+        if (string.IsNullOrEmpty(s)) {
+            result = default;
+            return false;
+        }
+
+        var c = s.Split(' ');
+        if (c.Length != 2) {
+            result = default;
+            return false;
+        }
+
+        if (NKColor.TryParse(c[0], null, out var c1) && NKColor.TryParse(c[1], null, out var c2)) {
+            result = new CheckerBckg(c1, c2);
+            return true;
+        }
+
+        result = default;
+        return false;
     }
 }

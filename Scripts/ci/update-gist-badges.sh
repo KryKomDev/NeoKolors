@@ -27,7 +27,7 @@ fi
 # Initialize an empty JSON object for files
 files_json=$(jq -n '{}')
 
-projects=("Common" "Console" "Extensions" "Settings" "Tui" "Tui.Core" "Tui.Fonts" "Tui.Fonts.Assets" "Tools.NKFont")
+projects=("Common" "Console" "Extensions" "Settings" "Tui" "Tui.Core" "Tui.Fonts" "Tui.Fonts.Assets" "Tui.Generators" "Tools.NKFont" "Tools.NKChess")
 
 for proj in "${projects[@]}"; do
   # Check if build artifact exists

@@ -1,11 +1,7 @@
-using System;
 using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Styles;
-using NeoKolors.Console;
 using NeoKolors.Console.Input;
-using NeoKolors.Common;
 using NeoKolors.Tui.Global;
-using NeoKolors.Tui.Styles.Properties;
 using NeoKolors.Tui.Events;
 
 namespace NeoKolors.Tui.Elements;
@@ -72,14 +68,14 @@ public class Slider : RangeBase, ISelectableElement<double>, IMouseInteractableE
         }
     }
 
-    protected override Size MeasureOverride(Size availableSize) {
-        return new Size(20, 1);
+    protected override Size2D MeasureOverride(Size2D availableSize) {
+        return new Size2D(20, 1);
     }
 
     protected override void RenderCore(ICharCanvas canvas) {
         var pos = RenderBounds.Lower;
         var contentPos = pos + RenderLayout.Content.Lower;
-        var contentWidth = RenderLayout.Content.Width;
+        var contentWidth = RenderLayout.Content.SizeX;
 
         string pctLabel = string.IsNullOrEmpty(Unit) ? $" {Value:0}" : $" {Value:0}{Unit}";
         int labelLength = pctLabel.Length;
@@ -125,12 +121,12 @@ public class Slider : RangeBase, ISelectableElement<double>, IMouseInteractableE
     private void HandleMouse(MouseEventArgs m) {
         if (!Style.Visible || !IsEnabled) return;
 
-        if (m.IsPress && m.Button == MouseButton.LEFT) {
-            if (RenderBounds.Contains(m.Position.X, m.Position.Y)) {
-                _isDragging = true;
-                Select();
-                UpdateValueFromX(m.Position.X);
-            }
+        if (m is { IsPress: true, Button: MouseButton.LEFT }) {
+            if (!RenderBounds.ContainsIn(m.Position.X, m.Position.Y)) return;
+
+            _isDragging = true;
+            Select();
+            UpdateValueFromX(m.Position.X);
         }
         else if (_isDragging) {
             if (m.Released || m.IsRelease || m.Button == MouseButton.RELEASE) {
@@ -172,7 +168,7 @@ public class Slider : RangeBase, ISelectableElement<double>, IMouseInteractableE
     private void UpdateValueFromX(int absoluteX) {
         var pos = RenderBounds.Lower;
         var contentPos = pos + RenderLayout.Content.Lower;
-        var contentWidth = RenderLayout.Content.Width;
+        var contentWidth = RenderLayout.Content.SizeX;
 
         string pctLabel = string.IsNullOrEmpty(Unit) ? $" {Value:0}" : $" {Value:0}{Unit}";
         int labelLength = pctLabel.Length;

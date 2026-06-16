@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2026 KryKom
 
 using System.Diagnostics.CodeAnalysis;
@@ -24,32 +24,49 @@ public struct ViewSize : IParsableValue<ViewSize> {
         Vertical   = Dimension.Auto;
     }
 
-    public static ViewSize Parse(string s) {
-        var args = s.Split(',').Select(a => a.Trim()).ToArray();
-
-        if (args.Length is > 2 or 0)
-            throw new FormatException();
-
-        return args.Length == 2 
-            ? new ViewSize(Dimension.Parse(args[0]), Dimension.Parse(args[1])) 
-            : new ViewSize(Dimension.Parse(args[0]));
-    }
-    
-    public ViewSize Parse(string s, IFormatProvider? provider) => Parse(s);
-
-    public bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out ViewSize result) {
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out ViewSize result) {
         if (string.IsNullOrEmpty(s)) {
             result = default;
             return false;
         }
-        
+
         try {
-            result = Parse(s);
-            return true;
+            var args = s.Split(',').Select(a => a.Trim()).ToArray();
+
+            if (args.Length is > 2 or 0) {
+                result = default;
+                return false;
+            }
+
+            if (args.Length == 2) {
+                if (Dimension.TryParse(args[0], null, out var h) && Dimension.TryParse(args[1], null, out var v)) {
+                    result = new ViewSize(h, v);
+                    return true;
+                }
+            }
+            else {
+                if (Dimension.TryParse(args[0], null, out var d)) {
+                    result = new ViewSize(d);
+                    return true;
+                }
+            }
+
+            result = default;
+            return false;
         }
-        catch (FormatException) {
+        catch {
             result = default;
             return false;
         }
     }
+
+    public static ViewSize Parse(string s) => Parse(s, null);
+
+    public static ViewSize Parse(string s, IFormatProvider? provider) {
+        if (s == null) throw new ArgumentNullException(nameof(s));
+        if (TryParse(s, provider, out var result)) return result;
+        throw new FormatException($"Invalid ViewSize: '{s}'");
+    }
+
+    bool IParsableValue<ViewSize>.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out ViewSize result) => TryParse(s, provider, out result);
 }

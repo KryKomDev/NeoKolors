@@ -51,7 +51,7 @@ public class StackPanel : Panel {
         _spacing = spacing;
     }
 
-    protected override Size MeasureOverride(Size availableSize) {
+    protected override Size2D MeasureOverride(Size2D availableSize) {
         int width = 0;
         int height = 0;
 
@@ -61,38 +61,38 @@ public class StackPanel : Panel {
             var childSize = child.DesiredSize;
 
             if (_orientation == Orientation.VERTICAL) {
-                height += childSize.Height;
+                height += childSize.Y;
                 if (i > 0) height += _spacing;
-                width = Math.Max(width, childSize.Width);
+                width = Math.Max(width, childSize.X);
             }
             else {
-                width += childSize.Width;
+                width += childSize.X;
                 if (i > 0) width += _spacing;
-                height = Math.Max(height, childSize.Height);
+                height = Math.Max(height, childSize.Y);
             }
         }
 
-        return new Size(width, height);
+        return new Size2D(width, height);
     }
 
-    protected override Size ArrangeOverride(Size finalSize) {
+    protected override Size2D ArrangeOverride(Size2D finalSize) {
         int offset = 0;
         var pos = RenderBounds.Lower;
 
         foreach (var child in _children) {
             var childSize = child.DesiredSize;
-            Point childPos;
+            Point2D childPos;
 
             if (_orientation == Orientation.VERTICAL) {
-                childPos = pos + RenderLayout.Content.Lower + new Point(0, offset);
-                offset += childSize.Height + _spacing;
+                childPos = pos + RenderLayout.Content.Lower + new Point2D(0, offset);
+                offset += childSize.Y + _spacing;
             }
             else {
-                childPos = pos + RenderLayout.Content.Lower + new Point(offset, 0);
-                offset += childSize.Width + _spacing;
+                childPos = pos + RenderLayout.Content.Lower + new Point2D(offset, 0);
+                offset += childSize.X + _spacing;
             }
 
-            child.Arrange(new Rectangle(childPos, childSize));
+            child.Arrange(new Area2D(childPos, childSize));
         }
 
         return finalSize;

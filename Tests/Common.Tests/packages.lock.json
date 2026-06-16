@@ -47,13 +47,13 @@
       },
       "Implyzer": {
         "type": "Transitive",
-        "resolved": "2026.1.0",
-        "contentHash": "1AzODnW/AbP+P/Lsdr+L9Tz5Y1sMJ6sLsDYVJSt881xFHFYIPcZ3EhjgccNW0In12DVuduI335ufBsWDrqidHg=="
+        "resolved": "2026.3.1",
+        "contentHash": "c8x44K8+eIfu4cayqvvJ4lMj3RQlNcBcoS3H8E1flNAlGbcueT40RxTaw5XTQD1io8bY7vVOFLQDWRX7y6E6Rg=="
       },
       "Metriks": {
         "type": "Transitive",
-        "resolved": "2026.2.6",
-        "contentHash": "XBs3C6mj6FN477YQ0/elgk5dpXdFXuHE+OSG8OhyNnxR2rqlEXXDrBlvKOxUp97CLnuVjKbLSnAz1wi6n95Scg==",
+        "resolved": "2026.3.0-rc1",
+        "contentHash": "fPEWNCxKN6GN1U+svEgsdrx4N2apGWWIfUmktrsF4gEk9xW+KztJlPM+OQBgyr9GdeXfJ7bATQ3gvGgZTqhcNQ==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4"
         }
@@ -140,9 +140,9 @@
       "neokolors.common": {
         "type": "Project",
         "dependencies": {
-          "Implyzer": "[2026.1.0, )",
+          "Implyzer": "[2026.3.1, )",
           "JetBrains.Annotations": "[2025.2.4, )",
-          "NeoKolors.Extensions": "[2026.2.0-rc1, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc2, )",
           "OneOf": "[3.0.271, )",
           "SkiaSharp": "[3.119.4, )"
         }
@@ -151,7 +151,7 @@
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Metriks": "[2026.2.6, )"
+          "Metriks": "[2026.3.0-rc1, )"
         }
       }
     }

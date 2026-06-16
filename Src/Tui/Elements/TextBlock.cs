@@ -1,7 +1,6 @@
 // NeoKolors
 // Copyright (c) 2026 KryKom
 
-using Metriks;
 using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Events;
@@ -48,19 +47,19 @@ public class TextBlock : Control<AnsiString>, IMouseInteractableElement<AnsiStri
 
     public TextBlock() : base(DefaultStyles) { }
 
-    protected override Size MeasureOverride(Size availableSize) {
+    protected override Size2D MeasureOverride(Size2D availableSize) {
         return _style.Font.GetSize(Content);
     }
 
-    protected override Size ArrangeOverride(Size finalSize) {
+    protected override Size2D ArrangeOverride(Size2D finalSize) {
         return finalSize;
     }
 
     protected override void RenderCore(ICharCanvas canvas) {
         var sp = _style.Position;
         var pos = new Point2D(
-            sp.AbsoluteX ? sp.X.ToScalar(RenderBounds.Width) : RenderBounds.LowerX + sp.X.ToScalar(RenderBounds.Width),
-            sp.AbsoluteY ? sp.Y.ToScalar(RenderBounds.Height) : RenderBounds.LowerY + sp.Y.ToScalar(RenderBounds.Height)
+            sp.AbsoluteX ? sp.X.ToScalar(RenderBounds.SizeX) : RenderBounds.LowerX + sp.X.ToScalar(RenderBounds.SizeX),
+            sp.AbsoluteY ? sp.Y.ToScalar(RenderBounds.SizeY) : RenderBounds.LowerY + sp.Y.ToScalar(RenderBounds.SizeY)
         );
         
         var align = _style.TextAlign;
@@ -74,12 +73,12 @@ public class TextBlock : Control<AnsiString>, IMouseInteractableElement<AnsiStri
             )
         )));
         
-        canvas.Fill(RenderLayout.Content + new Point(pos.X, pos.Y), ' ');
+        canvas.Fill(RenderLayout.Content + new Point2D(pos.X, pos.Y), ' ');
         
         _style.Font.PlaceString(
             styledContent,
             canvas,
-            RenderLayout.Content + new Point(pos.X, pos.Y),
+            RenderLayout.Content + new Point2D(pos.X, pos.Y),
             align.Horizontal,
             align.Vertical,
             _style.Overflow

@@ -175,7 +175,14 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
         }
     }
     
-    public Size2D GetSize() => new(Stdio.BufferWidth, Stdio.BufferHeight);
+    public Size2D GetSize() {
+        try {
+            return new Size2D(Stdio.BufferWidth, Stdio.BufferHeight);
+        }
+        catch (Exception) {
+            return new Size2D(80, 25);
+        }
+    }
 
     public virtual void Dispose() {
         if (_disposed)

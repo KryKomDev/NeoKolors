@@ -100,16 +100,16 @@ public class ListView : ItemsControl {
         _selectedIndex = -1;
     }
 
-    protected override Size MeasureOverride(Size availableSize) {
+    protected override Size2D MeasureOverride(Size2D availableSize) {
         if (ItemsPanel != null) {
             ItemsPanel.Measure(availableSize);
             var size = ItemsPanel.DesiredSize;
-            return size with { Width = size.Width + 2 };
+            return new Size2D(size.X + 2, size.Y);
         }
-        return Size.One;
+        return Size2D.One;
     }
 
-    protected override Size ArrangeOverride(Size finalSize) {
+    protected override Size2D ArrangeOverride(Size2D finalSize) {
         if (ItemsPanel != null) {
             ItemsPanel.Arrange(RenderLayout.Content + RenderBounds.Lower);
         }
@@ -124,11 +124,11 @@ public class ListView : ItemsControl {
             if (SelectedIndex >= 0 && SelectedIndex < ItemsPanel.Children.Count) {
                 int relativeY = 0;
                 for (int i = 0; i < SelectedIndex; i++) {
-                    relativeY += ItemsPanel.Children[i].DesiredSize.Height;
+                    relativeY += ItemsPanel.Children[i].DesiredSize.Y;
                 }
 
-                var indicatorPos = pos + RenderLayout.Content.Lower + new Point(0, relativeY);
-                if (RenderLayout.Content.Contains(0, relativeY)) {
+                var indicatorPos = pos + RenderLayout.Content.Lower + new Point2D(0, relativeY);
+                if (RenderLayout.Content.ContainsIn(0, relativeY)) {
                     canvas.Place("> ", indicatorPos, 2, HorizontalAlign.LEFT);
                 }
             }

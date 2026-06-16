@@ -1,13 +1,11 @@
 ﻿// NeoKolors
-// Copyright (c) krystof 2026
+// Copyright (c) KryKom 2026
 
-using Metriks;
 using NeoKolors.Common;
 using NeoKolors.Tui;
 using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Elements;
 using NeoKolors.Tui.Styles;
-using NeoKolors.Tui.Styles.Properties;
 using NeoKolors.Tui.Styles.Values;
 
 namespace NKChess;

@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text.Json;
 
 namespace NKChess;
@@ -42,12 +38,12 @@ public class AppPreferences {
                 };
             }
             if (!string.IsNullOrEmpty(prefs.WhiteEnginePath) && !prefs.AddedEngines.Any(e => e.Path == prefs.WhiteEnginePath)) {
-                string name = System.IO.Path.GetFileNameWithoutExtension(prefs.WhiteEnginePath);
+                string name = Path.GetFileNameWithoutExtension(prefs.WhiteEnginePath);
                 if (string.IsNullOrEmpty(name)) name = "White Engine";
                 prefs.AddedEngines.Add(new EngineConfig { Name = name, Path = prefs.WhiteEnginePath });
             }
             if (!string.IsNullOrEmpty(prefs.BlackEnginePath) && !prefs.AddedEngines.Any(e => e.Path == prefs.BlackEnginePath)) {
-                string name = System.IO.Path.GetFileNameWithoutExtension(prefs.BlackEnginePath);
+                string name = Path.GetFileNameWithoutExtension(prefs.BlackEnginePath);
                 if (string.IsNullOrEmpty(name)) name = "Black Engine";
                 prefs.AddedEngines.Add(new EngineConfig { Name = name, Path = prefs.BlackEnginePath });
             }

@@ -1,7 +1,5 @@
 using System.Text;
 using NeoKolors.Console;
-using NeoKolors.Console.Ansi.Mouse;
-using NeoKolors.Console.Input;
 using NeoKolors.Tui;
 using NeoKolors.Tui.Fonts.Assets;
 using static NeoKolors.Console.LoggerLevel;

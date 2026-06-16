@@ -11,13 +11,14 @@ namespace NeoKolors.Tui.Elements;
 /// Shows ( ) or (o).
 /// </summary>
 public class RadioButton : ToggleButton {
-    
     private string _groupName = string.Empty;
 
     public string GroupName {
         get => _groupName;
         set {
-            if (_groupName == value) return;
+            if (_groupName == value)
+                return;
+
             UnregisterRadio(this);
             _groupName = value ?? string.Empty;
             RegisterRadio(this);
@@ -26,7 +27,7 @@ public class RadioButton : ToggleButton {
     }
 
     public static StyleCollection DefaultStyles { get; } = new(AbstractElement.DefaultStyle) {
-        Border = BorderStyle.Borderless,
+        Border   = BorderStyle.Borderless,
         ReadOnly = true
     };
 
@@ -55,6 +56,7 @@ public class RadioButton : ToggleButton {
 
     protected override void OnCheckedChanged() {
         base.OnCheckedChanged();
+
         if (IsChecked == true && !string.IsNullOrEmpty(GroupName)) {
             // Uncheck other radios in the same group
             lock (Groups) {
@@ -70,12 +72,15 @@ public class RadioButton : ToggleButton {
     }
 
     private static void RegisterRadio(RadioButton radio) {
-        if (string.IsNullOrEmpty(radio.GroupName)) return;
+        if (string.IsNullOrEmpty(radio.GroupName))
+            return;
+
         lock (Groups) {
             if (!Groups.TryGetValue(radio.GroupName, out var list)) {
-                list = new List<WeakReference<RadioButton>>();
+                list                    = new List<WeakReference<RadioButton>>();
                 Groups[radio.GroupName] = list;
             }
+
             // Remove dead references
             list.RemoveAll(r => !r.TryGetTarget(out _));
             list.Add(new WeakReference<RadioButton>(radio));
@@ -83,10 +88,13 @@ public class RadioButton : ToggleButton {
     }
 
     private static void UnregisterRadio(RadioButton radio) {
-        if (string.IsNullOrEmpty(radio.GroupName)) return;
+        if (string.IsNullOrEmpty(radio.GroupName))
+            return;
+
         lock (Groups) {
             if (Groups.TryGetValue(radio.GroupName, out var list)) {
                 list.RemoveAll(r => !r.TryGetTarget(out var target) || target == radio);
+
                 if (list.Count == 0) {
                     Groups.Remove(radio.GroupName);
                 }
@@ -94,25 +102,27 @@ public class RadioButton : ToggleButton {
         }
     }
 
-    protected override Size MeasureOverride(Size availableSize) {
-        Size contentSize;
+    protected override Size2D MeasureOverride(Size2D availableSize) {
+        Size2D contentSize;
+
         if (Content is IElement element) {
             element.Measure(availableSize);
             contentSize = element.DesiredSize;
         }
         else {
             var text = Content?.ToString() ?? string.Empty;
-            contentSize = new Size(text.Length, 1);
+            contentSize = new Size2D(text.Length, 1);
         }
 
-        return new Size(contentSize.Width + 4, Math.Max(contentSize.Height, 1));
+        return new Size2D(contentSize.X + 4, Math.Max(contentSize.Y, 1));
     }
 
-    protected override Size ArrangeOverride(Size finalSize) {
+    protected override Size2D ArrangeOverride(Size2D finalSize) {
         if (Content is IElement element) {
             var contentPos = RenderBounds.Lower + RenderLayout.Content.Lower;
-            element.Arrange(new Rectangle(contentPos + new Point(4, 0), new Size(Math.Max(0, RenderLayout.Content.Width - 4), RenderLayout.Content.Height)));
+            element.Arrange(new Area2D(contentPos + new Point2D(4, 0), new Size2D(Math.Max(0, RenderLayout.Content.SizeX - 4), RenderLayout.Content.SizeY)));
         }
+
         return finalSize;
     }
 
@@ -129,7 +139,7 @@ public class RadioButton : ToggleButton {
         }
         else if (Content != null) {
             var text = Content.ToString() ?? string.Empty;
-            canvas.Place(text, contentPos + new Point(4, 0), Math.Max(0, RenderLayout.Content.Width - 4), HorizontalAlign.LEFT);
+            canvas.Place(text, contentPos + new Point2D(4, 0), Math.Max(0, RenderLayout.Content.SizeX - 4), HorizontalAlign.LEFT);
         }
     }
 

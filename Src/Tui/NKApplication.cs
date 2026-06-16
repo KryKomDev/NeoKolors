@@ -4,9 +4,7 @@
 using NeoKolors.Console.Events;
 using NeoKolors.Tui.Events;
 using System.Diagnostics;
-using Metriks;
 using NeoKolors.Console.Driver;
-using NeoKolors.Console.Driver.Dotnet;
 using NeoKolors.Console.Input;
 using NeoKolors.Tui.Global;
 using NeoKolors.Tui.Core;
@@ -14,31 +12,33 @@ using NeoKolors.Tui.Core;
 namespace NeoKolors.Tui;
 
 public class NKApplication : IMouseSupportingApplication {
-
+    /// <summary>
+    /// Gets the logger instance for the application.
+    /// </summary>
     private static readonly NKLogger LOGGER = NKDebug.GetLogger<NKApplication>();
-    
+
     // --- Screen ---
-    private readonly NKCharScreen _screen = new(NKConsole.BufferSize);
-    private Size2D _lastSize     = Size2D.Zero;
-    private Size2D _lasPixelSize = Size2D.Zero;
+    private readonly NKCharScreen _screen        = new(NKConsole.BufferSize);
+    private          Size2D       _lastSize      = Size2D.Zero;
+    private          Size2D       _lastPixelSize = Size2D.Zero;
 
     public NKCharScreen Screen => _screen;
-    
+
     /// <summary>
     /// Gets the object that can be used to synchronize access to the TUI thread, element tree, and rendering.
     /// </summary>
     public object SyncRoot { get; } = new();
-    
+
     // --- IApp impl ---
-    public IRenderable Base { get; set; }
+    public IRenderable Base   { get; set; }
     public NKAppConfig Config { get; }
-    
+
     // --- Flow control ---
-    public bool IsRunning { get; private set; }
-    public bool IsPaused { get; private set; }
-    private readonly SemaphoreSlim _pausedSignal = new(0);
+    public           bool                   IsRunning { get; private set; }
+    public           bool                   IsPaused  { get; private set; }
+    private readonly SemaphoreSlim          _pausedSignal = new(0);
     private readonly MouseCascadeController _mouseCascade;
-    
+
     // --- Events ---
     public event KeyEventHandler      KeyEvent;
     public event MouseEventHandler    MouseEvent;
@@ -52,42 +52,50 @@ public class NKApplication : IMouseSupportingApplication {
             KeyEvent.Invoke(k);
         }
     }
+
     private void InvokeMouseEvent(MouseEventArgs m) {
         lock (SyncRoot) {
             _mouseCascade.HandleMouseEvent(m);
             MouseEvent.Invoke(m);
         }
     }
+
     private void InvokeResizeEvent(ResizeEventArgs r) {
         lock (SyncRoot) {
             ResizeEvent.Invoke(r);
         }
     }
 
+    // --- Monitoring ---
+    public float Fps => _fps;
+
+    private float _fps           = 0f;
+    private long  _renderedCount = 0;
+    private long  _lastFpsUpdate = Stopwatch.GetTimestamp();
+
     public NKApplication(NKAppConfig config, IRenderable @base) {
-        Config = config;
-        Base   = @base;
+        Config        = config;
+        Base          = @base;
         _mouseCascade = new MouseCascadeController(this);
 
-        KeyEvent    +=  _     => { };
-        MouseEvent  +=  _     => { };
-        ResizeEvent +=  _     => { };
+        KeyEvent    += _ => { };
+        MouseEvent  += _ => { };
+        ResizeEvent += _ => { };
         StartEvent  += (_, _) => { };
-        StopEvent   +=  _     => { };
-        OnRender    += ( )    => { };
+        StopEvent   += _ => { };
+        OnRender    += () => { };
     }
-    
+
     public void Start() {
-        
         // configure console
         // NKConsole.MouseReportProtocol = Config.MouseReportProtocol;
         // NKConsole.MouseReportLevel    = Config.MouseReportLevel;
-        NKConsole.BracketedPasteMode  = Config.BracketedPaste;
-        
+        NKConsole.BracketedPasteMode = Config.BracketedPaste;
+
         if (Config.PauseOnFocusLost) {
-            NKConsole.ReportFocus    = true;
-            NKConsole.FocusOut += Pause;
-            NKConsole.FocusIn  += Unpause;
+            NKConsole.ReportFocus =  true;
+            NKConsole.FocusOut    += Pause;
+            NKConsole.FocusIn     += Unpause;
         }
 
         NKConsole.Key   += InvokeKeyEvent;
@@ -98,7 +106,7 @@ public class NKApplication : IMouseSupportingApplication {
         if (Config.KeepCursorDisabled) {
             NKConsole.HideCursor();
         }
-        
+
         NKConsole.EnableAltBuffer();
         NKConsole.InputDriver.Config.MouseConfig = ReportedMouseEvents.ALL;
         NKConsole.StartInputInterception();
@@ -107,19 +115,21 @@ public class NKApplication : IMouseSupportingApplication {
         IsRunning = true;
         AppEventBus.SetSourceApplication(this);
         StartEvent.Invoke(this, new AppStartEventArgs(Config.Rendering.IsLazy));
-        
+
         NKConsole.Key += CheckQuit;
-        
-        if (Config.Rendering.IsLazy) 
+
+        ResetFpsTime();
+
+        if (Config.Rendering.IsLazy)
             RunLazy();
         else if (Config.Rendering.IsUnlimited)
             RunUnlimited();
         else
             RunLimited();
-        
+
         FinalizeRun();
     }
-    
+
     public void Stop() {
         IsRunning = false;
         StopEvent.Invoke(this);
@@ -127,20 +137,19 @@ public class NKApplication : IMouseSupportingApplication {
 
     private void FinalizeRun() {
         NKConsole.InputDriver.Config.MouseConfig = ReportedMouseEvents.NONE;
-        
+
         if (Config.PauseOnFocusLost) {
-            NKConsole.ReportFocus    = false;
-            NKConsole.FocusOut -= Pause;
-            NKConsole.FocusIn  -= Unpause;
+            NKConsole.ReportFocus =  false;
+            NKConsole.FocusOut    -= Pause;
+            NKConsole.FocusIn     -= Unpause;
         }
 
         NKConsole.Key   -= InvokeKeyEvent;
         NKConsole.Mouse -= InvokeMouseEvent;
 
-        if (Config.KeepCursorDisabled) {
+        if (Config.KeepCursorDisabled)
             NKConsole.ShowCursor();
-        }
-        
+
         NKConsole.DisableAltBuffer();
         NKConsole.StopInputInterception();
 
@@ -148,20 +157,23 @@ public class NKApplication : IMouseSupportingApplication {
     }
 
     private void RunLazy() {
-        
         // configure lazy 
         var semaphore = new SemaphoreSlim(0);
         NKConsole.Mouse += SignalRender;
         NKConsole.Key   += SignalRender;
-        
+
         while (IsRunning) {
             Render();
+
+            UpdateFps();
+
+            // wait for next input
             semaphore.Wait();
         }
 
         NKConsole.Mouse -= SignalRender;
         NKConsole.Key   -= SignalRender;
-        
+
         return;
 
         void SignalRender<T>(T? _) {
@@ -172,43 +184,50 @@ public class NKApplication : IMouseSupportingApplication {
     }
 
     private void RunUnlimited() {
-        var sw = Stopwatch.StartNew();
+        var  sw = Stopwatch.StartNew();
         long fc = 0;
-        
+
         while (IsRunning) {
             if (IsPaused) {
                 sw.Stop();
                 _pausedSignal.Wait();
                 sw.Start();
+                ResetFpsTime();
             }
-            
+
             Render();
+            UpdateFps();
             fc++;
         }
-        
+
         sw.Stop();
-        if (fc <= 0 || !(sw.Elapsed.TotalSeconds > 0)) return;
-        
+
+        if (fc <= 0 || !(sw.Elapsed.TotalSeconds > 0))
+            return;
+
         double avgFps = fc / sw.Elapsed.TotalSeconds;
         LOGGER.Info($"Average FPS: {avgFps}");
     }
-    
+
     private void RunLimited() {
-        int targetFps = Config.Rendering.Limit; 
-        var frameTime = TimeSpan.FromSeconds(1.0 / targetFps);
-        var stopwatch = new Stopwatch();
+        int   targetFps    = Config.Rendering.Limit;
+        var   frameTime    = TimeSpan.FromSeconds(1.0 / targetFps);
+        var   stopwatch    = new Stopwatch();
         ulong delayedCount = 0;
-        var totalDelay = TimeSpan.Zero;
+        var   totalDelay   = TimeSpan.Zero;
 
         while (IsRunning) {
             if (IsPaused) {
                 _pausedSignal.Wait();
+                ResetFpsTime();
             }
-            
-            stopwatch.Restart();
-            
-            Render();
 
+            stopwatch.Restart();
+
+            Render();
+            UpdateFps();
+
+            // wait for next frame
             var elapsed = stopwatch.Elapsed;
 
             if (elapsed <= frameTime) {
@@ -218,63 +237,85 @@ public class NKApplication : IMouseSupportingApplication {
                 delayedCount++;
                 totalDelay += elapsed - frameTime;
             }
+
         }
-        
+
         LOGGER.Info(
             $"\n  Total frames delayed:    {delayedCount}" +
-            $"\n  Total delay:             {totalDelay}" +
+            $"\n  Total delay:             {totalDelay}"   +
             $"\n  Average delay per frame: {(delayedCount == 0 ? TimeSpan.Zero : totalDelay / delayedCount)}"
         );
 
         #if NK_RENDERING_PROFILING
-        
+
         LOGGER.Debug(
             $"\n  Screen rendering:    {_screen.ScrTotalTime}" +
-            $"\n   ├ Writing time:     {_screen.WritingTime}" +
-            $"\n   ├ Positioning time: {_screen.PosTime}" +
-            $"\n   ├ Computation time: {_screen.CompTime}" +
-            $"\n   ┆  ├ Access time:   {_screen.AccessTime}" +
-            $"\n   ╵  └ EscSeq time:   {_screen.EscseqTime}" +
-            $"\n  Sixel time:          {_screen.SixelTime}" +
+            $"\n   ├ Writing time:     {_screen.WritingTime}"  +
+            $"\n   ├ Positioning time: {_screen.PosTime}"      +
+            $"\n   ├ Computation time: {_screen.CompTime}"     +
+            $"\n   ┆  ├ Access time:   {_screen.AccessTime}"   +
+            $"\n   ╵  └ EscSeq time:   {_screen.EscseqTime}"   +
+            $"\n  Sixel time:          {_screen.SixelTime}"    +
             $"\n  Total time:          {_screen.ScrTotalTime + _screen.SixelTime}"
         );
-        
+
         LOGGER.Debug(
-            $"\n  Cursor positioning:" +
-            $"\n   ├ Bounds check total: {NKConsole.CursorPosition_BoundsCheckTime}" +
-            $"\n   ├ Position set total: {NKConsole.CursorPosition_BoundsCheckTime}" +
+            $"\n  Cursor positioning:"                                                +
+            $"\n   ├ Bounds check total: {NKConsole.CursorPosition_BoundsCheckTime}"  +
+            $"\n   ├ Position set total: {NKConsole.CursorPosition_BoundsCheckTime}"  +
             $"\n   ├ Bounds check avg: {NKConsole.CursorPosition_AvgBoundsCheckTime}" +
             $"\n   └ Position set avg: {NKConsole.CursorPosition_AvgSetPosTime}"
         );
-        
+
         #endif
     }
-    
+
     private void Render() {
         lock (SyncRoot) {
             if (!Config.KeepCursorDisabled) {
                 NKConsole.HideCursor();
                 NKConsole.SaveCursor();
             }
-            
+
             if (_lastSize != NKConsole.BufferSize) {
                 _lastSize = NKConsole.BufferSize;
                 _screen.Resize(_lastSize.X, _lastSize.Y);
                 InvokeResizeEvent(new ResizeEventArgs(_lastSize.X, _lastSize.Y));
-                _lasPixelSize = NKConsole.GetBuffSizePx();
+                _lastPixelSize = NKConsole.GetBuffSizePx();
                 ScreenSizeTracker.SetScreenSizeCh(_lastSize);
-                ScreenSizeTracker.SetScreenSizePx(_lasPixelSize);
+                ScreenSizeTracker.SetScreenSizePx(_lastPixelSize);
             }
-            
+
             OnRender.Invoke();
             Base.Render(_screen);
             _screen.Render();
-            
+
             if (!Config.KeepCursorDisabled) {
                 NKConsole.RestoreCursor();
                 NKConsole.ShowCursor();
             }
         }
+    }
+
+    private void ResetFpsTime() {
+        _lastFpsUpdate = Stopwatch.GetTimestamp();
+    }
+
+    private void UpdateFps() {
+        // update rendered frames counter
+        _renderedCount++;
+
+        long   now            = Stopwatch.GetTimestamp();
+        double elapsedSeconds = (double)(now - _lastFpsUpdate) / Stopwatch.Frequency;
+
+        if (elapsedSeconds < Config.FpsUpdateInterval.TotalSeconds)
+            return;
+
+        _fps = elapsedSeconds > 0 ? (float)(_renderedCount / elapsedSeconds) : 0f;
+
+        // reset
+        _renderedCount = 0;
+        _lastFpsUpdate = now;
     }
 
     private void Pause() {
@@ -290,10 +331,9 @@ public class NKApplication : IMouseSupportingApplication {
     }
 
     private void CheckQuit(KeyEventArgs keyInfo) {
-        if (keyInfo.Key       == Config.InterruptCombination.Key  &&
-            keyInfo.Down      == Config.InterruptCombination.Down &&
-            keyInfo.Modifiers.Matches(Config.InterruptCombination.Modifiers))
-        {
+        if (keyInfo.Key  == Config.InterruptCombination.Key  &&
+            keyInfo.Down == Config.InterruptCombination.Down &&
+            keyInfo.Modifiers.Matches(Config.InterruptCombination.Modifiers)) {
             IsRunning = false;
             Stop();
         }

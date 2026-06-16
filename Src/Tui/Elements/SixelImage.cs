@@ -13,14 +13,15 @@ namespace NeoKolors.Tui.Elements;
 /// Replaces the legacy Image element.
 /// </summary>
 public class SixelImage : Control<SKImage> {
-    
-    private SKImage? _image;
+    private SKImage?  _image;
     private SKBitmap? _bitmap;
 
     public SKImage? Source {
         get => _image;
         set {
-            if (ReferenceEquals(_image, value)) return;
+            if (ReferenceEquals(_image, value))
+                return;
+
             _image = value;
             _bitmap?.Dispose();
             _bitmap = _image != null ? SKBitmap.FromImage(_image) : null;
@@ -38,40 +39,45 @@ public class SixelImage : Control<SKImage> {
 
     public SixelImage() : base(DefaultStyles) { }
 
-    private static Size CharsToPixels(Size chars) {
+    private static Size2D CharsToPixels(Size2D chars) {
         var px = ScreenSizeTracker.GetScreenSizePx();
         var ch = ScreenSizeTracker.GetScreenSizeCh();
-        
+
         // default 9x18 ratio if screen size is not available
-        var fx = (ch.Width  == 0 || px.Width  == 0) ? 9.0f  : (float)px.Width  / ch.Width;
-        var fy = (ch.Height == 0 || px.Height == 0) ? 18.0f : (float)px.Height / ch.Height;
-        
-        return new Size((int)(fx * chars.Width), (int)(fy * chars.Height));
+        var fx = (ch.X == 0 || px.X == 0) ? 9.0f : (float)px.X  / ch.X;
+        var fy = (ch.Y == 0 || px.Y == 0) ? 18.0f : (float)px.Y / ch.Y;
+
+        return new Size2D((int)(fx * chars.X), (int)(fy * chars.Y));
     }
 
-    private static SizeF PixelsToChars(Size pixels) {
+    private static SizeF PixelsToChars(Size2D pixels) {
         var px = ScreenSizeTracker.GetScreenSizePx();
         var ch = ScreenSizeTracker.GetScreenSizeCh();
-        
+
         // default 9x18 ratio if screen size is not available
-        var fx = (ch.Width  == 0 || px.Width  == 0) ? 1.0f / 9.0f  : (float)ch.Width  / px.Width;
-        var fy = (ch.Height == 0 || px.Height == 0) ? 1.0f / 18.0f : (float)ch.Height / px.Height;
-        
-        return new SizeF(fx * pixels.Width, fy * pixels.Height);
+        var fx = (ch.X  == 0 || px.X  == 0) ? 1.0f / 9.0f : (float)ch.X   / px.X;
+        var fy = (ch.Y == 0 || px.Y == 0) ? 1.0f / 18.0f : (float)ch.Y / px.Y;
+
+        return new SizeF(fx * pixels.X, fy * pixels.Y);
     }
 
-    protected override Size MeasureOverride(Size availableSize) {
-        if (_image == null) return Size.Zero;
+    protected override Size2D MeasureOverride(Size2D availableSize) {
+        if (_image == null)
+            return Size2D.Zero;
 
-        var imgCh = PixelsToChars(new Size(_image.Width, _image.Height));
-        return new Size((int)imgCh.Width, (int)imgCh.Height);
+        var imgCh = PixelsToChars(new Size2D(_image.Width, _image.Height));
+
+        return new Size2D((int)imgCh.Width, (int)imgCh.Height);
     }
 
     protected override void RenderCore(ICharCanvas canvas) {
-        if (_bitmap == null) return;
+        if (_bitmap == null)
+            return;
+
         var pos = RenderBounds.Lower;
 
         var pixelSize = CharsToPixels(RenderLayout.Content.Size);
+
         canvas.PlaceSixel(
             _bitmap,
             pos + RenderLayout.Content.Lower,

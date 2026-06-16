@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2026 KryKom
 
 using System.Diagnostics.CodeAnalysis;
@@ -33,14 +33,9 @@ public readonly struct GridDimensions : IParsableValue<GridDimensions> {
     /// <exception cref="ArgumentException">Thrown if the input string format is invalid.</exception>
     /// <exception cref="FormatException">Thrown if parsing a dimension fails.</exception>
     public static GridDimensions Parse(string s, IFormatProvider? provider) {
-        s = s.Trim();
-        var rc = s.SubstringBetween('[', ']', true, true);
-        var rr = s[(rc.Length + 4)..^2];
-
-        var c = rc.Split(',').Select(a => Dimension.Parse(a.Trim()));
-        var r = rr.Split(',').Select(a => Dimension.Parse(a.Trim()));
-
-        return new GridDimensions(c.ToArray(), r.ToArray());
+        if (s == null) throw new ArgumentNullException(nameof(s));
+        if (TryParse(s, provider, out var result)) return result;
+        throw new FormatException($"Invalid grid dimensions: {s}");
     }
 
     public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out GridDimensions result) {
@@ -50,7 +45,14 @@ public readonly struct GridDimensions : IParsableValue<GridDimensions> {
         }
 
         try {
-            result = Parse(s, provider);
+            var trimmed = s.Trim();
+            var rc = trimmed.SubstringBetween('[', ']', true, true);
+            var rr = trimmed[(rc.Length + 4)..^2];
+
+            var c = rc.Split(',').Select(a => Dimension.Parse(a.Trim()));
+            var r = rr.Split(',').Select(a => Dimension.Parse(a.Trim()));
+
+            result = new GridDimensions(c.ToArray(), r.ToArray());
             return true;
         }
         catch {
@@ -59,6 +61,5 @@ public readonly struct GridDimensions : IParsableValue<GridDimensions> {
         }
     }
 
-    GridDimensions IParsableValue<GridDimensions>.Parse(string s, IFormatProvider? provider) => Parse(s, provider);
     bool IParsableValue<GridDimensions>.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out GridDimensions result) => TryParse(s, provider, out result);
 }

@@ -44,7 +44,7 @@ public interface IConsoleScreen {
     /// <param name="style">the style of the string</param>
     /// <param name="hAlign">the horizontal alignment of the string</param>
     /// <param name="vAlign">the vertical alignment of the string</param>
-    public void DrawText(string s, Rectangle border, NKStyle style = default,
+    public void DrawText(string s, Area2D border, NKStyle style = default,
         HorizontalAlign hAlign = HorizontalAlign.LEFT,
         VerticalAlign vAlign = VerticalAlign.TOP);
     
@@ -69,7 +69,7 @@ public interface IConsoleScreen {
     /// <param name="vAlign">the vertical alignment of the string</param>
     /// <param name="enableTopOverflow">if true, renders the text that overflows at the top</param>
     /// <param name="enableBottomOverflow">if true, renders the text that overflows at the bottom</param>
-    public void DrawText(string s, Rectangle border, IAsciiFont font, NKStyle style = default,
+    public void DrawText(string s, Area2D border, IAsciiFont font, NKStyle style = default,
         HorizontalAlign hAlign = HorizontalAlign.LEFT,
         VerticalAlign vAlign = VerticalAlign.TOP, 
         bool enableTopOverflow = true,
@@ -78,7 +78,7 @@ public interface IConsoleScreen {
     /// <summary>
     /// writes a rectangle to the console screen
     /// </summary>
-    public void DrawRect(Rectangle rectangle, NKColor infill, BorderStyle borderStyle = default);
+    public void DrawRect(Area2D rectangle, NKColor infill, BorderStyle borderStyle = default);
 
     /// <summary>
     /// writes an image to the console screen
@@ -86,7 +86,7 @@ public interface IConsoleScreen {
     /// <param name="bitmap">the bitmap to be drawn</param>
     /// <param name="rectangle">the perimeter of the drawn image</param>
     /// <param name="samplingOptions">sampling options for SkiaSharp</param>
-    public void DrawImage(SKBitmap bitmap, Rectangle rectangle, SKSamplingOptions samplingOptions = default);
+    public void DrawImage(SKBitmap bitmap, Area2D rectangle, SKSamplingOptions samplingOptions = default);
 
     public void Resize(ResizeEventArgs args);
 }

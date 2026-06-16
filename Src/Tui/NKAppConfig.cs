@@ -7,7 +7,6 @@ using NeoKolors.Console.Input;
 namespace NeoKolors.Tui;
 
 public readonly struct NKAppConfig {
-    
     /// <summary>
     /// Represents the configuration settings related to rendering in the application.
     /// This property defines the behavior and constraints used for rendering operations,
@@ -66,17 +65,22 @@ public readonly struct NKAppConfig {
     /// where cursor management is required for optimal user experience.
     /// </summary>
     public bool KeepCursorDisabled { get; }
-    
+
+    /// <summary>
+    /// Gets the time interval at which FPS updates are performed.
+    /// </summary>
+    public TimeSpan FpsUpdateInterval { get; }
+
     public NKAppConfig(
-        RenderingConfig?    rendering            = null, 
+        RenderingConfig?    rendering            = null,
         bool                ctrlCForceQuits      = false,
-        KeyEventArgs?       interruptCombination = null, 
+        KeyEventArgs?       interruptCombination = null,
         MouseReportProtocol mouseReportProtocol  = MouseReportProtocol.SGR,
-        MouseReportLevel    mouseReportLevel     = MouseReportLevel.ALL, 
-        bool                bracketedPaste       = false, 
+        MouseReportLevel    mouseReportLevel     = MouseReportLevel.ALL,
+        bool                bracketedPaste       = false,
         bool                pauseOnFocusLost     = true,
-        bool                keepCursorDisabled   = true) 
-    {
+        bool                keepCursorDisabled   = true,
+        TimeSpan?           fpsUpdateInterval    = null) {
         Rendering            = rendering ?? RenderingConfig.Limited(24);
         CtrlCForceQuits      = ctrlCForceQuits;
         InterruptCombination = interruptCombination ?? new KeyEventArgs(KeyCode.Q, KeyModifiers.LEFT_CTRL, 'q');
@@ -85,6 +89,7 @@ public readonly struct NKAppConfig {
         BracketedPaste       = bracketedPaste;
         PauseOnFocusLost     = pauseOnFocusLost;
         KeepCursorDisabled   = keepCursorDisabled;
+        FpsUpdateInterval    = fpsUpdateInterval ?? TimeSpan.FromSeconds(1);
     }
 
     public NKAppConfig() {
@@ -96,16 +101,18 @@ public readonly struct NKAppConfig {
         BracketedPaste       = false;
         PauseOnFocusLost     = true;
         KeepCursorDisabled   = true;
+        FpsUpdateInterval    = TimeSpan.FromSeconds(1);
     }
 
     public override string ToString() {
-        return $"Rendering: {Rendering.ToString()}, " +
-               $"Interrupt: {InterruptCombination.ToString()}, " +
-               $"Mouse Protocol: {MouseReportProtocol.ToString()}, " +
-               $"Mouse Level: {MouseReportLevel.ToString()}" +
-               (CtrlCForceQuits    ? ", Ctrl+C Force Quits"    : "Ctrl+C Is Input") +
-               (PauseOnFocusLost   ? ", Pauses On Focus Lost"  : "Runs Without Focus") +
-               (BracketedPaste     ? ", Bracketed Paste"       : "") +
-               (KeepCursorDisabled ? ", Keeps Cursor Disabled" : "");
+        return $"Rendering: {Rendering.ToString()}, "                            +
+            $"Interrupt: {InterruptCombination.ToString()}, "                    +
+            $"Mouse Protocol: {MouseReportProtocol.ToString()}, "                +
+            $"Mouse Level: {MouseReportLevel.ToString()}"                        +
+            $"FPS Update Interval: {FpsUpdateInterval.ToString()}"               +
+            (CtrlCForceQuits ? ", Ctrl+C Force Quits" : "Ctrl+C Is Input")       +
+            (PauseOnFocusLost ? ", Pauses On Focus Lost" : "Runs Without Focus") +
+            (BracketedPaste ? ", Bracketed Paste" : "")                          +
+            (KeepCursorDisabled ? ", Keeps Cursor Disabled" : "");
     }
 }

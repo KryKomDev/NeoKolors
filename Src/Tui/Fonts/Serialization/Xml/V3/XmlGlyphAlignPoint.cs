@@ -4,6 +4,7 @@
 // //
 
 using Metriks;
+using NeoKolors.Extensions;
 
 namespace NeoKolors.Tui.Fonts.Serialization.Xml.V3;
 
@@ -65,7 +66,7 @@ public readonly struct XmlGlyphAlignPoint {
         }
         
         var c = value[0];
-        var coords = value[2..^2].Split(',');
+        var coords = value[2.Index..^2].Split(',');
 
         if (coords.Length == 2 &&
             int.TryParse(coords[0].Trim(), out var x) &&

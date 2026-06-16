@@ -38,8 +38,8 @@ public class Frame : ContentControl {
         return true;
     }
 
-    protected override Size MeasureOverride(Size availableSize) {
-        var contentSize = Size.Zero;
+    protected override Size2D MeasureOverride(Size2D availableSize) {
+        var contentSize = Size2D.Zero;
         if (Content is IElement element) {
             element.Measure(availableSize);
             contentSize = element.DesiredSize;

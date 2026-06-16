@@ -35,8 +35,8 @@ public class AsciiImage : Control<string> {
         _asciiSource = asciiArt ?? string.Empty;
     }
 
-    protected override Size MeasureOverride(Size availableSize) {
-        if (string.IsNullOrEmpty(_asciiSource)) return Size.Zero;
+    protected override Size2D MeasureOverride(Size2D availableSize) {
+        if (string.IsNullOrEmpty(_asciiSource)) return Size2D.Zero;
 
         var lines = _asciiSource.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
         int maxLen = 0;
@@ -44,7 +44,7 @@ public class AsciiImage : Control<string> {
             maxLen = Math.Max(maxLen, line.Length);
         }
 
-        return new Size(maxLen, lines.Length);
+        return new Size2D(maxLen, lines.Length);
     }
 
     protected override void RenderCore(ICharCanvas canvas) {
@@ -52,12 +52,12 @@ public class AsciiImage : Control<string> {
         var pos = RenderBounds.Lower;
 
         var lines = _asciiSource.Split(["\r\n", "\r", "\n"], StringSplitOptions.None);
-        for (int y = 0; y < Math.Min(lines.Length, RenderLayout.Content.Height); y++) {
+        for (int y = 0; y < Math.Min(lines.Length, RenderLayout.Content.SizeY); y++) {
             var line = lines[y];
             canvas.Place(
                 line,
-                pos + RenderLayout.Content.Lower + new Point(0, y),
-                RenderLayout.Content.Width,
+                pos + RenderLayout.Content.Lower + new Point2D(0, y),
+                RenderLayout.Content.SizeX,
                 HorizontalAlign.LEFT
             );
         }

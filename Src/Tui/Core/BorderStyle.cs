@@ -1,4 +1,4 @@
-﻿//
+//
 // NeoKolors
 // Copyright (c) 2026 KryKom
 //
@@ -255,46 +255,6 @@ public struct BorderStyle : IParsableValue<BorderStyle> {
     public static BorderStyle Borderless => new(true);
     
     
-    public static BorderStyle Parse(string s, IFormatProvider? provider) {
-        if (s.Equals("Borderless", StringComparison.OrdinalIgnoreCase)) return Borderless;
-
-        var name = s.SubstringUntil('(');
-        var rawParameters = s.Substring(name.Length + 1, s.Length - name.Length - 2);
-        var parameters = rawParameters == "" 
-            ? [] 
-            : rawParameters
-                .Split(',')
-                .Select(a => a.Trim())
-                .Select(NKColor.Parse)
-                .Select(c => (object?)c)
-                .ToArray();
-
-        var method = typeof(BorderStyle).GetMethod("Get" + name);
-        
-        if (method == null) {
-            LOGGER.Error("Could not find border style '{0}'.", name);
-            return Borderless;
-        }
-
-        var pc = method.GetParameters().Length;
-
-        if (parameters.Length < pc) {
-            var np = new object?[pc];
-            Array.Copy(parameters, np, parameters.Length);
-            parameters = np;
-        }
-        else {
-            parameters = parameters[..pc];
-        }
-        
-        var res = method.Invoke(null, parameters);
-
-        if (res == null) {
-            LOGGER.Error("Failed to create border style '{0}'.", name);
-        }
-        
-        return (BorderStyle)(res ?? Borderless);
-    }
     public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out BorderStyle result) {
         if (string.IsNullOrEmpty(s)) {
             result = Borderless;
@@ -302,7 +262,59 @@ public struct BorderStyle : IParsableValue<BorderStyle> {
         }
 
         try {
-            result = Parse(s, provider);
+            if (s.Equals("Borderless", StringComparison.OrdinalIgnoreCase)) {
+                result = Borderless;
+                return true;
+            }
+
+            string name;
+            object?[] parameters;
+
+            if (s.Contains('(')) {
+                name = s.SubstringUntil('(');
+                var rawParameters = s.Substring(name.Length + 1, s.Length - name.Length - 2);
+                parameters = rawParameters == "" 
+                    ? [] 
+                    : rawParameters
+                        .Split(',')
+                        .Select(a => a.Trim())
+                        .Select(NKColor.Parse)
+                        .Select(c => (object?)c)
+                        .ToArray();
+            }
+            else {
+                name = s;
+                parameters = [];
+            }
+
+            var method = typeof(BorderStyle).GetMethod("Get" + name);
+            
+            if (method == null) {
+                LOGGER.Error("Could not find border style '{0}'.", name);
+                result = Borderless;
+                return false;
+            }
+
+            var pc = method.GetParameters().Length;
+
+            if (parameters.Length < pc) {
+                var np = new object?[pc];
+                Array.Copy(parameters, np, parameters.Length);
+                parameters = np;
+            }
+            else {
+                parameters = parameters[..pc];
+            }
+            
+            var res = method.Invoke(null, parameters);
+
+            if (res == null) {
+                LOGGER.Error("Failed to create border style '{0}'.", name);
+                result = Borderless;
+                return false;
+            }
+            
+            result = (BorderStyle)res;
             return true;
         }
         catch {
@@ -311,6 +323,11 @@ public struct BorderStyle : IParsableValue<BorderStyle> {
         }
     }
 
+    public static BorderStyle Parse(string s, IFormatProvider? provider) {
+        if (s == null) throw new ArgumentNullException(nameof(s));
+        if (TryParse(s, provider, out var result)) return result;
+        throw new FormatException($"Invalid border style: '{s}'");
+    }
+
     bool IParsableValue<BorderStyle>.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out BorderStyle result) => TryParse(s, provider, out result);
-    BorderStyle IParsableValue<BorderStyle>.Parse(string s, IFormatProvider? provider) => Parse(s, provider);
 }

@@ -1,7 +1,5 @@
-using System.IO;
 using System.Text;
 using System.Xml.Serialization;
-using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Fonts;
 using NeoKolors.Tui.Fonts.Serialization;
 using NeoKolors.Tui.Fonts.Serialization.Xml.V3;

@@ -1,8 +1,6 @@
 // NeoKolors.Test
 // Copyright (c) 2026 KryKom
 
-using NeoKolors.Tui.Core;
-using NeoKolors.Tui.Elements;
 using NeoKolors.Tui.Styles;
 using NeoKolors.Tui.Styles.Values;
 using NeoKolors.Console.Input;
@@ -243,12 +241,12 @@ public class NewElementTests {
         var textBlock = new TextBlock("Hello World");
         
         // Measure pass
-        textBlock.Measure(new Size(100, 100));
-        Assert.True(textBlock.DesiredSize.Width > 0);
-        Assert.True(textBlock.DesiredSize.Height > 0);
+        textBlock.Measure(new Size2D(100, 100));
+        Assert.True(textBlock.DesiredSize.X > 0);
+        Assert.True(textBlock.DesiredSize.Y > 0);
 
         // Arrange pass
-        var finalRect = new Rectangle(new Point(5, 5), new Size(30, 5));
+        var finalRect = new Area2D(new Point2D(5, 5), new Size2D(30, 5));
         textBlock.Arrange(finalRect);
         
         Assert.Equal(finalRect, textBlock.RenderBounds);
@@ -261,7 +259,7 @@ public class NewElementTests {
         textBlock.Style.Padding = new Spacing(Dimension.Chars(1));
         
         // Measure again with new constraints
-        textBlock.Measure(new Size(100, 100));
-        Assert.True(textBlock.DesiredSize.Width > 0);
+        textBlock.Measure(new Size2D(100, 100));
+        Assert.True(textBlock.DesiredSize.X > 0);
     }
 }

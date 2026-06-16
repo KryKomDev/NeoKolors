@@ -7,7 +7,9 @@
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
         <LangVersion>14</LangVersion>
-        <TargetFrameworks>net10.0;net5.0;net8.0;net9.0;netstandard2.1</TargetFrameworks>
+        <TargetFrameworks>net10.0;net5.0;net8.0;netstandard2.1</TargetFrameworks>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicense>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicense>
@@ -21,7 +23,6 @@
         
         <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
         
-        <DefineConstants>$(DefineConstants);IMPLYZER_PUBLIC_ATTRIBUTES</DefineConstants>
     </PropertyGroup>
 
     <ItemGroup>
@@ -29,7 +30,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Implyzer" Version="2026.1.0" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <PackageReference Include="Implyzer" Version="2026.3.1" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
         <PackageReference Include="OneOf" Version="3.0.271" />
         <PackageReference Include="SkiaSharp" Version="3.119.4" />

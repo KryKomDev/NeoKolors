@@ -62,8 +62,8 @@ public class GridView : ItemsControl {
         }
     }
 
-    protected override Size MeasureOverride(Size availableSize) {
-        int contentWidth = availableSize.Width;
+    protected override Size2D MeasureOverride(Size2D availableSize) {
+        int contentWidth = availableSize.X;
         int currentX = 0;
         int currentY = 0;
         int maxRowHeight = ItemHeight;
@@ -73,9 +73,9 @@ public class GridView : ItemsControl {
                 if (child == null) continue;
                 
                 int childW = child.Style.Width.IsAuto ? ItemWidth : child.Style.Width.ToScalar(contentWidth);
-                int childH = child.Style.Height.IsAuto ? ItemHeight : child.Style.Height.ToScalar(availableSize.Height);
+                int childH = child.Style.Height.IsAuto ? ItemHeight : child.Style.Height.ToScalar(availableSize.Y);
 
-                child.Measure(new Size(childW, childH));
+                child.Measure(new Size2D(childW, childH));
 
                 if (currentX + childW > contentWidth && currentX > 0) {
                     currentX = 0;
@@ -90,14 +90,14 @@ public class GridView : ItemsControl {
         }
 
         int finalHeight = currentY + ((ItemsPanel?.Children.Count ?? 0) > 0 ? maxRowHeight : 0);
-        return new Size(contentWidth, finalHeight);
+        return new Size2D(contentWidth, finalHeight);
     }
 
-    protected override Size ArrangeOverride(Size finalSize) {
+    protected override Size2D ArrangeOverride(Size2D finalSize) {
         if (ItemsPanel == null) return finalSize;
 
         var contentPos = RenderBounds.Lower + RenderLayout.Content.Lower;
-        var contentWidth = RenderLayout.Content.Width;
+        var contentWidth = RenderLayout.Content.SizeX;
 
         int currentX = 0;
         int currentY = 0;
@@ -106,14 +106,14 @@ public class GridView : ItemsControl {
             if (child == null) continue;
 
             int childW = child.Style.Width.IsAuto ? ItemWidth : child.Style.Width.ToScalar(contentWidth);
-            int childH = child.Style.Height.IsAuto ? ItemHeight : child.Style.Height.ToScalar(RenderLayout.Content.Height);
+            int childH = child.Style.Height.IsAuto ? ItemHeight : child.Style.Height.ToScalar(RenderLayout.Content.SizeY);
 
             if (currentX + childW > contentWidth && currentX > 0) {
                 currentX = 0;
                 currentY += childH;
             }
 
-            var childBounds = new Rectangle(contentPos + new Point(currentX, currentY), new Size(childW, childH));
+            var childBounds = new Area2D(contentPos + new Point2D(currentX, currentY), new Size2D(childW, childH));
             child.Arrange(childBounds);
 
             currentX += childW;

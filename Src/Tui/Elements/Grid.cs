@@ -79,7 +79,9 @@ public class Grid : Panel {
         _positions.Clear();
     }
 
-    private int[] ResolveLengths(List<GridLength>? definitions, int totalSize) {
+    private int[]? _lastResolvedColWidths;
+
+    private int[] ResolveLengths(List<GridLength>? definitions, int totalSize, bool isRows) {
         if (definitions == null || definitions.Count == 0) {
             return [totalSize];
         }
@@ -88,52 +90,102 @@ public class Grid : Panel {
         int remaining = totalSize;
         double starTotal = 0;
 
-        // First pass: Resolve fixed sizes and Auto
+        // First pass: Resolve fixed sizes (PIXEL)
         for (int i = 0; i < definitions.Count; i++) {
             var def = definitions[i];
 
-            switch (def.GridUnitType) {
-                case GridUnitType.PIXEL: {
-                    int size = Math.Min((int)def.Value, remaining);
-                    resolved[i] = size;
-                    remaining -= size;
-
-                    break;
-                }
-                case GridUnitType.AUTO: {
-                    resolved[i] = 1;
-                    remaining -= 1;
-
-                    break;
-                }
-                case GridUnitType.STAR: {
-                    starTotal += def.Value;
-
-                    break;
-                }
-                default: continue;
+            if (def.GridUnitType == GridUnitType.PIXEL) {
+                int size = Math.Min((int)def.Value, remaining);
+                resolved[i] = size;
+                remaining -= size;
+            }
+            else if (def.GridUnitType == GridUnitType.STAR) {
+                starTotal += def.Value;
             }
         }
 
-        // Second pass: Distribute remaining space to Star definitions proportional to value
+        // Second pass: Resolve AUTO sizes based on children
+        for (int i = 0; i < definitions.Count; i++) {
+            var def = definitions[i];
+
+            if (def.GridUnitType == GridUnitType.AUTO) {
+                int maxDesired = 0;
+
+                foreach (var child in _children) {
+                    if (child == null) continue;
+                    if (!_positions.TryGetValue(child, out var cellPos)) {
+                        cellPos = new GridPosition(0, 0);
+                    }
+
+                    if (isRows) {
+                        if (cellPos.Row == i && cellPos.RowSpan == 1) {
+                            int cellW = 0;
+                            if (_lastResolvedColWidths != null && cellPos.Column < _lastResolvedColWidths.Length) {
+                                for (int col = cellPos.Column; col < cellPos.Column + cellPos.ColumnSpan && col < _lastResolvedColWidths.Length; col++) {
+                                    cellW += _lastResolvedColWidths[col];
+                                }
+                            }
+                            else {
+                                cellW = remaining;
+                            }
+
+                            child.Measure(new Size2D(cellW, remaining));
+                            maxDesired = Math.Max(maxDesired, child.DesiredSize.Y);
+                        }
+                    }
+                    else {
+                        if (cellPos.Column == i && cellPos.ColumnSpan == 1) {
+                            child.Measure(new Size2D(remaining, totalSize));
+                            maxDesired = Math.Max(maxDesired, child.DesiredSize.X);
+                        }
+                    }
+                }
+
+                int resolvedSize = Math.Max(1, Math.Min(maxDesired, remaining));
+                resolved[i] = resolvedSize;
+                remaining -= resolvedSize;
+            }
+        }
+
+        // Third pass: Distribute remaining space to Star definitions proportional to value
         if (starTotal > 0 && remaining > 0) {
+            int starCount = 0;
+            for (int i = 0; i < definitions.Count; i++) {
+                if (definitions[i].GridUnitType == GridUnitType.STAR) starCount++;
+            }
+
+            int starIndex = 0;
+            int allocated = 0;
             for (int i = 0; i < definitions.Count; i++) {
                 var def = definitions[i];
 
                 if (def.GridUnitType != GridUnitType.STAR)
                     continue;
 
-                int size = (int)Math.Round(def.Value / starTotal * remaining);
+                starIndex++;
+                int size;
+                if (starIndex == starCount) {
+                    size = remaining - allocated;
+                }
+                else {
+                    size = (int)Math.Round(def.Value / starTotal * remaining);
+                }
                 resolved[i] = size;
+                allocated += size;
             }
+        }
+
+        if (!isRows) {
+            _lastResolvedColWidths = resolved;
         }
 
         return resolved;
     }
 
-    protected override Size MeasureOverride(Size availableSize) {
-        int[] rowHeights = ResolveLengths(RowDefinitions, availableSize.Height);
-        int[] colWidths  = ResolveLengths(ColumnDefinitions, availableSize.Width);
+    protected override Size2D MeasureOverride(Size2D availableSize) {
+        _lastResolvedColWidths = null;
+        int[] colWidths  = ResolveLengths(ColumnDefinitions, availableSize.X, false);
+        int[] rowHeights = ResolveLengths(RowDefinitions, availableSize.Y, true);
 
         foreach (var child in _children) {
             if (child is null) continue;
@@ -157,7 +209,7 @@ public class Grid : Panel {
                 }
             }
 
-            child.Measure(new Size(cellW, cellH));
+            child.Measure(new Size2D(cellW, cellH));
         }
 
         int totalColWidth = 0;
@@ -170,13 +222,14 @@ public class Grid : Panel {
         foreach (var h in rowHeights)
             totalRowHeight += h;
 
-        return new Size(Math.Max(10, totalColWidth), Math.Max(5, totalRowHeight));
+        return new Size2D(Math.Max(10, totalColWidth), Math.Max(5, totalRowHeight));
     }
 
-    protected override Size ArrangeOverride(Size finalSize) {
+    protected override Size2D ArrangeOverride(Size2D finalSize) {
         var pos = RenderBounds.Lower;
-        int[] rowHeights = ResolveLengths(RowDefinitions, RenderLayout.Content.Height);
-        int[] colWidths = ResolveLengths(ColumnDefinitions, RenderLayout.Content.Width);
+        _lastResolvedColWidths = null;
+        int[] colWidths = ResolveLengths(ColumnDefinitions, RenderLayout.Content.SizeX, false);
+        int[] rowHeights = ResolveLengths(RowDefinitions, RenderLayout.Content.SizeY, true);
 
         foreach (var child in _children) {
             if (child == null) continue;
@@ -206,9 +259,9 @@ public class Grid : Panel {
                 }
             }
 
-            var childBounds = new Rectangle(
-                pos + RenderLayout.Content.Lower + new Point(cellX, cellY),
-                new Size(cellW, cellH)
+            var childBounds = new Area2D(
+                pos + RenderLayout.Content.Lower + new Point2D(cellX, cellY),
+                new Size2D(cellW, cellH)
             );
 
             child.Arrange(childBounds);

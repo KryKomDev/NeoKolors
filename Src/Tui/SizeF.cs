@@ -1,10 +1,8 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2026 KryKom
 
 using System.Diagnostics;
 using System.Diagnostics.Contracts;
-using Metriks;
-using NeoKolors.Tui.Core;
 
 namespace NeoKolors.Tui;
 
@@ -37,7 +35,7 @@ public class SizeF {
     public static SizeF operator +(SizeF left, SizeF right) => new(left.Width + right.Width, left.Height + right.Height);
     
     [DebuggerStepThrough]
-    public static Rectangle operator +(SizeF size, Point p) => new(p, new Size((int)size.Width, (int)size.Height));
+    public static Area2D operator +(SizeF size, Point2D p) => new(p, new Size2D((int)size.Width, (int)size.Height));
     
     [DebuggerStepThrough]
     public static implicit operator SizeF(Size2D s) => new(s.X, s.Y);
@@ -46,10 +44,10 @@ public class SizeF {
     public static implicit operator Size2D(SizeF s) => new((int)s.Width, (int)s.Height);
     
     [DebuggerStepThrough]
-    public static implicit operator SizeF(Rectangle r) => new(r.Size.Width, r.Size.Height);
+    public static implicit operator SizeF(Area2D r) => new(r.Size.X, r.Size.Y);
 
     [DebuggerStepThrough]
-    public static implicit operator Rectangle(SizeF r) => new(new Point(0, 0), new Size((int)r.Width, (int)r.Height));
+    public static implicit operator Area2D(SizeF r) => new(new Point2D(0, 0), new Size2D((int)r.Width, (int)r.Height));
     
     [Pure]
     [JBPure]

@@ -1,7 +1,6 @@
 // NeoKolors
 // Copyright (c) KryKom 2026
 
-using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Fonts;
 using NeoKolors.Tui.Fonts.Serialization;
 

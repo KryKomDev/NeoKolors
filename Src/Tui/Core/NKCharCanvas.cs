@@ -71,7 +71,7 @@ public class NKCharCanvas : ICharCanvas {
 
                 // Skip default untouched cells or visually transparent empty cells from the source canvas
                 if ((p.Char == ' ' && p.Style == NKStyle.Default && p.ZIndex == int.MinValue) ||
-                    ((p.Char == null || p.Char == ' ') && p.Style.IsBColorInherit))
+                    (p.Char is null or ' ' && p.Style.IsBColorInherit))
                 {
                     continue;
                 }

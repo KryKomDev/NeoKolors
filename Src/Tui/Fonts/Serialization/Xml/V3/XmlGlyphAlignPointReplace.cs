@@ -102,7 +102,7 @@ public readonly struct XmlGlyphAlignPointReplace {
             }
 
             if (p.StartsWith("forg:")) {
-                var content = ExtractQuotedContent(p["forg:".Length..].Trim());
+                var content = ExtractQuotedContent(p["forg:".Length.Index..].Trim());
 
                 if (content == null) {
                     output = null; 
@@ -112,7 +112,7 @@ public readonly struct XmlGlyphAlignPointReplace {
                 customForg.AddRange(content.Unescape());
             }
             else if (p.StartsWith("bckg:")) {
-                var content = ExtractQuotedContent(p["bckg:".Length..].Trim());
+                var content = ExtractQuotedContent(p["bckg:".Length.Index..].Trim());
 
                 if (content == null) {
                     output = null;
@@ -122,7 +122,7 @@ public readonly struct XmlGlyphAlignPointReplace {
                 customBckg.AddRange(content.Unescape());
             }
             else if (p.StartsWith("none:")) {
-                var content = ExtractQuotedContent(p["none:".Length..].Trim());
+                var content = ExtractQuotedContent(p["none:".Length.Index..].Trim());
 
                 if (content == null) {
                     output = null;
@@ -132,7 +132,7 @@ public readonly struct XmlGlyphAlignPointReplace {
                 customNone.AddRange(content.Unescape());
             }
             else if (p.StartsWith("custom:")) {
-                var content = p["custom:".Length..].Trim();
+                var content = p["custom:".Length.Index..].Trim();
                 var quotes  = SplitByQuotes(content);
                 
                 if (quotes.Count < 2 || quotes.Count % 2 != 0) {
@@ -219,7 +219,7 @@ public readonly struct XmlGlyphAlignPointReplace {
             }
         }
 
-        parts.Add(input[start..]);
+        parts.Add(input[start.Index..]);
         return parts;
     }
 

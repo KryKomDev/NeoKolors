@@ -1,10 +1,8 @@
 // NeoKolors.Test
 // Copyright (c) 2026 KryKom
 
-using Metriks;
 using NeoKolors.Console.Events;
 using NeoKolors.Console.Input;
-using NeoKolors.Tui.Elements;
 using NeoKolors.Tui.Events;
 using NeoKolors.Tui.Styles.Properties;
 
@@ -25,10 +23,10 @@ public class MouseCascadeTests {
     public void HitTest_ShouldFindCorrectElementAndRespectVisibility() {
         // Arrange
         var root = new StackPanel();
-        root.Arrange(new Rectangle(0, 0, 10, 10));
+        root.Arrange(new Area2D(0, 0, 10, 10));
 
         var button = new Button { Content = "Click Me" };
-        button.Arrange(new Rectangle(1, 1, 5, 3));
+        button.Arrange(new Area2D(1, 1, 5, 3));
 
         root.SetChildNode([button]);
 
@@ -77,10 +75,10 @@ public class MouseCascadeTests {
     public void MouseCascade_ShouldDispatchClickAndHoverEvents() {
         // Arrange
         var root = new StackPanel();
-        root.Arrange(new Rectangle(0, 0, 10, 10));
+        root.Arrange(new Area2D(0, 0, 10, 10));
 
         var textBlock = new TextBlock("Hello");
-        textBlock.Arrange(new Rectangle(1, 1, 5, 2));
+        textBlock.Arrange(new Area2D(1, 1, 5, 2));
 
         root.SetChildNode([textBlock]);
 
@@ -116,5 +114,34 @@ public class MouseCascadeTests {
         var hoverOutEventArgs = new MouseEventArgs(MouseButton.RELEASE, KeyModifiers.NONE, new Point2D(8, 8), false, true);
         controller.HandleMouseEvent(hoverOutEventArgs);
         Assert.True(textBlockHoverOut);
+    }
+
+    [Fact]
+    public void MouseCascade_ClickOutside_ShouldDeselectCurrentlySelected() {
+        // Arrange
+        var root = new StackPanel();
+        root.Arrange(new Area2D(0, 0, 20, 20));
+
+        var textBox = new TextBox { Text = "" };
+        textBox.Arrange(new Area2D(1, 1, 10, 1));
+
+        root.SetChildNode([textBox]);
+
+        var app = new DummyApplication { Base = root };
+        var controller = new MouseCascadeController(app);
+
+        // Select the TextBox
+        textBox.Select();
+        Assert.Equal(textBox, Global.ElementManager.CurrentlySelected);
+
+        // Simulate click inside the TextBox - should NOT deselect
+        var clickInsideArgs = new MouseEventArgs(MouseButton.LEFT, KeyModifiers.NONE, new Point2D(2, 1), false, false);
+        controller.HandleMouseEvent(clickInsideArgs);
+        Assert.Equal(textBox, Global.ElementManager.CurrentlySelected);
+
+        // Simulate click outside the TextBox (e.g. at 15, 15 on root stack panel) - should deselect
+        var clickOutsideArgs = new MouseEventArgs(MouseButton.LEFT, KeyModifiers.NONE, new Point2D(15, 15), false, false);
+        controller.HandleMouseEvent(clickOutsideArgs);
+        Assert.Null(Global.ElementManager.CurrentlySelected);
     }
 }

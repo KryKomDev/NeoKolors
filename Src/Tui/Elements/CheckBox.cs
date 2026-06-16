@@ -27,24 +27,24 @@ public class CheckBox : ToggleButton {
         Content = label;
     }
 
-    protected override Size MeasureOverride(Size availableSize) {
-        Size contentSize;
+    protected override Size2D MeasureOverride(Size2D availableSize) {
+        Size2D contentSize;
         if (Content is IElement element) {
             element.Measure(availableSize);
             contentSize = element.DesiredSize;
         }
         else {
             var text = Content?.ToString() ?? string.Empty;
-            contentSize = new Size(text.Length, 1);
+            contentSize = new Size2D(text.Length, 1);
         }
 
-        return new Size(contentSize.Width + 4, Math.Max(contentSize.Height, 1));
+        return new Size2D(contentSize.X + 4, Math.Max(contentSize.Y, 1));
     }
 
-    protected override Size ArrangeOverride(Size finalSize) {
+    protected override Size2D ArrangeOverride(Size2D finalSize) {
         if (Content is IElement element) {
             var contentPos = RenderBounds.Lower + RenderLayout.Content.Lower;
-            element.Arrange(new Rectangle(contentPos + new Point(4, 0), new Size(Math.Max(0, RenderLayout.Content.Width - 4), RenderLayout.Content.Height)));
+            element.Arrange(new Area2D(contentPos + new Point2D(4, 0), new Size2D(Math.Max(0, RenderLayout.Content.SizeX - 4), RenderLayout.Content.SizeY)));
         }
         return finalSize;
     }
@@ -66,7 +66,7 @@ public class CheckBox : ToggleButton {
         }
         else if (Content != null) {
             var text = Content.ToString() ?? string.Empty;
-            canvas.Place(text, contentPos + new Point(4, 0), Math.Max(0, RenderLayout.Content.Width - 4), HorizontalAlign.LEFT);
+            canvas.Place(text, contentPos + new Point2D(4, 0), Math.Max(0, RenderLayout.Content.SizeX - 4), HorizontalAlign.LEFT);
         }
     }
 

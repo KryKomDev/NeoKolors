@@ -71,7 +71,7 @@ public readonly struct XmlGlyphMask {
                 }
                 default: {
                     if (p.StartsWith("custom-forg:")) {
-                        var content = ExtractQuotedContent(p["custom-forg:".Length..].Trim());
+                        var content = ExtractQuotedContent(p[new Index("custom-forg:".Length)..].Trim());
                         if (content == null) {
                             output = null;
                             return false;
@@ -80,7 +80,7 @@ public readonly struct XmlGlyphMask {
                         mapForg.AddRange(content.Unescape());
                     }
                     else if (p.StartsWith("custom-bckg:")) {
-                        var content = ExtractQuotedContent(p["custom-bckg:".Length..].Trim());
+                        var content = ExtractQuotedContent(p[new Index("custom-bckg:".Length)..].Trim());
                         if (content == null) {
                             output = null;
                             return false;
@@ -132,7 +132,7 @@ public readonly struct XmlGlyphMask {
             }
         }
 
-        parts.Add(input[start..]);
+        parts.Add(input[new Index(start)..]);
         return parts;
     }
 

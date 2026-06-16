@@ -7,7 +7,10 @@
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
         <LangVersion>default</LangVersion>
-        <TargetFrameworks>net5.0;net8.0;netstandard2.1;net9.0</TargetFrameworks>
+        <TargetFrameworks>net5.0;net8.0;netstandard2.1;net10.0</TargetFrameworks>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicense>LICENSE</PackageLicense>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>

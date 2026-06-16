@@ -13,9 +13,9 @@
       },
       "Implyzer": {
         "type": "Direct",
-        "requested": "[2026.1.0, )",
-        "resolved": "2026.1.0",
-        "contentHash": "1AzODnW/AbP+P/Lsdr+L9Tz5Y1sMJ6sLsDYVJSt881xFHFYIPcZ3EhjgccNW0In12DVuduI335ufBsWDrqidHg=="
+        "requested": "[2026.3.1, )",
+        "resolved": "2026.3.1",
+        "contentHash": "c8x44K8+eIfu4cayqvvJ4lMj3RQlNcBcoS3H8E1flNAlGbcueT40RxTaw5XTQD1io8bY7vVOFLQDWRX7y6E6Rg=="
       },
       "JetBrains.Annotations": {
         "type": "Direct",
@@ -25,9 +25,9 @@
       },
       "Metriks": {
         "type": "Direct",
-        "requested": "[2026.2.6, )",
-        "resolved": "2026.2.6",
-        "contentHash": "XBs3C6mj6FN477YQ0/elgk5dpXdFXuHE+OSG8OhyNnxR2rqlEXXDrBlvKOxUp97CLnuVjKbLSnAz1wi6n95Scg==",
+        "requested": "[2026.3.0-rc1, )",
+        "resolved": "2026.3.0-rc1",
+        "contentHash": "fPEWNCxKN6GN1U+svEgsdrx4N2apGWWIfUmktrsF4gEk9xW+KztJlPM+OQBgyr9GdeXfJ7bATQ3gvGgZTqhcNQ==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4",
           "System.Runtime.CompilerServices.Unsafe": "6.1.2"
@@ -50,24 +50,24 @@
       },
       "MessagePack": {
         "type": "Transitive",
-        "resolved": "3.1.6",
-        "contentHash": "c5M8C0Lrf6GdGiv01OCB86WEL5YDi7UdH5qsU+q7Q9WvqlhtE4kkJzzJpFufPbz+OULX8FGIB2qo/7CLQ6vizg==",
+        "resolved": "3.1.7",
+        "contentHash": "gXpifaxbhfBqh8bVToQn9j+OgCnhXWMbRCV7RQIbCVa9CNJG1fY6oHAYYl+ER3Tb9uUIHiQ5QbGiGwwFhoagbA==",
         "dependencies": {
-          "MessagePack.Annotations": "3.1.6",
-          "MessagePackAnalyzer": "3.1.6",
+          "MessagePack.Annotations": "3.1.7",
+          "MessagePackAnalyzer": "3.1.7",
           "Microsoft.NET.StringTools": "17.11.4",
           "System.Collections.Immutable": "8.0.0"
         }
       },
       "MessagePack.Annotations": {
         "type": "Transitive",
-        "resolved": "3.1.6",
-        "contentHash": "d0r/B7v1frvN6ElIgp5J5/cHeLADOK21qieHutimUpCWGcjhzOJV9glrItZO4E3dUcriMKX3Swsee3rFx9ouOw=="
+        "resolved": "3.1.7",
+        "contentHash": "IW1yX9viarFl/Dsio5G+pM90JkOSW4xhAiJcKxPPF5rzyp2/yCpieWju8G99QLEmaQeze2uQMEskUBA59YZmkw=="
       },
       "MessagePackAnalyzer": {
         "type": "Transitive",
-        "resolved": "3.1.6",
-        "contentHash": "7Ewqh8D5dAnF4XWy0q76eYFdNLIpDvQqLQOTfrWAGA35ARUB65mrrIES+J5Kw2FVwZGTjudeWh2FB89TC4YMyg=="
+        "resolved": "3.1.7",
+        "contentHash": "ZF+OOJTRS7Ogzb4gG36hPKVQk3kEbp6kkUcdRjhddDq/uSGcV4BKIdYiyJipExXyE/zsqYb0ic215O9kI+fjPA=="
       },
       "Microsoft.CodeAnalysis.Analyzers": {
         "type": "Transitive",
@@ -101,16 +101,16 @@
       },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.8",
-        "contentHash": "21nbDV60SRPWGIivsyl6lqBeEJNG1sginhhfWgRrr3Ais7aQ12To25OAHQxgoiJkjqy1aQ6RxpZBGYuTi7Ge6A=="
+        "resolved": "10.0.9",
+        "contentHash": "g41l/30G3K4B/d/L8kjux0+30e27c8D0FVQ/PFCpbekgfDpj9mnDhieP67EqXWvl1EWNeZh2rpR4F5B/jcDOHA=="
       },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.8",
-        "contentHash": "fdVadZmsC8jRP0KvKy8mO8f6GV/HyBvElfcSxEhd+5FM5boAw/01iSaCto5G3G37ApJira4A3pNaVvBv8cUiLQ==",
+        "resolved": "10.0.9",
+        "contentHash": "9S/DFt4cohlMPpzIxjG6kk0L8MuN2vDm9pbMCulxtJzzk82oJHVLBd8vuQxaPskaYQwKqmFmbannf5eoChgjYg==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.8",
-          "System.Diagnostics.DiagnosticSource": "10.0.8"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.9",
+          "System.Diagnostics.DiagnosticSource": "10.0.9"
         }
       },
       "Microsoft.NET.StringTools": {
@@ -158,16 +158,16 @@
       },
       "System.Collections.Immutable": {
         "type": "Transitive",
-        "resolved": "10.0.8",
-        "contentHash": "rvMGYko6bcE/ZTpj1Q/EM22rcZNiQyjH+71capjjfmqG+DDncVE4kSaE5ysCv2vEFIHt8+zALWYXgIETFvcFzw==",
+        "resolved": "10.0.9",
+        "contentHash": "ci6tokGOzXpemLiZeMrSlA8xKdU43cIO0spbHH+vLaoFMA+fI8CHI3Np3D78jC7EZZrC9jiHDj0VlVK962hzsw==",
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "6.1.2"
         }
       },
       "System.Diagnostics.DiagnosticSource": {
         "type": "Transitive",
-        "resolved": "10.0.8",
-        "contentHash": "rQHsK7Xr8Uz3449860ayVXp/CaLmrhHlMPxbpT/ibOPtp/dTTsr6+f/SxaGO2NzxHf+0siLE0UfdVN5z1I0EgQ==",
+        "resolved": "10.0.9",
+        "contentHash": "VzIU41Sb23Em98hDQc71LPwKTC72xkiG7lpCZaIkf84jBJW+ViaKPa24qqR4FPmj1N4vDWilzs6Dq5Om8aFj+Q==",
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "6.1.2"
         }
@@ -196,9 +196,9 @@
       "neokolors.common": {
         "type": "Project",
         "dependencies": {
-          "Implyzer": "[2026.1.0, )",
+          "Implyzer": "[2026.3.1, )",
           "JetBrains.Annotations": "[2025.2.4, )",
-          "NeoKolors.Extensions": "[2026.2.0-rc1, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc2, )",
           "OneOf": "[3.0.271, )",
           "SkiaSharp": "[3.119.4, )"
         }
@@ -207,9 +207,9 @@
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Microsoft.Extensions.Logging.Abstractions": "[10.0.8, )",
-          "NeoKolors.Common": "[2026.2.0-rc1, )",
-          "NeoKolors.Extensions": "[2026.2.0-rc1, )",
+          "Microsoft.Extensions.Logging.Abstractions": "[10.0.9, )",
+          "NeoKolors.Common": "[2026.2.0-rc2, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc2, )",
           "Newtonsoft.Json": "[13.0.4, )"
         }
       },
@@ -217,34 +217,34 @@
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Metriks": "[2026.2.6, )",
-          "System.Collections.Immutable": "[10.0.8, )"
+          "Metriks": "[2026.3.0-rc1, )",
+          "System.Collections.Immutable": "[10.0.9, )"
         }
       },
       "neokolors.tui.core": {
         "type": "Project",
         "dependencies": {
-          "NeoKolors.Common": "[2026.2.0-rc1, )",
-          "NeoKolors.Console": "[2026.2.0-rc1, )",
-          "NeoKolors.Extensions": "[2026.2.0-rc1, )"
+          "NeoKolors.Common": "[2026.2.0-rc2, )",
+          "NeoKolors.Console": "[2026.2.0-rc3, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc2, )"
         }
       },
       "neokolors.tui.fonts": {
         "type": "Project",
         "dependencies": {
-          "Implyzer": "[2026.1.0, )",
+          "Implyzer": "[2026.3.1, )",
           "JetBrains.Annotations": "[2025.2.4, )",
-          "MessagePack": "[3.1.6, )",
-          "Metriks": "[2026.2.6, )",
-          "NeoKolors.Common": "[2026.2.0-rc1, )",
-          "NeoKolors.Extensions": "[2026.2.0-rc1, )",
-          "NeoKolors.Tui.Core": "[2026.2.0-rc2.1, )"
+          "MessagePack": "[3.1.7, )",
+          "Metriks": "[2026.3.0-rc1, )",
+          "NeoKolors.Common": "[2026.2.0-rc2, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc2, )",
+          "NeoKolors.Tui.Core": "[2026.2.0-rc2.2, )"
         }
       },
       "neokolors.tui.fonts.assets": {
         "type": "Project",
         "dependencies": {
-          "NeoKolors.Tui.Fonts": "[2026.2.0-rc2.1, )"
+          "NeoKolors.Tui.Fonts": "[2026.2.0-rc2.2, )"
         }
       }
     },
@@ -260,9 +260,9 @@
       },
       "Implyzer": {
         "type": "Direct",
-        "requested": "[2026.1.0, )",
-        "resolved": "2026.1.0",
-        "contentHash": "1AzODnW/AbP+P/Lsdr+L9Tz5Y1sMJ6sLsDYVJSt881xFHFYIPcZ3EhjgccNW0In12DVuduI335ufBsWDrqidHg=="
+        "requested": "[2026.3.1, )",
+        "resolved": "2026.3.1",
+        "contentHash": "c8x44K8+eIfu4cayqvvJ4lMj3RQlNcBcoS3H8E1flNAlGbcueT40RxTaw5XTQD1io8bY7vVOFLQDWRX7y6E6Rg=="
       },
       "JetBrains.Annotations": {
         "type": "Direct",
@@ -272,9 +272,9 @@
       },
       "Metriks": {
         "type": "Direct",
-        "requested": "[2026.2.6, )",
-        "resolved": "2026.2.6",
-        "contentHash": "XBs3C6mj6FN477YQ0/elgk5dpXdFXuHE+OSG8OhyNnxR2rqlEXXDrBlvKOxUp97CLnuVjKbLSnAz1wi6n95Scg==",
+        "requested": "[2026.3.0-rc1, )",
+        "resolved": "2026.3.0-rc1",
+        "contentHash": "fPEWNCxKN6GN1U+svEgsdrx4N2apGWWIfUmktrsF4gEk9xW+KztJlPM+OQBgyr9GdeXfJ7bATQ3gvGgZTqhcNQ==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4"
         }
@@ -296,23 +296,23 @@
       },
       "MessagePack": {
         "type": "Transitive",
-        "resolved": "3.1.6",
-        "contentHash": "c5M8C0Lrf6GdGiv01OCB86WEL5YDi7UdH5qsU+q7Q9WvqlhtE4kkJzzJpFufPbz+OULX8FGIB2qo/7CLQ6vizg==",
+        "resolved": "3.1.7",
+        "contentHash": "gXpifaxbhfBqh8bVToQn9j+OgCnhXWMbRCV7RQIbCVa9CNJG1fY6oHAYYl+ER3Tb9uUIHiQ5QbGiGwwFhoagbA==",
         "dependencies": {
-          "MessagePack.Annotations": "3.1.6",
-          "MessagePackAnalyzer": "3.1.6",
+          "MessagePack.Annotations": "3.1.7",
+          "MessagePackAnalyzer": "3.1.7",
           "Microsoft.NET.StringTools": "17.11.4"
         }
       },
       "MessagePack.Annotations": {
         "type": "Transitive",
-        "resolved": "3.1.6",
-        "contentHash": "d0r/B7v1frvN6ElIgp5J5/cHeLADOK21qieHutimUpCWGcjhzOJV9glrItZO4E3dUcriMKX3Swsee3rFx9ouOw=="
+        "resolved": "3.1.7",
+        "contentHash": "IW1yX9viarFl/Dsio5G+pM90JkOSW4xhAiJcKxPPF5rzyp2/yCpieWju8G99QLEmaQeze2uQMEskUBA59YZmkw=="
       },
       "MessagePackAnalyzer": {
         "type": "Transitive",
-        "resolved": "3.1.6",
-        "contentHash": "7Ewqh8D5dAnF4XWy0q76eYFdNLIpDvQqLQOTfrWAGA35ARUB65mrrIES+J5Kw2FVwZGTjudeWh2FB89TC4YMyg=="
+        "resolved": "3.1.7",
+        "contentHash": "ZF+OOJTRS7Ogzb4gG36hPKVQk3kEbp6kkUcdRjhddDq/uSGcV4BKIdYiyJipExXyE/zsqYb0ic215O9kI+fjPA=="
       },
       "Microsoft.CodeAnalysis.Analyzers": {
         "type": "Transitive",
@@ -338,15 +338,15 @@
       },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.8",
-        "contentHash": "21nbDV60SRPWGIivsyl6lqBeEJNG1sginhhfWgRrr3Ais7aQ12To25OAHQxgoiJkjqy1aQ6RxpZBGYuTi7Ge6A=="
+        "resolved": "10.0.9",
+        "contentHash": "g41l/30G3K4B/d/L8kjux0+30e27c8D0FVQ/PFCpbekgfDpj9mnDhieP67EqXWvl1EWNeZh2rpR4F5B/jcDOHA=="
       },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.8",
-        "contentHash": "fdVadZmsC8jRP0KvKy8mO8f6GV/HyBvElfcSxEhd+5FM5boAw/01iSaCto5G3G37ApJira4A3pNaVvBv8cUiLQ==",
+        "resolved": "10.0.9",
+        "contentHash": "9S/DFt4cohlMPpzIxjG6kk0L8MuN2vDm9pbMCulxtJzzk82oJHVLBd8vuQxaPskaYQwKqmFmbannf5eoChgjYg==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.8"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.9"
         }
       },
       "Microsoft.NET.StringTools": {
@@ -391,9 +391,9 @@
       "neokolors.common": {
         "type": "Project",
         "dependencies": {
-          "Implyzer": "[2026.1.0, )",
+          "Implyzer": "[2026.3.1, )",
           "JetBrains.Annotations": "[2025.2.4, )",
-          "NeoKolors.Extensions": "[2026.2.0-rc1, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc2, )",
           "OneOf": "[3.0.271, )",
           "SkiaSharp": "[3.119.4, )"
         }
@@ -402,9 +402,9 @@
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Microsoft.Extensions.Logging.Abstractions": "[10.0.8, )",
-          "NeoKolors.Common": "[2026.2.0-rc1, )",
-          "NeoKolors.Extensions": "[2026.2.0-rc1, )",
+          "Microsoft.Extensions.Logging.Abstractions": "[10.0.9, )",
+          "NeoKolors.Common": "[2026.2.0-rc2, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc2, )",
           "Newtonsoft.Json": "[13.0.4, )"
         }
       },
@@ -412,33 +412,33 @@
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Metriks": "[2026.2.6, )"
+          "Metriks": "[2026.3.0-rc1, )"
         }
       },
       "neokolors.tui.core": {
         "type": "Project",
         "dependencies": {
-          "NeoKolors.Common": "[2026.2.0-rc1, )",
-          "NeoKolors.Console": "[2026.2.0-rc1, )",
-          "NeoKolors.Extensions": "[2026.2.0-rc1, )"
+          "NeoKolors.Common": "[2026.2.0-rc2, )",
+          "NeoKolors.Console": "[2026.2.0-rc3, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc2, )"
         }
       },
       "neokolors.tui.fonts": {
         "type": "Project",
         "dependencies": {
-          "Implyzer": "[2026.1.0, )",
+          "Implyzer": "[2026.3.1, )",
           "JetBrains.Annotations": "[2025.2.4, )",
-          "MessagePack": "[3.1.6, )",
-          "Metriks": "[2026.2.6, )",
-          "NeoKolors.Common": "[2026.2.0-rc1, )",
-          "NeoKolors.Extensions": "[2026.2.0-rc1, )",
-          "NeoKolors.Tui.Core": "[2026.2.0-rc2.1, )"
+          "MessagePack": "[3.1.7, )",
+          "Metriks": "[2026.3.0-rc1, )",
+          "NeoKolors.Common": "[2026.2.0-rc2, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc2, )",
+          "NeoKolors.Tui.Core": "[2026.2.0-rc2.2, )"
         }
       },
       "neokolors.tui.fonts.assets": {
         "type": "Project",
         "dependencies": {
-          "NeoKolors.Tui.Fonts": "[2026.2.0-rc2.1, )"
+          "NeoKolors.Tui.Fonts": "[2026.2.0-rc2.2, )"
         }
       }
     },
@@ -454,9 +454,9 @@
       },
       "Implyzer": {
         "type": "Direct",
-        "requested": "[2026.1.0, )",
-        "resolved": "2026.1.0",
-        "contentHash": "1AzODnW/AbP+P/Lsdr+L9Tz5Y1sMJ6sLsDYVJSt881xFHFYIPcZ3EhjgccNW0In12DVuduI335ufBsWDrqidHg=="
+        "requested": "[2026.3.1, )",
+        "resolved": "2026.3.1",
+        "contentHash": "c8x44K8+eIfu4cayqvvJ4lMj3RQlNcBcoS3H8E1flNAlGbcueT40RxTaw5XTQD1io8bY7vVOFLQDWRX7y6E6Rg=="
       },
       "JetBrains.Annotations": {
         "type": "Direct",
@@ -466,9 +466,9 @@
       },
       "Metriks": {
         "type": "Direct",
-        "requested": "[2026.2.6, )",
-        "resolved": "2026.2.6",
-        "contentHash": "XBs3C6mj6FN477YQ0/elgk5dpXdFXuHE+OSG8OhyNnxR2rqlEXXDrBlvKOxUp97CLnuVjKbLSnAz1wi6n95Scg==",
+        "requested": "[2026.3.0-rc1, )",
+        "resolved": "2026.3.0-rc1",
+        "contentHash": "fPEWNCxKN6GN1U+svEgsdrx4N2apGWWIfUmktrsF4gEk9xW+KztJlPM+OQBgyr9GdeXfJ7bATQ3gvGgZTqhcNQ==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4"
         }
@@ -490,24 +490,24 @@
       },
       "MessagePack": {
         "type": "Transitive",
-        "resolved": "3.1.6",
-        "contentHash": "c5M8C0Lrf6GdGiv01OCB86WEL5YDi7UdH5qsU+q7Q9WvqlhtE4kkJzzJpFufPbz+OULX8FGIB2qo/7CLQ6vizg==",
+        "resolved": "3.1.7",
+        "contentHash": "gXpifaxbhfBqh8bVToQn9j+OgCnhXWMbRCV7RQIbCVa9CNJG1fY6oHAYYl+ER3Tb9uUIHiQ5QbGiGwwFhoagbA==",
         "dependencies": {
-          "MessagePack.Annotations": "3.1.6",
-          "MessagePackAnalyzer": "3.1.6",
+          "MessagePack.Annotations": "3.1.7",
+          "MessagePackAnalyzer": "3.1.7",
           "Microsoft.NET.StringTools": "17.11.4",
           "System.Collections.Immutable": "8.0.0"
         }
       },
       "MessagePack.Annotations": {
         "type": "Transitive",
-        "resolved": "3.1.6",
-        "contentHash": "d0r/B7v1frvN6ElIgp5J5/cHeLADOK21qieHutimUpCWGcjhzOJV9glrItZO4E3dUcriMKX3Swsee3rFx9ouOw=="
+        "resolved": "3.1.7",
+        "contentHash": "IW1yX9viarFl/Dsio5G+pM90JkOSW4xhAiJcKxPPF5rzyp2/yCpieWju8G99QLEmaQeze2uQMEskUBA59YZmkw=="
       },
       "MessagePackAnalyzer": {
         "type": "Transitive",
-        "resolved": "3.1.6",
-        "contentHash": "7Ewqh8D5dAnF4XWy0q76eYFdNLIpDvQqLQOTfrWAGA35ARUB65mrrIES+J5Kw2FVwZGTjudeWh2FB89TC4YMyg=="
+        "resolved": "3.1.7",
+        "contentHash": "ZF+OOJTRS7Ogzb4gG36hPKVQk3kEbp6kkUcdRjhddDq/uSGcV4BKIdYiyJipExXyE/zsqYb0ic215O9kI+fjPA=="
       },
       "Microsoft.CodeAnalysis.Analyzers": {
         "type": "Transitive",
@@ -541,16 +541,16 @@
       },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.8",
-        "contentHash": "21nbDV60SRPWGIivsyl6lqBeEJNG1sginhhfWgRrr3Ais7aQ12To25OAHQxgoiJkjqy1aQ6RxpZBGYuTi7Ge6A=="
+        "resolved": "10.0.9",
+        "contentHash": "g41l/30G3K4B/d/L8kjux0+30e27c8D0FVQ/PFCpbekgfDpj9mnDhieP67EqXWvl1EWNeZh2rpR4F5B/jcDOHA=="
       },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.8",
-        "contentHash": "fdVadZmsC8jRP0KvKy8mO8f6GV/HyBvElfcSxEhd+5FM5boAw/01iSaCto5G3G37ApJira4A3pNaVvBv8cUiLQ==",
+        "resolved": "10.0.9",
+        "contentHash": "9S/DFt4cohlMPpzIxjG6kk0L8MuN2vDm9pbMCulxtJzzk82oJHVLBd8vuQxaPskaYQwKqmFmbannf5eoChgjYg==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.8",
-          "System.Diagnostics.DiagnosticSource": "10.0.8"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.9",
+          "System.Diagnostics.DiagnosticSource": "10.0.9"
         }
       },
       "Microsoft.NET.StringTools": {
@@ -598,16 +598,16 @@
       },
       "System.Collections.Immutable": {
         "type": "Transitive",
-        "resolved": "10.0.8",
-        "contentHash": "rvMGYko6bcE/ZTpj1Q/EM22rcZNiQyjH+71capjjfmqG+DDncVE4kSaE5ysCv2vEFIHt8+zALWYXgIETFvcFzw==",
+        "resolved": "10.0.9",
+        "contentHash": "ci6tokGOzXpemLiZeMrSlA8xKdU43cIO0spbHH+vLaoFMA+fI8CHI3Np3D78jC7EZZrC9jiHDj0VlVK962hzsw==",
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "6.1.2"
         }
       },
       "System.Diagnostics.DiagnosticSource": {
         "type": "Transitive",
-        "resolved": "10.0.8",
-        "contentHash": "rQHsK7Xr8Uz3449860ayVXp/CaLmrhHlMPxbpT/ibOPtp/dTTsr6+f/SxaGO2NzxHf+0siLE0UfdVN5z1I0EgQ==",
+        "resolved": "10.0.9",
+        "contentHash": "VzIU41Sb23Em98hDQc71LPwKTC72xkiG7lpCZaIkf84jBJW+ViaKPa24qqR4FPmj1N4vDWilzs6Dq5Om8aFj+Q==",
         "dependencies": {
           "System.Runtime.CompilerServices.Unsafe": "6.1.2"
         }
@@ -636,9 +636,9 @@
       "neokolors.common": {
         "type": "Project",
         "dependencies": {
-          "Implyzer": "[2026.1.0, )",
+          "Implyzer": "[2026.3.1, )",
           "JetBrains.Annotations": "[2025.2.4, )",
-          "NeoKolors.Extensions": "[2026.2.0-rc1, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc2, )",
           "OneOf": "[3.0.271, )",
           "SkiaSharp": "[3.119.4, )"
         }
@@ -647,9 +647,9 @@
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Microsoft.Extensions.Logging.Abstractions": "[10.0.8, )",
-          "NeoKolors.Common": "[2026.2.0-rc1, )",
-          "NeoKolors.Extensions": "[2026.2.0-rc1, )",
+          "Microsoft.Extensions.Logging.Abstractions": "[10.0.9, )",
+          "NeoKolors.Common": "[2026.2.0-rc2, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc2, )",
           "Newtonsoft.Json": "[13.0.4, )"
         }
       },
@@ -657,34 +657,34 @@
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Metriks": "[2026.2.6, )",
-          "System.Collections.Immutable": "[10.0.8, )"
+          "Metriks": "[2026.3.0-rc1, )",
+          "System.Collections.Immutable": "[10.0.9, )"
         }
       },
       "neokolors.tui.core": {
         "type": "Project",
         "dependencies": {
-          "NeoKolors.Common": "[2026.2.0-rc1, )",
-          "NeoKolors.Console": "[2026.2.0-rc1, )",
-          "NeoKolors.Extensions": "[2026.2.0-rc1, )"
+          "NeoKolors.Common": "[2026.2.0-rc2, )",
+          "NeoKolors.Console": "[2026.2.0-rc3, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc2, )"
         }
       },
       "neokolors.tui.fonts": {
         "type": "Project",
         "dependencies": {
-          "Implyzer": "[2026.1.0, )",
+          "Implyzer": "[2026.3.1, )",
           "JetBrains.Annotations": "[2025.2.4, )",
-          "MessagePack": "[3.1.6, )",
-          "Metriks": "[2026.2.6, )",
-          "NeoKolors.Common": "[2026.2.0-rc1, )",
-          "NeoKolors.Extensions": "[2026.2.0-rc1, )",
-          "NeoKolors.Tui.Core": "[2026.2.0-rc2.1, )"
+          "MessagePack": "[3.1.7, )",
+          "Metriks": "[2026.3.0-rc1, )",
+          "NeoKolors.Common": "[2026.2.0-rc2, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc2, )",
+          "NeoKolors.Tui.Core": "[2026.2.0-rc2.2, )"
         }
       },
       "neokolors.tui.fonts.assets": {
         "type": "Project",
         "dependencies": {
-          "NeoKolors.Tui.Fonts": "[2026.2.0-rc2.1, )"
+          "NeoKolors.Tui.Fonts": "[2026.2.0-rc2.2, )"
         }
       }
     },
@@ -700,9 +700,9 @@
       },
       "Implyzer": {
         "type": "Direct",
-        "requested": "[2026.1.0, )",
-        "resolved": "2026.1.0",
-        "contentHash": "1AzODnW/AbP+P/Lsdr+L9Tz5Y1sMJ6sLsDYVJSt881xFHFYIPcZ3EhjgccNW0In12DVuduI335ufBsWDrqidHg=="
+        "requested": "[2026.3.1, )",
+        "resolved": "2026.3.1",
+        "contentHash": "c8x44K8+eIfu4cayqvvJ4lMj3RQlNcBcoS3H8E1flNAlGbcueT40RxTaw5XTQD1io8bY7vVOFLQDWRX7y6E6Rg=="
       },
       "JetBrains.Annotations": {
         "type": "Direct",
@@ -712,9 +712,9 @@
       },
       "Metriks": {
         "type": "Direct",
-        "requested": "[2026.2.6, )",
-        "resolved": "2026.2.6",
-        "contentHash": "XBs3C6mj6FN477YQ0/elgk5dpXdFXuHE+OSG8OhyNnxR2rqlEXXDrBlvKOxUp97CLnuVjKbLSnAz1wi6n95Scg==",
+        "requested": "[2026.3.0-rc1, )",
+        "resolved": "2026.3.0-rc1",
+        "contentHash": "fPEWNCxKN6GN1U+svEgsdrx4N2apGWWIfUmktrsF4gEk9xW+KztJlPM+OQBgyr9GdeXfJ7bATQ3gvGgZTqhcNQ==",
         "dependencies": {
           "JetBrains.Annotations": "2025.2.4"
         }
@@ -736,23 +736,23 @@
       },
       "MessagePack": {
         "type": "Transitive",
-        "resolved": "3.1.6",
-        "contentHash": "c5M8C0Lrf6GdGiv01OCB86WEL5YDi7UdH5qsU+q7Q9WvqlhtE4kkJzzJpFufPbz+OULX8FGIB2qo/7CLQ6vizg==",
+        "resolved": "3.1.7",
+        "contentHash": "gXpifaxbhfBqh8bVToQn9j+OgCnhXWMbRCV7RQIbCVa9CNJG1fY6oHAYYl+ER3Tb9uUIHiQ5QbGiGwwFhoagbA==",
         "dependencies": {
-          "MessagePack.Annotations": "3.1.6",
-          "MessagePackAnalyzer": "3.1.6",
+          "MessagePack.Annotations": "3.1.7",
+          "MessagePackAnalyzer": "3.1.7",
           "Microsoft.NET.StringTools": "17.11.4"
         }
       },
       "MessagePack.Annotations": {
         "type": "Transitive",
-        "resolved": "3.1.6",
-        "contentHash": "d0r/B7v1frvN6ElIgp5J5/cHeLADOK21qieHutimUpCWGcjhzOJV9glrItZO4E3dUcriMKX3Swsee3rFx9ouOw=="
+        "resolved": "3.1.7",
+        "contentHash": "IW1yX9viarFl/Dsio5G+pM90JkOSW4xhAiJcKxPPF5rzyp2/yCpieWju8G99QLEmaQeze2uQMEskUBA59YZmkw=="
       },
       "MessagePackAnalyzer": {
         "type": "Transitive",
-        "resolved": "3.1.6",
-        "contentHash": "7Ewqh8D5dAnF4XWy0q76eYFdNLIpDvQqLQOTfrWAGA35ARUB65mrrIES+J5Kw2FVwZGTjudeWh2FB89TC4YMyg=="
+        "resolved": "3.1.7",
+        "contentHash": "ZF+OOJTRS7Ogzb4gG36hPKVQk3kEbp6kkUcdRjhddDq/uSGcV4BKIdYiyJipExXyE/zsqYb0ic215O9kI+fjPA=="
       },
       "Microsoft.CodeAnalysis.Analyzers": {
         "type": "Transitive",
@@ -782,16 +782,16 @@
       },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.8",
-        "contentHash": "21nbDV60SRPWGIivsyl6lqBeEJNG1sginhhfWgRrr3Ais7aQ12To25OAHQxgoiJkjqy1aQ6RxpZBGYuTi7Ge6A=="
+        "resolved": "10.0.9",
+        "contentHash": "g41l/30G3K4B/d/L8kjux0+30e27c8D0FVQ/PFCpbekgfDpj9mnDhieP67EqXWvl1EWNeZh2rpR4F5B/jcDOHA=="
       },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.8",
-        "contentHash": "fdVadZmsC8jRP0KvKy8mO8f6GV/HyBvElfcSxEhd+5FM5boAw/01iSaCto5G3G37ApJira4A3pNaVvBv8cUiLQ==",
+        "resolved": "10.0.9",
+        "contentHash": "9S/DFt4cohlMPpzIxjG6kk0L8MuN2vDm9pbMCulxtJzzk82oJHVLBd8vuQxaPskaYQwKqmFmbannf5eoChgjYg==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.8",
-          "System.Diagnostics.DiagnosticSource": "10.0.8"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.9",
+          "System.Diagnostics.DiagnosticSource": "10.0.9"
         }
       },
       "Microsoft.NET.StringTools": {
@@ -835,13 +835,13 @@
       },
       "System.Collections.Immutable": {
         "type": "Transitive",
-        "resolved": "10.0.8",
-        "contentHash": "rvMGYko6bcE/ZTpj1Q/EM22rcZNiQyjH+71capjjfmqG+DDncVE4kSaE5ysCv2vEFIHt8+zALWYXgIETFvcFzw=="
+        "resolved": "10.0.9",
+        "contentHash": "ci6tokGOzXpemLiZeMrSlA8xKdU43cIO0spbHH+vLaoFMA+fI8CHI3Np3D78jC7EZZrC9jiHDj0VlVK962hzsw=="
       },
       "System.Diagnostics.DiagnosticSource": {
         "type": "Transitive",
-        "resolved": "10.0.8",
-        "contentHash": "rQHsK7Xr8Uz3449860ayVXp/CaLmrhHlMPxbpT/ibOPtp/dTTsr6+f/SxaGO2NzxHf+0siLE0UfdVN5z1I0EgQ=="
+        "resolved": "10.0.9",
+        "contentHash": "VzIU41Sb23Em98hDQc71LPwKTC72xkiG7lpCZaIkf84jBJW+ViaKPa24qqR4FPmj1N4vDWilzs6Dq5Om8aFj+Q=="
       },
       "System.Reflection.Metadata": {
         "type": "Transitive",
@@ -854,9 +854,9 @@
       "neokolors.common": {
         "type": "Project",
         "dependencies": {
-          "Implyzer": "[2026.1.0, )",
+          "Implyzer": "[2026.3.1, )",
           "JetBrains.Annotations": "[2025.2.4, )",
-          "NeoKolors.Extensions": "[2026.2.0-rc1, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc2, )",
           "OneOf": "[3.0.271, )",
           "SkiaSharp": "[3.119.4, )"
         }
@@ -865,9 +865,9 @@
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Microsoft.Extensions.Logging.Abstractions": "[10.0.8, )",
-          "NeoKolors.Common": "[2026.2.0-rc1, )",
-          "NeoKolors.Extensions": "[2026.2.0-rc1, )",
+          "Microsoft.Extensions.Logging.Abstractions": "[10.0.9, )",
+          "NeoKolors.Common": "[2026.2.0-rc2, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc2, )",
           "Newtonsoft.Json": "[13.0.4, )"
         }
       },
@@ -875,34 +875,34 @@
         "type": "Project",
         "dependencies": {
           "JetBrains.Annotations": "[2025.2.4, )",
-          "Metriks": "[2026.2.6, )",
-          "System.Collections.Immutable": "[10.0.8, )"
+          "Metriks": "[2026.3.0-rc1, )",
+          "System.Collections.Immutable": "[10.0.9, )"
         }
       },
       "neokolors.tui.core": {
         "type": "Project",
         "dependencies": {
-          "NeoKolors.Common": "[2026.2.0-rc1, )",
-          "NeoKolors.Console": "[2026.2.0-rc1, )",
-          "NeoKolors.Extensions": "[2026.2.0-rc1, )"
+          "NeoKolors.Common": "[2026.2.0-rc2, )",
+          "NeoKolors.Console": "[2026.2.0-rc3, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc2, )"
         }
       },
       "neokolors.tui.fonts": {
         "type": "Project",
         "dependencies": {
-          "Implyzer": "[2026.1.0, )",
+          "Implyzer": "[2026.3.1, )",
           "JetBrains.Annotations": "[2025.2.4, )",
-          "MessagePack": "[3.1.6, )",
-          "Metriks": "[2026.2.6, )",
-          "NeoKolors.Common": "[2026.2.0-rc1, )",
-          "NeoKolors.Extensions": "[2026.2.0-rc1, )",
-          "NeoKolors.Tui.Core": "[2026.2.0-rc2.1, )"
+          "MessagePack": "[3.1.7, )",
+          "Metriks": "[2026.3.0-rc1, )",
+          "NeoKolors.Common": "[2026.2.0-rc2, )",
+          "NeoKolors.Extensions": "[2026.2.0-rc2, )",
+          "NeoKolors.Tui.Core": "[2026.2.0-rc2.2, )"
         }
       },
       "neokolors.tui.fonts.assets": {
         "type": "Project",
         "dependencies": {
-          "NeoKolors.Tui.Fonts": "[2026.2.0-rc2.1, )"
+          "NeoKolors.Tui.Fonts": "[2026.2.0-rc2.2, )"
         }
       }
     }

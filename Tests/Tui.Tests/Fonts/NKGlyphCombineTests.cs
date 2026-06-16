@@ -1,5 +1,5 @@
 // NeoKolors
-// Copyright (c) krystof 2026
+// Copyright (c) KryKom 2026
 
 using NeoKolors.Tui.Fonts;
 using Drct = NeoKolors.Tui.Fonts.Serialization.Xml.V3.XmlGlyphAlignDirection;

@@ -1,5 +1,5 @@
 // NeoKolors
-// Copyright (c) krystof 2026
+// Copyright (c) KryKom 2026
 
 using Microsoft.Build.Framework;
 using NeoKolors.Tui.Fonts.Serialization;
@@ -11,6 +11,7 @@ namespace NeoKolors.Tui.Fonts.Build;
 /// into pre-validated binary MessagePack (.nkf) font assets.
 /// </summary>
 public class CompileFontsTask : Microsoft.Build.Utilities.Task {
+    
     /// <summary>
     /// The base directory containing the font source folders and compiled assets.
     /// </summary>
@@ -20,32 +21,35 @@ public class CompileFontsTask : Microsoft.Build.Utilities.Task {
     public override bool Execute() {
         if (string.IsNullOrWhiteSpace(SourceDir)) {
             Log.LogError("SourceDir parameter is required and cannot be empty.");
+
             return false;
         }
 
         string baseDir = Path.GetFullPath(SourceDir);
 
 
-
         void Compile(string xmlSubDir, string outputFileName) {
-            string xmlDir = Path.Combine(baseDir, xmlSubDir);
+            string xmlDir     = Path.Combine(baseDir, xmlSubDir);
             string outputPath = Path.Combine(baseDir, outputFileName);
 
             if (!Directory.Exists(xmlDir)) {
                 Log.LogWarning("[FontTask] Source XML directory not found: " + xmlDir);
+
                 return;
             }
 
             Log.LogMessage(MessageImportance.High, $"[FontTask] Compiling XML Font directory '{xmlDir}' -> '{outputPath}'...");
-            
+
             var result = NKFontSerializer.TryDeserializeXml(xmlDir);
 
             foreach (var info in result.Infos) {
                 Log.LogMessage(MessageImportance.Normal, "[FontTask] " + info);
             }
+
             foreach (var warning in result.Warnings) {
                 Log.LogWarning("[FontTask] " + warning);
             }
+
             foreach (var error in result.Errors) {
                 Log.LogError("[FontTask] " + error);
             }
@@ -60,12 +64,14 @@ public class CompileFontsTask : Microsoft.Build.Utilities.Task {
 
         try {
             Compile("Bytesized", "Bytesized.nkf");
-            Compile("Future", "Future.nkf");
-            Compile("Dummy", "Dummy.nkf");
+            Compile("Future",    "Future.nkf");
+            Compile("Dummy",     "Dummy.nkf");
+
             return true;
         }
         catch (Exception ex) {
             Log.LogError("Critical Error during font compilation: " + ex.Message + "\n" + ex.StackTrace);
+
             return false;
         }
     }

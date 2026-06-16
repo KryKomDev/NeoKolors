@@ -13,23 +13,25 @@ namespace NeoKolors.Tui.Elements;
 /// A comprehensive stateful interactive multi-line text editing control.
 /// </summary>
 public class RichEditBox : Control<string>, ISelectableElement<string>, IMouseInteractableElement<string> {
-    
     private readonly List<string> _lines = [string.Empty];
-    private int _cursorX;
-    private int _cursorY;
+    private          int          _cursorX;
+    private          int          _cursorY;
 
     public string Text {
         get => string.Join("\n", _lines);
         set {
             _lines.Clear();
-            var val = value ?? string.Empty;
+            var val   = value ?? string.Empty;
             var parts = val.Replace("\r", "").Split('\n');
+
             foreach (var part in parts) {
                 _lines.Add(part);
             }
+
             if (_lines.Count == 0) {
                 _lines.Add(string.Empty);
             }
+
             _cursorY = Math.Clamp(_cursorY, 0, _lines.Count - 1);
             _cursorX = Math.Clamp(_cursorX, 0, _lines[_cursorY].Length);
             InvokeElementUpdated();
@@ -43,40 +45,44 @@ public class RichEditBox : Control<string>, ISelectableElement<string>, IMouseIn
     public bool IsSelectable => true;
 
     public static StyleCollection DefaultStyles { get; } = new(AbstractElement.DefaultStyle) {
-        Width = Dimension.Chars(40),
-        Height = Dimension.Chars(6),
-        Border = BorderStyle.GetNormal(),
+        Width           = Dimension.Chars(40),
+        Height          = Dimension.Chars(6),
+        Border          = BorderStyle.GetNormal(),
         BackgroundColor = NKColor.Default,
-        ReadOnly = true
+        ReadOnly        = true
     };
 
     public RichEditBox() : base(DefaultStyles) {
         OnClick += HandleClick;
     }
 
-    protected override Size MeasureOverride(Size availableSize) {
+    protected override Size2D MeasureOverride(Size2D availableSize) {
         int maxLen = Placeholder.Length;
+
         foreach (var line in _lines) {
             maxLen = Math.Max(maxLen, line.Length);
         }
-        return new Size(Math.Max(maxLen, 10), Math.Max(_lines.Count, 3));
+
+        return new Size2D(Math.Max(maxLen, 10), Math.Max(_lines.Count, 3));
     }
 
     protected override void RenderCore(ICharCanvas canvas) {
-        var pos = RenderBounds.Lower;
-        var contentPos = pos + RenderLayout.Content.Lower;
-        var contentWidth = RenderLayout.Content.Width;
-        var contentHeight = RenderLayout.Content.Height;
+        var pos           = RenderBounds.Lower;
+        var contentPos    = pos + RenderLayout.Content.Lower;
+        var contentWidth  = RenderLayout.Content.SizeX;
+        var contentHeight = RenderLayout.Content.SizeY;
 
         // Clear NEGATIVE style from the entire content region first
         for (int y = 0; y < contentHeight; y++) {
             for (int x = 0; x < contentWidth; x++) {
-                var cp = contentPos + new Point(x, y);
-                var relativeCp = cp - pos;
-                if (RenderLayout.Content.Contains(relativeCp.X, relativeCp.Y)) {
-                    var cell = canvas[cp.X, cp.Y];
-                    cell.Style = cell.Style with { Styles = cell.Style.Styles & ~NeoKolors.Common.TextStyles.NEGATIVE };
-                }
+                var cp         = contentPos + new Point2D(x, y);
+                var relativeCp = cp         - pos;
+
+                if (!RenderLayout.Content.ContainsIn(relativeCp.X, relativeCp.Y))
+                    continue;
+
+                var c = canvas[cp.X, cp.Y];
+                c.Style = c.Style with { Styles = c.Style.Styles & ~TextStyles.NEGATIVE };
             }
         }
 
@@ -85,27 +91,33 @@ public class RichEditBox : Control<string>, ISelectableElement<string>, IMouseIn
         }
         else {
             for (int y = 0; y < _lines.Count && y < contentHeight; y++) {
-                canvas.Place(_lines[y], contentPos + new Point(0, y), contentWidth, HorizontalAlign.LEFT);
+                canvas.Place(_lines[y], contentPos + new Point2D(0, y), contentWidth, HorizontalAlign.LEFT);
             }
         }
 
-        if (IsSelected) {
-            var cursorPoint = contentPos + new Point(_cursorX, _cursorY);
-            var relativeCursor = cursorPoint - pos;
-            if (RenderLayout.Content.Contains(relativeCursor.X, relativeCursor.Y)) {
-                var cell = canvas[cursorPoint.X, cursorPoint.Y];
-                if (cell.Char == null || cell.Char == '\0') {
-                    cell.Char = ' ';
-                }
-                cell.Style = cell.Style with { Styles = cell.Style.Styles | NeoKolors.Common.TextStyles.NEGATIVE };
-            }
-        }
+        if (!IsSelected)
+            return;
+
+        var cursorPoint    = contentPos  + new Point2D(_cursorX, _cursorY);
+        var relativeCursor = cursorPoint - pos;
+
+        if (!RenderLayout.Content.ContainsIn(relativeCursor.X, relativeCursor.Y))
+            return;
+
+        var cell = canvas[cursorPoint.X, cursorPoint.Y];
+
+        if (cell.Char is null or '\0')
+            cell.Char = ' ';
+
+        cell.Style = cell.Style with { Styles = cell.Style.Styles | TextStyles.NEGATIVE };
     }
 
     public void Select() {
-        if (IsSelected) return;
-        IsSelected = true;
-        IsFocused = true;
+        if (IsSelected)
+            return;
+
+        IsSelected           =  true;
+        IsFocused            =  true;
         AppEventBus.KeyEvent += HandleKey;
         InvokeElementUpdated();
 
@@ -115,9 +127,11 @@ public class RichEditBox : Control<string>, ISelectableElement<string>, IMouseIn
     }
 
     public void Deselect() {
-        if (!IsSelected) return;
-        IsSelected = false;
-        IsFocused = false;
+        if (!IsSelected)
+            return;
+
+        IsSelected           =  false;
+        IsFocused            =  false;
         AppEventBus.KeyEvent -= HandleKey;
         InvokeElementUpdated();
 
@@ -127,8 +141,36 @@ public class RichEditBox : Control<string>, ISelectableElement<string>, IMouseIn
     }
 
     private void HandleKey(KeyEventArgs keyInfo) {
+        if (keyInfo.Up)
+            return;
+
         switch (keyInfo.Key) {
-            case KeyCode.ARROW_LEFT:
+            case KeyCode.ESCAPE: {
+                Deselect();
+
+                break;
+            }
+            case KeyCode.ARROW_LEFT when keyInfo.Modifiers.GetHasCtrl(): {
+                if (_cursorX == 0 && _cursorY > 0) {
+                    _cursorY--;
+                    _cursorX = _lines[_cursorY].Length;
+
+                    break;
+                }
+
+                if (_cursorX > 0 && _lines[_cursorY][_cursorX - 1] == ' ') {
+                    while (_cursorX > 0 && _lines[_cursorY][_cursorX - 1] == ' ')
+                        _cursorX--;
+
+                    break;
+                }
+
+                while (_cursorX > 0 && _lines[_cursorY][_cursorX - 1] != ' ')
+                    _cursorX--;
+
+                break;
+            }
+            case KeyCode.ARROW_LEFT: {
                 if (_cursorX > 0) {
                     _cursorX--;
                 }
@@ -136,8 +178,30 @@ public class RichEditBox : Control<string>, ISelectableElement<string>, IMouseIn
                     _cursorY--;
                     _cursorX = _lines[_cursorY].Length;
                 }
+
                 break;
-            case KeyCode.ARROW_RIGHT:
+            }
+            case KeyCode.ARROW_RIGHT when keyInfo.Modifiers.GetHasCtrl(): {
+                if (_cursorX == _lines[_cursorY].Length && _cursorY < _lines.Count - 1) {
+                    _cursorY++;
+                    _cursorX = 0;
+
+                    break;
+                }
+
+                if (_cursorX < _lines[_cursorY].Length && _lines[_cursorY][_cursorX + 1] == ' ') {
+                    while (_cursorX == _lines[_cursorY].Length - 1 || (_cursorX < _lines[_cursorY].Length && _lines[_cursorY][_cursorX + 1] == ' '))
+                        _cursorX++;
+
+                    break;
+                }
+
+                while (_cursorX == _lines[_cursorY].Length - 1 || (_cursorX < _lines[_cursorY].Length && _lines[_cursorY][_cursorX + 1] != ' '))
+                    _cursorX++;
+
+                break;
+            }
+            case KeyCode.ARROW_RIGHT: {
                 if (_cursorX < _lines[_cursorY].Length) {
                     _cursorX++;
                 }
@@ -145,65 +209,138 @@ public class RichEditBox : Control<string>, ISelectableElement<string>, IMouseIn
                     _cursorY++;
                     _cursorX = 0;
                 }
+
                 break;
-            case KeyCode.ARROW_UP:
+            }
+            case KeyCode.ARROW_UP: {
                 if (_cursorY > 0) {
                     _cursorY--;
                     _cursorX = Math.Min(_cursorX, _lines[_cursorY].Length);
                 }
+
                 break;
-            case KeyCode.ARROW_DOWN:
+            }
+            case KeyCode.ARROW_DOWN: {
                 if (_cursorY < _lines.Count - 1) {
                     _cursorY++;
                     _cursorX = Math.Min(_cursorX, _lines[_cursorY].Length);
                 }
+
                 break;
-            case KeyCode.HOME:
+            }
+            case KeyCode.HOME: {
                 _cursorX = 0;
+
                 break;
-            case KeyCode.END:
+            }
+            case KeyCode.END: {
                 _cursorX = _lines[_cursorY].Length;
+
                 break;
-            case KeyCode.ENTER:
+            }
+            case KeyCode.ENTER: {
                 var currentLineContent = _lines[_cursorY];
-                var leftPart = currentLineContent.Substring(0, _cursorX);
-                var rightPart = currentLineContent.Substring(_cursorX);
+                var leftPart           = currentLineContent[.._cursorX];
+                var rightPart          = currentLineContent[_cursorX..];
                 _lines[_cursorY] = leftPart;
                 _lines.Insert(_cursorY + 1, rightPart);
                 _cursorY++;
                 _cursorX = 0;
+
                 break;
-            case KeyCode.BACKSPACE:
+            }
+            case KeyCode.BACKSPACE when keyInfo.Modifiers.GetHasCtrl(): {
+                if (_cursorX == 0 && _cursorY > 0) {
+                    var prevLine = _lines[_cursorY - 1];
+                    _cursorX = prevLine.Length;
+
+                    _lines[_cursorY - 1] = prevLine + _lines[_cursorY];
+                    _lines.RemoveAt(_cursorY);
+
+                    _cursorY--;
+
+                    break;
+                }
+
+                var i = _cursorX;
+
+                if (i > 0 && _lines[_cursorY][i - 1] == ' ') {
+                    while (i > 0 && _lines[_cursorY][i - 1] == ' ')
+                        i--;
+                }
+                else {
+                    while (i > 0 && _lines[_cursorY][i - 1] != ' ')
+                        i--;
+                }
+
+                _lines[_cursorY] = _lines[_cursorY].Remove(i, _cursorX - i);
+                _cursorX         = i;
+
+                break;
+            }
+            case KeyCode.BACKSPACE: {
                 if (_cursorX > 0) {
                     _lines[_cursorY] = _lines[_cursorY].Remove(_cursorX - 1, 1);
                     _cursorX--;
                 }
                 else if (_cursorY > 0) {
                     var prevLine = _lines[_cursorY - 1];
-                    _cursorX = prevLine.Length;
+                    _cursorX             = prevLine.Length;
                     _lines[_cursorY - 1] = prevLine + _lines[_cursorY];
                     _lines.RemoveAt(_cursorY);
                     _cursorY--;
                 }
+
                 break;
-            case KeyCode.DELETE:
+            }
+            case KeyCode.DELETE when keyInfo.Modifiers.GetHasCtrl(): {
+                if (_cursorX == _lines[_cursorY].Length) {
+                    _lines[_cursorY] += _lines[_cursorY + 1];
+                    _lines.RemoveAt(_cursorY + 1);
+
+                    break;
+                }
+
+                var i = _cursorX;
+
+                if (i < _lines[_cursorY].Length && _lines[_cursorY][i] == ' ') {
+                    while (i < _lines[_cursorY].Length && _lines[_cursorY][i] == ' ')
+                        i++;
+                }
+                else {
+                    while (i < _lines[_cursorY].Length && _lines[_cursorY][i] != ' ')
+                        i++;
+                }
+
+                _lines[_cursorY] = _lines[_cursorY].Remove(_cursorX, i - _cursorX);
+
+                break;
+            }
+            case KeyCode.DELETE: {
                 if (_cursorX < _lines[_cursorY].Length) {
                     _lines[_cursorY] = _lines[_cursorY].Remove(_cursorX, 1);
                 }
                 else if (_cursorY < _lines.Count - 1) {
-                    _lines[_cursorY] = _lines[_cursorY] + _lines[_cursorY + 1];
+                    _lines[_cursorY] += _lines[_cursorY + 1];
                     _lines.RemoveAt(_cursorY + 1);
                 }
+
                 break;
-            case KeyCode.SPACE:
+            }
+            case KeyCode.SPACE: {
                 AddChar(' ');
+
                 break;
-            default:
+            }
+            default: {
                 if (!char.IsControl(keyInfo.Char)) {
                     AddChar(keyInfo.Char);
                 }
+
                 break;
+            }
         }
+
         InvokeElementUpdated();
     }
 
@@ -220,18 +357,20 @@ public class RichEditBox : Control<string>, ISelectableElement<string>, IMouseIn
         Text = childNode;
     }
 
-    public event Action<MouseButton> OnClick = delegate { };
-    public event Action<MouseButton> OnRelease = delegate { };
-    public event Action OnHover = delegate { };
-    public event Action OnHoverOut = delegate { };
+    public event Action<MouseButton> OnClick    = delegate { };
+    public event Action<MouseButton> OnRelease  = delegate { };
+    public event Action              OnHover    = delegate { };
+    public event Action              OnHoverOut = delegate { };
 
-    public void Click(MouseButton button) => OnClick(button);
+    public void Click(MouseButton   button) => OnClick(button);
     public void Release(MouseButton button) => OnRelease(button);
-    public void Hover() => OnHover();
-    public void HoverOut() => OnHoverOut();
+    public void Hover()                     => OnHover();
+    public void HoverOut()                  => OnHoverOut();
 
     private void HandleClick(MouseButton button) {
-        if (!IsEnabled) return;
+        if (!IsEnabled)
+            return;
+
         Select();
     }
 }

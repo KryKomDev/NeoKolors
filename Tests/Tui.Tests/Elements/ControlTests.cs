@@ -1,9 +1,6 @@
 // NeoKolors.Test
 // Copyright (c) 2026 KryKom
 
-using NeoKolors.Tui.Elements;
-using NeoKolors.Tui.Core;
-
 namespace NeoKolors.Tui.Tests.Elements;
 
 public class ControlTests {
@@ -11,7 +8,7 @@ public class ControlTests {
     // Concrete mock classes for testing abstract base classes
     private class TestControl : Control<string> {
         protected override void RenderCore(ICharCanvas canvas) { }
-        protected override Size MeasureOverride(Size availableSize) => Size.Zero;
+        protected override Size2D MeasureOverride(Size2D availableSize) => Size2D.Zero;
         public override ElementInfo Info => ElementInfo.Default;
         public override string GetChildNode() => "";
         public override void SetChildNode(string childNode) { }
@@ -21,19 +18,19 @@ public class ControlTests {
 
     private class TestContentControl : ContentControl {
         protected override void RenderCore(ICharCanvas canvas) { }
-        protected override Size MeasureOverride(Size availableSize) => Size.Zero;
+        protected override Size2D MeasureOverride(Size2D availableSize) => Size2D.Zero;
         public override ElementInfo Info => ElementInfo.Default;
     }
 
     private class TestPanel : Panel {
         protected override void RenderCore(ICharCanvas canvas) { }
-        protected override Size MeasureOverride(Size availableSize) => Size.Zero;
+        protected override Size2D MeasureOverride(Size2D availableSize) => Size2D.Zero;
         public override ElementInfo Info => ElementInfo.Default;
     }
 
     private class TestRangeControl : RangeBase {
         protected override void RenderCore(ICharCanvas canvas) { }
-        protected override Size MeasureOverride(Size availableSize) => Size.Zero;
+        protected override Size2D MeasureOverride(Size2D availableSize) => Size2D.Zero;
         public override ElementInfo Info => ElementInfo.Default;
     }
 
@@ -177,20 +174,20 @@ public class ControlTests {
         Assert.False(tb2.IsSelected);
 
         // Click tb1 to select
-        tb1.Click(NeoKolors.Console.Input.MouseButton.LEFT);
+        tb1.Click(Console.Input.MouseButton.LEFT);
         Assert.True(tb1.IsSelected);
         Assert.False(tb2.IsSelected);
-        Assert.Equal(tb1, NeoKolors.Tui.Global.ElementManager.CurrentlySelected);
+        Assert.Equal(tb1, Global.ElementManager.CurrentlySelected);
 
         // Click tb2 to select, should automatically deselect tb1
-        tb2.Click(NeoKolors.Console.Input.MouseButton.LEFT);
+        tb2.Click(Console.Input.MouseButton.LEFT);
         Assert.False(tb1.IsSelected);
         Assert.True(tb2.IsSelected);
-        Assert.Equal(tb2, NeoKolors.Tui.Global.ElementManager.CurrentlySelected);
+        Assert.Equal(tb2, Global.ElementManager.CurrentlySelected);
 
         // Deselect tb2 directly
         tb2.Deselect();
         Assert.False(tb2.IsSelected);
-        Assert.Null(NeoKolors.Tui.Global.ElementManager.CurrentlySelected);
+        Assert.Null(Global.ElementManager.CurrentlySelected);
     }
 }

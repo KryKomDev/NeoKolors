@@ -1,4 +1,4 @@
-﻿// //
+// //
 // NeoKolors
 // Copyright (c) 2026 KryKom
 // //
@@ -18,14 +18,28 @@ public static class DotnetConsoleExtensions {
         /// </summary>
         /// <returns>A Size2D structure representing the width and height of the console buffer.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Size2D GetBufferSize() => new(Stdio.BufferWidth, Stdio.BufferHeight);
+        public static Size2D GetBufferSize() {
+            try {
+                return new Size2D(Stdio.BufferWidth, Stdio.BufferHeight);
+            }
+            catch (Exception) {
+                return new Size2D(80, 25);
+            }
+        }
 
         /// <summary>
         /// Retrieves the current dimensions of the console window as a 2D size structure.
         /// </summary>
         /// <returns>A Size2D structure representing the width and height of the console window.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Size2D GetWindowSize() => new(Stdio.WindowWidth, Stdio.WindowHeight);
+        public static Size2D GetWindowSize() {
+            try {
+                return new Size2D(Stdio.WindowWidth, Stdio.WindowHeight);
+            }
+            catch (Exception) {
+                return new Size2D(80, 25);
+            }
+        }
 
         /// <summary>
         /// Retrieves the current dimensions of the console buffer as a 2D size structure.

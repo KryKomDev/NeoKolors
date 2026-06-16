@@ -30,14 +30,14 @@ public class Page : Panel {
 
     public Page() : base(DefaultStyles) { }
 
-    protected override Size MeasureOverride(Size availableSize) {
+    protected override Size2D MeasureOverride(Size2D availableSize) {
         foreach (var child in _children) {
             child?.Measure(availableSize);
         }
         return availableSize;
     }
 
-    protected override Size ArrangeOverride(Size finalSize) {
+    protected override Size2D ArrangeOverride(Size2D finalSize) {
         var contentBounds = RenderLayout.Content + RenderBounds.Lower;
         foreach (var child in _children) {
             child?.Arrange(contentBounds);

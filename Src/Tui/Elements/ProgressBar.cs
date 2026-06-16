@@ -33,14 +33,14 @@ public class ProgressBar : RangeBase {
 
     public ProgressBar() : base(DefaultStyles) { }
 
-    protected override Size MeasureOverride(Size availableSize) {
-        return new Size(20, 1);
+    protected override Size2D MeasureOverride(Size2D availableSize) {
+        return new Size2D(20, 1);
     }
 
     protected override void RenderCore(ICharCanvas canvas) {
         var pos = RenderBounds.Lower;
         var contentPos = pos + RenderLayout.Content.Lower;
-        var contentWidth = RenderLayout.Content.Width;
+        var contentWidth = RenderLayout.Content.SizeX;
 
         if (contentWidth <= 5) {
             canvas.Place($"{Value:0}%", contentPos, contentWidth, HorizontalAlign.LEFT);

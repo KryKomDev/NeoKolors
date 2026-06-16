@@ -112,7 +112,16 @@ public static partial class NKConsole {
         return true;
     }
     
-    public static Size2D WindowSize => new(Stdio.WindowWidth, Stdio.WindowHeight);
+    public static Size2D WindowSize {
+        get {
+            try {
+                return new Size2D(Stdio.WindowWidth, Stdio.WindowHeight);
+            }
+            catch (Exception) {
+                return new Size2D(80, 25);
+            }
+        }
+    }
     public static Size2D BufferSize => InputDriver.GetSize();
     
 }

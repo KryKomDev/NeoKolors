@@ -17,7 +17,7 @@ public class Canvas : Panel {
 
     public Canvas() : base(DefaultStyles) { }
 
-    protected override Size MeasureOverride(Size availableSize) {
+    protected override Size2D MeasureOverride(Size2D availableSize) {
         int maxWidth = 0;
         int maxHeight = 0;
 
@@ -26,17 +26,17 @@ public class Canvas : Panel {
             child.Measure(availableSize);
             var childSize = child.DesiredSize;
             var childPos = child.Style.Position;
-            int childX = childPos.X.ToScalar(availableSize.Width);
-            int childY = childPos.Y.ToScalar(availableSize.Height);
+            int childX = childPos.X.ToScalar(availableSize.X);
+            int childY = childPos.Y.ToScalar(availableSize.Y);
 
-            maxWidth = Math.Max(maxWidth, childX + childSize.Width);
-            maxHeight = Math.Max(maxHeight, childY + childSize.Height);
+            maxWidth = Math.Max(maxWidth, childX + childSize.X);
+            maxHeight = Math.Max(maxHeight, childY + childSize.Y);
         }
 
-        return new Size(maxWidth, maxHeight);
+        return new Size2D(maxWidth, maxHeight);
     }
 
-    protected override Size ArrangeOverride(Size finalSize) {
+    protected override Size2D ArrangeOverride(Size2D finalSize) {
         var pos = RenderBounds.Lower;
         foreach (var child in _children) {
             if (child == null) continue;
@@ -44,11 +44,11 @@ public class Canvas : Panel {
             var childStyle = child.Style;
             var childPosProp = childStyle.Position;
             
-            int childX = childPosProp.X.ToScalar(RenderLayout.Content.Width);
-            int childY = childPosProp.Y.ToScalar(RenderLayout.Content.Height);
+            int childX = childPosProp.X.ToScalar(RenderLayout.Content.SizeX);
+            int childY = childPosProp.Y.ToScalar(RenderLayout.Content.SizeY);
 
-            var childPos = pos + RenderLayout.Content.Lower + new Point(childX, childY);
-            child.Arrange(new Rectangle(childPos, child.DesiredSize));
+            var childPos = pos + RenderLayout.Content.Lower + new Point2D(childX, childY);
+            child.Arrange(new Area2D(childPos, child.DesiredSize));
         }
         return finalSize;
     }

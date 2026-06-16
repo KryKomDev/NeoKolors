@@ -36,7 +36,7 @@ public class TreeView : Control<IReadOnlyList<TreeViewNode>>, INode<IReadOnlyLis
 
     public TreeView() : base(DefaultStyles) { }
 
-    protected override Size MeasureOverride(Size availableSize) {
+    protected override Size2D MeasureOverride(Size2D availableSize) {
         int height = 0;
         int maxWidth = 0;
 
@@ -44,13 +44,13 @@ public class TreeView : Control<IReadOnlyList<TreeViewNode>>, INode<IReadOnlyLis
             MeasureNode(node, ref height, ref maxWidth, 0);
         }
 
-        return new Size(maxWidth, height);
+        return new Size2D(maxWidth, height);
     }
 
     protected override void RenderCore(ICharCanvas canvas) {
         var pos = RenderBounds.Lower;
         var contentPos = pos + RenderLayout.Content.Lower;
-        var contentWidth = RenderLayout.Content.Width;
+        var contentWidth = RenderLayout.Content.SizeX;
 
         int currentLine = 0;
         foreach (var rootNode in RootNodes) {
@@ -61,7 +61,7 @@ public class TreeView : Control<IReadOnlyList<TreeViewNode>>, INode<IReadOnlyLis
     private void RenderNode(
         ICharCanvas canvas, 
         TreeViewNode node, 
-        Point startPoint, 
+        Point2D startPoint, 
         int width, 
         ref int currentLine, 
         int depth, 
@@ -69,7 +69,7 @@ public class TreeView : Control<IReadOnlyList<TreeViewNode>>, INode<IReadOnlyLis
     {
         if (currentLine >= canvas.Height) return;
 
-        var nodePos = startPoint + new Point(0, currentLine);
+        var nodePos = startPoint + new Point2D(0, currentLine);
 
         // Draw node header with expansion toggle: e.g. "► System Settings" or "  ├── Guest"
         string toggleSymbol = "";
