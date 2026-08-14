@@ -3,7 +3,7 @@
 
 using NeoKolors.Extensions;
 
-namespace NeoKolors.Console.Ansi.Mouse;
+namespace NeoKolors.Console.Ansi;
 
 internal readonly struct MouseEventInfo {
     

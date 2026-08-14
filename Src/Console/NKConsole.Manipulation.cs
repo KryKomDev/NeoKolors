@@ -122,6 +122,6 @@ public static partial class NKConsole {
             }
         }
     }
-    public static Size2D BufferSize => InputDriver.GetSize();
     
+    public static Size2D BufferSize => InputDriver.GetSize();
 }

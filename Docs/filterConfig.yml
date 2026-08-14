@@ -2,3 +2,12 @@
   - exclude:
       uidRegex: ^Implyzer$
       type: Namespace
+  - exclude:
+      uidRegex: ^System\..*$
+      type: Namespace
+  - exclude:
+      uidRegex: ^Microsoft\..*$
+      type: Namespace
+  - exclude:
+      uidRegex: ^HasFlagExtension\.Generator$
+      type: Namespace

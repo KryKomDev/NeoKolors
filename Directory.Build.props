@@ -1,8 +1,17 @@
 <Project>
     <PropertyGroup>
-        <DefineConstants>$(DefineConstants);NK_RENDERING_PROFILING</DefineConstants>
+        <DefineConstants>
+            $(DefineConstants); 
+            NK_RENDERING_PROFILING; 
+            PolyPublic
+        </DefineConstants>
+
+        <PolyArgumentExceptions>true</PolyArgumentExceptions>
+        
+        <DefineConstants>$(DefineConstants.Replace('%0A', '').Replace('%0D', '').Replace(' ', ''))</DefineConstants>
+        
         <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
-        <NoWarn>$(NoWarn);CS0436</NoWarn>
+        <NoWarn>$(NoWarn)</NoWarn>
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
         <CompilerGeneratedFilesOutputPath>obj\Generated</CompilerGeneratedFilesOutputPath>
     </PropertyGroup>

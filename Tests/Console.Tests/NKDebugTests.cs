@@ -111,31 +111,31 @@ public class NKDebugTests : IDisposable {
     public void SetLogLevel_Methods_ConfigureAppropriately() {
         // Test SetLogAll
         NKDebug.SetLogAll();
-        Assert.True(NKDebug.Logger.Config.Level.HasFlag(LoggerLevel.TRACE));
-        Assert.True(NKDebug.Logger.Config.Level.HasFlag(LoggerLevel.CRITICAL));
+        Assert.True(NKDebug.Logger.Level.HasFlag(NKLogLevel.TRACE));
+        Assert.True(NKDebug.Logger.Level.HasFlag(NKLogLevel.CRITICAL));
 
         // Test SetLogInfo
         NKDebug.SetLogInfo();
-        Assert.True(NKDebug.Logger.Config.Level.HasFlag(LoggerLevel.INFORMATION));
-        Assert.False(NKDebug.Logger.Config.Level.HasFlag(LoggerLevel.DEBUG));
+        Assert.True(NKDebug.Logger.Level.HasFlag(NKLogLevel.INFORMATION));
+        Assert.False(NKDebug.Logger.Level.HasFlag(NKLogLevel.DEBUG));
 
         // Test SetLogWarn
         NKDebug.SetLogWarn();
-        Assert.True(NKDebug.Logger.Config.Level.HasFlag(LoggerLevel.WARNING));
-        Assert.False(NKDebug.Logger.Config.Level.HasFlag(LoggerLevel.INFORMATION));
+        Assert.True(NKDebug.Logger.Level.HasFlag(NKLogLevel.WARNING));
+        Assert.False(NKDebug.Logger.Level.HasFlag(NKLogLevel.INFORMATION));
 
         // Test SetLogErrors
         NKDebug.SetLogErrors();
-        Assert.True(NKDebug.Logger.Config.Level.HasFlag(LoggerLevel.ERROR));
-        Assert.False(NKDebug.Logger.Config.Level.HasFlag(LoggerLevel.WARNING));
+        Assert.True(NKDebug.Logger.Level.HasFlag(NKLogLevel.ERROR));
+        Assert.False(NKDebug.Logger.Level.HasFlag(NKLogLevel.WARNING));
 
         // Test SetLogCrit
         NKDebug.SetLogCrit();
-        Assert.True(NKDebug.Logger.Config.Level.HasFlag(LoggerLevel.CRITICAL));
-        Assert.False(NKDebug.Logger.Config.Level.HasFlag(LoggerLevel.ERROR));
+        Assert.True(NKDebug.Logger.Level.HasFlag(NKLogLevel.CRITICAL));
+        Assert.False(NKDebug.Logger.Level.HasFlag(NKLogLevel.ERROR));
 
         // Test SetLogNone
         NKDebug.SetLogNone();
-        Assert.Equal(LoggerLevel.NONE, NKDebug.Logger.Config.Level);
+        Assert.Equal(NKLogLevel.NONE, NKDebug.Logger.Level);
     }
 }

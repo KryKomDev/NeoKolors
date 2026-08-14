@@ -9,24 +9,234 @@ using System.Text;
 using Metriks;
 using NeoKolors.Common;
 using NeoKolors.Console.Ansi;
-using NeoKolors.Console.Events;
-using NeoKolors.Console.Input;
 using OneOf;
 using static NeoKolors.Console.BoolStrings;
 using ArgumentException = System.ArgumentException;
 using FormatException = System.FormatException;
 using InvalidOperationException = System.InvalidOperationException;
 using OverflowException = System.OverflowException;
-using Std = System.Console;
-
-#if NK_ENABLE_NATIVE_IO
-#endif
-
 
 namespace NeoKolors.Console;
 
 public static partial class NKConsole {
+
+    #region String Read Overrides
+
+    /// <summary>
+    /// Asynchronously waits for a key press event and returns the corresponding key event information.
+    /// Ensures the input driver remains in a consistent state during this operation.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task result contains the details of the key event,
+    /// including the pressed key, its modifiers, and other associated data.
+    /// </returns>
+    /// <exception cref="System.InvalidOperationException">
+    /// Thrown if the input driver encounters an unexpected state or fails during the operation.
+    /// </exception>
+    public static async Task<KeyEventArgs> ReadKeyAsync(bool intercept = false) {
+        // use standard console reading if the input driver is not running
+        if (!InputDriver.IsRunning)
+            return new KeyEventArgs(Stdio.ReadKey(intercept));
+
+        var tcs = new TaskCompletionSource<KeyEventArgs>();
+
+        KeyEventHandler? handler = null;
+
+        handler = k => {
+            InputDriver.Key -= handler;
+            tcs.SetResult(k);
+        };
+
+        // await the key press event
+        var result = await tcs.Task;
+
+        if (!intercept)
+            OutputDriver.Write(result.Char);
+
+        return result;
+    }
+
+    /// <summary>
+    /// Synchronously waits for a key press event and retrieves the corresponding key event information.
+    /// Ensures the input driver remains in a consistent state during this operation.
+    /// </summary>
+    /// <returns>
+    /// An instance of <see cref="KeyEventArgs"/> containing details about the key event,
+    /// including the pressed key, its modifiers, and other associated data.
+    /// </returns>
+    /// <exception cref="System.AggregateException">
+    /// Thrown if the asynchronous underlying operation encounters an exception.
+    /// </exception>
+    /// <remarks>
+    /// This method blocks the calling thread until a key is pressed. For non-blocking behavior,
+    /// use the asynchronous version <see cref="ReadKeyAsync"/>.
+    /// </remarks>
+    public static KeyEventArgs ReadKey(bool intercept = false) {
+        return ReadKeyAsync(intercept).Result;
+    }
+
+    /// <summary>
+    /// Asynchronously waits for a character input from the user and returns the corresponding character.
+    /// The method relies on the underlying keyboard event handling to capture user input.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task result contains the character entered by the user.
+    /// </returns>
+    /// <exception cref="System.InvalidOperationException">
+    /// Thrown if the input driver encounters an unexpected state or fails during the operation.
+    /// </exception>
+    public static async Task<char> ReadCharAsync(bool intercept = false) => (await ReadKeyAsync(intercept)).Char;
+
+    /// <summary>
+    /// Reads a single character input from the console synchronously.
+    /// This method blocks until a character is entered and returns the corresponding character.
+    /// </summary>
+    /// <returns>
+    /// The character input by the user.
+    /// </returns>
+    public static char ReadChar(bool intercept = false) => ReadKey(intercept).Char;
+
+    /// <summary>
+    /// Asynchronously reads a line of text entered by the user until the Enter/Return key is pressed.
+    /// The operation processes each character input in sequence and constructs the resulting string.
+    /// </summary>
+    /// <returns>
+    /// A task representing the asynchronous operation. The task result contains the entire line of text
+    /// entered by the user, excluding the trailing newline character.
+    /// </returns>
+    /// <exception cref="System.InvalidOperationException">
+    /// Thrown if the input driver fails to initialize or encounters an error during the operation.
+    /// </exception>
+    public static async Task<string> ReadLineAsync(bool intercept = false) {
+        var sb = new StringBuilder();
+
+        // use standard console reading if the input driver is not running
+        if (!InputDriver.IsRunning) {
+            if (Stdio.IsInputRedirected) {
+                while (true) {
+                    var c = Stdio.Read();
+                
+                    if (c is -1 or '\n')
+                        return sb.ToString();
+                
+                    sb.Append((char)c);
+                }
+            }
+            
+            while (true) {
+                var k = Stdio.ReadKey(true);
+                    
+                switch (k.Key) {
+                    case ConsoleKey.Enter: {
+                        return sb.ToString();
+                    }
+                    case ConsoleKey.Backspace when sb.Length > 0: {
+                        sb.Remove(sb.Length - 1, 1); 
+                        break;
+                    }
+                }
+
+                sb.Append(k.KeyChar);
+            }
+        }
+
+        var tcs = new TaskCompletionSource();
+
+        // make sure the input driver does not change while waiting for the key press
+        var inputDriver = InputDriver;
+        var wasRunning  = inputDriver.IsRunning;
+
+        // start the input driver if it's not already running
+        if (!wasRunning)
+            inputDriver.Start();
+
+        inputDriver.Key += AppendChar;
+
+        // wait for the line to be completed
+        await tcs.Task;
+
+        // restore the original state of the input driver
+        if (!wasRunning)
+            inputDriver.Stop();
+
+        return sb.ToString();
+
+        // --- Local Functions --- //
+
+        void AppendChar(KeyEventArgs key) {
+            // ignore key presses that are not part of the line
+            if (key.Up)
+                return;
+
+            // print the character to the console if not intercepted
+            if (!intercept)
+                OutputDriver.Write(key.Char);
+
+            if (key.Key == KeyCode.RETURN) {
+                tcs.SetResult();
+            }
+            else if (key.Key == KeyCode.BACKSPACE && sb.Length > 0) {
+                sb.Remove(sb.Length - 1, 1);
+            }
+            else {
+                sb.Append(key.Char);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Reads a line of text input synchronously from the console until a newline character is entered.
+    /// Blocks the calling thread until the user completes their input.
+    /// </summary>
+    /// <returns>
+    /// The string representing the entire line of text entered by the user, excluding the terminating newline character.
+    /// </returns>
+    /// <exception cref="System.AggregateException">
+    /// Thrown if the underlying asynchronous operation encounters an exception.
+    /// </exception>
+    public static string ReadLine(bool intercept = false) => ReadLineAsync(intercept).Result;
+
+    /// <summary>
+    /// Reads a line of input from the console, invoking a callback action for each key press.
+    /// This method processes input character by character until the return key is pressed.
+    /// </summary>
+    /// <param name="onKeyPress">
+    /// A callback function invoked for each key press event. The function receives a <see cref="KeyEventArgs"/> object
+    /// containing information about the key event.
+    /// </param>
+    /// <param name="intercept">
+    /// A boolean value indicating whether the pressed key character should be visible in the console. If set to <c>true</c>,
+    /// characters are not displayed in the console; otherwise, they are displayed.
+    /// </param>
+    /// <returns>
+    /// A string containing the characters entered by the user, excluding the return key.
+    /// </returns>
+    public static string ReadLine(Action<KeyEventArgs> onKeyPress, bool intercept = false) {
+        var sb = new StringBuilder();
+
+        KeyEventArgs key;
+        
+        do {
+            // read the key press
+            key = ReadKey(intercept);
+            
+            // invoke the action
+            onKeyPress(key);
+            
+            // append the character to the string builder if not intercepted
+            sb.Append(key.Char);
+        }
+        while (key.Key != KeyCode.RETURN);
+        
+        WriteLine();
+        
+        return sb.ToString();
+    }
     
+    #endregion
+
+    #region Primitives Input Dialogue
+
     /// <summary>
     /// Reads a 64-bit integer value from the console and validates it using an optional validator function.
     /// Continues prompting the user until a valid input is provided or an exception occurs.
@@ -43,14 +253,15 @@ public static partial class NKConsole {
     /// </exception>
     public static long ReadLong(Func<long, string?>? validator = null, bool reply = true, NKStyle style = default) {
         validator ??= _ => null;
-        style = style == default ? new NKStyle(NKColor.Default, NKColor.Default) : style;
-        
+        style     =   style == default ? new NKStyle(NKColor.Default, NKColor.Default) : style;
+
         while (true) {
-            
-            string? s = Std.ReadLine();
-            
+            string? s = Stdio.ReadLine();
+
             if (s == null) {
-                if (reply) WriteLine("Invalid input.", style);
+                if (reply)
+                    WriteLine("Invalid input.", style);
+
                 continue;
             }
 
@@ -60,20 +271,28 @@ public static partial class NKConsole {
                 i = long.Parse(s);
             }
             catch (FormatException) {
-                if (reply) WriteLine("Invalid input. Please enter a valid integer.", style);
+                if (reply)
+                    WriteLine("Invalid input. Please enter a valid integer.", style);
+
                 continue;
             }
             catch (OverflowException) {
-                if (reply) WriteLine("Input overflow. Please enter a valid integer.", style);
+                if (reply)
+                    WriteLine("Input overflow. Please enter a valid integer.", style);
+
                 continue;
             }
-            
+
             var res = validator(i);
-            if (res == null) return i;
-            if (reply) WriteLine(res, style);
+
+            if (res == null)
+                return i;
+
+            if (reply)
+                WriteLine(res, style);
         }
     }
-    
+
     /// <summary>
     /// Reads a 32-bit integer value from the console and validates it using an optional validator function.
     /// Continues prompting the user until a valid input is provided or an exception occurs.
@@ -90,14 +309,15 @@ public static partial class NKConsole {
     /// </exception>
     public static int ReadInt(Func<int, string?>? validator = null, bool reply = true, NKStyle style = default) {
         validator ??= _ => null;
-        style = style == default ? new NKStyle(NKColor.Default, NKColor.Default) : style;
-        
+        style     =   style == default ? new NKStyle(NKColor.Default, NKColor.Default) : style;
+
         while (true) {
-            
-            string? s = Std.ReadLine();
-            
+            string? s = Stdio.ReadLine();
+
             if (s == null) {
-                if (reply) WriteLine("Invalid input.", style);
+                if (reply)
+                    WriteLine("Invalid input.", style);
+
                 continue;
             }
 
@@ -107,20 +327,28 @@ public static partial class NKConsole {
                 i = int.Parse(s);
             }
             catch (FormatException) {
-                if (reply) WriteLine("Invalid input. Please enter a valid integer.", style);
+                if (reply)
+                    WriteLine("Invalid input. Please enter a valid integer.", style);
+
                 continue;
             }
             catch (OverflowException) {
-                if (reply) WriteLine("Input overflow. Please enter a valid integer.", style);
+                if (reply)
+                    WriteLine("Input overflow. Please enter a valid integer.", style);
+
                 continue;
             }
-            
+
             var res = validator(i);
-            if (res == null) return i;
-            if (reply) WriteLine(res, style);
+
+            if (res == null)
+                return i;
+
+            if (reply)
+                WriteLine(res, style);
         }
     }
-    
+
     /// <summary>
     /// Reads a 16-bit integer value from the console and validates it using an optional validator function.
     /// Continues prompting the user until a valid input is provided or an exception occurs.
@@ -137,14 +365,15 @@ public static partial class NKConsole {
     /// </exception>
     public static short ReadShort(Func<short, string?>? validator = null, bool reply = true, NKStyle style = default) {
         validator ??= _ => null;
-        style = style == default ? new NKStyle(NKColor.Default, NKColor.Default) : style;
-        
+        style     =   style == default ? new NKStyle(NKColor.Default, NKColor.Default) : style;
+
         while (true) {
-            
-            string? s = Std.ReadLine();
-            
+            string? s = Stdio.ReadLine();
+
             if (s == null) {
-                if (reply) WriteLine("Invalid input.", style);
+                if (reply)
+                    WriteLine("Invalid input.", style);
+
                 continue;
             }
 
@@ -154,20 +383,28 @@ public static partial class NKConsole {
                 i = short.Parse(s);
             }
             catch (FormatException) {
-                if (reply) WriteLine("Invalid input. Please enter a valid integer.", style);
+                if (reply)
+                    WriteLine("Invalid input. Please enter a valid integer.", style);
+
                 continue;
             }
             catch (OverflowException) {
-                if (reply) WriteLine("Input overflow. Please enter a valid integer.", style);
+                if (reply)
+                    WriteLine("Input overflow. Please enter a valid integer.", style);
+
                 continue;
             }
-            
+
             var res = validator(i);
-            if (res == null) return i;
-            if (reply) WriteLine(res, style);
+
+            if (res == null)
+                return i;
+
+            if (reply)
+                WriteLine(res, style);
         }
     }
-    
+
     /// <summary>
     /// Reads an 8-bit integer value from the console and validates it using an optional validator function.
     /// Continues prompting the user until a valid input is provided or an exception occurs.
@@ -184,14 +421,15 @@ public static partial class NKConsole {
     /// </exception>
     public static byte ReadByte(Func<byte, string?>? validator = null, bool reply = true, NKStyle style = default) {
         validator ??= _ => null;
-        style = style == default ? new NKStyle(NKColor.Default, NKColor.Default) : style;
-        
+        style     =   style == default ? new NKStyle(NKColor.Default, NKColor.Default) : style;
+
         while (true) {
-            
-            string? s = Std.ReadLine();
-            
+            string? s = Stdio.ReadLine();
+
             if (s == null) {
-                if (reply) WriteLine("Invalid input.", style);
+                if (reply)
+                    WriteLine("Invalid input.", style);
+
                 continue;
             }
 
@@ -201,17 +439,25 @@ public static partial class NKConsole {
                 i = byte.Parse(s);
             }
             catch (FormatException) {
-                if (reply) WriteLine("Invalid input. Please enter a valid integer.", style);
+                if (reply)
+                    WriteLine("Invalid input. Please enter a valid integer.", style);
+
                 continue;
             }
             catch (OverflowException) {
-                if (reply) WriteLine("Input overflow. Please enter a valid integer.", style);
+                if (reply)
+                    WriteLine("Input overflow. Please enter a valid integer.", style);
+
                 continue;
             }
-            
+
             var res = validator(i);
-            if (res == null) return i;
-            if (reply) WriteLine(res, style);
+
+            if (res == null)
+                return i;
+
+            if (reply)
+                WriteLine(res, style);
         }
     }
 
@@ -228,20 +474,25 @@ public static partial class NKConsole {
     /// <returns>The validated string input provided by the user.</returns>
     public static string ReadString(Func<string, string?>? validator = null, bool reply = true, NKStyle? style = null) {
         validator ??= _ => null;
-        style ??= new NKStyle(NKColor.Default, NKColor.Default);
-        
+        style     ??= new NKStyle(NKColor.Default, NKColor.Default);
+
         while (true) {
-            
-            string? s = Std.ReadLine();
-            
+            string? s = Stdio.ReadLine();
+
             if (s == null) {
-                if (reply) WriteLine("Invalid input.", style.Value);
+                if (reply)
+                    WriteLine("Invalid input.", style.Value);
+
                 continue;
             }
-            
+
             var res = validator(s);
-            if (res == null) return s;
-            if (reply) WriteLine(res, style.Value);
+
+            if (res == null)
+                return s;
+
+            if (reply)
+                WriteLine(res, style.Value);
         }
     }
 
@@ -257,60 +508,60 @@ public static partial class NKConsole {
     /// <param name="style">The style of the invalid input messages.</param>
     /// <returns>The validated string input provided by the user.</returns>
     public static bool ReadBool(BoolStrings boolStrings = ALL, bool reply = true, NKStyle? style = null) {
-
         style ??= new NKStyle(NKColor.Default, NKColor.Default);
-        
+
         while (true) {
-            
-            string? s = Std.ReadLine();
-            
+            string? s = Stdio.ReadLine();
+
             if (s == null) {
-                if (reply) WriteLine("Invalid input.", style.Value);
+                if (reply)
+                    WriteLine("Invalid input.", style.Value);
+
                 continue;
             }
 
             var res = ParseBool(s, boolStrings);
 
-            if (res.IsT0) 
+            if (res.IsT0)
                 return res.AsT0;
 
-            if (reply) WriteLine(res.AsT1, style.Value);
+            if (reply)
+                WriteLine(res.AsT1, style.Value);
         }
     }
-    
+
     [Pure]
     [JetBrains.Annotations.Pure]
     private static OneOf<bool, string> ParseBool(string s, BoolStrings b) {
         return s.ToLower() switch {
-            "true"  => b.GetHasTrueFalse() ? true  : InvBoolMsg(b),
+            "true"  => b.GetHasTrueFalse() ? true : InvBoolMsg(b),
             "false" => b.GetHasTrueFalse() ? false : InvBoolMsg(b),
-            "t"     => b.GetHasTF()        ? true  : InvBoolMsg(b),
-            "f"     => b.GetHasTF()        ? false : InvBoolMsg(b),
-            "yes"   => b.GetHasYesNo()     ? true  : InvBoolMsg(b),
-            "no"    => b.GetHasYesNo()     ? false : InvBoolMsg(b),
-            "y"     => b.GetHasYN()        ? true  : InvBoolMsg(b),
-            "n"     => b.GetHasYN()        ? false : InvBoolMsg(b),
-            "on"    => b.GetHasOnOff()     ? true  : InvBoolMsg(b),
-            "off"   => b.GetHasOnOff()     ? false : InvBoolMsg(b),
-            "1"     => b.GetHasZeroOne()   ? true  : InvBoolMsg(b),
-            "0"     => b.GetHasZeroOne()   ? false : InvBoolMsg(b),
-            _ => InvBoolMsg(b)
+            "t"     => b.GetHasTF() ? true : InvBoolMsg(b),
+            "f"     => b.GetHasTF() ? false : InvBoolMsg(b),
+            "yes"   => b.GetHasYesNo() ? true : InvBoolMsg(b),
+            "no"    => b.GetHasYesNo() ? false : InvBoolMsg(b),
+            "y"     => b.GetHasYN() ? true : InvBoolMsg(b),
+            "n"     => b.GetHasYN() ? false : InvBoolMsg(b),
+            "on"    => b.GetHasOnOff() ? true : InvBoolMsg(b),
+            "off"   => b.GetHasOnOff() ? false : InvBoolMsg(b),
+            "1"     => b.GetHasZeroOne() ? true : InvBoolMsg(b),
+            "0"     => b.GetHasZeroOne() ? false : InvBoolMsg(b),
+            _       => InvBoolMsg(b)
         };
     }
-    
-    [Pure]
-    [JetBrains.Annotations.Pure]
-    private static string InvBoolMsg(BoolStrings b) 
-        => $"Invalid input. Please enter a valid boolean. (Allowed: {ToString(b)})";
 
     [Pure]
     [JetBrains.Annotations.Pure]
-    private static string ToString(this BoolStrings b) => 
-        b is ALL ? "true, false, yes, no, y, n, on, off, t, f, 1, 0" : b.ToString().ToLower().Replace('_', ',');
+    private static string InvBoolMsg(BoolStrings b) => $"Invalid input. Please enter a valid boolean. (Allowed: {ToString(b)})";
 
-    
+    [Pure]
+    [JetBrains.Annotations.Pure]
+    private static string ToString(this BoolStrings b) => b is ALL ? "true, false, yes, no, y, n, on, off, t, f, 1, 0" : b.ToString().ToLower().Replace('_', ',');
+
+    #endregion
+
     #region INPUT INTERCEPTION
-    
+
     /// <summary>
     /// Activates the input interception mechanism and initiates the input handling thread.
     /// Once initiated, the console will begin to listen for user inputs such as keys, mouse events,
@@ -322,17 +573,17 @@ public static partial class NKConsole {
     public static void StartInputInterception() {
         if (InterceptInput)
             throw new InvalidOperationException("Input interception is already enabled.");
-        
+
         InterceptInput = true;
         LOGGER.Info("Starting input interception...");
-        
+
         InputDriver.Key      += OnKey;
         InputDriver.Mouse    += OnMouse;
         InputDriver.FocusIn  += OnFocusIn;
         InputDriver.FocusOut += OnFocusOut;
         InputDriver.Paste    += OnPaste;
         InputDriver.VTQuery  += OnVTQuery;
-        
+
         InputDriver.Start();
     }
 
@@ -344,9 +595,9 @@ public static partial class NKConsole {
     public static void StopInputInterception() {
         InterceptInput = false;
         LOGGER.Info("Stopping input interception...");
-        
+
         InputDriver.Stop();
-        
+
         InputDriver.Key      -= OnKey;
         InputDriver.Mouse    -= OnMouse;
         InputDriver.FocusIn  -= OnFocusIn;
@@ -355,12 +606,12 @@ public static partial class NKConsole {
         InputDriver.VTQuery  -= OnVTQuery;
     }
 
-    private static void OnKey(KeyEventArgs k)        => Key(k);
-    private static void OnMouse(MouseEventArgs m)    => Mouse(m);
-    private static void OnFocusIn()                  => FocusIn();
-    private static void OnFocusOut()                 => FocusOut();
-    private static void OnPaste(string s)            => Paste(s);
-    private static void OnVTQuery(VTQuery r) => VTQueryResponse(r);
+    private static void OnKey(KeyEventArgs     k) => Key(k);
+    private static void OnMouse(MouseEventArgs m) => Mouse(m);
+    private static void OnFocusIn()               => FocusIn();
+    private static void OnFocusOut()              => FocusOut();
+    private static void OnPaste(string    s)      => Paste(s);
+    private static void OnVTQuery(VTQuery r)      => VTQueryResponse(r);
 
     #endregion
 
@@ -387,32 +638,33 @@ public static partial class NKConsole {
         if (string.IsNullOrEmpty(sequence)) {
             throw new ArgumentException("Sequence cannot be null or empty.", nameof(sequence));
         }
-    
-        var buffer = new StringBuilder();
+
+        var buffer        = new StringBuilder();
         var sequenceIndex = 0;
-    
+
         while (true) {
-            var key = Std.ReadKey(intercept);
-            var ch = key.KeyChar;
-        
+            var key = Stdio.ReadKey(intercept);
+            var ch  = key.KeyChar;
+
             buffer.Append(ch);
-        
+
             // Check if the current character matches the expected character in the sequence
             if (ch == sequence[sequenceIndex]) {
                 sequenceIndex++;
-            
+
                 // If the entire sequence matched, return the content before it
-                if (sequenceIndex != sequence.Length) 
+                if (sequenceIndex != sequence.Length)
                     continue;
-                
+
                 // Remove the sequence from the end of the buffer
                 buffer.Length -= sequence.Length;
+
                 return buffer.ToString();
             }
 
             // Reset sequence matching if the character doesn't match
             sequenceIndex = 0;
-            
+
             // Check if the current character is the start of the sequence
             if (ch == sequence[0]) {
                 sequenceIndex = 1;
@@ -436,15 +688,16 @@ public static partial class NKConsole {
     /// A string containing all characters read before encountering a specified delimiter character.
     /// </returns>
     public static string ReadUntil(out char last, bool intercept = false, params char[] oneOf) {
-        var key = Std.ReadKey(intercept);
-        string s = "";
+        var    key = Stdio.ReadKey(intercept);
+        string s   = "";
 
         while (!oneOf.Contains(key.KeyChar)) {
-            s += key.KeyChar;
-            key = Std.ReadKey(intercept);
+            s   += key.KeyChar;
+            key =  Stdio.ReadKey(intercept);
         }
 
         last = key.KeyChar;
+
         return s;
     }
 
@@ -459,12 +712,12 @@ public static partial class NKConsole {
     /// </param>
     /// <returns>A string containing all characters entered up to, but not including, the specified character.</returns>
     public static string ReadUntil(char c, bool intercept = false) {
-        var key = Std.ReadKey(intercept);
-        string s = "";
+        var    key = Stdio.ReadKey(intercept);
+        string s   = "";
 
         while (key.KeyChar != c) {
-            s += key.KeyChar;
-            key = Std.ReadKey(intercept);
+            s   += key.KeyChar;
+            key =  Stdio.ReadKey(intercept);
         }
 
         return s;
@@ -480,21 +733,22 @@ public static partial class NKConsole {
     /// </summary>
     public static async Task<bool> GetAltBufStateAsync() {
         OutputDriver.Write(EscapeCodes.REQUEST_ALTBUF_STATE);
-        
+
         // If multithreaded input interception is not enabled
         if (!InterceptInput) {
             var res = ReadUntil('y');
-            return res[8] == '1'; 
+
+            return res[8] == '1';
         }
-        
+
         var tcs = new TaskCompletionSource<bool>();
-        
+
         VTQueryResponseHandler? h = null;
-        
+
         h = a => {
-            if (a.Type != VTQueryType.DEC || a.DecMode == EscapeCodes.DecMode.ALTERNATE_BUFFER) 
+            if (a.Type != VTQueryType.DEC || a.DecMode == EscapeCodes.DecMode.ALTERNATE_BUFFER)
                 return;
-            
+
             VTQueryResponse -= h;
             tcs.SetResult(a.DecResponse == DecReqResponseType.ENABLED);
         };
@@ -522,8 +776,7 @@ public static partial class NKConsole {
     /// A tuple where the first value is the width in pixels and the second
     /// value is the height in pixels of the console window.
     /// </returns>
-    public static async Task<Size2D> GetBuffSizePxAsync() => 
-        await GetWinReqAsync(EscapeCodes.REPORT_BUFF_SIZE_PX, EscapeCodes.WinOpts.BUFF_SIZE_PX);
+    public static async Task<Size2D> GetBuffSizePxAsync() => await GetWinReqAsync(EscapeCodes.REPORT_BUFF_SIZE_PX, EscapeCodes.WinOpts.BUFF_SIZE_PX);
 
     /// <summary>
     /// Retrieves the current size of the console window in pixels as a tuple containing
@@ -543,8 +796,7 @@ public static partial class NKConsole {
     /// A tuple where the first value is the width in pixels and the second
     /// value is the height in pixels of the console window.
     /// </returns>
-    public static async Task<Size2D> GetCellSizePxAsync() => 
-        await GetWinReqAsync(EscapeCodes.REPORT_CHAR_CELL_SIZE_PX, EscapeCodes.WinOpts.CHAR_CELL_SIZE_PX);
+    public static async Task<Size2D> GetCellSizePxAsync() => await GetWinReqAsync(EscapeCodes.REPORT_CHAR_CELL_SIZE_PX, EscapeCodes.WinOpts.CHAR_CELL_SIZE_PX);
 
     /// <summary>
     /// Retrieves the current size of the console window in pixels as a tuple containing
@@ -564,31 +816,30 @@ public static partial class NKConsole {
     /// A tuple where the first value is the width in pixels and the second
     /// value is the height in pixels of the console window.
     /// </returns>
-    public static async Task<Size2D> GetBuffSizeChAsync() => 
-        await GetWinReqAsync(EscapeCodes.REPORT_BUFF_SIZE_CH, EscapeCodes.WinOpts.BUFF_SIZE_CH);
+    public static async Task<Size2D> GetBuffSizeChAsync() => await GetWinReqAsync(EscapeCodes.REPORT_BUFF_SIZE_CH, EscapeCodes.WinOpts.BUFF_SIZE_CH);
 
     private static async Task<Size2D> GetWinReqAsync(string escSeq, EscapeCodes.WinOpts type) {
-        
         // If input interception is not enabled
         if (!InterceptInput) {
             OutputDriver.Write(escSeq);
-            var res = ReadUntil('t', true);
+            var res   = ReadUntil('t', true);
             var split = res.Split(';');
+
             return new Size2D(int.Parse(split[2]), int.Parse(split[1]));
         }
-        
+
         InputDriver.RequestVTQuery(VTQuery.RequestWin(type));
-        
+
         var tcs = new TaskCompletionSource<Size2D>();
-        
+
         VTQueryResponseHandler? h = null;
-        
+
         h = a => {
             if (a.Type != VTQueryType.WIN || a.WinMode != type)
                 return;
-            
+
             VTQueryResponse -= h;
-            
+
             var res = a.WinResponse;
             tcs.SetResult(new Size2D(res.X, res.Y));
         };

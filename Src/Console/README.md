@@ -88,6 +88,6 @@ try
 catch (Exception ex)
 {
     // Beautiful formatted output in the terminal
-    NKDebug.Formatter.PrintException(ex);
+    ExceptionFormatter.Print(ex);
 }
 ```

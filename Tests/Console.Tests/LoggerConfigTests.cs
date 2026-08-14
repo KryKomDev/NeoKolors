@@ -3,7 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
-using static NeoKolors.Console.LoggerLevel;
+using static NeoKolors.Console.NKLogLevel;
 
 namespace NeoKolors.Console.Tests;
 

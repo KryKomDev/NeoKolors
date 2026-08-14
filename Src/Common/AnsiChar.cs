@@ -3,7 +3,7 @@
 
 namespace NeoKolors.Common;
 
-public record struct AnsiChar {
+public readonly record struct AnsiChar {
     public char    Char  { get; }
     public NKStyle Style { get; }
 

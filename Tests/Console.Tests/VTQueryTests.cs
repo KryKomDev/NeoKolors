@@ -1,6 +1,5 @@
 using NeoKolors.Common;
 using NeoKolors.Console.Ansi;
-using NeoKolors.Console.Events;
 
 namespace NeoKolors.Console.Tests.Ansi;
 

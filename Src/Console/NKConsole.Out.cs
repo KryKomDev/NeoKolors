@@ -685,7 +685,7 @@ public static partial class NKConsole {
         int cols = header.Length;
         
         // get properties that match the header
-        var props = t.GetProperties().Where(p => header.Contains(p.Name)).ToArray();
+        var props = t.GetProperties().Where(p => header.AsEnumerable().Contains(p.Name)).ToArray();
         
         // check if all properties were found
         if (props.Length != cols) 
@@ -769,7 +769,7 @@ public static partial class NKConsole {
         int cols = header.Length;
         
         // get properties that match the header
-        var props = t.GetProperties().Where(p => header.Contains(p.Name)).ToArray();
+        var props = t.GetProperties().Where(p => header.AsEnumerable().Contains(p.Name)).ToArray();
         
         // check if all properties were found
         if (props.Length != cols) 

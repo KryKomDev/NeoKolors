@@ -9,26 +9,29 @@ using static System.Math;
 namespace NeoKolors.Common;
 
 public readonly struct NKPalette : IFormattable {
-    
-    public uint this[int index] => _colors[index];
+
     private readonly NKColor[] _colors;
-    public NKColor[] Colors => _colors;
-    public int Length => _colors.Length;
-    public string Preview => ToPreview();
-    
-    public NKColor Base => _colors[0];
-    public NKColor Background => _colors[1];
-    public NKColor Text => _colors[2];
+
+    public NKColor[] Colors  => _colors;
+    public int       Length  => _colors.Length;
+    public string    Preview => ToPreview();
+
+    public NKColor Base          => _colors[0];
+    public NKColor Background    => _colors[1];
+    public NKColor Text          => _colors[2];
     public NKColor TextSecondary => _colors[3];
-    public NKColor Accent => _colors[4];
-    
-    
+    public NKColor Accent        => _colors[4];
+
+    public uint this[int index] => _colors[index];
+
     /// <summary>
     /// creates a new, ordered color palette from a set of integers, where the bytes mean AARRGGBB
     /// </summary>
     /// <param name="colors">the field of integers representing argb colors</param>
     public NKPalette(NKColor[] colors) {
-        if (colors.Length < 5) throw new ArgumentException("Any palette must contain at least 5 colors.");
+        if (colors.Length < 5)
+            throw new ArgumentException("Any palette must contain at least 5 colors.");
+
         _colors = colors;
     }
 
@@ -36,8 +39,9 @@ public readonly struct NKPalette : IFormattable {
     /// creates a new, ordered color palette from a set of colors
     /// </summary>
     public NKPalette(Color[] colors) {
-        if (colors.Length < 5) throw new ArgumentException("Any palette must contain at least 5 colors.");
-        
+        if (colors.Length < 5)
+            throw new ArgumentException("Any palette must contain at least 5 colors.");
+
         _colors = new NKColor[colors.Length];
 
         for (int i = 0; i < colors.Length; i++) {
@@ -50,11 +54,11 @@ public readonly struct NKPalette : IFormattable {
     /// </summary>
     /// <param name="url">the string</param>
     public NKPalette(string url) {
-
         _colors = new NKColor[(url.Length + 1) / 7];
 
-        if (_colors.Length < 5) throw new ArgumentException("Any palette must contain at least 5 colors.");
-        
+        if (_colors.Length < 5)
+            throw new ArgumentException("Any palette must contain at least 5 colors.");
+
         for (int i = 0; i < url.Length; i += 7) {
             string colorRaw = url.Substring(i, 6);
 
@@ -69,7 +73,7 @@ public readonly struct NKPalette : IFormattable {
         foreach (var c in _colors) {
             Console.Write("● ".AddColor(c));
         }
-        
+
         Console.Write("\n");
     }
 
@@ -81,7 +85,7 @@ public readonly struct NKPalette : IFormattable {
         foreach (var c in _colors) {
             print(c);
         }
-        
+
         Console.Write("\n");
     }
 
@@ -91,8 +95,9 @@ public readonly struct NKPalette : IFormattable {
     /// <param name="seed">seed for random</param>
     /// <param name="colorCount">how many colors will the palette contain</param>
     public static NKPalette GeneratePalette(int seed, int colorCount = 10) {
-        if (colorCount < 5) throw new ArgumentException("Any palette must contain at least 5 colors.");
-        
+        if (colorCount < 5)
+            throw new ArgumentException("Any palette must contain at least 5 colors.");
+
         var palette = new NKPalette(new NKColor[colorCount]);
 
         var rnd = new Random(seed);
@@ -101,12 +106,12 @@ public readonly struct NKPalette : IFormattable {
         var b = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
         var c = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
         var d = (rnd.NextDouble(), rnd.NextDouble(), rnd.NextDouble());
-        
+
         for (int i = 0; i < colorCount; i++) {
             Color color = GenerateColorAtX(a, b, c, d, (float)i / colorCount * 3);
             palette._colors[i] = color.R << 16 | color.G << 8 | color.B;
         }
-        
+
         return palette;
     }
 
@@ -118,20 +123,22 @@ public readonly struct NKPalette : IFormattable {
         (double R, double G, double B) a,
         (double R, double G, double B) b,
         (double R, double G, double B) c,
-        (double R, double G, double B) d, double x) 
-    {
+        (double R, double G, double B) d,
+        double                         x
+    ) {
         double re = Cos(2 * PI * (c.R + d.R * 2 * x));
         double gr = Cos(2 * PI * (c.G + d.G * 2 * x));
         double bl = Cos(2 * PI * (c.B + d.B * 2 * x));
-        
-        
+
+
         return Color.FromArgb(
             Normalize(a.R + b.R * re),
             Normalize(a.G + b.G * gr),
-            Normalize(a.B + b.B * bl));
+            Normalize(a.B + b.B * bl)
+        );
     }
 
-    private static byte Normalize(double d) => (byte)((d / 3 + 1f/3f) * 255);
+    private static byte Normalize(double d) => (byte)((d / 3 + 1f / 3f) * 255);
 
     /// <summary>
     /// Converts the NKPalette instance to its string representation.
@@ -159,10 +166,11 @@ public readonly struct NKPalette : IFormattable {
     /// <returns>A string representation of the palette, where colors are concatenated using the "#r" format.</returns>
     public string ToString(string? format, IFormatProvider? formatProvider) {
         format ??= "p";
+
         return format switch {
             "p" or "P" or "Preview" => Preview,
-            "u" or "U" or "Url" => ToUrl(),
-            _ => ToString()
+            "u" or "U" or "Url"     => ToUrl(),
+            _                       => ToString()
         };
     }
 }

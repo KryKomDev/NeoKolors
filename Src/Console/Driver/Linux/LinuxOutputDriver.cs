@@ -3,9 +3,7 @@
 // Copyright (c) 2026 KryKom
 // //
 
-using NeoKolors.Console.Driver.Dotnet;
-
-namespace NeoKolors.Console.Driver.Linux;
+namespace NeoKolors.Console;
 
 public class LinuxOutputDriver : DotnetOutputDriver {
     

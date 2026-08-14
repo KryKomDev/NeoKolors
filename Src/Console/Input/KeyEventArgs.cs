@@ -3,10 +3,9 @@
 // Copyright (c) 2026 KryKom
 //
 
-using NeoKolors.Console.Driver.Windows;
 using NeoKolors.Extensions;
 
-namespace NeoKolors.Console.Input;
+namespace NeoKolors.Console;
 
 /// <summary>
 /// Represents information about a keyboard event, including the pressed key, associated character,

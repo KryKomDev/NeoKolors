@@ -9,7 +9,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace NeoKolors.Console.Driver.Windows;
+namespace NeoKolors.Console;
 
 internal static partial class WinImports {
     

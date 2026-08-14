@@ -3,7 +3,7 @@
 // Copyright (c) 2026 KryKom
 //
 
-namespace NeoKolors.Console.Driver.Windows;
+namespace NeoKolors.Console;
 
 internal partial class WinImports {
     

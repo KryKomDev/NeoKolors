@@ -4,28 +4,28 @@
     "net10.0": {
       "JetBrains.Annotations": {
         "type": "Direct",
-        "requested": "[2025.2.4, )",
-        "resolved": "2025.2.4",
-        "contentHash": "TwbgxAkXxY+vNEhNVx/QXjJ4vqxmepOjsgRvvImQPbHkHMMb4W+ahL3laMsxXKtNT7iMy+E1B3xkqao2hf1n3A=="
+        "requested": "[2026.2.0, )",
+        "resolved": "2026.2.0",
+        "contentHash": "drvAEaI7Xf4wU6dx4UTB9MoZWXZlraaQ0qoeThPQ411FxNhId7QdUTukIC9I8aUHP0ycAaGwZNKqSvfOZQvUlg=="
       },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
-        "requested": "[18.6.0, )",
-        "resolved": "18.6.0",
-        "contentHash": "kAIBt0MsYR0o2RULmlW5BhQ1ha50aGEgLKG4f1p0kePBGLJCprqs3S+NxRrYN8UH7mSQRPKpeiH9mwPMEKUObQ==",
+        "requested": "[18.8.1, )",
+        "resolved": "18.8.1",
+        "contentHash": "dknJL3/9Y3t4XuCBqnc0PevPxgLsUMmVhjwup/b1HNovA8zWcj3XsfIf7c6p05363DWcqL7X/YhDL9B+Zymv1w==",
         "dependencies": {
-          "Microsoft.CodeCoverage": "18.6.0",
-          "Microsoft.TestPlatform.TestHost": "18.6.0"
+          "Microsoft.CodeCoverage": "18.8.1",
+          "Microsoft.TestPlatform.TestHost": "18.8.1"
         }
       },
       "SkiaSharp": {
         "type": "Direct",
-        "requested": "[3.119.4, )",
-        "resolved": "3.119.4",
-        "contentHash": "53NOSUZ1Us+91Sm0uCkIivh/k7jOowRErZT2sIWwPFN9mLUvdxnE6rS4sWo4255+Rd2MWUSF+j0NMZHD6Cke+Q==",
+        "requested": "[4.150.1, )",
+        "resolved": "4.150.1",
+        "contentHash": "5v3T8X1N62Dp+AkPO70GNBNS/NRBPGMOTiN+Prg33sZAcm/Ug3YOAH+3RTj/jxJV8NGTJs2idGpC2Qdae2mGLQ==",
         "dependencies": {
-          "SkiaSharp.NativeAssets.Win32": "3.119.4",
-          "SkiaSharp.NativeAssets.macOS": "3.119.4"
+          "SkiaSharp.NativeAssets.Win32": "4.150.1",
+          "SkiaSharp.NativeAssets.macOS": "4.150.1"
         }
       },
       "xunit": {
@@ -47,40 +47,59 @@
       },
       "Implyzer": {
         "type": "Transitive",
-        "resolved": "2026.3.1",
-        "contentHash": "c8x44K8+eIfu4cayqvvJ4lMj3RQlNcBcoS3H8E1flNAlGbcueT40RxTaw5XTQD1io8bY7vVOFLQDWRX7y6E6Rg=="
+        "resolved": "2026.4.4",
+        "contentHash": "gZu9L6PKnbHxqOHw4rCN6fE1AOS0D+EvQ91fm9vnOK3ej5hT3VXj8M0I2tMrQn+ItrHR9zRZUkHAbfnXba9V6g=="
+      },
+      "MessagePack": {
+        "type": "Transitive",
+        "resolved": "3.1.8",
+        "contentHash": "Qk2q+9FVxnMSp+NQ9y3SLz3HqWe7Rg3KRMHhBX28FkKUoOeP9YIU86mA4pFOxDDjUIRA9e7Ssbxs/LwWUcAzPw==",
+        "dependencies": {
+          "MessagePack.Annotations": "3.1.8",
+          "MessagePackAnalyzer": "3.1.8",
+          "Microsoft.NET.StringTools": "17.11.4"
+        }
+      },
+      "MessagePack.Annotations": {
+        "type": "Transitive",
+        "resolved": "3.1.8",
+        "contentHash": "SitOtZ4tOlAZZPF7p52M7143F+Cuz7o/aU0MrtAXX0+ZkPXzDNroOFhzzE2ogMFThsoEW/E6akXVVcBFM9ZKaw=="
+      },
+      "MessagePackAnalyzer": {
+        "type": "Transitive",
+        "resolved": "3.1.8",
+        "contentHash": "Vm4g0cR4YRKRchEOmMJ0uVFU6yxdg7cJa2KHv3SUAHEsdYKvMpHMF5A1hZfsix89ymD5cmuzRnw9a6dKMcvq+Q=="
       },
       "Metriks": {
         "type": "Transitive",
-        "resolved": "2026.3.0-rc1",
-        "contentHash": "fPEWNCxKN6GN1U+svEgsdrx4N2apGWWIfUmktrsF4gEk9xW+KztJlPM+OQBgyr9GdeXfJ7bATQ3gvGgZTqhcNQ==",
+        "resolved": "2026.3.0",
+        "contentHash": "4eWxns2gvXbpKzq98g+TXwEVeDq4PTQg7oQdqgn1uTVvwxnMJMOhkp1yWCfVlwpOw1nPpzu7Kj9UEXFuDKs6SQ==",
         "dependencies": {
-          "JetBrains.Annotations": "2025.2.4"
+          "JetBrains.Annotations": "2026.2.0"
         }
       },
       "Microsoft.CodeCoverage": {
         "type": "Transitive",
-        "resolved": "18.6.0",
-        "contentHash": "bkmCXn/65Cd0LdO2zTb/ValGAJ1H8y/CgYOiBb3jsDyHI3Y1ljKx6RBvhvn3e5D/4R4I00RRwLf+Bd2Sn6bJjA=="
+        "resolved": "18.8.1",
+        "contentHash": "Eclse/ZZjr4lmWzZFNN9h/OluhKL+SK/QbUyKUewgX139aGeyMEO/DkMPwuFs2MixvanTnz6891rF8UHDg+W4Q=="
+      },
+      "Microsoft.NET.StringTools": {
+        "type": "Transitive",
+        "resolved": "17.11.4",
+        "contentHash": "mudqUHhNpeqIdJoUx2YDWZO/I9uEDYVowan89R6wsomfnUJQk6HteoQTlNjZDixhT2B4IXMkMtgZtoceIjLRmA=="
       },
       "Microsoft.TestPlatform.ObjectModel": {
         "type": "Transitive",
-        "resolved": "18.6.0",
-        "contentHash": "gQTW4BIfM2ZLxixo9ITXoulLKjn20FiiHtqTsx9PENqTrX7368ZeJ5L0QZJyReXDWORPRV8jXwZR6Aar8JOyaA=="
+        "resolved": "18.8.1",
+        "contentHash": "qLbktNB1+b1XZLNJBTzaWVVJAd6PEzD7cgD406geMb6PcFZhp3EDNa1tctWx1+mtMU6MP/6ozVvFPC9vs2a9rw=="
       },
       "Microsoft.TestPlatform.TestHost": {
         "type": "Transitive",
-        "resolved": "18.6.0",
-        "contentHash": "em1eLz5Q46+hsCtAXdXggWAPd9gQyT4ngdsQ7k1eWvQgpsjtS/wAOJ/5TteieFdiAvrEq1iVn00LtusAxRaVmQ==",
+        "resolved": "18.8.1",
+        "contentHash": "FaQHPDTUOcE+SFTjssNPfrub2lT9Zyon4J2W/KLHt/efLJACb1TCeWXyOgh0D/4Q1e4n+S3E6mOKud+9nLZlEA==",
         "dependencies": {
-          "Microsoft.TestPlatform.ObjectModel": "18.6.0",
-          "Newtonsoft.Json": "13.0.3"
+          "Microsoft.TestPlatform.ObjectModel": "18.8.1"
         }
-      },
-      "Newtonsoft.Json": {
-        "type": "Transitive",
-        "resolved": "13.0.3",
-        "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
       },
       "OneOf": {
         "type": "Transitive",
@@ -89,13 +108,13 @@
       },
       "SkiaSharp.NativeAssets.macOS": {
         "type": "Transitive",
-        "resolved": "3.119.4",
-        "contentHash": "fgBOWEqbY012x7gMfJU4ezgz6dfhJb30Z6YdW35h85Zoe39+a8YNbAAwL29ihPfWoppg5AjvyKNzD1oCvlqWwA=="
+        "resolved": "4.150.1",
+        "contentHash": "r755HVwaHZhyf1clWjrM2/RoOZYCzkQEmE9pu/mVsebPejWu52niNPUwtfyf112qoF0PIk6OndqVOUoITj6TwQ=="
       },
       "SkiaSharp.NativeAssets.Win32": {
         "type": "Transitive",
-        "resolved": "3.119.4",
-        "contentHash": "XOpbx/4CReO2wYsq2s6rbvdauc6dntG4Zv499sHGTJ87bwZaFXszFkwql3+FIZMc8kUPeaj3Mx2ezIJmo8a1Kg=="
+        "resolved": "4.150.1",
+        "contentHash": "qrLSL8OonbkMJdSH8heK0Jl39Y2xxZGdd7Ru4cyBXk2ITdx+Fu1sCFLmvCKmnMaYs//mlN/YSpSpOurEXErcQw=="
       },
       "xunit.abstractions": {
         "type": "Transitive",
@@ -140,18 +159,20 @@
       "neokolors.common": {
         "type": "Project",
         "dependencies": {
-          "Implyzer": "[2026.3.1, )",
-          "JetBrains.Annotations": "[2025.2.4, )",
-          "NeoKolors.Extensions": "[2026.2.0-rc2, )",
+          "Implyzer": "[2026.4.4, )",
+          "JetBrains.Annotations": "[2026.2.0, )",
+          "MessagePack": "[3.1.8, )",
+          "NeoKolors.Extensions": "[2026.3.0, )",
           "OneOf": "[3.0.271, )",
-          "SkiaSharp": "[3.119.4, )"
+          "SkiaSharp": "[4.150.1, )"
         }
       },
       "neokolors.extensions": {
         "type": "Project",
         "dependencies": {
-          "JetBrains.Annotations": "[2025.2.4, )",
-          "Metriks": "[2026.3.0-rc1, )"
+          "Implyzer": "[2026.4.4, )",
+          "JetBrains.Annotations": "[2026.2.0, )",
+          "Metriks": "[2026.3.0, )"
         }
       }
     }

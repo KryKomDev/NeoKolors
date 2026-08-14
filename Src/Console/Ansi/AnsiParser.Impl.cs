@@ -6,7 +6,6 @@
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
-using NeoKolors.Console.Input;
 
 namespace NeoKolors.Console.Ansi;
 

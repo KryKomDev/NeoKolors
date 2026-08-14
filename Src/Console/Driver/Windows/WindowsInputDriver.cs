@@ -6,10 +6,8 @@
 using System.Diagnostics;
 using Metriks;
 using NeoKolors.Console.Ansi;
-using NeoKolors.Console.Events;
-using NeoKolors.Console.Input;
 
-namespace NeoKolors.Console.Driver.Windows;
+namespace NeoKolors.Console;
 
 public sealed class WindowsInputDriver : IInputDriver<WinInputDriverConfig> {
     
@@ -73,6 +71,8 @@ public sealed class WindowsInputDriver : IInputDriver<WinInputDriverConfig> {
         if (IsRunning || _disposed) 
             return;
         
+        _input.Enable();
+        
         IsRunning    = true;
         _inputThread = new Thread(Intercept) {
             IsBackground = true,
@@ -84,6 +84,7 @@ public sealed class WindowsInputDriver : IInputDriver<WinInputDriverConfig> {
     }
 
     public void Stop() {
+        _input.Disable();
         IsRunning = false;
     }
 
@@ -251,6 +252,7 @@ public sealed class WindowsInputDriver : IInputDriver<WinInputDriverConfig> {
             _onStopped -= handler;
         }
         
+        _input.Dispose();
         _disposed = true;
     }
 }

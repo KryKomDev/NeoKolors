@@ -4,10 +4,9 @@
 //
 
 using HasFlagExtension;
-using NeoKolors.Console.Driver.Windows;
-using static NeoKolors.Console.Input.KeyModifiers;
+using static NeoKolors.Console.KeyModifiers;
 
-namespace NeoKolors.Console.Input;
+namespace NeoKolors.Console;
 
 /// <summary>
 /// Represents a set of modifier keys that can be used in combination with other keys

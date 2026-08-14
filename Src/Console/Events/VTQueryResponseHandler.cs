@@ -5,6 +5,6 @@
 
 using NeoKolors.Console.Ansi;
 
-namespace NeoKolors.Console.Events;
+namespace NeoKolors.Console;
 
 public delegate void VTQueryResponseHandler(VTQuery response);

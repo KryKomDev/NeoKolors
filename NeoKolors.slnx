@@ -2,16 +2,26 @@
 
     <!--  Libs  -->
 
-    <Folder Name="/Src/">
+    <Folder Name="/Src/Extensions/">
         <Project Path="Src/Extensions/NeoKolors.Extensions.csproj" />
+    </Folder>
+    
+    <Folder Name="/Src/Common/">
         <Project Path="Src/Common/NeoKolors.Common.csproj" />
+    </Folder>
+    
+    <Folder Name="/Src/Console/">
         <Project Path="Src/Console/NeoKolors.Console.csproj" />
+    </Folder>
+    
+    <Folder Name="/Src/Settings/">
         <Project Path="Src/Settings/NeoKolors.Settings.csproj" />
+    </Folder>
+    
+    <Folder Name="/Src/Tui/">
         <Project Path="Src/Tui/NeoKolors.Tui.csproj" />
     </Folder>
     
-    <Folder Name="/Src/Tui/" />
-
     <Folder Name="/Src/Tui/Core/">
         <Project Path="Src/Tui/Core/NeoKolors.Tui.Core.csproj" />
     </Folder>
@@ -23,6 +33,10 @@
     
     <Folder Name="/Src/Tui/Generators/">
         <Project Path="Src/Tui/Generators/NeoKolors.Tui.Generators.csproj" />
+    </Folder>
+    
+    <Folder Name="/Src/Tui/Widgets/">
+        <Project Path="Src/Tui/Widgets/NeoKolors.Tui.Widgets.csproj" />
     </Folder>
 
     <!--  Tests  -->

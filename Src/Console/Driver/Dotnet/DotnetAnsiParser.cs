@@ -4,9 +4,8 @@
 //
 
 using NeoKolors.Console.Ansi;
-using NeoKolors.Console.Input;
 
-namespace NeoKolors.Console.Driver.Dotnet;
+namespace NeoKolors.Console;
 
 /// <summary>
 /// A parser that extends <see cref="AnsiParser"/> to handle ANSI escape code

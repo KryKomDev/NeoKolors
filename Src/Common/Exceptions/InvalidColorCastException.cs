@@ -3,7 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
-namespace NeoKolors.Common.Exceptions;
+namespace NeoKolors.Common;
 
 public class InvalidColorCastException : InvalidCastException {
     public InvalidColorCastException(string message) : base(message) { }

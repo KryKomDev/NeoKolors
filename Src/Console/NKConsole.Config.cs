@@ -1,26 +1,20 @@
 // NeoKolors
 // Copyright (c) 2025 KryKom
 
-using NeoKolors.Console.Ansi.Mouse;
-using NeoKolors.Console.Driver;
-using NeoKolors.Console.Driver.Dotnet;
-using NeoKolors.Console.Driver.Linux;
-using NeoKolors.Console.Driver.Windows;
-using NeoKolors.Console.Events;
-using NeoKolors.Console.Input;
+using static System.PlatformID;
 using static NeoKolors.Common.EscapeCodes;
-using static NeoKolors.Console.Ansi.Mouse.MouseReportLevel;
 
 namespace NeoKolors.Console;
 
 public partial class NKConsole {
-    
+
     private static readonly NKLogger LOGGER = NKDebug.GetLogger("NKConsole");
-    
-    private static bool             IS_ALT_BUFFER_ON;
-    private static MouseReportLevel MOUSE_REPORT_LEVEL = NONE;
-    private static bool             REPORT_FOCUS;
-    private static bool             BRACKETED_PASTE_MODE;
+
+    private static bool IS_ALT_BUFFER_ON;
+    private static bool REPORT_FOCUS;
+    private static bool BRACKETED_PASTE_MODE;
+
+    #region Drivers
 
     /// <summary>
     /// Gets or sets the output driver responsible for handling all character-based output to the terminal.
@@ -30,7 +24,7 @@ public partial class NKConsole {
     /// are rendered in the terminal. Depending on the environment or platform, different
     /// implementations of the output driver may be used. For example,
     /// - Windows systems may use <c>WindowsOutputDriver</c>.
-    /// - Unix-based a may use <c>LinuxOutputDriver</c>.
+    /// - Unix-based systems may use <c>LinuxOutputDriver</c>.
     /// - Other platforms may fall back to <c>DotnetOutputDriver</c>.
     /// This abstraction ensures that output operations are consistently handled across
     /// various platforms, while providing flexibility for future extensions or custom implementations.
@@ -62,23 +56,38 @@ public partial class NKConsole {
     /// Thrown when attempting to modify this property while input interception is enabled or
     /// the driver is actively processing input.
     /// </exception>
-    public static IInputDriver InputDriver { get; set; } = GetDefaultInput();
+    public static IInputDriver InputDriver { 
+        get;
+        set {
+            if (field.IsRunning)
+                throw new InvalidOperationException("Cannot modify InputDriver while the input driver is running.");
+
+            field.Dispose();
+                
+            field = value;
+        } 
+    } = GetDefaultInput();
 
     private static IOutputDriver GetDefaultOutput() {
         #if NK_ENABLE_NATIVE_IO
         try {
-            return Environment.OSVersion.Platform switch {
-                PlatformID.Win32Windows or PlatformID.Win32NT or PlatformID.Win32S or PlatformID.WinCE => 
+            IOutputDriver result = Environment.OSVersion.Platform switch {
+                Win32Windows or Win32NT or Win32S or WinCE when GetVTInfo().Platform.GetIsWindows() =>
                     new WindowsOutputDriver(),
-                PlatformID.Unix =>
+                Unix =>
                     new LinuxOutputDriver(),
-                PlatformID.MacOSX =>
+                MacOSX =>
                     new DotnetOutputDriver(), // TODO: create a frickin MacOSX driver
                 _ => new DotnetOutputDriver()
             };
+            
+            LOGGER.Info($"Using {result.GetType().Name} as output driver");
+
+            return result;
         }
         catch (Exception ex) {
             LOGGER.Warn($"Failed to create native output driver, falling back to dotnet driver: {ex.Message}");
+
             return new DotnetOutputDriver();
         }
         #else
@@ -89,18 +98,23 @@ public partial class NKConsole {
     private static IInputDriver GetDefaultInput() {
         #if NK_ENABLE_NATIVE_IO
         try {
-            return Environment.OSVersion.Platform switch {
-                PlatformID.Win32Windows or PlatformID.Win32NT or PlatformID.Win32S or PlatformID.WinCE => 
+            IInputDriver result = Environment.OSVersion.Platform switch {
+                Win32Windows or Win32NT or Win32S or WinCE when GetVTInfo().Platform.GetIsWindows() =>
                     new WindowsInputDriver(),
-                PlatformID.Unix =>
+                Unix =>
                     new LinuxInputDriver(),
-                PlatformID.MacOSX =>
+                MacOSX =>
                     new DotnetInputDriver(), // TODO: create a frickin MacOSX driver
                 _ => new DotnetInputDriver()
             };
+
+            LOGGER.Info($"Using {result.GetType().Name} as input driver");
+            
+            return result;
         }
         catch (Exception ex) {
             LOGGER.Warn($"Failed to create native input driver, falling back to dotnet driver: {ex.Message}");
+
             return new DotnetInputDriver();
         }
         #else
@@ -115,7 +129,7 @@ public partial class NKConsole {
     /// have been modified.
     /// </summary>
     public static void ResetIoDrivers() {
-        InputDriver  = GetDefaultInput ();
+        InputDriver  = GetDefaultInput();
         OutputDriver = GetDefaultOutput();
     }
 
@@ -125,10 +139,12 @@ public partial class NKConsole {
     /// DotnetOutputDriver, which are designed for compatibility with .NET platforms.
     /// </summary>
     public static void UseDotnetDrivers() {
-        InputDriver  = new DotnetInputDriver ();
+        InputDriver  = new DotnetInputDriver();
         OutputDriver = new DotnetOutputDriver();
     }
 
+    #endregion
+    
     public static bool IsAltBufferOn {
         get => IS_ALT_BUFFER_ON;
         set {
@@ -175,7 +191,7 @@ public partial class NKConsole {
     public static bool ReportFocus {
         get => REPORT_FOCUS;
         set {
-            OutputDriver.Write(value ? REPORT_FOCUS_ENABLE : REPORT_FOCUS_DISABLE); 
+            OutputDriver.Write(value ? REPORT_FOCUS_ENABLE : REPORT_FOCUS_DISABLE);
             REPORT_FOCUS = value;
             LOGGER.Info($"Focus reporting set to {value}");
         }
@@ -253,21 +269,16 @@ public partial class NKConsole {
     public static event KeyEventHandler        Key             = delegate { };
     public static event VTQueryResponseHandler VTQueryResponse = delegate { };
 
-    private static Task InvokeMouseEvent(MouseEventArgs info) 
-        => Task.Run(() => Mouse(info));
-    
-    private static Task InvokePasteEvent(string text) 
-        => Task.Run(() => Paste(text));
-    
-    private static Task InvokeFocusInEvent() 
-        => Task.Run(() => FocusIn());
-    
-    private static Task InvokeFocusOutEvent() 
-        => Task.Run(() => FocusOut());
-    
-    private static Task InvokeKeyEvent(KeyEventArgs info) 
-        => Task.Run(() => Key(info));
-    
+    private static Task InvokeMouseEvent(MouseEventArgs info) => Task.Run(() => Mouse(info));
+
+    private static Task InvokePasteEvent(string text) => Task.Run(() => Paste(text));
+
+    private static Task InvokeFocusInEvent() => Task.Run(() => FocusIn());
+
+    private static Task InvokeFocusOutEvent() => Task.Run(() => FocusOut());
+
+    private static Task InvokeKeyEvent(KeyEventArgs info) => Task.Run(() => Key(info));
+
     /// <summary>
     /// Gets value indicating whether input from the terminal is intercepted by NKConsole.
     /// </summary>

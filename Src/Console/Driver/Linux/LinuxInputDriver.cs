@@ -3,9 +3,7 @@
 
 #if NK_ENABLE_NATIVE_IO
 
-using NeoKolors.Console.Driver.Dotnet;
-
-namespace NeoKolors.Console.Driver.Linux;
+namespace NeoKolors.Console;
 
 public class LinuxInputDriver : DotnetInputDriver {
     // Currently, the DotnetInputDriver (using System.Console.ReadKey) provides 

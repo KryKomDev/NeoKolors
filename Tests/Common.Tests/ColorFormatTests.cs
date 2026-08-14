@@ -3,7 +3,6 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Common.Exceptions;
 using SkiaSharp;
 
 namespace NeoKolors.Common.Tests;

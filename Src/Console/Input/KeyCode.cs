@@ -4,7 +4,6 @@
 //
 
 using HasFlagExtension;
-using NeoKolors.Console.Driver.Windows;
 
 namespace NeoKolors.Console;
 

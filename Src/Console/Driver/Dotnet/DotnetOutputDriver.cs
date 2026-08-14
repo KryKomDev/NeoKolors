@@ -3,7 +3,7 @@
 // Copyright (c) 2026 KryKom
 //
 
-namespace NeoKolors.Console.Driver.Dotnet;
+namespace NeoKolors.Console;
 
 /// <summary>
 /// Represents an implementation of the <see cref="IOutputDriver"/> interface

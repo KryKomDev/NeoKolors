@@ -1,11 +1,10 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2025 KryKom
 
 // #define NK_DISABLE_ANSI_TIMEOUT
 
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
-using NeoKolors.Console.Events;
 
 namespace NeoKolors.Console.Ansi;
 

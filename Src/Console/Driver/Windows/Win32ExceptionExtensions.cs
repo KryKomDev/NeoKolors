@@ -6,7 +6,7 @@
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
-namespace NeoKolors.Console.Driver.Windows;
+namespace NeoKolors.Console;
 
 internal static class Win32ExceptionExtensions {
     extension(Win32Exception) {

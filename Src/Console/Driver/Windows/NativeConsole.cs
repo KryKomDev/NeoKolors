@@ -2,9 +2,10 @@
 // Copyright (c) 2025 KryKom
 
 using System.Runtime.InteropServices;
+
 // ReSharper disable InconsistentNaming
 
-namespace NeoKolors.Console.Driver.Windows;
+namespace NeoKolors.Console;
 
 internal static class NativeConsole {
     

@@ -1,6 +1,5 @@
 using Metriks;
 using NeoKolors.Console.Ansi;
-using NeoKolors.Console.Input;
 
 namespace NeoKolors.Console.Tests.Ansi;
 

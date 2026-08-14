@@ -18,6 +18,7 @@
       <link rel="icon" href="{{_rel}}{{{_appFaviconPath}}}{{^_appFaviconPath}}favicon.ico{{/_appFaviconPath}}">
       <link rel="stylesheet" href="{{_rel}}public/docfx.min.css">
       <link rel="stylesheet" href="{{_rel}}public/main.css">
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0">
       <meta name="docfx:navrel" content="{{_navRel}}">
       <meta name="docfx:tocrel" content="{{_tocRel}}">
       {{#_noindex}}<meta name="searchOption" content="noindex">{{/_noindex}}
@@ -45,6 +46,127 @@
         document.documentElement.setAttribute('data-bs-theme', theme === 'auto' ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : theme)
       </script>
 
+      {{#_accentColor}}
+      <script>
+        (function() {
+          const accentColor = '{{_accentColor}}';
+          const hexToRgb = (hex) => {
+            hex = hex.trim();
+            if (hex.startsWith('#')) hex = hex.substring(1);
+            if (hex.length === 3) hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+            if (hex.length === 6 || hex.length === 8) {
+              return {
+                r: parseInt(hex.substring(0, 2), 16),
+                g: parseInt(hex.substring(2, 4), 16),
+                b: parseInt(hex.substring(4, 6), 16)
+              };
+            }
+            return null;
+          };
+          const rgbStringToRgb = (rgbStr) => {
+            const match = rgbStr.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)/);
+            return match ? { r: parseInt(match[1]), g: parseInt(match[2]), b: parseInt(match[3]) } : null;
+          };
+          const rgbToHsl = (r, g, b) => {
+            r /= 255; g /= 255; b /= 255;
+            const max = Math.max(r, g, b), min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            if (max === min) {
+              h = s = 0;
+            } else {
+              const d = max - min;
+              s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+              switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+              }
+              h /= 6;
+            }
+            return { h: h * 360, s: s * 100, l: l * 100 };
+          };
+          const hslToRgb = (h, s, l) => {
+            h /= 360; s /= 100; l /= 100;
+            let r, g, b;
+            if (s === 0) {
+              r = g = b = l;
+            } else {
+              const hue2rgb = (p, q, t) => {
+                if (t < 0) t += 1;
+                if (t > 1) t -= 1;
+                if (t < 1/6) return p + (q - p) * 6 * t;
+                if (t < 1/2) return q;
+                if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+                return p;
+              };
+              const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+              const p = 2 * l - q;
+              r = hue2rgb(p, q, h + 1/3);
+              g = hue2rgb(p, q, h);
+              b = hue2rgb(p, q, h - 1/3);
+            }
+            return { r: Math.round(r * 255), g: Math.round(g * 255), b: Math.round(b * 255) };
+          };
+
+          let rgb = null;
+          const color = accentColor.trim();
+          if (color.startsWith('#')) {
+            rgb = hexToRgb(color);
+          } else if (color.startsWith('rgb')) {
+            rgb = rgbStringToRgb(color);
+          } else {
+            try {
+              const temp = document.createElement('div');
+              temp.style.color = color;
+              document.documentElement.appendChild(temp);
+              const comp = window.getComputedStyle(temp).color;
+              document.documentElement.removeChild(temp);
+              rgb = rgbStringToRgb(comp);
+            } catch (e) {}
+          }
+
+          if (rgb) {
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            
+            const lightPrimary = rgb;
+            const lightPrimaryRgb = `${lightPrimary.r}, ${lightPrimary.g}, ${lightPrimary.b}`;
+            const lightContainerObj = hslToRgb(hsl.h, hsl.s * 0.8, 92);
+            const lightContainer = `rgb(${lightContainerObj.r}, ${lightContainerObj.g}, ${lightContainerObj.b})`;
+            const lightOnContainerObj = hslToRgb(hsl.h, hsl.s, 15);
+            const lightOnContainer = `rgb(${lightOnContainerObj.r}, ${lightOnContainerObj.g}, ${lightOnContainerObj.b})`;
+
+            const darkPrimaryObj = hslToRgb(hsl.h, hsl.s * 0.8, 80);
+            const darkPrimary = `rgb(${darkPrimaryObj.r}, ${darkPrimaryObj.g}, ${darkPrimaryObj.b})`;
+            const darkPrimaryRgb = `${darkPrimaryObj.r}, ${darkPrimaryObj.g}, ${darkPrimaryObj.b}`;
+            const darkOnPrimaryObj = hslToRgb(hsl.h, hsl.s, 20);
+            const darkOnPrimary = `rgb(${darkOnPrimaryObj.r}, ${darkOnPrimaryObj.g}, ${darkOnPrimaryObj.b})`;
+            const darkContainerObj = hslToRgb(hsl.h, hsl.s * 0.8, 30);
+            const darkContainer = `rgb(${darkContainerObj.r}, ${darkContainerObj.g}, ${darkContainerObj.b})`;
+            const darkOnContainerObj = hslToRgb(hsl.h, hsl.s * 0.8, 90);
+            const darkOnContainer = `rgb(${darkOnContainerObj.r}, ${darkOnContainerObj.g}, ${darkOnContainerObj.b})`;
+
+            const styleEl = document.createElement('style');
+            styleEl.innerHTML = `
+              [data-bs-theme="light"], :root {
+                --md-primary: rgb(${lightPrimary.r}, ${lightPrimary.g}, ${lightPrimary.b});
+                --md-primary-rgb: ${lightPrimaryRgb};
+                --md-primary-container: ${lightContainer};
+                --md-on-primary-container: ${lightOnContainer};
+              }
+              [data-bs-theme="dark"] {
+                --md-primary: ${darkPrimary};
+                --md-primary-rgb: ${darkPrimaryRgb};
+                --md-on-primary: ${darkOnPrimary};
+                --md-primary-container: ${darkContainer};
+                --md-on-primary-container: ${darkOnContainer};
+              }
+            `;
+            document.head.appendChild(styleEl);
+          }
+        })();
+      </script>
+      {{/_accentColor}}
+
       <script>
         // Move GitHub link next to the theme toggle inside the dynamically created form.icons
         document.addEventListener('DOMContentLoaded', () => {
@@ -58,6 +180,543 @@
           }, 50);
           // Safety timeout to prevent infinite polling
           setTimeout(() => clearInterval(checkExist), 5000);
+
+          // Customize Callout headings if defined in metadata
+          {{#_calloutNoteHeading}}
+          document.querySelectorAll('.NOTE h5, .alert-info h5').forEach(h => {
+            h.childNodes.forEach(n => { if (n.nodeType === Node.TEXT_NODE) n.textContent = '{{_calloutNoteHeading}}'; });
+          });
+          {{/_calloutNoteHeading}}
+
+          {{#_calloutTipHeading}}
+          document.querySelectorAll('.TIP h5, .alert-success h5').forEach(h => {
+            h.childNodes.forEach(n => { if (n.nodeType === Node.TEXT_NODE) n.textContent = '{{_calloutTipHeading}}'; });
+          });
+          {{/_calloutTipHeading}}
+
+          {{#_calloutImportantHeading}}
+          document.querySelectorAll('.IMPORTANT h5, .IMPORTANT.alert h5').forEach(h => {
+            h.childNodes.forEach(n => { if (n.nodeType === Node.TEXT_NODE) n.textContent = '{{_calloutImportantHeading}}'; });
+          });
+          {{/_calloutImportantHeading}}
+
+          {{#_calloutWarningHeading}}
+          document.querySelectorAll('.WARNING h5, .alert-warning h5').forEach(h => {
+            h.childNodes.forEach(n => { if (n.nodeType === Node.TEXT_NODE) n.textContent = '{{_calloutWarningHeading}}'; });
+          });
+          {{/_calloutWarningHeading}}
+          {{#_calloutCautionHeading}}
+          document.querySelectorAll('.CAUTION h5, .alert-danger:not(.IMPORTANT) h5').forEach(h => {
+            h.childNodes.forEach(n => { if (n.nodeType === Node.TEXT_NODE) n.textContent = '{{_calloutCautionHeading}}'; });
+          });
+          {{/_calloutCautionHeading}}
+
+          // Custom Callout rendering
+          const customCallouts = [];
+          {{#_customCallouts}}
+          customCallouts.push({
+            name: '{{name}}',
+            heading: '{{heading}}',
+            color: '{{color}}',
+            icon: '{{icon}}'
+          });
+          {{/_customCallouts}}
+
+          customCallouts.forEach(callout => {
+            const { name, heading, color, icon } = callout;
+            if (!name) return;
+
+            // 1. Inject custom styles
+            const style = document.createElement('style');
+            style.innerHTML = `
+              .${name}, .alert-${name} {
+                border: 1.5px solid ${color} !important;
+              }
+              .${name} h5, .alert-${name} h5 {
+                color: ${color} !important;
+                display: flex !important;
+                align-items: center !important;
+              }
+              .${name} a, .alert-${name} a {
+                color: ${color} !important;
+              }
+              .${name} h5::before, .alert-${name} h5::before {
+                font-family: 'Material Symbols Outlined' !important;
+                content: '${icon}' !important;
+                font-size: 20px !important;
+                margin-right: 0.5rem !important;
+                transform: translateY(-3px) !important;
+                font-weight: normal !important;
+                font-style: normal !important;
+                text-transform: none !important;
+                line-height: 1 !important;
+                display: inline-block !important;
+              }
+            `;
+            document.head.appendChild(style);
+
+            // 2. Rename custom headings
+            document.querySelectorAll('.' + name + ' h5, .alert-' + name + ' h5').forEach(h => {
+              h.childNodes.forEach(n => { if (n.nodeType === Node.TEXT_NODE) n.textContent = heading; });
+            });
+          });
+
+          // Render Theme Responsive Images
+          (function() {
+            const article = document.querySelector('article');
+            if (!article) return;
+
+            const relMeta = document.querySelector('meta[name="docfx:rel"]');
+            const relPath = relMeta ? relMeta.getAttribute('content') : '';
+
+            // Find all anchor links inside the article
+            const links = Array.from(article.querySelectorAll('a'));
+            for (const link of links) {
+              const prevSibling = link.previousSibling;
+              const nextSibling = link.nextSibling;
+
+              // Check if previous sibling is a text node ending with '?'
+              if (!prevSibling || prevSibling.nodeType !== Node.TEXT_NODE) continue;
+              if (!prevSibling.textContent.endsWith('?')) continue;
+
+              // Check if next sibling is a text node
+              if (!nextSibling || nextSibling.nodeType !== Node.TEXT_NODE) continue;
+
+              const nextText = nextSibling.textContent;
+              const match = nextText.match(/^\s*\(([^)]+)\)/);
+              if (!match) continue;
+
+              const lightUrlRaw = link.getAttribute('href');
+              if (!lightUrlRaw) continue;
+
+              const darkUrlRaw = match[1];
+              const altText = link.textContent;
+
+              // Resolve ~/ urls
+              const resolveUrl = (url) => {
+                if (url.startsWith('~/')) {
+                  return relPath + url.substring(2);
+                }
+                return url;
+              };
+
+              const lightUrl = resolveUrl(lightUrlRaw);
+              const darkUrl = resolveUrl(darkUrlRaw);
+
+              // 1. Remove '?' from the end of the previous sibling
+              prevSibling.textContent = prevSibling.textContent.slice(0, -1);
+
+              // 2. Remove '(darkUrl)' from the beginning of the next sibling
+              nextSibling.textContent = nextText.substring(match[0].length);
+
+              // 3. Create the responsive image structure
+              const lightImg = document.createElement('img');
+              lightImg.src = lightUrl;
+              lightImg.alt = altText;
+              lightImg.className = 'theme-light-img';
+
+              const darkImg = document.createElement('img');
+              darkImg.src = darkUrl;
+              darkImg.alt = altText;
+              darkImg.className = 'theme-dark-img';
+
+              const container = document.createElement('span');
+              container.className = 'theme-responsive-image';
+              container.appendChild(lightImg);
+              container.appendChild(darkImg);
+
+              // Replace the link with the responsive image container
+              link.parentNode.insertBefore(container, link);
+              link.parentNode.removeChild(link);
+            }
+          })();
+
+          // Sizing attribute parser for images: ![alt](url){width=X height=Y}
+          (function() {
+            const article = document.querySelector('article');
+            if (!article) return;
+
+            const targets = Array.from(article.querySelectorAll('img:not(.theme-light-img):not(.theme-dark-img), .theme-responsive-image'));
+            for (const target of targets) {
+              let sibling = target.nextSibling;
+              if (!sibling && target.parentNode && target.parentNode.tagName === 'A') {
+                sibling = target.parentNode.nextSibling;
+              }
+
+              if (!sibling || sibling.nodeType !== Node.TEXT_NODE) continue;
+
+              const text = sibling.textContent;
+              const match = text.match(/^\s*\{([^}]+)\}/);
+              if (!match) continue;
+
+              const attrText = match[1];
+              const attrs = {};
+
+              // Parse key=value attributes
+              const pairRegex = /(\w+)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s,]+))/g;
+              let m;
+              while ((m = pairRegex.exec(attrText)) !== null) {
+                const key = m[1].toLowerCase();
+                const val = m[2] || m[3] || m[4];
+                attrs[key] = val;
+              }
+
+              // Fallback to colon syntax: width: 150px
+              const colonRegex = /(\w+)\s*:\s*([^;]+)/g;
+              if (Object.keys(attrs).length === 0) {
+                while ((m = colonRegex.exec(attrText)) !== null) {
+                  const key = m[1].toLowerCase().trim();
+                  const val = m[2].trim();
+                  attrs[key] = val;
+                }
+              }
+
+              if (Object.keys(attrs).length === 0) continue;
+
+              // Format helper
+              const formatDim = (val) => /^\d+$/.test(val) ? val + 'px' : val;
+
+              // Apply styles
+              if (attrs.width) {
+                const w = formatDim(attrs.width);
+                target.style.width = w;
+                if (target.classList.contains('theme-responsive-image')) {
+                  target.querySelectorAll('img').forEach(img => img.style.width = '100%');
+                }
+              }
+              if (attrs.height) {
+                const h = formatDim(attrs.height);
+                target.style.height = h;
+                if (target.classList.contains('theme-responsive-image')) {
+                  target.querySelectorAll('img').forEach(img => img.style.height = '100%');
+                }
+              }
+
+              // Remove the brace block from the text node
+              sibling.textContent = text.substring(match[0].length);
+            }
+          })();
+
+          // Reworked API layout logic
+          (function() {
+            const isReworked = {{#_reworkedApiLayout}}true{{/_reworkedApiLayout}}{{^_reworkedApiLayout}}false{{/_reworkedApiLayout}};
+            if (!isReworked) return;
+
+            window.reworkedApiLayout = true;
+            window.appName = "{{_appName}}";
+
+            let originalArticleHtml = '';
+
+            function renderNamespacesLandingPage() {
+              const article = document.querySelector('article');
+              if (!article) return;
+
+              article.setAttribute('data-landing-rendered', 'true');
+              article.innerHTML = `
+                <h1 class="text-break">Namespaces</h1>
+                <div class="markdown level0 summary">Select a namespace to explore its classes and structs.</div>
+                <div class="namespaces-table-container mt-4">
+                  <table class="table table-bordered table-striped table-condensed">
+                    <thead>
+                      <tr>
+                        <th style="width: 35%">Namespace</th>
+                        <th style="width: 25%">Types</th>
+                        <th style="width: 40%">Description</th>
+                      </tr>
+                    </thead>
+                    <tbody id="namespaces-table-body">
+                      <tr>
+                        <td colspan="3" class="text-center text-secondary py-4">
+                          <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                          Loading namespaces...
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              `;
+
+              const tocRelMeta = document.querySelector('meta[name="docfx:tocrel"]');
+              if (!tocRelMeta) return;
+
+              const tocUrl = tocRelMeta.getAttribute('content').replace('.html', '.json');
+              const pageDir = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+              const jsonUrl = pageDir + tocUrl;
+
+              fetch(jsonUrl)
+                .then(res => res.json())
+                .then(tocData => {
+                  const tbody = document.getElementById('namespaces-table-body');
+                  if (!tbody) return;
+
+                  if (!tocData.items || tocData.items.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="3" class="text-center text-secondary py-3">No namespaces found.</td></tr>`;
+                    return;
+                  }
+
+                  tbody.innerHTML = '';
+                  
+                  tocData.items.forEach(item => {
+                    if (item.type !== 'Namespace') return;
+
+                    const row = document.createElement('tr');
+                    
+                    const nameCell = document.createElement('td');
+                    nameCell.innerHTML = `<a href="${item.href}" class="xref">${item.name}</a>`;
+                    row.appendChild(nameCell);
+
+                    const typesCell = document.createElement('td');
+                    const counts = {};
+                    if (item.items) {
+                      item.items.forEach(child => {
+                        const type = child.type || 'Other';
+                        counts[type] = (counts[type] || 0) + 1;
+                      });
+                    }
+                    
+                    const countsHtml = Object.entries(counts)
+                      .map(([type, count]) => {
+                        let badgeClass = 'bg-secondary-subtle text-secondary-emphasis';
+                        if (type === 'Class') badgeClass = 'bg-primary-subtle text-primary-emphasis';
+                        else if (type === 'Struct') badgeClass = 'bg-info-subtle text-info-emphasis';
+                        else if (type === 'Interface') badgeClass = 'bg-success-subtle text-success-emphasis';
+                        else if (type === 'Enum') badgeClass = 'bg-warning-subtle text-warning-emphasis';
+
+                        return `<span class="badge ${badgeClass} me-1 mb-1">${type}: ${count}</span>`;
+                      })
+                      .join('');
+                    
+                    typesCell.innerHTML = countsHtml || '<span class="text-secondary">-</span>';
+                    row.appendChild(typesCell);
+
+                    const descCell = document.createElement('td');
+                    descCell.className = 'ns-desc text-secondary';
+                    descCell.innerHTML = `<em>Loading description...</em>`;
+                    row.appendChild(descCell);
+
+                    tbody.appendChild(row);
+
+                    fetch(pageDir + item.href)
+                      .then(r => r.text())
+                      .then(htmlText => {
+                        const parser = new DOMParser();
+                        const doc = parser.parseFromString(htmlText, 'text/html');
+                        const summaryEl = doc.querySelector('.markdown.level0.summary');
+                        const summaryHtml = summaryEl ? summaryEl.innerHTML.trim() : '';
+                        descCell.innerHTML = summaryHtml || '<span class="text-secondary">-</span>';
+                      })
+                      .catch(() => {
+                        descCell.innerHTML = '<span class="text-secondary">-</span>';
+                      });
+                  });
+                })
+                .catch(() => {
+                  const tbody = document.getElementById('namespaces-table-body');
+                  if (tbody) {
+                    tbody.innerHTML = `<tr><td colspan="3" class="text-center text-danger py-3">Failed to load namespaces.</td></tr>`;
+                  }
+                });
+            }
+
+            function reworkToc() {
+              const tocNav = document.getElementById('toc');
+              if (!tocNav) return;
+
+              const rootUl = tocNav.querySelector('ul');
+              if (!rootUl) return;
+
+              let activeEl = tocNav.querySelector('.active');
+              if (!activeEl) {
+                const currentPath = window.location.pathname;
+                const filename = currentPath.substring(currentPath.lastIndexOf('/') + 1);
+                if (filename) {
+                  const links = tocNav.querySelectorAll('a');
+                  for (const link of links) {
+                    const href = link.getAttribute('href');
+                    if (href && (href === filename || href.endsWith('/' + filename))) {
+                      activeEl = link;
+                      break;
+                    }
+                  }
+                }
+              }
+
+              if (!activeEl) {
+                if (window.location.hash === '#namespaces') {
+                  document.body.classList.add('landing-page');
+                }
+                return;
+              }
+
+              let activeNamespaceLi = null;
+              let parentLi = activeEl.closest('li');
+              while (parentLi) {
+                const parentUl = parentLi.parentElement;
+                if (parentUl === rootUl) {
+                  activeNamespaceLi = parentLi;
+                  break;
+                }
+                parentLi = parentUl.closest('li');
+              }
+
+              if (activeNamespaceLi) {
+                const originalNsLink = activeNamespaceLi.querySelector('a');
+                const nsHref = originalNsLink ? originalNsLink.getAttribute('href') : '';
+                const nsName = originalNsLink ? originalNsLink.textContent.trim() : '';
+
+                const subUl = activeNamespaceLi.querySelector('ul');
+                if (subUl) {
+                  const children = Array.from(subUl.children);
+                  rootUl.innerHTML = '';
+
+                  if (nsHref && nsName) {
+                    const nsLi = document.createElement('li');
+                    const nsA = document.createElement('a');
+                    nsA.setAttribute('href', nsHref);
+                    nsA.textContent = nsName;
+
+                    const currentPath = window.location.pathname;
+                    const filename = currentPath.substring(currentPath.lastIndexOf('/') + 1);
+                    if (nsHref === filename || nsHref.endsWith('/' + filename)) {
+                      nsA.className = 'active';
+                      nsLi.className = 'active';
+                    }
+
+                    nsLi.appendChild(nsA);
+                    rootUl.appendChild(nsLi);
+                  }
+
+                  children.forEach(child => {
+                    rootUl.appendChild(child);
+                  });
+                  rootUl.className = 'nav level1';
+                }
+              }
+            }
+
+            function handleLayout() {
+              const article = document.querySelector('article');
+              if (!article) return;
+
+              if (!originalArticleHtml) {
+                originalArticleHtml = article.innerHTML;
+              }
+
+              const isApiPage = window.location.pathname.includes('/api/');
+              const isLanding = window.location.hash === '#namespaces';
+
+              if (isApiPage) {
+                if (isLanding) {
+                  document.body.classList.add('landing-page');
+                  renderNamespacesLandingPage();
+                } else {
+                  document.body.classList.remove('landing-page');
+                  if (article.getAttribute('data-landing-rendered') === 'true') {
+                    article.innerHTML = originalArticleHtml;
+                    article.removeAttribute('data-landing-rendered');
+                  }
+                  reworkToc();
+                }
+              }
+            }
+
+            function observeToc() {
+              const tocNav = document.getElementById('toc');
+              if (!tocNav) return;
+
+              if (tocNav.querySelector('ul')) {
+                reworkToc();
+              }
+
+              const observer = new MutationObserver((mutations) => {
+                for (const mutation of mutations) {
+                  if (mutation.addedNodes.length > 0 && tocNav.querySelector('ul')) {
+                    reworkToc();
+                    observer.disconnect();
+                    break;
+                  }
+                }
+              });
+
+              observer.observe(tocNav, { childList: true, subtree: true });
+            }
+
+            function initNavbarRewrite() {
+              const relMeta = document.querySelector('meta[name="docfx:rel"]');
+              const relPath = relMeta ? relMeta.getAttribute('content') : '';
+              
+              fetch(relPath + 'toc.json')
+                .then(res => res.json())
+                .then(rootToc => {
+                  if (!rootToc.items) return;
+                  
+                  const apiItem = rootToc.items.find(item => item.tocHref && item.tocHref.includes('api/toc.html'));
+                  if (!apiItem) return;
+                  
+                  const targetHref = apiItem.href;
+                  
+                  const checkNavbar = setInterval(() => {
+                    const navbar = document.getElementById('navbar');
+                    if (navbar) {
+                      const links = navbar.querySelectorAll('a');
+                      links.forEach(link => {
+                        let href = link.getAttribute('href');
+                        if (href) {
+                          const normHref = href.replace(/\\/g, '/');
+                          const normTarget = targetHref.replace(/\\/g, '/');
+                          if (normHref.endsWith(normTarget)) {
+                            link.setAttribute('href', href + '#namespaces');
+                            clearInterval(checkNavbar);
+                          }
+                        }
+                      });
+                    }
+                  }, 50);
+                  
+                  setTimeout(() => clearInterval(checkNavbar), 5000);
+                })
+                .catch(() => {
+                  const navbar = document.getElementById('navbar');
+                  if (navbar) {
+                    const links = navbar.querySelectorAll('a');
+                    links.forEach(link => {
+                      const href = link.getAttribute('href');
+                      if (href && href.includes('/api/') && !href.includes('#')) {
+                        link.setAttribute('href', href + '#namespaces');
+                      }
+                    });
+                  }
+                });
+            }
+
+            function observeBreadcrumbs() {
+              const breadcrumb = document.getElementById('breadcrumb');
+              if (!breadcrumb) return;
+
+              const rewriteBreadcrumb = () => {
+                const links = breadcrumb.querySelectorAll('a');
+                links.forEach(link => {
+                  const href = link.getAttribute('href');
+                  if (href && href.includes('/api/') && !href.includes('#')) {
+                    link.setAttribute('href', href + '#namespaces');
+                  }
+                });
+              };
+
+              rewriteBreadcrumb();
+
+              const observer = new MutationObserver(rewriteBreadcrumb);
+              observer.observe(breadcrumb, { childList: true, subtree: true });
+            }
+
+            // Run initializations
+            initNavbarRewrite();
+            observeBreadcrumbs();
+            observeToc();
+            handleLayout();
+
+            window.addEventListener('hashchange', handleLayout);
+          })();
         });
       </script>
 

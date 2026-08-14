@@ -5,7 +5,7 @@
 
 using Metriks;
 
-namespace NeoKolors.Console.Input;
+namespace NeoKolors.Console;
 
 public readonly record struct MouseEventArgs {
     public MouseButton  Button    { get; init; }

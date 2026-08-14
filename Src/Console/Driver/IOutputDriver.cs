@@ -6,7 +6,7 @@
 using System.Diagnostics.CodeAnalysis;
 using NeoKolors.Extensions;
 
-namespace NeoKolors.Console.Driver;
+namespace NeoKolors.Console;
 
 public interface IOutputDriver : IDisposable {
     

@@ -5,7 +5,6 @@
 
 using System.Runtime.InteropServices;
 using NeoKolors.Common;
-using NeoKolors.Console.Events;
 
 namespace NeoKolors.Console.Ansi;
 

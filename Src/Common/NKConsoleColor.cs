@@ -7,7 +7,7 @@ namespace NeoKolors.Common;
 
 /// <summary>
 /// Contains the extended console color palette. Each color value corresponds to the same color in the ANSI
-/// representation. The first 16 colors are also contained in System.ConsoleColor,
+/// representation. The first 16 colors are also contained in <see cref="System.ConsoleColor"/>,
 /// the next 6x6x6 colors represent colors in a 6x6x6 cube where each axis represents a color channel,
 /// the last 24 colors are equally spaced grayscale colors.
 /// </summary>
@@ -19,22 +19,24 @@ namespace NeoKolors.Common;
 public enum NKConsoleColor : byte { 
 
     // basic colors
-    BLACK = 0x00,
-    DARK_RED = 0x01,
-    DARK_GREEN = 0x02,
-    DARK_YELLOW = 0x03,
-    DARK_BLUE = 0x04,
+    BLACK        = 0x00,
+    DARK_RED     = 0x01,
+    DARK_GREEN   = 0x02,
+    DARK_YELLOW  = 0x03,
+    DARK_BLUE    = 0x04,
     DARK_MAGENTA = 0x05,
-    DARK_CYAN = 0x06,
-    GRAY = 0x07,
-    DARK_GRAY = 0x08,
-    RED = 0x09,
-    GREEN = 0x0A,
-    YELLOW = 0x0B,
-    BLUE = 0x0C,
-    MAGENTA = 0x0D,
-    CYAN = 0x0E,
-    WHITE = 0x0F,
+    DARK_CYAN    = 0x06,
+    GRAY         = 0x07,
+    GREY         = 0x07,
+    DARK_GRAY    = 0x08,
+    DARK_GREY    = 0x08,
+    RED          = 0x09,
+    GREEN        = 0x0A,
+    YELLOW       = 0x0B,
+    BLUE         = 0x0C,
+    MAGENTA      = 0x0D,
+    CYAN         = 0x0E,
+    WHITE        = 0x0F,
     
     // color cube values
     

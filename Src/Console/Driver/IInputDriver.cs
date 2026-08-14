@@ -4,9 +4,8 @@
 using Implyzer;
 using Metriks;
 using NeoKolors.Console.Ansi;
-using NeoKolors.Console.Events;
 
-namespace NeoKolors.Console.Driver;
+namespace NeoKolors.Console;
 
 /// <summary>
 /// Defines an interface that represents an input driver for processing console input events.

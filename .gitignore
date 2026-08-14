@@ -22,6 +22,7 @@ mono_crash.*
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
+[Gg]enerated/
 [Rr]elease/
 [Rr]eleases/
 x64/
@@ -496,13 +497,7 @@ $RECYCLE.BIN/
 /_ReSharper.Caches/
 riderModule.iml
 
-# writerside output
-Docs/out/
-
 **/md/
 
 # idk
 NeoKolors.sln.DotSettings.user
-
-# Hugo Docs
-Docs/public/

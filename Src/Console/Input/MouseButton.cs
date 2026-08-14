@@ -1,7 +1,7 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-namespace NeoKolors.Console.Input;
+namespace NeoKolors.Console;
 
 /// <summary>
 /// Represents the various buttons and states of a mouse.

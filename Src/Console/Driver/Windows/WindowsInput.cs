@@ -1,4 +1,4 @@
-﻿//
+//
 // NeoKolors
 // Copyright (c) 2026 KryKom
 //
@@ -7,9 +7,9 @@ using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using static NeoKolors.Console.Driver.Windows.WinImports;
+using static NeoKolors.Console.WinImports;
 
-namespace NeoKolors.Console.Driver.Windows;
+namespace NeoKolors.Console;
 
 /// <summary>
 /// Represents a utility class for interacting with Windows console input handles.
@@ -24,8 +24,17 @@ internal class WindowsInput : IDisposable {
     private bool _disposed = false;
 
     public bool IsEnabled { get; private set; }
+    public bool IsDisabled => !IsEnabled;
     
     public WinVtInModes Modes => GetModes();
+    
+    const WinVtInModes ENABLED_MODES = 0
+        | WinVtInModes.ENABLE_MOUSE_INPUT
+        | WinVtInModes.ENABLE_EXTENDED_FLAGS;
+
+    const WinVtInModes DISABLED_MODES = 0
+        | WinVtInModes.ENABLE_QUICK_EDIT_MODE
+        | WinVtInModes.ENABLE_PROCESSED_INPUT;
     
     public WindowsInput() {
         _handle = GetStdIn();
@@ -42,21 +51,6 @@ internal class WindowsInput : IDisposable {
 
         // store the original VT modes to be restored on this instance disposal
         if (!GetStdInMode(_handle, out _originalModes))
-            Win32Exception.ThrowLast();
-
-        const WinVtInModes enabled = 0
-            | WinVtInModes.ENABLE_MOUSE_INPUT
-            | WinVtInModes.ENABLE_EXTENDED_FLAGS;
-
-        const WinVtInModes disabled = 0
-            | WinVtInModes.ENABLE_QUICK_EDIT_MODE
-            | WinVtInModes.ENABLE_PROCESSED_INPUT;
-        
-        // configure VT the modes
-        var modes = (_originalModes | enabled) & ~disabled;
-        
-        // set the VT modes
-        if (!SetStdInMode(_handle, modes))
             Win32Exception.ThrowLast();
     }
 
@@ -226,12 +220,55 @@ internal class WindowsInput : IDisposable {
             Marshal.FreeHGlobal(buff);
         }
     }
+
+    /// <summary>
+    /// Enables enhanced input modes for the console.
+    /// Updates the console's standard input handle to use the specified
+    /// configurations, including enabling mouse input and extended input flags,
+    /// while disabling quick edit mode and processed input mode.
+    /// </summary>
+    /// <exception cref="Win32Exception">
+    /// Thrown when the operation to enable the console input modes fails.
+    /// </exception>
+    public void Enable() {
+        if (IsEnabled)
+            return;
+        
+        // configure VT the modes
+        var modes = (_originalModes | ENABLED_MODES) & ~DISABLED_MODES;
+        
+        // set the VT modes
+        if (!SetStdInMode(_handle, modes))
+            Win32Exception.ThrowLast();
+        
+        IsEnabled = true;
+    }
+
+    /// <summary>
+    /// Disables the enhanced input modes for the console by restoring the original input configuration.
+    /// This operation resets any modifications made to the console input modes during the lifecycle
+    /// of the current <see cref="WindowsInput"/> instance.
+    /// </summary>
+    /// <exception cref="Win32Exception">
+    /// Thrown when the operation to reset the console's input modes fails.
+    /// </exception>
+    public void Disable() {
+        if (IsDisabled)
+            return;
+        
+        // reset the VT modes
+        if (!SetStdInMode(_handle, _originalModes))
+            Win32Exception.ThrowLast();
+        
+        IsEnabled = false;
+    }
     
     public void Dispose() {
         if (_disposed) return;
         
         _disposed = true;
-
+        IsEnabled = false;
+        
         if (!FlushConsoleInputBuffer(_handle)) {
             throw new Win32Exception(
                 $"Failed to flush stdin buffer. Exit code: {GetLastError()}, {Marshal.GetLastWin32Error()}"

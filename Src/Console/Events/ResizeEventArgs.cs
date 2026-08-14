@@ -3,7 +3,7 @@
 
 using Metriks;
 
-namespace NeoKolors.Console.Events;
+namespace NeoKolors.Console;
 
 public class ResizeEventArgs {
     public int Width { get; }

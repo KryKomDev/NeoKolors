@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 using HasFlagExtension;
 using NeoKolors.Extensions;
 
-namespace NeoKolors.Console.Driver.Windows;
+namespace NeoKolors.Console;
 
 internal partial class WinImports {
     

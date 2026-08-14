@@ -1,7 +1,7 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-namespace NeoKolors.Console.Ansi.Mouse;
+namespace NeoKolors.Console.Ansi;
 
 public enum MouseEventType {
     UNKNOWN = -1,

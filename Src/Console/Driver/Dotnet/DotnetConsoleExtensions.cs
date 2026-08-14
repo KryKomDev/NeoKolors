@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 using Metriks;
 using NeoKolors.Extensions;
 
-namespace NeoKolors.Console.Driver.Dotnet;
+namespace NeoKolors.Console;
 
 public static class DotnetConsoleExtensions {
     

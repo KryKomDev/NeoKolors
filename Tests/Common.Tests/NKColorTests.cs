@@ -3,8 +3,6 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Common.Exceptions;
-
 namespace NeoKolors.Common.Tests;
 
 public class NKColorTests {

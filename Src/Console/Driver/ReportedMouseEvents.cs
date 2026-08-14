@@ -5,7 +5,7 @@
 
 using HasFlagExtension;
 
-namespace NeoKolors.Console.Driver;
+namespace NeoKolors.Console;
 
 [Flags]
 public enum ReportedMouseEvents {

@@ -5,7 +5,6 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using System.Text;
 
 namespace NeoKolors.Common;
@@ -15,7 +14,8 @@ namespace NeoKolors.Common;
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = sizeof(ulong))]
 [SuppressMessage("ReSharper", "ShiftExpressionZeroLeftOperand")]
-public record struct NKStyle : IFormattable, IParsableValue<NKStyle> {
+public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsable<NKStyle> {
+
     //
     // Layout (0 is most significant):
     // (this may not be up to date, check offset constants for more info)
@@ -40,7 +40,6 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle> {
     // ISw == 1             -> color is Inherit.
     // DSw == 1 && ISw == 0 -> color is Console.
     //
-
 
     // ----- OFFSET CONSTANTS ----- //
 
@@ -86,6 +85,7 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle> {
     [FieldOffset(5)] private readonly byte _fCol_blue;
     [FieldOffset(6)] private readonly byte _fCol_switches;
     [FieldOffset(5)] private readonly byte _fCol_console;
+
     // ReSharper restore PrivateFieldCanBeConvertedToLocalVariable
 
     /// <summary>
@@ -420,7 +420,7 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle> {
         if (!other.IsFColorInherit)
             n = n.SetFColor(other.GetFColor());
 
-        if (!other.IsBColorInherit && !other.IsBColorDefault)
+        if (other is { IsBColorInherit: false, IsBColorDefault: false })
             n = n.SetBColor(other.GetBColor());
 
         n = n.SetStyles(other.GetStyles());
@@ -579,31 +579,31 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle> {
 
     public static explicit operator NKStyle(TextStyles s) => new(NKColor.Default, NKColor.Default, s);
 
-    public static NKStyle Parse(string s) => Parse(s, null);
+    public static NKStyle Parse([NotNullWhen(true)] string? s) => Parse(s, null);
 
-    public static NKStyle Parse(string s, IFormatProvider? provider) {
+    public static NKStyle Parse([NotNullWhen(true)] string? s, IFormatProvider? provider) {
         if (s == null)
             throw new ArgumentNullException(nameof(s));
 
-        if (TryParse(s, provider, out var result)) {
-            return result;
-        }
-
-        throw new FormatException($"Invalid style format: '{s}'");
+        return TryParse(s, provider, out var result) 
+            ? result 
+            : throw new FormatException($"Invalid style format: '{s}'");
     }
 
-    public static bool TryParse([NotNullWhen(true)] string? s, out NKStyle result) => TryParse(s, null, out result);
+    // ReSharper disable once RedundantNullableFlowAttribute
+    public static bool TryParse([NotNullWhen(true)] string? s, [MaybeNullWhen(false)] out NKStyle result) => TryParse(s, null, out result);
 
-    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out NKStyle result) {
+    // ReSharper disable once RedundantNullableFlowAttribute
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out NKStyle result) {
         if (s == null) {
             result = default;
 
             return false;
         }
 
-        var        style      = new NKStyle();
-        var        parts      = s.Split([';', ','], StringSplitOptions.RemoveEmptyEntries);
-        TextStyles textStyles = TextStyles.NONE;
+        var style      = new NKStyle();
+        var parts      = s.Split([';', ','], StringSplitOptions.RemoveEmptyEntries);
+        var textStyles = TextStyles.NONE;
 
         foreach (var rawPart in parts) {
             var part = rawPart.Trim();
@@ -652,10 +652,15 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle> {
         return true;
     }
 
-    bool IParsableValue<NKStyle>.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out NKStyle result) 
-        => TryParse(s, provider, out result);
+    bool IParsableValue<NKStyle>.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out NKStyle result) => TryParse(s, provider, out result);
 
     private static bool TryParseStyleColor(string val, out NKColor color) {
+        if (string.IsNullOrEmpty(val)) {
+            color = default;
+            
+            return false;
+        }
+        
         val = val.Trim();
         string normalized = val.StartsWith('#') ? val : val.Replace('-', '_');
 
@@ -663,8 +668,8 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle> {
             return true;
         }
 
-        if (!normalized.StartsWith('#') && 
-            normalized.Length > 0 && 
+        if (!normalized.StartsWith('#') &&
+            normalized.Length > 0       &&
             normalized.All(c => "0123456789abcdefABCDEF".Contains(c))) 
         {
             if (NKColor.TryParse("#" + normalized, null, out color)) {
@@ -681,17 +686,17 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle> {
         var normalized = s.Replace('-', '_').ToLowerInvariant();
 
         (style, var ret) = normalized switch {
-            "bold"          => (TextStyles.BOLD,          true),
-            "faint"         => (TextStyles.FAINT,         true),
-            "italic"        => (TextStyles.ITALIC,        true),
-            "underline"     => (TextStyles.UNDERLINE,     true),
-            "blink"         => (TextStyles.BLINK,         true),
-            "negative"      => (TextStyles.NEGATIVE,      true),
-            "invisible"     => (TextStyles.INVISIBLE,     true),
+            "bold"          => (TextStyles.BOLD, true),
+            "faint"         => (TextStyles.FAINT, true),
+            "italic"        => (TextStyles.ITALIC, true),
+            "underline"     => (TextStyles.UNDERLINE, true),
+            "blink"         => (TextStyles.BLINK, true),
+            "negative"      => (TextStyles.NEGATIVE, true),
+            "invisible"     => (TextStyles.INVISIBLE, true),
             "strikethrough" => (TextStyles.STRIKETHROUGH, true),
-            "none"          => (TextStyles.NONE,          true),
-            "all"           => (TextStyles.ALL,           true),
-            _               => (TextStyles.NONE,          false)
+            "none"          => (TextStyles.NONE, true),
+            "all"           => (TextStyles.ALL, true),
+            _               => (TextStyles.NONE, false)
         };
 
         return ret;

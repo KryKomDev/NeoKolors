@@ -1,6 +1,4 @@
 using NeoKolors.Console.Ansi;
-using NeoKolors.Console.Events;
-using NeoKolors.Console.Input;
 using NeoKolors.Extensions;
 
 namespace NeoKolors.Console.Tests;

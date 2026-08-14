@@ -4,9 +4,8 @@
 //
 
 using NeoKolors.Console.Ansi;
-using NeoKolors.Console.Input;
 
-namespace NeoKolors.Console.Driver.Windows;
+namespace NeoKolors.Console;
 
 /// <summary>
 /// A specialized ANSI escape code parser for Windows console input.

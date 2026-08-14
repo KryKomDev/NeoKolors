@@ -1,9 +1,9 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-using static NeoKolors.Console.Ansi.Mouse.XTermMouseModifiers;
+using static NeoKolors.Console.Ansi.XTermMouseModifiers;
 
-namespace NeoKolors.Console.Ansi.Mouse;
+namespace NeoKolors.Console.Ansi;
 
 // ReSharper disable once UnusedType.Local
 file enum RawMouseEventType {

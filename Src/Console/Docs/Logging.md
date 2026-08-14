@@ -1,60 +1,218 @@
-# NeoKolors Structured Logging & Diagnostics
+# NeoKolors Logging & Diagnostics Guide
 
-The `NeoKolors.Console` library includes a high-performance diagnostic system under **[NKDebug](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Console/NKDebug.cs)** and **[NKLogger](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Console/NKLogger.Config.cs)**. This system is tailored for fast, non-blocking asynchronous writing and pretty formatting.
+The **NeoKolors** logging engine provides high-performance ANSI-styled console output, file logging (plain text and binary), structured log record serialization, and seamless integration with `Microsoft.Extensions.Logging.Abstractions` and .NET Dependency Injection (`IServiceCollection`).
 
 ---
 
-## 1. Log Levels
+## 1. Overview & Architecture
 
-The logging system supports standard log levels, defined in [LoggerLevel](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Console/LoggerLevel.cs):
+The logging system consists of several modular components:
 
-| Level | Method | Purpose |
+| Component | Class | Description |
 | :--- | :--- | :--- |
-| `Trace` | `NKDebug.Trace(...)` | Granular debugging details, active only during deep diagnostics. |
-| `Debug` | `NKDebug.Debug(...)` | General development diagnostic details. |
-| `Info` | `NKDebug.Info(...)` | Major execution milestones (e.g. startup, network initialization). |
-| `Warn` | `NKDebug.Warn(...)` | Non-critical failures or potential misconfigurations. |
-| `Error` | `NKDebug.Error(...)` | Recoverable error states where operation continues. |
-| `Crit` | `NKDebug.Crit(...)` | Critical failure states requiring immediate attention. |
+| **Logger Core** | `NKLogger` | Primary logger implementing `Microsoft.Extensions.Logging.ILogger`. |
+| **DI Integration** | `NKLoggerProvider`, `NKLoggingBuilderExtensions` | `ILoggerProvider` implementation and `ILoggingBuilder` / `IServiceCollection` extension methods. |
+| **Console Output** | `AnsiLogWriter` | Formats and prints styled ANSI log records to console with configurable level themes and Powerline badges. |
+| **Plain Text File Output** | `TextLogWriter` | Formats and writes unstyled log records to files or any `TextWriter`. |
+| **Binary Output** | `BinaryLogWriter` | Serializes log records to binary streams using `NKLogRecordSerializer`. |
+| **Multi-Target Logging** | `CompositeLogWriter` | Dispatches log records simultaneously to multiple writers (e.g. Console + File log). |
+| **File Management** | `LogFileConfig` | Configures file creation and rotation modes (`Replace`, `Append`, `NewCount`, `NewDatetime`, `NewHashDatetime`). |
 
 ---
 
-## 2. Template-Based Structured Logging
+## 2. Using `NKLogger` with .NET Dependency Injection
 
-The logger uses semantic template parsing. Instead of formatting strings beforehand, pass arguments as parameters. This keeps the log files searchable and optimizes serialization:
+NeoKolors integrates natively with `Microsoft.Extensions.Logging`. You can register NeoKolors in any generic host, Web API, Worker Service, or `ServiceCollection`.
+
+### 2.1 Basic DI Registration
 
 ```csharp
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using NeoKolors.Console;
 
-// The logger dynamically replaces {Key} and {Value}
-NKDebug.Info("Loading configuration: {Key} = {Value}", "Theme", "MaterialDark");
+var services = new ServiceCollection();
 
-// Can also pass complex objects
-NKDebug.Warn("User {UserId} failed authentication from {IpAddress}", 1024, "127.0.0.1");
+// Register NeoKolors as the logging provider
+services.AddLogging(builder => {
+    builder.AddNeoKolors();
+});
+
+using var provider = services.BuildServiceProvider();
+var logger = provider.GetRequiredService<ILogger<Program>>();
+
+logger.LogInformation("NeoKolors logger registered successfully!");
+logger.LogWarning("System warning event ID: {EventId}", 404);
+```
+
+### 2.2 Configuring ANSI Console Theme
+
+You can customize timestamp formats and ANSI level styles when registering:
+
+```csharp
+services.AddLogging(builder => {
+    builder.AddNeoKolors(ansiConfig => {
+        ansiConfig.ShowTime = true;
+        ansiConfig.TimeFormat = "HH:mm:ss.fff";
+        ansiConfig.FormatExceptions = true;
+    });
+});
+```
+
+### 2.3 File Logging via `ILoggingBuilder`
+
+To write logs simultaneously to Console and a log file:
+
+```csharp
+services.AddLogging(builder => {
+    // Generates sequential log files: logs/app_1.log, logs/app_2.log, etc.
+    builder.AddNeoKolorsFile(LogFileConfig.NewCount("./logs/app_{0}.log"));
+});
 ```
 
 ---
 
-## 3. Configuring Log Output Backends
+## 3. Standalone Usage
 
-The logger can output to multiple targets concurrently, including standard output, standard error, or log files.
+You can also use `NKLogger` directly without Dependency Injection.
 
-### 3.1 File Logging Configuration
-To configure date-based log rotation, use `LogFileConfig`:
+### 3.1 Basic Standalone Usage
 
 ```csharp
 using NeoKolors.Console;
 
-// Create a datetime rotated file config: logs will be written to e.g. "./logs/2026-06-05.log"
-NKDebug.Logger.FileConfig = LogFileConfig.NewDatetime("./logs/{0:yyyy-MM-dd}.log");
+// Create a logger with default AnsiLogWriter
+var logger = new NKLogger(source: "DatabaseService");
+
+logger.Info("Connected to database successfully.");
+logger.Warn("Query execution took longer than expected.");
+logger.Error("Database connection lost!");
 ```
 
-### 3.2 Main Logger Level Configurations
-You can adjust logging thresholds dynamically:
+### 3.2 Global Diagnostic Hub (`NKDebug`)
+
+For application-wide logging and unhandled exception capture, use `NKDebug`:
 
 ```csharp
 using NeoKolors.Console;
 
-// Suppress all logs below Warn in production
-NKDebug.Logger.MinLevel = LoggerLevel.Warn;
+NKDebug.Info("Initializing application...");
+NKDebug.Warn("Configuration value missing, using fallback.");
+
+// Intercept unhandled exceptions with styled formatting
+NKDebug.ExceptionFormatting = true;
+NKDebug.EnableExceptionInterruption();
+```
+
+---
+
+## 4. Log Levels & Level Filtering
+
+`NKLogger` supports six log levels defined in the bitflag enum `NKLogLevel`:
+
+| Level Flag | `LogLevel` Equivalent | Helper Method |
+| :--- | :--- | :--- |
+| `CRITICAL` | `LogLevel.Critical` | `logger.SetLogCrit()` |
+| `ERROR` | `LogLevel.Error` | `logger.SetLogErrors()` |
+| `WARNING` | `LogLevel.Warning` | `logger.SetLogWarn()` |
+| `INFORMATION` | `LogLevel.Information` | `logger.SetLogInfo()` |
+| `DEBUG` | `LogLevel.Debug` | `logger.SetLogAll()` |
+| `TRACE` | `LogLevel.Trace` | `logger.SetLogAll()` |
+
+### Configuring Thresholds
+
+```csharp
+var logger = new NKLogger();
+
+// Only log Warnings, Errors, and Critical messages
+logger.SetLogWarn();
+
+// Or set custom level flags explicitly using bitwise OR
+logger.Level = NKLogLevel.ERROR | NKLogLevel.CRITICAL;
+```
+
+---
+
+## 5. Log File Configuration (`LogFileConfig`)
+
+`LogFileConfig` controls path resolution and file creation strategies.
+
+### 5.1 File Modes
+
+```csharp
+// Overwrite target file on each run
+var replaceConfig = LogFileConfig.Replace("./logs/current.log");
+
+// Append new entries to target file
+var appendConfig = LogFileConfig.Append("./logs/app.log");
+
+// Stateless sequential count: app_1.log, app_2.log, app_3.log...
+var countConfig = LogFileConfig.NewCount("./logs/app_{0}.log");
+
+// Date/time timestamped file: app_2026.08.14-22.30.00.log
+var dateTimeConfig = LogFileConfig.NewDatetime("./logs/app_{0}.log");
+
+// Unique hash + timestamped file
+var hashConfig = LogFileConfig.NewHash("./logs/app_{0}.log");
+```
+
+> **Note**: `LogFileConfig.NewCount` is completely stateless—it scans existing files in the target directory to determine the next sequential index without creating hidden `.nklog` tracking files.
+
+---
+
+## 6. Multi-Target Logging (`CompositeLogWriter`)
+
+To direct log output to multiple destinations (for example, printing ANSI output to console while appending plain text to a file):
+
+```csharp
+using NeoKolors.Console;
+
+var consoleWriter = new AnsiLogWriter();
+var fileWriter = TextLogWriter.CreateFromFile(LogFileConfig.NewCount("./logs/app_{0}.log"));
+
+// Combine writers
+var compositeWriter = new CompositeLogWriter(consoleWriter, fileWriter);
+
+// Use composite writer in logger
+var logger = new NKLogger(writer: compositeWriter, source: "AppCore");
+
+logger.Info("This message appears in BOTH the console and the log file!");
+```
+
+Alternatively, configure `NKLoggerOptions`:
+
+```csharp
+var options = new NKLoggerOptions()
+    .UseFileLogging(LogFileConfig.Append("./logs/app.log"));
+
+using var provider = new NKLoggerProvider(options);
+var logger = provider.CreateLogger("OrderService");
+```
+
+---
+
+## 7. Exception Formatting & Scopes
+
+### 7.1 Rich Exception Formatting
+
+`AnsiLogWriter` integrates with `ExceptionFormatter` to format exception stack traces with syntax-highlighted frames, parameters, and inner exception trees.
+
+```csharp
+try {
+    throw new InvalidOperationException("Failed to process transaction.");
+}
+catch (Exception ex) {
+    logger.Error(ex);
+}
+```
+
+### 7.2 Logging Scopes
+
+`NKLogger` supports `BeginScope`:
+
+```csharp
+using (logger.BeginScope("TransactionScope: {Id}", Guid.NewGuid())) {
+    logger.LogInformation("Processing payment step 1");
+    logger.LogInformation("Processing payment step 2");
+}
 ```

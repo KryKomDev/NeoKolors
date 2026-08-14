@@ -1,12 +1,12 @@
-﻿// //
+// //
 // NeoKolors
 // Copyright (c) 2026 KryKom
 // //
 
 using System.ComponentModel;
-using static NeoKolors.Console.Driver.Windows.WinImports;
+using static NeoKolors.Console.WinImports;
 
-namespace NeoKolors.Console.Driver.Windows;
+namespace NeoKolors.Console;
 
 /// <summary>
 /// Represents a Windows-specific implementation for managing standard output

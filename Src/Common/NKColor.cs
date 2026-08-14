@@ -13,7 +13,7 @@ namespace NeoKolors.Common;
 /// color structure that can hold every color supported by the console (+ARGB colors) 
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = sizeof(uint))]
-public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
+public readonly record struct NKColor : IFormattable, IParsableValue<NKColor>, INKParsable<NKColor> {
     
     /// <summary>
     /// Represents the underlying 32-bit unsigned integer value used to store the color data,
@@ -22,12 +22,10 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
     /// The lower 24 bits are used to store the actual color information.
     /// 6 bits remain unused...
     /// </summary>
-    [FieldOffset(0)]
-    private readonly uint _value;
+    [FieldOffset(0)] private readonly uint _value;
 
-    [FieldOffset(3)]
-    private readonly byte _type;
-    
+    [FieldOffset(3)] private readonly byte _type;
+
     public OneOf<uint, NKConsoleColor, DefaultColor, InheritColor> Value {
         get {
             return (ColorType)_type switch {
@@ -35,7 +33,7 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
                 ColorType.CONSOLE_COLOR => (NKConsoleColor)(_value & 0x000000ff),
                 ColorType.DEFAULT       => new DefaultColor(),
                 ColorType.INHERIT       => new InheritColor(),
-                _ => throw new ArgumentOutOfRangeException()
+                _                       => throw new ArgumentOutOfRangeException()
             };
         }
     }
@@ -52,15 +50,14 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
         Action<DefaultColor>   @default,
         Action<uint>           rgb,
         Action<NKConsoleColor> palette,
-        Action<InheritColor>   inherit) 
-    {
+        Action<InheritColor>   inherit
+    ) {
         switch ((ColorType)_type) {
             case ColorType.DEFAULT:       @default(new DefaultColor()); break;
-            case ColorType.CONSOLE_COLOR: palette(AsPalette);           break;
-            case ColorType.RGB:           rgb(AsRgb);                   break;
-            case ColorType.INHERIT:       inherit(new InheritColor());  break;
-            default:
-                throw new ArgumentOutOfRangeException();
+            case ColorType.CONSOLE_COLOR: palette(AsPalette); break;
+            case ColorType.RGB:           rgb(AsRgb); break;
+            case ColorType.INHERIT:       inherit(new InheritColor()); break;
+            default:                      throw new ArgumentOutOfRangeException();
         }
     }
 
@@ -78,8 +75,8 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
         Func<DefaultColor,   T> @default,
         Func<uint,           T> rgb,
         Func<NKConsoleColor, T> palette,
-        Func<InheritColor,   T> inherit)
-    {
+        Func<InheritColor,   T> inherit
+    ) {
         return (ColorType)_type switch {
             ColorType.DEFAULT       => @default(new DefaultColor()),
             ColorType.RGB           => rgb(AsRgb),
@@ -89,16 +86,16 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
         };
     }
 
-    public ColorType Type => (ColorType)(_type);
-    
+    public ColorType Type => (ColorType)_type;
+
     public bool IsRgb     => _type == (byte)ColorType.RGB;
     public bool IsPalette => _type == (byte)ColorType.CONSOLE_COLOR;
     public bool IsDefault => _type == (byte)ColorType.DEFAULT;
     public bool IsInherit => _type == (byte)ColorType.INHERIT;
-    
-    public uint AsRgb => _value & 0x00ffffff;
+
+    public uint           AsRgb     => _value & 0x00ffffff;
     public NKConsoleColor AsPalette => (NKConsoleColor)(_value & 0x000000ff);
-    
+
     // ====== CONSTRUCTORS ======
 
     public NKColor(int rgb) {
@@ -125,27 +122,27 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
         _value = value & 0x00ffffff;
         _type  = (byte)type;
     }
-    
+
     /// <summary>
     /// Returns a new color with the default console value.
     /// </summary>
     public static NKColor Default => new(ColorType.DEFAULT);
-    
+
     /// <summary>
     /// Returns a new color that indicates that the color should be inherited (not overriden).
     /// </summary>
     public static NKColor Inherit => new(ColorType.INHERIT);
-    
+
     public static NKColor FromRgb(byte r, byte g, byte b) => new((r << 16) | (g << 8) | b);
     public static NKColor FromRgb(uint hex) => new(ColorType.RGB, hex);
-    public static NKColor FromRgb(int hex) => new(hex);
-    
-    
+    public static NKColor FromRgb(int  hex) => new(hex);
+
+
     // ====== IMPLICIT CONVERSIONS ======
 
     public static implicit operator NKColor(NKConsoleColor color) => new(color);
-    public static implicit operator NKColor(ConsoleColor color) => new(color);
-    public static implicit operator NKColor(uint color) => FromRgb(color);
+    public static implicit operator NKColor(ConsoleColor   color) => new(color);
+    public static implicit operator NKColor(uint           color) => FromRgb(color);
 
     public static implicit operator NKColor(int color) => FromRgb(color);
 
@@ -164,7 +161,7 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
             _ => throw InvalidColorCastException.ConsoleToRgb(),
             _ => throw InvalidColorCastException.InheritToConsole()
         );
-    
+
     public static implicit operator int(NKColor color) =>
         color.Match(
             _ => throw InvalidColorCastException.DefaultToRgb(),
@@ -172,7 +169,7 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
             _ => throw InvalidColorCastException.ConsoleToRgb(),
             _ => throw InvalidColorCastException.InheritToConsole()
         );
-    
+
     public bool Equals(NKColor? other) => other.HasValue && _value == other.Value._value;
 
     public override int GetHashCode() {
@@ -212,12 +209,14 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
         );
 
     public void Write() =>
-        Console.Write(Match(
-            _ => "Default",
-            i => $"{"●".AddColor(i)} #{i:x6}",
-            c => $"{"●".AddColor(c)} {Enum.GetName(typeof(NKConsoleColor), c)}",
-            _ => "Inherit"
-        ));
+        Console.Write(
+            Match(
+                _ => "Default",
+                i => $"{"●".AddColor(i)} #{i:x6}",
+                c => $"{"●".AddColor(c)} {Enum.GetName(typeof(NKConsoleColor), c)}",
+                _ => "Inherit"
+            )
+        );
 
     public override string ToString() =>
         Match(
@@ -227,18 +226,19 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
             _ => "Inherit"
         );
 
-    public string ToString(string format) => 
-        ToString(format, CultureInfo.InvariantCulture);
-    
+    public string ToString(string format) => ToString(format, CultureInfo.InvariantCulture);
+
     public string ToString(string? format, IFormatProvider? formatProvider) {
-        if (string.IsNullOrEmpty(format)) format = "T";
+        if (string.IsNullOrEmpty(format))
+            format = "T";
+
         return format switch {
             "#p" or "#P" or "#Plain" or "#r" or "#R" or "#Raw" => "#" + ToString(),
-            "p" or "P" or "Plain" or "r" or "R" or "Raw" => ToString(),
-            "t" or "T" or "Text" or "f" or "F" or "Forg" => Text,
-            "b" or "B" or "Bckg" => Bckg,
-            "u" or "U" or "Underline" => Underline,
-            _ => Text
+            "p" or "P" or "Plain" or "r" or "R" or "Raw"       => ToString(),
+            "t" or "T" or "Text" or "f" or "F" or "Forg"       => Text,
+            "b" or "B" or "Bckg"                               => Bckg,
+            "u" or "U" or "Underline"                          => Underline,
+            _                                                  => Text
         };
     }
 
@@ -247,11 +247,15 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
         for (int z = 0; z < 6; z++) {
             for (int y = 0; y < 6; y++) {
                 for (int x = 0; x < 6; x++) {
-                    Console.Write($"{z * 36 + y * 6 + x + 16:x2}"
-                        .AddColorB((byte)(z * 255 / 5), (byte)(y * 255 / 5), (byte)(x * 255 / 5))
-                        .AddColor(
-                            FromRgb((byte)(z * 255 / 5), (byte)(y * 255 / 5), (byte)(x * 255 / 5)).GetInverse()));
+                    Console.Write(
+                        $"{z * 36 + y * 6 + x + 16:x2}"
+                            .AddColorB((byte)(z * 255 / 5), (byte)(y * 255 / 5), (byte)(x * 255 / 5))
+                            .AddColor(
+                                FromRgb((byte)(z * 255 / 5), (byte)(y * 255 / 5), (byte)(x * 255 / 5)).GetInverse()
+                            )
+                    );
                 }
+
                 Console.WriteLine();
             }
 
@@ -264,70 +268,81 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
             case ColorType.RGB:
                 byte r = (byte)(_value >> 16);
                 byte g = (byte)(_value >> 08);
-                byte b = (byte) _value;
-                
+                byte b = (byte)_value;
+
                 return FromRgb((byte)(255 - r), (byte)(255 - g), (byte)(255 - b));
             case ColorType.CONSOLE_COLOR:
                 byte c = (byte)(_value & 0x000000ff);
+
                 return new NKColor((NKConsoleColor)((c + 8) % 16));
-            case ColorType.DEFAULT:
-                return Default;
-            case ColorType.INHERIT:
-                return Inherit;
-            default:
-                throw new ArgumentOutOfRangeException();
+            case ColorType.DEFAULT: return Default;
+            case ColorType.INHERIT: return Inherit;
+            default:                throw new ArgumentOutOfRangeException();
         }
     }
 
     public bool Equals(NKColor other) => _value == other._value;
-    
-    public static NKColor Parse(string s) => Parse(s, CultureInfo.InvariantCulture);
-    
-    public static NKColor Parse(string s, IFormatProvider? provider) {
-        if (s == null) throw new ArgumentNullException(nameof(s));
-        if (TryParse(s, provider, out var result)) {
-            return result;
-        }
-        throw new FormatException($"Invalid color: {s}");
+
+    public static NKColor Parse([NotNullWhen(true)] string? s) => Parse(s, CultureInfo.InvariantCulture);
+
+    public static NKColor Parse([NotNullWhen(true)] string? s, IFormatProvider? provider) {
+        return TryParse(s, provider, out var result) 
+            ? result 
+            : throw new FormatException($"Invalid color: {s}");
     }
+
+    // ReSharper disable once RedundantNullableFlowAttribute
+    public static bool TryParse([NotNullWhen(true)] string? s, [MaybeNullWhen(false)] out NKColor result) => 
+        TryParse(s, CultureInfo.InvariantCulture, out result);
 
     public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out NKColor result) {
         if (string.IsNullOrEmpty(s)) {
             result = Default;
+
             return true;
         }
 
-        var trimmed = s.Trim();
-        
+        var trimmed = s.Trim().Replace('-', '_');
+
         if (trimmed.StartsWith('#')) {
             var hex = trimmed[1..];
+
             if (uint.TryParse(hex, NumberStyles.HexNumber, null, out uint rgb)) {
                 result = FromRgb(rgb);
+
                 return true;
             }
+
             result = Default;
+
             return false;
         }
-        
+
         if (string.Equals(trimmed, "Default", StringComparison.OrdinalIgnoreCase)) {
             result = Default;
+
             return true;
         }
+
         if (string.Equals(trimmed, "Inherit", StringComparison.OrdinalIgnoreCase)) {
             result = Inherit;
+
             return true;
         }
 
         if (Enum.TryParse<NKConsoleColor>(trimmed, true, out var nkc)) {
             result = new NKColor(nkc);
+
             return true;
         }
 
         result = Default;
+
         return false;
     }
-    
-    bool IParsableValue<NKColor>.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out NKColor result) => TryParse(s, provider, out result);
+
+    bool IParsableValue<NKColor>.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out NKColor result) => 
+        TryParse(s, provider, out result);
 
     /// <summary>
     /// Performs linear interpolation (Lerp) between two RGB colors based on a specified fraction.
@@ -344,15 +359,16 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
             throw new InvalidOperationException("Both colors must be RGB to use Linear Interpolation (Lerp).");
 
         var s = start.AsRgb;
-        var e = end  .AsRgb;
-        
+        var e = end.AsRgb;
+
         fraction = Math.Clamp(fraction, 0f, 1f);
         byte r = (byte)(s.R + (e.R - s.R) * fraction);
         byte g = (byte)(s.G + (e.G - s.G) * fraction);
         byte b = (byte)(s.B + (e.B - s.B) * fraction);
+
         return FromRgb(r, g, b);
     }
-    
+
     public static NKColor GetMultiStopColor(NKColor[] colors, float fraction) {
         switch (colors.Length) {
             case 0: return Default;
@@ -362,18 +378,19 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
         fraction = Math.Clamp(fraction, 0f, 1f);
 
         // If at the absolute end, return the last color
-        if (fraction >= 1f) return colors[^1];
+        if (fraction >= 1f)
+            return colors[^1];
 
         // Determine which segment we are in
         float segmentValue = fraction * (colors.Length - 1);
-        int segmentIndex = (int)Math.Floor(segmentValue);
-        
+        int   segmentIndex = (int)Math.Floor(segmentValue);
+
         // Determine how far we are into that specific segment
         float localFraction = segmentValue - segmentIndex;
 
         return Lerp(colors[segmentIndex], colors[segmentIndex + 1], localFraction);
     }
-    
+
 
     internal static void AppendInnerF(StringBuilder sb, NKColor prev, NKColor next) => AppendInner(sb, prev, next, 3);
     internal static void AppendInnerB(StringBuilder sb, NKColor prev, NKColor next) => AppendInner(sb, prev, next, 4);
@@ -383,37 +400,40 @@ public readonly record struct NKColor : IFormattable, IParsableValue<NKColor> {
         var prevIsDefault = prev.IsDefault || prev.IsInherit;
         var nextIsDefault = next.IsDefault || next.IsInherit;
 
-        if ((prevIsDefault && nextIsDefault) || prev == next) return;
+        if ((prevIsDefault && nextIsDefault) || prev == next)
+            return;
 
         if (nextIsDefault) {
             sb.Append($"{mode}9;");
+
             return;
         }
 
-        sb.Append(next.IsPalette 
-            ? $"{mode}8;5;{(byte)next.AsPalette};" 
-            : $"{mode}8;2;{next.AsRgb.R};{next.AsRgb.G};{next.AsRgb.B};"
+        sb.Append(
+            next.IsPalette
+                ? $"{mode}8;5;{(byte)next.AsPalette};"
+                : $"{mode}8;2;{next.AsRgb.R};{next.AsRgb.G};{next.AsRgb.B};"
         );
     }
 
 
-    public static NKColor White { get; } = new(NKConsoleColor.WHITE);
-    public static NKColor Black { get; } = new(NKConsoleColor.BLACK);
-    public static NKColor Red { get; } = new(NKConsoleColor.RED);
-    public static NKColor Green { get; } = new(NKConsoleColor.GREEN);
-    public static NKColor Blue { get; } = new(NKConsoleColor.BLUE);
-    public static NKColor Yellow { get; } = new(NKConsoleColor.YELLOW);
-    public static NKColor Magenta { get; } = new(NKConsoleColor.MAGENTA);
-    public static NKColor Cyan { get; } = new(NKConsoleColor.CYAN);
-    public static NKColor DarkBlue { get; } = new(NKConsoleColor.DARK_BLUE);
-    public static NKColor DarkGreen { get; } = new(NKConsoleColor.DARK_GREEN);
-    public static NKColor DarkRed { get; } = new(NKConsoleColor.DARK_RED);
-    public static NKColor DarkYellow { get; }  = new(NKConsoleColor.DARK_YELLOW);
+    public static NKColor White       { get; } = new(NKConsoleColor.WHITE);
+    public static NKColor Black       { get; } = new(NKConsoleColor.BLACK);
+    public static NKColor Red         { get; } = new(NKConsoleColor.RED);
+    public static NKColor Green       { get; } = new(NKConsoleColor.GREEN);
+    public static NKColor Blue        { get; } = new(NKConsoleColor.BLUE);
+    public static NKColor Yellow      { get; } = new(NKConsoleColor.YELLOW);
+    public static NKColor Magenta     { get; } = new(NKConsoleColor.MAGENTA);
+    public static NKColor Cyan        { get; } = new(NKConsoleColor.CYAN);
+    public static NKColor DarkBlue    { get; } = new(NKConsoleColor.DARK_BLUE);
+    public static NKColor DarkGreen   { get; } = new(NKConsoleColor.DARK_GREEN);
+    public static NKColor DarkRed     { get; } = new(NKConsoleColor.DARK_RED);
+    public static NKColor DarkYellow  { get; } = new(NKConsoleColor.DARK_YELLOW);
     public static NKColor DarkMagenta { get; } = new(NKConsoleColor.DARK_MAGENTA);
-    public static NKColor DarkCyan { get; } = new(NKConsoleColor.DARK_CYAN);
-    public static NKColor DarkGray { get; } = new(NKConsoleColor.DARK_GRAY);
-    public static NKColor Gray { get; } = new(NKConsoleColor.GRAY);
-    
+    public static NKColor DarkCyan    { get; } = new(NKConsoleColor.DARK_CYAN);
+    public static NKColor DarkGray    { get; } = new(NKConsoleColor.DARK_GRAY);
+    public static NKColor Gray        { get; } = new(NKConsoleColor.GRAY);
+
     public enum ColorType : byte {
         DEFAULT       = 0,
         CONSOLE_COLOR = 0b01,

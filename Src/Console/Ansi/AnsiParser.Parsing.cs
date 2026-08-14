@@ -3,9 +3,6 @@
 // Copyright (c) 2026 KryKom
 // //
 
-using NeoKolors.Console.Ansi.Mouse;
-using NeoKolors.Console.Events;
-
 namespace NeoKolors.Console.Ansi;
 
 public abstract partial class AnsiParser {

@@ -5,9 +5,8 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using NeoKolors.Console.Input;
 
-namespace NeoKolors.Console.Driver.Dotnet;
+namespace NeoKolors.Console;
 
 internal enum DotnetInputRecordType : byte {
     KEYBOARD,

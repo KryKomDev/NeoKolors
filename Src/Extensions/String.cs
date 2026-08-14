@@ -8,7 +8,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
-using static NeoKolors.Extensions.Exception.ThrowHelper.ArgOutOfRange;
 
 namespace NeoKolors.Extensions;
 
@@ -567,7 +566,12 @@ public static class String {
         /// </exception>
         [System.Diagnostics.Contracts.Pure]
         public static string ToRoman(int number, bool lowercase = false) {
-            ThrowIf(number is < 1 or > 3999, nameof(number));
+            if (number is < 1 or > 3999) {
+                throw new ArgumentOutOfRangeException(
+                    nameof(number), 
+                    "Maximum supported value is 3999."
+                );
+            }
 
             string output = "";
 

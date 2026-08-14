@@ -3,7 +3,7 @@
 // Copyright (c) 2026 KryKom
 // //
 
-namespace NeoKolors.Console.Driver.Windows;
+namespace NeoKolors.Console;
 
 /// <summary>
 /// The <c>WindowsOutputDriver</c> class provides an implementation of the <see cref="IOutputDriver"/> interface

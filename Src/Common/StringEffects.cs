@@ -3,9 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
-#if NET8_0_OR_GREATER
 using System.Diagnostics.CodeAnalysis;
-#endif
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
 using static NeoKolors.Common.EscapeCodes;
@@ -13,8 +11,6 @@ using static NeoKolors.Common.EscapeCodes;
 namespace NeoKolors.Common;
 
 public static class StringEffects {
-
-    private const string COMPOSITE = StringSyntaxAttribute.CompositeFormat;
 
     /// <param name="s">input string</param>
     extension(string s) {
@@ -156,7 +152,7 @@ public static class StringEffects {
 
 
     /// <param name="s">The input string containing format items to be replaced.</param>
-    extension([StringSyntax(COMPOSITE)] string s) {
+    extension([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string s) {
         
         /// <summary>
         /// Replaces format items in the input string with the corresponding color values provided in the array of colors.
