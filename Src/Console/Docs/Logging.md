@@ -8,15 +8,15 @@ The **NeoKolors** logging engine provides high-performance ANSI-styled console o
 
 The logging system consists of several modular components:
 
-| Component | Class | Description |
-| :--- | :--- | :--- |
-| **Logger Core** | `NKLogger` | Primary logger implementing `Microsoft.Extensions.Logging.ILogger`. |
-| **DI Integration** | `NKLoggerProvider`, `NKLoggingBuilderExtensions` | `ILoggerProvider` implementation and `ILoggingBuilder` / `IServiceCollection` extension methods. |
-| **Console Output** | `AnsiLogWriter` | Formats and prints styled ANSI log records to console with configurable level themes and Powerline badges. |
-| **Plain Text File Output** | `TextLogWriter` | Formats and writes unstyled log records to files or any `TextWriter`. |
-| **Binary Output** | `BinaryLogWriter` | Serializes log records to binary streams using `NKLogRecordSerializer`. |
-| **Multi-Target Logging** | `CompositeLogWriter` | Dispatches log records simultaneously to multiple writers (e.g. Console + File log). |
-| **File Management** | `LogFileConfig` | Configures file creation and rotation modes (`Replace`, `Append`, `NewCount`, `NewDatetime`, `NewHashDatetime`). |
+| Component                  | Class                                            | Description                                                                                                      |
+|:---------------------------|:-------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------|
+| **Logger Core**            | `NKLogger`                                       | Primary logger implementing `Microsoft.Extensions.Logging.ILogger`.                                              |
+| **DI Integration**         | `NKLoggerProvider`, `NKLoggingBuilderExtensions` | `ILoggerProvider` implementation and `ILoggingBuilder` / `IServiceCollection` extension methods.                 |
+| **Console Output**         | `AnsiLogWriter`                                  | Formats and prints styled ANSI log records to console with configurable level themes and Powerline badges.       |
+| **Plain Text File Output** | `TextLogWriter`                                  | Formats and writes unstyled log records to files or any `TextWriter`.                                            |
+| **Binary Output**          | `BinaryLogWriter`                                | Serializes log records to binary streams using `NKLogRecordSerializer`.                                          |
+| **Multi-Target Logging**   | `CompositeLogWriter`                             | Dispatches log records simultaneously to multiple writers (e.g. Console + File log).                             |
+| **File Management**        | `LogFileConfig`                                  | Configures file creation and rotation modes (`Replace`, `Append`, `NewCount`, `NewDatetime`, `NewHashDatetime`). |
 
 ---
 
@@ -110,14 +110,14 @@ NKDebug.EnableExceptionInterruption();
 
 `NKLogger` supports six log levels defined in the bitflag enum `NKLogLevel`:
 
-| Level Flag | `LogLevel` Equivalent | Helper Method |
-| :--- | :--- | :--- |
-| `CRITICAL` | `LogLevel.Critical` | `logger.SetLogCrit()` |
-| `ERROR` | `LogLevel.Error` | `logger.SetLogErrors()` |
-| `WARNING` | `LogLevel.Warning` | `logger.SetLogWarn()` |
-| `INFORMATION` | `LogLevel.Information` | `logger.SetLogInfo()` |
-| `DEBUG` | `LogLevel.Debug` | `logger.SetLogAll()` |
-| `TRACE` | `LogLevel.Trace` | `logger.SetLogAll()` |
+| Level Flag    | `LogLevel` Equivalent  | Helper Method           |
+|:--------------|:-----------------------|:------------------------|
+| `CRITICAL`    | `LogLevel.Critical`    | `logger.SetLogCrit()`   |
+| `ERROR`       | `LogLevel.Error`       | `logger.SetLogErrors()` |
+| `WARNING`     | `LogLevel.Warning`     | `logger.SetLogWarn()`   |
+| `INFORMATION` | `LogLevel.Information` | `logger.SetLogInfo()`   |
+| `DEBUG`       | `LogLevel.Debug`       | `logger.SetLogAll()`    |
+| `TRACE`       | `LogLevel.Trace`       | `logger.SetLogAll()`    |
 
 ### Configuring Thresholds
 

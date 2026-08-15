@@ -14,7 +14,7 @@
         <Company>KryKom</Company>
         <Version>2026.3</Version>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
-        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
         <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -36,11 +36,11 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Polyfill" Version="11.0.1">
+        <PackageReference Include="Polyfill" Version="11.2.0">
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="System.Collections.Immutable" Version="10.0.10" />
+        <PackageReference Include="System.Collections.Immutable" Version="10.0.11" />
     </ItemGroup>
     
     <ItemGroup>
