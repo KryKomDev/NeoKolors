@@ -148,16 +148,26 @@ public static class EscapeCodes {
     public const string INVISIBLE_END = "\e[28m";
     public const string STRIKETHROUGH_END = "\e[29m";
 
+    private const string UNDERLINE_START_TYPE_FORMAT_NO_ESCAPE = "4:{0};";
+    private const string UNDERLINE_START_NO_ESCAPE = "4;";
+
     /// <summary>
     /// Generates an escape sequence to enable underlining with the specified underline type.
     /// </summary>
     /// <param name="type">The type of underline to apply, such as normal, thick, curly, dotted, or dashed.
     /// Defaults to normal if not specified.</param>
+    /// <param name="addEsc">Whether to add the CSI and terminating character.</param>
     /// <returns>A string containing the formatted escape sequence to enable the specified underline style.</returns>
-    public static string GetUnderline(UnderlineType type = UnderlineType.NORMAL)
-        => type == UnderlineType.NORMAL 
-            ? UNDERLINE_START 
-            : UNDERLINE_START_TYPE_FORMAT.Format((int)type);
+    public static string GetUnderline(NKUnderlineType type = NKUnderlineType.NORMAL, bool addEsc = true)
+        => type == NKUnderlineType.NORMAL 
+            ? (addEsc 
+                ? UNDERLINE_START 
+                : UNDERLINE_START_NO_ESCAPE
+            ) 
+            : (addEsc 
+                ? UNDERLINE_START_TYPE_FORMAT 
+                : UNDERLINE_START_TYPE_FORMAT_NO_ESCAPE
+            ).Format((int)type + 1);
     
     #endregion
 

@@ -10,7 +10,7 @@ To support high-frequency terminal drawing, `NKStyle` is structured as a bit-pac
 
 ```csharp
 [StructLayout(LayoutKind.Explicit, Size = sizeof(ulong))]
-public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsable<NKStyle>
+public record struct NKStyle : IFormattable, IParsable<NKStyle>
 ```
 
 ### Bit Fields Layout

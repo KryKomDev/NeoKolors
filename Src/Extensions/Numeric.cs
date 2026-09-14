@@ -57,6 +57,9 @@ public static class Numeric {
         /// <returns>The clamped integer value.</returns>
         public int Clamp(int min, int max) => Math.Clamp(val, min, max);
 
+        public int TopClamp(int max) => max < val ? max : val;
+        public int BottomClamp(int min) => min > val ? min : val;
+        
         public Index Index => new(val);
     }
 

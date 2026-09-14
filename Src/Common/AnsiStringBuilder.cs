@@ -936,12 +936,12 @@ public sealed class AnsiStringBuilder {
     /// <summary>
     /// Updates only the foreground color in the specified range, preserving background color and text styles.
     /// </summary>
-    public AnsiStringBuilder SetFColor(NKColor color, int startIndex, int length) => ModifyStyle(s => s.SetFColor(color), startIndex, length);
+    public AnsiStringBuilder SetFColor(NKColor color, int startIndex, int length) => ModifyStyle(s => s.WithFColor(color), startIndex, length);
 
     /// <summary>
     /// Updates only the foreground color in the specified range, preserving background color and text styles.
     /// </summary>
-    public AnsiStringBuilder SetFColor(NKColor color, Range range) => ModifyStyle(s => s.SetFColor(color), range);
+    public AnsiStringBuilder SetFColor(NKColor color, Range range) => ModifyStyle(s => s.WithFColor(color), range);
 
     /// <summary>
     /// Updates only the background color for the entire builder content, preserving text color and text styles.
@@ -956,92 +956,92 @@ public sealed class AnsiStringBuilder {
     /// <summary>
     /// Updates only the background color in the specified range, preserving text color and text styles.
     /// </summary>
-    public AnsiStringBuilder SetBColor(NKColor color, int startIndex, int length) => ModifyStyle(s => s.SetBColor(color), startIndex, length);
+    public AnsiStringBuilder SetBColor(NKColor color, int startIndex, int length) => ModifyStyle(s => s.WithBColor(color), startIndex, length);
 
     /// <summary>
     /// Updates only the background color in the specified range, preserving text color and text styles.
     /// </summary>
-    public AnsiStringBuilder SetBColor(NKColor color, Range range) => ModifyStyle(s => s.SetBColor(color), range);
+    public AnsiStringBuilder SetBColor(NKColor color, Range range) => ModifyStyle(s => s.WithBColor(color), range);
 
     /// <summary>
     /// Sets text style flags for the entire builder content, preserving text color and background color.
     /// </summary>
-    public AnsiStringBuilder SetStyles(TextStyles styles) => SetStyles(styles, 0, _chars.Count);
+    public AnsiStringBuilder SetStyles(NKTextStyles styles) => SetStyles(styles, 0, _chars.Count);
 
     /// <summary>
     /// Sets text style flags from <paramref name="startIndex"/> to the end, preserving text color and background color.
     /// </summary>
-    public AnsiStringBuilder SetStyles(TextStyles styles, int startIndex) => SetStyles(styles, startIndex, _chars.Count - startIndex);
+    public AnsiStringBuilder SetStyles(NKTextStyles styles, int startIndex) => SetStyles(styles, startIndex, _chars.Count - startIndex);
 
     /// <summary>
     /// Sets text style flags in the specified range, preserving text color and background color.
     /// </summary>
-    public AnsiStringBuilder SetStyles(TextStyles styles, int startIndex, int length) => ModifyStyle(s => s.SetStyles(styles), startIndex, length);
+    public AnsiStringBuilder SetStyles(NKTextStyles styles, int startIndex, int length) => ModifyStyle(s => s.WithStyles(styles), startIndex, length);
 
     /// <summary>
     /// Sets text style flags in the specified range, preserving text color and background color.
     /// </summary>
-    public AnsiStringBuilder SetStyles(TextStyles styles, Range range) => ModifyStyle(s => s.SetStyles(styles), range);
+    public AnsiStringBuilder SetStyles(NKTextStyles styles, Range range) => ModifyStyle(s => s.WithStyles(styles), range);
 
     /// <summary>
     /// Adds specified text style flags (bitwise OR) for the entire builder content.
     /// </summary>
-    public AnsiStringBuilder AddStyles(TextStyles styles) => AddStyles(styles, 0, _chars.Count);
+    public AnsiStringBuilder AddStyles(NKTextStyles styles) => AddStyles(styles, 0, _chars.Count);
 
     /// <summary>
     /// Adds specified text style flags (bitwise OR) from <paramref name="startIndex"/> to the end.
     /// </summary>
-    public AnsiStringBuilder AddStyles(TextStyles styles, int startIndex) => AddStyles(styles, startIndex, _chars.Count - startIndex);
+    public AnsiStringBuilder AddStyles(NKTextStyles styles, int startIndex) => AddStyles(styles, startIndex, _chars.Count - startIndex);
 
     /// <summary>
     /// Adds specified text style flags (bitwise OR) in the specified range.
     /// </summary>
-    public AnsiStringBuilder AddStyles(TextStyles styles, int startIndex, int length) => ModifyStyle(s => s.SetStyles(s.Styles | styles), startIndex, length);
+    public AnsiStringBuilder AddStyles(NKTextStyles styles, int startIndex, int length) => ModifyStyle(s => s.WithStyles(s.Styles | styles), startIndex, length);
 
     /// <summary>
     /// Adds specified text style flags (bitwise OR) in the specified range.
     /// </summary>
-    public AnsiStringBuilder AddStyles(TextStyles styles, Range range) => ModifyStyle(s => s.SetStyles(s.Styles | styles), range);
+    public AnsiStringBuilder AddStyles(NKTextStyles styles, Range range) => ModifyStyle(s => s.WithStyles(s.Styles | styles), range);
 
     /// <summary>
     /// Removes specified text style flags (bitwise AND NOT) for the entire builder content.
     /// </summary>
-    public AnsiStringBuilder RemoveStyles(TextStyles styles) => RemoveStyles(styles, 0, _chars.Count);
+    public AnsiStringBuilder RemoveStyles(NKTextStyles styles) => RemoveStyles(styles, 0, _chars.Count);
 
     /// <summary>
     /// Removes specified text style flags (bitwise AND NOT) from <paramref name="startIndex"/> to the end.
     /// </summary>
-    public AnsiStringBuilder RemoveStyles(TextStyles styles, int startIndex) => RemoveStyles(styles, startIndex, _chars.Count - startIndex);
+    public AnsiStringBuilder RemoveStyles(NKTextStyles styles, int startIndex) => RemoveStyles(styles, startIndex, _chars.Count - startIndex);
 
     /// <summary>
     /// Removes specified text style flags (bitwise AND NOT) in the specified range.
     /// </summary>
-    public AnsiStringBuilder RemoveStyles(TextStyles styles, int startIndex, int length) => ModifyStyle(s => s.SetStyles(s.Styles & ~styles), startIndex, length);
+    public AnsiStringBuilder RemoveStyles(NKTextStyles styles, int startIndex, int length) => ModifyStyle(s => s.WithStyles(s.Styles & ~styles), startIndex, length);
 
     /// <summary>
     /// Removes specified text style flags (bitwise AND NOT) in the specified range.
     /// </summary>
-    public AnsiStringBuilder RemoveStyles(TextStyles styles, Range range) => ModifyStyle(s => s.SetStyles(s.Styles & ~styles), range);
+    public AnsiStringBuilder RemoveStyles(NKTextStyles styles, Range range) => ModifyStyle(s => s.WithStyles(s.Styles & ~styles), range);
 
     /// <summary>
     /// Toggles specified text style flags (bitwise XOR) for the entire builder content.
     /// </summary>
-    public AnsiStringBuilder ToggleStyles(TextStyles styles) => ToggleStyles(styles, 0, _chars.Count);
+    public AnsiStringBuilder ToggleStyles(NKTextStyles styles) => ToggleStyles(styles, 0, _chars.Count);
 
     /// <summary>
     /// Toggles specified text style flags (bitwise XOR) from <paramref name="startIndex"/> to the end.
     /// </summary>
-    public AnsiStringBuilder ToggleStyles(TextStyles styles, int startIndex) => ToggleStyles(styles, startIndex, _chars.Count - startIndex);
+    public AnsiStringBuilder ToggleStyles(NKTextStyles styles, int startIndex) => ToggleStyles(styles, startIndex, _chars.Count - startIndex);
 
     /// <summary>
     /// Toggles specified text style flags (bitwise XOR) in the specified range.
     /// </summary>
-    public AnsiStringBuilder ToggleStyles(TextStyles styles, int startIndex, int length) => ModifyStyle(s => s.SetStyles(s.Styles ^ styles), startIndex, length);
+    public AnsiStringBuilder ToggleStyles(NKTextStyles styles, int startIndex, int length) => ModifyStyle(s => s.WithStyles(s.Styles ^ styles), startIndex, length);
 
     /// <summary>
     /// Toggles specified text style flags (bitwise XOR) in the specified range.
     /// </summary>
-    public AnsiStringBuilder ToggleStyles(TextStyles styles, Range range) => ModifyStyle(s => s.SetStyles(s.Styles ^ styles), range);
+    public AnsiStringBuilder ToggleStyles(NKTextStyles styles, Range range) => ModifyStyle(s => s.WithStyles(s.Styles ^ styles), range);
 
     /// <summary>
     /// Overrides non-inherit attributes of existing styles for the entire builder content with the specified style.
@@ -1056,12 +1056,12 @@ public sealed class AnsiStringBuilder {
     /// <summary>
     /// Overrides non-inherit attributes of existing styles in the specified range with the specified style.
     /// </summary>
-    public AnsiStringBuilder OverrideStyle(NKStyle style, int startIndex, int length) => ModifyStyle(s => s.OverrideWith(style), startIndex, length);
+    public AnsiStringBuilder OverrideStyle(NKStyle style, int startIndex, int length) => ModifyStyle(s => s.With(style), startIndex, length);
 
     /// <summary>
     /// Overrides non-inherit attributes of existing styles in the specified range with the specified style.
     /// </summary>
-    public AnsiStringBuilder OverrideStyle(NKStyle style, Range range) => ModifyStyle(s => s.OverrideWith(style), range);
+    public AnsiStringBuilder OverrideStyle(NKStyle style, Range range) => ModifyStyle(s => s.With(style), range);
 
     // ============================ Conversion / Rendering ============================ //
 

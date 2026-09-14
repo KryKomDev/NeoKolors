@@ -10,7 +10,7 @@ Unlike typical color classes that allocate objects on the heap, `NKColor` is imp
 
 ```csharp
 [StructLayout(LayoutKind.Explicit, Size = sizeof(uint))]
-public readonly record struct NKColor : IFormattable, IParsableValue<NKColor>, INKParsable<NKColor>
+public readonly record struct NKColor : IFormattable, IParsable<NKColor>
 ```
 
 The underlying bits are packed as follows:

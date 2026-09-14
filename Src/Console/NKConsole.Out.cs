@@ -137,7 +137,7 @@ public static partial class NKConsole {
     /// <param name="s">string to print</param>
     /// <param name="t">style</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Write(string s, TextStyles t) => 
+    public static void Write(string s, NKTextStyles t) => 
         OutputDriver.Write(s.AddStyle(t));
     
 
@@ -211,7 +211,7 @@ public static partial class NKConsole {
     /// <param name="s">string to print</param>
     /// <param name="t">style</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(string s, TextStyles t) => 
+    public static void WriteLine(string s, NKTextStyles t) => 
         OutputDriver.WriteLine(s.AddStyle(t));
 
 
@@ -625,7 +625,7 @@ public static partial class NKConsole {
 
         // print header
         for (int i = 0; i < cols; i++) 
-            OutputDriver.Write($"{vSeparator} {header[i].AddStyle(TextStyles.BOLD).VisiblePadRight(maxWidths[i])} ");
+            OutputDriver.Write($"{vSeparator} {header[i].AddStyle(NKTextStyles.BOLD).VisiblePadRight(maxWidths[i])} ");
         OutputDriver.WriteLine(vSeparator);
 
         // print separator

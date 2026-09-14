@@ -12,7 +12,7 @@ public class AnsiLoggerConfig : TextLoggerConfig {
     private static readonly NKStyle DEFAULT_ERROR    = new(RED);
     private static readonly NKStyle DEFAULT_WARNING  = new(YELLOW);
     private static readonly NKStyle DEFAULT_INFO     = new(GREEN);
-    private static readonly NKStyle DEFAULT_DEBUG    = new(GRAY);
+    private static readonly NKStyle DEFAULT_DEBUG    = new(BLUE);
     private static readonly NKStyle DEFAULT_TRACE    = new(DARK_GRAY);
 
     public NKStyle CriticalStyle { get; set; } = DEFAULT_CRITICAL;

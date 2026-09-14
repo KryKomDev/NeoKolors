@@ -6,93 +6,36 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Text;
+using static NeoKolors.Common.NKTextStyles;
 
 namespace NeoKolors.Common;
 
 /// <summary>
 /// contains information about console styles (bg / fg color, bold, italic, etc.)
 /// </summary>
-[StructLayout(LayoutKind.Explicit, Size = sizeof(ulong))]
+[StructLayout(LayoutKind.Explicit, Size = sizeof(ulong) * 2)]
 [SuppressMessage("ReSharper", "ShiftExpressionZeroLeftOperand")]
-public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsable<NKStyle> {
+public readonly record struct NKStyle : IFormattable, IParsablePolyfill.IParsable<NKStyle> {
 
-    //
-    // Layout (0 is most significant):
-    // (this may not be up to date, check offset constants for more info)
-    //
-    // _raw:
-    // | 0 - 23 | 24 - 47 | 48 - 55 | 56   | 57   |
-    // |--------|---------|---------|------|------|
-    // | FColor | BColor  | Styles  | FCSw | BCSw |
-    //
-    // FColor (when FCSw == 0):
-    // | 14   | 15   | 16 - 23 |
-    // |------|------|---------|
-    // | FISw | FDSw | Color   |
-    //
-    // BColor (when BCSw == 0):
-    // | 38   | 39   | 40 - 47 |
-    // |------|------|---------|
-    // | BISw | BDSw | Color   |
-    //
-    // CSw == 1             -> color is Custom.
-    // DSw == 0             -> color is Default.
-    // ISw == 1             -> color is Inherit.
-    // DSw == 1 && ISw == 0 -> color is Console.
-    //
+    // field containing all the data for acceleration of some operations
+    [FieldOffset(0)] private readonly ulong _raw0;
+    [FieldOffset(8)] private readonly ulong _raw1;
 
-    // ----- OFFSET CONSTANTS ----- //
-
-    private const byte FORG_COL_SIZE = 24;
-    private const byte BCKG_COL_SIZE = 24;
-    private const byte STYLES_SIZE   = 8;
-    private const byte FORG_CSW_SIZE = 1;
-    private const byte BCKG_CSW_SIZE = 1;
-
-    // 0-based offsets from the left
-    private const byte FORG_COL_OFFSET = 0;
-    private const byte BCKG_COL_OFFSET = FORG_COL_OFFSET + FORG_COL_SIZE;
-    private const byte STYLES_OFFSET   = BCKG_COL_OFFSET + BCKG_COL_SIZE;
-    private const byte FORG_CSW_OFFSET = STYLES_OFFSET   + STYLES_SIZE;
-    private const byte BCKG_CSW_OFFSET = FORG_CSW_OFFSET + FORG_CSW_SIZE;
-
-    private const byte FORG_USW_OFFSET = FORG_COL_OFFSET + 14;
-    private const byte FORG_USW_SIZE   = 2;
-    private const byte BCKG_USW_OFFSET = BCKG_COL_OFFSET + 14;
-    private const byte BCKG_USW_SIZE   = 2;
-
-    private const ulong COL_TYP_DEFAULT = 0b00;
-    private const ulong COL_TYP_CONSOLE = 0b01;
-    private const ulong COL_TYP_INHERIT = 0b10;
-
-    private const byte TOTAL_SIZE  = FORG_COL_SIZE     + BCKG_COL_SIZE + STYLES_SIZE + FORG_CSW_SIZE + BCKG_CSW_SIZE;
-    private const int  UNUSED_SIZE = sizeof(ulong) * 8 - TOTAL_SIZE;
-
-    private const ulong BMP_24 = 0x00_00_00_00_00_ff_ff_fful;
-    private const ulong BMP_08 = 0x00_00_00_00_00_00_00_fful;
-
-    [FieldOffset(0)] private ulong _raw;
-
-    // ReSharper disable PrivateFieldCanBeConvertedToLocalVariable
-    [FieldOffset(1)] private readonly byte _styles;
-    [FieldOffset(4)] private readonly byte _bCol_red;
-    [FieldOffset(3)] private readonly byte _bCol_green;
-    [FieldOffset(2)] private readonly byte _bCol_blue;
-    [FieldOffset(3)] private readonly byte _bCol_switches;
-    [FieldOffset(2)] private readonly byte _bCol_console;
-    [FieldOffset(7)] private readonly byte _fCol_red;
-    [FieldOffset(6)] private readonly byte _fCol_green;
-    [FieldOffset(5)] private readonly byte _fCol_blue;
-    [FieldOffset(6)] private readonly byte _fCol_switches;
-    [FieldOffset(5)] private readonly byte _fCol_console;
-
-    // ReSharper restore PrivateFieldCanBeConvertedToLocalVariable
+    [FieldOffset(0)]  private readonly NKColor          _fColor;
+    [FieldOffset(4)]  private readonly NKColor          _bColor;
+    [FieldOffset(8)]  private readonly NKTextStyles     _styleData;
+    [FieldOffset(9)]  private readonly NKTextStyles     _styleInherit;
+    [FieldOffset(10)] private readonly NKUnderlineStyle _underlineStyle;
 
     /// <summary>
-    /// The actual compressed style
-    /// Bit 0 represents the most significant bit and bit 64 the least significant bit.
+    /// The actual compressed style (lower 64 bits)
     /// </summary>
-    public ulong Raw => _raw;
+    public ulong Raw0 => _raw0;
+
+    /// <summary>
+    /// Additional style data (upper 64 bits)
+    /// </summary>
+    public ulong Raw1 => _raw1;
 
     /// <summary>
     /// represents the color of the text
@@ -100,9 +43,8 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsabl
     public NKColor FColor {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => GetFColor();
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        set => SetFColor(value);
+        init => _fColor = value;
     }
 
     /// <summary>
@@ -111,21 +53,42 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsabl
     public NKColor BColor {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => GetBColor();
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        set => SetBColor(value);
+        init => _bColor = value;
+    }
+
+    public NKColor UColor {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Underline.Color;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        init => _underlineStyle = _underlineStyle with { Color = value };
     }
 
     /// <summary>
-    /// bitmap of the individual text styles (see <see cref="TextStyles"/>)
+    /// bitmap of the individual text styles (see <see cref="NKTextStyles"/>)
     /// </summary>
-    /// <seealso cref="TextStyles"/>
-    public TextStyles Styles {
+    public NKTextStyles Styles {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => GetStyles();
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        set => SetStyles(value);
+        init => _styleData = value;
+    }
+
+    /// <summary>
+    /// Text style mode flags reserved for style modifier behavior
+    /// </summary>
+    public NKTextStyles InheritedStyles {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => _styleInherit;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        init => _styleInherit = value;
+    }
+
+    public NKUnderlineStyle Underline {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => _underlineStyle;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        init => _underlineStyle = value;
     }
 
     /// <summary>
@@ -133,7 +96,7 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsabl
     /// </summary>
     public bool IsFColorCustom {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => (_raw >> (64 - FORG_CSW_OFFSET - FORG_CSW_SIZE) & 1ul) == 1;
+        get => FColor.IsRgb;
     }
 
     /// <summary>
@@ -141,7 +104,7 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsabl
     /// </summary>
     public bool IsBColorCustom {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => (_raw >> (64 - BCKG_CSW_OFFSET - BCKG_CSW_SIZE) & 1ul) == 1;
+        get => BColor.IsRgb;
     }
 
     /// <summary>
@@ -149,7 +112,7 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsabl
     /// </summary>
     public bool IsFColorDefault {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => !IsFColorCustom && (_raw >> (64 - FORG_USW_OFFSET - FORG_USW_SIZE) & 0b11ul) == COL_TYP_DEFAULT;
+        get => FColor.IsDefault;
     }
 
     /// <summary>
@@ -157,7 +120,7 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsabl
     /// </summary>
     public bool IsBColorDefault {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => !IsBColorCustom && (_raw >> (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE) & 0b11ul) == COL_TYP_DEFAULT;
+        get => BColor.IsDefault;
     }
 
     /// <summary>
@@ -165,7 +128,7 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsabl
     /// </summary>
     public bool IsFColorInherit {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => !IsFColorCustom && (_raw >> (64 - FORG_USW_OFFSET - FORG_USW_SIZE) & 0b11ul) == COL_TYP_INHERIT;
+        get => FColor.IsInherit;
     }
 
     /// <summary>
@@ -173,7 +136,7 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsabl
     /// </summary>
     public bool IsBColorInherit {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => !IsBColorCustom && (_raw >> (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE) & 0b11ul) == COL_TYP_INHERIT;
+        get => BColor.IsInherit;
     }
 
     /// <summary>
@@ -181,7 +144,7 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsabl
     /// </summary>
     public bool IsFColorConsole {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => !IsFColorCustom && (_raw >> (64 - FORG_USW_OFFSET - FORG_USW_SIZE) & 0b11ul) == COL_TYP_CONSOLE;
+        get => FColor.IsPalette;
     }
 
     /// <summary>
@@ -189,289 +152,144 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsabl
     /// </summary>
     public bool IsBColorConsole {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        get => !IsBColorCustom && (_raw >> (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE) & 0b11ul) == COL_TYP_CONSOLE;
+        get => BColor.IsPalette;
+    }
+    
+    public NKStyle(ulong raw0, ulong raw1) {
+        _raw0 = raw0;
+        _raw1 = raw1;
     }
 
-    /// <summary>
-    /// sets the color of the text to a custom color
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public NKStyle SetFColor(uint color) {
-        _raw = _raw & ~(BMP_24 << (64 - FORG_COL_OFFSET - FORG_COL_SIZE))
-            | ((color & BMP_24) << (64 - FORG_COL_OFFSET - FORG_COL_SIZE))
-            | (1ul              << (64 - FORG_CSW_OFFSET - FORG_CSW_SIZE));
-
-        return this;
+    public NKStyle(
+        NKColor          textColor       = default,
+        NKColor          backgroundColor = default,
+        NKTextStyles     styles          = NONE,
+        NKTextStyles     inheritedStyles = NONE,
+        NKUnderlineStyle underlineStyle  = default
+    ) {
+        _raw0           = 0;
+        _raw1           = 0;
+        _fColor         = textColor;
+        _bColor         = backgroundColor;
+        _styleData      = styles;
+        _styleInherit   = inheritedStyles;
+        _underlineStyle = underlineStyle;
     }
-
-    /// <summary>
-    /// sets the color of the text to a console color
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public NKStyle SetFColor(NKConsoleColor color) {
-        _raw = _raw & ~(BMP_24 << (64 - FORG_COL_OFFSET - FORG_COL_SIZE))
-            & ~(1ul            << (64 - FORG_CSW_OFFSET - FORG_CSW_SIZE))
-            | (((ulong)color & BMP_24) << (64 - FORG_COL_OFFSET - FORG_COL_SIZE))
-            & ~(0b11ul << (64 - FORG_USW_OFFSET - FORG_USW_SIZE))
-            | (COL_TYP_CONSOLE << (64 - FORG_USW_OFFSET - FORG_USW_SIZE));
-
-        return this;
-    }
-
-    /// <summary>
-    /// sets the color to be the default color
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public NKStyle SetFColor() {
-        _raw = _raw & ~(BMP_24 << (64 - FORG_COL_OFFSET - FORG_COL_SIZE))
-            & ~(1ul            << (64 - FORG_CSW_OFFSET - FORG_CSW_SIZE))
-            & ~(0b11ul         << (64 - FORG_USW_OFFSET - FORG_USW_SIZE))
-            | (COL_TYP_DEFAULT << (64 - FORG_USW_OFFSET - FORG_USW_SIZE));
-
-        return this;
-    }
-
-    /// <summary>
-    /// sets the color to be the default color
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public NKStyle SetFColor(DefaultColor _) => SetFColor();
-
-    /// <summary>
-    /// sets the color to inherit mode
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public NKStyle SetFColor(InheritColor _) {
-        _raw = _raw & ~(BMP_24 << (64 - FORG_COL_OFFSET - FORG_COL_SIZE))
-            & ~(1ul            << (64 - FORG_CSW_OFFSET - FORG_CSW_SIZE))
-            | (0b11ul          << (64 - FORG_USW_OFFSET - FORG_USW_SIZE))
-            & (COL_TYP_INHERIT << (64 - FORG_USW_OFFSET - FORG_USW_SIZE));
-
-        return this;
-    }
-
-    /// <summary>
-    /// sets the color of the text to a color
-    /// </summary>
-    public NKStyle SetFColor(NKColor color) {
-        return color.Type switch {
-            NKColor.ColorType.DEFAULT       => SetFColor(),
-            NKColor.ColorType.CONSOLE_COLOR => SetFColor(color.AsPalette),
-            NKColor.ColorType.RGB           => SetFColor(color.AsRgb),
-            NKColor.ColorType.INHERIT       => SetFColor(new InheritColor()),
-            _                               => throw new ArgumentOutOfRangeException()
-        };
-    }
-
-    /// <summary>
-    /// safely sets the color of the text to a color
-    /// </summary>
-    public NKStyle SafeSetFColor(NKColor color) {
-        return color.Type switch {
-            NKColor.ColorType.DEFAULT       => SetFColor(),
-            NKColor.ColorType.CONSOLE_COLOR => SetFColor(color.AsPalette),
-            NKColor.ColorType.RGB           => SetFColor(color.AsRgb),
-            NKColor.ColorType.INHERIT       => this,
-            _                               => throw new ArgumentOutOfRangeException()
-        };
-    }
-
-    /// <summary>
-    /// sets the color of the background to a custom color
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public NKStyle SetBColor(uint color) {
-        _raw = _raw & ~(BMP_24 << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE))
-            | ((color & BMP_24) << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE))
-            | (1ul              << (64 - BCKG_CSW_OFFSET - BCKG_CSW_SIZE));
-
-        return this;
-    }
-
-    /// <summary>
-    /// sets the color of the background to a console color
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public NKStyle SetBColor(NKConsoleColor color) {
-        _raw = _raw & ~(BMP_24 << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE))
-            & ~(1ul            << (64 - BCKG_CSW_OFFSET - BCKG_CSW_SIZE))
-            | (((ulong)color & BMP_24) << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE))
-            & ~(0b11ul << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE))
-            | (COL_TYP_CONSOLE << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE));
-
-        return this;
-    }
-
-    /// <summary>
-    /// sets the color of the background to be the default color
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public NKStyle SetBColor() {
-        _raw = _raw & ~(BMP_24 << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE))
-            & ~(1ul            << (64 - BCKG_CSW_OFFSET - BCKG_CSW_SIZE))
-            & ~(0b11ul         << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE))
-            | (COL_TYP_DEFAULT << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE));
-
-        return this;
-    }
-
-    /// <summary>
-    /// sets the color of the background to be the default color
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public NKStyle SetBColor(DefaultColor _) => SetBColor();
-
-    /// <summary>
-    /// sets the background color to inherit mode
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public NKStyle SetBColor(InheritColor _) {
-        _raw = _raw & ~(BMP_24 << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE))
-            & ~(1ul            << (64 - BCKG_CSW_OFFSET - BCKG_CSW_SIZE))
-            | (0b11ul          << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE))
-            & (COL_TYP_INHERIT << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE));
-
-        return this;
-    }
-
-    /// <summary>
-    /// sets the background color to a color
-    /// </summary>
-    public NKStyle SetBColor(NKColor color) {
-        return color.Type switch {
-            NKColor.ColorType.DEFAULT       => SetBColor(),
-            NKColor.ColorType.CONSOLE_COLOR => SetBColor(color.AsPalette),
-            NKColor.ColorType.RGB           => SetBColor(color.AsRgb),
-            NKColor.ColorType.INHERIT       => SetBColor(new InheritColor()),
-            _                               => throw new ArgumentOutOfRangeException()
-        };
-    }
-
-    /// <summary>
-    /// safely sets the background color to a color
-    /// </summary>
-    [Pure]
-    public NKStyle SafeSetBColor(NKColor color) {
-        return color.Type switch {
-            NKColor.ColorType.DEFAULT       => SetBColor(),
-            NKColor.ColorType.CONSOLE_COLOR => SetBColor(color.AsPalette),
-            NKColor.ColorType.RGB           => SetBColor(color.AsRgb),
-            NKColor.ColorType.INHERIT       => this,
-            _                               => throw new ArgumentOutOfRangeException()
-        };
-    }
-
-    /// <summary>
-    /// returns the text color of the specified field
-    /// </summary>
-    [Pure]
-    public NKColor GetFColor() {
-        if (IsFColorCustom)
-            return new NKColor((int)(_raw >> (64 - FORG_COL_OFFSET - FORG_COL_SIZE) & BMP_24));
-
-        return (ulong)_fCol_switches switch {
-            COL_TYP_INHERIT => NKColor.Inherit,
-            COL_TYP_DEFAULT => NKColor.Default,
-            COL_TYP_CONSOLE => new NKColor((NKConsoleColor)_fCol_console),
-            _               => throw new InvalidColorCastException($"Unknown text color switch '{_fCol_switches}'.")
-        };
-    }
-
-    /// <summary>
-    /// returns the text color of the specified field
-    /// </summary>
-    [Pure]
-    public NKColor GetBColor() {
-        if (IsBColorCustom)
-            return new NKColor((int)(_raw >> (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE) & BMP_24));
-
-        return (ulong)_bCol_switches switch {
-            COL_TYP_INHERIT => NKColor.Inherit,
-            COL_TYP_DEFAULT => NKColor.Default,
-            COL_TYP_CONSOLE => new NKColor((NKConsoleColor)_bCol_console),
-            _               => throw new InvalidColorCastException($"Unknown background color switch '{_bCol_switches}'.")
-        };
-    }
-
-    /// <summary>
-    /// sets the text styles
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public NKStyle SetStyles(TextStyles styles) {
-        _raw = _raw & ~(BMP_08 << (64 - STYLES_OFFSET - STYLES_SIZE)) |
-            ((ulong)styles << (64 - STYLES_OFFSET - STYLES_SIZE));
-
-        return this;
-    }
-
-    /// <summary>
-    /// returns the text styles
-    /// </summary>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    [Pure]
-    public TextStyles GetStyles() => (TextStyles)(_raw >> (64 - STYLES_OFFSET - STYLES_SIZE) & BMP_08);
-
-    /// <summary>
-    /// safely overwrites the contents of this instance with the contents of the other instance
-    /// </summary>
-    public NKStyle OverrideWith(NKStyle other) {
-        var n = new NKStyle(_raw);
-
-        if (!other.IsFColorInherit)
-            n = n.SetFColor(other.GetFColor());
-
-        if (other is { IsBColorInherit: false, IsBColorDefault: false })
-            n = n.SetBColor(other.GetBColor());
-
-        n = n.SetStyles(other.GetStyles());
-
-        return n;
-    }
-
-    [Pure]
-    private static ulong Init(NKColor f, NKColor b, TextStyles s) => InitS(InitB(InitF(0, f), b), s);
-
-    private static ulong InitF(ulong v, NKColor f) {
-        return f.Type switch {
-            NKColor.ColorType.DEFAULT => v,
-            NKColor.ColorType.RGB => v
-                | (1ul            << (64 - FORG_CSW_OFFSET - FORG_CSW_SIZE))
-                | ((ulong)f.AsRgb << (64 - FORG_COL_OFFSET - FORG_COL_SIZE)),
-            NKColor.ColorType.CONSOLE_COLOR => v
-                | (COL_TYP_CONSOLE    << (64 - FORG_USW_OFFSET - FORG_USW_SIZE))
-                | ((ulong)f.AsPalette << (64 - FORG_COL_OFFSET - FORG_COL_SIZE)),
-            NKColor.ColorType.INHERIT => v
-                | (COL_TYP_INHERIT << (64 - FORG_USW_OFFSET - FORG_USW_SIZE)),
-            _ => throw new ArgumentOutOfRangeException()
-        };
-    }
-
-    private static ulong InitB(ulong v, NKColor b) {
-        return b.Type switch {
-            NKColor.ColorType.DEFAULT => v,
-            NKColor.ColorType.RGB => v
-                | (1ul            << (64 - BCKG_CSW_OFFSET - BCKG_CSW_SIZE))
-                | ((ulong)b.AsRgb << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE)),
-            NKColor.ColorType.CONSOLE_COLOR => v
-                | (COL_TYP_CONSOLE    << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE))
-                | ((ulong)b.AsPalette << (64 - BCKG_COL_OFFSET - BCKG_COL_SIZE)),
-            NKColor.ColorType.INHERIT => v
-                | (COL_TYP_INHERIT << (64 - BCKG_USW_OFFSET - BCKG_USW_SIZE)),
-            _ => throw new ArgumentOutOfRangeException()
-        };
-    }
-
-    private static ulong InitS(ulong v, TextStyles s) => v | ((ulong)s << (64 - STYLES_OFFSET - STYLES_SIZE));
-
-    private NKStyle(ulong raw) => _raw = raw;
-
-    public NKStyle(NKColor f = default, NKColor b = default, TextStyles s = TextStyles.NONE) => _raw = Init(f, b, s);
 
     public NKStyle() {
-        _raw = 0;
+        _raw0 = 0;
+        _raw1 = 0;
     }
 
-    public string ToDbgString() => $"FColor: {FColor:p}, BColor: {BColor:p}{StylesToString()}";
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public NKColor GetFColor() => _fColor;
+
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public NKColor GetBColor() => _bColor;
+
+    [Pure]
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public NKTextStyles GetStyles() => _styleData;
+
+    /// <summary>
+    /// Creates a new <see cref="NKStyle"/> instance by applying the specified style properties
+    /// from the given <paramref name="other"/> instance.
+    /// </summary>
+    /// <param name="other">
+    /// An instance of <see cref="NKStyle"/> containing the style properties to apply.
+    /// </param>
+    /// <return>
+    /// A new <see cref="NKStyle"/> instance with properties combined from the current instance 
+    /// and the <paramref name="other"/> instance.
+    /// </return>
+    [Pure]
+    public NKStyle With(NKStyle other) {
+        var f = other._fColor.IsInherit ? _fColor : other._fColor;
+        var b = other._bColor.IsInherit ? _bColor : other._bColor;
+        var s = (other._styleData & ~other._styleInherit) | (_styleData & other._styleInherit);
+        var u = _underlineStyle.With(other._underlineStyle);
+
+        return new NKStyle(f, b, s, other.InheritedStyles, u);
+    }
+
+    /// <summary>
+    /// Creates a new <see cref="NKStyle"/> instance with the specified foreground color
+    /// applied, provided the given color is not marked as inherited.
+    /// </summary>
+    /// <param name="color">
+    /// An instance of <see cref="NKColor"/> representing the foreground color to apply.
+    /// If the color is marked as inherited, the current instance is returned unchanged.
+    /// </param>
+    /// <returns>
+    /// A new <see cref="NKStyle"/> instance with the foreground color set to the specified
+    /// <paramref name="color"/>, or the current instance if the color is marked as inherited.
+    /// </returns>
+    [Pure]
+    public NKStyle WithFColor(NKColor color) {
+        return !color.IsInherit
+            ? this with { FColor = color }
+            : this;
+    }
+
+    /// <summary>
+    /// Returns a new <see cref="NKStyle"/> instance with the specified background color applied.
+    /// </summary>
+    /// <param name="color">
+    /// The <see cref="NKColor"/> to set as the background color. If the color is marked as inherited (<see cref="NKColor.IsInherit"/>),
+    /// the current instance is returned unchanged.
+    /// </param>
+    /// <returns>
+    /// A new <see cref="NKStyle"/> instance with the background color updated to the specified <paramref name="color"/>,
+    /// or the current instance if the color is marked as inherited.
+    /// </returns>
+    [Pure]
+    public NKStyle WithBColor(NKColor color) {
+        return !color.IsInherit
+            ? this with { BColor = color }
+            : this;
+    }
+
+    /// <summary>
+    /// Creates a new <see cref="NKStyle"/> instance by applying the specified style properties
+    /// from the given <paramref name="styles"/> parameter, while also inheriting styles based
+    /// on the <paramref name="inheritedStyles"/> parameter.
+    /// </summary>
+    /// <param name="styles">
+    /// An instance of <see cref="NKTextStyles"/> containing the styles to apply to the new <see cref="NKStyle"/> instance.
+    /// </param>
+    /// <param name="inheritedStyles">
+    /// An optional instance of <see cref="NKTextStyles"/> containing the styles to inherit. By default, no styles are inherited.
+    /// </param>
+    /// <returns>
+    /// A new <see cref="NKStyle"/> instance with the specified styles applied, combined
+    /// with styles inherited from the <paramref name="inheritedStyles"/> parameter.
+    /// </returns>
+    [Pure]
+    public NKStyle WithStyles(NKTextStyles styles, NKTextStyles inheritedStyles = NONE) {
+        return this with {
+            Styles = (styles & ~inheritedStyles) | (_styleData & inheritedStyles)
+        };
+    }
+
+    /// <summary>
+    /// Creates a new <see cref="NKStyle"/> instance by applying the specified underline style
+    /// from the given <paramref name="underline"/> instance.
+    /// </summary>
+    /// <param name="underline">
+    /// An instance of <see cref="NKUnderlineStyle"/> containing the underline style to apply.
+    /// </param>
+    /// <return>
+    /// A new <see cref="NKStyle"/> instance with the updated underline style based on the
+    /// specified <paramref name="underline"/>.
+    /// </return>
+    [Pure]
+    public NKStyle WithUnderline(NKUnderlineStyle underline) {
+        return this with { Underline = Underline.With(underline) };
+    }
+    
+    private string ToDbgString() => $"FColor: {FColor:p}, BColor: {BColor:p}{StylesToString()}";
 
     public override string ToString() => ToString(null, null);
 
@@ -481,30 +299,8 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsabl
 
         return format switch {
             "p" or "P"     => ToDbgString(),
-            "bmp" or "BMP" => ToBitmapString(),
             _              => ToAnsi()
         };
-    }
-
-    public string ToBitmapString() {
-        var sb = new StringBuilder();
-
-        sb.Append($"{$"{_raw >> 56 & 0xFF:b8}".AddColor(NKConsoleColor.RED)}_");
-        sb.Append($"{$"{_raw >> 50 & 0b111111:b6}".AddColor(NKConsoleColor.RED)}");
-        sb.Append($"{$"{_raw >> 49 & 0b1:b1}".AddColor(NKConsoleColor.YELLOW)}");
-        sb.Append($"{$"{_raw >> 48 & 0b1:b1}".AddColor(NKConsoleColor.GREEN)}_");
-        sb.Append($"{$"{_raw >> 40 & 0xFF:b8}".AddColor(NKConsoleColor.RED)}_");
-
-        sb.Append($"{$"{_raw >> 32 & 0xFF:b8}".AddColor(NKConsoleColor.BLUE)}_");
-        sb.Append($"{$"{_raw >> 26 & 0b111111:b6}".AddColor(NKConsoleColor.BLUE)}");
-        sb.Append($"{$"{_raw >> 25 & 0b1:b1}".AddColor(NKConsoleColor.MAGENTA)}");
-        sb.Append($"{$"{_raw >> 24 & 0b1:b1}".AddColor(NKConsoleColor.CYAN)}_");
-        sb.Append($"{$"{_raw >> 16 & 0xFF:b8}".AddColor(NKConsoleColor.BLUE)}_");
-
-        sb.Append($"{$"{_raw >> 8 & 0xFF:b8}".AddColor(NKConsoleColor.WHITE)}_");
-        sb.Append($"{$"{_raw >> 0 & 0xFF:b8}".AddColor(NKConsoleColor.DARK_GRAY)}");
-
-        return sb.ToString();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -514,44 +310,23 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsabl
         var output = new List<string>();
         var styles = GetStyles();
 
-        if (styles.GetIsBold())
-            output.Add("Bold");
-
-        if (styles.GetIsItalic())
-            output.Add("Italic");
-
-        if (styles.GetIsUnderline())
-            output.Add("Underline");
-
-        if (styles.GetIsStrikethrough())
-            output.Add("Strikethrough");
-
-        if (styles.GetIsFaint())
-            output.Add("Faint");
-
-        if (styles.GetIsNegative())
-            output.Add("Negative");
-
-        if (styles.GetIsInvisible())
-            output.Add("Invisible");
-
-        if (styles.GetIsBlink())
-            output.Add("Blink");
+        if (styles.GetIsBold()) output.Add("Bold");
+        if (styles.GetIsItalic()) output.Add("Italic");
+        if (styles.GetIsUnderline()) output.Add("Underline");
+        if (styles.GetIsStrikethrough()) output.Add("Strikethrough");
+        if (styles.GetIsFaint()) output.Add("Faint");
+        if (styles.GetIsNegative()) output.Add("Negative");
+        if (styles.GetIsInvisible()) output.Add("Invisible");
+        if (styles.GetIsBlink()) output.Add("Blink");
 
         return output.Count != 0 ? $", {string.Join(", ", output.ToArray())}" : "";
     }
 
-    public          bool Equals(NKStyle other) => _raw == other._raw;
-    public override int  GetHashCode()         => _raw.GetHashCode();
+    public          bool Equals(NKStyle other) => _raw0 == other._raw0 && _raw1 == other._raw1;
+    public override int  GetHashCode()         => HashCode.Combine(_raw0, _raw1);
 
-    /// <summary>
-    /// Overrides the properties of the first NKStyle instance with those of the second NKStyle instance and returns the updated instance.
-    /// </summary>
-    /// <param name="overriden">The NKStyle instance to be overridden.</param>
-    /// <param name="overrider">The NKStyle instance providing the overriding properties.</param>
-    /// <returns>The resulting NKStyle instance after applying the overrides.</returns>
     public static NKStyle operator <<(NKStyle overriden, NKStyle overrider) {
-        return overriden.OverrideWith(overrider);
+        return overriden.With(overrider);
     }
 
     public static NKStyle Default => new(NKColor.Default, NKColor.Default);
@@ -561,49 +336,85 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsabl
         if (prev == next)
             return string.Empty;
 
-        var off = prev.Styles  & ~next.Styles;
-        var on  = ~prev.Styles & next.Styles;
-
         var sb = new StringBuilder("\e[");
 
-        off.AppendNegModes(sb);
-        on.AppendPosModes(sb);
+        sb.Append(NKTextStyles.GetEscSeq(prev._styleData, next._styleData, next.InheritedStyles, false));
+        
         NKColor.AppendInnerF(sb, prev.FColor, next.FColor);
         NKColor.AppendInnerB(sb, prev.BColor, next.BColor);
+        NKColor.AppendInnerU(sb, prev.UColor, next.UColor);
 
+        NKUnderlineType.AppendEscSeq(sb, prev.Underline.Type, next.Underline.Type, false);
+
+        if (sb[^1] != ';') {
+            return string.Empty;
+        }
+        
         sb.Remove(sb.Length - 1, 1);
         sb.Append('m');
 
         return sb.ToString();
     }
 
-    public static explicit operator NKStyle(TextStyles s) => new(NKColor.Default, NKColor.Default, s);
+    /// <summary>
+    /// Generates the escape sequence for applying the specified <paramref name="style"/>
+    /// to text output in a terminal, optionally forcing the generation of the sequence
+    /// regardless of inheritable properties.
+    /// </summary>
+    /// <param name="style">
+    /// The <see cref="NKStyle"/> instance representing the formatting and color properties
+    /// to be applied.
+    /// </param>
+    /// <param name="force">
+    /// A boolean value indicating whether to force the generation of the escape sequence,
+    /// overriding inherited properties if <c>true</c>.
+    /// </param>
+    /// <returns>
+    /// A <see cref="string"/> containing the terminal escape sequence to apply the specified
+    /// formatting and color properties.
+    /// </returns>
+    [Pure]
+    public static string GetEscSeq(NKStyle style, bool force = false) {
+        var sb = new StringBuilder();
 
-    public static NKStyle Parse([NotNullWhen(true)] string? s) => Parse(s, null);
+        sb.Append("\e[");
+        
+        sb.Append(NKTextStyles.GetEscSeq(style.Styles, style.InheritedStyles, force, false));
 
-    public static NKStyle Parse([NotNullWhen(true)] string? s, IFormatProvider? provider) {
-        if (s == null)
-            throw new ArgumentNullException(nameof(s));
+        NKColor.AppendInnerF(sb, style.FColor);
+        NKColor.AppendInnerB(sb, style.BColor);
+        NKColor.AppendInnerU(sb, style.UColor);
+        
+        NKUnderlineType.AppendEscSeq(sb, style.Underline.Type, false);
 
-        return TryParse(s, provider, out var result) 
-            ? result 
-            : throw new FormatException($"Invalid style format: '{s}'");
+        if (sb[^1] != ';') {
+            return string.Empty;
+        }
+        
+        sb.Remove(sb.Length - 1, 1);
+        sb.Append('m');
+        
+        return sb.ToString();
     }
 
-    // ReSharper disable once RedundantNullableFlowAttribute
-    public static bool TryParse([NotNullWhen(true)] string? s, [MaybeNullWhen(false)] out NKStyle result) => TryParse(s, null, out result);
+    public static explicit operator NKStyle(NKTextStyles s) => new(NKColor.Default, NKColor.Default, s);
 
-    // ReSharper disable once RedundantNullableFlowAttribute
-    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, [MaybeNullWhen(false)] out NKStyle result) {
+    // ============================== PARSING ============================== //
+
+    #region Parsing
+
+    public static bool TryParse([NotNullWhen(true)] string? s, IFormatProvider? formatProvider, out NKStyle result) {
         if (s == null) {
             result = default;
 
             return false;
         }
 
-        var style      = new NKStyle();
         var parts      = s.Split([';', ','], StringSplitOptions.RemoveEmptyEntries);
-        var textStyles = TextStyles.NONE;
+        var textStyles = NONE;
+        var f          = NKColor.Default;
+        var b          = NKColor.Default;
+        var t          = NONE;
 
         foreach (var rawPart in parts) {
             var part = rawPart.Trim();
@@ -620,7 +431,7 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsabl
                     return false;
                 }
 
-                style = style.SetFColor(color);
+                f = color;
             }
             else if (part.StartsWith("b#", StringComparison.OrdinalIgnoreCase)) {
                 var colorStr = part[2..];
@@ -631,7 +442,7 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsabl
                     return false;
                 }
 
-                style = style.SetBColor(color);
+                b = color;
             }
             else if (TryParseTextStyle(part, out var ts)) {
                 textStyles |= ts;
@@ -643,24 +454,35 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsabl
             }
         }
 
-        if (textStyles != TextStyles.NONE) {
-            style = style.SetStyles(textStyles);
+        if (textStyles != NONE) {
+            t = textStyles;
         }
 
-        result = style;
+        result = new NKStyle(f, b, t);
 
         return true;
     }
 
-    bool IParsableValue<NKStyle>.TryParse([NotNullWhen(true)] string? s, IFormatProvider? provider, out NKStyle result) => TryParse(s, provider, out result);
+    public static bool TryParse([NotNullWhen(true)] string? s, out NKStyle result) => TryParse(s, null, out result);
+    
+    public static NKStyle Parse(string? s, IFormatProvider? provider) {
+        if (s == null)
+            throw new ArgumentNullException(nameof(s));
+
+        return TryParse(s, provider, out var result)
+            ? result
+            : throw new FormatException($"Invalid style format: '{s}'");
+    }
+    
+    public static NKStyle Parse([NotNullWhen(true)] string? s) => Parse(s, null);
 
     private static bool TryParseStyleColor(string val, out NKColor color) {
         if (string.IsNullOrEmpty(val)) {
             color = default;
-            
+
             return false;
         }
-        
+
         val = val.Trim();
         string normalized = val.StartsWith('#') ? val : val.Replace('-', '_');
 
@@ -668,13 +490,11 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsabl
             return true;
         }
 
-        if (!normalized.StartsWith('#') &&
-            normalized.Length > 0       &&
-            normalized.All(c => "0123456789abcdefABCDEF".Contains(c))) 
-        {
-            if (NKColor.TryParse("#" + normalized, null, out color)) {
-                return true;
-            }
+        if (!normalized.StartsWith('#')                               &&
+            normalized.Length > 0                                     &&
+            normalized.All(c => "0123456789abcdefABCDEF".Contains(c)) &&
+            NKColor.TryParse("#" + normalized, null, out color)) {
+            return true;
         }
 
         color = default;
@@ -682,23 +502,25 @@ public record struct NKStyle : IFormattable, IParsableValue<NKStyle>, INKParsabl
         return false;
     }
 
-    private static bool TryParseTextStyle(string s, out TextStyles style) {
+    private static bool TryParseTextStyle(string s, out NKTextStyles style) {
         var normalized = s.Replace('-', '_').ToLowerInvariant();
 
         (style, var ret) = normalized switch {
-            "bold"          => (TextStyles.BOLD, true),
-            "faint"         => (TextStyles.FAINT, true),
-            "italic"        => (TextStyles.ITALIC, true),
-            "underline"     => (TextStyles.UNDERLINE, true),
-            "blink"         => (TextStyles.BLINK, true),
-            "negative"      => (TextStyles.NEGATIVE, true),
-            "invisible"     => (TextStyles.INVISIBLE, true),
-            "strikethrough" => (TextStyles.STRIKETHROUGH, true),
-            "none"          => (TextStyles.NONE, true),
-            "all"           => (TextStyles.ALL, true),
-            _               => (TextStyles.NONE, false)
+            "bold"          => (BOLD, true),
+            "faint"         => (FAINT, true),
+            "italic"        => (ITALIC, true),
+            "underline"     => (UNDERLINE, true),
+            "blink"         => (BLINK, true),
+            "negative"      => (NEGATIVE, true),
+            "invisible"     => (INVISIBLE, true),
+            "strikethrough" => (STRIKETHROUGH, true),
+            "none"          => (NONE, true),
+            "all"           => (ALL, true),
+            _               => (NONE, false)
         };
 
         return ret;
     }
+    
+    #endregion
 }

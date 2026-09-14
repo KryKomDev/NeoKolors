@@ -54,22 +54,22 @@ public class ExceptionFormat {
     // =================================== Styles =================================== //
 
     /// <summary>Gets or sets the style of the exception type name (e.g. InvalidOperationException).</summary>
-    public NKStyle ExceptionTypeStyle { get; set; } = new(YELLOW, s: TextStyles.ITALIC);
+    public NKStyle ExceptionTypeStyle { get; set; } = new(YELLOW, styles: NKTextStyles.ITALIC);
 
     /// <summary>Gets or sets the style of the exception namespace prefix (e.g. System.IO.).</summary>
     public NKStyle ExceptionNamespaceStyle { get; set; } = new();
 
     /// <summary>Gets or sets the style of the exception message text.</summary>
-    public NKStyle MessageStyle { get; set; } = new(f: RED, s: TextStyles.BOLD);
+    public NKStyle MessageStyle { get; set; } = new(textColor: RED, styles: NKTextStyles.BOLD);
 
     /// <summary>Gets or sets the style of the source file name in stack traces.</summary>
-    public NKStyle FileNameStyle { get; set; } = new(BLUE, s: TextStyles.BOLD);
+    public NKStyle FileNameStyle { get; set; } = new(BLUE, styles: NKTextStyles.BOLD);
 
     /// <summary>Gets or sets the style of the directory path in stack traces.</summary>
     public NKStyle PathStyle { get; set; } = new(GRAY);
 
     /// <summary>Gets or sets the style of the method name in stack traces.</summary>
-    public NKStyle MethodStyle { get; set; } = new(BLUE, s: TextStyles.ITALIC | TextStyles.BOLD);
+    public NKStyle MethodStyle { get; set; } = new(BLUE, styles: NKTextStyles.ITALIC | NKTextStyles.BOLD);
 
     /// <summary>Gets or sets the style of the method declaring type / namespace in stack traces.</summary>
     public NKStyle MethodSourceStyle { get; set; } = new(GRAY);
@@ -81,13 +81,13 @@ public class ExceptionFormat {
     public NKStyle MethodParamTypeStyle { get; set; } = new(CYAN);
 
     /// <summary>Gets or sets the style of method parameter variable names in stack traces.</summary>
-    public NKStyle MethodParamNameStyle { get; set; } = new(NKColor.Default, s: TextStyles.FAINT);
+    public NKStyle MethodParamNameStyle { get; set; } = new(NKColor.Default, styles: NKTextStyles.FAINT);
 
     /// <summary>Gets or sets the style of line numbers in stack traces.</summary>
     public NKStyle LineNumberStyle { get; set; } = new(GREEN);
 
     /// <summary>Gets or sets the style of the HelpLink URL / text.</summary>
-    public NKStyle HelpLinkStyle { get; set; } = new(s: TextStyles.ITALIC);
+    public NKStyle HelpLinkStyle { get; set; } = new(styles: NKTextStyles.ITALIC);
 
     /// <summary>Gets or sets the style of HResult code display.</summary>
     public NKStyle HResultStyle { get; set; } = new(DARK_GRAY);
@@ -102,7 +102,7 @@ public class ExceptionFormat {
     public NKStyle SourceSnippetLineStyle { get; set; } = new(GRAY);
 
     /// <summary>Gets or sets the style of the target error line in source code snippets.</summary>
-    public NKStyle SourceSnippetHighlightLineStyle { get; set; } = new(YELLOW, s: TextStyles.BOLD);
+    public NKStyle SourceSnippetHighlightLineStyle { get; set; } = new(YELLOW, styles: NKTextStyles.BOLD);
 
     /// <summary>Gets or sets the style of normal line numbers in source code snippets.</summary>
     public NKStyle SourceSnippetLineNumberStyle { get; set; } = new(DARK_GRAY);
@@ -114,7 +114,7 @@ public class ExceptionFormat {
     public NKStyle TextStyle { get; set; } = new();
 
     /// <summary>Gets or sets the style of inner exception header labels.</summary>
-    public NKStyle InnerExceptionStyle { get; set; } = new(DARK_YELLOW, s: TextStyles.BOLD);
+    public NKStyle InnerExceptionStyle { get; set; } = new(DARK_YELLOW, styles: NKTextStyles.BOLD);
 
     // ================================== Decoration ================================== //
 

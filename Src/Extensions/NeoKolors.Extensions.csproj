@@ -23,12 +23,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="HasFlagExtension.Generator" Version="2026.3.0">
+        <PackageReference Include="HasFlagExtension.Generator" Version="2026.3.2">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="JetBrains.Annotations" Version="2026.2.0" />
-        <PackageReference Include="Implyzer" Version="2026.4.4" OutputItemType="Analyzer" ReferenceOutputAssembly="false">
+        <PackageReference Include="Implyzer" Version="2026.5.4" OutputItemType="Analyzer" ReferenceOutputAssembly="false">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Metriks" Version="2026.3.0" />
@@ -36,11 +36,7 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Polyfill" Version="11.2.0">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="System.Collections.Immutable" Version="10.0.11" />
+        <PackageReference Include="System.Collections.Immutable" Version="10.0.12" />
     </ItemGroup>
     
     <ItemGroup>

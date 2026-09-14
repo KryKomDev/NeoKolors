@@ -299,7 +299,7 @@ public static class StringEffects {
         /// <returns>string with the style applied</returns>
         /// <exception cref="ArgumentOutOfRangeException">an invalid style was inputted</exception>
         [System.Diagnostics.Contracts.Pure]
-        public string AddStyle(TextStyles style) => $"{style.GetEscSeq()}{s}{style.GetNegEscSeq()}";
+        public string AddStyle(NKTextStyles style) => $"{style.GetEscSeq()}{s}{style.GetNegEscSeq()}";
     }
 
 
@@ -311,7 +311,7 @@ public static class StringEffects {
     /// <returns>styled string</returns>
     [System.Diagnostics.Contracts.Pure]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string AddStyle(this char c, TextStyles styles) => (c + "").AddStyle(styles);
+    public static string AddStyle(this char c, NKTextStyles styles) => (c + "").AddStyle(styles);
 
 
     extension(NKConsoleColor color) {
@@ -481,9 +481,9 @@ public static class StringEffects {
         /// <summary>
         /// Applies the specified text style to the given string.
         /// </summary>
-        /// <param name="style">The <see cref="TextStyles"/> value specifying the styles
+        /// <param name="style">The <see cref="NKTextStyles"/> value specifying the styles
         /// to apply, such as bold, italic, or underline.</param>
         /// <returns>A new string with the specified text styles applied.</returns>
-        public string AddCStyle(TextStyles style) => $"{style.GetEscSeq()}{s}";
+        public string AddCStyle(NKTextStyles style) => $"{style.GetEscSeq()}{s}";
     }
 }

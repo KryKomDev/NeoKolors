@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) krystof 2026
 
 using MessagePack;
@@ -31,9 +31,10 @@ public sealed class AnsiStringSerializer : IMessagePackFormatter<AnsiString?> {
         writer.WriteArrayHeader(styles.Length);
 
         foreach (var marker in styles) {
-            writer.WriteArrayHeader(2);
+            writer.WriteArrayHeader(3);
             writer.WriteInt32(marker.Index);
-            writer.WriteUInt64(marker.Style.Raw);
+            writer.WriteUInt64(marker.Style.Raw0);
+            writer.WriteUInt64(marker.Style.Raw1);
         }
     }
 
@@ -60,12 +61,13 @@ public sealed class AnsiStringSerializer : IMessagePackFormatter<AnsiString?> {
         for (int i = 0; i < styleCount; i++) {
             int markerCount = reader.ReadArrayHeader();
 
-            if (markerCount != 2)
+            if (markerCount != 3)
                 throw new MessagePackSerializationException("Invalid StyleMarker array length.");
 
             int   index = reader.ReadInt32();
-            ulong raw   = reader.ReadUInt64();
-            var   style = Unsafe.As<ulong, NKStyle>(ref raw);
+            ulong raw0  = reader.ReadUInt64();
+            ulong raw1  = reader.ReadUInt64();
+            var   style = new NKStyle(raw0, raw1);
 
             markers.Add(new AnsiString.StyleMarker(index, style));
         }

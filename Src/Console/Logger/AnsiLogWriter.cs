@@ -18,11 +18,18 @@ namespace NeoKolors.Console;
 public class AnsiLogWriter : ILogWriter {
 
     private static readonly AnsiString CRITICAL_LABEL = AnsiString.Parse("{:n} CRITICAL {:!n}");
-    private static readonly AnsiString ERROR_LABEL    = AnsiString.Parse("{:n} ERROR {:!n}");
-    private static readonly AnsiString WARNING_LABEL  = "[ warn ]";
-    private static readonly AnsiString INFO_LABEL     = "[ info ]";
-    private static readonly AnsiString TRACE_LABEL    = "[ trace ]";
-    private static readonly AnsiString DEBUG_LABEL    = "[ debug ]";
+    private static readonly AnsiString ERROR_LABEL    = AnsiString.Parse("{:n} ERROR {:!n}"); 
+    
+    // i dunno why ReSharper doesn't like this, it's not a collection!
+    // ReSharper disable UseCollectionExpression
+    
+    private static readonly AnsiString WARNING_LABEL  = new("[ warn ]");
+    private static readonly AnsiString INFO_LABEL     = new("[ info ]");
+    private static readonly AnsiString TRACE_LABEL    = new("[ trace ]");
+    private static readonly AnsiString DEBUG_LABEL    = new("[ debug ]");
+    private static readonly AnsiString DEFAULT_LABEL  = new("[ msg ]");
+    
+    // ReSharper restore UseCollectionExpression
 
     public AnsiLoggerConfig Config { get; set; }
 
@@ -31,6 +38,19 @@ public class AnsiLogWriter : ILogWriter {
     }
 
     public void Write(NKLogRecord record) {
+        var sb = new AnsiStringBuilder();
+
+        // append header
+        sb.Append(GetHeader(record));
+
+        // append message
+        sb.Append(GetMessage(record));
+
+        // write to output
+        Stdio.WriteLine(sb.ToString());
+    }
+
+    private AnsiString GetHeader(NKLogRecord record) {
         var sb = new AnsiStringBuilder();
 
         // append time
@@ -44,14 +64,10 @@ public class AnsiLogWriter : ILogWriter {
         // append level
         sb.Append(GetLevel(record));
         sb.Append(' ');
-
-        // append message
-        sb.Append(GetMessage(record));
-
-        // write to output
-        System.Console.Out.WriteLine(sb.ToString());
+        
+        return sb.ToAnsiString().AddStyle(GetStyle(record.Level));
     }
-
+    
     private string GetTimestamp(NKLogRecord record) => record.Timestamp.ToString(Config.TimeFormat);
 
     private static AnsiString GetLevel(NKLogRecord record) {
@@ -62,26 +78,31 @@ public class AnsiLogWriter : ILogWriter {
             INFORMATION => INFO_LABEL,
             DEBUG       => DEBUG_LABEL,
             TRACE       => TRACE_LABEL,
-            _           => "[ msg ]"
+            _           => DEFAULT_LABEL
         };
     }
 
     private static bool HasSource(NKLogRecord record) => !string.IsNullOrEmpty(record.Source) || record.EventId != null;
 
     private static AnsiString GetSource(NKLogRecord record) {
-        if (record.Source != null && record.EventId != null) {
-            var eventId = record.EventId.Value;
-            string idStr = !string.IsNullOrEmpty(eventId.Name) ? $"{eventId.Id}:{eventId.Name}" : eventId.Id.ToString();
+        if (record is { Source: not null, EventId: not null }) {
+            var    eventId = record.EventId.Value;
+            string idStr   = !string.IsNullOrEmpty(eventId.Name) ? $"{eventId.Id}:{eventId.Name}" : eventId.Id.ToString();
+
             return $"{record.Source}:{idStr}".ToAnsiString();
         }
+
         if (record.Source != null) {
             return record.Source.ToAnsiString();
         }
+
         if (record.EventId != null) {
-            var eventId = record.EventId.Value;
-            string idStr = !string.IsNullOrEmpty(eventId.Name) ? $"{eventId.Id}:{eventId.Name}" : eventId.Id.ToString();
+            var    eventId = record.EventId.Value;
+            string idStr   = !string.IsNullOrEmpty(eventId.Name) ? $"{eventId.Id}:{eventId.Name}" : eventId.Id.ToString();
+
             return idStr.ToAnsiString();
         }
+
         return AnsiString.Empty;
     }
 
@@ -98,7 +119,7 @@ public class AnsiLogWriter : ILogWriter {
         };
     }
 
-    private AnsiString GetMessage(NKLogRecord message) {
+    private AnsiString? GetMessage(NKLogRecord message) {
         var sb = new AnsiStringBuilder();
 
         if (message.Message.IsT1) {

@@ -15,12 +15,11 @@ namespace NeoKolors.Common;
 public sealed class AnsiString :
     IEnumerable<AnsiChar>,
     IEquatable<AnsiString>,
-    ICloneable 
-{
+    ICloneable {
     // ============================ Fields and Props ============================ // 
 
     #region Fields and Properties
-    
+
     public static AnsiString Empty { get; } = new();
 
     private readonly string            _text;
@@ -36,7 +35,7 @@ public sealed class AnsiString :
     /// Each style marker represents a specific style, including its start
     /// and end positions within the text.
     /// </summary>
-    public ImmutableArray<StyleMarker> Styles => [.._styles];
+    public ImmutableArray<StyleMarker> Styles => [.. _styles];
 
     /// <summary>
     /// Gets the number of characters in the string.
@@ -78,7 +77,7 @@ public sealed class AnsiString :
     /// </summary>
     /// <param name="text">The plain string value.</param>
     public AnsiString(string? text) {
-        _text   = text;
+        _text   = text ?? throw new ArgumentNullException(nameof(text));
         _styles = [];
     }
 
@@ -360,12 +359,12 @@ public sealed class AnsiString :
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where only the foreground color is updated in the specified range, preserving background color and text styles.
     /// </summary>
-    public AnsiString SetFColor(NKColor color, int startIndex, int length) => ModifyStyle(s => s.SetFColor(color), startIndex, length);
+    public AnsiString SetFColor(NKColor color, int startIndex, int length) => ModifyStyle(s => s.WithFColor(color), startIndex, length);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where only the foreground color is updated in the specified range, preserving background color and text styles.
     /// </summary>
-    public AnsiString SetFColor(NKColor color, Range range) => ModifyStyle(s => s.SetFColor(color), range);
+    public AnsiString SetFColor(NKColor color, Range range) => ModifyStyle(s => s.WithFColor(color), range);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where only the background color is updated for the entire string, preserving text color and text styles.
@@ -380,92 +379,92 @@ public sealed class AnsiString :
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where only the background color is updated in the specified range, preserving text color and text styles.
     /// </summary>
-    public AnsiString SetBColor(NKColor color, int startIndex, int length) => ModifyStyle(s => s.SetBColor(color), startIndex, length);
+    public AnsiString SetBColor(NKColor color, int startIndex, int length) => ModifyStyle(s => s.WithBColor(color), startIndex, length);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where only the background color is updated in the specified range, preserving text color and text styles.
     /// </summary>
-    public AnsiString SetBColor(NKColor color, Range range) => ModifyStyle(s => s.SetBColor(color), range);
+    public AnsiString SetBColor(NKColor color, Range range) => ModifyStyle(s => s.WithBColor(color), range);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where the text style flags are set for the entire string, preserving text color and background color.
     /// </summary>
-    public AnsiString SetStyles(TextStyles styles) => SetStyles(styles, 0, _text.Length);
+    public AnsiString SetStyles(NKTextStyles styles) => SetStyles(styles, 0, _text.Length);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where the text style flags are set from <paramref name="startIndex"/> to the end, preserving text color and background color.
     /// </summary>
-    public AnsiString SetStyles(TextStyles styles, int startIndex) => SetStyles(styles, startIndex, _text.Length - startIndex);
+    public AnsiString SetStyles(NKTextStyles styles, int startIndex) => SetStyles(styles, startIndex, _text.Length - startIndex);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where the text style flags are set in the specified range, preserving text color and background color.
     /// </summary>
-    public AnsiString SetStyles(TextStyles styles, int startIndex, int length) => ModifyStyle(s => s.SetStyles(styles), startIndex, length);
+    public AnsiString SetStyles(NKTextStyles styles, int startIndex, int length) => ModifyStyle(s => s.WithStyles(styles), startIndex, length);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where the text style flags are set in the specified range, preserving text color and background color.
     /// </summary>
-    public AnsiString SetStyles(TextStyles styles, Range range) => ModifyStyle(s => s.SetStyles(styles), range);
+    public AnsiString SetStyles(NKTextStyles styles, Range range) => ModifyStyle(s => s.WithStyles(styles), range);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where the specified text style flags are added (bitwise OR) for the entire string.
     /// </summary>
-    public AnsiString AddStyles(TextStyles styles) => AddStyles(styles, 0, _text.Length);
+    public AnsiString AddStyles(NKTextStyles styles) => AddStyles(styles, 0, _text.Length);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where the specified text style flags are added (bitwise OR) from <paramref name="startIndex"/> to the end.
     /// </summary>
-    public AnsiString AddStyles(TextStyles styles, int startIndex) => AddStyles(styles, startIndex, _text.Length - startIndex);
+    public AnsiString AddStyles(NKTextStyles styles, int startIndex) => AddStyles(styles, startIndex, _text.Length - startIndex);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where the specified text style flags are added (bitwise OR) in the specified range.
     /// </summary>
-    public AnsiString AddStyles(TextStyles styles, int startIndex, int length) => ModifyStyle(s => s.SetStyles(s.Styles | styles), startIndex, length);
+    public AnsiString AddStyles(NKTextStyles styles, int startIndex, int length) => ModifyStyle(s => s.WithStyles(s.Styles | styles), startIndex, length);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where the specified text style flags are added (bitwise OR) in the specified range.
     /// </summary>
-    public AnsiString AddStyles(TextStyles styles, Range range) => ModifyStyle(s => s.SetStyles(s.Styles | styles), range);
+    public AnsiString AddStyles(NKTextStyles styles, Range range) => ModifyStyle(s => s.WithStyles(s.Styles | styles), range);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where the specified text style flags are removed (bitwise AND NOT) for the entire string.
     /// </summary>
-    public AnsiString RemoveStyles(TextStyles styles) => RemoveStyles(styles, 0, _text.Length);
+    public AnsiString RemoveStyles(NKTextStyles styles) => RemoveStyles(styles, 0, _text.Length);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where the specified text style flags are removed (bitwise AND NOT) from <paramref name="startIndex"/> to the end.
     /// </summary>
-    public AnsiString RemoveStyles(TextStyles styles, int startIndex) => RemoveStyles(styles, startIndex, _text.Length - startIndex);
+    public AnsiString RemoveStyles(NKTextStyles styles, int startIndex) => RemoveStyles(styles, startIndex, _text.Length - startIndex);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where the specified text style flags are removed (bitwise AND NOT) in the specified range.
     /// </summary>
-    public AnsiString RemoveStyles(TextStyles styles, int startIndex, int length) => ModifyStyle(s => s.SetStyles(s.Styles & ~styles), startIndex, length);
+    public AnsiString RemoveStyles(NKTextStyles styles, int startIndex, int length) => ModifyStyle(s => s.WithStyles(s.Styles & ~styles), startIndex, length);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where the specified text style flags are removed (bitwise AND NOT) in the specified range.
     /// </summary>
-    public AnsiString RemoveStyles(TextStyles styles, Range range) => ModifyStyle(s => s.SetStyles(s.Styles & ~styles), range);
+    public AnsiString RemoveStyles(NKTextStyles styles, Range range) => ModifyStyle(s => s.WithStyles(s.Styles & ~styles), range);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where the specified text style flags are toggled (bitwise XOR) for the entire string.
     /// </summary>
-    public AnsiString ToggleStyles(TextStyles styles) => ToggleStyles(styles, 0, _text.Length);
+    public AnsiString ToggleStyles(NKTextStyles styles) => ToggleStyles(styles, 0, _text.Length);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where the specified text style flags are toggled (bitwise XOR) from <paramref name="startIndex"/> to the end.
     /// </summary>
-    public AnsiString ToggleStyles(TextStyles styles, int startIndex) => ToggleStyles(styles, startIndex, _text.Length - startIndex);
+    public AnsiString ToggleStyles(NKTextStyles styles, int startIndex) => ToggleStyles(styles, startIndex, _text.Length - startIndex);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where the specified text style flags are toggled (bitwise XOR) in the specified range.
     /// </summary>
-    public AnsiString ToggleStyles(TextStyles styles, int startIndex, int length) => ModifyStyle(s => s.SetStyles(s.Styles ^ styles), startIndex, length);
+    public AnsiString ToggleStyles(NKTextStyles styles, int startIndex, int length) => ModifyStyle(s => s.WithStyles(s.Styles ^ styles), startIndex, length);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where the specified text style flags are toggled (bitwise XOR) in the specified range.
     /// </summary>
-    public AnsiString ToggleStyles(TextStyles styles, Range range) => ModifyStyle(s => s.SetStyles(s.Styles ^ styles), range);
+    public AnsiString ToggleStyles(NKTextStyles styles, Range range) => ModifyStyle(s => s.WithStyles(s.Styles ^ styles), range);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where the specified style overrides non-inherit attributes of existing styles for the entire string.
@@ -480,12 +479,12 @@ public sealed class AnsiString :
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where the specified style overrides non-inherit attributes of existing styles in the specified range.
     /// </summary>
-    public AnsiString OverrideStyle(NKStyle style, int startIndex, int length) => ModifyStyle(s => s.OverrideWith(style), startIndex, length);
+    public AnsiString OverrideStyle(NKStyle style, int startIndex, int length) => ModifyStyle(s => s.With(style), startIndex, length);
 
     /// <summary>
     /// Returns a new <see cref="AnsiString"/> where the specified style overrides non-inherit attributes of existing styles in the specified range.
     /// </summary>
-    public AnsiString OverrideStyle(NKStyle style, Range range) => ModifyStyle(s => s.OverrideWith(style), range);
+    public AnsiString OverrideStyle(NKStyle style, Range range) => ModifyStyle(s => s.With(style), range);
 
     #endregion
 
@@ -669,9 +668,9 @@ public sealed class AnsiString :
     public static AnsiString operator +(NKStyle style, AnsiString? str) => str?.AddStyle(style) ?? new AnsiString();
 
     /// <summary>
-    /// Adds <see cref="TextStyles"/> to an <see cref="AnsiString"/>.
+    /// Adds <see cref="NKTextStyles"/> to an <see cref="AnsiString"/>.
     /// </summary>
-    public static AnsiString operator +(AnsiString? str, TextStyles styles) => str?.AddStyles(styles) ?? new AnsiString();
+    public static AnsiString operator +(AnsiString? str, NKTextStyles styles) => str?.AddStyles(styles) ?? new AnsiString();
 
     /// <summary>
     /// Sets text color on an <see cref="AnsiString"/>.
@@ -682,13 +681,13 @@ public sealed class AnsiString :
     /// Returns a copy of this string converted to uppercase, preserving all styles.
     /// </summary>
     /// <returns>A new <see cref="AnsiString"/> instance.</returns>
-    public AnsiString ToUpper() => new(_text.ToUpper(), [.._styles]);
+    public AnsiString ToUpper() => new(_text.ToUpper(), [.. _styles]);
 
     /// <summary>
     /// Returns a copy of this string converted to lowercase, preserving all styles.
     /// </summary>
     /// <returns>A new <see cref="AnsiString"/> instance.</returns>
-    public AnsiString ToLower() => new(_text.ToLower(), [.._styles]);
+    public AnsiString ToLower() => new(_text.ToLower(), [.. _styles]);
 
     /// <summary>
     /// Removes all leading and trailing white-space characters from the current string.
@@ -807,7 +806,7 @@ public sealed class AnsiString :
     /// <param name="oldChar">The character to be replaced.</param>
     /// <param name="newChar">The character to replace all occurrences of <paramref name="oldChar"/>.</param>
     /// <returns>A new <see cref="AnsiString"/> instance.</returns>
-    public AnsiString Replace(char oldChar, char newChar) => new(_text.Replace(oldChar, newChar), [.._styles]);
+    public AnsiString Replace(char oldChar, char newChar) => new(_text.Replace(oldChar, newChar), [.. _styles]);
 
     /// <summary>
     /// Returns a new string in which all occurrences of a specified string in the current instance 
@@ -1104,7 +1103,7 @@ public sealed class AnsiString :
             if (!TryParseColor(colorStr, out var color))
                 return false;
 
-            style = style.SetFColor(color);
+            style = style.WithFColor(color);
 
             return true;
         }
@@ -1118,29 +1117,29 @@ public sealed class AnsiString :
             if (!TryParseColor(colorStr, out var color))
                 return false;
 
-            style = style.SetBColor(color);
+            style = style.WithBColor(color);
 
             return true;
         }
 
-        var flags = TextStyles.NONE;
+        var flags = NKTextStyles.NONE;
 
         foreach (var c in content)
             switch (c) {
-                case 'b': flags |= TextStyles.BOLD; break;
-                case 'i': flags |= TextStyles.ITALIC; break;
-                case 'u': flags |= TextStyles.UNDERLINE; break;
-                case 'f': flags |= TextStyles.FAINT; break;
-                case 'l': flags |= TextStyles.BLINK; break;
-                case 'n': flags |= TextStyles.NEGATIVE; break;
-                case 'v': flags |= TextStyles.INVISIBLE; break;
-                case 's': flags |= TextStyles.STRIKETHROUGH; break;
+                case 'b': flags |= NKTextStyles.BOLD; break;
+                case 'i': flags |= NKTextStyles.ITALIC; break;
+                case 'u': flags |= NKTextStyles.UNDERLINE; break;
+                case 'f': flags |= NKTextStyles.FAINT; break;
+                case 'l': flags |= NKTextStyles.BLINK; break;
+                case 'n': flags |= NKTextStyles.NEGATIVE; break;
+                case 'v': flags |= NKTextStyles.INVISIBLE; break;
+                case 's': flags |= NKTextStyles.STRIKETHROUGH; break;
                 default:  return false;
             }
 
         style = isNegated
-            ? style.SetStyles(style.Styles & ~flags)
-            : style.SetStyles(flags);
+            ? style.WithStyles(style.Styles & ~flags)
+            : style.WithStyles(flags);
 
         return true;
     }
@@ -1277,7 +1276,7 @@ public sealed class AnsiString :
     /// Creates a shallow copy of the <see cref="AnsiString"/>. 
     /// Note that since the class is immutable, this is mostly for interface compliance.
     /// </summary>
-    public AnsiString Clone() => new(_text, [.._styles]);
+    public AnsiString Clone() => new(_text, [.. _styles]);
 
     object ICloneable.Clone() => Clone();
 
