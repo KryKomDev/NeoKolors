@@ -35,8 +35,26 @@ public static partial class NKConsole {
     /// </exception>
     public static async Task<KeyEventArgs> ReadKeyAsync(bool intercept = false) {
         // use standard console reading if the input driver is not running
-        if (!InputDriver.IsRunning)
+        if (!InputDriver.IsRunning) {
+            if (Stdio.IsInputRedirected) {
+                int ch = Stdio.Read();
+                if (ch == -1)
+                    return default;
+
+                char c = (char)ch;
+                var key = c switch {
+                    '\r' => ConsoleKey.Enter,
+                    '\n' => ConsoleKey.Enter,
+                    '\t' => ConsoleKey.Tab,
+                    '\b' => ConsoleKey.Backspace,
+                    _    => (ConsoleKey)c
+                };
+
+                return new KeyEventArgs(new ConsoleKeyInfo(c, key, false, false, false));
+            }
+
             return new KeyEventArgs(Stdio.ReadKey(intercept));
+        }
 
         var tcs = new TaskCompletionSource<KeyEventArgs>();
 

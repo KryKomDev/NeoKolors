@@ -16,21 +16,71 @@ public sealed class NKLogger : ILogger, IDisposable {
 
     #region Config
     
-    public bool       Enabled { get; set; }
-    public ILogWriter Writer  { get; set; }
-    public NKLogLevel Level   { get; set; }
-    public string?    Source  { get; set; }
+    private static readonly AnsiLogWriter DEFAULT_WRITER = new();
 
-    internal IExternalScopeProvider? ScopeProvider { get; set; }
+    private ILogWriter?              _writer;
+    private NKLogLevel?              _level;
+    private bool?                    _enabled;
+    private readonly Func<NKLogger>? _parentGetter;
+    private IExternalScopeProvider?  _scopeProvider;
 
-    public NKLogger(ILogWriter? writer = null, string? source = null, NKLogLevel? level = null, bool enabled = true) {
-        Writer  = writer ?? new AnsiLogWriter();
-        Source  = source;
-        Level   = level ?? CRITICAL | ERROR | WARNING | INFORMATION | DEBUG | TRACE;
-        Enabled = enabled;
+    public bool Enabled {
+        get => _enabled ?? _parentGetter?.Invoke()?.Enabled ?? true;
+        set => _enabled = value;
     }
 
-    public NKLogger(string source) : this(null, source) { }
+    public ILogWriter Writer {
+        get => _writer ?? _parentGetter?.Invoke()?.Writer ?? DEFAULT_WRITER;
+        set => _writer = value;
+    }
+
+    public NKLogLevel Level {
+        get => _level ?? _parentGetter?.Invoke()?.Level ?? (CRITICAL | ERROR | WARNING | INFORMATION | DEBUG | TRACE);
+        set => _level = value;
+    }
+
+    public string? Source { get; set; }
+
+    /// <summary>
+    /// The parent logger, if this instance is a child logger; otherwise <c>null</c>.
+    /// </summary>
+    public NKLogger? Parent => _parentGetter?.Invoke();
+
+    internal IExternalScopeProvider? ScopeProvider {
+        get => _scopeProvider ?? _parentGetter?.Invoke()?.ScopeProvider;
+        set => _scopeProvider = value;
+    }
+
+    public NKLogger(ILogWriter? writer = null, string? source = null, NKLogLevel? level = null, bool enabled = true) {
+        _writer  = writer ?? new AnsiLogWriter();
+        Source   = source;
+        _level   = level ?? (CRITICAL | ERROR | WARNING | INFORMATION | DEBUG | TRACE);
+        _enabled = enabled;
+    }
+
+    public NKLogger(string source) : this(writer: null, source: source) { }
+
+    public NKLogger(Func<NKLogger> parentGetter, string? source = null) {
+        _parentGetter = parentGetter ?? throw new ArgumentNullException(nameof(parentGetter));
+        Source        = source;
+    }
+
+    public NKLogger(NKLogger parent, string? source = null) : this(() => parent ?? throw new ArgumentNullException(nameof(parent)), source) { }
+
+    /// <summary>
+    /// Resets the log level override, reverting to the parent's log level if this is a child logger.
+    /// </summary>
+    public void ResetLevel() => _level = null;
+
+    /// <summary>
+    /// Resets the log writer override, reverting to the parent's writer if this is a child logger.
+    /// </summary>
+    public void ResetWriter() => _writer = null;
+
+    /// <summary>
+    /// Resets the enabled override, reverting to the parent's enabled state if this is a child logger.
+    /// </summary>
+    public void ResetEnabled() => _enabled = null;
 
     /// <summary>
     /// Enables all log message levels, including critical, error, warning, information, debug, and trace.
@@ -228,7 +278,7 @@ public sealed class NKLogger : ILogger, IDisposable {
     }
 
     public void Dispose() {
-        Writer.Dispose();
+        _writer?.Dispose();
     }
 
     private sealed class NullScope : IDisposable {

@@ -34,14 +34,18 @@
         </PackageReference>
         <PackageReference Include="IParsablePolyfill" Version="2026.3.0.3" />
         <PackageReference Include="JetBrains.Annotations" Version="2026.2.0"/>
-        <PackageReference Include="MessagePack" Version="3.1.8"/>
+        <PackageReference Include="MessagePack" Version="3.1.10" />
         <PackageReference Include="OneOf" Version="3.0.271"/>
 
-        <PackageReference Include="SkiaSharp" Version="4.152.0" />
-        <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.152.0" />
-        <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="4.152.0" />
-        <PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="4.152.0" />
-        <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" Version="4.152.0" />
+        <PackageReference Include="SkiaSharp" Version="4.153.0" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="4.153.0" />
+        <PackageReference Include="SkiaSharp.NativeAssets.macOS" Version="4.153.0" />
+        <PackageReference Include="SkiaSharp.NativeAssets.Win32" Version="4.153.0" />
+        <PackageReference Include="SkiaSharp.NativeAssets.WebAssembly" Version="4.153.0" />
+        <PackageReference Update="Polyfill" Version="11.4.1">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>

@@ -31,12 +31,16 @@
         <PackageReference Include="Implyzer" Version="2026.5.4" OutputItemType="Analyzer" ReferenceOutputAssembly="false">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Metriks" Version="2026.3.0" />
+        <PackageReference Include="Metriks" Version="2026.4.0-preview.1" />
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="System.Collections.Immutable" Version="10.0.12" />
+        <PackageReference Update="Polyfill" Version="11.4.1">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
     
     <ItemGroup>

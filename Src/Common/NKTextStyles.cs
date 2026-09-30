@@ -109,50 +109,34 @@ public static partial class NKTextStylesExtensions {
         /// </summary>
         /// <returns>A string containing the formatted ANSI escape sequence for the specified text styles,
         /// or an empty string if no styles are applied.</returns>
-        public string GetEscSeq(NKTextStyles previous) {
-            var off = previous  & ~styles;
-            var on  = ~previous & styles;
-
-            if (off == NONE && on == NONE)
-                return string.Empty;
-
-            var sb = new StringBuilder("\e[");
-
-            off.AppendNegModes(sb);
-            on.AppendPosModes(sb);
-
-            sb.Remove(sb.Length - 1, 1);
-            sb.Append('m');
-
-            return sb.ToString();
-        }
+        public string GetEscSeq(NKTextStyles previous) =>
+            NKTextStyles.GetEscSeq(previous, styles, NONE, addEsc: true);
 
         /// <summary>
         /// Appends the activating ANSI escape sequence for the specified active text styles.
         /// </summary>
         internal void AppendPosModes(StringBuilder sb) {
-            sb.Append(styles.GetIsBold() ? "1;" : "");
-            sb.Append(styles.GetIsFaint() ? "2;" : "");
-            sb.Append(styles.GetIsItalic() ? "3;" : "");
-            sb.Append(styles.GetIsUnderline() ? "4;" : "");
-            sb.Append(styles.GetIsBlink() ? "5;" : "");
-            sb.Append(styles.GetIsNegative() ? "7;" : "");
-            sb.Append(styles.GetIsInvisible() ? "8;" : "");
-            sb.Append(styles.GetIsStrikethrough() ? "9;" : "");
+            if (styles.GetIsBold()) sb.Append("1;");
+            if (styles.GetIsFaint()) sb.Append("2;");
+            if (styles.GetIsItalic()) sb.Append("3;");
+            if (styles.GetIsUnderline()) sb.Append("4;");
+            if (styles.GetIsBlink()) sb.Append("5;");
+            if (styles.GetIsNegative()) sb.Append("7;");
+            if (styles.GetIsInvisible()) sb.Append("8;");
+            if (styles.GetIsStrikethrough()) sb.Append("9;");
         }
 
         /// <summary>
         /// Appends the terminating ANSI escape sequence for the specified active text styles.
         /// </summary>
         internal void AppendNegModes(StringBuilder sb) {
-            sb.Append(styles.GetIsBold() ? "22;" : "");
-            sb.Append(styles.GetIsFaint() ? "22;" : "");
-            sb.Append(styles.GetIsItalic() ? "23;" : "");
-            sb.Append(styles.GetIsUnderline() ? "24;" : "");
-            sb.Append(styles.GetIsBlink() ? "25;" : "");
-            sb.Append(styles.GetIsNegative() ? "27;" : "");
-            sb.Append(styles.GetIsInvisible() ? "28;" : "");
-            sb.Append(styles.GetIsStrikethrough() ? "29;" : "");
+            if (styles.GetIsBold() || styles.GetIsFaint()) sb.Append("22;");
+            if (styles.GetIsItalic())                      sb.Append("23;");
+            if (styles.GetIsUnderline())                   sb.Append("24;");
+            if (styles.GetIsBlink())                       sb.Append("25;");
+            if (styles.GetIsNegative())                    sb.Append("27;");
+            if (styles.GetIsInvisible())                   sb.Append("28;");
+            if (styles.GetIsStrikethrough())               sb.Append("29;");
         }
     }
 
@@ -182,25 +166,16 @@ public static partial class NKTextStylesExtensions {
             if (addEsc)
                 sb.Append("\e[");
 
-            var on  = next  & ~inherit & ~prev;
-            var off = ~next & ~inherit & prev;
+            var on     = next  & ~inherit & ~prev;
+            var off    = ~next & ~inherit & prev;
+            var target = (next & ~inherit) | (prev & inherit);
 
-            // This mess had to be made because of the way VTs handle bold/faint
-            // Screw you who designed the codes.
-            if (off.GetIsBold() ^ off.GetIsFaint()) {
+            // SGR 22 cancels both bold and faint. If either is turned off,
+            // emit 22 and re-enable whichever one should still be active in target.
+            if (off.GetIsBold() || off.GetIsFaint()) {
                 sb.Append("22;");
-
-                if (on.GetIsBold() || on.GetIsFaint()) {
-                    sb.Append(on.GetIsBold() ? "1;" : "2;");
-                }
-                else {
-                    sb.Append(prev.GetIsBold() ? "2;" : "1;");
-                }
-            }
-            else if (off.GetIsBold() && off.GetIsFaint()) {
-                sb.Append("22;");
-                if (on.GetIsBold())  sb.Append("1;");
-                if (on.GetIsFaint()) sb.Append("2;");
+                if (target.GetIsBold())  sb.Append("1;");
+                if (target.GetIsFaint()) sb.Append("2;");
             }
             else {
                 if (on.GetIsBold())  sb.Append("1;");

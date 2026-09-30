@@ -3,6 +3,7 @@
 
 using JetBrains.Annotations;
 using Microsoft.Extensions.Logging;
+using NeoKolors.Common;
 using NeoKolors.Extensions;
 
 namespace NeoKolors.Console;
@@ -13,8 +14,7 @@ namespace NeoKolors.Console;
 public static class NKDebug {
 
     static NKDebug() {
-        Logger = new NKLogger();
-        AppDomain.CurrentDomain.ProcessExit += (_, _) => { Logger.Writer.Dispose(); };
+        AppDomain.CurrentDomain.ProcessExit += (_, _) => { Logger?.Writer.Dispose(); };
         EnableExceptionInterruption();
     }
     
@@ -25,19 +25,22 @@ public static class NKDebug {
     /// </summary>
     /// <param name="source">The source identifier for the logger instance.</param>
     /// <returns>An instance of <see cref="NKLogger"/> configured with the specified source.</returns>
-    public static NKLogger GetLogger(string source) => new NKLogger(source);
+    public static NKLogger GetLogger(string source) => new(() => Logger, source);
     
     /// <summary>
     /// Retrieves an instance of <see cref="NKLogger"/> configured with the specified source.
     /// </summary>
     /// <returns>An instance of <see cref="NKLogger"/> configured with the specified source.</returns>
-    public static NKLogger GetLogger<TSource>() => new NKLogger(typeof(TSource).Name);
+    public static NKLogger GetLogger<TSource>() => new(() => Logger, typeof(TSource).Name);
 
     /// <summary>
     /// Global instance of the <see cref="NKLogger"/>.
     /// </summary>
-    public static NKLogger Logger { get; }
-    
+    public static NKLogger Logger {
+        get;
+        set => field = value ?? throw new ArgumentNullException(nameof(value));
+    } = new();
+
     /// <inheritdoc cref="NKLogger.Trace(AnsiString?, string?, EventId?)"/>
     public static void Trace(string message) => Logger.Trace(message);
     

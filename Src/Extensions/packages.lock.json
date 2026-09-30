@@ -25,9 +25,9 @@
       },
       "Metriks": {
         "type": "Direct",
-        "requested": "[2026.3.0, )",
-        "resolved": "2026.3.0",
-        "contentHash": "4eWxns2gvXbpKzq98g+TXwEVeDq4PTQg7oQdqgn1uTVvwxnMJMOhkp1yWCfVlwpOw1nPpzu7Kj9UEXFuDKs6SQ==",
+        "requested": "[2026.4.0-preview.1, )",
+        "resolved": "2026.4.0-preview.1",
+        "contentHash": "Gb0FMJLOO0abcT9AyasGiY4+xQI5y6bCDo9kt3VVUdupCIksIVQz7YPBnZhoQMcXVClcQ04opTNNWdfUD/hXdQ==",
         "dependencies": {
           "JetBrains.Annotations": "2026.2.0",
           "System.Runtime.CompilerServices.Unsafe": "6.1.2"
@@ -44,9 +44,9 @@
       },
       "Polyfill": {
         "type": "Direct",
-        "requested": "[11.3.0, )",
-        "resolved": "11.3.0",
-        "contentHash": "bSmvuJftFcVuh6dn3TL3upLzk5rNuFZgzuZgM+7YGOvTL3xihd038i1IpqywikM/2Jnh/TOc+DIWGhfjTEjMHA=="
+        "requested": "[11.4.1, )",
+        "resolved": "11.4.1",
+        "contentHash": "HbyvI2RZLjW8zaJOiAtyTaCVEAAvhPp7kCkEgHne4igfAY3o7W0JAmurNrjdItUdRIXanYrWiet2ng/Jjd9+/w=="
       },
       "System.Collections.Immutable": {
         "type": "Direct",
@@ -138,9 +138,9 @@
       },
       "Metriks": {
         "type": "Direct",
-        "requested": "[2026.3.0, )",
-        "resolved": "2026.3.0",
-        "contentHash": "4eWxns2gvXbpKzq98g+TXwEVeDq4PTQg7oQdqgn1uTVvwxnMJMOhkp1yWCfVlwpOw1nPpzu7Kj9UEXFuDKs6SQ==",
+        "requested": "[2026.4.0-preview.1, )",
+        "resolved": "2026.4.0-preview.1",
+        "contentHash": "Gb0FMJLOO0abcT9AyasGiY4+xQI5y6bCDo9kt3VVUdupCIksIVQz7YPBnZhoQMcXVClcQ04opTNNWdfUD/hXdQ==",
         "dependencies": {
           "JetBrains.Annotations": "2026.2.0"
         }
@@ -156,9 +156,9 @@
       },
       "Polyfill": {
         "type": "Direct",
-        "requested": "[11.3.0, )",
-        "resolved": "11.3.0",
-        "contentHash": "bSmvuJftFcVuh6dn3TL3upLzk5rNuFZgzuZgM+7YGOvTL3xihd038i1IpqywikM/2Jnh/TOc+DIWGhfjTEjMHA=="
+        "requested": "[11.4.1, )",
+        "resolved": "11.4.1",
+        "contentHash": "HbyvI2RZLjW8zaJOiAtyTaCVEAAvhPp7kCkEgHne4igfAY3o7W0JAmurNrjdItUdRIXanYrWiet2ng/Jjd9+/w=="
       },
       "System.Collections.Immutable": {
         "type": "Direct",
@@ -218,9 +218,9 @@
       },
       "Metriks": {
         "type": "Direct",
-        "requested": "[2026.3.0, )",
-        "resolved": "2026.3.0",
-        "contentHash": "4eWxns2gvXbpKzq98g+TXwEVeDq4PTQg7oQdqgn1uTVvwxnMJMOhkp1yWCfVlwpOw1nPpzu7Kj9UEXFuDKs6SQ==",
+        "requested": "[2026.4.0-preview.1, )",
+        "resolved": "2026.4.0-preview.1",
+        "contentHash": "Gb0FMJLOO0abcT9AyasGiY4+xQI5y6bCDo9kt3VVUdupCIksIVQz7YPBnZhoQMcXVClcQ04opTNNWdfUD/hXdQ==",
         "dependencies": {
           "JetBrains.Annotations": "2026.2.0"
         }
@@ -236,9 +236,9 @@
       },
       "Polyfill": {
         "type": "Direct",
-        "requested": "[11.3.0, )",
-        "resolved": "11.3.0",
-        "contentHash": "bSmvuJftFcVuh6dn3TL3upLzk5rNuFZgzuZgM+7YGOvTL3xihd038i1IpqywikM/2Jnh/TOc+DIWGhfjTEjMHA=="
+        "requested": "[11.4.1, )",
+        "resolved": "11.4.1",
+        "contentHash": "HbyvI2RZLjW8zaJOiAtyTaCVEAAvhPp7kCkEgHne4igfAY3o7W0JAmurNrjdItUdRIXanYrWiet2ng/Jjd9+/w=="
       },
       "System.Collections.Immutable": {
         "type": "Direct",
@@ -330,9 +330,9 @@
       },
       "Metriks": {
         "type": "Direct",
-        "requested": "[2026.3.0, )",
-        "resolved": "2026.3.0",
-        "contentHash": "4eWxns2gvXbpKzq98g+TXwEVeDq4PTQg7oQdqgn1uTVvwxnMJMOhkp1yWCfVlwpOw1nPpzu7Kj9UEXFuDKs6SQ==",
+        "requested": "[2026.4.0-preview.1, )",
+        "resolved": "2026.4.0-preview.1",
+        "contentHash": "Gb0FMJLOO0abcT9AyasGiY4+xQI5y6bCDo9kt3VVUdupCIksIVQz7YPBnZhoQMcXVClcQ04opTNNWdfUD/hXdQ==",
         "dependencies": {
           "JetBrains.Annotations": "2026.2.0"
         }
@@ -348,9 +348,9 @@
       },
       "Polyfill": {
         "type": "Direct",
-        "requested": "[11.3.0, )",
-        "resolved": "11.3.0",
-        "contentHash": "bSmvuJftFcVuh6dn3TL3upLzk5rNuFZgzuZgM+7YGOvTL3xihd038i1IpqywikM/2Jnh/TOc+DIWGhfjTEjMHA=="
+        "requested": "[11.4.1, )",
+        "resolved": "11.4.1",
+        "contentHash": "HbyvI2RZLjW8zaJOiAtyTaCVEAAvhPp7kCkEgHne4igfAY3o7W0JAmurNrjdItUdRIXanYrWiet2ng/Jjd9+/w=="
       },
       "System.Collections.Immutable": {
         "type": "Direct",

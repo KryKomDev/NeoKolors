@@ -92,18 +92,21 @@ public sealed class TextLogWriter : ILogWriter, IAsyncDisposable {
     private static bool HasSource(NKLogRecord record) => !string.IsNullOrEmpty(record.Source) || record.EventId != null;
 
     private static string GetSource(NKLogRecord record) {
-        if (record.Source != null && record.EventId != null) {
+        if (record is { Source: not null, EventId: not null }) {
             var eventId = record.EventId.Value;
             string idStr = !string.IsNullOrEmpty(eventId.Name) ? $"{eventId.Id}:{eventId.Name}" : eventId.Id.ToString();
             return $"{record.Source}:{idStr}";
         }
+        
         if (record.Source != null) {
             return record.Source;
         }
+        
         if (record.EventId != null) {
             var eventId = record.EventId.Value;
             return !string.IsNullOrEmpty(eventId.Name) ? $"{eventId.Id}:{eventId.Name}" : eventId.Id.ToString();
         }
+        
         return string.Empty;
     }
 

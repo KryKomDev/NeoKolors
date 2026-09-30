@@ -11,6 +11,8 @@ namespace NeoKolors.Common;
 /// contains ansi escape sequences  
 /// </summary>
 public static class EscapeCodes {
+    
+    public const string ST = "\x9C";
 
     #region COLORING
 
@@ -444,8 +446,29 @@ public static class EscapeCodes {
     
     #region OSC
 
-    public const string OSC_FORMAT = "\e]{0};{1}\a";
-    public const string OSC_REQ_FORMAT = "\e]{0};?\a";
+    public const string LINK_START = "\e]8;;{0}\e\\";
+    public const string LINK_START_ID = "\e]8;id={0};{1}\e\\";
+    public const string LINK_END = "\e]8;;\e\\";
+
+    /// <summary>
+    /// Generates an escape sequence to create a hyperlink with the specified URI and label.
+    /// </summary>
+    /// <param name="uri">The URI to navigate to when the hyperlink is activated.</param>
+    /// <param name="label">The visible text for the hyperlink.</param>
+    /// <returns>A string containing the formatted escape sequence that represents the hyperlink.</returns>
+    public static string GetLink(string uri, string label) => $"{LINK_START.Format(uri)}{label}{LINK_END}";
+
+    /// <summary>
+    /// Generates an escape sequence to create a hyperlink with the specified URI, label, and optional link ID.
+    /// </summary>
+    /// <param name="uri">The URI that the hyperlink will point to.</param>
+    /// <param name="label">The text to display as the hyperlink.</param>
+    /// <param name="id">An optional identifier for the link, allowing for multiple unique links within the same text.</param>
+    /// <returns>A string containing the formatted escape sequence for the hyperlink.</returns>
+    public static string GetLink(string uri, string label, string id) => $"{LINK_START_ID.Format(id, uri)}{label}{LINK_END}";
+
+    public const string OSC_FORMAT            = "\e]{0};{1}\a";
+    public const string OSC_REQ_FORMAT        = "\e]{0};?\a";
     public const string REDEFINE_COLOR_FORMAT = "\e]4;{0};{1}\a";
 
     /// <summary>

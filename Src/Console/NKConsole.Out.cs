@@ -32,7 +32,14 @@ public static partial class NKConsole {
     /// <param name="value">The string to write.</param>
     public static void Write(string value) => OutputDriver.Write(value);
 
+
+    /// <summary>
+    /// Writes the specified ANSI string to the output.
+    /// </summary>
+    /// <param name="value">The ANSI string to write to the console output.</param>
+    public static void Write(AnsiString value) => OutputDriver.Write(value.ToString());
     
+
     /// <summary>
     /// Writes the specified formatted string along with its arguments to the output.
     /// </summary>
@@ -59,6 +66,13 @@ public static partial class NKConsole {
     /// <param name="value">The string to write followed by a new line.</param>
     public static void WriteLine(string value) => OutputDriver.WriteLine(value);
 
+
+    /// <summary>
+    /// Writes the specified ANSI string to the output and a new line.
+    /// </summary>
+    /// <param name="value">The ANSI string to write to the console output.</param>
+    public static void WriteLine(AnsiString value) => OutputDriver.WriteLine(value.ToString());
+    
     
     /// <summary>
     /// Writes the specified string value followed by a new line to the output.
@@ -1069,9 +1083,20 @@ public static partial class NKConsole {
 
 
     // ===================================================================================== //
-    //                                ---  SIXEL WRITING  ---                                //
+    //                              ---  GRAPHICS WRITING  ---                               //
     // ===================================================================================== //
-
+    
+    
+    // TODO: use SKBitmap or SKImage?
+    
+    public static void WriteImage(SKImage image, Point2D offset, Size2D charSize, SKSamplingOptions samplingOptions) {
+        throw new NotImplementedException();
+    }
+    
+    public static void WriteImage(SKBitmap image, Point2D offset, Size2D charSize, SKSamplingOptions samplingOptions) {
+        throw new NotImplementedException();
+    }
+    
     #region SIXEL
     
     /// <summary>

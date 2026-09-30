@@ -40,6 +40,20 @@ public readonly record struct NKUnderlineStyle {
         init => _flags = (byte)(value ? (_flags | INHERIT_TYPE_MASK) : (_flags & ~INHERIT_TYPE_MASK));
     }
 
+    public static NKUnderlineStyle Default { get; } =
+        new(
+            NKColor.Default,
+            NKUnderlineType.NORMAL,
+            inheritType: false
+        );
+    
+    public static NKUnderlineStyle Inherit { get; } =
+        new(
+            NKColor.Inherit,
+            NKUnderlineType.NORMAL,
+            inheritType: true
+        );
+
     public NKUnderlineStyle(NKColor color, NKUnderlineType flags, bool inheritType = false) {
         _color = color.GetRaw() & COLOR_MASK;
         _flags = (byte)((_flags & ~(UNDERLINE_TYPE_MASK | INHERIT_TYPE_MASK)) 

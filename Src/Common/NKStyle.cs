@@ -154,7 +154,7 @@ public readonly record struct NKStyle : IFormattable, IParsablePolyfill.IParsabl
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => BColor.IsPalette;
     }
-    
+
     public NKStyle(ulong raw0, ulong raw1) {
         _raw0 = raw0;
         _raw1 = raw1;
@@ -288,7 +288,7 @@ public readonly record struct NKStyle : IFormattable, IParsablePolyfill.IParsabl
     public NKStyle WithUnderline(NKUnderlineStyle underline) {
         return this with { Underline = Underline.With(underline) };
     }
-    
+
     private string ToDbgString() => $"FColor: {FColor:p}, BColor: {BColor:p}{StylesToString()}";
 
     public override string ToString() => ToString(null, null);
@@ -298,8 +298,8 @@ public readonly record struct NKStyle : IFormattable, IParsablePolyfill.IParsabl
             return ToAnsi();
 
         return format switch {
-            "p" or "P"     => ToDbgString(),
-            _              => ToAnsi()
+            "p" or "P" => ToDbgString(),
+            _          => ToAnsi()
         };
     }
 
@@ -310,14 +310,29 @@ public readonly record struct NKStyle : IFormattable, IParsablePolyfill.IParsabl
         var output = new List<string>();
         var styles = GetStyles();
 
-        if (styles.GetIsBold()) output.Add("Bold");
-        if (styles.GetIsItalic()) output.Add("Italic");
-        if (styles.GetIsUnderline()) output.Add("Underline");
-        if (styles.GetIsStrikethrough()) output.Add("Strikethrough");
-        if (styles.GetIsFaint()) output.Add("Faint");
-        if (styles.GetIsNegative()) output.Add("Negative");
-        if (styles.GetIsInvisible()) output.Add("Invisible");
-        if (styles.GetIsBlink()) output.Add("Blink");
+        if (styles.GetIsBold())
+            output.Add("Bold");
+
+        if (styles.GetIsItalic())
+            output.Add("Italic");
+
+        if (styles.GetIsUnderline())
+            output.Add("Underline");
+
+        if (styles.GetIsStrikethrough())
+            output.Add("Strikethrough");
+
+        if (styles.GetIsFaint())
+            output.Add("Faint");
+
+        if (styles.GetIsNegative())
+            output.Add("Negative");
+
+        if (styles.GetIsInvisible())
+            output.Add("Invisible");
+
+        if (styles.GetIsBlink())
+            output.Add("Blink");
 
         return output.Count != 0 ? $", {string.Join(", ", output.ToArray())}" : "";
     }
@@ -329,7 +344,23 @@ public readonly record struct NKStyle : IFormattable, IParsablePolyfill.IParsabl
         return overriden.With(overrider);
     }
 
-    public static NKStyle Default => new(NKColor.Default, NKColor.Default);
+    public static NKStyle Default { get; } =
+        new(
+            textColor: NKColor.Default,
+            backgroundColor: NKColor.Default,
+            styles: NONE,
+            inheritedStyles: NONE,
+            underlineStyle: NKUnderlineStyle.Default
+        );
+
+    public static NKStyle Inherit { get; } =
+        new(
+            textColor: NKColor.Inherit,
+            backgroundColor: NKColor.Inherit,
+            styles: NONE,
+            inheritedStyles: ALL,
+            underlineStyle: NKUnderlineStyle.Inherit
+        );
 
     [JBPure]
     public static string GetEscSeq(NKStyle prev, NKStyle next) {
@@ -339,7 +370,7 @@ public readonly record struct NKStyle : IFormattable, IParsablePolyfill.IParsabl
         var sb = new StringBuilder("\e[");
 
         sb.Append(NKTextStyles.GetEscSeq(prev._styleData, next._styleData, next.InheritedStyles, false));
-        
+
         NKColor.AppendInnerF(sb, prev.FColor, next.FColor);
         NKColor.AppendInnerB(sb, prev.BColor, next.BColor);
         NKColor.AppendInnerU(sb, prev.UColor, next.UColor);
@@ -349,7 +380,7 @@ public readonly record struct NKStyle : IFormattable, IParsablePolyfill.IParsabl
         if (sb[^1] != ';') {
             return string.Empty;
         }
-        
+
         sb.Remove(sb.Length - 1, 1);
         sb.Append('m');
 
@@ -378,22 +409,22 @@ public readonly record struct NKStyle : IFormattable, IParsablePolyfill.IParsabl
         var sb = new StringBuilder();
 
         sb.Append("\e[");
-        
+
         sb.Append(NKTextStyles.GetEscSeq(style.Styles, style.InheritedStyles, force, false));
 
         NKColor.AppendInnerF(sb, style.FColor);
         NKColor.AppendInnerB(sb, style.BColor);
         NKColor.AppendInnerU(sb, style.UColor);
-        
+
         NKUnderlineType.AppendEscSeq(sb, style.Underline.Type, false);
 
         if (sb[^1] != ';') {
             return string.Empty;
         }
-        
+
         sb.Remove(sb.Length - 1, 1);
         sb.Append('m');
-        
+
         return sb.ToString();
     }
 
@@ -464,7 +495,7 @@ public readonly record struct NKStyle : IFormattable, IParsablePolyfill.IParsabl
     }
 
     public static bool TryParse([NotNullWhen(true)] string? s, out NKStyle result) => TryParse(s, null, out result);
-    
+
     public static NKStyle Parse(string? s, IFormatProvider? provider) {
         if (s == null)
             throw new ArgumentNullException(nameof(s));
@@ -473,7 +504,7 @@ public readonly record struct NKStyle : IFormattable, IParsablePolyfill.IParsabl
             ? result
             : throw new FormatException($"Invalid style format: '{s}'");
     }
-    
+
     public static NKStyle Parse([NotNullWhen(true)] string? s) => Parse(s, null);
 
     private static bool TryParseStyleColor(string val, out NKColor color) {
@@ -521,6 +552,7 @@ public readonly record struct NKStyle : IFormattable, IParsablePolyfill.IParsabl
 
         return ret;
     }
-    
+
     #endregion
+
 }

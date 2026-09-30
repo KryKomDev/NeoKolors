@@ -59,10 +59,10 @@ public partial class NKConsole {
     public static IInputDriver InputDriver { 
         get;
         set {
-            if (field.IsRunning)
+            if (field is not null && field.IsRunning)
                 throw new InvalidOperationException("Cannot modify InputDriver while the input driver is running.");
 
-            field.Dispose();
+            field?.Dispose();
                 
             field = value;
         } 
@@ -81,12 +81,18 @@ public partial class NKConsole {
                 _ => new DotnetOutputDriver()
             };
             
-            LOGGER.Info($"Using {result.GetType().Name} as output driver");
+            LOGGER.Info(
+                "Using {Name} as output driver", 
+                result.GetType().Name
+            );
 
             return result;
         }
         catch (Exception ex) {
-            LOGGER.Warn($"Failed to create native output driver, falling back to dotnet driver: {ex.Message}");
+            LOGGER.Warn(
+                "Failed to create native output driver, falling back to dotnet driver: {ExMessage}", 
+                ex.Message
+            );
 
             return new DotnetOutputDriver();
         }
