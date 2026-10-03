@@ -138,4 +138,90 @@ public class NKDebugTests : IDisposable {
         NKDebug.SetLogNone();
         Assert.Equal(NKLogLevel.NONE, NKDebug.Logger.Level);
     }
+
+    [Fact]
+    public void GetLogger_InheritsWriterAndLevelFromNKDebug() {
+        var logger = NKDebug.GetLogger("InheritTest");
+
+        Assert.NotNull(logger);
+        Assert.Equal("InheritTest", logger.Source);
+        Assert.Same(NKDebug.Logger, logger.Parent);
+        Assert.Same(NKDebug.Logger.Writer, logger.Writer);
+        Assert.Equal(NKDebug.Logger.Level, logger.Level);
+        Assert.Equal(NKDebug.Logger.Enabled, logger.Enabled);
+    }
+
+    [Fact]
+    public void GetLogger_ReflectsChangesToNKDebugLogger() {
+        var logger = NKDebug.GetLogger("SyncTest");
+
+        // Change level via NKDebug
+        NKDebug.SetLogWarn();
+        Assert.Equal(NKDebug.Logger.Level, logger.Level);
+
+        // Change output destination via NKDebug
+        using var customSw = new StringWriter();
+        NKDebug.SetOutput(customSw);
+        Assert.Same(NKDebug.Logger.Writer, logger.Writer);
+
+        // Writing through child logger should output to the new destination with Source included
+        logger.Warn("Warning from sync logger");
+        var output = customSw.ToString();
+        Assert.Contains("Warning from sync logger", output);
+        Assert.Contains("SyncTest", output);
+    }
+
+    [Fact]
+    public void GetLogger_ReflectsReplacingNKDebugLogger() {
+        var originalLogger = NKDebug.Logger;
+        try {
+            var child = NKDebug.GetLogger("ReplacementTest");
+
+            using var sw = new StringWriter();
+            var newRootLogger = new NKLogger(new TextLogWriter(sw), level: NKLogLevel.ERROR);
+            NKDebug.Logger = newRootLogger;
+
+            // Existing child logger should immediately reflect the new root logger
+            Assert.Same(newRootLogger, child.Parent);
+            Assert.Same(newRootLogger.Writer, child.Writer);
+            Assert.Equal(NKLogLevel.ERROR, child.Level);
+
+            child.Error("Error message from child");
+            Assert.Contains("Error message from child", sw.ToString());
+            Assert.Contains("ReplacementTest", sw.ToString());
+        }
+        finally {
+            NKDebug.Logger = originalLogger;
+        }
+    }
+
+    [Fact]
+    public void GetLogger_SupportsLocalOverridesAndReset() {
+        var child = NKDebug.GetLogger("OverrideTest");
+        NKDebug.SetLogWarn();
+
+        Assert.Equal(NKDebug.Logger.Level, child.Level);
+
+        // Override child's level locally
+        child.Level = NKLogLevel.DEBUG;
+        Assert.Equal(NKLogLevel.DEBUG, child.Level);
+        Assert.Equal(NKLogLevel.CRITICAL | NKLogLevel.ERROR | NKLogLevel.WARNING, NKDebug.Logger.Level);
+
+        // Reset child's level back to parent
+        child.ResetLevel();
+        Assert.Equal(NKDebug.Logger.Level, child.Level);
+    }
+
+    [Fact]
+    public void ChildLogger_DisposeDoesNotDisposeSharedParentWriter() {
+        NKDebug.SetLogAll();
+        var child = NKDebug.GetLogger("DisposeTest");
+
+        // Disposing child should not dispose the shared parent writer
+        child.Dispose();
+
+        // Writing through NKDebug should still work without ObjectDisposedException
+        NKDebug.Info("Message after child disposed");
+        Assert.Contains("Message after child disposed", _stringWriter.ToString());
+    }
 }

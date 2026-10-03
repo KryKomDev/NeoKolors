@@ -1,4 +1,4 @@
-﻿//
+//
 // NeoKolors
 // Copyright (c) 2025 KryKom
 //
@@ -154,13 +154,160 @@ public class NKColorTests {
     }
 
     [Fact]
-    public void IParsableValue_Interface_ShouldWork() {
-        IParsableValue<NKColor> parsable = new NKColor();
-        Assert.True(parsable.TryParse("#112233", null, out var result));
-        Assert.Equal(0x112233u, result.AsRgb);
+    public void Match_ActionOverload_ExecutesCorrectBranch() {
+        int branch = 0;
 
-        IParsableValue nonGeneric = parsable;
-        Assert.True(nonGeneric.TryParse("#445566", null, out var objResult));
-        Assert.Equal(0x445566u, ((NKColor)objResult!).AsRgb);
+        NKColor.Default.Match(
+            _ => branch = 1,
+            _ => branch = 2,
+            _ => branch = 3,
+            _ => branch = 4
+        );
+        Assert.Equal(1, branch);
+
+        NKColor.FromRgb(10, 20, 30).Match(
+            _ => branch = 1,
+            _ => branch = 2,
+            _ => branch = 3,
+            _ => branch = 4
+        );
+        Assert.Equal(2, branch);
+
+        new NKColor(NKConsoleColor.CYAN).Match(
+            _ => branch = 1,
+            _ => branch = 2,
+            _ => branch = 3,
+            _ => branch = 4
+        );
+        Assert.Equal(3, branch);
+
+        NKColor.Inherit.Match(
+            _ => branch = 1,
+            _ => branch = 2,
+            _ => branch = 3,
+            _ => branch = 4
+        );
+        Assert.Equal(4, branch);
     }
+
+    [Fact]
+    public void Lerp_ValidRgbColors_InterpolatesCorrectly() {
+        var start = NKColor.FromRgb(0, 0, 0);
+        var end   = NKColor.FromRgb(100, 200, 50);
+
+        var mid = NKColor.Lerp(start, end, 0.5f);
+        Assert.Equal(NKColor.FromRgb(50, 100, 25), mid);
+
+        var zero = NKColor.Lerp(start, end, 0f);
+        Assert.Equal(start, zero);
+
+        var one = NKColor.Lerp(start, end, 1f);
+        Assert.Equal(end, one);
     }
+
+    [Fact]
+    public void Lerp_NonRgbColor_ThrowsInvalidOperationException() {
+        var rgb = NKColor.FromRgb(10, 20, 30);
+        var pal = new NKColor(NKConsoleColor.RED);
+
+        Assert.Throws<InvalidOperationException>(() => NKColor.Lerp(pal, pal, 0.5f));
+    }
+
+    [Fact]
+    public void GetMultiStopColor_InterpolatesAcrossSegments() {
+        var colors = new[] {
+            NKColor.FromRgb(0, 0, 0),
+            NKColor.FromRgb(100, 100, 100),
+            NKColor.FromRgb(200, 200, 200)
+        };
+
+        Assert.Equal(colors[0], NKColor.GetMultiStopColor(colors, 0f));
+        Assert.Equal(colors[1], NKColor.GetMultiStopColor(colors, 0.5f));
+        Assert.Equal(colors[2], NKColor.GetMultiStopColor(colors, 1f));
+
+        // Edge cases: empty array and single element
+        Assert.Equal(NKColor.Default, NKColor.GetMultiStopColor([], 0.5f));
+        Assert.Equal(colors[0], NKColor.GetMultiStopColor([colors[0]], 0.5f));
+    }
+
+    [Fact]
+    public void PredefinedColors_HaveCorrectPaletteValues() {
+        Assert.Equal(NKConsoleColor.WHITE,        NKColor.White.AsPalette);
+        Assert.Equal(NKConsoleColor.BLACK,        NKColor.Black.AsPalette);
+        Assert.Equal(NKConsoleColor.RED,          NKColor.Red.AsPalette);
+        Assert.Equal(NKConsoleColor.GREEN,        NKColor.Green.AsPalette);
+        Assert.Equal(NKConsoleColor.BLUE,         NKColor.Blue.AsPalette);
+        Assert.Equal(NKConsoleColor.YELLOW,       NKColor.Yellow.AsPalette);
+        Assert.Equal(NKConsoleColor.CYAN,         NKColor.Cyan.AsPalette);
+        Assert.Equal(NKConsoleColor.MAGENTA,      NKColor.Magenta.AsPalette);
+        Assert.Equal(NKConsoleColor.DARK_RED,     NKColor.DarkRed.AsPalette);
+        Assert.Equal(NKConsoleColor.DARK_GREEN,   NKColor.DarkGreen.AsPalette);
+        Assert.Equal(NKConsoleColor.DARK_YELLOW,  NKColor.DarkYellow.AsPalette);
+        Assert.Equal(NKConsoleColor.DARK_BLUE,    NKColor.DarkBlue.AsPalette);
+        Assert.Equal(NKConsoleColor.DARK_MAGENTA, NKColor.DarkMagenta.AsPalette);
+        Assert.Equal(NKConsoleColor.DARK_CYAN,    NKColor.DarkCyan.AsPalette);
+        Assert.Equal(NKConsoleColor.DARK_GRAY,    NKColor.DarkGray.AsPalette);
+        Assert.Equal(NKConsoleColor.GRAY,         NKColor.Gray.AsPalette);
+    }
+
+    [Fact]
+    public void Underline_Property_ReturnsExpectedAnsi() {
+        var rgb = NKColor.FromRgb(10, 20, 30);
+        Assert.Equal("\e[58;2;10;20;30m", rgb.Underline);
+        Assert.Equal("\e[58;2;10;20;30m", rgb.ToString("U"));
+
+        var pal = new NKColor(NKConsoleColor.RED);
+        Assert.Equal("\e[58;5;9m", pal.Underline);
+        Assert.Equal("\e[58;5;9m", pal.ToString("U"));
+
+        Assert.Equal(EscapeCodes.UNDERLINE_COLOR_RESET, NKColor.Default.Underline);
+        Assert.Equal("Inherit", NKColor.Inherit.Underline);
+    }
+
+    [Fact]
+    public void NKColorExtensions_ConvertsValuesCorrectly() {
+        int intVal = 0x123456;
+        NKColor c1 = intVal.Rgb;
+        Assert.True(c1.IsRgb);
+        Assert.Equal(0x123456u, c1.AsRgb);
+
+        uint uintVal = 0x654321u;
+        NKColor c2 = uintVal.Rgb;
+        Assert.True(c2.IsRgb);
+        Assert.Equal(0x654321u, c2.AsRgb);
+
+        NKConsoleColor palVal = NKConsoleColor.CYAN;
+        NKColor c3 = palVal.NK;
+        Assert.True(c3.IsPalette);
+        Assert.Equal(NKConsoleColor.CYAN, c3.AsPalette);
+    }
+
+    [Theory]
+    [InlineData(0x123456)]
+    [InlineData(0)]
+    [InlineData(0xffffff)]
+    public void Protobuf_Serialization_Rgb_Roundtrip(int rgb) {
+        var original = new NKColor(rgb);
+        using var ms = new MemoryStream();
+        ProtoBuf.Serializer.Serialize(ms, original);
+        ms.Position = 0;
+        var deserialized = ProtoBuf.Serializer.Deserialize<NKColor>(ms);
+
+        Assert.Equal(original, deserialized);
+        Assert.Equal(original.Type, deserialized.Type);
+        Assert.Equal(original.AsRgb, deserialized.AsRgb);
+    }
+
+    [Fact]
+    public void Protobuf_Serialization_SpecialColors_Roundtrip() {
+        foreach (var original in new[] { NKColor.Default, NKColor.Inherit, new NKColor(NKConsoleColor.MAGENTA) }) {
+            using var ms = new MemoryStream();
+            ProtoBuf.Serializer.Serialize(ms, original);
+            ms.Position = 0;
+            var deserialized = ProtoBuf.Serializer.Deserialize<NKColor>(ms);
+
+            Assert.Equal(original, deserialized);
+            Assert.Equal(original.Type, deserialized.Type);
+        }
+    }
+}

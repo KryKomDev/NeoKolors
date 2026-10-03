@@ -1,31 +1,35 @@
+using static NeoKolors.Common.NKConsoleColor;
+using static NeoKolors.Common.NKTextStyles;
+
 namespace NeoKolors.Common.Tests;
 
 public class AnsiStringTests {
-    
+
     [Fact]
     public void Constructor_Empty_CreatesEmptyString() {
         var ansi = new AnsiString();
-        Assert.Equal(0, ansi.Length);
+        Assert.Equal(0,            ansi.Length);
         Assert.Equal(string.Empty, ansi.Plain);
         Assert.Equal(string.Empty, ansi.ToString());
     }
 
     [Fact]
     public void Constructor_String_CreatesSimpleAnsiString() {
-        var str = "Hello";
+        var str  = "Hello";
         var ansi = new AnsiString(str);
         Assert.Equal(str.Length, ansi.Length);
-        Assert.Equal(str, ansi.Plain);
-        Assert.Equal(str, ansi.ToString());
+        Assert.Equal(str,        ansi.Plain);
+        Assert.Equal(str,        ansi.ToString());
     }
 
     [Fact]
     public void Constructor_StringAndStyle_AppliesStyleAtStart() {
-        var str = "Hello";
-        var style = new NKStyle(NKConsoleColor.RED);
-        var ansi = new AnsiString(str, style);
+        var str   = "Hello";
+        var style = new NKStyle(RED);
+        var ansi  = new AnsiString(str, style);
 
         Assert.Equal(str, ansi.Plain);
+
         // ToString should contain escape codes.
         var result = ansi.ToString();
         Assert.StartsWith("\e[", result);
@@ -33,9 +37,104 @@ public class AnsiStringTests {
     }
 
     [Fact]
+    public void Constructor_StringAndStyle_DefaultStyle_CreatesNoMarkers() {
+        var ansi = new AnsiString("Hello", NKStyle.Default);
+        Assert.Equal("Hello", ansi.Plain);
+        Assert.Empty(ansi.Styles);
+        Assert.Equal("Hello", ansi.ToString());
+    }
+
+    [Fact]
+    public void Constructor_StringAndStyle_InheritedProperties_ResolvesAgainstDefault() {
+        var style = new NKStyle(textColor: NKColor.Inherit, styles: BOLD);
+        var ansi  = new AnsiString("Hello", style);
+
+        Assert.Single(ansi.Styles);
+        Assert.Equal(NKColor.Default, ansi.Styles[0].Style.FColor);
+        Assert.True(ansi.Styles[0].Style.Styles.HasFlag(BOLD));
+    }
+
+    [Fact]
+    public void Constructor_Chars_DefaultStyles_CreatesNoMarkers() {
+        var chars = "Hello".Select(c => new AnsiChar(c, NKStyle.Default));
+        var ansi  = new AnsiString(chars);
+
+        Assert.Equal("Hello", ansi.Plain);
+        Assert.Empty(ansi.Styles);
+        Assert.Equal("Hello", ansi.ToString());
+        Assert.Equal(NKStyle.Default, ansi.GetStyleAt(0));
+    }
+
+    [Fact]
+    public void Constructor_Chars_InheritedColors_CreatesSingleMarker() {
+        var redStyle     = new NKStyle(RED);
+        var inheritStyle = new NKStyle(textColor: NKColor.Inherit);
+        var chars = new[] {
+            new AnsiChar('A', redStyle),
+            new AnsiChar('B', inheritStyle),
+            new AnsiChar('C', inheritStyle),
+            new AnsiChar('D', redStyle)
+        };
+        var ansi = new AnsiString(chars);
+
+        Assert.Single(ansi.Styles);
+        Assert.Equal(0, ansi.Styles[0].Index);
+        Assert.Equal(redStyle, ansi.Styles[0].Style);
+        Assert.Equal(redStyle, ansi.GetStyleAt(0));
+        Assert.Equal(redStyle, ansi.GetStyleAt(1));
+        Assert.Equal(redStyle, ansi.GetStyleAt(2));
+        Assert.Equal(redStyle, ansi.GetStyleAt(3));
+    }
+
+    [Fact]
+    public void Constructor_Chars_InheritedStyles_CreatesNoRedundantMarkers() {
+        var baseStyle    = new NKStyle(RED, styles: BOLD);
+        var inheritStyle = new NKStyle(textColor: NKColor.Inherit, inheritedStyles: BOLD);
+        var chars = new[] {
+            new AnsiChar('A', baseStyle),
+            new AnsiChar('B', inheritStyle),
+            new AnsiChar('C', baseStyle)
+        };
+        var ansi = new AnsiString(chars);
+
+        Assert.Single(ansi.Styles);
+        Assert.Equal(0, ansi.Styles[0].Index);
+        Assert.Equal(baseStyle, ansi.GetStyleAt(1));
+        Assert.Equal(baseStyle, ansi.GetStyleAt(2));
+    }
+
+    [Fact]
+    public void Constructor_Chars_TransitionsAndReverts_CreatesMinimalMarkers() {
+        // 2 default chars, 2 red chars, 2 default chars
+        var chars = new[] {
+            new AnsiChar('1', NKStyle.Default),
+            new AnsiChar('2', NKStyle.Default),
+            new AnsiChar('3', new NKStyle(RED)),
+            new AnsiChar('4', new NKStyle(RED)),
+            new AnsiChar('5', NKStyle.Default),
+            new AnsiChar('6', NKStyle.Default)
+        };
+        var ansi = new AnsiString(chars);
+
+        // Marker at index 2 (RED), marker at index 4 (Default)
+        Assert.Equal(2, ansi.Styles.Length);
+        Assert.Equal(2, ansi.Styles[0].Index);
+        Assert.Equal(RED, ansi.Styles[0].Style.FColor.AsPalette);
+        Assert.Equal(4, ansi.Styles[1].Index);
+        Assert.Equal(NKStyle.Default, ansi.Styles[1].Style);
+
+        Assert.Equal(NKStyle.Default, ansi.GetStyleAt(0));
+        Assert.Equal(NKStyle.Default, ansi.GetStyleAt(1));
+        Assert.Equal(RED, ansi.GetStyleAt(2).FColor.AsPalette);
+        Assert.Equal(RED, ansi.GetStyleAt(3).FColor.AsPalette);
+        Assert.Equal(NKStyle.Default, ansi.GetStyleAt(4));
+        Assert.Equal(NKStyle.Default, ansi.GetStyleAt(5));
+    }
+
+    [Fact]
     public void Style_AppliesStyleToWholeString() {
-        var ansi = new AnsiString("Test");
-        var style = new NKStyle(NKConsoleColor.BLUE);
+        var ansi   = new AnsiString("Test");
+        var style  = new NKStyle(BLUE);
         var styled = ansi.ApplyStyle(style);
 
         // Original should be unchanged (immutability check)
@@ -48,11 +147,12 @@ public class AnsiStringTests {
 
     [Fact]
     public void Style_AtIndex_AppliesStyleFromIndex() {
-        var ansi = new AnsiString("Hello World");
-        var style = new NKStyle(NKConsoleColor.GREEN);
+        var ansi   = new AnsiString("Hello World");
+        var style  = new NKStyle(GREEN);
         var styled = ansi.ApplyStyle(style, 6); // "World"
 
         var str = styled.ToString();
+
         // "Hello " should be plain, "World" should be styled.
         // Index 6 is 'W'.
 
@@ -62,15 +162,15 @@ public class AnsiStringTests {
 
         // We expect something like: Hello \x1b[...mWorld
         Assert.Contains("Hello ", str);
-        Assert.Contains("World", str);
+        Assert.Contains("World",  str);
         Assert.True(str.IndexOf("\e[", StringComparison.Ordinal) > 0, "Escape sequence should appear after 'Hello '");
     }
 
     [Fact]
     public void Style_Range_AppliesStyleInRange() {
-        var text = "0123456789";
-        var ansi = new AnsiString(text);
-        var style = new NKStyle(NKConsoleColor.RED);
+        var text  = "0123456789";
+        var ansi  = new AnsiString(text);
+        var style = new NKStyle(RED);
 
         // Apply to 4..7 (4,5,6) -> "456"
         var styled = ansi.ApplyStyle(style, 4..7);
@@ -79,8 +179,8 @@ public class AnsiStringTests {
 
         var str = styled.ToString();
         Assert.Contains("0123", str);
-        Assert.Contains("456", str);
-        Assert.Contains("789", str);
+        Assert.Contains("456",  str);
+        Assert.Contains("789",  str);
 
         // Check for multiple escape sequences (start of red, end of red)
         Assert.True(str.Split("\e[").Length >= 3);
@@ -88,10 +188,10 @@ public class AnsiStringTests {
 
     [Fact]
     public void Equality_ChecksValueAndStyles() {
-        var s1 = new AnsiString("Test", new NKStyle(NKConsoleColor.RED));
-        var s2 = new AnsiString("Test", new NKStyle(NKConsoleColor.RED));
-        var s3 = new AnsiString("Other", new NKStyle(NKConsoleColor.RED));
-        var s4 = new AnsiString("Other", new NKStyle(NKConsoleColor.RED));
+        var s1 = new AnsiString("Test",  new NKStyle(RED));
+        var s2 = new AnsiString("Test",  new NKStyle(RED));
+        var s3 = new AnsiString("Other", new NKStyle(RED));
+        var s4 = new AnsiString("Other", new NKStyle(RED));
 
         Assert.Equal(s1, s2);
         Assert.NotEqual(s1, s3);
@@ -108,34 +208,35 @@ public class AnsiStringTests {
         var lines = ansi.Chop(11);
 
         Assert.NotEmpty(lines);
+
         foreach (var line in lines) {
             Assert.True(line.Length <= 11);
         }
-        
+
         Assert.Equal("Hello world", lines[0].Plain);
-        Assert.Equal("this is a", lines[1].Plain);
-        Assert.Equal("test", lines[2].Plain);
+        Assert.Equal("this is a",   lines[1].Plain);
+        Assert.Equal("test",        lines[2].Plain);
     }
 
     [Fact]
     public void Chop_NoSpaces_SplitsAtWidth() {
-        var text = "1234567890";
-        var ansi = new AnsiString(text);
+        var text  = "1234567890";
+        var ansi  = new AnsiString(text);
         var lines = ansi.Chop(3);
 
-        Assert.Equal(4, lines.Length);
+        Assert.Equal(4,     lines.Length);
         Assert.Equal("123", lines[0].Plain);
         Assert.Equal("456", lines[1].Plain);
         Assert.Equal("789", lines[2].Plain);
-        Assert.Equal("0", lines[3].Plain);
+        Assert.Equal("0",   lines[3].Plain);
     }
 
     [Fact]
     public void Chop_ExactlyAtWidth_Works() {
-        var text = "123 456";
-        var ansi = new AnsiString(text);
+        var text  = "123 456";
+        var ansi  = new AnsiString(text);
         var lines = ansi.Chop(3);
-        
+
         // i=0 '1' w=1
         // i=1 '2' w=2
         // i=2 '3' w=3
@@ -147,19 +248,19 @@ public class AnsiStringTests {
         // i=6 '6' w=3
         // loop ends.
         // lastBreak != 7 -> lines.Add(chars[4..7]) ("456").
-        
-        Assert.Equal(2, lines.Length);
+
+        Assert.Equal(2,     lines.Length);
         Assert.Equal("123", lines[0].Plain);
         Assert.Equal("456", lines[1].Plain);
     }
-    
+
     [Fact]
     public void Chop_PreservesStyles() {
-        var style = new NKStyle(NKConsoleColor.RED);
-        var ansi = new AnsiString("Hello World", style);
-        
+        var style = new NKStyle(RED);
+        var ansi  = new AnsiString("Hello World", style);
+
         var lines = ansi.Chop(5);
-        
+
         Assert.Equal(2, lines.Length);
         Assert.Contains("\e[", lines[0].ToString());
         Assert.Contains("\e[", lines[1].ToString());
@@ -167,88 +268,90 @@ public class AnsiStringTests {
 
     [Fact]
     public void Chop_HandlesNewlines() {
-        const string text = "Line1\nLine2";
-        var ansi = new AnsiString(text);
-        var lines = ansi.Chop(50);
+        const string text  = "Line1\nLine2";
+        var          ansi  = new AnsiString(text);
+        var          lines = ansi.Chop(50);
 
-        Assert.Equal(2, lines.Length);
+        Assert.Equal(2,       lines.Length);
         Assert.Equal("Line1", lines[0].Plain);
         Assert.Equal("Line2", lines[1].Plain);
     }
 
     [Fact]
     public void Enumerator_YieldsAnsiChars() {
-        var text = "AB";
-        var style = new NKStyle(NKConsoleColor.RED);
-        var ansi = new AnsiString(text, style);
+        var text  = "AB";
+        var style = new NKStyle(RED);
+        var ansi  = new AnsiString(text, style);
 
         var list = new List<AnsiChar>();
+
         foreach (var c in ansi) {
             list.Add(c);
         }
 
-        Assert.Equal(2, list.Count);
-        Assert.Equal('A', list[0].Char);
+        Assert.Equal(2,     list.Count);
+        Assert.Equal('A',   list[0].Char);
         Assert.Equal(style, list[0].Style);
-        Assert.Equal('B', list[1].Char);
+        Assert.Equal('B',   list[1].Char);
         Assert.Equal(style, list[1].Style);
     }
 
     [Fact]
     public void Substring_PreservesStyleCorrectly() {
-        var style1 = new NKStyle(NKConsoleColor.RED);
-        var style2 = new NKStyle(NKConsoleColor.BLUE);
-        var ansi = new AnsiString("AAA", style1) + new AnsiString("BBB", style2);
+        var style1 = new NKStyle(RED);
+        var style2 = new NKStyle(BLUE);
+        var ansi   = new AnsiString("AAA", style1) + new AnsiString("BBB", style2);
 
         // AAA (red) BBB (blue)
         // Substring(2, 2) -> "AB" (A is red, B is blue)
         var sub = ansi.Substring(2, 2);
 
-        Assert.Equal("AB", sub.Plain);
+        Assert.Equal("AB",   sub.Plain);
         Assert.Equal(style1, sub.GetStyleAt(0));
         Assert.Equal(style2, sub.GetStyleAt(1));
     }
 
     [Fact]
     public void Replace_Char_MaintainsStyles() {
-        var style = new NKStyle(NKConsoleColor.RED);
-        var ansi = new AnsiString("apple", style);
+        var style    = new NKStyle(RED);
+        var ansi     = new AnsiString("apple", style);
         var replaced = ansi.Replace('p', 'b');
 
         Assert.Equal("abble", replaced.Plain);
-        foreach(var c in replaced) {
+
+        foreach (var c in replaced) {
             Assert.Equal(style, c.Style);
         }
     }
 
     [Fact]
     public void Replace_String_AppliesStyleOfFirstMatch() {
-        var style1 = new NKStyle(NKConsoleColor.RED);
-        var style2 = new NKStyle(NKConsoleColor.BLUE);
-        var ansi = new AnsiString("A", style1) + new AnsiString("X", style2) + new AnsiString("B", style1);
+        var style1 = new NKStyle(RED);
+        var style2 = new NKStyle(BLUE);
+        var ansi   = new AnsiString("A", style1) + new AnsiString("X", style2) + new AnsiString("B", style1);
 
         // "AXB" where A, B are Red and X is Blue.
         // Replace "X" with "YYY"
         var replaced = ansi.Replace("X", "YYY");
 
         Assert.Equal("AYYYB", replaced.Plain);
-        Assert.Equal(style1, replaced.GetStyleAt(0)); // A
-        Assert.Equal(style2, replaced.GetStyleAt(1)); // Y
-        Assert.Equal(style2, replaced.GetStyleAt(2)); // Y
-        Assert.Equal(style2, replaced.GetStyleAt(3)); // Y
-        Assert.Equal(style1, replaced.GetStyleAt(4)); // B
+        Assert.Equal(style1,  replaced.GetStyleAt(0)); // A
+        Assert.Equal(style2,  replaced.GetStyleAt(1)); // Y
+        Assert.Equal(style2,  replaced.GetStyleAt(2)); // Y
+        Assert.Equal(style2,  replaced.GetStyleAt(3)); // Y
+        Assert.Equal(style1,  replaced.GetStyleAt(4)); // B
     }
 
     [Fact]
     public void Split_ReturnsStyledParts() {
-        var style1 = new NKStyle(NKConsoleColor.RED);
-        var style2 = new NKStyle(NKConsoleColor.BLUE);
-        var ansi = new AnsiString("Red", style1) + "," + new AnsiString("Blue", style2);
+        var style1 = new NKStyle(RED);
+        var style2 = new NKStyle(BLUE);
+        var ansi   = new AnsiString("Red", style1) + "," + new AnsiString("Blue", style2);
 
         var parts = ansi.Split(',');
 
-        Assert.Equal(2, parts.Length);
-        Assert.Equal("Red", parts[0].Plain);
+        Assert.Equal(2,      parts.Length);
+        Assert.Equal("Red",  parts[0].Plain);
         Assert.Equal(style1, parts[0].GetStyleAt(0));
         Assert.Equal("Blue", parts[1].Plain);
         Assert.Equal(style2, parts[1].GetStyleAt(0));
@@ -256,63 +359,63 @@ public class AnsiStringTests {
 
     [Fact]
     public void Join_CombinesStyledStrings() {
-        var s1 = new AnsiString("A", new NKStyle(NKConsoleColor.RED));
-        var s2 = new AnsiString("B", new NKStyle(NKConsoleColor.BLUE));
+        var s1 = new AnsiString("A", new NKStyle(RED));
+        var s2 = new AnsiString("B", new NKStyle(BLUE));
 
         var joined = AnsiString.Join("-", [s1, s2]);
 
-        Assert.Equal("A-B", joined.Plain);
-        Assert.Equal(NKConsoleColor.RED, joined.GetStyleAt(0).FColor.AsPalette);
+        Assert.Equal("A-B",           joined.Plain);
+        Assert.Equal(RED,             joined.GetStyleAt(0).FColor.AsPalette);
         Assert.Equal(NKStyle.Default, joined.GetStyleAt(1)); // separator '-'
-        Assert.Equal(NKConsoleColor.BLUE, joined.GetStyleAt(2).FColor.AsPalette);
+        Assert.Equal(BLUE,            joined.GetStyleAt(2).FColor.AsPalette);
     }
 
     [Fact]
     public void Insert_MaintainsSurroundingStyles() {
-        var style1 = new NKStyle(NKConsoleColor.RED);
-        var style2 = new NKStyle(NKConsoleColor.BLUE);
-        var ansi = new AnsiString("AA", style1) + new AnsiString("BB", style2);
+        var style1 = new NKStyle(RED);
+        var style2 = new NKStyle(BLUE);
+        var ansi   = new AnsiString("AA", style1) + new AnsiString("BB", style2);
 
         // Insert at index 2 (between AA and BB)
         var inserted = ansi.Insert(2, "X");
 
-        Assert.Equal("AAXBB", inserted.Plain);
-        Assert.Equal(style1, inserted.GetStyleAt(0));
-        Assert.Equal(style1, inserted.GetStyleAt(1));
+        Assert.Equal("AAXBB",         inserted.Plain);
+        Assert.Equal(style1,          inserted.GetStyleAt(0));
+        Assert.Equal(style1,          inserted.GetStyleAt(1));
         Assert.Equal(NKStyle.Default, inserted.GetStyleAt(2)); // "X" is unstyled
-        Assert.Equal(style2, inserted.GetStyleAt(3));
+        Assert.Equal(style2,          inserted.GetStyleAt(3));
     }
 
     [Fact]
     public void Padding_InheritsCorrectStyles() {
-        var style = new NKStyle(NKConsoleColor.RED);
-        var ansi = new AnsiString("Hi", style);
+        var style = new NKStyle(RED);
+        var ansi  = new AnsiString("Hi", style);
 
         var paddedLeft = ansi.PadLeft(4, '.');
         Assert.Equal("..Hi", paddedLeft.Plain);
-        Assert.Equal(style, paddedLeft.GetStyleAt(0)); // Inherits from first char style
+        Assert.Equal(style,  paddedLeft.GetStyleAt(0)); // Inherits from first char style
 
         var paddedRight = ansi.PadRight(4, '.');
         Assert.Equal("Hi..", paddedRight.Plain);
-        Assert.Equal(style, paddedRight.GetStyleAt(3)); // Inherits from last char style
+        Assert.Equal(style,  paddedRight.GetStyleAt(3)); // Inherits from last char style
     }
 
     [Fact]
     public void Trim_RemovesWhitespaceButKeepsInternalStyles() {
-        var style = new NKStyle(NKConsoleColor.GREEN);
-        var ansi = new AnsiString("  ") + new AnsiString("Styled", style) + "  ";
+        var style = new NKStyle(GREEN);
+        var ansi  = new AnsiString("  ") + new AnsiString("Styled", style) + "  ";
 
         var trimmed = ansi.Trim();
 
         Assert.Equal("Styled", trimmed.Plain);
-        Assert.Equal(style, trimmed.GetStyleAt(0));
+        Assert.Equal(style,    trimmed.GetStyleAt(0));
     }
 
     [Fact]
     public void EmptyString_Operations_DoNotThrow() {
         var empty = new AnsiString();
 
-        Assert.Equal(0, empty.Length);
+        Assert.Equal(0,            empty.Length);
         Assert.Equal(string.Empty, empty.ToUpper().Plain);
         Assert.Equal(string.Empty, empty.Replace("a", "b").Plain);
         Assert.Single(empty.Split(','));
@@ -320,70 +423,71 @@ public class AnsiStringTests {
 
     [Fact]
     public void AddStyle_ComposesStyles() {
-        var redStyle = new NKStyle(NKConsoleColor.RED);
-        var boldStyle = new NKStyle(s: TextStyles.BOLD, f: NKColor.Inherit);
+        var redStyle  = new NKStyle(RED);
+        var boldStyle = new NKStyle(styles: BOLD, textColor: NKColor.Inherit);
 
-        var ansi = new AnsiString("Test", redStyle);
+        var ansi     = new AnsiString("Test", redStyle);
         var composed = ansi.AddStyle(boldStyle);
 
         var finalStyle = composed.GetStyleAt(0);
-        Assert.Equal(NKConsoleColor.RED, finalStyle.FColor.AsPalette);
-        Assert.True(finalStyle.Styles.HasFlag(TextStyles.BOLD));
+        Assert.Equal(RED, finalStyle.FColor.AsPalette);
+        Assert.True(finalStyle.Styles.HasFlag(BOLD));
     }
 
     [Fact]
     public void AddStyle_Range_ComposesOnlyInRange() {
-        var redStyle = new NKStyle(NKConsoleColor.RED);
-        var boldStyle = new NKStyle(s: TextStyles.BOLD, f: NKColor.Inherit);
+        var redStyle  = new NKStyle(RED);
+        var boldStyle = new NKStyle(styles: BOLD, textColor: NKColor.Inherit);
 
-        var ansi = new AnsiString("Hello World", redStyle);
+        var ansi     = new AnsiString("Hello World", redStyle);
         var composed = ansi.AddStyle(boldStyle, 6..11); // "World"
 
         // "Hello " should be just Red
-        Assert.Equal(NKConsoleColor.RED, composed.GetStyleAt(0).FColor.AsPalette);
-        Assert.False(composed.GetStyleAt(0).Styles.HasFlag(TextStyles.BOLD));
+        Assert.Equal(RED, composed.GetStyleAt(0).FColor.AsPalette);
+        Assert.False(composed.GetStyleAt(0).Styles.HasFlag(BOLD));
 
         // "World" should be Red + Bold
-        Assert.Equal(NKConsoleColor.RED, composed.GetStyleAt(6).FColor.AsPalette);
-        Assert.True(composed.GetStyleAt(6).Styles.HasFlag(TextStyles.BOLD));
+        Assert.Equal(RED, composed.GetStyleAt(6).FColor.AsPalette);
+        Assert.True(composed.GetStyleAt(6).Styles.HasFlag(BOLD));
     }
 
     [Fact]
     public void ApplyStyle_OverwritesExistingStyles() {
-        var redBold = new NKStyle(NKConsoleColor.RED, s: TextStyles.BOLD);
-        var blueOnly = new NKStyle(NKConsoleColor.BLUE);
+        var redBold  = new NKStyle(RED, styles: BOLD);
+        var blueOnly = new NKStyle(BLUE);
 
-        var ansi = new AnsiString("Test", redBold);
+        var ansi        = new AnsiString("Test", redBold);
         var overwritten = ansi.ApplyStyle(blueOnly);
-        var finalStyle = overwritten.GetStyleAt(0);
-        Assert.Equal(NKConsoleColor.BLUE, finalStyle.FColor.AsPalette);
-        Assert.False(finalStyle.Styles.HasFlag(TextStyles.BOLD), "ApplyStyle should have removed Bold");
+        var finalStyle  = overwritten.GetStyleAt(0);
+        Assert.Equal(BLUE, finalStyle.FColor.AsPalette);
+        Assert.False(finalStyle.Styles.HasFlag(BOLD), "ApplyStyle should have removed Bold");
     }
 
     [Fact]
     public void Parse_PlainString_ReturnsPlainAnsiString() {
         var parsed = AnsiString.Parse("Hello World");
-        Assert.Equal("Hello World", parsed.Plain);
+        Assert.Equal("Hello World",   parsed.Plain);
         Assert.Equal(NKStyle.Default, parsed.GetStyleAt(0));
     }
 
     [Fact]
     public void Parse_WithStyleFlags_AppliesStyleCorrectly() {
         var parsed = AnsiString.Parse("Hello {:b}World{:i}!");
-        Assert.Equal("Hello World!", parsed.Plain);
-        Assert.Equal(NKStyle.Default, parsed.GetStyleAt(0)); // "Hello "
-        Assert.True(parsed.GetStyleAt(6).Styles.HasFlag(TextStyles.BOLD)); // "World"
-        Assert.True(parsed.GetStyleAt(11).Styles.HasFlag(TextStyles.ITALIC)); // "!"
+        Assert.Equal("Hello World!",  parsed.Plain);
+        Assert.Equal(NKStyle.Default, parsed.GetStyleAt(0));       // "Hello "
+        Assert.True(parsed.GetStyleAt(6).Styles.HasFlag(BOLD));    // "World"
+        Assert.True(parsed.GetStyleAt(11).Styles.HasFlag(ITALIC)); // "!"
     }
 
     [Fact]
     public void Parse_WithColors_AppliesForegroundAndBackground() {
         var parsed = AnsiString.Parse("{:f#red}Red{:b#dark-cyan} CyanBg");
         Assert.Equal("Red CyanBg", parsed.Plain);
-        Assert.Equal(NKConsoleColor.RED, parsed.GetStyleAt(0).FColor.AsPalette);
-        Assert.Equal(NKConsoleColor.DARK_CYAN, parsed.GetStyleAt(3).BColor.AsPalette);
+        Assert.Equal(RED,          parsed.GetStyleAt(0).FColor.AsPalette);
+        Assert.Equal(DARK_CYAN,    parsed.GetStyleAt(3).BColor.AsPalette);
+
         // Foreground red should persist after background change
-        Assert.Equal(NKConsoleColor.RED, parsed.GetStyleAt(3).FColor.AsPalette);
+        Assert.Equal(RED, parsed.GetStyleAt(3).FColor.AsPalette);
     }
 
     [Fact]
@@ -398,122 +502,128 @@ public class AnsiStringTests {
     public void Parse_EscapedCurlyBraces_ReturnsLiteralBraces() {
         var parsed = AnsiString.Parse("{{Hello {:b}World}}");
         Assert.Equal("{Hello World}", parsed.Plain);
-        Assert.Equal(NKStyle.Default, parsed.GetStyleAt(0)); // "{"
-        Assert.True(parsed.GetStyleAt(7).Styles.HasFlag(TextStyles.BOLD)); // "World}"
+        Assert.Equal(NKStyle.Default, parsed.GetStyleAt(0));    // "{"
+        Assert.True(parsed.GetStyleAt(7).Styles.HasFlag(BOLD)); // "World}"
     }
 
     [Fact]
     public void TryParse_InvalidFormat_ReturnsFalse() {
-        Assert.False(AnsiString.TryParse("Hello {invalid} World", out _));
-        Assert.False(AnsiString.TryParse("Hello {:b", out _));
-        Assert.False(AnsiString.TryParse("Hello } World", out _));
+        Assert.False(AnsiString.TryParse("Hello {invalid} World",    out _));
+        Assert.False(AnsiString.TryParse("Hello {:b",                out _));
+        Assert.False(AnsiString.TryParse("Hello } World",            out _));
         Assert.False(AnsiString.TryParse("Hello {:f#invalid} World", out _));
     }
 
     [Fact]
     public void Parse_WithNegatedStyleFlags_NegatesActiveStyles() {
         var parsed = AnsiString.Parse("Hello {:b}World{:!b}!");
-        Assert.Equal("Hello World!", parsed.Plain);
-        Assert.Equal(NKStyle.Default, parsed.GetStyleAt(0)); // "Hello "
-        Assert.True(parsed.GetStyleAt(6).Styles.HasFlag(TextStyles.BOLD)); // "World"
-        Assert.False(parsed.GetStyleAt(11).Styles.HasFlag(TextStyles.BOLD)); // "!"
+        Assert.Equal("Hello World!",  parsed.Plain);
+        Assert.Equal(NKStyle.Default, parsed.GetStyleAt(0));      // "Hello "
+        Assert.True(parsed.GetStyleAt(6).Styles.HasFlag(BOLD));   // "World"
+        Assert.False(parsed.GetStyleAt(11).Styles.HasFlag(BOLD)); // "!"
     }
 
     [Fact]
     public void Parse_WithCombinedStyleFlagsAndNegation_NegatesOnlySpecified() {
         // First set BOLD and ITALIC, then negate only BOLD
         var parsed = AnsiString.Parse("Hello {:bi}World{:!b}!");
-        Assert.Equal("Hello World!", parsed.Plain);
+        Assert.Equal("Hello World!",  parsed.Plain);
         Assert.Equal(NKStyle.Default, parsed.GetStyleAt(0));
-        
+
         var worldStyle = parsed.GetStyleAt(6);
-        Assert.True(worldStyle.Styles.HasFlag(TextStyles.BOLD));
-        Assert.True(worldStyle.Styles.HasFlag(TextStyles.ITALIC));
+        Assert.True(worldStyle.Styles.HasFlag(BOLD));
+        Assert.True(worldStyle.Styles.HasFlag(ITALIC));
 
         var exclamStyle = parsed.GetStyleAt(11);
-        Assert.False(exclamStyle.Styles.HasFlag(TextStyles.BOLD));
-        Assert.True(exclamStyle.Styles.HasFlag(TextStyles.ITALIC));
+        Assert.False(exclamStyle.Styles.HasFlag(BOLD));
+        Assert.True(exclamStyle.Styles.HasFlag(ITALIC));
     }
 
     [Fact]
     public void TryParse_InvalidNegationFormat_ReturnsFalse() {
-        Assert.False(AnsiString.TryParse("Hello {:!} World", out _));
-        Assert.False(AnsiString.TryParse("Hello {:!f#red} World", out _));
+        Assert.False(AnsiString.TryParse("Hello {:!} World",       out _));
+        Assert.False(AnsiString.TryParse("Hello {:!f#red} World",  out _));
         Assert.False(AnsiString.TryParse("Hello {:!b#blue} World", out _));
     }
 
     [Fact]
     public void SetFColor_PreservesBackgroundAndStyles() {
-        var originalStyle = new NKStyle(f: NKConsoleColor.RED, b: NKConsoleColor.BLUE, s: TextStyles.BOLD);
+        var originalStyle = new NKStyle(
+            textColor: RED,
+            backgroundColor:
+            BLUE,
+            styles: BOLD
+        );
+
         var ansi = new AnsiString("Test", originalStyle);
 
-        var updated = ansi.SetFColor(NKConsoleColor.GREEN);
+        var updated = ansi.SetFColor(GREEN);
 
         var style = updated.GetStyleAt(0);
-        Assert.Equal(NKConsoleColor.GREEN, style.FColor.AsPalette);
-        Assert.Equal(NKConsoleColor.BLUE, style.BColor.AsPalette);
-        Assert.True(style.Styles.HasFlag(TextStyles.BOLD));
+        Assert.Equal(GREEN, style.FColor.AsPalette);
+        Assert.Equal(BLUE,  style.BColor.AsPalette);
+        Assert.True(style.Styles.HasFlag(BOLD));
     }
 
     [Fact]
     public void SetBColor_PreservesForegroundAndStyles() {
-        var originalStyle = new NKStyle(f: NKConsoleColor.RED, b: NKConsoleColor.BLUE, s: TextStyles.BOLD);
-        var ansi = new AnsiString("Test", originalStyle);
+        var originalStyle = new NKStyle(textColor: RED, backgroundColor: BLUE, styles: BOLD);
+        var ansi          = new AnsiString("Test", originalStyle);
 
-        var updated = ansi.SetBColor(NKConsoleColor.YELLOW);
+        var updated = ansi.SetBColor(YELLOW);
 
         var style = updated.GetStyleAt(0);
-        Assert.Equal(NKConsoleColor.RED, style.FColor.AsPalette);
-        Assert.Equal(NKConsoleColor.YELLOW, style.BColor.AsPalette);
-        Assert.True(style.Styles.HasFlag(TextStyles.BOLD));
+        Assert.Equal(RED,    style.FColor.AsPalette);
+        Assert.Equal(YELLOW, style.BColor.AsPalette);
+        Assert.True(style.Styles.HasFlag(BOLD));
     }
 
     [Fact]
     public void TextStyles_Add_Remove_Toggle_WorkCorrectly() {
-        var originalStyle = new NKStyle(f: NKConsoleColor.RED, s: TextStyles.BOLD);
-        var ansi = new AnsiString("Test", originalStyle);
+        var originalStyle = new NKStyle(textColor: RED, styles: BOLD);
+        var ansi          = new AnsiString("Test", originalStyle);
 
         // Add ITALIC
-        var added = ansi.AddStyles(TextStyles.ITALIC);
-        Assert.True(added.GetStyleAt(0).Styles.HasFlag(TextStyles.BOLD));
-        Assert.True(added.GetStyleAt(0).Styles.HasFlag(TextStyles.ITALIC));
+        var added = ansi.AddStyles(ITALIC);
+        Assert.True(added.GetStyleAt(0).Styles.HasFlag(BOLD));
+        Assert.True(added.GetStyleAt(0).Styles.HasFlag(ITALIC));
 
         // Remove BOLD
-        var removed = added.RemoveStyles(TextStyles.BOLD);
-        Assert.False(removed.GetStyleAt(0).Styles.HasFlag(TextStyles.BOLD));
-        Assert.True(removed.GetStyleAt(0).Styles.HasFlag(TextStyles.ITALIC));
+        var removed = added.RemoveStyles(BOLD);
+        Assert.False(removed.GetStyleAt(0).Styles.HasFlag(BOLD));
+        Assert.True(removed.GetStyleAt(0).Styles.HasFlag(ITALIC));
 
         // Toggle ITALIC (removes it) and BOLD (adds it)
-        var toggled = removed.ToggleStyles(TextStyles.ITALIC | TextStyles.BOLD);
-        Assert.True(toggled.GetStyleAt(0).Styles.HasFlag(TextStyles.BOLD));
-        Assert.False(toggled.GetStyleAt(0).Styles.HasFlag(TextStyles.ITALIC));
+        var toggled = removed.ToggleStyles(ITALIC | BOLD);
+        Assert.True(toggled.GetStyleAt(0).Styles.HasFlag(BOLD));
+        Assert.False(toggled.GetStyleAt(0).Styles.HasFlag(ITALIC));
 
         // FColor should remain Red throughout
-        Assert.Equal(NKConsoleColor.RED, toggled.GetStyleAt(0).FColor.AsPalette);
+        Assert.Equal(RED, toggled.GetStyleAt(0).FColor.AsPalette);
     }
 
     [Fact]
     public void ModifyStyle_WithIndex_AppliesPerCharacter() {
-        var ansi = new AnsiString("0123");
-        var updated = ansi.ModifyStyle((style, index) => index % 2 == 0 ? style.SetFColor(NKConsoleColor.RED) : style.SetFColor(NKConsoleColor.BLUE));
+        var ansi    = new AnsiString("0123");
+        var updated = ansi.ModifyStyle((style, index) => index % 2 == 0 ? style with { FColor = RED } : style with { FColor = BLUE });
 
-        Assert.Equal(NKConsoleColor.RED, updated.GetStyleAt(0).FColor.AsPalette);
-        Assert.Equal(NKConsoleColor.BLUE, updated.GetStyleAt(1).FColor.AsPalette);
-        Assert.Equal(NKConsoleColor.RED, updated.GetStyleAt(2).FColor.AsPalette);
-        Assert.Equal(NKConsoleColor.BLUE, updated.GetStyleAt(3).FColor.AsPalette);
+        Assert.Equal(RED,  updated.GetStyleAt(0).FColor.AsPalette);
+        Assert.Equal(BLUE, updated.GetStyleAt(1).FColor.AsPalette);
+        Assert.Equal(RED,  updated.GetStyleAt(2).FColor.AsPalette);
+        Assert.Equal(BLUE, updated.GetStyleAt(3).FColor.AsPalette);
     }
 
     [Fact]
     public void OverrideStyle_AppliesOnlyNonInheritedProperties() {
-        var initial = new NKStyle(f: NKConsoleColor.RED, b: NKConsoleColor.BLUE, s: TextStyles.BOLD);
-        var ansi = new AnsiString("Test", initial);
+        var initial = new NKStyle(textColor: RED, backgroundColor: BLUE, styles: BOLD);
+        var ansi    = new AnsiString("Test", initial);
 
-        var overrider = new NKStyle(f: NKConsoleColor.GREEN); // b is Inherit/Default
-        var result = ansi.OverrideStyle(overrider);
+        var overrider = new NKStyle(textColor: GREEN, backgroundColor: NKColor.Inherit); // b is Inherit
+        var result    = ansi.OverrideStyle(overrider);
 
         var style = result.GetStyleAt(0);
-        Assert.Equal(NKConsoleColor.GREEN, style.FColor.AsPalette);
-        Assert.Equal(NKConsoleColor.BLUE, style.BColor.AsPalette);
+        Assert.Equal(GREEN, style.FColor.AsPalette);
+        Assert.Equal(BLUE,  style.BColor.AsPalette);
     }
 
     [Fact]
@@ -522,25 +632,25 @@ public class AnsiStringTests {
 
         // char concatenation
         Assert.Equal("Hello!", (ansi + '!').Plain);
-        Assert.Equal("!Hello", ('!' + ansi).Plain);
+        Assert.Equal("!Hello", ('!'  + ansi).Plain);
 
         // AnsiChar concatenation
-        var ansiChar = new AnsiChar('X', new NKStyle(NKConsoleColor.RED));
+        var ansiChar = new AnsiChar('X', new NKStyle(RED));
         var withChar = ansi + ansiChar;
         Assert.Equal("HelloX", withChar.Plain);
-        Assert.Equal(NKConsoleColor.RED, withChar.GetStyleAt(5).FColor.AsPalette);
+        Assert.Equal(RED,      withChar.GetStyleAt(5).FColor.AsPalette);
 
         // NKStyle composition
-        var styled = ansi + new NKStyle(NKConsoleColor.GREEN, s: TextStyles.BOLD);
-        Assert.Equal(NKConsoleColor.GREEN, styled.GetStyleAt(0).FColor.AsPalette);
-        Assert.True(styled.GetStyleAt(0).Styles.HasFlag(TextStyles.BOLD));
+        var styled = ansi + new NKStyle(GREEN, styles: BOLD);
+        Assert.Equal(GREEN, styled.GetStyleAt(0).FColor.AsPalette);
+        Assert.True(styled.GetStyleAt(0).Styles.HasFlag(BOLD));
 
-        // TextStyles addition
-        var bolded = ansi + TextStyles.BOLD;
-        Assert.True(bolded.GetStyleAt(0).Styles.HasFlag(TextStyles.BOLD));
+        // NKTextStyles addition
+        var bolded = ansi + BOLD;
+        Assert.True(bolded.GetStyleAt(0).Styles.HasFlag(BOLD));
 
         // NKColor setting
-        var colored = ansi + (NKColor)NKConsoleColor.YELLOW;
-        Assert.Equal(NKConsoleColor.YELLOW, colored.GetStyleAt(0).FColor.AsPalette);
+        var colored = ansi + (NKColor)YELLOW;
+        Assert.Equal(YELLOW, colored.GetStyleAt(0).FColor.AsPalette);
     }
 }

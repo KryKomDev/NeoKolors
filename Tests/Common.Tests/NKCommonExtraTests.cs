@@ -43,10 +43,10 @@ public class NKCommonExtraTests {
 
     [Fact]
     public void TextStyles_Flags_WorkAsExpected() {
-        var styles = TextStyles.BOLD | TextStyles.ITALIC;
+        var styles = NKTextStyles.BOLD | NKTextStyles.ITALIC;
         
-        Assert.True(styles.HasFlag(TextStyles.BOLD));
-        Assert.True(styles.HasFlag(TextStyles.ITALIC));
-        Assert.False(styles.HasFlag(TextStyles.UNDERLINE));
+        Assert.True(styles.HasFlag(NKTextStyles.BOLD));
+        Assert.True(styles.HasFlag(NKTextStyles.ITALIC));
+        Assert.False(styles.HasFlag(NKTextStyles.UNDERLINE));
     }
 }

@@ -1,6 +1,9 @@
 // NeoKolors
 // Copyright (c) 2026 KryKom
 
+using static NeoKolors.Common.NKConsoleColor;
+using static NeoKolors.Common.NKTextStyles;
+
 namespace NeoKolors.Common.Tests;
 
 public class AnsiStringBuilderTests
@@ -30,7 +33,7 @@ public class AnsiStringBuilderTests
         Assert.True(builder4.Capacity >= 100);
 
         // AnsiString constructor
-        var style = new NKStyle(NKConsoleColor.RED);
+        var style = new NKStyle(RED);
         var ansiStr = new AnsiString("Hello", style);
         var builder5 = new AnsiStringBuilder(ansiStr);
         Assert.Equal(5, builder5.Length);
@@ -66,7 +69,7 @@ public class AnsiStringBuilderTests
     public void Indexer_ShouldGetAndSet()
     {
         var builder = new AnsiStringBuilder("Hello");
-        var style = new NKStyle(NKConsoleColor.BLUE);
+        var style = new NKStyle(BLUE);
 
         Assert.Equal('H', builder[0].Char);
 
@@ -79,8 +82,8 @@ public class AnsiStringBuilderTests
     public void Append_Methods_ShouldAddCorrectly()
     {
         var builder = new AnsiStringBuilder();
-        var styleRed = new NKStyle(NKConsoleColor.RED);
-        var styleBlue = new NKStyle(NKConsoleColor.BLUE);
+        var styleRed = new NKStyle(RED);
+        var styleBlue = new NKStyle(BLUE);
 
         builder.CurrentStyle = styleRed;
 
@@ -142,7 +145,7 @@ public class AnsiStringBuilderTests
     public void Insert_Methods_ShouldInsertCorrectly()
     {
         var builder = new AnsiStringBuilder("Hello");
-        var style = new NKStyle(NKConsoleColor.GREEN);
+        var style = new NKStyle(GREEN);
 
         // Insert char
         builder.Insert(1, 'X', style);
@@ -174,7 +177,7 @@ public class AnsiStringBuilderTests
     [Fact]
     public void Replace_Char_ShouldReplaceMatchingChars()
     {
-        var style = new NKStyle(NKConsoleColor.RED);
+        var style = new NKStyle(RED);
         var builder = new AnsiStringBuilder();
         builder.Append('a', style);
         builder.Append('b', style);
@@ -189,7 +192,7 @@ public class AnsiStringBuilderTests
     [Fact]
     public void Replace_String_ShouldReplaceMatchingSubstrings()
     {
-        var style = new NKStyle(NKConsoleColor.BLUE);
+        var style = new NKStyle(BLUE);
         var builder = new AnsiStringBuilder();
         builder.Append("hello world", style);
 
@@ -203,7 +206,7 @@ public class AnsiStringBuilderTests
     public void Styling_Methods_ShouldApplyCorrectly()
     {
         var builder = new AnsiStringBuilder("Hello World");
-        var red = new NKStyle(NKConsoleColor.RED);
+        var red = new NKStyle(RED);
 
         builder.ApplyStyle(red, 0, 5);
         Assert.Equal(red, builder[0].Style);
@@ -223,32 +226,70 @@ public class AnsiStringBuilderTests
     [Fact]
     public void SetFColor_PreservesBackgroundAndStyles()
     {
-        var initial = new NKStyle(f: NKConsoleColor.RED, b: NKConsoleColor.BLUE, s: TextStyles.BOLD);
+        var initial = new NKStyle(textColor: RED, backgroundColor: BLUE, styles: BOLD);
         var builder = new AnsiStringBuilder("Hello", 10).ApplyStyle(initial);
 
-        builder.SetFColor(NKConsoleColor.GREEN);
+        builder.SetFColor(GREEN);
 
-        Assert.Equal(NKConsoleColor.GREEN, builder[0].Style.FColor.AsPalette);
-        Assert.Equal(NKConsoleColor.BLUE, builder[0].Style.BColor.AsPalette);
-        Assert.True(builder[0].Style.Styles.HasFlag(TextStyles.BOLD));
+        Assert.Equal(GREEN, builder[0].Style.FColor.AsPalette);
+        Assert.Equal(BLUE, builder[0].Style.BColor.AsPalette);
+        Assert.True(builder[0].Style.Styles.HasFlag(BOLD));
     }
 
     [Fact]
     public void TextStyles_Add_Remove_Toggle_WorkOnBuilder()
     {
-        var initial = new NKStyle(f: NKConsoleColor.RED, s: TextStyles.BOLD);
+        var initial = new NKStyle(textColor: RED, styles: BOLD);
         var builder = new AnsiStringBuilder("Test").ApplyStyle(initial);
 
-        builder.AddStyles(TextStyles.ITALIC);
-        Assert.True(builder[0].Style.Styles.HasFlag(TextStyles.BOLD));
-        Assert.True(builder[0].Style.Styles.HasFlag(TextStyles.ITALIC));
+        builder.AddStyles(ITALIC);
+        Assert.True(builder[0].Style.Styles.HasFlag(BOLD));
+        Assert.True(builder[0].Style.Styles.HasFlag(ITALIC));
 
-        builder.RemoveStyles(TextStyles.BOLD);
-        Assert.False(builder[0].Style.Styles.HasFlag(TextStyles.BOLD));
-        Assert.True(builder[0].Style.Styles.HasFlag(TextStyles.ITALIC));
+        builder.RemoveStyles(BOLD);
+        Assert.False(builder[0].Style.Styles.HasFlag(BOLD));
+        Assert.True(builder[0].Style.Styles.HasFlag(ITALIC));
 
-        builder.ToggleStyles(TextStyles.ITALIC | TextStyles.BOLD);
-        Assert.True(builder[0].Style.Styles.HasFlag(TextStyles.BOLD));
-        Assert.False(builder[0].Style.Styles.HasFlag(TextStyles.ITALIC));
+        builder.ToggleStyles(ITALIC | BOLD);
+        Assert.True(builder[0].Style.Styles.HasFlag(BOLD));
+        Assert.False(builder[0].Style.Styles.HasFlag(ITALIC));
+    }
+
+    [Fact]
+    public void SetBColor_PreservesForegroundAndStyles()
+    {
+        var initial = new NKStyle(textColor: RED, backgroundColor: BLUE, styles: BOLD);
+        var builder = new AnsiStringBuilder("Hello").ApplyStyle(initial);
+
+        builder.SetBColor(YELLOW);
+
+        Assert.Equal(RED,    builder[0].Style.FColor.AsPalette);
+        Assert.Equal(YELLOW, builder[0].Style.BColor.AsPalette);
+        Assert.True(builder[0].Style.Styles.HasFlag(BOLD));
+    }
+
+    [Fact]
+    public void OverrideStyle_AppliesOnlyNonInheritedProperties()
+    {
+        var initial = new NKStyle(textColor: RED, backgroundColor: BLUE, styles: BOLD);
+        var builder = new AnsiStringBuilder("Test").ApplyStyle(initial);
+
+        var overrider = new NKStyle(textColor: GREEN, backgroundColor: NKColor.Inherit, inheritedStyles: BOLD);
+        builder.OverrideStyle(overrider);
+
+        Assert.Equal(GREEN, builder[0].Style.FColor.AsPalette);
+        Assert.Equal(BLUE,  builder[0].Style.BColor.AsPalette);
+        Assert.True(builder[0].Style.Styles.HasFlag(BOLD));
+    }
+
+    [Fact]
+    public void Underline_CanBeAppliedAndRetained()
+    {
+        var underline = new NKUnderlineStyle(new NKColor(RED), NKUnderlineType.CURLY);
+        var style = new NKStyle { Underline = underline };
+        var builder = new AnsiStringBuilder(new AnsiString("Underlined", style));
+
+        Assert.Equal(NKUnderlineType.CURLY, builder[0].Style.Underline.Type);
+        Assert.Equal(new NKColor(RED), builder[0].Style.Underline.Color);
     }
 }

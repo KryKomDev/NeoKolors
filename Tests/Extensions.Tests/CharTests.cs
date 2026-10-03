@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2025 KryKom
 
 namespace NeoKolors.Extensions.Tests;
@@ -395,6 +395,113 @@ public class CharTests {
         
         Assert.Equal('\n', result.BaseChar);
         Assert.Null(result.Diacritics);
+    }
+
+    #endregion
+
+    #region Character Sets Tests
+
+    [Fact]
+    public void CharacterSets_ContainExpectedCharacters() {
+        Assert.Contains('a', char.BasicVowelsLower);
+        Assert.Contains('y', char.BasicVowelsLower);
+        Assert.Contains('á', char.ExtendedVowelsLower);
+        Assert.Contains('b', char.BasicConsonantsLower);
+        Assert.Contains('č', char.ExtendedConsonantsLower);
+
+        Assert.Contains('A', char.BasicVowelsUpper);
+        Assert.Contains('Á', char.ExtendedVowelsUpper);
+        Assert.Contains('B', char.BasicConsonantsUpper);
+        Assert.Contains('Č', char.ExtendedConsonantsUpper);
+
+        Assert.Equal(10, char.Digits.Count);
+        Assert.Contains('0', char.Digits);
+        Assert.Contains('9', char.Digits);
+    }
+
+    #endregion
+
+    #region Spacing and Combining Tests
+
+    [Theory]
+    [InlineData('\u0300', '`')]
+    [InlineData('\u0301', '´')]
+    [InlineData('\u0302', '^')]
+    [InlineData('\u0308', '¨')]
+    [InlineData('\u030C', 'ˇ')]
+    [InlineData('\u0303', '~')]
+    [InlineData('\u0327', '¸')]
+    [InlineData('\u030A', '˚')]
+    public void ToSpacing_And_ToCombining_RoundtripCorrectly(char combining, char spacing) {
+        Assert.Equal(spacing, char.ToSpacing(combining));
+        Assert.Equal(combining, char.ToCombining(spacing));
+    }
+
+    [Fact]
+    public void ToSpacing_UnmappedChar_ReturnsOriginal() {
+        Assert.Equal('x', char.ToSpacing('x'));
+        Assert.Equal('x', char.ToCombining('x'));
+    }
+
+    #endregion
+
+    #region ParseEsc and TryParseEsc Tests
+
+    [Theory]
+    [InlineData("a", 'a')]
+    [InlineData("\\a", '\a')]
+    [InlineData("\\b", '\b')]
+    [InlineData("\\e", '\e')]
+    [InlineData("\\f", '\f')]
+    [InlineData("\\n", '\n')]
+    [InlineData("\\r", '\r')]
+    [InlineData("\\t", '\t')]
+    [InlineData("\\v", '\v')]
+    [InlineData("\\\\", '\\')]
+    [InlineData("\\'", '\'')]
+    [InlineData("\\\"", '\"')]
+    [InlineData("\\0", '\0')]
+    [InlineData("\\x41", 'A')]
+    [InlineData("\\u0042", 'B')]
+    public void TryParseEsc_ValidEscapes_ReturnsCorrectChar(string input, char expected) {
+        Assert.True(char.TryParseEsc(input, out var result));
+        Assert.Equal(expected, result);
+        Assert.Equal(expected, char.ParseEsc(input));
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("abc")]
+    [InlineData("\\z")]
+    [InlineData("\\x")]
+    [InlineData("\\u12")]
+    public void TryParseEsc_InvalidEscapes_ReturnsFalse(string input) {
+        Assert.False(char.TryParseEsc(input, out var result));
+        Assert.Equal('\0', result);
+        Assert.Throws<FormatException>(() => char.ParseEsc(input));
+    }
+
+    #endregion
+
+    #region ToStringEsc Tests
+
+    [Theory]
+    [InlineData('\a', "\\a")]
+    [InlineData('\b', "\\b")]
+    [InlineData('\e', "\\e")]
+    [InlineData('\f', "\\f")]
+    [InlineData('\n', "\\n")]
+    [InlineData('\r', "\\r")]
+    [InlineData('\t', "\\t")]
+    [InlineData('\v', "\\v")]
+    [InlineData('\\', "\\\\")]
+    [InlineData('\'', "\\'")]
+    [InlineData('\"', "\\\"")]
+    [InlineData('\0', "\\0")]
+    [InlineData('A', "A")]
+    [InlineData('z', "z")]
+    public void ToStringEsc_ReturnsCorrectEscapedString(char input, string expected) {
+        Assert.Equal(expected, char.ToStringEsc(input));
     }
 
     #endregion

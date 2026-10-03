@@ -10,13 +10,19 @@
       },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
-        "requested": "[18.9.0, )",
-        "resolved": "18.9.0",
-        "contentHash": "xIzVXa/VpKXqDWzyC/5Hw8JbFY5u9k3Jc53CpcjBiOXvkQGio484LD9FNwOiGUSMDcYL3Rcw9sNgGi5WrswlPQ==",
+        "requested": "[18.10.1, )",
+        "resolved": "18.10.1",
+        "contentHash": "SxCFvJE/2ltUQgCgv6+Ixagohw4sZc9hM7Wid2foaNM7paBscktoHLoRDz91fW8wbHG87Rg9Ku59/8PXumqUrA==",
         "dependencies": {
-          "Microsoft.CodeCoverage": "18.9.0",
-          "Microsoft.TestPlatform.TestHost": "18.9.0"
+          "Microsoft.CodeCoverage": "18.10.1",
+          "Microsoft.TestPlatform.TestHost": "18.10.1"
         }
+      },
+      "Polyfill": {
+        "type": "Direct",
+        "requested": "[11.4.1, )",
+        "resolved": "11.4.1",
+        "contentHash": "HbyvI2RZLjW8zaJOiAtyTaCVEAAvhPp7kCkEgHne4igfAY3o7W0JAmurNrjdItUdRIXanYrWiet2ng/Jjd9+/w=="
       },
       "xunit": {
         "type": "Direct",
@@ -37,41 +43,49 @@
       },
       "Implyzer": {
         "type": "Transitive",
-        "resolved": "2026.4.4",
-        "contentHash": "gZu9L6PKnbHxqOHw4rCN6fE1AOS0D+EvQ91fm9vnOK3ej5hT3VXj8M0I2tMrQn+ItrHR9zRZUkHAbfnXba9V6g=="
+        "resolved": "2026.5.4",
+        "contentHash": "TAqwPQKqnBUpXgVUCbHJgpKCfJ71/2ZInzWFFhi2tMspXql1B4lVlxfXqO/KhuN88bxPp2yUh49Ng7UOV8FHxQ=="
+      },
+      "IParsablePolyfill": {
+        "type": "Transitive",
+        "resolved": "2026.3.0.3",
+        "contentHash": "JkWrRD3eS3Uo2UvEJwBrCDBIwzMWzWVs5H86GvADgg9aaJwmAp/G/qa0rkV+UUh2J/T6Rpxhi+GSsrdW3YhZpQ==",
+        "dependencies": {
+          "Implyzer": "2026.5.4"
+        }
       },
       "MessagePack": {
         "type": "Transitive",
-        "resolved": "3.1.8",
-        "contentHash": "Qk2q+9FVxnMSp+NQ9y3SLz3HqWe7Rg3KRMHhBX28FkKUoOeP9YIU86mA4pFOxDDjUIRA9e7Ssbxs/LwWUcAzPw==",
+        "resolved": "3.1.10",
+        "contentHash": "IvYiuLIGLbklU8qZFp0krv1f+0d0kkWbyb+I4Qmk8p5o+JxQsKUp2L5SBHV4vVmBh+DAj3bWDukGAl+87GMwrQ==",
         "dependencies": {
-          "MessagePack.Annotations": "3.1.8",
-          "MessagePackAnalyzer": "3.1.8",
+          "MessagePack.Annotations": "3.1.10",
+          "MessagePackAnalyzer": "3.1.10",
           "Microsoft.NET.StringTools": "17.11.4"
         }
       },
       "MessagePack.Annotations": {
         "type": "Transitive",
-        "resolved": "3.1.8",
-        "contentHash": "SitOtZ4tOlAZZPF7p52M7143F+Cuz7o/aU0MrtAXX0+ZkPXzDNroOFhzzE2ogMFThsoEW/E6akXVVcBFM9ZKaw=="
+        "resolved": "3.1.10",
+        "contentHash": "3XvSeRdiR9ujCcTuijFwn2DRO8+a2S4fkNvwMaMwnXvdUJRaWAVc37scCiFME0AYLXGtnWF+GHMZT/a+i5Vv7g=="
       },
       "MessagePackAnalyzer": {
         "type": "Transitive",
-        "resolved": "3.1.8",
-        "contentHash": "Vm4g0cR4YRKRchEOmMJ0uVFU6yxdg7cJa2KHv3SUAHEsdYKvMpHMF5A1hZfsix89ymD5cmuzRnw9a6dKMcvq+Q=="
+        "resolved": "3.1.10",
+        "contentHash": "t0sPByiRt2ipKUg64M1foAt5uDnJOiOGimE0rKXZ5CdiQw0Sf4TfELiWNjowcCHO0M6gRePrI90kXPc7rN2llw=="
       },
       "Metriks": {
         "type": "Transitive",
-        "resolved": "2026.3.0",
-        "contentHash": "4eWxns2gvXbpKzq98g+TXwEVeDq4PTQg7oQdqgn1uTVvwxnMJMOhkp1yWCfVlwpOw1nPpzu7Kj9UEXFuDKs6SQ==",
+        "resolved": "2026.4.0-preview.1",
+        "contentHash": "Gb0FMJLOO0abcT9AyasGiY4+xQI5y6bCDo9kt3VVUdupCIksIVQz7YPBnZhoQMcXVClcQ04opTNNWdfUD/hXdQ==",
         "dependencies": {
           "JetBrains.Annotations": "2026.2.0"
         }
       },
       "Microsoft.CodeCoverage": {
         "type": "Transitive",
-        "resolved": "18.9.0",
-        "contentHash": "MtegCIKGuG0r/LCdIjoR1HgzCGIUBhR3aNdbtQpts5vMXQuqBDZ2Jsd2uFKoHFM2XrQV6ZrDf3F5oLi3SLTp8w=="
+        "resolved": "18.10.1",
+        "contentHash": "tV7tCyp/t+DuwQugLkCeUN7NBFFB4fEGRPr0gkMQ2nQgAvQQjmGlZZi1dsLzbyoe/A0mbnKybmkIh8qhT9p4Zw=="
       },
       "Microsoft.NET.StringTools": {
         "type": "Transitive",
@@ -80,15 +94,15 @@
       },
       "Microsoft.TestPlatform.ObjectModel": {
         "type": "Transitive",
-        "resolved": "18.9.0",
-        "contentHash": "Fz/qXC52VXXopzHj7v2reCKcCqSxkTDCkEDfkNAH0vni/7qK/KLMiEYtRmnUanxO2F2g2zZZ60qCpxF0AF7URA=="
+        "resolved": "18.10.1",
+        "contentHash": "o+PuLDRVp1iwiVAPBADZItXgm9Ck23XtPhE4kZtZVi0uYnMiiz1Dx9Cjh75kJ+ijfqnORL3VOTOaQVKi0f/ixg=="
       },
       "Microsoft.TestPlatform.TestHost": {
         "type": "Transitive",
-        "resolved": "18.9.0",
-        "contentHash": "Oq+Pma/J86aZL72t71bcESvDszDsTjUfl6PIsuDdPoKTHZfNMhKamCfLD5fKx51W/u0KozXtJo2/3fnt0sgPxg==",
+        "resolved": "18.10.1",
+        "contentHash": "KYz2omqkoz9E2mWa4fdgT+Ycie1wi5968EmyJlusjlp87RxxtA2FvDm8tcBEYIDzLnkWGnsKjE4d13Z7/rxkQA==",
         "dependencies": {
-          "Microsoft.TestPlatform.ObjectModel": "18.9.0"
+          "Microsoft.TestPlatform.ObjectModel": "18.10.1"
         }
       },
       "OneOf": {
@@ -96,34 +110,47 @@
         "resolved": "3.0.271",
         "contentHash": "pqpqeK8xQGggExhr4tesVgJkjdn+9HQAO0QgrYV2hFjE3y90okzk1kQMntMiUOGfV7FrCUfKPaVvPBD4IANqKg=="
       },
+      "protobuf-net": {
+        "type": "Transitive",
+        "resolved": "3.4.30",
+        "contentHash": "N49mhnY5fpWds085lO6ocppox9y4cTb1EmbHAAYVJMl/iYSYyNpz4Ohxnk80qtqv52dNZI+/6hQbaiz3+rTEwA==",
+        "dependencies": {
+          "protobuf-net.Core": "3.4.30"
+        }
+      },
+      "protobuf-net.Core": {
+        "type": "Transitive",
+        "resolved": "3.4.30",
+        "contentHash": "CZf8U6eON9OBtcPyOiXJ6Oq3Opi/lWtEiireyLCy43iof1A2oA0GEOrEHZISzmQ46s61iOC06Sa4Cs+D41t1DA=="
+      },
       "SkiaSharp": {
         "type": "Transitive",
-        "resolved": "4.151.1",
-        "contentHash": "FNlVsGZ9to3o9pObVqhIZanHjUGOoPb/Zxk5svCSLMJnKwxPKV7sIJrjs9BpB/jF3j9OdsaMOb4cfwSJbjueSw==",
+        "resolved": "4.153.0",
+        "contentHash": "SUb82mheKR0PhZB0tm3Oz0z1Xy9j+0186AeOhY8ff7O777jq57tLaJXhFpbOKJ75y6axzp4kslMGzB0ka7oLsQ==",
         "dependencies": {
-          "SkiaSharp.NativeAssets.Win32": "4.151.1",
-          "SkiaSharp.NativeAssets.macOS": "4.151.1"
+          "SkiaSharp.NativeAssets.Win32": "4.153.0",
+          "SkiaSharp.NativeAssets.macOS": "4.153.0"
         }
       },
       "SkiaSharp.NativeAssets.Linux": {
         "type": "Transitive",
-        "resolved": "4.151.1",
-        "contentHash": "4FM5fSV6W3nMOeawrxkgu3sf3uWUfQEizZ+ww6kcByf9XERiSbZftf5dyJxOUFDLcrtj9aslN2Jb7uZsO/lfWw=="
+        "resolved": "4.153.0",
+        "contentHash": "HpWn0Hk2WnQhc885Ac0feSKe9I7iVrXAkVRGMcwKkOjrmvV4pycrq+xRz1JrU0V54YCKZgO99kXt5r+/UkI1uA=="
       },
       "SkiaSharp.NativeAssets.macOS": {
         "type": "Transitive",
-        "resolved": "4.151.1",
-        "contentHash": "nLXwdhi0oB7pqqNLbSOLX+FIZQOMAU/yFPspzcDTJjTmPbMWyp0JWyeVj8sFJ/cweurEfT0J/lvfgdXX2EFHXA=="
+        "resolved": "4.153.0",
+        "contentHash": "HupVxGOlrSHW4G0yXtNQW2c56tqlQeXoBXt1yxjDX2V49AgmmhnvS81U/arLX/a9M388PZZKJyjIjK7nVT1eGQ=="
       },
       "SkiaSharp.NativeAssets.WebAssembly": {
         "type": "Transitive",
-        "resolved": "4.151.1",
-        "contentHash": "jZ6uHGAs3Ppg+yZq5I8wCvROUlnvOYkrWo2uMoliXnCKkubipiWresZidIne2l86n6CbMfsYpbrVKwGm5zmVrQ=="
+        "resolved": "4.153.0",
+        "contentHash": "Y8qkK/TH8Sm5oms98BX9wy/lBRGJ/b83rzRaF6eATNGdfoPP1AqLTOhttnTKsDxdoNPoHXSFpJGJ+HrG1Y4axQ=="
       },
       "SkiaSharp.NativeAssets.Win32": {
         "type": "Transitive",
-        "resolved": "4.151.1",
-        "contentHash": "G+nln30ZX2ZuhH+ungf6x/QMXCje38KTS0VTfQeMyeY8uyMBmsZwFz2D30ZxUjZqsVbEIcaC2bsYF65876s4Yg=="
+        "resolved": "4.153.0",
+        "contentHash": "c1glJgnMtRYQE05h71nkotqZAdcmi8+9B9UcTvsQRKSA8G3QEM50lktSR119hJt3JE6KN8lHqihKMsJNbIVWOA=="
       },
       "xunit.abstractions": {
         "type": "Transitive",
@@ -168,24 +195,26 @@
       "neokolors.common": {
         "type": "Project",
         "dependencies": {
-          "Implyzer": "[2026.4.4, )",
+          "IParsablePolyfill": "[2026.3.0.3, )",
+          "Implyzer": "[2026.5.4, )",
           "JetBrains.Annotations": "[2026.2.0, )",
-          "MessagePack": "[3.1.8, )",
+          "MessagePack": "[3.1.10, )",
           "NeoKolors.Extensions": "[2026.3.0, )",
           "OneOf": "[3.0.271, )",
-          "SkiaSharp": "[4.151.1, )",
-          "SkiaSharp.NativeAssets.Linux": "[4.151.1, )",
-          "SkiaSharp.NativeAssets.WebAssembly": "[4.151.1, )",
-          "SkiaSharp.NativeAssets.Win32": "[4.151.1, )",
-          "SkiaSharp.NativeAssets.macOS": "[4.151.1, )"
+          "SkiaSharp": "[4.153.0, )",
+          "SkiaSharp.NativeAssets.Linux": "[4.153.0, )",
+          "SkiaSharp.NativeAssets.WebAssembly": "[4.153.0, )",
+          "SkiaSharp.NativeAssets.Win32": "[4.153.0, )",
+          "SkiaSharp.NativeAssets.macOS": "[4.153.0, )",
+          "protobuf-net": "[3.4.30, )"
         }
       },
       "neokolors.extensions": {
         "type": "Project",
         "dependencies": {
-          "Implyzer": "[2026.4.4, )",
+          "Implyzer": "[2026.5.4, )",
           "JetBrains.Annotations": "[2026.2.0, )",
-          "Metriks": "[2026.3.0, )"
+          "Metriks": "[2026.4.0-preview.1, )"
         }
       }
     }

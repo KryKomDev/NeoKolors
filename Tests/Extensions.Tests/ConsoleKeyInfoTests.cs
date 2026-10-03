@@ -36,6 +36,17 @@ public class ConsoleKeyInfoTests {
         Assert.False(keyCtrl.HasShift);
         Assert.False(keyCtrl.HasAlt);
         Assert.True(keyCtrl.HasCtrl);
+
+        // ConsoleModifiers extensions
+        ConsoleModifiers shift = ConsoleModifiers.Shift;
+        Assert.True(shift.HasShift);
+        Assert.False(shift.HasAlt);
+        Assert.False(shift.HasCtrl);
+
+        ConsoleModifiers altCtrl = ConsoleModifiers.Alt | ConsoleModifiers.Control;
+        Assert.False(altCtrl.HasShift);
+        Assert.True(altCtrl.HasAlt);
+        Assert.True(altCtrl.HasCtrl);
     }
     
     [Theory]

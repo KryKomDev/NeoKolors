@@ -1,4 +1,4 @@
-﻿namespace NeoKolors.Extensions.Tests;
+namespace NeoKolors.Extensions.Tests;
 
 public class NameConvertorTests {
     [Theory]
@@ -122,5 +122,33 @@ public class NameConvertorTests {
         result = result.SnakeToKebab();
             
         Assert.Equal("hello-world-test", result);
+    }
+
+    [Theory]
+    [InlineData("hello world", "helloWorld")]
+    [InlineData("simple test case", "simpleTestCase")]
+    [InlineData("single", "single")]
+    public void SpaceToCamel_ConvertsCorrectly(string input, string expected) {
+        Assert.Equal(expected, input.SpaceToCamel());
+    }
+
+    [Theory]
+    [InlineData("HELLO_WORLD", "Hello World")]
+    [InlineData("SIMPLE_TEST", "Simple Test")]
+    [InlineData("SINGLE", "Single")]
+    public void EnumToSpace_ConvertsCorrectly(string input, string expected) {
+        Assert.Equal(expected, input.EnumToSpace());
+    }
+
+    [Theory]
+    [InlineData("helloWorld", NamingCase.CAMEL, NamingCase.PASCAL, "HelloWorld")]
+    [InlineData("HelloWorld", NamingCase.PASCAL, NamingCase.SNAKE, "hello_world")]
+    [InlineData("hello_world", NamingCase.SNAKE, NamingCase.SCREAMING_SNAKE, "HELLO_WORLD")]
+    [InlineData("HELLO_WORLD", NamingCase.SCREAMING_SNAKE, NamingCase.KEBAB, "hello-world")]
+    [InlineData("hello-world", NamingCase.KEBAB, NamingCase.SPACED_CAMEL, "hello World")]
+    [InlineData("hello World", NamingCase.SPACED_CAMEL, NamingCase.TRAIN, "HELLO-WORLD")]
+    [InlineData("HELLO-WORLD", NamingCase.TRAIN, NamingCase.CAMEL, "helloWorld")]
+    public void NameConvertor_Convert_WorksBetweenAllCases(string input, NamingCase source, NamingCase target, string expected) {
+        Assert.Equal(expected, NameConvertor.Convert(input, source, target));
     }
 }

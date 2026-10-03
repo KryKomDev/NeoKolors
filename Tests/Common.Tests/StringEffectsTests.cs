@@ -120,18 +120,18 @@ public class StringEffectsTests {
     [Fact]
     public void AddStyle_AppliesSingleStyle() {
         var input = "Hello";
-        var result = input.AddStyle(TextStyles.BOLD);
+        var result = input.AddStyle(NKTextStyles.BOLD);
 
         Assert.Equal($"{EscapeCodes.BOLD_START}Hello{EscapeCodes.BOLD_END}", result);
     }
 
     [Fact]
     public void AddCStyle_AppliesStyleWithoutNegativeReset() {
-        var style = new NKStyle(NKConsoleColor.RED, NKConsoleColor.BLACK, TextStyles.BOLD);
+        var style = new NKStyle(NKConsoleColor.RED, NKConsoleColor.BLACK, NKTextStyles.BOLD);
         var input = "Hello";
         var result = input.AddCStyle(style);
 
-        // AddCStyle uses AddCStyle(TextStyles), AddCColorF, AddCColorB
+        // AddCStyle uses AddCStyle(NKTextStyles), AddCColorF, AddCColorB
         // It should NOT contain negative resets (like [22m for bold) but just the start sequences.
         Assert.Contains(EscapeCodes.BOLD_START, result);
         Assert.Contains(EscapeCodes.PALETTE_COLOR_RED, result);
