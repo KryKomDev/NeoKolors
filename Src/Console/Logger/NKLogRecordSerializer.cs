@@ -1,234 +1,103 @@
 // NeoKolors
 // Copyright (c) KryKom 2026
 
-using MessagePack;
-using MessagePack.Formatters;
-using MessagePack.Resolvers;
 using Microsoft.Extensions.Logging;
 using NeoKolors.Common;
 using OneOf;
+using ProtoBuf;
 
 namespace NeoKolors.Console;
 
 /// <summary>
-/// Provides serialization utilities for <see cref="NKLogRecord"/> using MessagePack.
+/// Provides serialization utilities for <see cref="NKLogRecord"/> using Protobuf.
 /// </summary>
 public static class NKLogRecordSerializer {
-    public static readonly MessagePackSerializerOptions Options = MessagePackSerializerOptions.Standard
-        .WithResolver(
-            CompositeResolver.Create(
-                NKLogRecordFormatterResolver.Instance,
-                StandardResolver.Instance
-            )
-        );
+
+    [ProtoContract]
+    internal class ProtoNKLogRecord {
+        [ProtoMember(1)] public long TimestampBinary { get; set; }
+        [ProtoMember(2)] public int Level { get; set; }
+        [ProtoMember(3)] public ProtoEventId? EventId { get; set; }
+        [ProtoMember(4)] public string? Source { get; set; }
+        [ProtoMember(5)] public ProtoLogMessage? Message { get; set; }
+    }
+
+    [ProtoContract]
+    internal class ProtoEventId {
+        [ProtoMember(1)] public int Id { get; set; }
+        [ProtoMember(2)] public string? Name { get; set; }
+    }
+
+    [ProtoContract]
+    internal class ProtoLogMessage {
+        [ProtoMember(1)] public int MessageType { get; set; } // 0 = AnsiString, 1 = Exception
+        [ProtoMember(2)] public AnsiStringSerializer.ProtoAnsiStringPayload? AnsiString { get; set; }
+        [ProtoMember(3)] public ProtoExceptionInfo? Exception { get; set; }
+    }
+
+    [ProtoContract]
+    internal class ProtoExceptionInfo {
+        [ProtoMember(1)] public string Type { get; set; } = string.Empty;
+        [ProtoMember(2)] public string Message { get; set; } = string.Empty;
+        [ProtoMember(3)] public string StackTrace { get; set; } = string.Empty;
+    }
 
     /// <summary>
-    /// Serializes an <see cref="NKLogRecord"/> to the specified stream using MessagePack.
+    /// Serializes an <see cref="NKLogRecord"/> to the specified stream using Protobuf.
     /// </summary>
     public static void Serialize(Stream stream, NKLogRecord record) {
-        MessagePackSerializer.Serialize(stream, record, Options);
+        var proto = new ProtoNKLogRecord {
+            TimestampBinary = record.Timestamp.ToBinary(),
+            Level           = (int)record.Level,
+            Source          = record.Source,
+            EventId         = record.EventId == null ? null : new ProtoEventId {
+                Id   = record.EventId.Value.Id,
+                Name = record.EventId.Value.Name
+            },
+            Message         = record.Message.IsT0
+                ? new ProtoLogMessage {
+                    MessageType = 0,
+                    AnsiString  = AnsiStringSerializer.ToPayload(record.Message.AsT0)
+                }
+                : new ProtoLogMessage {
+                    MessageType = 1,
+                    Exception   = new ProtoExceptionInfo {
+                        Type       = record.Message.AsT1.GetType().FullName ?? record.Message.AsT1.GetType().Name,
+                        Message    = record.Message.AsT1.Message,
+                        StackTrace = record.Message.AsT1.StackTrace ?? string.Empty
+                    }
+                }
+        };
+
+        Serializer.SerializeWithLengthPrefix(stream, proto, PrefixStyle.Base128);
     }
 
     /// <summary>
-    /// Deserializes an <see cref="NKLogRecord"/> from the specified stream using MessagePack.
+    /// Deserializes an <see cref="NKLogRecord"/> from the specified stream using Protobuf.
     /// </summary>
     public static NKLogRecord Deserialize(Stream stream) {
-        return MessagePackSerializer.Deserialize<NKLogRecord>(stream, Options);
-    }
-}
+        var proto = Serializer.DeserializeWithLengthPrefix<ProtoNKLogRecord>(stream, PrefixStyle.Base128);
+        if (proto == null)
+            throw new InvalidOperationException("Failed to deserialize log record from stream.");
 
-public sealed class NKLogRecordFormatterResolver : IFormatterResolver {
-    public static readonly IFormatterResolver Instance = new NKLogRecordFormatterResolver();
+        var timestamp = DateTime.FromBinary(proto.TimestampBinary);
+        var level     = (NKLogLevel)proto.Level;
+        EventId? eventId = proto.EventId == null
+            ? null
+            : new EventId(proto.EventId.Id, proto.EventId.Name);
 
-    private NKLogRecordFormatterResolver() { }
-
-    public IMessagePackFormatter<T>? GetFormatter<T>() {
-        return FormatterCache<T>.Formatter;
-    }
-
-    private static class FormatterCache<T> {
-        public static readonly IMessagePackFormatter<T>? Formatter;
-
-        static FormatterCache() {
-            Formatter = (IMessagePackFormatter<T>?)GetFormatterHelper(typeof(T));
-        }
-
-        private static object? GetFormatterHelper(Type t) {
-            if (t == typeof(NKLogRecord))
-                return new NKLogRecordFormatter();
-
-            if (t == typeof(EventId?))
-                return new NullableEventIdFormatter();
-
-            if (t == typeof(AnsiString))
-                return new AnsiStringSerializer();
-
-            return t == typeof(OneOf<AnsiString, Exception>)
-                ? new OneOfMessageFormatter()
-                : null;
-        }
-    }
-}
-
-public sealed class NKLogRecordFormatter : IMessagePackFormatter<NKLogRecord> {
-    
-    public void Serialize(
-        ref MessagePackWriter        writer,
-        NKLogRecord                  value,
-        MessagePackSerializerOptions options
-    ) {
-        writer.WriteArrayHeader(5);
-        writer.Write(value.Timestamp.ToBinary());
-        writer.WriteInt32((int)value.Level);
-        options.Resolver.GetFormatterWithVerify<EventId?>().Serialize(ref writer, value.EventId, options);
-        options.Resolver.GetFormatterWithVerify<AnsiString?>().Serialize(ref writer, value.Source, options);
-        options.Resolver.GetFormatterWithVerify<OneOf<AnsiString, Exception>>().Serialize(ref writer, value.Message, options);
-    }
-
-    public NKLogRecord Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options) {
-        int count = reader.ReadArrayHeader();
-
-        if (count != 5)
-            throw new MessagePackSerializationException("Invalid NKLogRecord array length.");
-
-        var         timestamp = DateTime.FromBinary(reader.ReadInt64());
-        var         level     = (NKLogLevel)reader.ReadInt32();
-        var         eventId   = options.Resolver.GetFormatterWithVerify<EventId?>().Deserialize(ref reader, options);
-        AnsiString? source    = options.Resolver.GetFormatterWithVerify<AnsiString?>().Deserialize(ref reader, options);
-        var         message   = options.Resolver.GetFormatterWithVerify<OneOf<AnsiString, Exception>>().Deserialize(ref reader, options);
-
-        return new NKLogRecord(timestamp, level, message, eventId, source);
-    }
-}
-
-public sealed class NullableEventIdFormatter : IMessagePackFormatter<EventId?> {
-    
-    public void Serialize(
-        ref MessagePackWriter        writer,
-        EventId?                     value,
-        MessagePackSerializerOptions options
-    ) {
-        if (value == null) {
-            writer.WriteNil();
-        }
-        else {
-            writer.WriteArrayHeader(2);
-            writer.WriteInt32(value.Value.Id);
-            writer.Write(value.Value.Name ?? "");
-        }
-    }
-
-    public EventId? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options) {
-        if (reader.IsNil) {
-            reader.ReadNil();
-
-            return null;
-        }
-
-        int count = reader.ReadArrayHeader();
-
-        if (count != 2)
-            throw new MessagePackSerializationException("Invalid EventId array length.");
-
-        int     id   = reader.ReadInt32();
-        string? name = reader.ReadString();
-
-        return new EventId(id, name);
-    }
-}
-
-public sealed class OneOfMessageFormatter : IMessagePackFormatter<OneOf<AnsiString, Exception>> {
-    
-    public void Serialize(
-        ref MessagePackWriter        writer,
-        OneOf<AnsiString, Exception> value,
-        MessagePackSerializerOptions options
-    ) {
-        writer.WriteArrayHeader(2);
-        writer.WriteInt32(value.Index);
-
-        if (value.Index == 0) {
-            options.Resolver.GetFormatterWithVerify<AnsiString?>().Serialize(ref writer, value.AsT0, options);
-        }
-        else {
-            SerializeException(ref writer, value.AsT1);
-        }
-    }
-
-    private static void SerializeException(ref MessagePackWriter writer, Exception ex) {
-        while (true) {
-            writer.WriteMapHeader(4);
-            writer.Write("Type");
-            writer.Write(ex.GetType().FullName ?? ex.GetType().Name);
-            writer.Write("Message");
-            writer.Write(ex.Message);
-            writer.Write("StackTrace");
-            writer.Write(ex.StackTrace ?? "");
-            writer.Write("InnerException");
-
-            if (ex.InnerException != null) {
-                ex = ex.InnerException;
-
-                continue;
+        OneOf<AnsiString, Exception> message = default;
+        if (proto.Message != null) {
+            if (proto.Message.MessageType == 0 && proto.Message.AnsiString != null) {
+                message = OneOf<AnsiString, Exception>.FromT0(AnsiStringSerializer.ToDomain(proto.Message.AnsiString));
             }
-
-            writer.WriteNil();
-
-            break;
-        }
-    }
-
-    public OneOf<AnsiString, Exception> Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options) {
-        int count = reader.ReadArrayHeader();
-
-        if (count != 2)
-            throw new MessagePackSerializationException("Invalid OneOf message array length.");
-
-        int index = reader.ReadInt32();
-
-        if (index == 0) {
-            AnsiString? ansi = options.Resolver.GetFormatterWithVerify<AnsiString?>().Deserialize(ref reader, options);
-
-            return ansi != null 
-                ? OneOf<AnsiString, Exception>.FromT0(ansi)
-                : throw new MessagePackSerializationException("Invalid null AnsiString in OneOf message.");
-        }
-
-        var    dict  = DeserializeException(ref reader);
-        string msg   = dict.GetValueOrDefault("Message",    "");
-        string type  = dict.GetValueOrDefault("Type",       "System.Exception");
-        string stack = dict.GetValueOrDefault("StackTrace", "");
-        var    ex    = new DeserializedException(type, msg, stack);
-
-        return OneOf<AnsiString, Exception>.FromT1(ex);
-    }
-
-    private static Dictionary<string, string> DeserializeException(ref MessagePackReader reader) {
-        var dict  = new Dictionary<string, string>();
-        int count = reader.ReadMapHeader();
-
-        for (int i = 0; i < count; i++) {
-            string? key = reader.ReadString();
-
-            if (key is null)
-                throw new MessagePackSerializationException("Invalid null key in exception dictionary.");
-            
-            if (reader.IsNil) {
-                reader.ReadNil();
-                dict[key] = "";
-            }
-            else {
-                if (key == "InnerException") {
-                    reader.Skip();
-                }
-                else {
-                    dict[key] = reader.ReadString() 
-                        ?? throw new MessagePackSerializationException("Invalid null string in exception dictionary.");
-                }
+            else if (proto.Message.Exception != null) {
+                var exInfo = proto.Message.Exception;
+                message = OneOf<AnsiString, Exception>.FromT1(new DeserializedException(exInfo.Type, exInfo.Message, exInfo.StackTrace));
             }
         }
 
-        return dict;
+        return new NKLogRecord(timestamp, level, message, eventId, proto.Source);
     }
 }
 

@@ -6,12 +6,14 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using OneOf;
+using ProtoBuf;
 
 namespace NeoKolors.Common;
 
 /// <summary>
 /// color structure that can hold every color supported by the console (+ARGB colors) 
 /// </summary>
+[ProtoContract(Surrogate = typeof(NKColorSurrogate))]
 [StructLayout(LayoutKind.Explicit, Size = sizeof(uint))]
 public readonly record struct NKColor : IFormattable, IParsablePolyfill.IParsable<NKColor> {
 
@@ -491,4 +493,12 @@ public readonly record struct NKColor : IFormattable, IParsablePolyfill.IParsabl
         RGB           = 2,
         INHERIT       = 3
     }
+}
+
+[ProtoContract]
+public struct NKColorSurrogate {
+    [ProtoMember(1)] public uint Value { get; set; }
+
+    public static implicit operator NKColorSurrogate(NKColor color) => new() { Value = color.GetRaw() };
+    public static implicit operator NKColor(NKColorSurrogate surrogate) => NKColor.FromRaw(surrogate.Value);
 }

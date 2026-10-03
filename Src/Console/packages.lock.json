@@ -29,18 +29,6 @@
         "resolved": "2026.2.0",
         "contentHash": "drvAEaI7Xf4wU6dx4UTB9MoZWXZlraaQ0qoeThPQ411FxNhId7QdUTukIC9I8aUHP0ycAaGwZNKqSvfOZQvUlg=="
       },
-      "MessagePack": {
-        "type": "Direct",
-        "requested": "[3.1.10, )",
-        "resolved": "3.1.10",
-        "contentHash": "IvYiuLIGLbklU8qZFp0krv1f+0d0kkWbyb+I4Qmk8p5o+JxQsKUp2L5SBHV4vVmBh+DAj3bWDukGAl+87GMwrQ==",
-        "dependencies": {
-          "MessagePack.Annotations": "3.1.10",
-          "MessagePackAnalyzer": "3.1.10",
-          "Microsoft.NET.StringTools": "17.11.4",
-          "System.Collections.Immutable": "8.0.0"
-        }
-      },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "Direct",
         "requested": "[10.0.12, )",
@@ -63,6 +51,15 @@
         "resolved": "11.4.1",
         "contentHash": "HbyvI2RZLjW8zaJOiAtyTaCVEAAvhPp7kCkEgHne4igfAY3o7W0JAmurNrjdItUdRIXanYrWiet2ng/Jjd9+/w=="
       },
+      "protobuf-net": {
+        "type": "Direct",
+        "requested": "[3.4.30, )",
+        "resolved": "3.4.30",
+        "contentHash": "N49mhnY5fpWds085lO6ocppox9y4cTb1EmbHAAYVJMl/iYSYyNpz4Ohxnk80qtqv52dNZI+/6hQbaiz3+rTEwA==",
+        "dependencies": {
+          "protobuf-net.Core": "3.4.30"
+        }
+      },
       "IParsablePolyfill": {
         "type": "Transitive",
         "resolved": "2026.3.0.3",
@@ -70,16 +67,6 @@
         "dependencies": {
           "Implyzer": "2026.5.4"
         }
-      },
-      "MessagePack.Annotations": {
-        "type": "Transitive",
-        "resolved": "3.1.10",
-        "contentHash": "3XvSeRdiR9ujCcTuijFwn2DRO8+a2S4fkNvwMaMwnXvdUJRaWAVc37scCiFME0AYLXGtnWF+GHMZT/a+i5Vv7g=="
-      },
-      "MessagePackAnalyzer": {
-        "type": "Transitive",
-        "resolved": "3.1.10",
-        "contentHash": "t0sPByiRt2ipKUg64M1foAt5uDnJOiOGimE0rKXZ5CdiQw0Sf4TfELiWNjowcCHO0M6gRePrI90kXPc7rN2llw=="
       },
       "Metriks": {
         "type": "Transitive",
@@ -125,18 +112,18 @@
         "resolved": "10.0.12",
         "contentHash": "9/qymSh7hVDMGTGwrLz8MRp5zRyXy9adGDOs4HwRdnLil3oZGYuWeZjbmHgCQ9BL1qBroVfgUK3U/nb61617Cw=="
       },
-      "Microsoft.NET.StringTools": {
-        "type": "Transitive",
-        "resolved": "17.11.4",
-        "contentHash": "mudqUHhNpeqIdJoUx2YDWZO/I9uEDYVowan89R6wsomfnUJQk6HteoQTlNjZDixhT2B4IXMkMtgZtoceIjLRmA==",
-        "dependencies": {
-          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
-        }
-      },
       "OneOf": {
         "type": "Transitive",
         "resolved": "3.0.271",
         "contentHash": "pqpqeK8xQGggExhr4tesVgJkjdn+9HQAO0QgrYV2hFjE3y90okzk1kQMntMiUOGfV7FrCUfKPaVvPBD4IANqKg=="
+      },
+      "protobuf-net.Core": {
+        "type": "Transitive",
+        "resolved": "3.4.30",
+        "contentHash": "CZf8U6eON9OBtcPyOiXJ6Oq3Opi/lWtEiireyLCy43iof1A2oA0GEOrEHZISzmQ46s61iOC06Sa4Cs+D41t1DA==",
+        "dependencies": {
+          "System.Collections.Immutable": "10.0.12"
+        }
       },
       "SkiaSharp": {
         "type": "Transitive",
@@ -211,14 +198,14 @@
           "IParsablePolyfill": "[2026.3.0.3, )",
           "Implyzer": "[2026.5.4, )",
           "JetBrains.Annotations": "[2026.2.0, )",
-          "MessagePack": "[3.1.10, )",
           "NeoKolors.Extensions": "[2026.3.0, )",
           "OneOf": "[3.0.271, )",
           "SkiaSharp": "[4.153.0, )",
           "SkiaSharp.NativeAssets.Linux": "[4.153.0, )",
           "SkiaSharp.NativeAssets.WebAssembly": "[4.153.0, )",
           "SkiaSharp.NativeAssets.Win32": "[4.153.0, )",
-          "SkiaSharp.NativeAssets.macOS": "[4.153.0, )"
+          "SkiaSharp.NativeAssets.macOS": "[4.153.0, )",
+          "protobuf-net": "[3.4.30, )"
         }
       },
       "neokolors.extensions": {
@@ -259,17 +246,6 @@
         "resolved": "2026.2.0",
         "contentHash": "drvAEaI7Xf4wU6dx4UTB9MoZWXZlraaQ0qoeThPQ411FxNhId7QdUTukIC9I8aUHP0ycAaGwZNKqSvfOZQvUlg=="
       },
-      "MessagePack": {
-        "type": "Direct",
-        "requested": "[3.1.10, )",
-        "resolved": "3.1.10",
-        "contentHash": "IvYiuLIGLbklU8qZFp0krv1f+0d0kkWbyb+I4Qmk8p5o+JxQsKUp2L5SBHV4vVmBh+DAj3bWDukGAl+87GMwrQ==",
-        "dependencies": {
-          "MessagePack.Annotations": "3.1.10",
-          "MessagePackAnalyzer": "3.1.10",
-          "Microsoft.NET.StringTools": "17.11.4"
-        }
-      },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "Direct",
         "requested": "[10.0.12, )",
@@ -291,6 +267,15 @@
         "resolved": "11.4.1",
         "contentHash": "HbyvI2RZLjW8zaJOiAtyTaCVEAAvhPp7kCkEgHne4igfAY3o7W0JAmurNrjdItUdRIXanYrWiet2ng/Jjd9+/w=="
       },
+      "protobuf-net": {
+        "type": "Direct",
+        "requested": "[3.4.30, )",
+        "resolved": "3.4.30",
+        "contentHash": "N49mhnY5fpWds085lO6ocppox9y4cTb1EmbHAAYVJMl/iYSYyNpz4Ohxnk80qtqv52dNZI+/6hQbaiz3+rTEwA==",
+        "dependencies": {
+          "protobuf-net.Core": "3.4.30"
+        }
+      },
       "IParsablePolyfill": {
         "type": "Transitive",
         "resolved": "2026.3.0.3",
@@ -298,16 +283,6 @@
         "dependencies": {
           "Implyzer": "2026.5.4"
         }
-      },
-      "MessagePack.Annotations": {
-        "type": "Transitive",
-        "resolved": "3.1.10",
-        "contentHash": "3XvSeRdiR9ujCcTuijFwn2DRO8+a2S4fkNvwMaMwnXvdUJRaWAVc37scCiFME0AYLXGtnWF+GHMZT/a+i5Vv7g=="
-      },
-      "MessagePackAnalyzer": {
-        "type": "Transitive",
-        "resolved": "3.1.10",
-        "contentHash": "t0sPByiRt2ipKUg64M1foAt5uDnJOiOGimE0rKXZ5CdiQw0Sf4TfELiWNjowcCHO0M6gRePrI90kXPc7rN2llw=="
       },
       "Metriks": {
         "type": "Transitive",
@@ -344,15 +319,15 @@
         "resolved": "10.0.12",
         "contentHash": "9/qymSh7hVDMGTGwrLz8MRp5zRyXy9adGDOs4HwRdnLil3oZGYuWeZjbmHgCQ9BL1qBroVfgUK3U/nb61617Cw=="
       },
-      "Microsoft.NET.StringTools": {
-        "type": "Transitive",
-        "resolved": "17.11.4",
-        "contentHash": "mudqUHhNpeqIdJoUx2YDWZO/I9uEDYVowan89R6wsomfnUJQk6HteoQTlNjZDixhT2B4IXMkMtgZtoceIjLRmA=="
-      },
       "OneOf": {
         "type": "Transitive",
         "resolved": "3.0.271",
         "contentHash": "pqpqeK8xQGggExhr4tesVgJkjdn+9HQAO0QgrYV2hFjE3y90okzk1kQMntMiUOGfV7FrCUfKPaVvPBD4IANqKg=="
+      },
+      "protobuf-net.Core": {
+        "type": "Transitive",
+        "resolved": "3.4.30",
+        "contentHash": "CZf8U6eON9OBtcPyOiXJ6Oq3Opi/lWtEiireyLCy43iof1A2oA0GEOrEHZISzmQ46s61iOC06Sa4Cs+D41t1DA=="
       },
       "SkiaSharp": {
         "type": "Transitive",
@@ -389,14 +364,14 @@
           "IParsablePolyfill": "[2026.3.0.3, )",
           "Implyzer": "[2026.5.4, )",
           "JetBrains.Annotations": "[2026.2.0, )",
-          "MessagePack": "[3.1.10, )",
           "NeoKolors.Extensions": "[2026.3.0, )",
           "OneOf": "[3.0.271, )",
           "SkiaSharp": "[4.153.0, )",
           "SkiaSharp.NativeAssets.Linux": "[4.153.0, )",
           "SkiaSharp.NativeAssets.WebAssembly": "[4.153.0, )",
           "SkiaSharp.NativeAssets.Win32": "[4.153.0, )",
-          "SkiaSharp.NativeAssets.macOS": "[4.153.0, )"
+          "SkiaSharp.NativeAssets.macOS": "[4.153.0, )",
+          "protobuf-net": "[3.4.30, )"
         }
       },
       "neokolors.extensions": {
@@ -436,18 +411,6 @@
         "resolved": "2026.2.0",
         "contentHash": "drvAEaI7Xf4wU6dx4UTB9MoZWXZlraaQ0qoeThPQ411FxNhId7QdUTukIC9I8aUHP0ycAaGwZNKqSvfOZQvUlg=="
       },
-      "MessagePack": {
-        "type": "Direct",
-        "requested": "[3.1.10, )",
-        "resolved": "3.1.10",
-        "contentHash": "IvYiuLIGLbklU8qZFp0krv1f+0d0kkWbyb+I4Qmk8p5o+JxQsKUp2L5SBHV4vVmBh+DAj3bWDukGAl+87GMwrQ==",
-        "dependencies": {
-          "MessagePack.Annotations": "3.1.10",
-          "MessagePackAnalyzer": "3.1.10",
-          "Microsoft.NET.StringTools": "17.11.4",
-          "System.Collections.Immutable": "8.0.0"
-        }
-      },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "Direct",
         "requested": "[10.0.12, )",
@@ -470,6 +433,15 @@
         "resolved": "11.4.1",
         "contentHash": "HbyvI2RZLjW8zaJOiAtyTaCVEAAvhPp7kCkEgHne4igfAY3o7W0JAmurNrjdItUdRIXanYrWiet2ng/Jjd9+/w=="
       },
+      "protobuf-net": {
+        "type": "Direct",
+        "requested": "[3.4.30, )",
+        "resolved": "3.4.30",
+        "contentHash": "N49mhnY5fpWds085lO6ocppox9y4cTb1EmbHAAYVJMl/iYSYyNpz4Ohxnk80qtqv52dNZI+/6hQbaiz3+rTEwA==",
+        "dependencies": {
+          "protobuf-net.Core": "3.4.30"
+        }
+      },
       "IParsablePolyfill": {
         "type": "Transitive",
         "resolved": "2026.3.0.3",
@@ -477,16 +449,6 @@
         "dependencies": {
           "Implyzer": "2026.5.4"
         }
-      },
-      "MessagePack.Annotations": {
-        "type": "Transitive",
-        "resolved": "3.1.10",
-        "contentHash": "3XvSeRdiR9ujCcTuijFwn2DRO8+a2S4fkNvwMaMwnXvdUJRaWAVc37scCiFME0AYLXGtnWF+GHMZT/a+i5Vv7g=="
-      },
-      "MessagePackAnalyzer": {
-        "type": "Transitive",
-        "resolved": "3.1.10",
-        "contentHash": "t0sPByiRt2ipKUg64M1foAt5uDnJOiOGimE0rKXZ5CdiQw0Sf4TfELiWNjowcCHO0M6gRePrI90kXPc7rN2llw=="
       },
       "Metriks": {
         "type": "Transitive",
@@ -531,18 +493,18 @@
         "resolved": "10.0.12",
         "contentHash": "9/qymSh7hVDMGTGwrLz8MRp5zRyXy9adGDOs4HwRdnLil3oZGYuWeZjbmHgCQ9BL1qBroVfgUK3U/nb61617Cw=="
       },
-      "Microsoft.NET.StringTools": {
-        "type": "Transitive",
-        "resolved": "17.11.4",
-        "contentHash": "mudqUHhNpeqIdJoUx2YDWZO/I9uEDYVowan89R6wsomfnUJQk6HteoQTlNjZDixhT2B4IXMkMtgZtoceIjLRmA==",
-        "dependencies": {
-          "System.Runtime.CompilerServices.Unsafe": "6.0.0"
-        }
-      },
       "OneOf": {
         "type": "Transitive",
         "resolved": "3.0.271",
         "contentHash": "pqpqeK8xQGggExhr4tesVgJkjdn+9HQAO0QgrYV2hFjE3y90okzk1kQMntMiUOGfV7FrCUfKPaVvPBD4IANqKg=="
+      },
+      "protobuf-net.Core": {
+        "type": "Transitive",
+        "resolved": "3.4.30",
+        "contentHash": "CZf8U6eON9OBtcPyOiXJ6Oq3Opi/lWtEiireyLCy43iof1A2oA0GEOrEHZISzmQ46s61iOC06Sa4Cs+D41t1DA==",
+        "dependencies": {
+          "System.Collections.Immutable": "10.0.12"
+        }
       },
       "SkiaSharp": {
         "type": "Transitive",
@@ -617,14 +579,14 @@
           "IParsablePolyfill": "[2026.3.0.3, )",
           "Implyzer": "[2026.5.4, )",
           "JetBrains.Annotations": "[2026.2.0, )",
-          "MessagePack": "[3.1.10, )",
           "NeoKolors.Extensions": "[2026.3.0, )",
           "OneOf": "[3.0.271, )",
           "SkiaSharp": "[4.153.0, )",
           "SkiaSharp.NativeAssets.Linux": "[4.153.0, )",
           "SkiaSharp.NativeAssets.WebAssembly": "[4.153.0, )",
           "SkiaSharp.NativeAssets.Win32": "[4.153.0, )",
-          "SkiaSharp.NativeAssets.macOS": "[4.153.0, )"
+          "SkiaSharp.NativeAssets.macOS": "[4.153.0, )",
+          "protobuf-net": "[3.4.30, )"
         }
       },
       "neokolors.extensions": {
@@ -665,17 +627,6 @@
         "resolved": "2026.2.0",
         "contentHash": "drvAEaI7Xf4wU6dx4UTB9MoZWXZlraaQ0qoeThPQ411FxNhId7QdUTukIC9I8aUHP0ycAaGwZNKqSvfOZQvUlg=="
       },
-      "MessagePack": {
-        "type": "Direct",
-        "requested": "[3.1.10, )",
-        "resolved": "3.1.10",
-        "contentHash": "IvYiuLIGLbklU8qZFp0krv1f+0d0kkWbyb+I4Qmk8p5o+JxQsKUp2L5SBHV4vVmBh+DAj3bWDukGAl+87GMwrQ==",
-        "dependencies": {
-          "MessagePack.Annotations": "3.1.10",
-          "MessagePackAnalyzer": "3.1.10",
-          "Microsoft.NET.StringTools": "17.11.4"
-        }
-      },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "Direct",
         "requested": "[10.0.12, )",
@@ -698,6 +649,15 @@
         "resolved": "11.4.1",
         "contentHash": "HbyvI2RZLjW8zaJOiAtyTaCVEAAvhPp7kCkEgHne4igfAY3o7W0JAmurNrjdItUdRIXanYrWiet2ng/Jjd9+/w=="
       },
+      "protobuf-net": {
+        "type": "Direct",
+        "requested": "[3.4.30, )",
+        "resolved": "3.4.30",
+        "contentHash": "N49mhnY5fpWds085lO6ocppox9y4cTb1EmbHAAYVJMl/iYSYyNpz4Ohxnk80qtqv52dNZI+/6hQbaiz3+rTEwA==",
+        "dependencies": {
+          "protobuf-net.Core": "3.4.30"
+        }
+      },
       "IParsablePolyfill": {
         "type": "Transitive",
         "resolved": "2026.3.0.3",
@@ -705,16 +665,6 @@
         "dependencies": {
           "Implyzer": "2026.5.4"
         }
-      },
-      "MessagePack.Annotations": {
-        "type": "Transitive",
-        "resolved": "3.1.10",
-        "contentHash": "3XvSeRdiR9ujCcTuijFwn2DRO8+a2S4fkNvwMaMwnXvdUJRaWAVc37scCiFME0AYLXGtnWF+GHMZT/a+i5Vv7g=="
-      },
-      "MessagePackAnalyzer": {
-        "type": "Transitive",
-        "resolved": "3.1.10",
-        "contentHash": "t0sPByiRt2ipKUg64M1foAt5uDnJOiOGimE0rKXZ5CdiQw0Sf4TfELiWNjowcCHO0M6gRePrI90kXPc7rN2llw=="
       },
       "Metriks": {
         "type": "Transitive",
@@ -755,15 +705,15 @@
         "resolved": "10.0.12",
         "contentHash": "9/qymSh7hVDMGTGwrLz8MRp5zRyXy9adGDOs4HwRdnLil3oZGYuWeZjbmHgCQ9BL1qBroVfgUK3U/nb61617Cw=="
       },
-      "Microsoft.NET.StringTools": {
-        "type": "Transitive",
-        "resolved": "17.11.4",
-        "contentHash": "mudqUHhNpeqIdJoUx2YDWZO/I9uEDYVowan89R6wsomfnUJQk6HteoQTlNjZDixhT2B4IXMkMtgZtoceIjLRmA=="
-      },
       "OneOf": {
         "type": "Transitive",
         "resolved": "3.0.271",
         "contentHash": "pqpqeK8xQGggExhr4tesVgJkjdn+9HQAO0QgrYV2hFjE3y90okzk1kQMntMiUOGfV7FrCUfKPaVvPBD4IANqKg=="
+      },
+      "protobuf-net.Core": {
+        "type": "Transitive",
+        "resolved": "3.4.30",
+        "contentHash": "CZf8U6eON9OBtcPyOiXJ6Oq3Opi/lWtEiireyLCy43iof1A2oA0GEOrEHZISzmQ46s61iOC06Sa4Cs+D41t1DA=="
       },
       "SkiaSharp": {
         "type": "Transitive",
@@ -818,14 +768,14 @@
           "IParsablePolyfill": "[2026.3.0.3, )",
           "Implyzer": "[2026.5.4, )",
           "JetBrains.Annotations": "[2026.2.0, )",
-          "MessagePack": "[3.1.10, )",
           "NeoKolors.Extensions": "[2026.3.0, )",
           "OneOf": "[3.0.271, )",
           "SkiaSharp": "[4.153.0, )",
           "SkiaSharp.NativeAssets.Linux": "[4.153.0, )",
           "SkiaSharp.NativeAssets.WebAssembly": "[4.153.0, )",
           "SkiaSharp.NativeAssets.Win32": "[4.153.0, )",
-          "SkiaSharp.NativeAssets.macOS": "[4.153.0, )"
+          "SkiaSharp.NativeAssets.macOS": "[4.153.0, )",
+          "protobuf-net": "[3.4.30, )"
         }
       },
       "neokolors.extensions": {

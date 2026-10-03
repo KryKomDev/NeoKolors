@@ -6,6 +6,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Text;
+using ProtoBuf;
 using static NeoKolors.Common.NKTextStyles;
 
 namespace NeoKolors.Common;
@@ -13,6 +14,7 @@ namespace NeoKolors.Common;
 /// <summary>
 /// contains information about console styles (bg / fg color, bold, italic, etc.)
 /// </summary>
+[ProtoContract(Surrogate = typeof(NKStyleSurrogate))]
 [StructLayout(LayoutKind.Explicit, Size = sizeof(ulong) * 2)]
 [SuppressMessage("ReSharper", "ShiftExpressionZeroLeftOperand")]
 public readonly record struct NKStyle : IFormattable, IParsablePolyfill.IParsable<NKStyle> {
@@ -555,4 +557,13 @@ public readonly record struct NKStyle : IFormattable, IParsablePolyfill.IParsabl
 
     #endregion
 
+}
+
+[ProtoContract]
+public struct NKStyleSurrogate {
+    [ProtoMember(1)] public ulong Raw0 { get; set; }
+    [ProtoMember(2)] public ulong Raw1 { get; set; }
+
+    public static implicit operator NKStyleSurrogate(NKStyle style) => new() { Raw0 = style.Raw0, Raw1 = style.Raw1 };
+    public static implicit operator NKStyle(NKStyleSurrogate surrogate) => new(surrogate.Raw0, surrogate.Raw1);
 }

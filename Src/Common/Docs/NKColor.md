@@ -97,3 +97,17 @@ The `GetInverse()` method returns the bitwise inverse of an RGB color, or maps t
 NKColor color = NKColor.FromRgb(255, 255, 0); // Yellow
 NKColor inverse = color.GetInverse();          // Blue
 ```
+
+---
+
+## 7. Binary Serialization (Protobuf)
+
+`NKColor` implements code-first Protobuf serialization via a custom surrogate `NKColorSurrogate`:
+
+```csharp
+[ProtoContract(Surrogate = typeof(NKColorSurrogate))]
+[StructLayout(LayoutKind.Explicit, Size = sizeof(uint))]
+public readonly record struct NKColor : IFormattable, IParsablePolyfill.IParsable<NKColor>
+```
+
+The surrogate directly packs and unpacks the 32-bit raw integer representation (`GetRaw()` and `FromRaw(uint)`), allowing `NKColor` to be used directly as a member in any Protobuf contract. For rules on extending or updating this struct without breaking binary compatibility, see the [Binary Serialization & Class Update Guide](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/Docs/Serialization-Guide.md).

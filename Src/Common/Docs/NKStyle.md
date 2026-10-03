@@ -89,3 +89,19 @@ NKStyle.AppendControlChars(sb, previousStyle, currentStyle);
 - If both foreground and background colors are identical to the previous cell, no color codes are written.
 - If text style effects are disabled (e.g., bold was active and is now inactive), a reset sequence (`\e[0m`) is emitted, and other properties are re-applied.
 - If a style is added (e.g., adding italic), only the specific addition code is written (`\e[3m`).
+
+---
+
+## 5. Binary Serialization (Protobuf)
+
+`NKStyle` is configured with `protobuf-net` using an internal surrogate `NKStyleSurrogate`:
+
+```csharp
+[ProtoContract(Surrogate = typeof(NKStyleSurrogate))]
+[StructLayout(LayoutKind.Explicit, Size = sizeof(ulong) * 2)]
+public readonly record struct NKStyle : IFormattable, IParsablePolyfill.IParsable<NKStyle>
+```
+
+The surrogate serializes the raw 64-bit integer words (`Raw0` and `Raw1`), ensuring high throughput and allowing `NKStyle` to be used directly in any Protobuf contract (such as [`AnsiStringSerializer`](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/AnsiStringSerializer.cs) and `NKFontSerializer`).
+
+For architectural details, update procedures, and best practices, consult the [Binary Serialization & Class Update Guide](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/Docs/Serialization-Guide.md).

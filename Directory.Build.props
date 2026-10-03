@@ -1,12 +1,13 @@
 <Project>
     <PropertyGroup>
+        <LangVersion>14</LangVersion>
         <DefineConstants>
             $(DefineConstants); 
-            NK_RENDERING_PROFILING; 
-            PolyPublic
+            NK_RENDERING_PROFILING
         </DefineConstants>
 
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
+        <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
         
         <DefineConstants>$(DefineConstants.Replace('%0A', '').Replace('%0D', '').Replace(' ', ''))</DefineConstants>
         
@@ -15,4 +16,11 @@
         <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
         <CompilerGeneratedFilesOutputPath>obj\Generated</CompilerGeneratedFilesOutputPath>
     </PropertyGroup>
+    
+<!--    <ItemGroup>-->
+<!--        <PackageReference Include="Polyfill" Version="11.4.1">-->
+<!--            <PrivateAssets>all</PrivateAssets>-->
+<!--            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>-->
+<!--        </PackageReference>-->
+<!--    </ItemGroup>-->
 </Project>

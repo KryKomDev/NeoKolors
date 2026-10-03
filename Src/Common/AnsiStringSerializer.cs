@@ -1,77 +1,94 @@
 // NeoKolors
 // Copyright (c) krystof 2026
 
-using MessagePack;
-using MessagePack.Formatters;
+using ProtoBuf;
 
 namespace NeoKolors.Common;
 
 /// <summary>
-/// A sealed class that implements the IMessagePackFormatter interface for serializing and deserializing
-/// instances of the <see cref="AnsiString"/> type using the MessagePack library.
-/// Provides custom logic to transform AnsiString objects to and from MessagePack's binary representation.
+/// Provides serialization and deserialization utilities for <see cref="AnsiString"/> instances using Protobuf.
 /// </summary>
-public sealed class AnsiStringSerializer : IMessagePackFormatter<AnsiString?> {
-    
-    public void Serialize(
-        ref MessagePackWriter        writer,
-        AnsiString?                  value,
-        MessagePackSerializerOptions options
-    ) {
-        if (value == null) {
-            writer.WriteNil();
+public static class AnsiStringSerializer {
 
-            return;
-        }
-
-        writer.WriteArrayHeader(2);
-        writer.Write(value.Plain);
-
-        var styles = value.Styles;
-        writer.WriteArrayHeader(styles.Length);
-
-        foreach (var marker in styles) {
-            writer.WriteArrayHeader(3);
-            writer.WriteInt32(marker.Index);
-            writer.WriteUInt64(marker.Style.Raw0);
-            writer.WriteUInt64(marker.Style.Raw1);
-        }
+    [ProtoContract]
+    public class ProtoAnsiStringPayload {
+        [ProtoMember(1)] public string Plain { get; set; } = string.Empty;
+        [ProtoMember(2)] public List<ProtoStyleMarker> Markers { get; set; } = [];
     }
 
-    public AnsiString? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options) {
-        if (reader.IsNil) {
-            reader.ReadNil();
+    [ProtoContract]
+    public struct ProtoStyleMarker {
+        [ProtoMember(1)] public int Index { get; set; }
+        [ProtoMember(2)] public NKStyle Style { get; set; }
+    }
 
+    [ProtoContract]
+    public class ProtoNullableAnsiString {
+        [ProtoMember(1)] public bool HasValue { get; set; }
+        [ProtoMember(2)] public ProtoAnsiStringPayload? Payload { get; set; }
+    }
+
+    /// <summary>
+    /// Serializes an <see cref="AnsiString"/> instance into a byte array using Protobuf.
+    /// </summary>
+    public static byte[] Serialize(AnsiString? value) {
+        using var ms = new MemoryStream();
+        Serialize(ms, value);
+        return ms.ToArray();
+    }
+
+    /// <summary>
+    /// Serializes an <see cref="AnsiString"/> instance into the specified stream using Protobuf.
+    /// </summary>
+    public static void Serialize(Stream stream, AnsiString? value) {
+        var proto = new ProtoNullableAnsiString {
+            HasValue = value != null,
+            Payload  = value == null ? null : ToPayload(value)
+        };
+        Serializer.Serialize(stream, proto);
+    }
+
+    /// <summary>
+    /// Deserializes an <see cref="AnsiString"/> instance from a byte array using Protobuf.
+    /// </summary>
+    public static AnsiString? Deserialize(byte[] bytes) {
+        using var ms = new MemoryStream(bytes);
+        return Deserialize(ms);
+    }
+
+    /// <summary>
+    /// Deserializes an <see cref="AnsiString"/> instance from a stream using Protobuf.
+    /// </summary>
+    public static AnsiString? Deserialize(Stream stream) {
+        var proto = Serializer.Deserialize<ProtoNullableAnsiString>(stream);
+        if (proto is not { HasValue: true } || proto.Payload == null)
             return null;
+
+        return ToDomain(proto.Payload);
+    }
+
+    public static ProtoAnsiStringPayload ToPayload(AnsiString value) {
+        var payload = new ProtoAnsiStringPayload {
+            Plain   = value.Plain,
+            Markers = new List<ProtoStyleMarker>(value.Styles.Length)
+        };
+
+        foreach (var marker in value.Styles) {
+            payload.Markers.Add(new ProtoStyleMarker {
+                Index = marker.Index,
+                Style = marker.Style
+            });
         }
 
-        int count = reader.ReadArrayHeader();
+        return payload;
+    }
 
-        if (count != 2)
-            throw new MessagePackSerializationException("Invalid AnsiString array length.");
-
-        string? text = reader.ReadString();
-
-        if (text is null)
-            throw new MessagePackSerializationException("Invalid null text in AnsiString.");
-
-        int styleCount = reader.ReadArrayHeader();
-        var markers    = new List<AnsiString.StyleMarker>(styleCount);
-
-        for (int i = 0; i < styleCount; i++) {
-            int markerCount = reader.ReadArrayHeader();
-
-            if (markerCount != 3)
-                throw new MessagePackSerializationException("Invalid StyleMarker array length.");
-
-            int   index = reader.ReadInt32();
-            ulong raw0  = reader.ReadUInt64();
-            ulong raw1  = reader.ReadUInt64();
-            var   style = new NKStyle(raw0, raw1);
-
-            markers.Add(new AnsiString.StyleMarker(index, style));
+    public static AnsiString ToDomain(ProtoAnsiStringPayload payload) {
+        var markers = new List<AnsiString.StyleMarker>(payload.Markers.Count);
+        foreach (var marker in payload.Markers) {
+            markers.Add(new AnsiString.StyleMarker(marker.Index, marker.Style));
         }
 
-        return new AnsiString(text, markers);
+        return new AnsiString(payload.Plain, markers);
     }
 }
