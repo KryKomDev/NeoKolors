@@ -47,7 +47,6 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '10.0.x'
-          cache: true
 
       - name: Restore Solution
         run: dotnet restore NeoKolors.slnx
@@ -120,3 +119,4 @@ jobs:
             --api-key "$NUGET_API_KEY" \
             --source https://api.nuget.org/v3/index.json \
             --skip-duplicate
+
