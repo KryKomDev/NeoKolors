@@ -18,6 +18,8 @@
       href: ../../Src/Common/Docs/NKConsoleColor.md
     - name: Text Styles and Effects
       href: ../../Src/Common/Docs/TextStyles.md
+    - name: Binary Serialization & Class Updates
+      href: ../../Src/Common/Docs/Serialization-Guide.md
 - name: NeoKolors.Console
   items:
     - name: Console Overview & Drivers

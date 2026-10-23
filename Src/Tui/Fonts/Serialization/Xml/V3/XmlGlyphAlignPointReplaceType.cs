@@ -1,7 +1,7 @@
 ﻿// NeoKolors
 // Copyright (c) KryKom 2026
 
-namespace NeoKolors.Tui.Fonts.Serialization.Xml.V3;
+namespace NeoKolors.Tui.Fonts.Xml.V3;
 
 public enum XmlGlyphAlignPointReplaceType : byte {
     UNSPECIFIED = 0,

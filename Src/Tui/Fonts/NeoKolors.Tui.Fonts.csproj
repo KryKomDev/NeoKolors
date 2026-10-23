@@ -10,18 +10,17 @@
 
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
-        <Version>2026.2-rc2.2</Version>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageIcon>package-icon.png</PackageIcon>
+        <PackageIcon>Package-Icon.png</PackageIcon>
     </PropertyGroup>
 
     <ItemGroup>
-        <None Include="README.md" Pack="true" PackagePath="\"/>
-        <None Include="../../../LICENSE" Pack="true" PackagePath="\"/>
-        <None Include="../../../Assets/package-icon.png" Pack="true" PackagePath="\"/>
+        <None Include="README.md" Pack="true" PackagePath="\" />
+        <None Include="../../../LICENSE" Pack="true" PackagePath="\" />
+        <None Include="../../../Assets/Package-Icon.png" Pack="true" PackagePath="\" />
     </ItemGroup>
     
     <ItemGroup>
@@ -37,23 +36,31 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="HasFlagExtension.Generator" Version="2026.1.0">
+        <PackageReference Include="HasFlagExtension.Generator" Version="2026.4.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Implyzer" Version="2026.3.1" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-        <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
-        <PackageReference Include="MessagePack" Version="3.1.7" />
-        <PackageReference Include="Metriks" Version="2026.3.0-rc1" />
+        <PackageReference Include="Implyzer" Version="2026.5.4" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <PackageReference Include="JetBrains.Annotations" Version="2026.2.0" />
+        <PackageReference Include="Metriks" Version="2026.4.0" />
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Build.Framework" Version="18.7.1" PrivateAssets="all" ExcludeAssets="runtime">
+        <PackageReference Include="Microsoft.Build.Framework" Version="18.10.1" PrivateAssets="all" ExcludeAssets="runtime">
           <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.7.1" PrivateAssets="all" ExcludeAssets="runtime">
+        <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.10.1" PrivateAssets="all" ExcludeAssets="runtime">
           <IncludeAssets>compile; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Polyfill" Version="11.4.1">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="protobuf-net" Version="3.4.30" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Coloring\" />
     </ItemGroup>
 </Project>

@@ -1,4 +1,4 @@
-﻿name: Create GitHub Release
+name: Release & Publish
 
 on:
   push:
@@ -7,117 +7,116 @@ on:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Tag name for the release (e.g. v1.0.0)'
+        description: 'Tag name for release (e.g. v2026.3.0)'
         required: true
         type: string
+      dry_run:
+        description: 'Dry run (do not publish to NuGet)'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  id-token: write
 
 jobs:
   build-and-pack:
-    name: Pack ${{ matrix.project.name }}
+    name: Build, Test & Pack
     runs-on: ubuntu-latest
-
-    strategy:
-      fail-fast: false
-      matrix:
-        project:
-          - name: Common
-            path: Src/Common/NeoKolors.Common.csproj
-            test_path: Tests/Common.Tests/NeoKolors.Common.Tests.csproj
-          - name: Console
-            path: Src/Console/NeoKolors.Console.csproj
-            test_path: Tests/Console.Tests/NeoKolors.Console.Tests.csproj
-          - name: Extensions
-            path: Src/Extensions/NeoKolors.Extensions.csproj
-            test_path: Tests/Extensions.Tests/NeoKolors.Extensions.Tests.csproj
-          - name: Settings
-            path: Src/Settings/NeoKolors.Settings.csproj
-            test_path: Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj
-          - name: Tui
-            path: Src/Tui/NeoKolors.Tui.csproj
-            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
-          - name: Tui.Core
-            path: Src/Tui/Core/NeoKolors.Tui.Core.csproj
-            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
-          - name: Tui.Fonts
-            path: Src/Tui/Fonts/NeoKolors.Tui.Fonts.csproj
-            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
-          - name: Tui.Fonts.Assets
-            path: Src/Tui/Fonts/Assets/NeoKolors.Tui.Fonts.Assets.csproj
-            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
-          - name: Tools.NKFont
-            path: Tools/NKFont/NeoKolors.Tools.NKFont.csproj
-            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
-          - name: Tools.NKChess
-            path: Tools/NKChess/NeoKolors.Tools.NKChess.csproj
-            test_path: Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj
-
+    outputs:
+      release_tag: ${{ steps.version.outputs.tag }}
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: '10.0.x'
-        cache: false
+      - name: Determine Release Tag
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ github.event.inputs.tag_name }}"
+          else
+            TAG="${{ github.ref_name }}"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
-    - name: Restore Target Project
-      run: dotnet restore ${{ matrix.project.path }}
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+          cache: true
 
-    - name: Build Target Project
-      run: dotnet build ${{ matrix.project.path }} --configuration Release --no-restore
+      - name: Restore Solution
+        run: dotnet restore NeoKolors.slnx
 
-    - name: Restore Test Project
-      run: dotnet restore ${{ matrix.project.test_path }}
+      - name: Build Solution (Release)
+        run: dotnet build NeoKolors.slnx -c Release --no-restore
 
-    - name: Build Test Project
-      run: dotnet build ${{ matrix.project.test_path }} --configuration Release --no-restore
-  
-    - name: Run Tests
-      run: dotnet test ${{ matrix.project.test_path }} --configuration Release --no-build
+      - name: Run Tests
+        run: dotnet test NeoKolors.slnx -c Release --no-build
 
-    - name: Pack Target Project
-      run: dotnet pack ${{ matrix.project.path }} --configuration Release --no-build --output ./output/
+      - name: Pack Packages
+        run: >-
+          dotnet pack NeoKolors.slnx
+          -c Release
+          --no-build
+          --output ./packages
 
-    - name: Upload Package Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: nuget-package-${{ matrix.project.name }}
-        path: ./output/*.nupkg
-        if-no-files-found: error
+      - name: Upload Package Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: |
+            ./packages/*.nupkg
+            ./packages/*.snupkg
 
-  create-release:
+  github-release:
     name: Create GitHub Release
-    runs-on: ubuntu-latest
     needs: build-and-pack
-    permissions:
-      contents: write
-
+    runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Set Release Tag
-      run: |
-        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-          echo "RELEASE_TAG=${{ github.event.inputs.tag_name }}" >> $GITHUB_ENV
-        else
-          echo "RELEASE_TAG=${{ github.ref_name }}" >> $GITHUB_ENV
-        fi
-      shell: bash
+      - name: Download Packages
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-packages
+          path: ./packages
 
-    - name: Download all Package Artifacts
-      uses: actions/download-artifact@v4
-      with:
-        path: ./packages/
-        pattern: nuget-package-*
-        merge-multiple: true
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ needs.build-and-pack.outputs.release_tag }}
+        shell: bash
+        run: |
+          gh release create "$RELEASE_TAG" ./packages/* --generate-notes --title "Release $RELEASE_TAG"
 
-    - name: Create Release and Upload Assets
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        gh release create "$RELEASE_TAG" ./packages/*.nupkg --generate-notes --title "Release $RELEASE_TAG"
-      shell: bash
+  publish-nuget:
+    name: Publish to NuGet
+    needs: [build-and-pack, github-release]
+    runs-on: ubuntu-latest
+    if: ${{ github.event.inputs.dry_run != true && github.event.inputs.dry_run != 'true' }}
+    steps:
+      - name: Download Packages
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-packages
+          path: ./packages
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Push to NuGet
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          dotnet nuget push "./packages/*.nupkg" \
+            --api-key "$NUGET_API_KEY" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate

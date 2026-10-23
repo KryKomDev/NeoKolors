@@ -2,12 +2,12 @@
 // Copyright (c) 2026 KryKom
 
 using Metriks;
-using NeoKolors.Tui.Fonts.Serialization.Xml.V3;
+using NeoKolors.Tui.Fonts.Xml.V3;
 using OneOf;
 using OneOf.Types;
-using static NeoKolors.Tui.Fonts.Serialization.Xml.V3.XmlGlyphAlignPointReplaceType;
+using static NeoKolors.Tui.Fonts.Xml.V3.XmlGlyphAlignPointReplaceType;
 
-namespace NeoKolors.Tui.Fonts.Serialization;
+namespace NeoKolors.Tui.Fonts;
 
 internal static class NKFontSerializerHelper {
     

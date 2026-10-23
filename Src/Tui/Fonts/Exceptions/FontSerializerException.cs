@@ -1,7 +1,7 @@
 ﻿// NeoKolors
 // Copyright (c) 2026 KryKom
 
-namespace NeoKolors.Tui.Fonts.Exceptions;
+namespace NeoKolors.Tui.Fonts;
 
 public sealed class FontSerializerException : Exception {
     
@@ -60,7 +60,7 @@ public sealed class FontSerializerException : Exception {
         => new($"The input path of font serializer must be a directory. '{path}' is not a directory.");
     
     public static FontSerializerException InvalidMapItem(Type type) 
-        => new($"Invalid font map item: type '{type.Name}'.");
+        => new($"Invalid font map item: flags '{type.Name}'.");
 
     public static FontSerializerException UnreadableStream() 
         => new("Cannot read font stream.");

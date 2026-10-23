@@ -5,6 +5,7 @@
     <Folder Name="/Src/Extensions/">
         <Project Path="Src/Extensions/NeoKolors.Extensions.csproj" />
     </Folder>
+    <Folder Name="/Src/" />
     
     <Folder Name="/Src/Common/">
         <Project Path="Src/Common/NeoKolors.Common.csproj" />
@@ -26,6 +27,10 @@
         <Project Path="Src/Tui/Core/NeoKolors.Tui.Core.csproj" />
     </Folder>
     
+    <Folder Name="/Src/Tui/Elements/">
+        <Project Path="Src/Tui/Elements/NeoKolors.Tui.Elements.csproj" />
+    </Folder>
+    
     <Folder Name="/Src/Tui/Fonts/">
         <Project Path="Src/Tui/Fonts/NeoKolors.Tui.Fonts.csproj" />
         <Project Path="Src/Tui/Fonts/Assets/NeoKolors.Tui.Fonts.Assets.csproj" />
@@ -39,6 +44,13 @@
         <Project Path="Src/Tui/Widgets/NeoKolors.Tui.Widgets.csproj" />
     </Folder>
 
+    <Folder Name="/Src/Tui/Lifecycle/">
+        <Project Path="Src/Tui/Lifecycle/Core/NeoKolors.Tui.Lifecycle.Core.csproj" />
+        <Project Path="Src/Tui/Lifecycle/Apps/NeoKolors.Tui.Lifecycle.Apps.csproj" />
+        <Project Path="Src/Tui/Lifecycle/Game2D/NeoKolors.Tui.Lifecycle.Game2D.csproj" />
+        <Project Path="Src/Tui/Lifecycle/Game3D/NeoKolors.Tui.Lifecycle.Game3D.csproj" />
+    </Folder>
+
     <!--  Tests  -->
     
     <Folder Name="/Tests/">
@@ -48,24 +60,24 @@
         <Project Path="Tests/Console.Tests/NeoKolors.Console.Tests.csproj" />
         <Project Path="Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj" />
         <Project Path="Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj" />
+        <Project Path="Tests/Lifecycle.Tests/NeoKolors.Tui.Lifecycle.Tests.csproj" />
     </Folder>
 
     <!--  Tools  -->
     
     <Folder Name="/Tools/">
-        <Project Path="Tools/NKChess/NeoKolors.Tools.NKChess.csproj" />
         <Project Path="Tools/NKFont/NeoKolors.Tools.NKFont.csproj" />
     </Folder>
 
     <!--  Examples  -->
     
     <Folder Name="/Examples/">
+        <File Path="Examples/ExampleApp.cs" />
+        <File Path="Examples/ExampleGame2D.cs" />
         <Project Path="Examples/Ascii/Ascii.csproj" />
-        <Project Path="Examples/DashBoard/DashBoard.csproj" />
         <Project Path="Examples/Neofetch/Neofetch.csproj" />
         <Project Path="Examples/Testing/Testing.csproj" />
         <Project Path="Examples/WeekNumber/WeekNumber.csproj" />
-        <Project Path="Examples/XmlTestApp/XmlTestApp.csproj" />
     </Folder>
     
 </Solution>

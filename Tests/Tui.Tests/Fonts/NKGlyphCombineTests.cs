@@ -2,7 +2,7 @@
 // Copyright (c) KryKom 2026
 
 using NeoKolors.Tui.Fonts;
-using Drct = NeoKolors.Tui.Fonts.Serialization.Xml.V3.XmlGlyphAlignDirection;
+using Drct = NeoKolors.Tui.Fonts.Xml.V3.XmlGlyphAlignDirection;
 
 namespace NeoKolors.Tui.Tests.Fonts;
 
@@ -73,11 +73,11 @@ public class NKGlyphCombineTests {
         var g1Glyph = new GlyphCell[1, 2];
         g1Glyph[0, 0] = GlyphCell.Char('A');
         g1Glyph[0, 1] = GlyphCell.Char('B');
-        var g1 = new NKGlyph(g1Glyph, 1, new[] { new AlignPoint('x', new Metriks.Point2D(0, 0)) });
+        var g1 = new NKGlyph(g1Glyph, 1, new[] { new AlignPoint('x', new Point2D(0, 0)) });
 
         var g2Glyph = new GlyphCell[1, 1];
         g2Glyph[0, 0] = GlyphCell.Char('C');
-        var g2 = new NKGlyph(g2Glyph, 0, new[] { new AlignPoint('x', new Metriks.Point2D(0, 0)) });
+        var g2 = new NKGlyph(g2Glyph, 0, new[] { new AlignPoint('x', new Point2D(0, 0)) });
 
         var combined = NKGlyph.Combine(g1, g2, 'x');
 

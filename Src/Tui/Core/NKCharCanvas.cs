@@ -1,238 +1,318 @@
 // NeoKolors
-// Copyright (c) 2026 KryKom
+// Copyright (c) krystof 2026
 
+using System.Runtime.CompilerServices;
 using Metriks;
 using NeoKolors.Common;
-using NeoKolors.Console;
+using NeoKolors.Extensions;
 using SkiaSharp;
 
 namespace NeoKolors.Tui.Core;
 
 public class NKCharCanvas : ICharCanvas {
-    
-    protected readonly List2D<CellInfo>     _data;
-    protected readonly List<SixelImageInfo> _images;
+    protected List2D<NKCell>    _data;
+    protected List2D<int>       _zLay;
+    protected List<NKImageData> _images;
 
-    protected readonly bool _resize;
-    
-    public int Width   => _data.XSize;
-    public int Height  => _data.YSize;
-    public Size2D Size => _data.Size;
+    public IReadOnlyList2D<NKCell> Data => _data;
 
-    public CellInfo this[int x, int y] {
-        get => _data[x, y];
-        set => _data[x, y] = value;
+    public Size2D Size {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => _data.Size;
     }
-    
-    public NKCharCanvas(int width, int height, bool resize = false) {
-        _data = new List2D<CellInfo>(width, height);
-        _data.Resize(width, height);
-        _data.Fill(CellInfo.GetDefault);
+
+    public int Width {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => _data.XSize;
+    }
+
+    public int Height {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => _data.YSize;
+    }
+
+    public int XSize {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => _data.XSize;
+    }
+
+    public int YSize {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => _data.YSize;
+    }
+
+    public NKCharCanvas(Size2D size) : this(size.X, size.Y) { }
+
+    public NKCharCanvas(int x, int y) {
+        _data   = ListPool2D<NKCell>.Rent(x, y);
+        _zLay   = ListPool2D<int>.Rent(x, y);
         _images = [];
-        _resize = resize;
+
+        _data.Resize(x, y);
+        _zLay.Resize(x, y);
+
+        _data.Fill(NKCell.Default);
+        _zLay.Fill(int.MinValue);
     }
 
-    public NKCharCanvas() {
-        _data = new List2D<CellInfo>();
-        _data.Resize(NKConsole.WindowSize.X, NKConsole.WindowSize.Y);
-        _data.Fill(CellInfo.GetDefault);
-        _images = [];
-        _resize = false;
-    }
-    
-    public void Place(ICharCanvas canvas, Point2D offset = default) {
-        Place(canvas.GetCellsArray(), offset);
-    }
+    #region Drawing
 
-    public void Place(NKCharCanvas canvas, Point2D offset = default) {
-        Place(canvas.GetCellsArray(), offset);
-    }
-    
-    public void Place(CellInfo[,] cells, Point2D offset = default) {
-        var sx = cells.GetLength(0) + offset.X;
-        var sy = cells.GetLength(1) + offset.Y;
-        
-        if (_resize && (sx > _data.XSize || sy > _data.YSize))
-            _data.Expand(Math.Max(sx, _data.XSize), Math.Max(sy, _data.YSize), CellInfo.GetDefault);
+    public void Draw(ICharCanvas canvas, int xOffset, int yOffset, int z) {
+        if (xOffset                 >= XSize ||
+            yOffset                 >= YSize ||
+            xOffset + canvas.Size.X < 0      ||
+            yOffset + canvas.Size.Y < 0
+        ) {
+            return;
+        }
 
-        int srcW = cells.GetLength(0);
-        int srcH = cells.GetLength(1);
+        var xs = xOffset.BottomClamp(0);
+        var ys = yOffset.BottomClamp(0);
+        var xe = (xs + canvas.Size.X).TopClamp(XSize);
+        var ye = (ys + canvas.Size.Y).TopClamp(YSize);
 
-        for (int x = 0; x < srcW; x++) {
-            int tx = x + offset.X;
-            if (tx < 0 || tx >= _data.XSize) continue;
+        // clear clusters
 
-            for (int y = 0; y < srcH; y++) {
-                int ty = y + offset.Y;
-                if (ty < 0 || ty >= _data.YSize) continue;
+        if (xOffset > 0) {
+            for (int yi = ys; yi < ye; yi++) {
+                ClearClusterLeft(xOffset, yi);
+            }
+        }
 
-                var p = cells[x, y];
-                if (p == null) continue;
+        var r = xOffset + canvas.Size.X;
 
-                // Skip default untouched cells or visually transparent empty cells from the source canvas
-                if ((p.Char == ' ' && p.Style == NKStyle.Default && p.ZIndex == int.MinValue) ||
-                    (p.Char is null or ' ' && p.Style.IsBColorInherit))
-                {
+        if (r < XSize - 1) {
+            for (int yi = ys; yi < ye; yi++) {
+                ClearClusterRight(r, yi);
+            }
+        }
+
+        // draw
+        for (int x = xs; x < xe; x++) {
+            for (int y = ys; y < ye; y++) {
+                if (_zLay[x, y] > z || canvas.Data[x - xOffset, y - yOffset].Flags.GetIsTransparent())
                     continue;
-                }
 
-                var t = _data[tx, ty];
-
-                if (t.ZIndex <= p.ZIndex) {
-                    if (p.Style.IsBColorInherit) {
-                        t.Char = p.Char ?? t.Char;
-                    } else {
-                        t.Char = p.Char;
-                    }
-                    t.Style = t.Style.OverrideWith(p.Style);
-                    t.ZIndex = p.ZIndex;
-                }
+                _data[x, y] = canvas.Data[x - xOffset, y - yOffset];
+                _zLay[x, y] = z;
             }
         }
     }
 
-    public void Place(char?[,] chars, Point2D offset = default, int zIndex = 0) {
-        var sx = chars.GetLength(0) + offset.X;
-        var sy = chars.GetLength(1) + offset.Y;
-        
-        if (_resize && (sx > _data.XSize || sy > _data.YSize))
-            _data.Expand(Math.Max(sx, _data.XSize), Math.Max(sy, _data.YSize), CellInfo.GetDefault);
-        
-        for (int x = offset.X; x < Math.Min(chars.Len0 + offset.X, _data.XSize); x++) {
-            for (int y = offset.Y; y < Math.Min(chars.Len1 + offset.Y, _data.YSize); y++) {
-                var cellInfo = _data[x, y];
-                
-                if (cellInfo.ZIndex <= zIndex) {
-                    cellInfo.Char = chars[x - offset.X, y - offset.Y];
-                    cellInfo.ZIndex = zIndex;
-                }
-            }
+    public void Draw(AnsiChar c, int xOffset, int yOffset, int z) {
+        if (xOffset < 0      ||
+            yOffset < 0      ||
+            xOffset >= XSize ||
+            yOffset >= YSize ||
+            z       < _zLay[xOffset, yOffset]
+        ) {
+            return;
         }
+
+        ClearCluster(xOffset, yOffset);
+
+        var cell = new NKCell(c, NKCellFlags.SINGLE);
+        _data[xOffset, yOffset] = cell with { Style = _data[xOffset, yOffset].Style.With(cell.Style) };
+        _zLay[xOffset, yOffset] = z;
     }
 
-    public void Place(char[,] chars, Point2D offset = default, int zIndex = 0) {
-        var sx = chars.GetLen0() + offset.X;
-        var sy = chars.GetLen1() + offset.Y;
-        
-        if (_resize && (sx > _data.XSize || sy > _data.YSize))
-            _data.Expand(Math.Max(sx, _data.XSize), Math.Max(sy, _data.YSize), CellInfo.GetDefault);
-        
-        for (int x = offset.X; x < Math.Min(chars.Len0 + offset.X, _data.XSize); x++) {
-            for (int y = offset.Y; y < Math.Min(chars.Len1 + offset.Y, _data.YSize); y++) {
-                var cellInfo = _data[x, y];
-                
-                if (cellInfo.ZIndex <= zIndex) {
-                    cellInfo.Char = chars[x - offset.X, y - offset.Y];
-                    cellInfo.ZIndex = zIndex;
-                }
-            }
-        }
-    }
-
-    public void Place(string str, Point2D offset = default, int zIndex = 0) {
-        if (offset.Y != ..^Height)
+    public void Draw(AnsiString str, int xOffset, int yOffset, int z) {
+        if (AnsiString.IsNullOrEmpty(str) || yOffset >= YSize)
             return;
 
-        int xi = 0;
-        
-        for (int x = Math.Clamp(offset.X, 0, Width); x < Math.Clamp(offset.X + str.Length, 0, Width); x++) {
-            if (_data[x, offset.Y].ZIndex <= zIndex) {
-                _data[x, offset.Y].Char = str[xi];
-                _data[x, offset.Y].ZIndex = zIndex;
-            }
+        var lines = str.Split('\n');
 
-            xi++;
+        if (yOffset + lines.Length < 0)
+            return;
+
+        for (int y = yOffset.BottomClamp(0); y < (yOffset + lines.Length).TopClamp(YSize); y++) {
+            var line = lines[y - yOffset];
+
+            if (xOffset > 0 && xOffset < XSize)
+                ClearClusterLeft(xOffset, y);
+
+            if (xOffset + line.Length >= 0 && xOffset + line.Length < XSize)
+                ClearClusterRight(xOffset + line.Length, y);
+
+            var cells = NKCell.FromString(line);
+
+            for (int x = xOffset.BottomClamp(0); x < (xOffset + cells.Length).TopClamp(XSize); x++) {
+                if (_zLay[x, y] > z)
+                    continue;
+
+                var cell = cells[x - xOffset];
+                _data[x, y] = cell with { Style = _data[x, y].Style.With(cell.Style) };
+                _zLay[x, y] = z;
+            }
         }
     }
 
-    public void Place(AnsiString str, Point2D offset = default, int zIndex = 0) {
-        if (offset.Y != ..^Height)
+    public void Draw(
+        SKImage           image,
+        int               xOffset,
+        int               yOffset,
+        int               xSize,
+        int               ySize,
+        int               zLayer,
+        SKSamplingOptions samplingOptions = default
+    ) {
+        _images.Add(
+            new NKImageData {
+                Image           = image,
+                SamplingOptions = samplingOptions,
+                ZLayer          = zLayer,
+                Position        = new Point2D(xOffset, yOffset),
+                Size            = new Size2D(xSize, ySize),
+            }
+        );
+
+        for (int x = xOffset.BottomClamp(0); x < (xOffset + xSize).TopClamp(XSize); x++)
+        for (int y = yOffset.BottomClamp(0); y < (yOffset + ySize).TopClamp(YSize); y++) {
+            if (_zLay[x, y] > zLayer)
+                continue;
+
+            _zLay[x, y] = zLayer;
+        }
+    }
+
+    public void DrawVerticalLine(AnsiChar c, int x, int y, int length, int z) {
+        if (x < 0 || x >= XSize || y < 0 || y >= YSize)
             return;
 
-        int xi = 0;
-        var chars = str.ToArray();
-        
-        for (int x = Math.Clamp(offset.X, 0, Width); x < Math.Clamp(offset.X + str.Length, 0, Width); x++) {
-            var cellInfo = _data[x, offset.Y];
-            if (cellInfo.ZIndex <= zIndex) {
-                cellInfo.Char  = chars[xi].Char;
-                cellInfo.Style = cellInfo.Style.OverrideWith(chars[xi].Style);
-                cellInfo.ZIndex = zIndex;
-            }
+        for (int yi = y.BottomClamp(0); yi < (y + length).TopClamp(YSize); yi++) {
+            if (_zLay[x, yi] > z)
+                continue;
 
-            xi++;
+            var cell = new NKCell(c, NKCellFlags.SINGLE);
+            _data[x, yi] = cell with { Style = _data[x, yi].Style.With(cell.Style) };
+            _zLay[x, yi] = z;
+        }
+    }
+
+    public void DrawHorizontalLine(AnsiChar c, int x, int y, int length, int z) {
+        if (y < 0 || y >= YSize || x >= XSize || x + length < 0)
+            return;
+
+        if (x >= 0)
+            ClearClusterLeft(x, y);
+
+        if (x + length < XSize)
+            ClearClusterRight(x + length, y);
+
+        for (int xi = x.BottomClamp(0); xi < (x + length).TopClamp(XSize); xi++) {
+            if (_zLay[xi, y] > z)
+                continue;
+
+            var cell = new NKCell(c, NKCellFlags.SINGLE);
+            _data[xi, y] = cell with { Style = _data[xi, y].Style.With(cell.Style) };
+            _zLay[xi, y] = z;
+        }
+    }
+
+    public void DrawRect(AnsiChar c, int x, int y, int width, int height, int z) {
+        for (int yi = y.BottomClamp(0); yi < (y + height).TopClamp(YSize); yi++) {
+            DrawHorizontalLine(c, x, yi, width, z);
+        }
+    }
+
+    public void DrawBorder(NKBorderOld border, int x, int y, int width, int height, int z) {
+        throw new NotImplementedException();
+    }
+    
+    #endregion
+
+    #region Helper Methods
+
+    private void ClearCluster(int x, int y) {
+        if (!_data[x, y].Flags.GetIsCluster())
+            return;
+
+        for (int xi = x; xi >= 0; xi--) {
+            _data[xi, y] = NKCell.Default with { Style = _data[xi, y].Style };
+
+            if (_data[xi, y].Flags.GetIsClusterStart() ||
+                (xi - 1 >= 0 && !_data[xi - 1, y].Flags.GetIsCluster())
+            ) {
+                break;
+            }
+        }
+
+        if (x + 1 < XSize && !_data[x + 1, y].Flags.GetIsClusterContinuation())
+            return;
+
+        for (int xi = x + 1; xi < XSize; xi++) {
+            _data[xi, y] = NKCell.Default with { Style = _data[xi, y].Style };
+
+            if (xi + 1 <= XSize                        ||
+                !_data[xi + 1, y].Flags.GetIsCluster() ||
+                _data[xi + 1, y].Flags.GetIsClusterStart()
+            ) {
+                break;
+            }
         }
     }
     
-    public void Place(AnsiChar c, Point2D offset = default, int zIndex = 0) {
-        if (offset.X != ..^Width || offset.Y != ..^Height) 
+    private void ClearClusterLeft(int x, int y) {
+        if (!_data[x, y].Flags.GetIsCluster()) {
             return;
-        
-        var cellInfo = _data[offset.X, offset.Y];
+        }
 
-        if (cellInfo.ZIndex > zIndex)
-            return;
-        
-        cellInfo.Char  = c.Char;
-        cellInfo.Style = cellInfo.Style.OverrideWith(c.Style);
-        cellInfo.ZIndex = zIndex;
-    }
+        for (int xi = x; xi >= 0; xi--) {
+            _data[xi, y] = NKCell.Default with { Style = _data[xi, y].Style };
 
-    public void Restyle(NKStyle[,] styles, Point2D offset = default, int zIndex = 0) {
-        for (int x = offset.X; x < Math.Min(styles.Len0 + offset.X, _data.XSize); x++) {
-            for (int y = offset.Y; y < Math.Min(styles.Len1 + offset.Y, _data.YSize); y++) {
-                var cellInfo = _data[x, y];
-                
-                if (cellInfo.ZIndex <= zIndex) {
-                    cellInfo.Style = styles[x - offset.X, y - offset.Y];
-                    cellInfo.ZIndex = zIndex;
-                }
+            if (_data[xi, y].Flags.GetIsClusterStart() ||
+                (xi - 1 >= 0 && !_data[xi - 1, y].Flags.GetIsCluster())
+            ) {
+                break;
             }
         }
     }
-    
-    public void PlaceSixel(SKBitmap image, Point2D offset, Size2D size, Size2D charSize, int zIndex = 0) {
-        _images.Add(new SixelImageInfo(image, size, charSize, offset, zIndex));
 
-        // calculate visible region
-        var startX = Math.Max(0, offset.X);
-        var startY = Math.Max(0, offset.Y);
-        var endX   = Math.Min(_data.XSize, offset.X + charSize.X);
-        var endY   = Math.Min(_data.YSize, offset.Y + charSize.Y);
+    private void ClearClusterRight(int x, int y) {
+        if (!_data[x, y].Flags.GetIsCluster()) {
+            return;
+        }
 
-        var width  = endX - startX;
-        var height = endY - startY;
+        for (int xi = x; xi < XSize; xi++) {
+            _data[xi, y] = NKCell.Default with { Style = _data[xi, y].Style };
 
-        if (width > 0 && height > 0)
-            _data.Fill(() => CellInfo.GetNull(zIndex), new Point2D(startX, startY), new Size2D(width, height));
+            if (xi + 1 <= XSize                        ||
+                !_data[xi + 1, y].Flags.GetIsCluster() ||
+                _data[xi + 1, y].Flags.GetIsClusterStart()
+            ) {
+                break;
+            }
+        }
     }
 
-    public ISixelImageInfo[] GetSixels() {
-        return _images.Select(i => (ISixelImageInfo)i).ToArray();
+    #endregion
+
+    public void Resize(Size2D size) {
+        _data.Resize(size.X, size.Y);
+        _zLay.Resize(size.X, size.Y);
     }
 
-    public void Resize(int width, int height) {
-        _data.Resize(width, height, CellInfo.GetDefault);
+    public void ResetZ() {
+        _zLay.Fill(int.MinValue);
     }
 
     public void Clean() {
-        for (int x = 0; x < Width; x++) {
-            for (int y = 0; y < Height; y++) {
-                var cell = _data[x, y];
-                if (cell != null) {
-                    cell.Char = ' ';
-                    cell.Style = NKStyle.Default;
-                    cell.ZIndex = int.MinValue;
-                }
-            }
-        }
+        _data.Fill(NKCell.Default);
+        _zLay.Fill(int.MinValue);
     }
-    
-    public void Clear() {
+
+    public void Dispose() {
+        if (_data is null)
+            return;
+
         _data.Clear();
-    }
-    
-    public CellInfo[,] GetCellsArray() {
-        return _data.ToArray();
+        ListPool2D<NKCell>.Return(_data);
+        _data = null!;
+
+        _zLay.Clear();
+        ListPool2D<int>.Return(_zLay);
+        _zLay = null!;
+
+        GC.SuppressFinalize(this);
     }
 }

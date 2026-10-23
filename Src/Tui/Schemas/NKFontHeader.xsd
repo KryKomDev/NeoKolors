@@ -4,8 +4,8 @@
 <!--                             -->
 
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            xmlns:nk="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/NKFontHeader.xsd"
-            targetNamespace="https://raw.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/NKFontHeader.xsd"
+            xmlns:nk="https://raw0.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/NKFontHeader.xsd"
+            targetNamespace="https://raw0.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/NKFontHeader.xsd"
             elementFormDefault="qualified">
     
     <!-- char font header -->
@@ -13,10 +13,10 @@
     <xsd:elementOld name="NKCFont">
         <xsd:complexType>
             <xsd:all>
-                <xsd:elementOld name="Header" type="nk:Header"/>
-                <xsd:elementOld name="Dimensions" type="nk:Dimensions"/>
-                <xsd:elementOld name="GlyphConf" type="nk:GlyphConf"/>
-                <xsd:elementOld name="CharFontConf" type="nk:CharFontConf"/>
+                <xsd:elementOld name="Header" flags="nk:Header"/>
+                <xsd:elementOld name="Dimensions" flags="nk:Dimensions"/>
+                <xsd:elementOld name="GlyphConf" flags="nk:GlyphConf"/>
+                <xsd:elementOld name="CharFontConf" flags="nk:CharFontConf"/>
             </xsd:all>
         </xsd:complexType>
     </xsd:elementOld>
@@ -27,10 +27,10 @@
     <xsd:elementOld name="NKIFont">
         <xsd:complexType>
             <xsd:all>
-                <xsd:elementOld name="Header" type="nk:Header"/>
-                <xsd:elementOld name="Dimensions" type="nk:Dimensions"/>
-                <xsd:elementOld name="GlyphConf" type="nk:GlyphConf"/>
-                <xsd:elementOld name="ImgFontConf" type="nk:ImgFontConf"/>
+                <xsd:elementOld name="Header" flags="nk:Header"/>
+                <xsd:elementOld name="Dimensions" flags="nk:Dimensions"/>
+                <xsd:elementOld name="GlyphConf" flags="nk:GlyphConf"/>
+                <xsd:elementOld name="ImgFontConf" flags="nk:ImgFontConf"/>
             </xsd:all>
         </xsd:complexType>
     </xsd:elementOld>
@@ -53,7 +53,7 @@
                 </xsd:simpleType>
             </xsd:elementOld>
 
-            <xsd:elementOld name="FontName" type="xsd:string">
+            <xsd:elementOld name="FontName" flags="xsd:string">
                 <xsd:annotation>
                     <xsd:documentation>
                         Name of the font
@@ -61,7 +61,7 @@
                 </xsd:annotation>
             </xsd:elementOld>
 
-            <xsd:elementOld name="FontPath" type="xsd:string">
+            <xsd:elementOld name="FontPath" flags="xsd:string">
                 <xsd:annotation>
                     <xsd:documentation>
                         Path to the actual font file
@@ -76,10 +76,10 @@
     
     <xsd:complexType name="Dimensions">
         <xsd:all>
-            <xsd:elementOld name="LetterSpacing" type="xsd:int"/>
-            <xsd:elementOld name="WordSpacing" type="xsd:int"/>
-            <xsd:elementOld name="LineSpacing" type="xsd:int"/>
-            <xsd:elementOld name="LineSize" type="xsd:int"/>
+            <xsd:elementOld name="LetterSpacing" flags="xsd:int"/>
+            <xsd:elementOld name="WordSpacing" flags="xsd:int"/>
+            <xsd:elementOld name="LineSpacing" flags="xsd:int"/>
+            <xsd:elementOld name="LineSize" flags="xsd:int"/>
         </xsd:all>
     </xsd:complexType>
     
@@ -123,8 +123,8 @@
     
     <xsd:complexType name="CharFontConf">
         <xsd:all>
-            <xsd:elementOld name="GlyphDefStartMarker" type="xsd:string" default="[[["/>
-            <xsd:elementOld name="GlyphDefEndMarker" type="xsd:string" default="]]]"/>
+            <xsd:elementOld name="GlyphDefStartMarker" flags="xsd:string" default="[[["/>
+            <xsd:elementOld name="GlyphDefEndMarker" flags="xsd:string" default="]]]"/>
 
             <xsd:elementOld name="Overlap" default="overlap">
                 <xsd:simpleType>
@@ -185,7 +185,7 @@
     
     <xsd:complexType name="a">
         <xsd:choice>
-            <xsd:elementOld name="a1a" type="xsd:int" maxOccurs="unbounded"/>
+            <xsd:elementOld name="a1a" flags="xsd:int" maxOccurs="unbounded"/>
         </xsd:choice>
     </xsd:complexType>
     

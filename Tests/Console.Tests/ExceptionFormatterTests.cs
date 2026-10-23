@@ -230,7 +230,7 @@ public class ExceptionFormatterTests {
 
         var config = new ExceptionFormat {
             ShowHighlight = false,
-            PathTransformer = p => "[TRANSFORMED]/" + System.IO.Path.GetFileName(p)
+            PathTransformer = p => "[TRANSFORMED]/" + Path.GetFileName(p)
         };
 
         // Act

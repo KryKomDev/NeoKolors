@@ -1,7 +1,6 @@
 // NeoKolors
 // Copyright (c) 2026 KryKom
 
-using System.Text;
 using static NeoKolors.Common.NKTextStyles;
 
 namespace NeoKolors.Common.Tests;

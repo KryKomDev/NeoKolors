@@ -1,10 +1,9 @@
 using System.Text;
 using System.Xml.Serialization;
 using NeoKolors.Tui.Fonts;
-using NeoKolors.Tui.Fonts.Serialization;
-using NeoKolors.Tui.Fonts.Serialization.Xml.V3;
+using NeoKolors.Tui.Fonts.Xml.V3;
 
-namespace NeoKolors.Tui.Tests;
+namespace NeoKolors.Tui.Tests.Fonts;
 
 public class NKFontFigletSerializerTests {
 
@@ -82,16 +81,16 @@ public class NKFontFigletSerializerTests {
         Assert.Equal('M', glyphOmega.Glyph[0, 1].Character);
 
         // 5. Test rendering
-        var canvas = new NKCharCanvas(10, 5);
-        font.PlaceString("A$", canvas); // Render 'A' and '$' (space)
+        using var canvas = new NKCharCanvas(10, 5);
+        font.DrawString("A$", canvas); // Render 'A' and '$' (space)
         
         // A is at x=0. Glyph A has 'A' on both lines.
-        Assert.Equal('A', canvas[0, 0].Char);
-        Assert.Equal('A', canvas[0, 1].Char);
+        Assert.Equal('A', canvas.Data[0, 0].Char);
+        Assert.Equal('A', canvas.Data[0, 1].Char);
         
         // '$' is space, so canvas at x=1 should remain empty/transparent (which defaults to ' ')
-        Assert.Equal(' ', canvas[1, 0].Char);
-        Assert.Equal(' ', canvas[1, 1].Char);
+        Assert.Equal(' ', canvas.Data[1, 0].Char);
+        Assert.Equal(' ', canvas.Data[1, 1].Char);
     }
 
     [Fact]
@@ -108,7 +107,7 @@ public class NKFontFigletSerializerTests {
         string xml = @"<FontConfig>
             <Name>TestFont</Name>
             <Author>Test Author</Author>
-            <LicenseType>MIT</LicenseType>
+            <LicenseType>MPL-2.0</LicenseType>
             <LicenseFile>LICENSE.txt</LicenseFile>
             <Ligatures>true</Ligatures>
             <LetterSpacing>2</LetterSpacing>
@@ -127,7 +126,7 @@ public class NKFontFigletSerializerTests {
         Assert.NotNull(config);
         Assert.Equal("TestFont", config.Name);
         Assert.Equal("Test Author", config.Author);
-        Assert.Equal("MIT", config.LicenseType);
+        Assert.Equal("MPL-2.0", config.LicenseType);
         Assert.Equal("LICENSE.txt", config.LicenseFile);
     }
 

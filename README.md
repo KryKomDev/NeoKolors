@@ -16,31 +16,11 @@ classes, and a modern, web-inspired Text User Interface (TUI) framework.
 
 ---
 
-## Build status
+## Status
 
-### Projects
-
-| Project name     | Build status  | Test status |
-|:-----------------|:--------------|:------------|
-| Common           | [![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Common.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) | [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Common.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) |
-| Console          | [![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Console.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) | [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Console.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) |
-| Extensions       | [![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Extensions.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) | [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Extensions.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) |
-| Tui              | [![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Tui.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) | [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Tui.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) |
-| Tui.Core         | [![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Tui.Core.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) | [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Tui.Core.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) |
-| Tui.Fonts        | [![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Tui.Fonts.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) | [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Tui.Fonts.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) |
-| Tui.Fonts.Assets | [![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Tui.Fonts.Assets.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) | [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Tui.Fonts.Assets.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) |
-| Tui.Generators   | [![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Tui.Generators.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) | [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Tui.Generators.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) |
-
-### Tools
-
-| Tool name | Build status                                                                                                                                                                                                                                                                   | Test status                                                                                                                                                                                                                                                                  |
-|:----------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| NKFont    | [![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Tools.NKFont.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml)  | [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Tools.NKFont.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml)  |
-| NKChess   | [![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Tools.NKChess.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) | [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Tools.NKChess.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) |
-
-### Docs
-
-[![Deploy](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/deploy-docs.yml?style=for-the-badge&labelColor=2a313c)](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/deploy-docs.yml?style=for-the-badge&labelColor=2a313c)
+[![Build & Test](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/ci.yml?branch=main&style=for-the-badge&label=Build%20%26%20Test&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/ci.yml)
+[![Documentation](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/docs.yml?branch=main&style=for-the-badge&label=Docs&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/docs.yml)
+[![Release](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/release.yml?style=for-the-badge&label=Release&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/release.yml)
 
 ---
 
@@ -212,3 +192,38 @@ Or, manually reference in a project using `<PackageReference>` in your `.csproj`
 
 > [!NOTE]
 > You do not need to copy all the lines. Select only the packages you want to import.
+
+```mermaid
+flowchart TD
+        subgraph Triggers
+            PR[Pull Request]
+            PushMain[Push to main]
+            PushTag[Push Tag v*.*.*]
+            Manual[workflow_dispatch]
+        end
+
+        subgraph CI["1. CI & Validation (ci.yml)"]
+            TestMatrix["Build & Test Matrix<br/>(Linux + Windows/macOS sanity)"]
+            DocsLint["DocFX Validation (Dry-run)"]
+            TestReport["GitHub Step Summary & Test Report"]
+        end
+
+        subgraph Docs["2. Docs Deployment (docs.yml)"]
+            BuildDocs["DocFX Build (API & Guides)"]
+            DeployPages["Deploy to GitHub Pages"]
+        end
+
+        subgraph ReleaseAndPublish["3. Release & Publish (release.yml)"]
+            PackRelease["Build & Pack NuGet (.nupkg + .snupkg)"]
+            CreateGHRelease["GitHub Release (Auto-Changelog)"]
+            PushNuGet["Publish to NuGet.org (OIDC / API Key)"]
+        end
+
+        PR --> CI
+        PushMain --> CI
+        PushMain --> Docs
+        PushTag --> ReleaseAndPublish
+        ReleaseAndPublish --> Docs
+        Manual --> CI
+        Manual --> ReleaseAndPublish
+```

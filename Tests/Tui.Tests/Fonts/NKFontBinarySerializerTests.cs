@@ -2,9 +2,8 @@
 // Copyright (c) KryKom 2026
 
 using NeoKolors.Tui.Fonts;
-using NeoKolors.Tui.Fonts.Serialization;
 
-namespace NeoKolors.Tui.Tests;
+namespace NeoKolors.Tui.Tests.Fonts;
 
 public class NKFontBinarySerializerTests {
 
@@ -47,18 +46,18 @@ public class NKFontBinarySerializerTests {
 
         // 6. Visual and Rendering equivalence check
         // Render a complex string containing simple chars, spaces, ligatures, and diacritics
-        var originalCanvas = new NKCharCanvas(80, 20);
-        var deserializedCanvas = new NKCharCanvas(80, 20);
+        using var originalCanvas = new NKCharCanvas(80, 20);
+        using var deserializedCanvas = new NKCharCanvas(80, 20);
 
         var testString = "A B c -> y ů Ů Á Ä Č Ď É Ě Ë Í Ï Ľ Ň Ó Ö Ř Š Ť Ú Ů Ü ý ÿ Ž!";
         
-        originalFont.PlaceString(testString, originalCanvas);
-        deserializedFont.PlaceString(testString, deserializedCanvas);
+        originalFont.DrawString(testString, originalCanvas);
+        deserializedFont.DrawString(testString, deserializedCanvas);
 
         for (int y = 0; y < originalCanvas.Height; y++) {
             for (int x = 0; x < originalCanvas.Width; x++) {
-                var origCell = originalCanvas[x, y];
-                var deserCell = deserializedCanvas[x, y];
+                var origCell = originalCanvas.Data[x, y];
+                var deserCell = deserializedCanvas.Data[x, y];
                 
                 Assert.Equal(origCell.Char, deserCell.Char);
                 Assert.Equal(origCell.Style, deserCell.Style);

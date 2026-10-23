@@ -5,7 +5,7 @@
 
 using System.Xml.Serialization;
 
-namespace NeoKolors.Tui.Fonts.Serialization.Xml.V3;
+namespace NeoKolors.Tui.Fonts.Xml.V3;
 
 public class XmlDefaultFontConfig {
     

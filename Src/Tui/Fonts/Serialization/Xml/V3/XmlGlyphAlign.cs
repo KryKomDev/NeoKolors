@@ -5,9 +5,9 @@
 
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
-using Drct = NeoKolors.Tui.Fonts.Serialization.Xml.V3.XmlGlyphAlignDirection;
+using Drct = NeoKolors.Tui.Fonts.Xml.V3.XmlGlyphAlignDirection;
 
-namespace NeoKolors.Tui.Fonts.Serialization.Xml.V3;
+namespace NeoKolors.Tui.Fonts.Xml.V3;
 
 [StructLayout(LayoutKind.Explicit)]
 public readonly struct XmlGlyphAlign {

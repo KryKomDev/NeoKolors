@@ -5,7 +5,6 @@
 
 using System.Collections;
 using NeoKolors.Common;
-using Polyfills;
 using static NeoKolors.Common.NKConsoleColor;
 
 namespace NeoKolors.Console;
@@ -33,10 +32,15 @@ public static partial class ExceptionFormatter {
 
         Stdio.Write(Format(e0).ToString());
 
-        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+        if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
             WinExceptionSuppressor.Mute();
-        else
+        }
+        else {
             Stdio.SetError(TextWriter.Null);
+        }
+
+        if (args.IsTerminating)
+            Environment.Exit(args.ExceptionObject is Exception e ? e.HResult : 1);
     }
 
     /// <summary>
@@ -188,7 +192,7 @@ public static partial class ExceptionFormatter {
         var mStyle       = format.DimSystemFrames && frame.IsSystemFrame ? dimStyle : format.MethodStyle;
         var mArgsStyle   = format.DimSystemFrames && frame.IsSystemFrame ? dimStyle : format.MethodArgumentsStyle;
 
-        string atPrefix = new string(' ', Math.Max(0, format.StackTraceIndent)) + "at ";
+        string atPrefix = new string(' ', Math.Max(0, format.StackTraceIndent))     + "at ";
         string inPrefix = new string(' ', Math.Max(0, format.StackTraceIndent + 2)) + "in ";
 
         sb.Append(indent);
@@ -196,12 +200,15 @@ public static partial class ExceptionFormatter {
 
         if (!string.IsNullOrEmpty(frame.DeclaringType)) {
             string declaringTypeToDisplay = frame.DeclaringType;
+
             if (!format.ShowMethodNamespace) {
                 int lastDot = declaringTypeToDisplay.LastIndexOf('.');
+
                 if (lastDot != -1) {
                     declaringTypeToDisplay = declaringTypeToDisplay.Substring(lastDot + 1);
                 }
             }
+
             sb.Append(declaringTypeToDisplay + ".", mSourceStyle);
         }
 
@@ -210,7 +217,7 @@ public static partial class ExceptionFormatter {
         FormatParameters(sb, frame.Parameters, format, frame.IsSystemFrame);
 
         if (frame.HasSourceInfo) {
-            bool isCompactSingleLine = !format.ShowMethodNamespace && !format.ShowFilePath;
+            bool isCompactSingleLine = format is { ShowMethodNamespace: false, ShowFilePath: false };
 
             if (isCompactSingleLine) {
                 sb.Append(" in ", dimStyle);
@@ -232,8 +239,8 @@ public static partial class ExceptionFormatter {
             else {
                 displayPath = format.PathFormat switch {
                     PathFormatMode.FILE_NAME_ONLY => Path.GetFileName(displayPath),
-                    PathFormatMode.RELATIVE_PATH => GetRelativePath(displayPath),
-                    _                           => displayPath
+                    PathFormatMode.RELATIVE_PATH  => GetRelativePath(displayPath),
+                    _                             => displayPath
                 };
             }
 
@@ -247,7 +254,7 @@ public static partial class ExceptionFormatter {
                 sb.Append(displayPath, format.FileNameStyle);
             }
 
-            sb.Append(":line ", dimStyle);
+            sb.Append(":line ",                    dimStyle);
             sb.Append(frame.LineNumber.ToString(), format.LineNumberStyle);
 
             if (format.ShowSourceSnippet && File.Exists(frame.FilePath)) {
@@ -259,18 +266,20 @@ public static partial class ExceptionFormatter {
     }
 
     private static void FormatParameters(AnsiStringBuilder sb, string rawParameters, ExceptionFormat format, bool isSystemFrame) {
-        var dimStyle = new NKStyle(DARK_GRAY);
-        NKStyle pPunctStyle = (format.DimSystemFrames && isSystemFrame) ? dimStyle : format.MethodArgumentsStyle;
-        NKStyle pTypeStyle = (format.DimSystemFrames && isSystemFrame) ? dimStyle : format.MethodParamTypeStyle;
-        NKStyle pNameStyle = (format.DimSystemFrames && isSystemFrame) ? dimStyle : format.MethodParamNameStyle;
+        var dimStyle    = new NKStyle(DARK_GRAY);
+        var pPunctStyle = format.DimSystemFrames && isSystemFrame ? dimStyle : format.MethodArgumentsStyle;
+        var pTypeStyle  = format.DimSystemFrames && isSystemFrame ? dimStyle : format.MethodParamTypeStyle;
+        var pNameStyle  = format.DimSystemFrames && isSystemFrame ? dimStyle : format.MethodParamNameStyle;
 
         if (string.IsNullOrEmpty(rawParameters)) {
             return;
         }
 
         string trimmed = rawParameters.Trim();
+
         if (!trimmed.StartsWith("(") || !trimmed.EndsWith(")")) {
             sb.Append(rawParameters, pPunctStyle);
+
             return;
         }
 
@@ -280,19 +289,21 @@ public static partial class ExceptionFormatter {
 
         if (!string.IsNullOrEmpty(content)) {
             string[] paramsList = SplitParameters(content);
+
             for (int i = 0; i < paramsList.Length; i++) {
                 if (i > 0) {
                     sb.Append(", ", pPunctStyle);
                 }
 
                 string paramToken = paramsList[i].Trim();
-                int lastSpace = paramToken.LastIndexOf(' ');
+                int    lastSpace  = paramToken.LastIndexOf(' ');
+
                 if (lastSpace != -1) {
                     string typePart = paramToken.Substring(0, lastSpace);
                     string namePart = paramToken.Substring(lastSpace + 1);
 
                     sb.Append(typePart, pTypeStyle);
-                    sb.Append(" ", pPunctStyle);
+                    sb.Append(" ",      pPunctStyle);
                     sb.Append(namePart, pNameStyle);
                 }
                 else {
@@ -305,22 +316,27 @@ public static partial class ExceptionFormatter {
     }
 
     private static string[] SplitParameters(string content) {
-        var list = new List<string>();
-        int depth = 0;
+        var list      = new List<string>();
+        int depth     = 0;
         int lastStart = 0;
 
         for (int i = 0; i < content.Length; i++) {
             char c = content[i];
-            if (c is '<' or '[' or '(') depth++;
-            else if (c is '>' or ']' or ')') depth--;
-            else if (c == ',' && depth == 0) {
-                list.Add(content.Substring(lastStart, i - lastStart));
-                lastStart = i + 1;
+
+            switch (c) {
+                case '<' or '[' or '(': depth++; break;
+                case '>' or ']' or ')': depth--; break;
+                case ',' when depth == 0: {
+                    list.Add(content.Substring(lastStart, i - lastStart));
+                    lastStart = i + 1;
+
+                    break;
+                }
             }
         }
 
         if (lastStart < content.Length) {
-            list.Add(content.Substring(lastStart));
+            list.Add(content[lastStart..]);
         }
 
         return list.ToArray();
@@ -342,10 +358,12 @@ public static partial class ExceptionFormatter {
 
             string snippetIndent = new string(' ', Math.Max(0, format.StackTraceIndent));
             string headerSpaces  = new string(' ', Math.Max(0, format.StackTraceIndent) + maxLineNumWidth + 1);
+
             string pointerStr = format.SourceSnippetPointer.EndsWith(" ")
                 ? format.SourceSnippetPointer
                 : format.SourceSnippetPointer + " ";
-            string targetSep = " " + pointerStr;
+
+            string targetSep    = " " + pointerStr;
             string nonTargetSep = " │ ";
 
             if (targetSep.Length > nonTargetSep.Length) {
@@ -356,10 +374,10 @@ public static partial class ExceptionFormatter {
             sb.AppendLine();
             sb.AppendLine();
             sb.Append(indent);
-            sb.Append(headerSpaces, dimStyle);
-            sb.Append("┌─ ",             dimStyle);
-            sb.Append(displayFilePath,  format.FileNameStyle);
-            sb.Append(":",               dimStyle);
+            sb.Append(headerSpaces,    dimStyle);
+            sb.Append("┌─ ",           dimStyle);
+            sb.Append(displayFilePath, format.FileNameStyle);
+            sb.Append(":",             dimStyle);
             sb.AppendLine(targetLineNumber.ToString(), format.LineNumberStyle);
 
             for (int i = start; i <= end; i++) {

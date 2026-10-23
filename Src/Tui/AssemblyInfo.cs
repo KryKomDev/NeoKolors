@@ -6,5 +6,4 @@ using HasFlagExtension;
 using static HasFlagExtension.NamingCase;
 
 [assembly: EnumNaming(SCREAMING_SNAKE, PASCAL)]
-[assembly: InternalsVisibleTo("XmlTestApp")]
 [assembly: InternalsVisibleTo("NeoKolors.Tui.Tests")]

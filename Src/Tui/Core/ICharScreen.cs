@@ -1,5 +1,5 @@
 ﻿// NeoKolors
-// Copyright (c) 2026 KryKom
+// Copyright (c) krystof 2026
 
 namespace NeoKolors.Tui.Core;
 

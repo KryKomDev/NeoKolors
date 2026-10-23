@@ -13,14 +13,22 @@
         
         <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
         <NoWarn>$(NoWarn)</NoWarn>
-        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-        <CompilerGeneratedFilesOutputPath>obj\Generated</CompilerGeneratedFilesOutputPath>
+
+        <!-- MinVer Configuration -->
+        <MinVerTagPrefix>v</MinVerTagPrefix>
+        <MinVerMinimumMajorMinor>2026.3</MinVerMinimumMajorMinor>
+        <MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
     </PropertyGroup>
-    
-<!--    <ItemGroup>-->
-<!--        <PackageReference Include="Polyfill" Version="11.4.1">-->
-<!--            <PrivateAssets>all</PrivateAssets>-->
-<!--            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>-->
-<!--        </PackageReference>-->
-<!--    </ItemGroup>-->
+
+    <ItemGroup>
+        <PackageReference Include="MinVer" Version="6.0.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <!-- Prevent test and example projects from being packed into NuGet packages -->
+    <PropertyGroup Condition="$(MSBuildProjectFullPath.Contains('Tests')) Or $(MSBuildProjectFullPath.Contains('Examples'))">
+        <IsPackable>false</IsPackable>
+    </PropertyGroup>
 </Project>

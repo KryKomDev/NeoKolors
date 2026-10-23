@@ -3,7 +3,6 @@
     <PropertyGroup>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>2026.3</Version>
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
         <LangVersion>14</LangVersion>
@@ -25,7 +24,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="HasFlagExtension.Generator" Version="2026.3.2">
+        <PackageReference Include="HasFlagExtension.Generator" Version="2026.4.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>

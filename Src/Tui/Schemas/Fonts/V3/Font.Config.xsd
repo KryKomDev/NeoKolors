@@ -118,7 +118,7 @@
             
             <xsd:element name="AlignPointMarkers" minOccurs="0" default="">
                 <xsd:annotation>
-                    <xsd:documentation>Defines the default align point characters, that will be used if not specified by a component glyph.</xsd:documentation>
+                    <xsd:documentation>Defines the default align point characters that will be used if not specified by a component glyph.</xsd:documentation>
                 </xsd:annotation>
             </xsd:element>
         </xsd:all>

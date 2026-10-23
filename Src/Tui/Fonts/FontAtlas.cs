@@ -1,9 +1,8 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2026 KryKom
 
 using System.Reflection;
 using NeoKolors.Console;
-using NeoKolors.Tui.Fonts.Serialization;
 
 namespace NeoKolors.Tui.Fonts;
 
@@ -28,8 +27,8 @@ public static class FontAtlas {
     private static void AddInternal(string name) => Add(name, NKFontSerializer.ReadInternal(name) ?? IAsciiFont.Default);
 
     public static void Add(string key, IAsciiFont value) {
-        LOGGER.Info($"Adding '{key}'.");
-        FONTS.Add(key, value);
+        if (!TryAdd(key, value))
+            throw new InvalidOperationException($"Could not add '{key}'.");
     }
 
     public static IAsciiFont Get(string key) => FONTS[key];

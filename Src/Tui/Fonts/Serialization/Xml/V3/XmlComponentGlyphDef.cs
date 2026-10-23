@@ -8,7 +8,7 @@ using System.Xml.Serialization;
 using NeoKolors.Common;
 using NeoKolors.Extensions;
 
-namespace NeoKolors.Tui.Fonts.Serialization.Xml.V3;
+namespace NeoKolors.Tui.Fonts.Xml.V3;
 
 public class XmlComponentGlyphDef : XmlGlyphDef {
     
@@ -25,7 +25,7 @@ public class XmlComponentGlyphDef : XmlGlyphDef {
     [XmlIgnore] public XmlGlyphAlignPointReplace? AlignPointReplace { get; set; }
     [XmlIgnore] public char                       Symbol            { get; set; }
     [XmlIgnore] public XmlGlyphMask?              Mask              { get; set; }
-    [XmlIgnore] public TextStyles                 Styles            { get; set; }
+    [XmlIgnore] public NKTextStyles                 Styles            { get; set; }
 
     [XmlAttribute("Symbol")]
     public string SymbolString {
@@ -87,7 +87,7 @@ public class XmlComponentGlyphDef : XmlGlyphDef {
     [DefaultValue("NONE")]
     public string StylesString {
         get => Styles.ToString().ToLowerInvariant();
-        set => Styles = Enum.Parse<TextStyles>(value.ToUpperInvariant().Replace('-', '_'));
+        set => Styles = Enum.Parse<NKTextStyles>(value.ToUpperInvariant().Replace('-', '_'));
     }
 
     public XmlComponentGlyphDef() {

@@ -3,7 +3,6 @@
 
 using System.Reflection;
 using NeoKolors.Console;
-using NeoKolors.Tui.Fonts.Serialization;
 
 #if NK_FONTS_ENABLE_AUTO_REGISTRATION
 using System.Runtime.CompilerServices;

@@ -11,58 +11,57 @@
 
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
-        <Version>2026.2-rc2.1</Version>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageIcon>package-icon.png</PackageIcon>
+        <PackageIcon>Package-Icon.png</PackageIcon>
 
         <DefineConstants>$(DefineConstants);NK_ENABLE_CACHE_ANALYSIS</DefineConstants>
 
-        <DefaultItemExcludes>$(DefaultItemExcludes);Generators\**;Core\**;Fonts\**</DefaultItemExcludes>
+        <DefaultItemExcludes>$(DefaultItemExcludes);Generators\**;Core\**;Fonts\**;Widgets\**;Elements\**;Lifecycle\**</DefaultItemExcludes>
+
+        <!--        <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>-->
+        <!--        <CompilerGeneratedFilesOutputPath>Generated</CompilerGeneratedFilesOutputPath>-->
+
     </PropertyGroup>
-    
+
     <ItemGroup>
-        <ProjectReference Include="..\Console\NeoKolors.Console.csproj" />
-        <ProjectReference Include="..\Common\NeoKolors.Common.csproj" />
-        <ProjectReference Include="..\Extensions\NeoKolors.Extensions.csproj" />
+        <ProjectReference Include="..\Console\NeoKolors.Console.csproj"/>
+        <ProjectReference Include="..\Common\NeoKolors.Common.csproj"/>
+        <ProjectReference Include="..\Extensions\NeoKolors.Extensions.csproj"/>
 
         <!-- internal projects -->
         <ProjectReference Include="./Fonts/NeoKolors.Tui.Fonts.csproj"/>
         <ProjectReference Include="./Fonts/Assets/NeoKolors.Tui.Fonts.Assets.csproj"/>
-        <ProjectReference Include="./Core/NeoKolors.Tui.Core.csproj" />
-        <ProjectReference 
-            Include=".\Generators\NeoKolors.Tui.Generators.csproj" 
-            OutputItemType="Analyzer" 
-            ReferenceOutputAssembly="false" 
-        />
+        <ProjectReference Include="./Core/NeoKolors.Tui.Core.csproj"/>
+        <ProjectReference Include="./Elements/NeoKolors.Tui.Elements.csproj"/>
+        <ProjectReference Include=".\Generators\NeoKolors.Tui.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="HasFlagExtension.Generator" Version="2026.1.0">
+        <PackageReference Include="HasFlagExtension.Generator" Version="2026.4.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Implyzer" Version="2026.3.1" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-        <PackageReference Include="JetBrains.Annotations" Version="2025.2.4" />
-        <PackageReference Include="Metriks" Version="2026.3.0-rc1" />
+        <PackageReference Include="Implyzer" Version="2026.5.4" OutputItemType="Analyzer" ReferenceOutputAssembly="false"/>
+        <PackageReference Include="JetBrains.Annotations" Version="2026.2.0"/>
+        <PackageReference Include="Metriks" Version="2026.4.0" />
         <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Portable.Xaml" Version="0.26.0" />
+        <PackageReference Include="Portable.Xaml" Version="0.26.0"/>
+        <PackageReference Include="Polyfill" Version="11.4.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
-    
+
     <ItemGroup>
         <None Include="README.md" Pack="true" PackagePath="\"/>
         <None Include="../../LICENSE" Pack="true" PackagePath="\"/>
-        <None Include="../../Assets/package-icon.png" Pack="true" PackagePath="\"/>
+        <None Include="../../Assets/Package-Icon.png" Pack="true" PackagePath="\"/>
     </ItemGroup>
-    
-<!--    <ItemGroup>-->
-<!--        <EmbeddedResource Include="./Schemas/Fonts/V2/Font.Config.xsd"/>-->
-<!--        <EmbeddedResource Include="./Schemas/Fonts/V2/Font.Map.xsd"/>-->
-<!--    </ItemGroup>-->
-    
+
 </Project>

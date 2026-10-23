@@ -2,13 +2,12 @@
 // Copyright (c) KryKom 2026
 
 using Microsoft.Build.Framework;
-using NeoKolors.Tui.Fonts.Serialization;
 
 namespace NeoKolors.Tui.Fonts.Build;
 
 /// <summary>
 /// A compiled MSBuild task that deserializes raw XML fonts and compiles them
-/// into pre-validated binary MessagePack (.nkf) font assets.
+/// into pre-validated binary Protobuf (.nkf) font assets.
 /// </summary>
 public class CompileFontsTask : Microsoft.Build.Utilities.Task {
     
@@ -33,25 +32,25 @@ public class CompileFontsTask : Microsoft.Build.Utilities.Task {
             string outputPath = Path.Combine(baseDir, outputFileName);
 
             if (!Directory.Exists(xmlDir)) {
-                Log.LogWarning("[FontTask] Source XML directory not found: " + xmlDir);
+                Log.LogWarning("[CompileFont] Source XML directory not found: " + xmlDir);
 
                 return;
             }
 
-            Log.LogMessage(MessageImportance.High, $"[FontTask] Compiling XML Font directory '{xmlDir}' -> '{outputPath}'...");
+            Log.LogMessage(MessageImportance.High, $"[CompileFont] Compiling XML Font directory '{xmlDir}' -> '{outputPath}'...");
 
             var result = NKFontSerializer.TryDeserializeXml(xmlDir);
 
             foreach (var info in result.Infos) {
-                Log.LogMessage(MessageImportance.Normal, "[FontTask] " + info);
+                Log.LogMessage(MessageImportance.Normal, "[CompileFont] " + info);
             }
 
             foreach (var warning in result.Warnings) {
-                Log.LogWarning("[FontTask] " + warning);
+                Log.LogWarning("[CompileFont] " + warning);
             }
 
             foreach (var error in result.Errors) {
-                Log.LogError("[FontTask] " + error);
+                Log.LogError("[CompileFont] " + error);
             }
 
             if (!result.Success || result.Font == null) {
@@ -59,7 +58,7 @@ public class CompileFontsTask : Microsoft.Build.Utilities.Task {
             }
 
             NKFontSerializer.SerializeBinary(result.Font, outputPath);
-            Log.LogMessage(MessageImportance.High, "[FontTask] Successfully compiled font: " + outputPath);
+            Log.LogMessage(MessageImportance.High, "[CompileFont] Successfully compiled font: " + outputPath);
         }
 
         try {

@@ -4,8 +4,8 @@
 using System.Text;
 using Metriks;
 using NeoKolors.Console;
-using static NeoKolors.Tui.Fonts.Serialization.Xml.V3.XmlGlyphAlignDirection;
-using Drct = NeoKolors.Tui.Fonts.Serialization.Xml.V3.XmlGlyphAlignDirection;
+using static NeoKolors.Tui.Fonts.Xml.V3.XmlGlyphAlignDirection;
+using Drct = NeoKolors.Tui.Fonts.Xml.V3.XmlGlyphAlignDirection;
 
 namespace NeoKolors.Tui.Fonts;
 
@@ -189,7 +189,7 @@ public class NKGlyph : IGlyph {
     /// </summary>
     /// <returns>
     /// A string where each line represents a row of the glyph and each character corresponds to a
-    /// <see cref="GlyphCell"/>, depending on the cell's type.
+    /// <see cref="GlyphCell"/>, depending on the cell's flags.
     /// </returns>
     public string AsString {
         get {

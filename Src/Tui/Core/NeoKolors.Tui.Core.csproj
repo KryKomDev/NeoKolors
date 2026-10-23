@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net10.0;net8.0;net5.0;netstandard2.1</TargetFrameworks>
-        <LangVersion>14</LangVersion>
+        <TargetFrameworks>net11.0;net10.0;net8.0;net5.0;netstandard2.1</TargetFrameworks>
+        <LangVersion>15</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <IncludeSymbols>true</IncludeSymbols>
@@ -10,24 +10,33 @@
 
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
-        <Version>2026.2-rc2.2</Version>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageIcon>package-icon.png</PackageIcon>
+        <PackageIcon>Package-Icon.png</PackageIcon>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>
         <None Include="README.md" Pack="true" PackagePath="\"/>
         <None Include="../../../LICENSE" Pack="true" PackagePath="\"/>
-        <None Include="../../../Assets/package-icon.png" Pack="true" PackagePath="\"/>
+        <None Include="../../../Assets/Package-Icon.png" Pack="true" PackagePath="\"/>
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="../../Extensions/NeoKolors.Extensions.csproj"/>
         <ProjectReference Include="../../Common/NeoKolors.Common.csproj"/>
         <ProjectReference Include="../../Console/NeoKolors.Console.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="HasFlagExtension.Generator" Version="2026.4.0" />
+        <PackageReference Include="System.Text.Encodings.Web" Version="10.0.12"/>
+        <PackageReference Include="Polyfill" Version="11.4.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
 </Project>

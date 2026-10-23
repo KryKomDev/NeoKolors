@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <LangVersion>14</LangVersion>
+        <IsPackable>false</IsPackable>
+        <IsTestProject>true</IsTestProject>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="JetBrains.Annotations" Version="2026.2.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" />
+        <PackageReference Include="xunit" Version="2.9.3" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="4.0.0">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Polyfill" Version="11.4.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Src\Tui\Lifecycle\Core\NeoKolors.Tui.Lifecycle.Core.csproj" />
+        <ProjectReference Include="..\..\Src\Tui\Lifecycle\Apps\NeoKolors.Tui.Lifecycle.Apps.csproj" />
+        <ProjectReference Include="..\..\Src\Tui\Lifecycle\Game2D\NeoKolors.Tui.Lifecycle.Game2D.csproj" />
+        <ProjectReference Include="..\..\Src\Tui\Lifecycle\Game3D\NeoKolors.Tui.Lifecycle.Game3D.csproj" />
+        <ProjectReference Include="..\..\Src\Tui\Core\NeoKolors.Tui.Core.csproj" />
+        <ProjectReference Include="..\..\Src\Tui\Elements\NeoKolors.Tui.Elements.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="Xunit"/>
+    </ItemGroup>
+
+</Project>

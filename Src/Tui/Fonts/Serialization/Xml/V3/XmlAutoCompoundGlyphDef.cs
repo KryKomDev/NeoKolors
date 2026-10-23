@@ -8,14 +8,14 @@ using System.Xml.Serialization;
 using NeoKolors.Common;
 using NeoKolors.Extensions;
 
-namespace NeoKolors.Tui.Fonts.Serialization.Xml.V3;
+namespace NeoKolors.Tui.Fonts.Xml.V3;
 
 public class XmlAutoCompoundGlyphDef : XmlGlyphDef {
     
     [XmlIgnore] public char                 Symbol      { get; set; }
     [XmlIgnore] public XmlGlyphAlign?       Align       { get; set; }
     [XmlIgnore] public XmlGlyphAlignPoint[] AlignPoints { get; set; }
-    [XmlIgnore] public TextStyles           Styles      { get; set; }
+    [XmlIgnore] public NKTextStyles           Styles      { get; set; }
     
     [XmlAttribute("Base")]       public string Base       { get; set; }
     [XmlAttribute("IsBaseMain")] public bool   IsBaseMain { get; set; }
@@ -58,7 +58,7 @@ public class XmlAutoCompoundGlyphDef : XmlGlyphDef {
     [DefaultValue("NONE")]
     public string StylesString {
         get => Styles.ToString().ToLowerInvariant();
-        set => Styles = Enum.Parse<TextStyles>(value.ToUpperInvariant().Replace('-', '_'));
+        set => Styles = Enum.Parse<NKTextStyles>(value.ToUpperInvariant().Replace('-', '_'));
     }
     
     public XmlAutoCompoundGlyphDef() {

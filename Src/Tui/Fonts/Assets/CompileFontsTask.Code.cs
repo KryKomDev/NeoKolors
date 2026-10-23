@@ -75,7 +75,7 @@ var assembly = Assembly.Load(assemblyBytes);
 var taskType = assembly.GetType("NeoKolors.Tui.Fonts.Build.CompileFontsTask");
 
 if (taskType == null) {
-    Log.LogError("Could not find compiled CompileFontsTask type in fonts assembly.");
+    Log.LogError("Could not find compiled CompileFontsTask flags in fonts assembly.");
     return false;
 }
 

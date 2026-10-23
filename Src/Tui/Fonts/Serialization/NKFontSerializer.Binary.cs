@@ -1,25 +1,17 @@
 // NeoKolors
 // Copyright (c) KryKom 2026
 
-using MessagePack;
-using MessagePack.Formatters;
-using MessagePack.Resolvers;
 using NeoKolors.Common;
+using ProtoBuf;
 
-namespace NeoKolors.Tui.Fonts.Serialization;
+namespace NeoKolors.Tui.Fonts;
 
 public static partial class NKFontSerializer {
-    private const uint BINARY_MAGIC = 0x4E4B4642; // "NKFB" in ASCII (NeoKolors Font Binary)
-    private const byte BINARY_VERSION = 2; // Version 2 utilizes MessagePack
-
-    private static readonly MessagePackSerializerOptions OPTIONS = MessagePackSerializerOptions.Standard
-        .WithResolver(CompositeResolver.Create(
-            NeoKolorsFormatterResolver.Instance,
-            StandardResolver.Instance
-        ));
+    private const uint BINARY_MAGIC   = 0x4E4B4642; // "NKFB" in ASCII (NeoKolors Font Binary)
+    private const byte BINARY_VERSION = 3;          // Version 3 utilizes Protobuf
 
     /// <summary>
-    /// Serializes an <see cref="NKFont"/> instance into a binary stream using MessagePack.
+    /// Serializes an <see cref="NKFont"/> instance into a binary stream using Protobuf.
     /// </summary>
     public static void SerializeBinary(NKFont font, Stream stream) {
         using var writer = new BinaryWriter(stream, System.Text.Encoding.UTF8, leaveOpen: true);
@@ -27,11 +19,12 @@ public static partial class NKFontSerializer {
         writer.Write(BINARY_VERSION);
         writer.Flush();
 
-        MessagePackSerializer.Serialize(stream, font, OPTIONS);
+        var proto = ToProto(font);
+        Serializer.Serialize(stream, proto);
     }
 
     /// <summary>
-    /// Deserializes an <see cref="NKFont"/> instance from a binary stream using MessagePack.
+    /// Deserializes an <see cref="NKFont"/> instance from a binary stream using Protobuf.
     /// </summary>
     public static NKFont? DeserializeBinary(Stream stream) {
         using var reader = new BinaryReader(stream, System.Text.Encoding.UTF8, leaveOpen: true);
@@ -44,8 +37,11 @@ public static partial class NKFontSerializer {
 
         var version = reader.ReadByte();
 
-        if (version == BINARY_VERSION) 
-            return MessagePackSerializer.Deserialize<NKFont>(stream, OPTIONS);
+        if (version == BINARY_VERSION) {
+            var proto = Serializer.Deserialize<ProtoNKFont>(stream);
+
+            return proto == null ? null : ToDomain(proto);
+        }
 
         LOGGER.Error($"Unsupported binary font version '{version}'. Expected '{BINARY_VERSION}'.");
 
@@ -74,403 +70,293 @@ public static partial class NKFontSerializer {
 
         return DeserializeBinary(stream);
     }
-}
 
-#region Custom MessagePack Formatters
+    #region Protobuf Mapping
 
-public sealed class NeoKolorsFormatterResolver : IFormatterResolver {
-    public static readonly IFormatterResolver Instance = new NeoKolorsFormatterResolver();
-
-    private NeoKolorsFormatterResolver() { }
-
-    public IMessagePackFormatter<T>? GetFormatter<T>() {
-        return FormatterCache<T>.Formatter;
-    }
-
-    private static class FormatterCache<T> {
-        public static readonly IMessagePackFormatter<T>? Formatter;
-
-        static FormatterCache() {
-            Formatter = (IMessagePackFormatter<T>?)GetFormatterHelper(typeof(T));
-        }
-
-        private static object? GetFormatterHelper(Type t) {
-            if (t == typeof(NKStyle)) return new NKStyleFormatter();
-            if (t == typeof(AlignPoint)) return new AlignPointFormatter();
-            if (t == typeof(GlyphCell)) return new GlyphCellFormatter();
-            if (t == typeof(NKGlyph)) return new NKGlyphFormatter();
-            if (t == typeof(NKGlyphSymbol)) return new NKGlyphSymbolFormatter();
-            if (t == typeof(NKFontInfo)) return new NKFontInfoFormatter();
-            if (t == typeof(NKFont)) return new NKFontFormatter();
-
-            return null;
-        }
-    }
-}
-
-public sealed class NKStyleFormatter : IMessagePackFormatter<NKStyle> {
-    public void Serialize(ref MessagePackWriter writer, NKStyle value, MessagePackSerializerOptions options) {
-        writer.WriteUInt64(value.Raw);
-    }
-
-    public NKStyle Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options) {
-        ulong raw = reader.ReadUInt64();
-
-        return System.Runtime.CompilerServices.Unsafe.As<ulong, NKStyle>(ref raw);
-    }
-}
-
-public sealed class AlignPointFormatter : IMessagePackFormatter<AlignPoint> {
-    public void Serialize(ref MessagePackWriter writer, AlignPoint value, MessagePackSerializerOptions options) {
-        writer.WriteArrayHeader(3);
-        writer.Write(value.Character);
-        writer.Write(value.Position.X);
-        writer.Write(value.Position.Y);
-    }
-
-    public AlignPoint Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options) {
-        int count = reader.ReadArrayHeader();
-
-        if (count != 3) throw new MessagePackSerializationException("Invalid AlignPoint array length.");
-
-        char character = reader.ReadChar();
-        int x = reader.ReadInt32();
-        int y = reader.ReadInt32();
-
-        return new AlignPoint(character, new Metriks.Point2D(x, y));
-    }
-}
-
-public sealed class GlyphCellFormatter : IMessagePackFormatter<GlyphCell> {
-    public void Serialize(ref MessagePackWriter writer, GlyphCell value, MessagePackSerializerOptions options) {
-        writer.WriteArrayHeader(2);
-        writer.Write((byte)value.Type);
-
-        if (value.Type == GlyphCellType.CHARACTER) {
-            writer.Write(value.Character);
-        }
-        else {
-            writer.Write('\0');
-        }
-    }
-
-    public GlyphCell Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options) {
-        int count = reader.ReadArrayHeader();
-
-        if (count != 2) throw new MessagePackSerializationException("Invalid GlyphCell array length.");
-
-        var type = (GlyphCellType)reader.ReadByte();
-        char character = reader.ReadChar();
-
-        return type switch {
-            GlyphCellType.FOREGROUND => GlyphCell.Foreground,
-            GlyphCellType.BACKGROUND => GlyphCell.Background,
-            _                        => GlyphCell.Char(character)
+    private static ProtoNKFont ToProto(NKFont font) {
+        var proto = new ProtoNKFont {
+            Info                            = ToProto(font.Info),
+            UnknownSymbolGlyph              = ToProto(font.UnknownSymbolGlyph),
+            StrikethroughGlyph              = ToProto(font.StrikethroughGlyph),
+            RenderStrikethroughAboveLetters = font.RenderStrikethroughAboveLetters,
+            UnderlineGlyph                  = ToProto(font.UnderlineGlyph),
+            RenderUnderlineAboveLetters     = font.RenderUnderlineAboveLetters,
+            Glyphs                          = new List<ProtoGlyphEntry>(font.Glyphs.Count)
         };
-    }
-}
 
-public sealed class NKGlyphFormatter : IMessagePackFormatter<NKGlyph?> {
-    public void Serialize(ref MessagePackWriter writer, NKGlyph? value, MessagePackSerializerOptions options) {
-        if (value == null) {
-            writer.WriteNil();
-
-            return;
+        foreach (var kvp in font.Glyphs) {
+            proto.Glyphs.Add(
+                new ProtoGlyphEntry {
+                    Symbol = ToProto(kvp.Key),
+                    Glyph  = ToProto(kvp.Value)
+                }
+            );
         }
 
-        writer.WriteArrayHeader(5);
-        writer.Write(value.BaselineOffset);
-        writer.Write(value.Width);
-        writer.Write(value.Height);
-
-        // 2D Array of cells
-        writer.WriteArrayHeader(value.Width * value.Height);
-        var cellFormatter = options.Resolver.GetFormatterWithVerify<GlyphCell>();
-
-        for (int x = 0; x < value.Width; x++) {
-            for (int y = 0; y < value.Height; y++) {
-                cellFormatter.Serialize(ref writer, value.Glyph[x, y], options);
-            }
-        }
-
-        // AlignPoints
-        var apFormatter = options.Resolver.GetFormatterWithVerify<AlignPoint>();
-        writer.WriteArrayHeader(value.AlignPoints.Count);
-
-        foreach (var ap in value.AlignPoints) {
-            apFormatter.Serialize(ref writer, ap, options);
-        }
+        return proto;
     }
 
-    public NKGlyph? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options) {
-        if (reader.IsNil) {
-            reader.ReadNil();
+    private static NKFont ToDomain(ProtoNKFont proto) {
+        var info   = proto.Info != null ? ToDomain(proto.Info) : default;
+        var glyphs = new Dictionary<NKGlyphSymbol, NKGlyph>(proto.Glyphs.Count, NKGlyphSymbol.Comparer);
 
-            return null;
-        }
-
-        int count = reader.ReadArrayHeader();
-
-        if (count != 5) throw new MessagePackSerializationException("Invalid NKGlyph array length.");
-
-        int baselineOffset = reader.ReadInt32();
-        int width = reader.ReadInt32();
-        int height = reader.ReadInt32();
-
-        var grid = new GlyphCell[width, height];
-        int cellCount = reader.ReadArrayHeader();
-
-        if (cellCount != width * height) throw new MessagePackSerializationException("Invalid cell grid size.");
-
-        var cellFormatter = options.Resolver.GetFormatterWithVerify<GlyphCell>();
-
-        for (int x = 0; x < width; x++) {
-            for (int y = 0; y < height; y++) {
-                grid[x, y] = cellFormatter.Deserialize(ref reader, options);
-            }
-        }
-
-        int apCount = reader.ReadArrayHeader();
-        var alignPoints = new AlignPoint[apCount];
-        var apFormatter = options.Resolver.GetFormatterWithVerify<AlignPoint>();
-
-        for (int i = 0; i < apCount; i++) {
-            alignPoints[i] = apFormatter.Deserialize(ref reader, options);
-        }
-
-        return new NKGlyph(grid, baselineOffset, alignPoints);
-    }
-}
-
-public sealed class NKGlyphSymbolFormatter : IMessagePackFormatter<NKGlyphSymbol> {
-    public void Serialize(ref MessagePackWriter writer, NKGlyphSymbol value, MessagePackSerializerOptions options) {
-        writer.WriteArrayHeader(4);
-        writer.Write(value.Type);
-
-        var styleFormatter = options.Resolver.GetFormatterWithVerify<NKStyle>();
-        styleFormatter.Serialize(ref writer, value.Styles, options);
-
-        if (value.IsSimple) {
-            writer.Write(value.SimpleSymbol);
-            writer.WriteNil();
-        }
-        else {
-            writer.Write('\0');
-            writer.Write(value.LigatureSymbol);
-        }
-    }
-
-    public NKGlyphSymbol Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options) {
-        int count = reader.ReadArrayHeader();
-
-        if (count != 4) throw new MessagePackSerializationException("Invalid NKGlyphSymbol array length.");
-
-        byte type = reader.ReadByte();
-        var styleFormatter = options.Resolver.GetFormatterWithVerify<NKStyle>();
-        var styles = styleFormatter.Deserialize(ref reader, options);
-
-        char simpleChar = reader.ReadChar();
-        string? ligatureStr = reader.ReadString();
-
-        return type switch {
-            1 => NKGlyphSymbol.Simple(simpleChar, styles),
-            2 => NKGlyphSymbol.Ligature(ligatureStr ?? string.Empty, styles),
-            _ => throw new MessagePackSerializationException($"Unknown glyph symbol type '{type}'.")
-        };
-    }
-}
-
-public sealed class NKFontInfoFormatter : IMessagePackFormatter<NKFontInfo> {
-    public void Serialize(ref MessagePackWriter writer, NKFontInfo value, MessagePackSerializerOptions options) {
-        writer.WriteArrayHeader(13);
-        writer.Write(value.Name);
-        writer.Write(value.Ligatures);
-        writer.Write(value.Leading);
-        writer.Write(value.LetterSpacing);
-        writer.Write(value.WordSpacing);
-
-        writer.Write((byte)value.FontPropoInfo.Type);
-
-        if (value.FontPropoInfo.Info.IsT1) {
-            var mono = value.FontPropoInfo.AsMono;
-            writer.Write(mono.GlyphWidth);
-            writer.Write(mono.GlyphHeight);
-            writer.Write(mono.AlignToGrid);
-        }
-        else {
-            var variable = value.FontPropoInfo.AsVar;
-            writer.Write(variable.Kerning);
-            writer.Write(0);
-            writer.Write(false);
-        }
-
-        writer.Write(value.Author);
-        writer.Write(value.LicenseType);
-        writer.Write(value.LicenseFile);
-        writer.Write(value.LicenseContent);
-    }
-
-    public NKFontInfo Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options) {
-        int count = reader.ReadArrayHeader();
-
-        if (count != 9 && count != 11 && count != 13) throw new MessagePackSerializationException("Invalid NKFontInfo array length.");
-
-        string name = reader.ReadString() ?? string.Empty;
-        bool ligatures = reader.ReadBoolean();
-        int leading = reader.ReadInt32();
-        int letterSpacing = reader.ReadInt32();
-        int wordSpacing = reader.ReadInt32();
-
-        var propoType = (FontProportionsInfo.ProportionType)reader.ReadByte();
-
-        bool isMono = !propoType.HasFlag(FontProportionsInfo.ProportionType.VARIABLE);
-        NKFontMonospacedConfig mono = default;
-        NKFontVariableConfig variable = default;
-
-        if (isMono) {
-            int glyphWidth = reader.ReadInt32();
-            int glyphHeight = reader.ReadInt32();
-            bool alignToGrid = reader.ReadBoolean();
-            mono = new NKFontMonospacedConfig(glyphWidth, glyphHeight, alignToGrid);
-        }
-        else {
-            bool kerning = reader.ReadBoolean();
-            reader.ReadInt32(); // skip
-            reader.ReadBoolean(); // skip
-            variable = new NKFontVariableConfig(kerning);
-        }
-
-        string? author = null;
-        string? licenseType = null;
-        string? licenseFile = null;
-        string? licenseContent = null;
-        if (count >= 11) {
-            author = reader.ReadString();
-            licenseType = reader.ReadString();
-        }
-        if (count >= 13) {
-            licenseFile = reader.ReadString();
-            licenseContent = reader.ReadString();
-        }
-
-        return isMono
-            ? new NKFontInfo(name, ligatures, leading, letterSpacing, wordSpacing, mono, author, licenseType, licenseFile, licenseContent)
-            : new NKFontInfo(name, ligatures, leading, letterSpacing, wordSpacing, variable, author, licenseType, licenseFile, licenseContent);
-    }
-}
-
-public sealed class NKFontFormatter : IMessagePackFormatter<NKFont?> {
-    public void Serialize(ref MessagePackWriter writer, NKFont? value, MessagePackSerializerOptions options) {
-        if (value == null) {
-            writer.WriteNil();
-
-            return;
-        }
-
-        writer.WriteArrayHeader(7);
-
-        var infoFormatter = options.Resolver.GetFormatterWithVerify<NKFontInfo>();
-        infoFormatter.Serialize(ref writer, value.Info, options);
-
-        // Glyphs Dictionary
-        var symbolFormatter = options.Resolver.GetFormatterWithVerify<NKGlyphSymbol>();
-        var glyphFormatter = options.Resolver.GetFormatterWithVerify<NKGlyph?>();
-
-        writer.WriteMapHeader(value.Glyphs.Count);
-
-        foreach (var kvp in value.Glyphs) {
-            symbolFormatter.Serialize(ref writer, kvp.Key, options);
-            glyphFormatter.Serialize(ref writer, kvp.Value, options);
-        }
-
-        // Fallback Glyphs
-        glyphFormatter.Serialize(ref writer, value.UnknownSymbolGlyph, options);
-
-        if (value.StrikethroughGlyph != null) {
-            glyphFormatter.Serialize(ref writer, value.StrikethroughGlyph, options);
-            writer.Write(value.RenderStrikethroughAboveLetters);
-        }
-        else {
-            writer.WriteNil();
-            writer.Write(true);
-        }
-
-        if (value.UnderlineGlyph != null) {
-            glyphFormatter.Serialize(ref writer, value.UnderlineGlyph, options);
-            writer.Write(value.RenderUnderlineAboveLetters);
-        }
-        else {
-            writer.WriteNil();
-            writer.Write(true);
-        }
-    }
-
-    public NKFont? Deserialize(ref MessagePackReader reader, MessagePackSerializerOptions options) {
-        if (reader.IsNil) {
-            reader.ReadNil();
-
-            return null;
-        }
-
-        int count = reader.ReadArrayHeader();
-
-        if (count < 7) throw new MessagePackSerializationException("Invalid NKFont array length.");
-
-        var infoFormatter = options.Resolver.GetFormatterWithVerify<NKFontInfo>();
-        var info = infoFormatter.Deserialize(ref reader, options);
-
-        var symbolFormatter = options.Resolver.GetFormatterWithVerify<NKGlyphSymbol>();
-        var glyphFormatter = options.Resolver.GetFormatterWithVerify<NKGlyph?>();
-
-        int glyphsCount = reader.ReadMapHeader();
-        var glyphs = new Dictionary<NKGlyphSymbol, NKGlyph>(glyphsCount);
-
-        for (int i = 0; i < glyphsCount; i++) {
-            var symbol = symbolFormatter.Deserialize(ref reader, options);
-            var glyph = glyphFormatter.Deserialize(ref reader, options);
+        foreach (var entry in proto.Glyphs) {
+            var symbol = ToDomain(entry.Symbol);
+            var glyph  = ToDomain(entry.Glyph);
 
             if (glyph != null) {
                 glyphs[symbol] = glyph;
             }
         }
 
-        // Fallback Glyphs
-        NKGlyph? unknownSymbolGlyph = glyphFormatter.Deserialize(ref reader, options);
-
-        NKGlyph? strikethroughGlyph = null;
-        bool renderStrikethroughAboveLetters = true;
-
-        if (!reader.IsNil) {
-            strikethroughGlyph = glyphFormatter.Deserialize(ref reader, options);
-            renderStrikethroughAboveLetters = reader.ReadBoolean();
-        }
-        else {
-            reader.ReadNil();
-            reader.ReadBoolean();
-        }
-
-        NKGlyph? underlineGlyph = null;
-        bool renderUnderlineAboveLetters = true;
-
-        if (!reader.IsNil) {
-            underlineGlyph = glyphFormatter.Deserialize(ref reader, options);
-            renderUnderlineAboveLetters = reader.ReadBoolean();
-        }
-        else {
-            reader.ReadNil();
-            reader.ReadBoolean();
-        }
+        var unknownGlyph       = ToDomain(proto.UnknownSymbolGlyph);
+        var strikethroughGlyph = ToDomain(proto.StrikethroughGlyph);
+        var underlineGlyph     = ToDomain(proto.UnderlineGlyph);
 
         return new NKFont(
             info,
             glyphs,
-            unknownSymbolGlyph,
+            unknownGlyph,
             strikethroughGlyph,
-            renderStrikethroughAboveLetters,
+            proto.RenderStrikethroughAboveLetters,
             underlineGlyph,
-            renderUnderlineAboveLetters
+            proto.RenderUnderlineAboveLetters
         );
     }
+
+    private static ProtoNKFontInfo ToProto(NKFontInfo info) {
+        var proto = new ProtoNKFontInfo {
+            Name           = info.Name ?? string.Empty,
+            Ligatures      = info.Ligatures,
+            Leading        = info.Leading,
+            LetterSpacing  = info.LetterSpacing,
+            WordSpacing    = info.WordSpacing,
+            ProportionType = (int)info.ProportionType,
+            Author         = info.Author,
+            LicenseType    = info.LicenseType,
+            LicenseFile    = info.LicenseFile,
+            LicenseContent = info.LicenseContent
+        };
+
+        if (info.FontPropoInfo.Info.IsT1) {
+            var mono = info.FontPropoInfo.AsMono;
+            proto.MonoGlyphWidth  = mono.GlyphWidth;
+            proto.MonoGlyphHeight = mono.GlyphHeight;
+            proto.MonoAlignToGrid = mono.AlignToGrid;
+        }
+        else {
+            var variable = info.FontPropoInfo.AsVar;
+            proto.VarKerning = variable.Kerning;
+        }
+
+        return proto;
+    }
+
+    private static NKFontInfo ToDomain(ProtoNKFontInfo proto) {
+        var  propoType = (FontProportionsInfo.ProportionType)proto.ProportionType;
+        bool isMono    = !propoType.HasFlag(FontProportionsInfo.ProportionType.VARIABLE);
+
+        int monoDefaultWordSpacing = proto.MonoGlyphWidth + proto.LetterSpacing + 1;
+        int wordSpacing = isMono && proto.WordSpacing <= proto.LetterSpacing
+            ? monoDefaultWordSpacing
+            : proto.WordSpacing;
+
+        return isMono
+            ? new NKFontInfo(
+                proto.Name,
+                proto.Ligatures,
+                proto.Leading,
+                proto.LetterSpacing,
+                wordSpacing,
+                new NKFontMonospacedConfig(
+                    proto.MonoGlyphWidth,
+                    proto.MonoGlyphHeight,
+                    proto.MonoAlignToGrid
+                ),
+                proto.Author,
+                proto.LicenseType,
+                proto.LicenseFile,
+                proto.LicenseContent
+            )
+            : new NKFontInfo(
+                proto.Name,
+                proto.Ligatures,
+                proto.Leading,
+                proto.LetterSpacing,
+                proto.WordSpacing,
+                new NKFontVariableConfig(proto.VarKerning),
+                proto.Author,
+                proto.LicenseType,
+                proto.LicenseFile,
+                proto.LicenseContent
+            );
+    }
+
+    private static ProtoNKGlyph? ToProto(NKGlyph? glyph) {
+        if (glyph == null)
+            return null;
+
+        var proto = new ProtoNKGlyph {
+            BaselineOffset = glyph.BaselineOffset,
+            Width          = glyph.Width,
+            Height         = glyph.Height,
+            Cells          = new List<ProtoGlyphCell>(glyph.Width * glyph.Height),
+            AlignPoints    = new List<ProtoAlignPoint>(glyph.AlignPoints.Count)
+        };
+
+        for (int x = 0; x < glyph.Width; x++) {
+            for (int y = 0; y < glyph.Height; y++) {
+                var cell = glyph.Glyph[x, y];
+
+                proto.Cells.Add(
+                    new ProtoGlyphCell {
+                        Type      = (int)cell.Type,
+                        Character = cell.Type == GlyphCellType.CHARACTER ? cell.Character : '\0'
+                    }
+                );
+            }
+        }
+
+        foreach (var ap in glyph.AlignPoints) {
+            proto.AlignPoints.Add(
+                new ProtoAlignPoint {
+                    Character = ap.Character,
+                    X         = ap.Position.X,
+                    Y         = ap.Position.Y
+                }
+            );
+        }
+
+        return proto;
+    }
+
+    private static NKGlyph? ToDomain(ProtoNKGlyph? proto) {
+        if (proto == null)
+            return null;
+
+        var grid = new GlyphCell[proto.Width, proto.Height];
+        int idx  = 0;
+
+        for (int x = 0; x < proto.Width; x++) {
+            for (int y = 0; y < proto.Height; y++) {
+                if (idx < proto.Cells.Count) {
+                    var cell = proto.Cells[idx++];
+
+                    grid[x, y] = (GlyphCellType)cell.Type switch {
+                        GlyphCellType.FOREGROUND => GlyphCell.Foreground,
+                        GlyphCellType.BACKGROUND => GlyphCell.Background,
+                        _                        => GlyphCell.Char((char)cell.Character)
+                    };
+                }
+                else {
+                    grid[x, y] = GlyphCell.Background;
+                }
+            }
+        }
+
+        var alignPoints = new AlignPoint[proto.AlignPoints.Count];
+
+        for (int i = 0; i < proto.AlignPoints.Count; i++) {
+            var ap = proto.AlignPoints[i];
+            alignPoints[i] = new AlignPoint((char)ap.Character, new Metriks.Point2D(ap.X, ap.Y));
+        }
+
+        return new NKGlyph(grid, proto.BaselineOffset, alignPoints);
+    }
+
+    private static ProtoNKGlyphSymbol ToProto(NKGlyphSymbol symbol) {
+        return new ProtoNKGlyphSymbol {
+            Type           = symbol.Type,
+            Styles         = symbol.Styles,
+            SimpleSymbol   = symbol.IsSimple ? symbol.SimpleSymbol : '\0',
+            LigatureSymbol = symbol.IsLigature ? symbol.LigatureSymbol : null
+        };
+    }
+
+    private static NKGlyphSymbol ToDomain(ProtoNKGlyphSymbol proto) {
+        return proto.Type switch {
+            1 => NKGlyphSymbol.Simple((char)proto.SimpleSymbol, proto.Styles),
+            2 => NKGlyphSymbol.Ligature(proto.LigatureSymbol ?? string.Empty, proto.Styles),
+            _ => throw new InvalidOperationException($"Unknown glyph symbol type '{proto.Type}'.")
+        };
+    }
+
+    #endregion
+
+}
+
+#region Protobuf Contracts
+
+[ProtoContract]
+internal class ProtoNKFont {
+    [ProtoMember(1)] public ProtoNKFontInfo?      Info               { get; set; }
+    [ProtoMember(2)] public List<ProtoGlyphEntry> Glyphs             { get; set; } = [];
+    [ProtoMember(3)] public ProtoNKGlyph?         UnknownSymbolGlyph { get; set; }
+    [ProtoMember(4)] public ProtoNKGlyph?         StrikethroughGlyph { get; set; }
+
+    [ProtoMember(5)]
+    [System.ComponentModel.DefaultValue(true)]
+    public bool RenderStrikethroughAboveLetters { get; set; } = true;
+
+    [ProtoMember(6)] public ProtoNKGlyph? UnderlineGlyph { get; set; }
+
+    [ProtoMember(7)]
+    [System.ComponentModel.DefaultValue(true)]
+    public bool RenderUnderlineAboveLetters { get; set; } = true;
+}
+
+[ProtoContract]
+internal class ProtoGlyphEntry {
+    [ProtoMember(1)] public ProtoNKGlyphSymbol Symbol { get; set; }
+    [ProtoMember(2)] public ProtoNKGlyph?      Glyph  { get; set; }
+}
+
+[ProtoContract]
+internal class ProtoNKFontInfo {
+    [ProtoMember(1)]  public string  Name            { get; set; } = string.Empty;
+    [ProtoMember(2)]  public bool    Ligatures       { get; set; }
+    [ProtoMember(3)]  public int     Leading         { get; set; }
+    [ProtoMember(4)]  public int     LetterSpacing   { get; set; }
+    [ProtoMember(5)]  public int     WordSpacing     { get; set; }
+    [ProtoMember(6)]  public int     ProportionType  { get; set; }
+    [ProtoMember(7)]  public int     MonoGlyphWidth  { get; set; }
+    [ProtoMember(8)]  public int     MonoGlyphHeight { get; set; }
+    [ProtoMember(9)]  public bool    MonoAlignToGrid { get; set; }
+    [ProtoMember(10)] public bool    VarKerning      { get; set; }
+    [ProtoMember(11)] public string? Author          { get; set; }
+    [ProtoMember(12)] public string? LicenseType     { get; set; }
+    [ProtoMember(13)] public string? LicenseFile     { get; set; }
+    [ProtoMember(14)] public string? LicenseContent  { get; set; }
+}
+
+[ProtoContract]
+internal struct ProtoNKGlyphSymbol {
+    [ProtoMember(1)] public byte    Type           { get; set; }
+    [ProtoMember(2)] public NKStyle Styles         { get; set; }
+    [ProtoMember(3)] public int     SimpleSymbol   { get; set; }
+    [ProtoMember(4)] public string? LigatureSymbol { get; set; }
+}
+
+[ProtoContract]
+internal class ProtoNKGlyph {
+    [ProtoMember(1)] public int                   BaselineOffset { get; set; }
+    [ProtoMember(2)] public int                   Width          { get; set; }
+    [ProtoMember(3)] public int                   Height         { get; set; }
+    [ProtoMember(4)] public List<ProtoGlyphCell>  Cells          { get; set; } = [];
+    [ProtoMember(5)] public List<ProtoAlignPoint> AlignPoints    { get; set; } = [];
+}
+
+[ProtoContract]
+internal struct ProtoGlyphCell {
+    [ProtoMember(1)] public int Type      { get; set; }
+    [ProtoMember(2)] public int Character { get; set; }
+}
+
+[ProtoContract]
+internal struct ProtoAlignPoint {
+    [ProtoMember(1)] public int Character { get; set; }
+    [ProtoMember(2)] public int X         { get; set; }
+    [ProtoMember(3)] public int Y         { get; set; }
 }
 
 #endregion

@@ -1,35 +1,32 @@
 ﻿// NeoKolors
-// Copyright (c) 2026 KryKom
+// Copyright (c) krystof 2026
 
 using Metriks;
-using NeoKolors.Common;
-using SkiaSharp;
 
 namespace NeoKolors.Tui.Core;
 
-public interface ICharCanvas {
+public interface ICharCanvas : ICharDrawer, IDisposable {
     
-    public int Width   { get; }
-    public int Height  { get; }
-    public Size2D Size { get; }
+    /// <summary>
+    /// Gets the 2D grid of <see cref="NKCell" /> representing the contents of the character canvas.
+    /// </summary>
+    /// <remarks>
+    /// This property provides access to the underlying data structure of the canvas, which contains
+    /// individual cells responsible for rendering and styling characters. Each cell holds a character
+    /// and its associated visual attributes. Modifications to this data will be reflected in the
+    /// canvas rendering, allowing for dynamic updates and custom drawing operations.
+    /// </remarks>
+    public IReadOnlyList2D<NKCell> Data { get; }
     
-    public CellInfo this[int x, int y] { get; set; }
-    
-    public void Place(ICharCanvas canvas, Point2D offset = default);
-    public void Place(CellInfo[,] cells,  Point2D offset = default);
-    public void Place(char?[,]    chars,  Point2D offset = default, int zIndex = 0);
-    public void Place(string str, Point2D offset = default, int zIndex = 0);
-    public void Place(AnsiString str, Point2D offset = default, int zIndex = 0);
-    public void Place(AnsiChar c, Point2D offset = default, int zIndex = 0);
-    
-    public void Restyle(NKStyle[,] styles, Point2D offset = default, int zIndex = 0);
-    
-    public void PlaceSixel(SKBitmap image, Point2D offset, Size2D size, Size2D charSize, int zIndex = 0);
-    public ISixelImageInfo[] GetSixels();
-    
-    public void Resize(int width, int height);
-    public void Clean();
-    public void Clear();
-    
-    public CellInfo[,] GetCellsArray();
+    /// <summary>
+    /// Resizes the current canvas to the specified dimensions.
+    /// </summary>
+    /// <param name="size">The new dimensions to resize the canvas to.</param>
+    public void Resize(Size2D size);
+
+    /// <summary>
+    /// Resets the z-index of all elements within the current canvas to their default state,
+    /// removing any previously applied z-index transformations.
+    /// </summary>
+    public void ResetZ();
 }

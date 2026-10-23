@@ -9,7 +9,7 @@ public class LogFileConfigReworkTests : IDisposable {
     private readonly string _tempDirectory;
 
     public LogFileConfigReworkTests() {
-        _tempDirectory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "NKLogTests_" + Guid.NewGuid().ToString("N"));
+        _tempDirectory = Path.Combine(Path.GetTempPath(), "NKLogTests_" + Guid.NewGuid().ToString("N"));
         Directory.CreateDirectory(_tempDirectory);
     }
 
@@ -26,7 +26,7 @@ public class LogFileConfigReworkTests : IDisposable {
 
     [Fact]
     public void Replace_CreatesOrOverwritesFile() {
-        string logPath = System.IO.Path.Combine(_tempDirectory, "test_replace.log");
+        string logPath = Path.Combine(_tempDirectory, "test_replace.log");
         var fileConfig = LogFileConfig.Replace(logPath);
 
         using (var writer = fileConfig.CreateOutput()) {
@@ -47,7 +47,7 @@ public class LogFileConfigReworkTests : IDisposable {
 
     [Fact]
     public void Append_AppendsContentToFile() {
-        string logPath = System.IO.Path.Combine(_tempDirectory, "test_append.log");
+        string logPath = Path.Combine(_tempDirectory, "test_append.log");
         var fileConfig = LogFileConfig.Append(logPath);
 
         using (var writer = fileConfig.CreateOutput()) {
@@ -65,7 +65,7 @@ public class LogFileConfigReworkTests : IDisposable {
 
     [Fact]
     public void NewCount_GeneratesSequentialFiles_WithoutConfigFile() {
-        string templatePath = System.IO.Path.Combine(_tempDirectory, "app_{0}.log");
+        string templatePath = Path.Combine(_tempDirectory, "app_{0}.log");
         var config1 = LogFileConfig.NewCount(templatePath);
 
         using (var writer = config1.CreateOutput()) {
@@ -77,11 +77,11 @@ public class LogFileConfigReworkTests : IDisposable {
             writer.WriteLine("Log 2");
         }
 
-        string configFile = System.IO.Path.Combine(_tempDirectory, ".nklog");
+        string configFile = Path.Combine(_tempDirectory, ".nklog");
         Assert.False(File.Exists(configFile), "Config file .nklog should NOT exist.");
 
-        Assert.True(File.Exists(System.IO.Path.Combine(_tempDirectory, "app_1.log")));
-        Assert.True(File.Exists(System.IO.Path.Combine(_tempDirectory, "app_2.log")));
+        Assert.True(File.Exists(Path.Combine(_tempDirectory, "app_1.log")));
+        Assert.True(File.Exists(Path.Combine(_tempDirectory, "app_2.log")));
     }
 
     [Fact]
@@ -102,7 +102,7 @@ public class LogFileConfigReworkTests : IDisposable {
 
     [Fact]
     public void NKLoggerOptions_UseFileLogging_ConfiguresFileAndConsole() {
-        string logPath = System.IO.Path.Combine(_tempDirectory, "combined.log");
+        string logPath = Path.Combine(_tempDirectory, "combined.log");
         var options = new NKLoggerOptions().UseFileLogging(logPath);
 
         using var provider = new NKLoggerProvider(options);

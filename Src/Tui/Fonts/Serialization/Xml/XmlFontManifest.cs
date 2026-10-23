@@ -3,7 +3,7 @@
 
 using System.Xml.Serialization;
 
-namespace NeoKolors.Tui.Fonts.Serialization.Xml;
+namespace NeoKolors.Tui.Fonts.Xml;
 
 [XmlRoot("FontManifest")]
 public class XmlFontManifest {

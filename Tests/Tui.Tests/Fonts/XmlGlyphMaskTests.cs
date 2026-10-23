@@ -3,7 +3,7 @@
 // Copyright (c) 2026 KryKom
 // //
 
-using NeoKolors.Tui.Fonts.Serialization.Xml.V3;
+using NeoKolors.Tui.Fonts.Xml.V3;
 
 namespace NeoKolors.Tui.Tests.Fonts;
 

@@ -3,7 +3,7 @@
 
 using NeoKolors.Console;
 
-namespace NeoKolors.Tui.Fonts.Serialization;
+namespace NeoKolors.Tui.Fonts;
 
 public class NKFontDeserializationResult {
     public NKFont? Font { get; }

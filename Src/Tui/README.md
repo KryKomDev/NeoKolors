@@ -82,7 +82,7 @@ Configure the console settings, initialize your visual DOM, and start the applic
 ```csharp
 using System.Text;
 using NeoKolors.Tui;
-using NeoKolors.Tui.Dom;
+using NeoKolors.Tui;
 
 namespace MyAwesomeApp;
 

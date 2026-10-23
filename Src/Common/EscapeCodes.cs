@@ -1,4 +1,4 @@
-﻿//
+//
 // NeoKolors
 // Copyright (c) 2025 KryKom
 //
@@ -431,6 +431,7 @@ public static class EscapeCodes {
     #endregion
     
     public enum DecMode {
+        AUTOWRAP = 7,
         REPORT_MOUSE_P = 9,
         REPORT_MOUSE_PR = 1000,
         REPORT_MOUSE_PRD = 1002,

@@ -6,7 +6,7 @@
 using Metriks;
 using NeoKolors.Extensions;
 
-namespace NeoKolors.Tui.Fonts.Serialization.Xml.V3;
+namespace NeoKolors.Tui.Fonts.Xml.V3;
 
 public readonly struct XmlGlyphAlignPoint {
     

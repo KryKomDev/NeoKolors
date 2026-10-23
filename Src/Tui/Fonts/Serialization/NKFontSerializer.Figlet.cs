@@ -1,7 +1,7 @@
 // NeoKolors
 // Copyright (c) KryKom 2026
 
-namespace NeoKolors.Tui.Fonts.Serialization;
+namespace NeoKolors.Tui.Fonts;
 
 public static partial class NKFontSerializer {
     /// <summary>
@@ -125,7 +125,7 @@ public static partial class NKFontSerializer {
             }
 
             if (licenseType == null) {
-                var licenseMatch = GetValueAfterPrefix(trimmed, "license type:", "license:", "licence type:", "licence:");
+                var licenseMatch = GetValueAfterPrefix(trimmed, "license flags:", "license:", "licence flags:", "licence:");
 
                 if (licenseMatch != null) {
                     licenseType = licenseMatch;

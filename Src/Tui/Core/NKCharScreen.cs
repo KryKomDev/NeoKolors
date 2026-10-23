@@ -1,212 +1,136 @@
 // NeoKolors
-// Copyright (c) 2026 KryKom
+// Copyright (c) krystof 2026
 
 using System.Text;
 using Metriks;
 using NeoKolors.Common;
 using NeoKolors.Console;
 
-#if NK_RENDERING_PROFILING
-using System.Diagnostics;
-#endif
-
 namespace NeoKolors.Tui.Core;
 
 public class NKCharScreen : NKCharCanvas, ICharScreen {
-    
-    #if NK_RENDERING_PROFILING
-    
-    private readonly Stopwatch _writingTime     = new();
-    private readonly Stopwatch _screenTotalTime = new();
-    private readonly Stopwatch _sixelTime       = new();
-    private readonly Stopwatch _accessTime      = new();
-    private readonly Stopwatch _positionTime    = new();
-    private readonly Stopwatch _escseqTime      = new();
 
-    public TimeSpan WritingTime  => _writingTime    .Elapsed;
-    public TimeSpan CompTime     => _screenTotalTime.Elapsed - _writingTime.Elapsed;
-    public TimeSpan ScrTotalTime => _screenTotalTime.Elapsed;
-    public TimeSpan SixelTime    => _sixelTime      .Elapsed;
-    public TimeSpan AccessTime   => _accessTime     .Elapsed;
-    public TimeSpan PosTime      => _positionTime   .Elapsed;
-    public TimeSpan EscseqTime   => _escseqTime     .Elapsed;
-    
-    #endif
+    private          List2D<NKCell>?         _prevData;
+    private          List<NKImageData>?      _prevImages;
+    private readonly Profiler.ScreenProfiler _screenProfiler;
+    private readonly StringBuilder           _sb         = new();
+    private readonly object                  _renderLock = new();
 
-    private readonly List<SixelImageInfo> _prevImages = [];
-    private readonly StringBuilder        _sb = new();
-    private readonly object               _renderLock = new();
+    public NKCharScreen(Size2D size) : base(size) {
+        _screenProfiler = new Profiler.ScreenProfiler();
+        Profiler.Global.Register(_screenProfiler);
+    }
 
-    public NKCharScreen(int width, int height) : base(width, height) { }
-    public NKCharScreen(Size2D size) : base(size.X, size.Y) { }
+    public NKCharScreen(int x, int y) : base(x, y) {
+        _screenProfiler = new Profiler.ScreenProfiler();
+        Profiler.Global.Register(_screenProfiler);
+    }
 
     public void Render() {
         lock (_renderLock) {
-            var prevStyle = NKStyle.Default;
+            _screenProfiler.Start_Screen_Total();
 
-            #if NK_RENDERING_PROFILING
-            _screenTotalTime.Start();
-            #endif
+            ForceRenderImages();
 
-            _sb.Clear();
-            _sb.Append("\e[0m");
+            RenderChars();
 
-            for (int y = 0; y < Height; y++) {
-                prevStyle = RenderLine(y, prevStyle);
-            }
-
-            if (_sb.Length > 0) {
-                #if NK_RENDERING_PROFILING
-                _writingTime.Start();
-                #endif
-
-                NKConsole.Write(_sb.ToString());
-                _sb.Clear();
-
-                #if NK_RENDERING_PROFILING
-                _writingTime.Stop();
-                #endif
-            }
-
-            #if NK_RENDERING_PROFILING
-            _screenTotalTime.Stop();
-            #endif
-
-            var ri = _images.Except(_prevImages).ToArray();
-
-            for (int i = 0; i < ri.Length; i++) {
-                var b = ri[i];
-
-                #if NK_RENDERING_PROFILING
-                _sixelTime.Start();
-                #endif
-
-                NKConsole.WriteSixel(b.Image, b.Offset.X, b.Offset.Y, b.Size.X, b.Size.Y);
-
-                #if NK_RENDERING_PROFILING
-                _sixelTime.Stop();
-                #endif
-            }
-
-            _prevImages.Clear();
-            _prevImages.AddRange(_images);
-            _images.Clear();
+            _screenProfiler.Stop_Screen_Total();
         }
     }
 
-    private NKStyle RenderLine(int y, NKStyle prevStyle) {
-        var isBehind = true;
+    private void ForceRenderImages() {
+        _screenProfiler.Start_Screen_RenderImage();
+       
+        for (int i = 0; i < _images.Count; i++) {
+            var img = _images[i];
 
-        for (int x = 0; x < Width; x++) {
-            #if NK_RENDERING_PROFILING
-            _accessTime.Start();
-            #endif
+            NKConsole.WriteImage(img.Image, img.Position, img.Size, img.SamplingOptions);
+        }
 
-            // get the cell data
-            var cell = _data[x, y];
+        _prevImages = [.. _images];
+        
+        _screenProfiler.Stop_Screen_RenderImage();
+    }
+    
+    private void RenderImages() {
+        throw new NotImplementedException();
+        
+        // _screenProfiler.Start_Screen_RenderImage();
+        //
+        // _screenProfiler.Stop_Screen_RenderImage();
+    }
 
-            #if NK_RENDERING_PROFILING
-            _accessTime.Stop();
-            #endif
+    private void ForceRenderChars() => RenderCharsInternal(force: true);
 
-            var (c, nkStyle, changed, _) = cell;
+    private void RenderChars() => RenderCharsInternal(force: false);
 
-            if (!changed) {
-                isBehind = true;
-                continue;
+    private void RenderCharsInternal(bool force) {
+        _screenProfiler.Start_Screen_RenderChars();
+
+        if (_prevData == null) {
+            _prevData = ListPool2D<NKCell>.Rent(Width, Height);
+            _prevData.Resize(Width, Height);
+            force = true;
+        }
+        else if (_prevData.Size != Size) {
+            ListPool2D<NKCell>.Return(_prevData);
+            _prevData = ListPool2D<NKCell>.Rent(Width, Height);
+            _prevData.Resize(Width, Height);
+            force = true;
+        }
+
+        _sb.Clear();
+        var prevStyle = NKStyle.Default;
+        var ys = _data.YSize;
+        var xs = _data.XSize;
+
+        for (int y = 0; y < ys; y++) {
+            var isBehind = true;
+
+            for (int x = 0; x < xs; x++) {
+                var cell = _data[x, y];
+
+                if (!force && cell == _prevData[x, y]) {
+                    isBehind = true;
+                    continue;
+                }
+
+                if (isBehind) {
+                    _sb.Append($"\e[{y + 1};{x + 1}H");
+                    isBehind = false;
+                }
+
+                if (cell.Style != prevStyle) {
+                    _sb.Append(NKStyle.GetEscSeq(prevStyle, cell.Style));
+                    prevStyle = cell.Style;
+                }
+
+                var c = cell.Char;
+                _sb.Append(char.IsControl(c) || c == '\0' ? ' ' : c);
+            }
+        }
+
+        if (_sb.Length > 0) {
+            if (prevStyle != NKStyle.Default) {
+                _sb.Append("\e[0m");
             }
 
-            cell.SetUpdated();
-
-            if (isBehind) {
-                #if NK_RENDERING_PROFILING
-                _positionTime.Start();
-                #endif
-
-                _sb.Append($"\e[{y + 1};{x + 1}H");
-
-                #if NK_RENDERING_PROFILING
-                _positionTime.Stop();
-                #endif
-            }
-
-            isBehind = false;
-
-            #if NK_RENDERING_PROFILING
-            _escseqTime.Start();
-            #endif
-
-            _sb.Append(NKStyle.GetEscSeq(prevStyle, nkStyle));
-
-            #if NK_RENDERING_PROFILING
-            _escseqTime.Stop();
-            #endif
-
-            prevStyle = nkStyle;
-
-            var actualChar = c ?? ' ';
-            _sb.Append(char.IsControl(actualChar) ? ' ' : actualChar);
+            NKConsole.Write(_sb.ToString());
         }
 
-        return prevStyle;
+        _prevData.CopyFrom(_data);
+
+        _screenProfiler.Stop_Screen_RenderChars();
     }
 
-    // ============================= TESTING OVERRIDE METHODS ============================= // 
-
-    #if NK_IMMEDIATE_RENDERING
-    
-    public new CellInfo this[int x, int y] {
-        get => base[x, y];
-        set {
-            base[x, y] = value;
-            Render();
+    public new void Dispose() {
+        if (_prevData != null) {
+            _prevData.Clear();
+            ListPool2D<NKCell>.Return(_prevData);
+            _prevData = null;
         }
-    }
-    
-    public new void Place(ICharCanvas canvas, Point2D offset = default) {
-        base.Place(canvas, offset);
-        Render();
-    }
-    
-    public new void Place(CellInfo[,] cells, Point2D offset = default) {
-        base.Place(cells, offset);
-        Render();
-    }
-    
-    public new void Place(char?[,] chars, Point2D offset = default, int zIndex = 0) {
-        base.Place(chars, offset, zIndex);
-        Render();
-    }
-    
-    public new void PlaceString(string str, Point2D offset = default, int zIndex = 0) {
-        base.PlaceString(str, offset, zIndex);
-        Render();
-    }
-    
-    public new void Restyle(NKStyle[,] styles, Point2D offset = default, int zIndex = 0) {
-        base.Restyle(styles, offset, zIndex);
-        Render();
-    }
-    
-    public new void PlaceSixel(SKImage image, Point2D offset, Size2D size, int zIndex = 0) {
-        base.PlaceSixel(image, offset, size, zIndex);
-        Render();
-    }
-    
-    public new void Clear() {
-        base.Clear();
-        Render();
-    }
 
-    #endif
-
-    public new void Resize(int width, int height) {
-        lock (_renderLock) {
-            base.Resize(width, height);
-            
-            #if NK_IMMEDIATE_RENDERING
-            Render();
-            #endif
-        }
+        base.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

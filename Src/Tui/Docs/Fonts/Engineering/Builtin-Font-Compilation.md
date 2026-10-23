@@ -1,7 +1,7 @@
-+++
+---
 Written for NeoKolors.Tui.Fonts version 2026.3 (NKFont V3)
 by KryKom with love and care :)
-+++
+---
 
 # Built-in Font Compilation and Asset Library Embedding Pipeline
 

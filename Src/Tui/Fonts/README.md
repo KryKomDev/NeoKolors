@@ -17,8 +17,7 @@
 
 The font system is built around several key types:
 
-- **[IAsciiFont](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/Fonts/IAsciiFont.cs)**: The base interface defining string measurement and rendering logic onto a canvas.
-- **[IExtendedAsciiFont](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/Fonts/IExtendedAsciiFont.cs)**: Extends font placing methods to accept [TextRenderingOptions](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/Fonts/TextRenderingOptions.cs) for detailed alignment and formatting.
+- **[IAsciiFont](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/Fonts/IAsciiFont.cs)**: The base interface defining string measurement and rendering logic onto a canvas, with support for [TextRenderingOptions](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/Fonts/TextRenderingOptions.cs) for detailed alignment and formatting.
 - **[NKFont](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/Fonts/NKFont.cs)**: The primary implementation of the font system, containing layout, ligature dictionary mapping, character effects (underline, strikethrough), and cell-level rendering.
 - **[FontAtlas](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/Fonts/FontAtlas.cs)**: A central registry where active fonts (such as `Default` or custom loaded fonts) are registered and resolved.
 - **[NKFontSerializer](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/Fonts/Serialization/NKFontSerializer.Xml.V3.cs)**: Handles serialization and deserialization, capable of loading XML folders, packaged zip archives, web URIs, or binary streams.
@@ -36,19 +35,19 @@ using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Fonts;
 
 // Get a font from the Atlas
-if (FontAtlas.TryGet("Future", out var font) && font is IExtendedAsciiFont asciiFont)
+if (FontAtlas.TryGet("Future", out var font))
 {
     var canvas = new NKCharCanvas(80, 20);
-    var bounds = new Area2D(new Point2D(0, 0), new Point2D(80, 20));
+    var bounds = new Rect2D(new Point2D(0, 0), new Point2D(80, 20));
 
-    // Place the string with Center alignment
-    asciiFont.PlaceString(
+    // Draw the string with Center alignment
+    font.DrawString(
         "HELLO WORLD",
         canvas,
         bounds,
         new NKStyle(),
         HorizontalAlign.CENTER,
-        VerticalAlign.MIDDLE
+        VerticalAlign.CENTER
     );
 }
 ```

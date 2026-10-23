@@ -9,12 +9,11 @@
 
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
-        <Version>2026.2-rc2.1</Version>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageIcon>package-icon.png</PackageIcon>
+        <PackageIcon>Package-Icon.png</PackageIcon>
         
         <DefineConstants>$(DefineConstants)</DefineConstants>
     </PropertyGroup>
@@ -22,7 +21,7 @@
     <ItemGroup>
         <None Include="README.md" Pack="true" PackagePath="\"/>
         <None Include="../../../../LICENSE" Pack="true" PackagePath="\"/>
-        <None Include="../../../../Assets/package-icon.png" Pack="true" PackagePath="\"/>
+        <None Include="../../../../Assets/Package-Icon.png" Pack="true" PackagePath="\"/>
     </ItemGroup>
     
     <ItemGroup>
@@ -39,6 +38,13 @@
         <EmbeddedResource Include="Dummy.nkf" />
         <EmbeddedResource Include="Future.nkf" />
         <EmbeddedResource Include="Figlet/*.flf" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Polyfill" Version="11.4.1">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
     </ItemGroup>
 
     <!-- Inline C# Task for Font Compilation -->

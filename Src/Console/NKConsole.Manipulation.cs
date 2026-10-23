@@ -63,18 +63,18 @@ public static partial class NKConsole {
     public static void ShowCursor() => OutputDriver.Write(ENABLE_CURSOR_VISIBLE);
 
     #endregion
-    
+
     #if NK_NKCONSOLE_PROFILING
     private static          ulong     CSR_POS_COUNT  = 0;
     private static readonly Stopwatch CSR_POS_BOUNDS = new();
     private static readonly Stopwatch CSR_POS_SET    = new();
 
     public static TimeSpan CursorPosition_BoundsCheckTime    => CSR_POS_BOUNDS.Elapsed;
-    public static TimeSpan CursorPosition_SetPosTime         => CSR_POS_SET   .Elapsed;
+    public static TimeSpan CursorPosition_SetPosTime         => CSR_POS_SET.Elapsed;
     public static TimeSpan CursorPosition_AvgBoundsCheckTime => CSR_POS_COUNT == 0 ? TimeSpan.Zero : CSR_POS_BOUNDS.Elapsed / CSR_POS_COUNT;
-    public static TimeSpan CursorPosition_AvgSetPosTime      => CSR_POS_COUNT == 0 ? TimeSpan.Zero : CSR_POS_SET.Elapsed / CSR_POS_COUNT;
+    public static TimeSpan CursorPosition_AvgSetPosTime      => CSR_POS_COUNT == 0 ? TimeSpan.Zero : CSR_POS_SET.Elapsed    / CSR_POS_COUNT;
     #endif
-    
+
     /// <summary>
     /// Attempts to set the cursor position in the console window to the specified coordinates.
     /// </summary>
@@ -82,36 +82,37 @@ public static partial class NKConsole {
     /// <param name="y">The vertical position of the cursor, measured in rows.</param>
     /// <returns>Returns true if the cursor position was successfully set; otherwise, false.</returns>
     public static bool TrySetCursorPosition(int x, int y) {
-
         #if NK_NKCONSOLE_PROFILING
         CSR_POS_COUNT++;
         CSR_POS_BOUNDS.Start();
         #endif
 
         var s = InputDriver.GetSize();
-        if (!(x >= 0 && x < s.X && y >= 0 && y < s.Y)) 
+
+        if (!(x >= 0 && x < s.X && y >= 0 && y < s.Y))
             return false;
 
         #if NK_NKCONSOLE_PROFILING
         CSR_POS_BOUNDS.Stop();
         CSR_POS_SET.Start();
         #endif
-        
+
         try {
             OutputDriver.Write($"\e[{y + 1};{x + 1}H");
         }
         catch (Exception) {
             LOGGER.Error("Tried to set cursor position outside of bounds.");
+
             return false;
         }
 
         #if NK_NKCONSOLE_PROFILING
         CSR_POS_SET.Stop();
         #endif
-        
+
         return true;
     }
-    
+
     public static Size2D WindowSize {
         get {
             try {
@@ -122,6 +123,11 @@ public static partial class NKConsole {
             }
         }
     }
-    
-    public static Size2D BufferSize => InputDriver.GetSize();
+
+    public static int WindowWidth  => Stdio.WindowWidth;
+    public static int WindowHeight => Stdio.WindowHeight;
+
+    public static Size2D BufferSize   => InputDriver.GetSize();
+    public static int    BufferWidth  => Stdio.BufferWidth;
+    public static int    BufferHeight => Stdio.BufferHeight;
 }

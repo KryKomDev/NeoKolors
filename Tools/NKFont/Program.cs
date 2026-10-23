@@ -2,13 +2,12 @@
 // Copyright (c) 2026 KryKom
 
 using System.CommandLine;
+using Metriks;
 using NeoKolors.Common;
 using NeoKolors.Console;
 using NeoKolors.Extensions;
 using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Fonts;
-using NeoKolors.Tui.Fonts.Serialization;
-
 using NeoKolors.Tui.Fonts.Assets;
 
 namespace NeoKolors.Tools.NKFont;
@@ -26,23 +25,20 @@ internal static class Program {
         var installDir = AppContext.BaseDirectory;
 
         if (!Directory.Exists(installDir))
-            Directory.CreateDirectory(installDir); 
-        
+            Directory.CreateDirectory(installDir);
+
         var logsDir = Path.Combine(installDir, "logs");
-        
+
         if (!Directory.Exists(logsDir))
             Directory.CreateDirectory(logsDir);
-        
+
         if (!Directory.Exists(FONTS_STORAGE_DIR))
             Directory.CreateDirectory(FONTS_STORAGE_DIR);
 
-        NKDebug.Logger.FileConfig = LogFileConfig.NewDatetime($"{logsDir}/{{0}}.log");
-
-        NKDebug.Logger.SimpleMessages = true;
+        NKDebug.SetFileLogging(LogFileConfig.NewDatetime($"{logsDir}/{{0}}.log"));
     }
-    
+
     static int Main(string[] args) {
-        
         // Support UTF-8 encoding for smooth unicode characters
         System.Console.OutputEncoding = System.Text.Encoding.UTF8;
 
@@ -55,48 +51,151 @@ internal static class Program {
         };
 
         var outputNkfArg = new Argument<string>("output-nkf") {
-            Description = 
+            Description =
                 "The path to save the compiled binary font (.nkf). If omitted," +
                 " saves using the font's internal name in the current directory.",
             Arity = ArgumentArity.ZeroOrOne
         };
 
         var compileCommand = new Command(
-            "compile", 
+            "compile",
             "Compile an XML font definition (directory or zip) into a compiled binary .nkf font."
         );
-        
+
         compileCommand.Arguments.Add(xmlPathArg);
         compileCommand.Arguments.Add(outputNkfArg);
 
-        compileCommand.SetAction(parseResult => {
-            string xmlPath = parseResult.GetValue(xmlPathArg) ?? string.Empty;
-            string? outputNkf = parseResult.GetValue(outputNkfArg);
-            HandleCompile(xmlPath, outputNkf);
-        });
+        compileCommand.SetAction(
+            parseResult => {
+                string  xmlPath   = parseResult.GetValue(xmlPathArg) ?? string.Empty;
+                string? outputNkf = parseResult.GetValue(outputNkfArg);
+                HandleCompile(xmlPath, outputNkf);
+            }
+        );
 
         // 2. display command
         var fontArg = new Argument<string>("font") {
             Description = "A built-in font name, compiled .nkf file, or raw XML font folder/zip."
         };
-        
+
         var textArg = new Argument<string[]>("text") {
             Description = "The text to display."
         };
-        
+
+        var halignOption = new Option<HorizontalAlign>("--horizontal-align", "--halign", "-a") {
+            Description         = "Horizontal alignment of rendered text (Left, Center, Right).",
+            DefaultValueFactory = _ => HorizontalAlign.LEFT
+        };
+
+        var valignOption = new Option<VerticalAlign>("--vertical-align", "--valign") {
+            Description         = "Vertical alignment of rendered text (Top, Center, Bottom).",
+            DefaultValueFactory = _ => VerticalAlign.TOP
+        };
+
+        var overflowOption = new Option<bool>("--overflow") {
+            Description         = "Allow text to overflow outside bounds instead of clipping.",
+            DefaultValueFactory = _ => false
+        };
+
+        var justifyOption = new Option<bool>("--justify", "--justify-text", "-j") {
+            Description         = "Justify text within the available width.",
+            DefaultValueFactory = _ => false
+        };
+
+        var wordWrapOption = new Option<WordWrapType>("--word-wrap", "--wrap") {
+            Description         = "Word wrap behavior (None, Hard, Word).",
+            DefaultValueFactory = _ => WordWrapType.WORD
+        };
+
+        var widthOption = new Option<int?>("--width", "-w") {
+            Description = "Explicit bounding box width in characters."
+        };
+
+        var heightOption = new Option<int?>("--height", "-H") {
+            Description = "Explicit bounding box height in rows."
+        };
+
+        var colorOption = new Option<string?>("--color", "--coloring", "-c") {
+            Description = "Foreground color for rendering (e.g. Red, #FF0000)."
+        };
+
+        var hgradOption = new Option<string?>("--hgrad") {
+            Description = "Horizontal gradient color stops, comma-separated (e.g. Red,Blue or #FF0000,#00FF00)."
+        };
+
+        var vgradOption = new Option<string?>("--vgrad") {
+            Description = "Vertical gradient color stops, comma-separated (e.g. Red,Blue or #FF0000,#00FF00)."
+        };
+
+        var letterSpacingOption = new Option<int?>("--letter-spacing") {
+            Description = "Letter spacing adjustment in characters."
+        };
+
+        var wordSpacingOption = new Option<int?>("--word-spacing") {
+            Description = "Word spacing adjustment in characters."
+        };
+
+        var leadingOption = new Option<int?>("--leading", "--line-spacing") {
+            Description = "Line spacing / leading in rows."
+        };
+
+        var ligaturesOption = new Option<bool?>("--ligatures") {
+            Description = "Enable or disable font ligatures."
+        };
+
+        var proportionsOption = new Option<string?>("--proportions") {
+            Description = "Font proportions mode: monospaced (mono), variable (var), or kerning."
+        };
+
         var displayCommand = new Command("display", "Display/render the given string using a specified font.");
         displayCommand.Arguments.Add(fontArg);
         displayCommand.Arguments.Add(textArg);
+        displayCommand.Options.Add(halignOption);
+        displayCommand.Options.Add(valignOption);
+        displayCommand.Options.Add(overflowOption);
+        displayCommand.Options.Add(justifyOption);
+        displayCommand.Options.Add(wordWrapOption);
+        displayCommand.Options.Add(widthOption);
+        displayCommand.Options.Add(heightOption);
+        displayCommand.Options.Add(colorOption);
+        displayCommand.Options.Add(hgradOption);
+        displayCommand.Options.Add(vgradOption);
+        displayCommand.Options.Add(letterSpacingOption);
+        displayCommand.Options.Add(wordSpacingOption);
+        displayCommand.Options.Add(leadingOption);
+        displayCommand.Options.Add(ligaturesOption);
+        displayCommand.Options.Add(proportionsOption);
 
         displayCommand.Aliases.Add("show");
         displayCommand.Aliases.Add("render");
 
-        displayCommand.SetAction(parseResult => {
-            string font = parseResult.GetValue(fontArg) ?? string.Empty;
-            string[] textParts = parseResult.GetValue(textArg) ?? Array.Empty<string>();
-            string text = string.Join(" ", textParts);
-            HandleDisplay(font, text);
-        });
+        displayCommand.SetAction(
+            parseResult => {
+                string   font      = parseResult.GetValue(fontArg) ?? string.Empty;
+                string[] textParts = parseResult.GetValue(textArg) ?? Array.Empty<string>();
+                string   text      = string.Join(" ", textParts);
+
+                var displayOpts = new DisplayOptions(
+                    HorizontalAlign: parseResult.GetValue(halignOption),
+                    VerticalAlign: parseResult.GetValue(valignOption),
+                    Overflow: parseResult.GetValue(overflowOption),
+                    Justify: parseResult.GetValue(justifyOption),
+                    WordWrap: parseResult.GetValue(wordWrapOption),
+                    Width: parseResult.GetValue(widthOption),
+                    Height: parseResult.GetValue(heightOption),
+                    Color: parseResult.GetValue(colorOption),
+                    HGrad: parseResult.GetValue(hgradOption),
+                    VGrad: parseResult.GetValue(vgradOption),
+                    LetterSpacing: parseResult.GetValue(letterSpacingOption),
+                    WordSpacing: parseResult.GetValue(wordSpacingOption),
+                    Leading: parseResult.GetValue(leadingOption),
+                    Ligatures: parseResult.GetValue(ligaturesOption),
+                    Proportions: parseResult.GetValue(proportionsOption)
+                );
+
+                HandleDisplay(font, text, displayOpts);
+            }
+        );
 
         // 3. create command
         var outputDirArg = new Argument<string>("output-dir") {
@@ -105,12 +204,13 @@ internal static class Program {
 
         var fontNameArg = new Argument<string>("font-name") {
             Description = "The internal name of the font. If omitted, defaults to the name of the folder.",
-            Arity = ArgumentArity.ZeroOrOne
+            Arity       = ArgumentArity.ZeroOrOne
         };
 
         var allAsciiOption = new Option<bool>("--all-ascii") {
             Description = "Add all printable ASCII characters to the blank font structure."
         };
+
         allAsciiOption.Aliases.Add("-a");
 
         var createCommand = new Command("create", "Create a new blank XML nkfont definition folder structure.");
@@ -120,12 +220,14 @@ internal static class Program {
 
         createCommand.Aliases.Add("new");
 
-        createCommand.SetAction(parseResult => {
-            string outputDir = parseResult.GetValue(outputDirArg) ?? string.Empty;
-            string? fontName = parseResult.GetValue(fontNameArg);
-            bool allAscii = parseResult.GetValue(allAsciiOption);
-            HandleCreate(outputDir, fontName, allAscii);
-        });
+        createCommand.SetAction(
+            parseResult => {
+                string  outputDir = parseResult.GetValue(outputDirArg) ?? string.Empty;
+                string? fontName  = parseResult.GetValue(fontNameArg);
+                bool    allAscii  = parseResult.GetValue(allAsciiOption);
+                HandleCreate(outputDir, fontName, allAscii);
+            }
+        );
 
         // 4. list command
         var listCommand = new Command("list", "List all available built-in fonts.");
@@ -140,11 +242,13 @@ internal static class Program {
         glyphsCommand.Arguments.Add(glyphsFontArg);
 
         glyphsCommand.Aliases.Add("inspect-font");
-        
-        glyphsCommand.SetAction(parseResult => {
-            string font = parseResult.GetValue(glyphsFontArg) ?? string.Empty;
-            HandleGlyphs(font);
-        });
+
+        glyphsCommand.SetAction(
+            parseResult => {
+                string font = parseResult.GetValue(glyphsFontArg) ?? string.Empty;
+                HandleGlyphs(font);
+            }
+        );
 
         // 6. inspect command
         var inspectFontArg = new Argument<string>("font") {
@@ -160,46 +264,59 @@ internal static class Program {
         inspectCommand.Arguments.Add(inspectGlyphArg);
 
         inspectCommand.Aliases.Add("inspect-glyph");
-        
-        inspectCommand.SetAction(parseResult => {
-            string font = parseResult.GetValue(inspectFontArg) ?? string.Empty;
-            string glyph = parseResult.GetValue(inspectGlyphArg) ?? string.Empty;
-            HandleInspect(font, glyph);
-        });
+
+        inspectCommand.SetAction(
+            parseResult => {
+                string font  = parseResult.GetValue(inspectFontArg)  ?? string.Empty;
+                string glyph = parseResult.GetValue(inspectGlyphArg) ?? string.Empty;
+                HandleInspect(font, glyph);
+            }
+        );
 
         // 7. add command
         var addPathArg = new Argument<string>("font-path") {
             Description = "The path to the .flf or .nkf font file to add."
         };
+
         var addCommand = new Command("add", "Add a font file to the tools internal storage.");
         addCommand.Arguments.Add(addPathArg);
         addCommand.Aliases.Add("import");
         addCommand.Aliases.Add("install");
-        addCommand.SetAction(parseResult => {
-            string fontPath = parseResult.GetValue(addPathArg) ?? string.Empty;
-            HandleAdd(fontPath);
-        });
+
+        addCommand.SetAction(
+            parseResult => {
+                string fontPath = parseResult.GetValue(addPathArg) ?? string.Empty;
+                HandleAdd(fontPath);
+            }
+        );
 
         // 8. remove command
         var removeNameArg = new Argument<string>("font-name") {
             Description = "The name of the font to remove from internal storage."
         };
+
         var removeCommand = new Command("remove", "Remove a font from the tools internal storage.");
         removeCommand.Arguments.Add(removeNameArg);
         removeCommand.Aliases.Add("delete");
         removeCommand.Aliases.Add("uninstall");
-        removeCommand.SetAction(parseResult => {
-            string fontName = parseResult.GetValue(removeNameArg) ?? string.Empty;
-            HandleRemove(fontName);
-        });
+
+        removeCommand.SetAction(
+            parseResult => {
+                string fontName = parseResult.GetValue(removeNameArg) ?? string.Empty;
+                HandleRemove(fontName);
+            }
+        );
 
         // 9. clean-logs command
         var cleanLogsCommand = new Command("clean-logs", "Clean all log files generated by the nkfont tool.");
         cleanLogsCommand.Aliases.Add("clear-logs");
         cleanLogsCommand.Aliases.Add("flush-logs");
-        cleanLogsCommand.SetAction(_ => {
-            HandleCleanLogs();
-        });
+
+        cleanLogsCommand.SetAction(
+            _ => {
+                HandleCleanLogs();
+            }
+        );
 
         // Add commands to root
         var rootCommand = new RootCommand("NeoKolors NKFont CLI Tool - Manage, compile, display, and create TUI fonts.");
@@ -265,7 +382,25 @@ internal static class Program {
         }
     }
 
-    static void HandleDisplay(string fontKey, string text) {
+    private record DisplayOptions(
+        HorizontalAlign HorizontalAlign,
+        VerticalAlign   VerticalAlign,
+        bool            Overflow,
+        bool            Justify,
+        WordWrapType    WordWrap,
+        int?            Width,
+        int?            Height,
+        string?         Color,
+        string?         HGrad,
+        string?         VGrad,
+        int?            LetterSpacing,
+        int?            WordSpacing,
+        int?            Leading,
+        bool?           Ligatures,
+        string?         Proportions
+    );
+
+    static void HandleDisplay(string fontKey, string text, DisplayOptions options) {
         var font = LoadFont(fontKey);
 
         if (font == null) {
@@ -275,39 +410,190 @@ internal static class Program {
         }
 
         text = text.Unescape();
-        
+
         if (!AnsiString.TryParse(text, out var ansiString)) {
             PrintError($"Could not parse text '{text}'.");
-            
+
             return;
         }
 
-        var size = font.GetSize(ansiString, maxWidth: NKConsole.WindowSize.X);
+        IColoringStrategy? coloringStrategy = null;
 
-        if (size.X == 0 || size.Y == 0) {
+        if (!string.IsNullOrEmpty(options.HGrad)) {
+            var colors = ParseColorList(options.HGrad);
+
+            if (colors == null || colors.Length == 0) {
+                return;
+            }
+
+            coloringStrategy = ColoringStrategies.HGrad(colors);
+        }
+        else if (!string.IsNullOrEmpty(options.VGrad)) {
+            var colors = ParseColorList(options.VGrad);
+
+            if (colors == null || colors.Length == 0) {
+                return;
+            }
+
+            coloringStrategy = ColoringStrategies.VGrad(colors);
+        }
+        else if (!string.IsNullOrEmpty(options.Color)) {
+            if (NKColor.TryParse(options.Color, out var col)) {
+                coloringStrategy = ColoringStrategies.Solid(col);
+            }
+            else {
+                PrintError($"Could not parse color '{options.Color}'.");
+
+                return;
+            }
+        }
+
+        FontProportionsInfo? proportionsInfo = null;
+
+        if (!string.IsNullOrEmpty(options.Proportions)) {
+            var propLower = options.Proportions.Trim().ToLowerInvariant();
+
+            switch (propLower) {
+                case "mono" or "monospaced":
+                    if (font is Tui.Fonts.NKFont nkf && nkf.Info.ProportionType.GetIsMonospaced()) {
+                        proportionsInfo = nkf.Info.FontPropoInfo;
+                    }
+                    else {
+                        proportionsInfo = new FontProportionsInfo(new NKFontMonospacedConfig(1, 1, false));
+                    }
+
+                    break;
+                case "var" or "variable": proportionsInfo = new FontProportionsInfo(new NKFontVariableConfig(kerning: false)); break;
+                case "kerning":           proportionsInfo = new FontProportionsInfo(new NKFontVariableConfig(kerning: true)); break;
+                default:
+                    PrintError($"Unknown proportions '{options.Proportions}'. Supported values: monospaced (mono), variable (var), kerning.");
+
+                    return;
+            }
+        }
+
+        FontSpacingInfo? spacingInfo = null;
+
+        if (options.LetterSpacing != null || options.WordSpacing != null || options.Leading != null || options.Ligatures != null) {
+            var baseSpacing = font is Tui.Fonts.NKFont nkf
+                ? new FontSpacingInfo(
+                    ligatures: nkf.Info.Ligatures,
+                    leading: nkf.Info.Leading,
+                    letterSpacing: nkf.Info.LetterSpacing,
+                    wordSpacing: nkf.Info.WordSpacing
+                )
+                : new FontSpacingInfo();
+
+            spacingInfo = new FontSpacingInfo(
+                ligatures: options.Ligatures         ?? baseSpacing.Ligatures,
+                leading: options.Leading             ?? baseSpacing.Leading,
+                letterSpacing: options.LetterSpacing ?? baseSpacing.LetterSpacing,
+                wordSpacing: options.WordSpacing     ?? baseSpacing.WordSpacing
+            );
+        }
+
+        var renderingOptions = new TextRenderingOptions(
+            horizontalAlign: options.HorizontalAlign,
+            verticalAlign: options.VerticalAlign,
+            overflow: options.Overflow,
+            justifyText: options.Justify,
+            wordWrap: options.WordWrap,
+            coloring: coloringStrategy,
+            proportions: proportionsInfo,
+            spacing: spacingInfo
+        );
+
+        int maxWindowWidth     = Math.Max(20, NKConsole.WindowSize.X - 1);
+        int effectiveWrapWidth = options.Width ?? maxWindowWidth;
+
+        var measuredSize = options.WordWrap == WordWrapType.NONE
+            ? font.GetSize(ansiString, renderingOptions)
+            : font.GetSize(ansiString, renderingOptions, maxWidth: effectiveWrapWidth);
+
+        if (measuredSize.X == 0 || measuredSize.Y == 0) {
             NKConsole.WriteLine("Warning: Rendered text has zero width or height.", ConsoleColor.Yellow);
 
             return;
         }
 
-        var canvas = new NKCharCanvas(size.X, size.Y);
-        font.PlaceString(ansiString, canvas, maxWidth: NKConsole.WindowSize.X);
+        int boundsWidth;
+        int canvasWidth;
+
+        if (options.Width != null) {
+            boundsWidth = options.Width.Value;
+            canvasWidth = options.Overflow ? Math.Max(boundsWidth, measuredSize.X) : boundsWidth;
+        }
+        else if (options.HorizontalAlign != HorizontalAlign.LEFT || options.Justify) {
+            boundsWidth = maxWindowWidth;
+            canvasWidth = maxWindowWidth;
+        }
+        else {
+            boundsWidth = measuredSize.X;
+            canvasWidth = measuredSize.X;
+        }
+
+        int boundsHeight;
+        int canvasHeight;
+
+        if (options.Height != null) {
+            boundsHeight = options.Height.Value;
+            canvasHeight = options.Overflow ? Math.Max(boundsHeight, measuredSize.Y) : boundsHeight;
+        }
+        else {
+            boundsHeight = measuredSize.Y;
+            canvasHeight = measuredSize.Y;
+        }
+
+        boundsWidth  = Math.Max(1, boundsWidth);
+        boundsHeight = Math.Max(1, boundsHeight);
+        canvasWidth  = Math.Max(1, canvasWidth);
+        canvasHeight = Math.Max(1, canvasHeight);
+
+        var bounds = new Rect2D(0, 0, boundsWidth, boundsHeight);
+
+        using var canvas = new NKCharCanvas(canvasWidth, canvasHeight);
+        font.DrawString(ansiString, canvas, bounds, renderingOptions);
 
         NKConsole.WriteLine();
-        NKConsole.WriteLine($"Text size: {size}", ConsoleColor.Yellow);
+        NKConsole.WriteLine($"Text size: {measuredSize}", ConsoleColor.Yellow);
         NKConsole.WriteLine();
-        
+
         // Render cell by cell to console using NeoKolors styles
         for (int y = 0; y < canvas.Height; y++) {
             for (int x = 0; x < canvas.Width; x++) {
-                var cell = canvas[x, y];
-                NKConsole.Write(cell.Char ?? ' ', cell.Style);
+                var cell = canvas.Data[x, y];
+                NKConsole.Write(cell.Char, cell.Style);
             }
 
             System.Console.WriteLine();
         }
-        
+
         NKConsole.WriteLine();
+    }
+
+    static NKColor[]? ParseColorList(string input) {
+        var parts = input.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        if (parts.Length == 0) {
+            PrintError("Gradient color list cannot be empty.");
+
+            return null;
+        }
+
+        var colors = new List<NKColor>(parts.Length);
+
+        foreach (var part in parts) {
+            if (NKColor.TryParse(part, out var c)) {
+                colors.Add(c);
+            }
+            else {
+                PrintError($"Could not parse color '{part}'.");
+
+                return null;
+            }
+        }
+
+        return colors.ToArray();
     }
 
     static void HandleCreate(string outputDir, string? fontName, bool allAscii = false) {
@@ -333,7 +619,7 @@ internal static class Program {
             Directory.CreateDirectory(fullOutputDir);
 
             string manifestContent = ReadTemplate("manifest.nkfont");
-            string configContent = ReadTemplate("Config.xml").Replace("{FONT_NAME}", fontName);
+            string configContent   = ReadTemplate("Config.xml").Replace("{FONT_NAME}", fontName);
             string mapContent;
 
             if (allAscii) {
@@ -386,12 +672,12 @@ internal static class Program {
                 // Helper to format XML Symbol
                 string GetXmlSymbol(char c) {
                     return c switch {
-                        '&' => "\\x26",
-                        '<' => "\\x3c",
-                        '>' => "\\x3e",
-                        '"' => "\\x22",
+                        '&'  => "\\x26",
+                        '<'  => "\\x3c",
+                        '>'  => "\\x3e",
+                        '"'  => "\\x22",
                         '\\' => "\\\\",
-                        _ => c.ToString()
+                        _    => c.ToString()
                     };
                 }
 
@@ -415,8 +701,8 @@ internal static class Program {
 
                 // Special characters
                 foreach (var kvp in specialChars) {
-                    char symbol = kvp.Key;
-                    string name = kvp.Value;
+                    char   symbol = kvp.Key;
+                    string name   = kvp.Value;
                     File.WriteAllText(Path.Combine(fullOutputDir, "special", $"{name}.nkg"), ".", System.Text.Encoding.UTF8);
                     mapLines.Add($"    <Component Symbol=\"{GetXmlSymbol(symbol)}\" File=\"special/{name}.nkg\"/>");
                 }
@@ -433,8 +719,8 @@ internal static class Program {
 
             // Write common files
             File.WriteAllText(Path.Combine(fullOutputDir, "manifest.nkfont"), manifestContent, System.Text.Encoding.UTF8);
-            File.WriteAllText(Path.Combine(fullOutputDir, "Config.xml"), configContent, System.Text.Encoding.UTF8);
-            File.WriteAllText(Path.Combine(fullOutputDir, "Map.xml"), mapContent, System.Text.Encoding.UTF8);
+            File.WriteAllText(Path.Combine(fullOutputDir, "Config.xml"),      configContent,   System.Text.Encoding.UTF8);
+            File.WriteAllText(Path.Combine(fullOutputDir, "Map.xml"),         mapContent,      System.Text.Encoding.UTF8);
 
             PrintSuccess($"Successfully created blank XML font definition '{fontName}' at '{fullOutputDir}'!");
             PrintSuccess("You can compile it using: nkfont compile <path-to-folder> <output-file.nkf>");
@@ -445,9 +731,9 @@ internal static class Program {
     }
 
     static string ReadTemplate(string name) {
-        var assembly = System.Reflection.Assembly.GetExecutingAssembly();
-        string resourceName = $"NeoKolors.Tools.NKFont.Templates.{name}";
-        using var stream = assembly.GetManifestResourceStream(resourceName);
+        var       assembly     = System.Reflection.Assembly.GetExecutingAssembly();
+        string    resourceName = $"NeoKolors.Tools.NKFont.Templates.{name}";
+        using var stream       = assembly.GetManifestResourceStream(resourceName);
 
         if (stream == null) {
             throw new FileNotFoundException($"Embedded template '{name}' not found. Resource attempted: {resourceName}");
@@ -460,7 +746,7 @@ internal static class Program {
 
     static void HandleList() {
         System.Console.WriteLine();
-        NKConsole.WriteLine("Available Fonts:", new NKStyle(ConsoleColor.Yellow, s: TextStyles.BOLD));
+        NKConsole.WriteLine("Available Fonts:", new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
         NKConsole.WriteLine("────────────────", ConsoleColor.DarkYellow);
         System.Console.WriteLine();
 
@@ -468,12 +754,14 @@ internal static class Program {
 
         // Collect built-in fonts
         foreach (var value in FontAtlas.Values) {
-            string author = "-";
+            string author  = "-";
             string license = "-";
+
             if (value is Tui.Fonts.NKFont nkFont) {
-                author = nkFont.Info.Author ?? "-";
+                author  = nkFont.Info.Author      ?? "-";
                 license = nkFont.Info.LicenseType ?? "-";
             }
+
             fontRows.Add((value.Name, author, license, value.GetType().Name, "Built-in"));
         }
 
@@ -482,52 +770,56 @@ internal static class Program {
             var files = Directory.EnumerateFiles(FONTS_STORAGE_DIR)
                 .Where(f => f.EndsWith(".flf", StringComparison.OrdinalIgnoreCase) || f.EndsWith(".nkf", StringComparison.OrdinalIgnoreCase))
                 .ToList();
+
             foreach (var file in files) {
-                string name = Path.GetFileNameWithoutExtension(file);
-                string ext = Path.GetExtension(file).ToUpperInvariant();
-                string author = "-";
+                string name    = Path.GetFileNameWithoutExtension(file);
+                string ext     = Path.GetExtension(file).ToUpperInvariant();
+                string author  = "-";
                 string license = "-";
-                var font = LoadFromFile(file);
+                var    font    = LoadFromFile(file);
+
                 if (font is Tui.Fonts.NKFont nkFont) {
-                    author = nkFont.Info.Author ?? "-";
+                    author  = nkFont.Info.Author      ?? "-";
                     license = nkFont.Info.LicenseType ?? "-";
                 }
+
                 fontRows.Add((name, author, license, ext, "Stored"));
             }
         }
 
         // Dynamically calculate column widths (at least as wide as headers)
-        int colName = Math.Max("FONT NAME".Length, fontRows.Count > 0 ? fontRows.Max(x => x.Name.Length) : 0) + 1;
-        int colAuthor = Math.Max("AUTHOR".Length, fontRows.Count > 0 ? fontRows.Max(x => x.Author.Length) : 0) + 1;
-        int colLicense = Math.Max("LICENSE".Length, fontRows.Count > 0 ? fontRows.Max(x => x.License.Length) : 0) + 1;
-        int colType = Math.Max("TYPE/FORMAT".Length, fontRows.Count > 0 ? fontRows.Max(x => x.Type.Length) : 0) + 1;
-        int colSource = Math.Max("SOURCE".Length, fontRows.Count > 0 ? fontRows.Max(x => x.Source.Length) : 0) + 1;
+        int colName    = Math.Max("FONT NAME".Length,   fontRows.Count > 0 ? fontRows.Max(x => x.Name.Length) : 0)    + 1;
+        int colAuthor  = Math.Max("AUTHOR".Length,      fontRows.Count > 0 ? fontRows.Max(x => x.Author.Length) : 0)  + 1;
+        int colLicense = Math.Max("LICENSE".Length,     fontRows.Count > 0 ? fontRows.Max(x => x.License.Length) : 0) + 1;
+        int colType    = Math.Max("TYPE/FORMAT".Length, fontRows.Count > 0 ? fontRows.Max(x => x.Type.Length) : 0)    + 1;
+        int colSource  = Math.Max("SOURCE".Length,      fontRows.Count > 0 ? fontRows.Max(x => x.Source.Length) : 0)  + 1;
 
         // Print table headers
-        NKConsole.Write("  " + "FONT NAME".PadRight(colName), new NKStyle(ConsoleColor.Cyan, s: TextStyles.BOLD));
-        NKConsole.Write("│ " + "AUTHOR".PadRight(colAuthor), new NKStyle(ConsoleColor.Cyan, s: TextStyles.BOLD));
-        NKConsole.Write("│ " + "LICENSE".PadRight(colLicense), new NKStyle(ConsoleColor.Cyan, s: TextStyles.BOLD));
-        NKConsole.Write("│ " + "TYPE/FORMAT".PadRight(colType), new NKStyle(ConsoleColor.Cyan, s: TextStyles.BOLD));
-        NKConsole.WriteLine("│ " + "SOURCE".PadRight(colSource), new NKStyle(ConsoleColor.Cyan, s: TextStyles.BOLD));
+        NKConsole.Write("  "     + "FONT NAME".PadRight(colName),   new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD));
+        NKConsole.Write("│ "     + "AUTHOR".PadRight(colAuthor),    new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD));
+        NKConsole.Write("│ "     + "LICENSE".PadRight(colLicense),  new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD));
+        NKConsole.Write("│ "     + "TYPE/FORMAT".PadRight(colType), new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD));
+        NKConsole.WriteLine("│ " + "SOURCE".PadRight(colSource), new NKStyle(ConsoleColor.Cyan,    styles: NKTextStyles.BOLD));
 
         // Separator row
-        string sepLine = "  " + new string('─', colName) +
-                         "┼─" + new string('─', colAuthor) +
-                         "┼─" + new string('─', colLicense) +
-                         "┼─" + new string('─', colType) +
-                         "┼─" + new string('─', colSource);
+        string sepLine = "  " + new string('─', colName)    +
+            "┼─"              + new string('─', colAuthor)  +
+            "┼─"              + new string('─', colLicense) +
+            "┼─"              + new string('─', colType)    +
+            "┼─"              + new string('─', colSource);
+
         NKConsole.WriteLine(sepLine, ConsoleColor.DarkGray);
 
         // Render table rows
         foreach (var r in fontRows.OrderBy(x => x.Source).ThenBy(x => x.Name)) {
-            NKConsole.Write("  " + r.Name.PadRight(colName), new NKStyle(ConsoleColor.Yellow, s: TextStyles.BOLD));
-            NKConsole.Write("│ ", ConsoleColor.DarkGray);
-            NKConsole.Write(r.Author.PadRight(colAuthor), ConsoleColor.White);
-            NKConsole.Write("│ ", ConsoleColor.DarkGray);
-            NKConsole.Write(r.License.PadRight(colLicense), ConsoleColor.Green);
-            NKConsole.Write("│ ", ConsoleColor.DarkGray);
-            NKConsole.Write(r.Type.PadRight(colType), ConsoleColor.Cyan);
-            NKConsole.Write("│ ", ConsoleColor.DarkGray);
+            NKConsole.Write("  " + r.Name.PadRight(colName), new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
+            NKConsole.Write("│ ",                            ConsoleColor.DarkGray);
+            NKConsole.Write(r.Author.PadRight(colAuthor),    ConsoleColor.White);
+            NKConsole.Write("│ ",                            ConsoleColor.DarkGray);
+            NKConsole.Write(r.License.PadRight(colLicense),  ConsoleColor.Green);
+            NKConsole.Write("│ ",                            ConsoleColor.DarkGray);
+            NKConsole.Write(r.Type.PadRight(colType),        ConsoleColor.Cyan);
+            NKConsole.Write("│ ",                            ConsoleColor.DarkGray);
             NKConsole.WriteLine(r.Source.PadRight(colSource), r.Source == "Built-in" ? ConsoleColor.Magenta : ConsoleColor.Blue);
         }
 
@@ -539,22 +831,24 @@ internal static class Program {
 
         if (font == null) {
             PrintError($"Could not load font '{fontKey}'.");
+
             return;
         }
 
         if (font is not Tui.Fonts.NKFont nkFont) {
-            PrintError($"Font '{fontKey}' of type '{font.GetType().Name}' does not support glyph listing.");
+            PrintError($"Font '{fontKey}' of flags '{font.GetType().Name}' does not support glyph listing.");
+
             return;
         }
 
         System.Console.WriteLine();
-        
+
         // Print Font Details Header
-        NKConsole.WriteLine("Font Details:", new NKStyle(ConsoleColor.Yellow, s: TextStyles.BOLD));
+        NKConsole.WriteLine("Font Details:", new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
         NKConsole.WriteLine("─────────────", ConsoleColor.DarkYellow);
-        
+
         NKConsole.Write("  Name:            ", ConsoleColor.Cyan);
-        NKConsole.WriteLine(nkFont.Name, new NKStyle(ConsoleColor.White, s: TextStyles.BOLD));
+        NKConsole.WriteLine(nkFont.Name, new NKStyle(ConsoleColor.White, styles: NKTextStyles.BOLD));
 
         if (!string.IsNullOrEmpty(nkFont.Info.Author)) {
             NKConsole.Write("  Author:          ", ConsoleColor.Cyan);
@@ -562,7 +856,7 @@ internal static class Program {
         }
 
         if (!string.IsNullOrEmpty(nkFont.Info.LicenseType)) {
-            NKConsole.Write("  License Type:    ", ConsoleColor.Cyan);
+            NKConsole.Write("  License Flags:    ", ConsoleColor.Cyan);
             NKConsole.WriteLine(nkFont.Info.LicenseType, ConsoleColor.White);
         }
 
@@ -570,43 +864,43 @@ internal static class Program {
             NKConsole.Write("  License File:    ", ConsoleColor.Cyan);
             NKConsole.WriteLine(nkFont.Info.LicenseFile, ConsoleColor.White);
         }
-        
+
         NKConsole.Write("  Proportions:     ", ConsoleColor.Cyan);
         NKConsole.WriteLine(nkFont.Info.ProportionType.ToString(), ConsoleColor.White);
-        
+
         NKConsole.Write("  Ligatures:       ", ConsoleColor.Cyan);
         NKConsole.WriteLine(nkFont.Info.Ligatures ? "Yes" : "No", ConsoleColor.White);
-        
+
         NKConsole.Write("  Leading:         ", ConsoleColor.Cyan);
         NKConsole.WriteLine(nkFont.Info.Leading.ToString(), ConsoleColor.White);
-        
+
         NKConsole.Write("  Letter Spacing:  ", ConsoleColor.Cyan);
         NKConsole.WriteLine(nkFont.Info.LetterSpacing.ToString(), ConsoleColor.White);
-        
+
         NKConsole.Write("  Word Spacing:    ", ConsoleColor.Cyan);
         NKConsole.WriteLine(nkFont.Info.WordSpacing.ToString(), ConsoleColor.White);
-        
+
         NKConsole.Write("  Total Glyphs:    ", ConsoleColor.Cyan);
-        NKConsole.WriteLine(nkFont.Glyphs.Count.ToString(), new NKStyle(ConsoleColor.White, s: TextStyles.BOLD));
+        NKConsole.WriteLine(nkFont.Glyphs.Count.ToString(), new NKStyle(ConsoleColor.White, styles: NKTextStyles.BOLD));
         System.Console.WriteLine();
 
         // Print Table Header
-        NKConsole.WriteLine("Glyphs Defined in Font:", new NKStyle(ConsoleColor.Yellow, s: TextStyles.BOLD));
+        NKConsole.WriteLine("Glyphs Defined in Font:", new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
         NKConsole.WriteLine("───────────────────────", ConsoleColor.DarkYellow);
         System.Console.WriteLine();
-        
+
         // Define Column Widths
-        const int colSymbol = 14;
-        const int colType = 12;
-        const int colSize = 10;
+        const int colSymbol   = 14;
+        const int colType     = 12;
+        const int colSize     = 10;
         const int colBaseline = 12;
 
         // Print table header row
-        NKConsole.Write("  " + "SYMBOL".PadRight(colSymbol), new NKStyle(ConsoleColor.Cyan, s: TextStyles.BOLD));
-        NKConsole.Write("│ " + "TYPE".PadRight(colType), new NKStyle(ConsoleColor.Cyan, s: TextStyles.BOLD));
-        NKConsole.Write("│ " + "SIZE".PadRight(colSize), new NKStyle(ConsoleColor.Cyan, s: TextStyles.BOLD));
-        NKConsole.Write("│ " + "BASELINE".PadRight(colBaseline), new NKStyle(ConsoleColor.Cyan, s: TextStyles.BOLD));
-        NKConsole.WriteLine("│ STYLES", new NKStyle(ConsoleColor.Cyan, s: TextStyles.BOLD));
+        NKConsole.Write("  " + "SYMBOL".PadRight(colSymbol),     new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD));
+        NKConsole.Write("│ " + "TYPE".PadRight(colType),         new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD));
+        NKConsole.Write("│ " + "SIZE".PadRight(colSize),         new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD));
+        NKConsole.Write("│ " + "BASELINE".PadRight(colBaseline), new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD));
+        NKConsole.WriteLine("│ STYLES", new NKStyle(ConsoleColor.Cyan,                          styles: NKTextStyles.BOLD));
 
         // Horizontal separator line
         string sepLine = "  " + new string('─', colSymbol) + "┼" + new string('─', colType + 1) + "┼" + new string('─', colSize + 1) + "┼" + new string('─', colBaseline + 1) + "┼" + new string('─', 20);
@@ -619,28 +913,28 @@ internal static class Program {
             .ToList();
 
         foreach (var (symbol, glyph) in sortedGlyphs) {
-            string symStr = symbol.IsSimple ? FormatSymbol(symbol.SimpleSymbol) : FormatLigature(symbol.LigatureSymbol);
-            string typeStr = symbol.IsSimple ? "Simple" : "Ligature";
-            string sizeStr = $"{glyph.Width}x{glyph.Height}";
-            string baseStr = glyph.BaselineOffset.ToString();
-            string stylesStr = symbol.Styles.Styles == TextStyles.NONE ? "None" : symbol.Styles.Styles.ToString();
+            string symStr    = symbol.IsSimple ? FormatSymbol(symbol.SimpleSymbol) : FormatLigature(symbol.LigatureSymbol);
+            string typeStr   = symbol.IsSimple ? "Simple" : "Ligature";
+            string sizeStr   = $"{glyph.Width}x{glyph.Height}";
+            string baseStr   = glyph.BaselineOffset.ToString();
+            string stylesStr = symbol.Styles.Styles == NKTextStyles.NONE ? "None" : symbol.Styles.Styles.ToString();
 
             // Print styled row
-            NKConsole.Write("  " + symStr.PadRight(colSymbol), new NKStyle(ConsoleColor.Yellow, s: TextStyles.BOLD));
-            
-            NKConsole.Write("│ ", ConsoleColor.DarkGray);
+            NKConsole.Write("  " + symStr.PadRight(colSymbol), new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
+
+            NKConsole.Write("│ ",                      ConsoleColor.DarkGray);
             NKConsole.Write(typeStr.PadRight(colType), symbol.IsSimple ? ConsoleColor.White : ConsoleColor.Cyan);
-            
-            NKConsole.Write("│ ", ConsoleColor.DarkGray);
+
+            NKConsole.Write("│ ",                      ConsoleColor.DarkGray);
             NKConsole.Write(sizeStr.PadRight(colSize), ConsoleColor.Green);
-            
-            NKConsole.Write("│ ", ConsoleColor.DarkGray);
+
+            NKConsole.Write("│ ",                          ConsoleColor.DarkGray);
             NKConsole.Write(baseStr.PadRight(colBaseline), ConsoleColor.Magenta);
-            
+
             NKConsole.Write("│ ", ConsoleColor.DarkGray);
-            NKConsole.WriteLine(stylesStr, symbol.Styles.Styles == TextStyles.NONE ? ConsoleColor.DarkGray : ConsoleColor.Blue);
+            NKConsole.WriteLine(stylesStr, symbol.Styles.Styles == NKTextStyles.NONE ? ConsoleColor.DarkGray : ConsoleColor.Blue);
         }
-        
+
         System.Console.WriteLine();
     }
 
@@ -649,56 +943,58 @@ internal static class Program {
 
         if (font == null) {
             PrintError($"Could not load font '{fontKey}'.");
+
             return;
         }
 
         if (font is not Tui.Fonts.NKFont nkFont) {
             PrintError($"Font '{fontKey}' of type '{font.GetType().Name}' does not support glyph inspection.");
+
             return;
         }
 
         System.Console.WriteLine();
-        
+
         // Search for the glyph in the font
         NKGlyphSymbol? matchedSymbol = null;
-        NKGlyph? matchedGlyph = null;
+        NKGlyph?       matchedGlyph  = null;
 
-        char searchChar = '\0';
-        bool isSimpleSearch = false;
+        char   searchChar      = '\0';
+        bool   isSimpleSearch  = false;
         string normalizedInput = glyphInput.Trim();
 
         if (normalizedInput.Equals("[space]", StringComparison.OrdinalIgnoreCase) || normalizedInput.Equals("space", StringComparison.OrdinalIgnoreCase)) {
-            searchChar = ' ';
+            searchChar     = ' ';
             isSimpleSearch = true;
         }
         else if (normalizedInput.Equals("[tab]", StringComparison.OrdinalIgnoreCase) || normalizedInput.Equals("tab", StringComparison.OrdinalIgnoreCase)) {
-            searchChar = '\t';
+            searchChar     = '\t';
             isSimpleSearch = true;
         }
         else if (normalizedInput.Equals("[newline]", StringComparison.OrdinalIgnoreCase) || normalizedInput.Equals("newline", StringComparison.OrdinalIgnoreCase)) {
-            searchChar = '\n';
+            searchChar     = '\n';
             isSimpleSearch = true;
         }
-        else if (normalizedInput.Equals("[return]", StringComparison.OrdinalIgnoreCase) || 
-                 normalizedInput.Equals("return", StringComparison.OrdinalIgnoreCase) || 
-                 normalizedInput.Equals("cr", StringComparison.OrdinalIgnoreCase)) {
-            searchChar = '\r';
+        else if (normalizedInput.Equals("[return]", StringComparison.OrdinalIgnoreCase) ||
+            normalizedInput.Equals("return",        StringComparison.OrdinalIgnoreCase) ||
+            normalizedInput.Equals("cr",            StringComparison.OrdinalIgnoreCase)) {
+            searchChar     = '\r';
             isSimpleSearch = true;
         }
         else if (glyphInput.Length == 1) {
-            searchChar = glyphInput[0];
+            searchChar     = glyphInput[0];
             isSimpleSearch = true;
         }
 
         foreach (var (sym, value) in nkFont.Glyphs) {
             if ((!isSimpleSearch || !sym.IsSimple || sym.SimpleSymbol != searchChar) &&
-                (!sym.IsLigature || !sym.LigatureSymbol.Equals(glyphInput, StringComparison.Ordinal)))
-            {
+                (!sym.IsLigature || !sym.LigatureSymbol.Equals(glyphInput, StringComparison.Ordinal))) {
                 continue;
             }
 
             matchedSymbol = sym;
-            matchedGlyph = value;
+            matchedGlyph  = value;
+
             break;
         }
 
@@ -711,26 +1007,28 @@ internal static class Program {
                     continue;
 
                 matchedSymbol = sym;
-                matchedGlyph = kvp.Value;
+                matchedGlyph  = kvp.Value;
+
                 break;
             }
         }
 
         if (matchedSymbol == null || matchedGlyph == null) {
             PrintError($"Glyph '{glyphInput}' not found in font '{font.Name}'.");
+
             return;
         }
 
         // Print Glyph Metadata
-        NKConsole.WriteLine("Glyph Details:", new NKStyle(ConsoleColor.Yellow, s: TextStyles.BOLD));
+        NKConsole.WriteLine("Glyph Details:", new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
         NKConsole.WriteLine("──────────────", ConsoleColor.DarkYellow);
 
-        string symStr = matchedSymbol.Value.IsSimple 
-            ? FormatSymbol(matchedSymbol.Value.SimpleSymbol) 
+        string symStr = matchedSymbol.Value.IsSimple
+            ? FormatSymbol(matchedSymbol.Value.SimpleSymbol)
             : FormatLigature(matchedSymbol.Value.LigatureSymbol);
 
         NKConsole.Write("  Symbol:          ", ConsoleColor.Cyan);
-        NKConsole.WriteLine(symStr, new NKStyle(ConsoleColor.Yellow, s: TextStyles.BOLD));
+        NKConsole.WriteLine(symStr, new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
 
         NKConsole.Write("  Type:            ", ConsoleColor.Cyan);
         NKConsole.WriteLine(matchedSymbol.Value.IsSimple ? "Simple" : "Ligature", ConsoleColor.White);
@@ -742,10 +1040,12 @@ internal static class Program {
         NKConsole.WriteLine(matchedGlyph.BaselineOffset.ToString(), ConsoleColor.Magenta);
 
         NKConsole.Write("  Styles:          ", ConsoleColor.Cyan);
-        string stylesStr = matchedSymbol.Value.Styles.Styles == TextStyles.NONE 
-            ? "None" 
+
+        string stylesStr = matchedSymbol.Value.Styles.Styles == NKTextStyles.NONE
+            ? "None"
             : matchedSymbol.Value.Styles.Styles.ToString();
-        NKConsole.WriteLine(stylesStr, matchedSymbol.Value.Styles.Styles == TextStyles.NONE ? ConsoleColor.DarkGray : ConsoleColor.Blue);
+
+        NKConsole.WriteLine(stylesStr, matchedSymbol.Value.Styles.Styles == NKTextStyles.NONE ? ConsoleColor.DarkGray : ConsoleColor.Blue);
 
         if (matchedGlyph.AlignPoints.Any()) {
             NKConsole.Write("  Align Points:    ", ConsoleColor.Cyan);
@@ -760,19 +1060,20 @@ internal static class Program {
         System.Console.WriteLine();
 
         // Visual Representation
-        NKConsole.WriteLine("Visual Representation:", new NKStyle(ConsoleColor.Yellow, s: TextStyles.BOLD));
+        NKConsole.WriteLine("Visual Representation:", new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
         NKConsole.WriteLine("──────────────────────", ConsoleColor.DarkYellow);
 
         int baselineY = matchedGlyph.Height + matchedGlyph.BaselineOffset - 1;
 
         // Top Border
-        NKConsole.Write("  ┌", ConsoleColor.DarkGray);
+        NKConsole.Write("  ┌",                               ConsoleColor.DarkGray);
         NKConsole.Write(new string('─', matchedGlyph.Width), ConsoleColor.DarkGray);
         NKConsole.WriteLine("┐", ConsoleColor.DarkGray);
 
         // Rows
         for (int y = 0; y < matchedGlyph.Height; y++) {
             NKConsole.Write("  │", ConsoleColor.DarkGray);
+
             for (int x = 0; x < matchedGlyph.Width; x++) {
                 var cell = matchedGlyph.Glyph[x, y];
 
@@ -788,7 +1089,7 @@ internal static class Program {
                         break;
                     }
                     case GlyphCellType.CHARACTER: {
-                        NKConsole.Write(cell.Character.ToString(), new NKStyle(ConsoleColor.Yellow, s: TextStyles.BOLD));
+                        NKConsole.Write(cell.Character.ToString(), new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
 
                         break;
                     }
@@ -797,19 +1098,19 @@ internal static class Program {
                     }
                 }
             }
-            
+
             NKConsole.Write("│", ConsoleColor.DarkGray);
 
             // Tag next to baseline row
             if (y == baselineY) {
-                NKConsole.Write("  <-- Baseline", new NKStyle(ConsoleColor.Magenta, s: TextStyles.BOLD));
+                NKConsole.Write("  <-- Baseline", new NKStyle(ConsoleColor.Magenta, styles: NKTextStyles.BOLD));
             }
-            
+
             System.Console.WriteLine();
         }
 
         // Bottom Border
-        NKConsole.Write("  └", ConsoleColor.DarkGray);
+        NKConsole.Write("  └",                               ConsoleColor.DarkGray);
         NKConsole.Write(new string('─', matchedGlyph.Width), ConsoleColor.DarkGray);
         NKConsole.WriteLine("┘", ConsoleColor.DarkGray);
 
@@ -824,17 +1125,17 @@ internal static class Program {
             NKConsole.Write("  Note: ", ConsoleColor.Cyan);
             NKConsole.WriteLine($"Baseline is {rowsAbove} row(s) above the grid.", ConsoleColor.DarkGray);
         }
-        
+
         System.Console.WriteLine();
     }
 
     static string FormatSymbol(char c) {
         return c switch {
-            ' ' => "[Space]",
+            ' '  => "[Space]",
             '\t' => "[Tab]",
             '\n' => "[Newline]",
             '\r' => "[Carriage Return]",
-            _ => $"'{c}'"
+            _    => $"'{c}'"
         };
     }
 
@@ -849,17 +1150,24 @@ internal static class Program {
 
         // 2. Try loading from internal storage
         string internalPath = Path.Combine(FONTS_STORAGE_DIR, fontKey);
+
         if (File.Exists(internalPath)) {
             var font = LoadFromFile(internalPath);
-            if (font != null) return font;
+
+            if (font != null)
+                return font;
         }
         else {
             string[] possibleExtensions = { ".nkf", ".flf" };
+
             foreach (var ext in possibleExtensions) {
                 string pathWithExt = Path.Combine(FONTS_STORAGE_DIR, fontKey + ext);
+
                 if (File.Exists(pathWithExt)) {
                     var font = LoadFromFile(pathWithExt);
-                    if (font != null) return font;
+
+                    if (font != null)
+                        return font;
                 }
             }
         }
@@ -867,7 +1175,9 @@ internal static class Program {
         // 3. Try loading from binary file path
         if (File.Exists(fontKey)) {
             var font = LoadFromFile(Path.GetFullPath(fontKey));
-            if (font != null) return font;
+
+            if (font != null)
+                return font;
         }
 
         // 4. Try loading as general XML path (directory or zip)
@@ -877,7 +1187,8 @@ internal static class Program {
             try {
                 var font = NKFontSerializer.DeserializeXml(fullPath);
 
-                if (font != null) return font;
+                if (font != null)
+                    return font;
             }
             catch {
                 // Ignore and fall through
@@ -893,7 +1204,7 @@ internal static class Program {
 
             if (fs.Length >= 5) {
                 var buffer = new byte[5];
-                int read = fs.Read(buffer, 0, 5);
+                int read   = fs.Read(buffer, 0, 5);
 
                 if (read == 5) {
                     uint magic = (uint)(buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24));
@@ -917,30 +1228,36 @@ internal static class Program {
         catch {
             // Ignore
         }
+
         return null;
     }
 
     static void HandleAdd(string fontPath) {
         string fullPath = Path.GetFullPath(fontPath);
+
         if (!File.Exists(fullPath)) {
             PrintError($"Font file '{fullPath}' does not exist.");
+
             return;
         }
 
         PrintInfo($"Validating font file '{Path.GetFileName(fullPath)}'...");
         var font = LoadFromFile(fullPath);
+
         if (font == null) {
             PrintError("Failed to load font. The file is not a valid FIGlet (.flf) or NeoKolors binary (.nkf) font.");
+
             return;
         }
 
         string destFileName = Path.GetFileName(fullPath);
-        string destPath = Path.Combine(FONTS_STORAGE_DIR, destFileName);
+        string destPath     = Path.Combine(FONTS_STORAGE_DIR, destFileName);
 
         try {
             if (!Directory.Exists(FONTS_STORAGE_DIR)) {
                 Directory.CreateDirectory(FONTS_STORAGE_DIR);
             }
+
             File.Copy(fullPath, destPath, overwrite: true);
             PrintSuccess($"Successfully added font '{font.Name}' to internal storage at '{destPath}'!");
         }
@@ -952,6 +1269,7 @@ internal static class Program {
     static void HandleRemove(string fontName) {
         if (string.IsNullOrWhiteSpace(fontName)) {
             PrintError("Font name cannot be empty.");
+
             return;
         }
 
@@ -962,8 +1280,10 @@ internal static class Program {
         };
 
         bool deleted = false;
+
         foreach (var c in candidates) {
             string path = Path.Combine(FONTS_STORAGE_DIR, c);
+
             if (File.Exists(path)) {
                 try {
                     File.Delete(path);
@@ -972,6 +1292,7 @@ internal static class Program {
                 }
                 catch (Exception ex) {
                     PrintError($"Failed to delete '{c}': {ex.Message}");
+
                     return;
                 }
             }
@@ -984,17 +1305,18 @@ internal static class Program {
 
     static void HandleCleanLogs() {
         var installDir = AppContext.BaseDirectory;
-        var logsDir = Path.Combine(installDir, "logs");
+        var logsDir    = Path.Combine(installDir, "logs");
 
         if (!Directory.Exists(logsDir)) {
             PrintSuccess("No log directory found. Nothing to clean.");
+
             return;
         }
 
         try {
-            var files = Directory.GetFiles(logsDir, "*.log");
+            var files        = Directory.GetFiles(logsDir, "*.log");
             int deletedCount = 0;
-            int failedCount = 0;
+            int failedCount  = 0;
 
             foreach (var file in files) {
                 try {
@@ -1013,9 +1335,11 @@ internal static class Program {
             if (deletedCount > 0) {
                 PrintSuccess($"Successfully cleaned {deletedCount} log file(s).");
             }
+
             if (failedCount > 0) {
                 PrintInfo($"{failedCount} active log file(s) are currently in use by the running tool and were not deleted.");
             }
+
             if (deletedCount == 0 && failedCount == 0) {
                 PrintInfo("No log files to clean.");
             }
@@ -1026,17 +1350,22 @@ internal static class Program {
     }
 
     static void PrintError(string msg) {
-        NKConsole.Write("[ERROR] ", new NKStyle(ConsoleColor.Red, s: TextStyles.BOLD));
+        NKConsole.Write("[ERROR] ", new NKStyle(ConsoleColor.Red, styles: NKTextStyles.BOLD));
         NKConsole.WriteLine(msg, ConsoleColor.Red);
     }
 
     static void PrintSuccess(string msg) {
-        NKConsole.Write("[SUCCESS] ", new NKStyle(ConsoleColor.Green, s: TextStyles.BOLD));
+        NKConsole.Write("[SUCCESS] ", new NKStyle(ConsoleColor.Green, styles: NKTextStyles.BOLD));
         NKConsole.WriteLine(msg, ConsoleColor.Green);
     }
 
     static void PrintInfo(string msg) {
-        NKConsole.Write("[INFO] ", new NKStyle(ConsoleColor.Cyan, s: TextStyles.BOLD));
+        NKConsole.Write("[INFO] ", new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD));
         NKConsole.WriteLine(msg, ConsoleColor.Cyan);
+    }
+
+    static void PrintWarning(string msg) {
+        NKConsole.Write("[WARNING] ", new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
+        NKConsole.WriteLine(msg, ConsoleColor.Yellow);
     }
 }

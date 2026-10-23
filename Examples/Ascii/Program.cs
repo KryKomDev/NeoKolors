@@ -35,9 +35,9 @@ class Program {
         for (int y = 0; y < rows; y++) {
             for (int x = 0; x < cols; x++) {
                 int ch = x * rows + y;
-                NKConsole.Write($"   {ch:000}", new NKStyle(ConsoleColor.Blue, s: TextStyles.FAINT));
-                NKConsole.Write($" {ch:x2}", new NKStyle(ConsoleColor.Magenta, s: TextStyles.FAINT));
-                NKConsole.Write($" {(ch < 33 ? UNPRINTABLE[ch] : ch == 127 ? DEL : (char)ch + "  ")}", new NKStyle(s: TextStyles.BOLD));
+                NKConsole.Write($"   {ch:000}", new NKStyle(ConsoleColor.Blue, styles: NKTextStyles.FAINT));
+                NKConsole.Write($" {ch:x2}", new NKStyle(ConsoleColor.Magenta, styles: NKTextStyles.FAINT));
+                NKConsole.Write($" {(ch < 33 ? UNPRINTABLE[ch] : ch == 127 ? DEL : (char)ch + "  ")}", new NKStyle(styles: NKTextStyles.BOLD));
             }
             
             Console.WriteLine();

@@ -11,20 +11,20 @@ namespace NeoKolors.Tui.Fonts;
 [StructLayout(LayoutKind.Explicit)]
 public readonly record struct NKGlyphSymbol {
 
-    [FieldOffset(16)] private readonly byte    _type;
     [FieldOffset(0)]  private readonly NKStyle _styles;
-    [FieldOffset(17)] private readonly char    _symbol_simple;
-    [FieldOffset(8)]  private readonly string? _symbol_ligature;
+    [FieldOffset(32)] private readonly byte    _type;
+    [FieldOffset(33)] private readonly char    _symbol_simple;
+    [FieldOffset(16)] private readonly string? _symbol_ligature;
 
     public byte    Type   => _type;
     public NKStyle Styles => _styles;
 
-    public bool IsSimple       => _type == 1;
-    public bool IsLigature     => _type == 2;
+    public bool IsSimple   => _type == 1;
+    public bool IsLigature => _type == 2;
 
     public char SimpleSymbol => _type == 1 ? _symbol_simple : throw new IOp();
 
-    public string LigatureSymbol => _type == 2 ? _symbol_ligature!        : throw new IOp();
+    public string LigatureSymbol => _type == 2 ? _symbol_ligature! : throw new IOp();
     public int    LigatureLength => _type == 2 ? _symbol_ligature!.Length : throw new IOp();
 
     private NKGlyphSymbol(char simple, NKStyle styles = default) {
@@ -41,16 +41,16 @@ public readonly record struct NKGlyphSymbol {
         _symbol_ligature = ligature;
     }
 
-    public static NKGlyphSymbol Simple(char symbol, NKStyle styles = default) =>
-        new(symbol, styles);
+    public static NKGlyphSymbol Simple(char symbol, NKStyle styles = default) => new(symbol, styles);
 
-    public static NKGlyphSymbol Ligature(string ligature, NKStyle styles = default) =>
-        new(ligature, styles);
+    public static NKGlyphSymbol Ligature(string ligature, NKStyle styles = default) => new(ligature, styles);
 
     public bool Equals(NKGlyphSymbol other) {
-        if (_type != other._type || _styles != other._styles) return false;
+        if (_type != other._type || _styles != other._styles)
+            return false;
+
         return _type switch {
-            1 => _symbol_simple == other._symbol_simple,
+            1 => _symbol_simple   == other._symbol_simple,
             2 => _symbol_ligature == other._symbol_ligature,
             _ => true
         };
@@ -60,12 +60,12 @@ public readonly record struct NKGlyphSymbol {
         var hash = new HashCode();
         hash.Add(_type);
         hash.Add(_styles);
-        
+
         switch (_type) {
-            case 1: hash.Add(_symbol_simple);   break;
+            case 1: hash.Add(_symbol_simple); break;
             case 2: hash.Add(_symbol_ligature); break;
         }
-        
+
         return hash.ToHashCode();
     }
 
@@ -76,4 +76,25 @@ public readonly record struct NKGlyphSymbol {
             _ => throw new ArgumentOutOfRangeException()
         };
     }
+
+    private sealed class NKGlyphSymbolEqualityComparer : IEqualityComparer<NKGlyphSymbol> {
+        public bool Equals(NKGlyphSymbol x, NKGlyphSymbol y) {
+            return x._type == y._type                  &&
+                x._styles.Equals(y._styles)            &&
+                x._symbol_simple   == y._symbol_simple &&
+                x._symbol_ligature == y._symbol_ligature;
+        }
+
+        public int GetHashCode(NKGlyphSymbol obj) {
+            return HashCode.Combine(
+                obj._type,
+                obj._styles,
+                obj._symbol_simple,
+                obj._symbol_ligature
+            );
+        }
+    }
+
+    public static IEqualityComparer<NKGlyphSymbol> Comparer { get; } =
+        new NKGlyphSymbolEqualityComparer();
 }

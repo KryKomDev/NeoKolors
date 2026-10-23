@@ -6,9 +6,9 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using NeoKolors.Extensions;
-using static NeoKolors.Tui.Fonts.Serialization.Xml.V3.XmlGlyphAlignPointReplaceType;
+using static NeoKolors.Tui.Fonts.Xml.V3.XmlGlyphAlignPointReplaceType;
 
-namespace NeoKolors.Tui.Fonts.Serialization.Xml.V3;
+namespace NeoKolors.Tui.Fonts.Xml.V3;
 
 /// <summary>
 /// Defines how the characters interpreted as align-points in the glyph file should be erased or replaced.

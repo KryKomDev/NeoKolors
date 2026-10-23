@@ -8,7 +8,7 @@ using System.Xml.Serialization;
 using HasFlagExtension;
 using NeoKolors.Extensions;
 
-namespace NeoKolors.Tui.Fonts.Serialization.Xml.V3;
+namespace NeoKolors.Tui.Fonts.Xml.V3;
 
 public abstract class XmlAutoCompoundApplicable {
     public abstract HashSet<char> ApplicableChars { get; }

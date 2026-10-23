@@ -350,7 +350,7 @@ public class NKStyleTests {
     public void Protobuf_Serialization_Roundtrip() {
         var original = new NKStyle {
             FColor          = NKColor.FromRgb(255, 128, 64),
-            BColor          = new NKColor(NKConsoleColor.DARK_BLUE),
+            BColor          = new NKColor(DARK_BLUE),
             Styles          = BOLD | ITALIC,
             InheritedStyles = FAINT,
             Underline       = new NKUnderlineStyle(NKColor.FromRgb(0, 200, 100), NKUnderlineType.CURLY)

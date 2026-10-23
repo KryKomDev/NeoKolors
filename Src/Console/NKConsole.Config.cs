@@ -82,16 +82,16 @@ public partial class NKConsole {
             };
             
             LOGGER.Info(
-                "Using {Name} as output driver", 
-                result.GetType().Name
+                "Using {0} as output driver", 
+                args: result.GetType().Name
             );
 
             return result;
         }
         catch (Exception ex) {
             LOGGER.Warn(
-                "Failed to create native output driver, falling back to dotnet driver: {ExMessage}", 
-                ex.Message
+                "Failed to create native output driver, falling back to dotnet driver: {0}", 
+                args: ex.Message
             );
 
             return new DotnetOutputDriver();
@@ -114,12 +114,18 @@ public partial class NKConsole {
                 _ => new DotnetInputDriver()
             };
 
-            LOGGER.Info($"Using {result.GetType().Name} as input driver");
+            LOGGER.Info(
+                "Using {0} as input driver",
+                args: result.GetType().Name
+            );
             
             return result;
         }
         catch (Exception ex) {
-            LOGGER.Warn($"Failed to create native input driver, falling back to dotnet driver: {ex.Message}");
+            LOGGER.Warn(
+                "Failed to create native input driver, falling back to dotnet driver: {0}",
+                args: ex.Message
+            );
 
             return new DotnetInputDriver();
         }
@@ -179,7 +185,7 @@ public partial class NKConsole {
     public static void DisableAltBuffer() {
         OutputDriver.Write(ALT_BUFF_RC_DISABLE);
         IS_ALT_BUFFER_ON = false;
-        LOGGER.Info($"Alt buffer set to {IS_ALT_BUFFER_ON}");
+        LOGGER.Info("Alt buffer set to {IsAltBufferOn}", args: IS_ALT_BUFFER_ON);
     }
 
     /// <summary>
@@ -199,7 +205,7 @@ public partial class NKConsole {
         set {
             OutputDriver.Write(value ? REPORT_FOCUS_ENABLE : REPORT_FOCUS_DISABLE);
             REPORT_FOCUS = value;
-            LOGGER.Info($"Focus reporting set to {value}");
+            LOGGER.Info("Focus reporting set to {Value}", args: value);
         }
     }
 
@@ -211,7 +217,7 @@ public partial class NKConsole {
     public static void EnableFocusReporting() {
         OutputDriver.Write(REPORT_FOCUS_ENABLE);
         REPORT_FOCUS = true;
-        LOGGER.Info($"Focus reporting set to true");
+        LOGGER.Info("Focus reporting set to true");
     }
 
     /// <summary>
@@ -222,7 +228,7 @@ public partial class NKConsole {
     public static void DisableFocusReporting() {
         OutputDriver.Write(REPORT_FOCUS_DISABLE);
         REPORT_FOCUS = false;
-        LOGGER.Info($"Focus reporting set to false");
+        LOGGER.Info("Focus reporting set to false");
     }
 
     /// <summary>
