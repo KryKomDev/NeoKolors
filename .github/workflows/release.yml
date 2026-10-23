@@ -46,7 +46,8 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '11.0.x'
+          dotnet-quality: 'preview'
 
       - name: Restore Solution
         run: dotnet restore NeoKolors.slnx
@@ -109,7 +110,8 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '10.0.x'
+          dotnet-version: '11.0.x'
+          dotnet-quality: 'preview'
 
       - name: Push to NuGet
         env:
@@ -119,4 +121,5 @@ jobs:
             --api-key "$NUGET_API_KEY" \
             --source https://api.nuget.org/v3/index.json \
             --skip-duplicate
+
 
