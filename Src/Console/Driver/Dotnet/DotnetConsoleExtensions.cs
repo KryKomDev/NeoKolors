@@ -69,9 +69,7 @@ public static class DotnetConsoleExtensions {
         /// available or input is redirected.</returns>
         public static ConsoleKeyInfo? ReadKeyU(bool intercept = false) {
             if (!Stdio.IsInputRedirected)
-                return Stdio.KeyAvailable 
-                    ? Stdio.ReadKey(intercept) 
-                    : null;
+                return Stdio.ReadKey(intercept);
 
             var c = Stdio.Read();
             

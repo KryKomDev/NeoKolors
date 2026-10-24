@@ -10,6 +10,8 @@
         <LangVersion>14</LangVersion>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
+        
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
 
     <ItemGroup>

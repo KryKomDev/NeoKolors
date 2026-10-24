@@ -3,7 +3,8 @@
         <LangVersion>14</LangVersion>
         <DefineConstants>
             $(DefineConstants); 
-            NK_RENDERING_PROFILING
+            NK_RENDERING_PROFILING;
+            NK_ENABLE_NATIVE_IO
         </DefineConstants>
 
         <PolyArgumentExceptions>true</PolyArgumentExceptions>

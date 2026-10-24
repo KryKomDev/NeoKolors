@@ -18,66 +18,57 @@ namespace NeoKolors.Console;
 /// console framework.
 /// </remarks>
 public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
-
     private static readonly NKLogger LOGGER = NKDebug.GetLogger("DotnetInputDriver");
 
-    public event MouseEventHandler?      Mouse    = delegate { };
-    public event KeyEventHandler?        Key      = delegate { };
-    public event FocusInEventHandler?    FocusIn  = delegate { };
-    public event FocusOutEventHandler?   FocusOut = delegate { };
-    public event ResizeEventHandler?     Resize   = delegate { };
-    public event PasteEventHandler?      Paste    = delegate { };
-    public event VTQueryResponseHandler? VTQuery  = delegate { };
+    public event MouseEventHandler? Mouse = delegate { };
+    public event KeyEventHandler? Key = delegate { };
+    public event FocusInEventHandler? FocusIn = delegate { };
+    public event FocusOutEventHandler? FocusOut = delegate { };
+    public event ResizeEventHandler? Resize = delegate { };
+    public event PasteEventHandler? Paste = delegate { };
+    public event VTQueryResponseHandler? VTQuery = delegate { };
 
-    private bool                             _disposed = false;
-    private Thread?                          _inputThread;
-    private bool                             _isStopped = true;
-    private event Action                     _onStopped = delegate { };
-    private readonly DotnetAnsiParser        _parser;
-    private readonly LockObject              _queueLock    = new();
-    private readonly Queue<VTQuery>          _requestQueue = new();
-    private          DotnetInputDriverConfig _config;
+    private bool _disposed = false;
+    private Thread? _inputThread;
+    private bool _isStopped = true;
+    private readonly DotnetAnsiParser _parser;
+    private readonly LockObject _queueLock = new();
+    private readonly Queue<VTQuery> _requestQueue = new();
+    private DotnetInputDriverConfig? _config = null!;
+
+    private ReportedMouseEvents _activeMouseLevel = ReportedMouseEvents.NONE;
+    private MouseReportProtocol _activeMouseProtocol = MouseReportProtocol.X10;
+
+    private event Action OnStopped = delegate { };
 
     public bool IsRunning { get; private set; }
 
     public DotnetInputDriverConfig Config {
-        get => _config;
+        get => _config!;
         set {
-            _config.PropertyChanged -= HandleConfigChange;
+            if (_config != null)
+                _config.PropertyChanged -= HandleConfigChange;
 
             _config = value;
 
-            value.PropertyChanged += HandleConfigChange;
+            if (_config != null) {
+                _config.PropertyChanged += HandleConfigChange;
+                ApplyMouseReporting();
+            }
         }
     }
 
     private void HandleConfigChange(object? sender, PropertyChangedEventArgs e) {
         LOGGER.Debug($"Config change: {e.PropertyName}");
-        
+
         switch (e.PropertyName) {
-            case nameof(Config.MouseReportLevel) when e is IPropertyChangedEventTrackingArgs<ReportedMouseEvents> l: {
-                SetReportedMouseEvents(l.OldValue, l.NewValue);
-
-                break;
-            }
-            case nameof(Config.MouseReportLevel): {
-                SetReportedMouseEvents(_config.MouseReportLevel);
-
-                break;
-            }
-            case nameof(Config.MouseReportProtocol) when e is IPropertyChangedEventTrackingArgs<MouseReportProtocol> p: {
-                SetMouseReportProtocol(p.OldValue, p.NewValue);
-
-                break;
-            }
+            case nameof(Config.MouseReportLevel):
             case nameof(Config.MouseReportProtocol): {
-                SetMouseReportProtocol(_config.MouseReportProtocol);
-
+                ApplyMouseReporting();
                 break;
             }
             default: {
                 LOGGER.Warn($"Unhandled config change: {e.PropertyName}");
-
                 break;
             }
         }
@@ -85,13 +76,42 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
 
     public DotnetInputDriver(DotnetInputDriverConfig? config = null) {
         _parser = new DotnetAnsiParser(HandleUnused);
-        _config = config ?? new DotnetInputDriverConfig();
+        Config = config ?? new DotnetInputDriverConfig();
 
         try {
             Stdio.TreatControlCAsInput = !Config.CtrlCForceQuits;
         }
         catch (Exception ex) {
             LOGGER.Warn($"Failed to set TreatControlCAsInput: {ex.Message}");
+        }
+    }
+
+    private void ApplyMouseReporting() {
+        var targetLevel = _config!.MouseReportLevel;
+        var targetProtocol = targetLevel != ReportedMouseEvents.NONE
+            ? _config.MouseReportProtocol
+            : MouseReportProtocol.X10;
+
+        if (_activeMouseLevel != targetLevel) {
+            SetReportedMouseEvents(_activeMouseLevel, targetLevel);
+            _activeMouseLevel = targetLevel;
+        }
+
+        if (_activeMouseProtocol != targetProtocol) {
+            SetMouseReportProtocol(_activeMouseProtocol, targetProtocol);
+            _activeMouseProtocol = targetProtocol;
+        }
+    }
+
+    private void ResetMouseReporting() {
+        if (_activeMouseLevel != ReportedMouseEvents.NONE) {
+            SetReportedMouseEvents(_activeMouseLevel, ReportedMouseEvents.NONE);
+            _activeMouseLevel = ReportedMouseEvents.NONE;
+        }
+
+        if (_activeMouseProtocol != MouseReportProtocol.X10) {
+            SetMouseReportProtocol(_activeMouseProtocol, MouseReportProtocol.X10);
+            _activeMouseProtocol = MouseReportProtocol.X10;
         }
     }
 
@@ -115,17 +135,21 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
             return;
 
         IsRunning = true;
+        ApplyMouseReporting();
 
         _inputThread = new Thread(Intercept) {
             IsBackground = true,
-            Priority     = ThreadPriority.BelowNormal,
-            Name         = "NeoKolors .NET Input Interceptor"
+            Priority = ThreadPriority.BelowNormal,
+            Name = "NeoKolors .NET Input Interceptor"
         };
 
         _inputThread.Start();
     }
 
-    public virtual void Stop() => IsRunning = false;
+    public virtual void Stop() {
+        IsRunning = false;
+        ResetMouseReporting();
+    }
 
     private void Intercept() {
         _isStopped = false;
@@ -133,8 +157,11 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
         while (IsRunning) {
             // try to get some input
             try {
-                if (Stdio.KeyAvailable) {
+                if (Stdio.PeekU()) {
                     ProcessInput(_parser.Parse());
+                }
+                else {
+                    Thread.Sleep(1);
                 }
             }
             catch (Exception e) when (e is InvalidOperationException or EndOfStreamException) {
@@ -148,7 +175,7 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
         }
 
         _isStopped = true;
-        _onStopped.Invoke();
+        OnStopped.Invoke();
     }
 
     private void ProcessInput(AnsiRecord? record) {
@@ -235,15 +262,24 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
         Stop();
 
         if (!_isStopped) {
-            var are     = new AutoResetEvent(false);
+            var are = new AutoResetEvent(false);
             var handler = void () => are.Set();
 
-            _onStopped += handler;
+            OnStopped += handler;
             are.WaitOne();
-            _onStopped -= handler;
+            OnStopped -= handler;
         }
 
         _disposed = true;
+    }
+
+    private static void WriteTerminal(string seq) {
+        try {
+            NKConsole.OutputDriver.Write(seq);
+        }
+        catch (Exception ex) {
+            LOGGER.Warn($"Failed to write terminal escape sequence: {ex.Message}");
+        }
     }
 
     private static void SetMouseReportProtocol(MouseReportProtocol newValue) {
@@ -269,11 +305,11 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
 
         // disable the original protocol
         if (d != null)
-            NKConsole.OutputDriver.Write(d);
+            WriteTerminal(d);
 
         // enable the new protocol
         if (e != null)
-            NKConsole.OutputDriver.Write(e);
+            WriteTerminal(e);
 
         LOGGER.Info($"Mouse reporting protocol set to {newValue}");
     }
@@ -303,11 +339,11 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
 
         // disable the original level
         if (d != null)
-            NKConsole.OutputDriver.Write(d);
+            WriteTerminal(d);
 
         // enable the new level
         if (e != null)
-            NKConsole.OutputDriver.Write(e);
+            WriteTerminal(e);
 
         LOGGER.Info($"Mouse reporting level set to {newValue}.");
     }

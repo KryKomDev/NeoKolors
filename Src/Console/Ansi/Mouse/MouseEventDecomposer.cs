@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2025 KryKom
 
 using Metriks;
@@ -21,9 +21,9 @@ internal static class MouseEventDecomposer {
     /// modifiers, movement status, and position.</returns>
     internal static MouseEventArgs DecomposeUtf8(char type, char x, char y) {
         var t   = GetType(type  - 32);
-        var pos = new Point2D(x - 32, y - 32);
+        var pos = new Point2D(x - 33, y - 33);
 
-        return new MouseEventArgs(t.Btn, t.Mods, pos, t.Move, t is { Btn: MouseButton.RELEASE, Move: false });
+        return new MouseEventArgs(t.Btn, t.Mods, pos, t is { Btn: MouseButton.RELEASE, Move: false }, t.Move);
     }
 
     /// <summary>

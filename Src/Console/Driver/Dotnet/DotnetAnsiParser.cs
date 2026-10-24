@@ -1,4 +1,4 @@
-﻿//
+//
 // NeoKolors
 // Copyright (c) 2026 KryKom
 //
@@ -34,7 +34,7 @@ public class DotnetAnsiParser : AnsiParser {
         var key = Stdio.ReadKeyU(intercept: true);
 
         if (key == null)
-            throw new InvalidOperationException();
+            throw new EndOfStreamException();
         
         _inputQueue.Enqueue(key.Value);
 
@@ -45,7 +45,7 @@ public class DotnetAnsiParser : AnsiParser {
         var key = Stdio.ReadKeyU(intercept: true);
 
         if (key == null)
-            throw new InvalidOperationException();
+            throw new EndOfStreamException();
         
         _inputQueue.Enqueue(key.Value);
         

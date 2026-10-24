@@ -7,3 +7,4 @@ using static HasFlagExtension.NamingCase;
 
 [assembly: EnumNaming(SCREAMING_SNAKE, PASCAL)]
 [assembly: InternalsVisibleTo("Testing")]
+[assembly: InternalsVisibleTo("NeoKolors.Console.Tests")]
