@@ -13,7 +13,7 @@ namespace NeoKolors.Console.Tests;
 [Collection("ConsoleTests")]
 public class LinuxDriverTests {
 
-    [Fact]
+    [LinuxFact]
     public unsafe void LinuxImports_StructSizes_MatchLinuxAbi() {
         Assert.Equal(60, sizeof(LinuxImports.Termios));
         Assert.Equal(8, sizeof(LinuxImports.WinSize));
@@ -21,7 +21,7 @@ public class LinuxDriverTests {
         Assert.Equal(8, sizeof(LinuxImports.PipeFds));
     }
 
-    [Theory]
+    [LinuxTheory]
     [InlineData('\r', KeyCode.RETURN, KeyModifiers.NONE)]
     [InlineData('\n', KeyCode.RETURN, KeyModifiers.NONE)]
     [InlineData('\t', KeyCode.TAB, KeyModifiers.NONE)]
@@ -44,7 +44,7 @@ public class LinuxDriverTests {
         Assert.Equal(expectedModifiers, args.Modifiers);
     }
 
-    [Fact]
+    [LinuxFact]
     public void LinuxPipe_OutputAndInput_DirectTransfer() {
         int ret = LinuxImports.pipe(out var pipeFds);
         Assert.Equal(0, ret);
@@ -74,7 +74,7 @@ public class LinuxDriverTests {
         }
     }
 
-    [Fact]
+    [LinuxFact]
     public void LinuxTerminal_TryGetWindowSize_DoesNotThrow() {
         bool success = LinuxTerminal.TryGetWindowSize(out var size);
         if (success) {
@@ -83,7 +83,7 @@ public class LinuxDriverTests {
         }
     }
 
-    [Fact]
+    [LinuxFact]
     public void LinuxTerminal_TryGetWindowPixelSize_DoesNotThrow() {
         bool success = LinuxTerminal.TryGetWindowPixelSize(out var pixelSize);
         if (success) {
@@ -92,7 +92,7 @@ public class LinuxDriverTests {
         }
     }
 
-    [Fact]
+    [LinuxFact]
     public void LinuxInputDriverConfig_Defaults_AreValid() {
         var config = new LinuxInputDriverConfig();
 
@@ -104,7 +104,7 @@ public class LinuxDriverTests {
         Assert.True(config.CtrlCForceQuits);
     }
 
-    [Fact]
+    [LinuxFact]
     public void LinuxInputDriverConfig_PropertyChanged_Fires() {
         var config = new LinuxInputDriverConfig();
         string? changedProp = null;
@@ -118,14 +118,14 @@ public class LinuxDriverTests {
         Assert.Equal(nameof(config.MouseReportProtocol), changedProp);
     }
 
-    [Fact]
+    [LinuxFact]
     public void LinuxInputDriver_ConstructsAndDisposes_WithoutThrowing() {
         using var driver = new LinuxInputDriver();
         Assert.NotNull(driver);
         Assert.False(driver.IsRunning);
     }
 
-    [Fact]
+    [LinuxFact]
     public void LinuxOutputDriver_ConstructsAndDisposes_WithoutThrowing() {
         using var driver = new LinuxOutputDriver();
         Assert.NotNull(driver);

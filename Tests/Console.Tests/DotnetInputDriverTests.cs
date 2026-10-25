@@ -68,7 +68,7 @@ public class DotnetInputDriverTests {
         }
     }
 
-    [Fact]
+    [LinuxFact]
     public void LinuxInputDriver_InheritsDotnetInputDriverCorrectly() {
         var rec = new RecordingOutputDriver();
         var prevOutput = NKConsole.OutputDriver;
