@@ -1,53 +1,37 @@
 # NeoKolors Documentation
 
-NeoKolors is a C# library ecosystem providing color utilities, console graphics, and a Text User Interface (TUI)
-framework.
+NeoKolors is a modern, high-performance C# library ecosystem providing color utilities, console graphics, native cross-platform terminal drivers, typography engines, and a state-driven Text User Interface (TUI) framework.
 
 ---
 
-## Projects
+## Projects in the Ecosystem
 
-### NeoKolors.Common
+### Core Foundation
 
-Provides common structures and classes for working with colors, ANSI escape sequences, Sixel graphics, and color
-palettes. Key types include `NKColor`, which supports RGB, hex, and standard console colors, and `NKStyle`, which
-combines foreground and background colors with text styles. The package also handles immutable styled `AnsiString`
-structures and high-performance raster-to-Sixel conversion for rendering images directly in compatible terminals.
+- **NeoKolors.Common**: Common structures and classes for working with colors, ANSI escape sequences, Sixel graphics, and color palettes. Key types include `NKColor` (32-bit compact RGB TrueColor, 256 colors, inherit values) and `NKStyle` (128-bit explicit layout struct packing foreground, background, and text formatting). It also handles immutable styled `AnsiString` structures and high-performance raster-to-Sixel conversion for rendering images directly in compliant terminals.
+- **NeoKolors.Console**: Cross-platform terminal driver, low-level virtual terminal controls, asynchronous mouse and keyboard input capture, structured logging, and unhandled exception formatting. Features native Linux I/O drivers (`epoll`/`termios`), native Windows Console API drivers, and managed .NET fallback drivers.
+- **NeoKolors.Extensions**: High-performance extension methods for string manipulation, word wrapping (`Chop`), ANSI printable length measurement, 2D array grid utilities (`List2D`), and case conversion across Camel, Pascal, Snake, Screaming Snake, Kebab, and Train cases.
+- **NeoKolors.Settings**: Type-safe settings building and parsing framework. Uses a tree-based structure composed of `SettingsNode`, `SettingsGroup`, and typed `IArgument` variants to define configurations with input validation and auto-merging.
 
-### NeoKolors.Console
+### TUI & Typography
 
-Provides a configurable console logger, low-level terminal controls, mouse and keyboard input events capture, and
-unhandled exception formatting. The `NKConsole` driver provides access to virtual terminal states, alternate screen
-buffers, bracketed paste mode, and mouse reporting. `NKLogger` provides asynchronous structured logging with levels and
-templates, while `ExceptionFormatter` transforms unhandled stack traces into visually descriptive layouts.
+- **NeoKolors.Tui.Core**: Double-buffered character canvas (`NKCharCanvas`), diff-based screen presenter (`NKCharScreen`), customizable border styles (`NKBorderStyle`), cell layering (`ZLayers`), profiler, and spatial hit-maps (`HitMap`).
+- **NeoKolors.Tui.Elements**: Component tree featuring declarative flexbox layouts (`Flex`), tabular grids (`Grid`), borders (`Border`), interactive buttons (`Button`), tables (`Table`), lists (`List`), styled text (`Text`), and mouse event routing (`ElementsMouseDispatcher`).
+- **NeoKolors.Tui.Fonts**: Typography and text rendering engine supporting XML V3 definitions, MessagePack binary `.nkf` compilation, Figlet fonts, and dynamic kerning.
+- **NeoKolors.Tui.Fonts.Assets**: Pre-compiled built-in font assets (such as `Bytesized` and `Future`) embedded as binary resources.
+- **NeoKolors.Tui.Widgets**: Standalone interactive widgets (progress bars, spinners, prompts) for standard console streams without full-screen TUI apps.
+- **NeoKolors.Tui**: Metapackage combining TUI core, elements, and styling.
 
-### NeoKolors.Extensions
+### Application & Game Lifecycles
 
-Provides utility extension methods for string manipulation, word wrapping, case conversion, collection indexing, and key
-mapping. String helpers include `Chop` for paragraph wrapping and `GetPlainLength` to calculate printable text length
-after stripping ANSI formatting. The `UniversalNamingConvertor` supports case conversions across Pascal, camel, snake,
-screaming snake, kebab, and train case naming styles.
+- **NeoKolors.Tui.Lifecycle.Core**: Engine state machine (`ILifecycle`, `LifecycleController`), high-precision frame timing (`FrameClock`), fixed-timestep physics accumulator (`FixedTimestepAccumulator`), and scene stack (`SceneStack`).
+- **NeoKolors.Tui.Lifecycle.Apps**: Application hosting infrastructure (`AppLifecycleHost`), view presenter (`NKAppView`), focus tracking, and execution loop strategies (`ThrottledAppLoopStrategy`, `LazyAppLoopStrategy`).
+- **NeoKolors.Tui.Lifecycle.Game2D**: Dedicated 2D terminal game loop engine (`Game2DLoop`), 2D camera viewport (`Camera2D`), and multi-stage rendering pipeline (`Render2DPipeline`).
+- **NeoKolors.Tui.Lifecycle.Game3D**: 3D terminal graphics lifecycle and viewport architecture abstractions.
 
-### NeoKolors.Settings
+### Tools & CLI
 
-Provides a type-safe settings building and parsing framework to parse configurations and construct typed objects. The
-system uses a tree-based structure composed of `SettingsNode`, `SettingsGroup`, and `IArgument` variants. Developers
-define arguments and construct final typed configurations using builder contexts, allowing input validation and mutual
-options merging.
-
-### NeoKolors.Tui
-
-Provides a component-driven Text User Interface (TUI) framework featuring stateful controls, layout panels, visual
-states, and routed events. It uses stateful controls (such as `Panel`, `ContentControl`, `TextBlock`, and `TextBox`) and
-a structured layout system composed of `Grid`, `StackPanel`, `RelativePanel`, and `Canvas`. A visual state manager
-handles cursor hover and focus triggers, and events propagate via tunneling and bubbling.
-
-### NeoKolors.Tui.Fonts
-
-Provides typography and text rendering engines supporting ASCII and ANSI font assets and XML-based font compilation. It
-includes built-in stylized font resources (such as `Bytesized` and `Future`) and integrates an MSBuild compiler task to
-package font descriptor assets into embedded resources at build time. Custom fonts are defined using XML specifications
-for metrics and glyph coordinate grids.
+- **NeoKolors.Tools.NKFont**: Global .NET CLI tool (`nkfont`) to inspect, create, compile, and preview custom terminal fonts.
 
 ---
 
@@ -55,19 +39,25 @@ for metrics and glyph coordinate grids.
 
 ### GitHub Repository
 
-The NeoKolors project is open-source and hosted on GitHub. The repository contains the source code, examples, unit
-tests, and the issue tracker for the library ecosystem.
+The NeoKolors project is open-source and hosted on GitHub. The repository contains the source code, examples, unit tests, and the issue tracker for the library ecosystem.
 
-* Repository URL: https://github.com/KryKomDev/NeoKolors
+* Repository URL: [https://github.com/KryKomDev/NeoKolors](https://github.com/KryKomDev/NeoKolors)
 
 ### NuGet Packages
 
-All projects in the NeoKolors ecosystem are published on NuGet for integration into .NET applications. You can add
-references to individual packages using the .NET CLI or reference them manually in your project configuration.
+All libraries in the NeoKolors ecosystem are published on NuGet for integration into .NET applications:
 
 ```bash
+# Foundation
 dotnet add package NeoKolors.Common
 dotnet add package NeoKolors.Console
+dotnet add package NeoKolors.Extensions
 dotnet add package NeoKolors.Settings
-dotnet add package NeoKolors.Tui
+
+# TUI Framework
+dotnet add package NeoKolors.Tui.Core
+dotnet add package NeoKolors.Tui.Elements
+dotnet add package NeoKolors.Tui.Lifecycle.Apps
+dotnet add package NeoKolors.Tui.Lifecycle.Game2D
+dotnet add package NeoKolors.Tui.Fonts
 ```

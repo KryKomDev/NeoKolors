@@ -6,15 +6,16 @@ The `NeoKolors.Console` project is the low-level foundation for the NeoKolors ec
 
 ## 1. Driver Architecture
 
-To achieve cross-platform terminal control (including Windows Console API and Virtual Terminal/ANSI sequences), the library abstracts input and output through interfaces:
+To achieve high-performance, cross-platform terminal control, NeoKolors abstracts input, output, and queries through interfaces:
 
 ```mermaid
 classDiagram
     class IInputDriver {
         <<interface>>
-        +event Action~KeyEventArgs~ Key
-        +event Action~MouseEvent~ Mouse
-        +event Action~FocusEventArgs~ Focus
+        +event Action~ConsoleKeyInfo~ Key
+        +event Action~MouseEventInfo~ Mouse
+        +event Action FocusIn
+        +event Action FocusOut
         +Start()
         +Stop()
     }
@@ -26,49 +27,48 @@ classDiagram
         +SetCursorPosition(int x, int y)
         +ShowCursor(bool show)
         +EnableAltBuffer(bool enable)
-        +SetMouseReporting(MouseReportingLevel level)
+        +SetMouseReporting(MouseReportProtocol protocol, MouseReportLevel level)
     }
 
-    class DotnetInputDriver {
-        +Start()
-        +Stop()
+    class LinuxInputDriver {
     }
-
-    class WindowsInput {
-        +Start()
-        +Stop()
+    class LinuxOutputDriver {
     }
-
-    IInputDriver <|.. DotnetInputDriver
-    IInputDriver <|.. WindowsInput
-
-    class DotnetOutputDriver {
-        +Write(string text)
+    class WindowsInputDriver {
     }
-
     class WindowsOutputDriver {
-        +Write(string text)
+    }
+    class DotnetInputDriver {
+    }
+    class DotnetOutputDriver {
     }
 
-    IOutputDriver <|.. DotnetOutputDriver
+    IInputDriver <|.. LinuxInputDriver
+    IInputDriver <|.. WindowsInputDriver
+    IInputDriver <|.. DotnetInputDriver
+
+    IOutputDriver <|.. LinuxOutputDriver
     IOutputDriver <|.. WindowsOutputDriver
+    IOutputDriver <|.. DotnetOutputDriver
 ```
 
 ### 1.1 Input Drivers
-* **[IInputDriver](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Console/Driver/IInputDriver.cs)**: Declares events for key presses, mouse clicks/movements, and focus changes.
-* **[DotnetInputDriver](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Console/Driver/Dotnet/DotnetInputDriver.cs)**: Standard C# input driver that polls `System.Console.ReadKey` and parses incoming ANSI escape sequences.
-* **[WindowsInput](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Console/Driver/Windows/WindowsInput.cs)**: Low-level Windows Console API hook (`ReadConsoleInputW`) for high-fidelity mouse/keyboard reporting on legacy Windows command prompts.
+* **`IInputDriver`**: Declares events for key presses, mouse clicks/movements, and focus changes.
+* **`LinuxInputDriver`**: Native Linux input driver utilizing direct POSIX `termios` configuration, non-blocking asynchronous file descriptor polling via `epoll`, and SGR (1006) mouse protocol parsing.
+* **`WindowsInputDriver`**: Native Windows Console API driver leveraging `kernel32.dll` and `ReadConsoleInputW` for low-level input record capturing.
+* **`DotnetInputDriver`**: Managed fallback driver that polls `System.Console.ReadKey` and parses incoming ANSI escape sequences.
 
 ### 1.2 Output Drivers
-* **[IOutputDriver](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Console/Driver/IOutputDriver.cs)**: Declares primitives to write to the terminal, move cursors, toggles screen buffers, and configures mouse tracking.
-* **[DotnetOutputDriver](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Console/Driver/Dotnet/DotnetOutputDriver.cs)**: Standard ANSI escape-sequence based terminal writer.
-* **[WindowsOutputDriver](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Console/Driver/Windows/WindowsOutputDriver.cs)**: Uses `SetConsoleMode` and native Win32 output buffers.
+* **`IOutputDriver`**: Declares primitives to write to the terminal, move cursors, toggle screen buffers, and configure mouse tracking.
+* **`LinuxOutputDriver`**: Native Linux POSIX terminal output driver with optimized unbuffered standard output writing.
+* **`WindowsOutputDriver`**: Windows Console API driver enabling Virtual Terminal Processing (`ENABLE_VIRTUAL_TERMINAL_PROCESSING`).
+* **`DotnetOutputDriver`**: Managed ANSI output driver using `System.Console.Out`.
 
 ---
 
 ## 2. Interactive Console Operations (`NKConsole`)
 
-The static class **[NKConsole](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Console/NKConsole.Out.cs)** serves as the developer-facing entry point. It wraps output operations, buffer toggling, and input hooks.
+The static class **`NKConsole`** serves as the primary developer-facing entry point. It wraps output operations, buffer toggling, and input hooks.
 
 ### 2.1 Virtual Terminal Mode Toggles
 
@@ -90,15 +90,15 @@ Instead of polling `Console.ReadKey`, subscribe to clean events:
 
 ```csharp
 using NeoKolors.Console;
-using NeoKolors.Console.Input;
+using NeoKolors.Console.Ansi.Mouse;
 
-NKConsole.KeyDown += (KeyEventArgs e) => {
-    if (e.Key == KeyCode.Escape) {
+NKConsole.Key += e => {
+    if (e.Down && e.Key == KeyCode.ESCAPE) {
         NKConsole.WriteLine("Exiting application...");
     }
 };
 
-NKConsole.Mouse += (MouseEvent e) => {
+NKConsole.Mouse += e => {
     NKConsole.SetCursorPosition(e.Position.X, e.Position.Y);
     NKConsole.Write("X");
 };

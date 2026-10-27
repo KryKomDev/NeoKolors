@@ -734,10 +734,10 @@ public static partial class NKConsole {
     }
 
     /// <summary>
-    /// Automatically collects all properties of type <see cref="T"/> from a type specified by <see cref="TSource"/>
+    /// Automatically collects all properties of type <typeparamref name="T"/> from a type specified by <typeparamref name="TSource"/>
     /// and lists their values in a table.
     /// </summary>
-    /// <param name="header">Properties of <see cref="T"/> to be listed in the table</param>
+    /// <param name="header">Properties of <typeparamref name="T"/> to be listed in the table</param>
     /// <param name="displayName">Whether to add a column for the names of the properties.</param>
     /// <param name="style">The style of the table</param>
     /// <typeparam name="T">The type of a single row item</typeparam>
@@ -751,11 +751,11 @@ public static partial class NKConsole {
     }
 
     /// <summary>
-    /// Automatically collects all properties of type <see cref="TTarget"/> from a type specified by <see cref="source"/>
+    /// Automatically collects all properties of type <typeparamref name="TTarget"/> from a type specified by <paramref name="source"/>
     /// and lists their values in a table.
     /// </summary>
     /// <param name="source">The type to collect the properties from</param>
-    /// <param name="header">Properties of <see cref="TTarget"/> to be listed in the table</param>
+    /// <param name="header">Properties of <typeparamref name="TTarget"/> to be listed in the table</param>
     /// <param name="displayName">Whether to add a column for the names of the properties.</param>
     /// <param name="style">The style of the table</param>
     /// <typeparam name="TTarget">The type of a single row item</typeparam>

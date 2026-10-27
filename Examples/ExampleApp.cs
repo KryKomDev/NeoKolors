@@ -19,7 +19,7 @@ using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Elements;
 using NeoKolors.Tui.Lifecycle.Apps;
 
-var logStream = new FileStream("./logs/example_app.blog", FileMode.Create, FileAccess.Write);
+using var logStream = new FileStream("./logs/example_app.blog", FileMode.Create, FileAccess.Write);
 
 NKDebug.Logger.Writer = new CompositeLogWriter(
     new BinaryLogWriter(logStream),

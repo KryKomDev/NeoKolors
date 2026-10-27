@@ -6,14 +6,18 @@
         {
           "src": "../Src",
           "files": [
-            "Common/NeoKolors.Common.csproj",
-            "Console/NeoKolors.Console.csproj",
-            "Extensions/NeoKolors.Extensions.csproj",
-            "Settings/NeoKolors.Settings.csproj",
-            "Tui/NeoKolors.Tui.csproj",
-            "Tui/Core/NeoKolors.Tui.Core.csproj",
-            "Tui/Fonts/NeoKolors.Tui.Fonts.csproj",
-            "Tui/Fonts/Assets/NeoKolors.Tui.Fonts.Assets.csproj"
+            "Common/bin/Release/net10.0/NeoKolors.Common.dll",
+            "Console/bin/Release/net10.0/NeoKolors.Console.dll",
+            "Extensions/bin/Release/net10.0/NeoKolors.Extensions.dll",
+            "Settings/bin/Release/net10.0/NeoKolors.Settings.dll",
+            "Tui/bin/Release/net10.0/NeoKolors.Tui.dll",
+            "Tui/Core/bin/Release/net10.0/NeoKolors.Tui.Core.dll",
+            "Tui/Elements/bin/Release/net10.0/NeoKolors.Tui.Elements.dll",
+            "Tui/Fonts/bin/Release/net10.0/NeoKolors.Tui.Fonts.dll",
+            "Tui/Lifecycle/Core/bin/Release/net10.0/NeoKolors.Tui.Lifecycle.Core.dll",
+            "Tui/Lifecycle/Apps/bin/Release/net10.0/NeoKolors.Tui.Lifecycle.Apps.dll",
+            "Tui/Lifecycle/Game2D/bin/Release/net10.0/NeoKolors.Tui.Lifecycle.Game2D.dll",
+            "Tui/Lifecycle/Game3D/bin/Release/net10.0/NeoKolors.Tui.Lifecycle.Game3D.dll"
           ]
         }
       ],
@@ -28,7 +32,9 @@
         "files": [
           "index.md",
           "toc.yml",
-          "articles/toc.yml"
+          "articles/toc.yml",
+          "articles/index.md",
+          "articles/Project-Structure.md"
         ],
         "exclude": [
           "_site/**",
@@ -52,6 +58,11 @@
         "dest": "articles/console"
       },
       {
+        "src": "../Src/Console/Driver",
+        "files": ["**/*.md"],
+        "dest": "articles/console/Driver"
+      },
+      {
         "src": "../Src/Extensions/Docs",
         "files": ["**/*.md"],
         "dest": "articles/extensions"
@@ -65,6 +76,21 @@
         "src": "../Src/Tui/Docs",
         "files": ["**/*.md"],
         "dest": "articles/tui"
+      },
+      {
+        "src": "../Src/Tui/Elements",
+        "files": ["README.md"],
+        "dest": "articles/tui/elements"
+      },
+      {
+        "src": "../Src/Tui/Lifecycle",
+        "files": ["**/*.md"],
+        "dest": "articles/tui/lifecycle"
+      },
+      {
+        "src": "../Tools/NKFont",
+        "files": ["README.md"],
+        "dest": "articles/tools"
       }
     ],
     "overwrite": [

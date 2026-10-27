@@ -1,4 +1,4 @@
-﻿//
+//
 // NeoKolors
 // Copyright (c) 2025 KryKom
 //
@@ -78,8 +78,8 @@ public class SelectionListArgument<T> : IArgument<T[]>, IXsdArgument where T : n
     /// sets the selected values
     /// </summary>
     /// <param name="value">
-    /// value is array of <see cref="T"/> -> sets selected values to this array, <br/>
-    /// value is <see cref="T"/> -> adds this value to the selected values, <br/>
+    /// value is array of <typeparamref name="T"/> -> sets selected values to this array, <br/>
+    /// value is <typeparamref name="T"/> -> adds this value to the selected values, <br/>
     /// value is null -> removes the last value from the selected values, <br/>
     /// value is <see cref="SelectionListArgument{T}"/> -> sets selected values to the values of this argument
     /// </param>

@@ -12,8 +12,9 @@
         
         <DefineConstants>$(DefineConstants.Replace('%0A', '').Replace('%0D', '').Replace(' ', ''))</DefineConstants>
         
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
-        <NoWarn>$(NoWarn)</NoWarn>
+        <NoWarn>$(NoWarn);CS1591</NoWarn>
 
         <!-- MinVer Configuration -->
         <MinVerTagPrefix>v</MinVerTagPrefix>

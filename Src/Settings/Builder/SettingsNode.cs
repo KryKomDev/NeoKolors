@@ -1,4 +1,4 @@
-﻿// NeoKolors
+// NeoKolors
 // Copyright (c) 2025 KryKom
 
 using System.Runtime.CompilerServices;
@@ -31,7 +31,6 @@ public class SettingsNode<TResult> : ISettingsNode<TResult> {
     /// Represents a settings node builder that organizes settings elements and
     /// allows the configuration of settings such as arguments, groups, and result constructors.
     /// </summary>
-    /// <typeparam name="TResult">The type of the result the settings node will produce.</typeparam>
     public SettingsNode(SettingsNodeSupplier<TResult> supplier) => 
         supplier(this);
 

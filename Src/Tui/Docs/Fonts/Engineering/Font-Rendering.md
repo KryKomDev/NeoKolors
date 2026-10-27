@@ -1,7 +1,5 @@
-﻿---
-Written for NeoKolors.Tui.Fonts version 2026.3 (NKFont V3)
-by KryKom with love and care :)
----
+> Written for NeoKolors.Tui.Fonts version 2026.3 (NKFont V3)  
+> by KryKom with love and care :)
 
 # Font Rendering
 
@@ -15,8 +13,8 @@ The rendering process has the following steps:
 1. [Tokenization](#1-tokenization)
 2. [Measuring](#2-measuring)
 3. [Alignment](#3-alignment)
-4. [Placement](#4-placing-the-glyph)
-5. [Styling](#5-styling-the-letters)
+4. [Placement](#4-placement)
+5. [Styling](#5-styling)
 
 ## 1 Tokenization
 

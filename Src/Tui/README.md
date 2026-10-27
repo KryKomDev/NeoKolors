@@ -1,109 +1,128 @@
 # NeoKolors.Tui
 
-[![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Tui.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Tui.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Tui?style=for-the-badge&labelColor=%232a313c&color=%23e051c6)](https://www.nuget.org/packages/NeoKolors.Tui) [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Tui?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://www.nuget.org/packages/NeoKolors.Tui) [![License](https://img.shields.io/github/license/KryKomDev/NeoKolors?style=for-the-badge&labelColor=%232a313c&color=%2358a6ff)](https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE)
+[![Build & Test](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/ci.yml?branch=main&style=for-the-badge&label=Build%20%26%20Test&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/ci.yml) [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Tui?style=for-the-badge&labelColor=%232a313c&color=%23e051c6)](https://www.nuget.org/packages/NeoKolors.Tui) [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Tui?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://www.nuget.org/packages/NeoKolors.Tui) [![License](https://img.shields.io/github/license/KryKomDev/NeoKolors?style=for-the-badge&labelColor=%232a313c&color=%2358a6ff)](https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE)
 
-`NeoKolors.Tui` is a modern, web-inspired, and desktop-grade Text User Interface (TUI) framework for C#. Modelled with influence from UWP/WinUI, it features a Document Object Model (DOM), visual tree layout, CSS-like styling, reactive events, mouse support, and a high-performance rendering system for terminal screens.
+`NeoKolors.Tui` is a state-driven, component-oriented Text User Interface (TUI) framework for .NET. It provides double-buffered canvas rendering, flexible layout panels, responsive borders, interactive mouse support, and modular application and game lifecycle engines.
+
+---
+
+## Modular Architecture
+
+The TUI ecosystem is divided into focused modules:
+
+- **[NeoKolors.Tui.Core](Core/)**: Double-buffered `NKCharCanvas` and `NKCharScreen`, diff-based ANSI flusher, custom border styling (`NKBorderStyle`), cell layering (`ZLayers`), profiler, and spatial hit-maps (`HitMap`).
+- **[NeoKolors.Tui.Elements](Elements/)**: Component tree featuring `Flex`, `Grid`, `Table`, `Border`, `Button`, `List`, `Text`, and mouse event routing (`ElementsMouseDispatcher`).
+- **[NeoKolors.Tui.Lifecycle.Core](Lifecycle/Core/)**: Engine foundation with `ILifecycle`, `LifecycleController`, `FrameClock`, `FixedTimestepAccumulator`, `DeltaTime`, and `SceneStack`.
+- **[NeoKolors.Tui.Lifecycle.Apps](Lifecycle/Apps/)**: Application hosting infrastructure with `AppLifecycleHost`, `NKAppView`, activation state tracking, and throttled/lazy rendering loops.
+- **[NeoKolors.Tui.Lifecycle.Game2D](Lifecycle/Game2D/)**: 2D arcade terminal game loop, 2D camera viewport, and multi-stage rendering pipelines.
+- **[NeoKolors.Tui.Lifecycle.Game3D](Lifecycle/Game3D/)**: 3D terminal graphics lifecycle abstractions and architecture plans.
+- **[NeoKolors.Tui.Fonts](Fonts/)**: Dynamic typography engine supporting XML V3 definitions, MessagePack binary `.nkf` compilation, Figlet fonts, and font assets.
+- **[NeoKolors.Tui.Widgets](Widgets/)**: Standalone console widget controls.
 
 ---
 
 ## Core Features
 
-- **XAML Layout Declarations**: Define complex console screens cleanly using XML-based XAML layouts, parsed and compiled via the `Portable.Xaml` engine.
-- **Incremental Source Generation**: A custom build-time [XamlSourceGenerator](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/Generators/XamlSourceGenerator.cs) automatically matches `.xaml`/`.nkxaml` layout files to C# code-behind classes, generating typed element bindings and the visual initializer logic (`InitializeComponent`).
-- **Comprehensive Control Suite**: Includes container grids, panels, interactive input controls, scrollable areas, and support for terminal media:
-  - **Layout & Panels**: [Grid](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/Elements/Grid.cs), [StackPanel](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/Elements/StackPanel.cs), `RelativePanel`, `ScrollViewer`, `Canvas`, `Panel`, `Page`.
-  - **Inputs & Action Elements**: `Button`, `TextBox`, `PasswordBox`, `CheckBox`, `RadioButton`, `ComboBox`, `Slider`, `ToggleSwitch`.
-  - **Output & Media**: `TextBlock`, `ProgressBar`, `ToolTip`, `AsciiImage`, `SixelImage` (renders high-quality image graphics using terminal Sixel protocols).
-- **CSS-Inspired Styling Engine**: Elements support style collections, triggers, and precise positioning (margins, padding, viewport sizing like `vh`/`vw`, or characters like `ch`).
-- **Interactive Event Pipeline**: Full mouse support (clicks, hovering, scrolling, dragging) with event bubbling/cascades, and a standardized keyboard shortcut and resize notification bus.
-- **Optimized Rendering Loops**: Supports multiple rendering execution patterns:
-  - *Lazy Mode*: Draws only when keyboard/mouse inputs occur to preserve CPU resources.
-  - *Limited Mode*: Locks application redraws to a specified target frame rate (e.g. 60 or 144 FPS).
-  - *Unlimited Mode*: Executes redrawing continuously at maximum possible speeds, tracking throughput performance.
-
----
-
-## Core Architecture
-
-The framework revolves around three main parts:
-1. **[IApplication](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/IApplication.cs) & [NKApplication](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/NKApplication.cs)**: Drives the lifecycle of the TUI application, controlling the main render loops, intercepting hardware console inputs (via the NeoKolors Driver), and translating them into UI events.
-2. **[IDom](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/Dom/IDom.cs) & [NKDom](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/Dom/NKDom.cs)**: Stores the visual tree layout representation, and provides element queries (getting components by ID, Class, or Type) to dynamically update the view hierarchy.
-3. **[IElement](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/Elements/IElement.cs) & [AbstractElement](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/Elements/AbstractElement.cs)**: The structural base classes representing visual components, managing dimensions, styling configurations, focus status, visibility, and drawing behavior.
+- **Zero-Flicker Diff Rendering**:
+  `NKCharScreen` maintains front and back character buffers. When `Render()` executes, only changed character cells, foreground/background colors, and style attributes are converted to ANSI sequences, drastically reducing terminal I/O latency and eliminating screen flicker.
+- **Declarative Layout Trees**:
+  Compose views using `Flex` (row/column orientation, justify content, align items, flex wrapping, gap spacing) and `Grid` (multi-row and multi-column tabular arrangements with Auto and Star sizing).
+- **Interactive Mouse Dispatching**:
+  Components register visual interaction bounds into a spatial `HitMap`. Mouse clicks, movements, and scroll events are translated into clean component-level callbacks via `ElementsMouseDispatcher`.
+- **Decoupled Execution Lifecycles**:
+  Use `ThrottledAppLoopStrategy` to throttle active rendering (e.g. 60 FPS) and background rendering (e.g. 10 FPS) when OS terminal window focus is lost. Wake up the render loop immediately on state changes using `SignalWakeup()`.
 
 ---
 
 ## Getting Started
 
-Building a NeoKolors TUI application follows a familiar XAML & Code-Behind pattern:
-
-### 1. Declare the View (`MainView.xaml`)
-Create an XML file representing your visual structure. Specify the class name using the `x:Class` attribute:
-
-```xml
-<Page x:Class="MyAwesomeApp.MainView" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <StackPanel Id="MainContainer" Padding="2ch" Alignment="Center">
-        <TextBlock 
-            Id="Header" 
-            Content="Welcome to NeoKolors!" 
-            TextColor="cyan" 
-            TextStyle="Bold, Underline"/>
-        
-        <Button Id="StartBtn" Content="Click Me!" MarginTop="2ch"/>
-    </StackPanel>
-</Page>
-```
-
-### 2. Create the Code-Behind (`MainView.xaml.cs`)
-Implement the partial C# class matching the XAML file declaration:
-
-```csharp
-using NeoKolors.Tui.Elements;
-
-namespace MyAwesomeApp;
-
-public partial class MainView {
-    public MainView() {
-        // Automatically generated by the XamlSourceGenerator 
-        // to load the layout and bind elements (e.g. Header, StartBtn).
-        InitializeComponent();
-        
-        // Bind events programmatically
-        StartBtn.OnClick += () => {
-            Header.Content = "Application Started!";
-            Header.TextColor = "green";
-        };
-    }
-}
-```
-
-### 3. Initialize and Start (`Program.cs`)
-Configure the console settings, initialize your visual DOM, and start the application life-cycle:
+Building an interactive TUI application:
 
 ```csharp
 using System.Text;
-using NeoKolors.Tui;
-using NeoKolors.Tui;
+using Metriks;
+using NeoKolors.Common;
+using NeoKolors.Console;
+using NeoKolors.Tui.Core;
+using NeoKolors.Tui.Elements;
+using NeoKolors.Tui.Lifecycle.Apps;
 
-namespace MyAwesomeApp;
+Console.OutputEncoding = Encoding.UTF8;
 
-internal static class Program {
-    public static void Main(string[] args) {
-        // Ensure UTF-8 output encoding is configured for unicode characters
-        Console.OutputEncoding = Encoding.UTF8;
+// 1. Setup screen, hit map, and lifecycle host
+var screen = new NKCharScreen(NKConsole.WindowSize);
+var hitMap = new HitMap();
+var mouseDispatcher = new ElementsMouseDispatcher();
+var host = new AppLifecycleHost();
+var loopStrategy = new ThrottledAppLoopStrategy { ActiveFps = 60 };
 
-        // Instantiate the XAML visual view root
-        var mainView = new MainView();
-        var dom = new NKDom(mainView);
+int counter = 0;
 
-        // Configure the application rendering and inputs
-        var config = new NKAppConfig(
-            rendering: RenderingConfig.Limited(60) // Lock to 60 FPS
-        );
+// 2. Define the UI builder
+IElement BuildUi() {
+    var container = new Flex {
+        Direction = FlexDirection.Column,
+        Justify = FlexJustify.Center,
+        Align = FlexAlign.Center,
+        Width = screen.Size.X,
+        Height = screen.Size.Y
+    };
 
-        var app = new NKApplication(config, mainView);
+    var btn = new Button {
+        Text = $"  Clicked {counter} Times  ",
+        NormalStyle = new NKStyle(NKColor.FromRgb(255, 255, 255), NKColor.FromRgb(50, 70, 180), TextStyles.Bold),
+        HoverStyle = new NKStyle(NKColor.FromRgb(255, 255, 255), NKColor.FromRgb(70, 110, 230), TextStyles.Bold)
+    };
 
-        // Run the TUI
-        app.Start();
+    btn.OnClick += () => {
+        counter++;
+        view.RootElement = BuildUi();
+        view.Invalidate();
+        loopStrategy.SignalWakeup();
+    };
+
+    var box = new Border(btn) {
+        Title = " Counter Dashboard ",
+        Style = NKBorderStyle.GetRounded(NKColor.FromRgb(0, 220, 180))
+    };
+
+    container.Add(box);
+    return container;
+}
+
+// 3. Create view presenter
+var view = new NKAppView(BuildUi(), screen, hitMap);
+
+// Wire inputs
+NKConsole.Mouse += m => {
+    mouseDispatcher.Dispatch(hitMap, m);
+    view.Invalidate();
+    loopStrategy.SignalWakeup();
+};
+
+NKConsole.Key += k => {
+    if (k.Down && (k.Key == KeyCode.ESCAPE || k.Char == 'q'))
+        host.RequestClose();
+};
+
+// 4. Run the application
+try {
+    NKConsole.HideCursor();
+    NKConsole.EnableAltBuffer();
+    host.Start();
+
+    while (host.State != LifecycleState.STOPPED) {
+        loopStrategy.Tick(host, view);
     }
+} finally {
+    NKConsole.DisableAltBuffer();
+    NKConsole.ShowCursor();
 }
 ```
+
+---
+
+## Documentation
+
+For full guides, architecture diagrams, and tutorials, visit the official documentation:
+👉 **[https://krykomdev.github.io/NeoKolors/](https://krykomdev.github.io/NeoKolors/)**

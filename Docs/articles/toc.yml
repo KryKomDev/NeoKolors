@@ -1,5 +1,7 @@
 - name: Articles Overview
-  href: ../index.md
+  href: index.md
+- name: Project Structure
+  href: Project-Structure.md
 - name: NeoKolors.Common
   items:
     - name: Common Overview
@@ -24,6 +26,8 @@
   items:
     - name: Console Overview & Drivers
       href: ../../Src/Console/Docs/Console-Overview.md
+    - name: Driver Deep Dive
+      href: ../../Src/Console/Driver/Drivers.md
     - name: Logging & Diagnostics
       href: ../../Src/Console/Docs/Logging.md
     - name: Exception Formatting
@@ -54,16 +58,14 @@
       href: ../../Src/Tui/Docs/Tui-Overview.md
     - name: Quick-Start Tutorial
       href: ../../Src/Tui/Docs/Tutorial-Quickstart.md
-    - name: Designing TUIs with XAML
-      href: ../../Src/Tui/Docs/Tutorial-Xaml.md
-    - name: Elements Hierarchy
-      href: ../../Src/Tui/Docs/Elements/Type-Hierarchy.md
+    - name: Application Lifecycle & Hosting
+      href: ../../Src/Tui/Docs/Application/Application-Lifecycle.md
+    - name: Elements Suite
+      href: ../../Src/Tui/Elements/README.md
     - name: Core Canvas & Screen
       href: ../../Src/Tui/Docs/Core/Canvas-and-Screen.md
-    - name: Styling System
-      href: ../../Src/Tui/Docs/Styles/Styling-System.md
-    - name: Application Lifecycle
-      href: ../../Src/Tui/Docs/Application/Application-Lifecycle.md
+    - name: Elements Hierarchy Spec
+      href: ../../Src/Tui/Docs/Elements/Type-Hierarchy.md
     - name: Layout Computation
       items:
         - name: Computation Methods
@@ -88,3 +90,17 @@
           href: ../../Src/Tui/Docs/Fonts/Xml/Xml-Font-Definition-Mapping.md
         - name: Xml Glyph Definition Properties
           href: ../../Src/Tui/Docs/Fonts/Xml/Xml-Glyph-Definition-Properties.md
+- name: NeoKolors.Lifecycle
+  items:
+    - name: Core Lifecycle & FrameClock
+      href: ../../Src/Tui/Lifecycle/Core/README.md
+    - name: Application Hosting & Loop Strategies
+      href: ../../Src/Tui/Lifecycle/Apps/README.md
+    - name: 2D Game Loop Engine
+      href: ../../Src/Tui/Lifecycle/Game2D/README.md
+    - name: 3D Architecture Plan
+      href: ../../Src/Tui/Lifecycle/Game3D/Game3D-Architecture-Plan.md
+- name: Tools & CLI
+  items:
+    - name: nkfont CLI Tool Guide
+      href: ../../Tools/NKFont/README.md

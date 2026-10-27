@@ -91,20 +91,20 @@ The `Defaults` element contains default configuration for glyph definitions.
 
 #### Align
 
-The default value for the `Align` property of [Compound](Font-Mapping.md) and
-[Auto-Compound](Font-Mapping.md) glyphs.
+The default value for the `Align` property of [Compound](Xml-Font-Definition-Mapping.md) and
+[Auto-Compound](Xml-Font-Definition-Mapping.md) glyphs.
 
 #### Mask
 
 The default value for the `Mask` property. For more see: 
-[Mask](Glyph-Properties.md).
+[Mask](Xml-Glyph-Definition-Properties.md).
 
 #### AlignPointReplace
 
 The default value for the `AlignPointReplace` property. For more 
-see: [AlignPointReplace](Glyph-Properties.md).
+see: [AlignPointReplace](Xml-Glyph-Definition-Properties.md).
 
 #### AlignPointMarkers
 
 The default value for the `AlignPointMarkers` property. For more see:
-[AlignPointMarkers](Glyph-Properties.md).
+[AlignPointMarkers](Xml-Glyph-Definition-Properties.md).

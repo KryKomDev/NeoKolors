@@ -29,8 +29,7 @@ using NeoKolors.Tui.Lifecycle.Game2D;
 // =============================================================================
 
 // 1. Setup Logging
-Directory.CreateDirectory("./logs");
-var logStream = new FileStream("./logs/example_game.blog", FileMode.Create, FileAccess.Write);
+using var logStream = new FileStream("./logs/example_game.blog", FileMode.Create, FileAccess.Write);
 
 NKDebug.Logger.Writer = new CompositeLogWriter(
     new BinaryLogWriter(logStream),
@@ -800,7 +799,7 @@ public class HudAndPresentStage(NKCharScreen screen, CosmicGameState state, Game
         if (state.IsGameOver) {
             string[] gameOverBox = [
                 "╔═══════════════════════════════════════════════════╗",
-                "║        ✦  M I S S I O N   F A I L E D  ✦          ║",
+                "║         ✦  M I S S I O N   F A I L E D  ✦         ║",
                 "║             H U L L   B R E A C H E D             ║",
                 "╠═══════════════════════════════════════════════════╣",
                $"║   FINAL SCORE: {state.Score,-10:N0}  WAVE SURVIVED: {state.Wave,-4} ║",

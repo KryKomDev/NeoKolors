@@ -1,6 +1,6 @@
 # NeoKolors.Settings
 
-[![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Settings.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Settings.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Settings?style=for-the-badge&labelColor=%232a313c&color=%23e051c6)](https://www.nuget.org/packages/NeoKolors.Settings) [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Settings?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://www.nuget.org/packages/NeoKolors.Settings) [![License](https://img.shields.io/github/license/KryKomDev/NeoKolors?style=for-the-badge&labelColor=%232a313c&color=%2358a6ff)](https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE)
+[![Build & Test](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/ci.yml?branch=main&style=for-the-badge&label=Build%20%26%20Test&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/ci.yml) [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Settings?style=for-the-badge&labelColor=%232a313c&color=%23e051c6)](https://www.nuget.org/packages/NeoKolors.Settings) [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Settings?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://www.nuget.org/packages/NeoKolors.Settings) [![License](https://img.shields.io/github/license/KryKomDev/NeoKolors?style=for-the-badge&labelColor=%232a313c&color=%2358a6ff)](https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE)
 
 This package includes a settings building system for easier automation of instance building and settings communication
 between different parts of applications.
@@ -15,7 +15,7 @@ Let's say you have a class `C` and you want to create a settings that will outpu
 `C` has an `Int32` field `value` whose allowed values are >= -10 and <= 10.
 
 ```csharp
-var builder = SettingsBuidler<C>.Build("c-builder",
+var builder = SettingsBuilder<C>.Build("c-builder",
     SettingsNode<C>.New("default")
         .Argument("field", Arguments.Integer(-10, 10))
         .Constructs(context => new C((int)context["field"].Get()))

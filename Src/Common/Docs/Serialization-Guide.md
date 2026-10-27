@@ -2,8 +2,8 @@
 
 This guide explains how binary serialization works across NeoKolors using **Protobuf** (via
 `protobuf-net`) and provides step-by-step instructions for updating core classes—such as
-[`NKStyle`](../NKStyle.cs), [`NKColor`](../NKColor.cs), [`AnsiString`](../AnsiString.cs),
-[`NKLogRecord`](../../Console/Logger/NKLogRecord.cs), and [`NKFont`](../../Tui/Fonts/NKFont.cs)
+`NKStyle`, `NKColor`, `AnsiString`,
+`NKLogRecord`, and `NKFont`
 — without breaking serialization formats.
 
 ---
@@ -16,7 +16,7 @@ NeoKolors uses a code-first Protobuf approach implemented with [
 - Requires no external `.proto` files or build-time compilation steps.
 - Uses **surrogates** to cleanly decouple bit-packed, explicit memory layout structs from
   serialization concerns.
-- Enables core types ([`NKStyle`](../NKStyle.cs), [`NKColor`](../NKColor.cs)) to be embedded
+- Enables core types (`NKStyle`, `NKColor`) to be embedded
   directly as fields in other Protobuf contracts across the codebase.
 
 ### Serialization Map
@@ -42,7 +42,7 @@ NeoKolors uses a code-first Protobuf approach implemented with [
 
 ## 2. Updating `NKColor`
 
-[`NKColor`](../../Common/NKColor.cs) is a
+`NKColor` is a
 32-bit explicit layout struct (`uint _value`).
 
 ### Serialization Rule
@@ -67,7 +67,7 @@ public struct NKColorSurrogate {
 
 1. **Preserving 32-bit packing**:
     - The lower 24 bits store RGB or console color index.
-    - The upper 8 bits store [`ColorType`](../../Common/NKColor.cs).
+    - The upper 8 bits store `ColorType`.
 2. **If adding new color modes**:
     - Add new enum values to `ColorType` (must fit within the 8-bit space).
     - Because serialization records `uint Value` via `GetRaw()` / `FromRaw()`, no changes to
@@ -84,7 +84,7 @@ public struct NKColorSurrogate {
 
 ## 3. Updating `NKStyle`
 
-[`NKStyle`](../../Common/NKStyle.cs) is a
+`NKStyle` is a
 128-bit explicit layout struct composed of two 64-bit integers: `_raw0` and `_raw1`.
 
 ### Serialization Rule
@@ -133,7 +133,7 @@ public struct NKStyleSurrogate {
 ## 4. Updating `AnsiString` & `AnsiStringSerializer`
 
 [
-`AnsiStringSerializer`](../../Common/AnsiStringSerializer.cs)
+`AnsiStringSerializer`
 serializes styled text to/from Protobuf byte arrays or streams.
 
 ### Contract Definition
@@ -170,13 +170,13 @@ public class ProtoNullableAnsiString {
 
 ## 5. Updating Binary Logging (`NKLogRecordSerializer`)
 
-[`NKLogRecordSerializer`](../../Console/Logger/NKLogRecordSerializer.cs)
+`NKLogRecordSerializer`
 manages serialization of log records (`.blog` files).
 
 ### Streaming & Delimitation
 
 Because logs are written continuously to a stream (e.g., via [
-`BinaryLogWriter`](../../Console/Logger/BinaryLogWriter.cs)),
+`BinaryLogWriter`),
 messages **must** be length-prefixed:
 
 ```csharp
@@ -194,7 +194,7 @@ var proto = Serializer.DeserializeWithLengthPrefix<ProtoNKLogRecord>(stream, Pre
       not renumber 1 through 5).
 2. If extending exception logging:
     - Modify `ProtoExceptionInfo` and
-      [`DeserializedException`](../../Console/Logger/NKLogRecordSerializer.cs).
+      `DeserializedException`.
 3. Run tests:
    `dotnet test Tests/Console.Tests/NeoKolors.Console.Tests.csproj --filter NKBinaryLoggerTests`.
 
@@ -202,7 +202,7 @@ var proto = Serializer.DeserializeWithLengthPrefix<ProtoNKLogRecord>(stream, Pre
 
 ## 6. Updating Font Binary Serialization (`NKFontSerializer.Binary`)
 
-[`NKFontSerializer.Binary.cs`](../../Tui/Fonts/Serialization/NKFontSerializer.Binary.cs)
+`NKFontSerializer.Binary.cs`
 serializes compiled fonts (`.nkf`).
 
 ### Header Specification
@@ -217,7 +217,7 @@ Followed immediately by the Protobuf payload (`ProtoNKFont`).
 ### How to Update Font Schemas
 
 1. **When making non-breaking additions** (e.g. new optional metadata field on
-   [`NKFontInfo`](../../Tui/Fonts/NKFontInfo.cs)):
+   `NKFontInfo`):
     - Add a new `[ProtoMember(N)]` tag to `ProtoNKFontInfo` or `ProtoNKFont`.
     - Update `ToProto` and `ToDomain` mapping methods.
 2. **When making breaking changes**:
@@ -228,7 +228,7 @@ Followed immediately by the Protobuf payload (`ProtoNKFont`).
       dotnet build Src/Tui/Fonts/Assets/NeoKolors.Tui.Fonts.Assets.csproj
       ```
     - This automatically re-runs
-      [`CompileFontsTask`](../../Tui/Fonts/Build/CompileFontsTask.cs),
+      `CompileFontsTask`,
       regenerating `Bytesized.nkf`, `Future.nkf`, and `Dummy.nkf`.
 4. **Verification**:
     - Run tests:

@@ -1,4 +1,5 @@
 # NeoKolors.Tui.Widgets
 
-This package contains tools for controlling simple widgets and other elements
-inside the terminal without having to run a full TUI application. 
+[![Build & Test](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/ci.yml?branch=main&style=for-the-badge&label=Build%20%26%20Test&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/ci.yml) [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Tui.Widgets?style=for-the-badge&labelColor=%232a313c&color=%23e051c6)](https://www.nuget.org/packages/NeoKolors.Tui.Widgets) [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Tui.Widgets?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://www.nuget.org/packages/NeoKolors.Tui.Widgets) [![License](https://img.shields.io/github/license/KryKomDev/NeoKolors?style=for-the-badge&labelColor=%232a313c&color=%2358a6ff)](https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE)
+
+`NeoKolors.Tui.Widgets` is a companion package for creating lightweight, standalone interactive widgets (such as progress bars, spinners, prompts, and popups) inside standard console streams without needing to initialize a full-screen TUI application lifecycle.

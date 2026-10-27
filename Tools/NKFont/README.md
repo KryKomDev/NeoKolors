@@ -1,6 +1,6 @@
 # NeoKolors.Tools.NKFont (`nkfont`)
 
-[![Build Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/build-Tools.NKFont.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) [![Test Status](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/KryKomDev/9fb6af0ba84bfb5106a78ff35bd8be3c/raw/test-Tools.NKFont.json&style=for-the-badge&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/build.yml) [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Tools.NKFont?style=for-the-badge&labelColor=%232a313c&color=%23e051c6)](https://www.nuget.org/packages/NeoKolors.Tools.NKFont) [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Tools.NKFont?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://www.nuget.org/packages/NeoKolors.Tools.NKFont) [![License](https://img.shields.io/github/license/KryKomDev/NeoKolors?style=for-the-badge&labelColor=%232a313c&color=%2358a6ff)](https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE)
+[![Build & Test](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/ci.yml?branch=main&style=for-the-badge&label=Build%20%26%20Test&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/ci.yml) [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Tools.NKFont?style=for-the-badge&labelColor=%232a313c&color=%23e051c6)](https://www.nuget.org/packages/NeoKolors.Tools.NKFont) [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Tools.NKFont?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://www.nuget.org/packages/NeoKolors.Tools.NKFont) [![License](https://img.shields.io/github/license/KryKomDev/NeoKolors?style=for-the-badge&labelColor=%232a313c&color=%2358a6ff)](https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE)
 
 `NKFontTool` is a command-line interface (CLI) tool designed to manage, compile, display, inspect, and create custom TUI fonts for the NeoKolors framework.
 
@@ -14,7 +14,7 @@ The tool parses font source definitions (XML configurations and raw `.nkg` text 
 To run the tool directly from source during development:
 
 ```bash
-dotnet run --project Tools/NKFontTool/NKFontTool.csproj -- [arguments]
+dotnet run --project Tools/NKFont/NeoKolors.Tools.NKFont.csproj -- [arguments]
 ```
 
 ### 2. Install as a .NET Global Tool
@@ -22,10 +22,10 @@ The project is configured to pack as a .NET Tool under the command name `nkfont`
 
 ```bash
 # Package the tool
-dotnet pack Tools/NKFontTool/NKFontTool.csproj -c Release
+dotnet pack Tools/NKFont/NeoKolors.Tools.NKFont.csproj -c Release
 
 # Install globally from the build directory
-dotnet tool install --global --add-source Tools/NKFontTool/bin/Release NKFontTool
+dotnet tool install --global --add-source Tools/NKFont/bin/Release NeoKolors.Tools.NKFont
 ```
 
 Once installed, you can execute it from anywhere using the command:
@@ -143,5 +143,5 @@ nkfont glyph Future a
 ---
 
 ## Code Reference
-- **CLI Logic entrypoint**: [Program.cs](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Tools/NKFontTool/Program.cs)
-- **Project Configuration**: [NKFontTool.csproj](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Tools/NKFontTool/NKFontTool.csproj)
+- **CLI Logic entrypoint**: [Program.cs](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Tools/NKFont/Program.cs)
+- **Project Configuration**: [NKFontTool.csproj](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Tools/NKFont/NeoKolors.Tools.NKFont.csproj)

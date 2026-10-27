@@ -1,7 +1,5 @@
-﻿---
-Written for NeoKolors.Tui.Fonts version 2026.3 (NKFont V3)
-by KryKom with love and care :)
----
+> Written for NeoKolors.Tui.Fonts version 2026.3 (NKFont V3)  
+> by KryKom with love and care :)
 
 # Glyph Content Compilation
 
@@ -19,7 +17,7 @@ character or cell specified for the marker.
 ## 2 Masking 
 
 The masking step replaces the characters with the characters or cells
-specified in the [`Mask`](Xml-Glyph-Definition-Properties.md#masking) 
+specified in the [`Mask`](../../Xml/Xml-Glyph-Definition-Properties.md#masking) 
 property.
 
 ## 3 Size reduction
