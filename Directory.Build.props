@@ -2,16 +2,16 @@
     <PropertyGroup>
         <LangVersion>14</LangVersion>
         <DefineConstants>
-            $(DefineConstants); 
+            $(DefineConstants);
             NK_RENDERING_PROFILING;
             NK_ENABLE_NATIVE_IO
         </DefineConstants>
 
         <PolyArgumentExceptions>true</PolyArgumentExceptions>
         <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
-        
+
         <DefineConstants>$(DefineConstants.Replace('%0A', '').Replace('%0D', '').Replace(' ', ''))</DefineConstants>
-        
+
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
         <NoWarn>$(NoWarn);CS1591</NoWarn>

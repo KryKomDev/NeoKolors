@@ -19,6 +19,7 @@
         <ProjectReference Include="..\..\Src\Tui\Elements\NeoKolors.Tui.Elements.csproj" />
         <ProjectReference Include="..\..\Src\Tui\Lifecycle\Core\NeoKolors.Tui.Lifecycle.Core.csproj" />
         <ProjectReference Include="..\..\Src\Tui\Lifecycle\Apps\NeoKolors.Tui.Lifecycle.Apps.csproj" />
+        <ProjectReference Include="..\..\Src\Tui\Widgets\NeoKolors.Tui.Widgets.csproj" />
     </ItemGroup>
     
     <ItemGroup>

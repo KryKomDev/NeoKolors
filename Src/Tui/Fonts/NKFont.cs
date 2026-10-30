@@ -522,15 +522,25 @@ public class NKFont : IAsciiFont {
                                 Styles = cellStyle.Styles & ~NKTextStyles.STRIKETHROUGH
                             };
 
-                        if (cellChar != null) {
-                            if (options.Coloring != null) {
-                                var relX = Math.Clamp(cx - bounds.LowerX, 0, Math.Max(0, bounds.Size.X - 1));
-                                var relY = Math.Clamp(cy - bounds.LowerY, 0, Math.Max(0, bounds.Size.Y - 1));
-                                cellStyle = cellStyle.WithFColor(options.Coloring.GetColor(relX, relY, bounds.Size.X, bounds.Size.Y));
-                            }
+                        char charToDraw;
 
-                            drawer.Draw(new AnsiChar(cellChar.Value, cellStyle), cx, cy, z);
+                        if (cellChar != null) {
+                            charToDraw = cellChar.Value;
                         }
+                        else if (drawer is ICharCanvas canvas && canvas.Data[cx, cy].Char is var existing && existing != ' ' && existing != '\0') {
+                            charToDraw = existing;
+                        }
+                        else {
+                            charToDraw = ' ';
+                        }
+
+                        if (options.Coloring != null) {
+                            var relX = Math.Clamp(cx - bounds.LowerX, 0, Math.Max(0, bounds.Size.X - 1));
+                            var relY = Math.Clamp(cy - bounds.LowerY, 0, Math.Max(0, bounds.Size.Y - 1));
+                            cellStyle = cellStyle.WithFColor(options.Coloring.GetColor(relX, relY, bounds.Size.X, bounds.Size.Y));
+                        }
+
+                        drawer.Draw(new AnsiChar(charToDraw, cellStyle), cx, cy, z);
                     }
                 }
             }
@@ -633,10 +643,10 @@ public class NKFont : IAsciiFont {
         if (tokens.Length == 0)
             return Size2D.Zero;
 
-        int cs = options.Spacing != null ? options.Spacing.LetterSpacing : _fontInfo.LetterSpacing;
-        int ws = options.Spacing != null ? options.Spacing.WordSpacing : _fontInfo.WordSpacing;
+        int cs = options.Spacing?.LetterSpacing ?? _fontInfo.LetterSpacing;
+        int ws = options.Spacing?.WordSpacing   ?? _fontInfo.WordSpacing;
 
-        int effectiveLeading = options.Spacing != null && options.Spacing.Leading > 0
+        int effectiveLeading = options.Spacing is { Leading: > 0 }
             ? options.Spacing.Leading
             : _fontInfo.Leading;
 

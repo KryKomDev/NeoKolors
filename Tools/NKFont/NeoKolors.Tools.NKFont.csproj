@@ -5,10 +5,11 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <LangVersion>15</LangVersion>
 
         <PackAsTool>true</PackAsTool>
         <ToolCommandName>nkfont</ToolCommandName>
-        
+
         <Authors>KryKom</Authors>
         <Company>KryKom</Company>
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
@@ -23,21 +24,22 @@
         <None Include="../../LICENSE" Pack="true" PackagePath="\"/>
         <None Include="../../Assets/Package-Icon.png" Pack="true" PackagePath="\"/>
     </ItemGroup>
-    
+
     <ItemGroup>
-        <ProjectReference Include="../../Src/Tui/NeoKolors.Tui.csproj" />
+        <ProjectReference Include="../../Src/Tui/NeoKolors.Tui.csproj"/>
+        <ProjectReference Include="../../Src/Tui/Widgets/NeoKolors.Tui.Widgets.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="System.CommandLine" Version="3.0.0-preview.4.26230.115" />
-      <PackageReference Include="Polyfill" Version="11.4.1">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
+        <PackageReference Include="System.CommandLine" Version="3.0.0-preview.4.26230.115"/>
+        <PackageReference Include="Polyfill" Version="11.4.1">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="Templates\**" />
+        <EmbeddedResource Include="Templates\**"/>
     </ItemGroup>
 
 </Project>

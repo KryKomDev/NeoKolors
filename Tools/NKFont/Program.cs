@@ -7,8 +7,12 @@ using NeoKolors.Common;
 using NeoKolors.Console;
 using NeoKolors.Extensions;
 using NeoKolors.Tui.Core;
+using NeoKolors.Tui.Elements;
 using NeoKolors.Tui.Fonts;
 using NeoKolors.Tui.Fonts.Assets;
+using NeoKolors.Tui.Widgets.Live;
+using static System.Text.Encoding;
+using NKTableStyle = NeoKolors.Tui.Core.NKTableStyle;
 
 namespace NeoKolors.Tools.NKFont;
 
@@ -40,7 +44,7 @@ internal static class Program {
 
     static int Main(string[] args) {
         // Support UTF-8 encoding for smooth unicode characters
-        System.Console.OutputEncoding = System.Text.Encoding.UTF8;
+        System.Console.OutputEncoding = UTF8;
 
         // Force-load and register built-in fonts
         AssetsProvider.RegisterFonts();
@@ -246,7 +250,7 @@ internal static class Program {
         glyphsCommand.SetAction(
             parseResult => {
                 string font = parseResult.GetValue(glyphsFontArg) ?? string.Empty;
-                HandleGlyphs(font);
+                HandleInspectFont(font);
             }
         );
 
@@ -269,7 +273,7 @@ internal static class Program {
             parseResult => {
                 string font  = parseResult.GetValue(inspectFontArg)  ?? string.Empty;
                 string glyph = parseResult.GetValue(inspectGlyphArg) ?? string.Empty;
-                HandleInspect(font, glyph);
+                HandleInspectGlyph(font, glyph);
             }
         );
 
@@ -343,43 +347,47 @@ internal static class Program {
             return;
         }
 
-        PrintInfo($"Reading and parsing XML font definition from '{fullXmlPath}'...");
-        Tui.Fonts.NKFont? font;
+        NKWidgets.Status(
+            $"Reading and parsing XML font definition from '{Path.GetFileName(fullXmlPath)}'...",
+            ctx => {
+                Tui.Fonts.NKFont? font;
 
-        try {
-            font = NKFontSerializer.DeserializeXml(fullXmlPath);
-        }
-        catch (Exception ex) {
-            PrintError($"Failed to deserialize XML font: {ex}");
+                try {
+                    font = NKFontSerializer.DeserializeXml(fullXmlPath);
+                }
+                catch (Exception ex) {
+                    ctx.Fail($"Failed to deserialize XML font: {ex.Message}");
 
-            return;
-        }
+                    return;
+                }
 
-        if (font == null) {
-            PrintError("Failed to load/compile XML font definition. Please check XML validation logs.");
+                if (font == null) {
+                    ctx.Fail("Failed to load/compile XML font definition. Please check XML validation logs.");
 
-            return;
-        }
+                    return;
+                }
 
-        string outputPath;
+                string outputPath;
 
-        if (!string.IsNullOrEmpty(outputNkf)) {
-            outputPath = Path.GetFullPath(outputNkf);
-        }
-        else {
-            string safeName = string.Join("_", font.Name.Split(Path.GetInvalidFileNameChars()));
-            outputPath = Path.Combine(Directory.GetCurrentDirectory(), $"{safeName}.nkf");
-        }
+                if (!string.IsNullOrEmpty(outputNkf)) {
+                    outputPath = Path.GetFullPath(outputNkf);
+                }
+                else {
+                    string safeName = string.Join("_", font.Name.Split(Path.GetInvalidFileNameChars()));
+                    outputPath = Path.Combine(Directory.GetCurrentDirectory(), $"{safeName}.nkf");
+                }
 
-        PrintInfo($"Serializing compiled font '{font.Name}' to '{outputPath}'...");
+                ctx.Status = $"Serializing compiled font '{font.Name}' to '{Path.GetFileName(outputPath)}'...";
 
-        try {
-            NKFontSerializer.SerializeBinary(font, outputPath);
-            PrintSuccess($"Successfully compiled font '{font.Name}' to '{outputPath}'!");
-        }
-        catch (Exception ex) {
-            PrintError($"Failed to save compiled font: {ex.Message}");
-        }
+                try {
+                    NKFontSerializer.SerializeBinary(font, outputPath);
+                    ctx.Success($"Successfully compiled font '{font.Name}' ({font.Glyphs.Count} glyphs) to '{outputPath}'!");
+                }
+                catch (Exception ex) {
+                    ctx.Fail($"Failed to save compiled font: {ex.Message}");
+                }
+            }
+        );
     }
 
     private record DisplayOptions(
@@ -555,20 +563,24 @@ internal static class Program {
         font.DrawString(ansiString, canvas, bounds, renderingOptions);
 
         NKConsole.WriteLine();
-        NKConsole.WriteLine($"Text size: {measuredSize}", ConsoleColor.Yellow);
+        NKConsole.WriteLine($"Text size: {measuredSize} | Font: {font.Name}", ConsoleColor.Yellow);
         NKConsole.WriteLine();
 
-        // Render cell by cell to console using NeoKolors styles
-        for (int y = 0; y < canvas.Height; y++) {
-            for (int x = 0; x < canvas.Width; x++) {
-                var cell = canvas.Data[x, y];
-                NKConsole.Write(cell.Char, cell.Style);
-            }
+        // var displayCard = new Border(
+        //     element: new CanvasElement(canvas),
+        //     style: NKBorderStyle.GetRounded()
+        // );
 
-            System.Console.WriteLine();
+        NKWidgets.Render(new CanvasElement(canvas));
+        NKConsole.WriteLine();
+    }
+
+    private sealed class CanvasElement(ICharCanvas canvas) : IElement {
+        public Size2D Measure(LayoutContext context) => canvas.Size;
+
+        public void Render(RenderContext context, Size2D parent) {
+            context.Canvas.Draw(canvas, context.Origin.X, context.Origin.Y, context.ZIndex);
         }
-
-        NKConsole.WriteLine();
     }
 
     static NKColor[]? ParseColorList(string input) {
@@ -613,117 +625,115 @@ internal static class Program {
             return;
         }
 
-        PrintInfo($"Creating blank XML nkfont definition at '{fullOutputDir}' for font '{fontName}'...");
-
         try {
-            Directory.CreateDirectory(fullOutputDir);
-
-            string manifestContent = ReadTemplate("manifest.nkfont");
-            string configContent   = ReadTemplate("Config.xml").Replace("{FONT_NAME}", fontName);
-            string mapContent;
-
             if (allAscii) {
-                // Directories
-                Directory.CreateDirectory(Path.Combine(fullOutputDir, "lowercase"));
-                Directory.CreateDirectory(Path.Combine(fullOutputDir, "uppercase"));
-                Directory.CreateDirectory(Path.Combine(fullOutputDir, "digits"));
-                Directory.CreateDirectory(Path.Combine(fullOutputDir, "special"));
+                NKWidgets.Progress(
+                    $"Scaffolding full ASCII font template for '{fontName}'...",
+                    pctx => {
+                        Directory.CreateDirectory(fullOutputDir);
 
-                // Special characters mapping dictionary
-                var specialChars = new Dictionary<char, string> {
-                    { '!', "exclamation" },
-                    { '"', "quote" },
-                    { '#', "hash" },
-                    { '$', "dollar" },
-                    { '%', "percent" },
-                    { '&', "ampersand" },
-                    { '\'', "apostrophe" },
-                    { '(', "lparen" },
-                    { ')', "rparen" },
-                    { '*', "asterisk" },
-                    { '+', "plus" },
-                    { ',', "comma" },
-                    { '-', "dash" },
-                    { '.', "dot" },
-                    { '/', "slash" },
-                    { ':', "colon" },
-                    { ';', "semicolon" },
-                    { '<', "lt" },
-                    { '=', "equal" },
-                    { '>', "gt" },
-                    { '?', "question" },
-                    { '@', "at" },
-                    { '[', "lbracket" },
-                    { '\\', "backslash" },
-                    { ']', "rbracket" },
-                    { '^', "caret" },
-                    { '_', "underscore" },
-                    { '`', "backtick" },
-                    { '{', "lbrace" },
-                    { '|', "pipe" },
-                    { '}', "rbrace" },
-                    { '~', "tilde" }
-                };
+                        string manifestContent = ReadTemplate("manifest.nkfont");
+                        string configContent   = ReadTemplate("Config.xml").Replace("{FONT_NAME}", fontName);
 
-                var mapLines = new List<string> {
-                    "<FontMap xmlns=\"https://krykomdev.github.io/NeoKolors/Schemas/Fonts/v3/\">"
-                };
+                        Directory.CreateDirectory(Path.Combine(fullOutputDir, "lowercase"));
+                        Directory.CreateDirectory(Path.Combine(fullOutputDir, "uppercase"));
+                        Directory.CreateDirectory(Path.Combine(fullOutputDir, "digits"));
+                        Directory.CreateDirectory(Path.Combine(fullOutputDir, "special"));
 
-                // Helper to format XML Symbol
-                string GetXmlSymbol(char c) {
-                    return c switch {
-                        '&'  => "\\x26",
-                        '<'  => "\\x3c",
-                        '>'  => "\\x3e",
-                        '"'  => "\\x22",
-                        '\\' => "\\\\",
-                        _    => c.ToString()
-                    };
-                }
+                        var specialChars = new Dictionary<char, string> {
+                            { '!', "exclamation" }, { '"', "quote" }, { '#', "hash" }, { '$', "dollar" },
+                            { '%', "percent" }, { '&', "ampersand" }, { '\'', "apostrophe" }, { '(', "lparen" },
+                            { ')', "rparen" }, { '*', "asterisk" }, { '+', "plus" }, { ',', "comma" },
+                            { '-', "dash" }, { '.', "dot" }, { '/', "slash" }, { ':', "colon" },
+                            { ';', "semicolon" }, { '<', "lt" }, { '=', "equal" }, { '>', "gt" },
+                            { '?', "question" }, { '@', "at" }, { '[', "lbracket" }, { '\\', "backslash" },
+                            { ']', "rbracket" }, { '^', "caret" }, { '_', "underscore" }, { '`', "backtick" },
+                            { '{', "lbrace" }, { '|', "pipe" }, { '}', "rbrace" }, { '~', "tilde" }
+                        };
 
-                // Lowercase letters (a-z)
-                for (char c = 'a'; c <= 'z'; c++) {
-                    File.WriteAllText(Path.Combine(fullOutputDir, "lowercase", $"{c}.nkg"), ".", System.Text.Encoding.UTF8);
-                    mapLines.Add($"    <Component Symbol=\"{c}\" File=\"lowercase/{c}.nkg\"/>");
-                }
+                        var mapLines = new List<string> {
+                            "<FontMap xmlns=\"https://krykomdev.github.io/NeoKolors/Schemas/Fonts/v3/\">"
+                        };
 
-                // Uppercase letters (A-Z)
-                for (char c = 'A'; c <= 'Z'; c++) {
-                    File.WriteAllText(Path.Combine(fullOutputDir, "uppercase", $"{c}.nkg"), ".", System.Text.Encoding.UTF8);
-                    mapLines.Add($"    <Component Symbol=\"{c}\" File=\"uppercase/{c}.nkg\"/>");
-                }
+                        string GetXmlSymbol(char c) =>
+                            c switch {
+                                '&'  => "\\x26",
+                                '<'  => "\\x3c",
+                                '>'  => "\\x3e",
+                                '"'  => "\\x22",
+                                '\\' => "\\\\",
+                                _    => c.ToString()
+                            };
 
-                // Digits (0-9)
-                for (char c = '0'; c <= '9'; c++) {
-                    File.WriteAllText(Path.Combine(fullOutputDir, "digits", $"{c}.nkg"), ".", System.Text.Encoding.UTF8);
-                    mapLines.Add($"    <Component Symbol=\"{c}\" File=\"digits/{c}.nkg\"/>");
-                }
+                        int totalCount = 26 + 26 + 10 + specialChars.Count;
+                        int current    = 0;
 
-                // Special characters
-                foreach (var kvp in specialChars) {
-                    char   symbol = kvp.Key;
-                    string name   = kvp.Value;
-                    File.WriteAllText(Path.Combine(fullOutputDir, "special", $"{name}.nkg"), ".", System.Text.Encoding.UTF8);
-                    mapLines.Add($"    <Component Symbol=\"{GetXmlSymbol(symbol)}\" File=\"special/{name}.nkg\"/>");
-                }
+                        for (char c = 'a'; c <= 'z'; c++) {
+                            File.WriteAllText(Path.Combine(fullOutputDir, "lowercase", $"{c}.nkg"), ".", UTF8);
+                            mapLines.Add($"    <Component Symbol=\"{c}\" File=\"lowercase/{c}.nkg\"/>");
+                            current++;
+                            pctx.Report(current / (double)totalCount, $"Generating lowercase/{c}.nkg...");
+                        }
 
-                mapLines.Add("</FontMap>");
-                mapContent = string.Join(Environment.NewLine, mapLines);
+                        for (char c = 'A'; c <= 'Z'; c++) {
+                            File.WriteAllText(Path.Combine(fullOutputDir, "uppercase", $"{c}.nkg"), ".", UTF8);
+                            mapLines.Add($"    <Component Symbol=\"{c}\" File=\"uppercase/{c}.nkg\"/>");
+                            current++;
+                            pctx.Report(current / (double)totalCount, $"Generating uppercase/{c}.nkg...");
+                        }
+
+                        for (char c = '0'; c <= '9'; c++) {
+                            File.WriteAllText(Path.Combine(fullOutputDir, "digits", $"{c}.nkg"), ".", UTF8);
+                            mapLines.Add($"    <Component Symbol=\"{c}\" File=\"digits/{c}.nkg\"/>");
+                            current++;
+                            pctx.Report(current / (double)totalCount, $"Generating digits/{c}.nkg...");
+                        }
+
+                        foreach (var kvp in specialChars) {
+                            char   symbol = kvp.Key;
+                            string name   = kvp.Value;
+                            File.WriteAllText(Path.Combine(fullOutputDir, "special", $"{name}.nkg"), ".", UTF8);
+                            mapLines.Add($"    <Component Symbol=\"{GetXmlSymbol(symbol)}\" File=\"special/{name}.nkg\"/>");
+                            current++;
+                            pctx.Report(current / (double)totalCount, $"Generating special/{name}.nkg...");
+                        }
+
+                        mapLines.Add("</FontMap>");
+                        string mapContent = string.Join(Environment.NewLine, mapLines);
+
+                        File.WriteAllText(Path.Combine(fullOutputDir, "manifest.nkfont"), manifestContent, UTF8);
+                        File.WriteAllText(Path.Combine(fullOutputDir, "Config.xml"),      configContent,   UTF8);
+                        File.WriteAllText(Path.Combine(fullOutputDir, "Map.xml"),         mapContent,      UTF8);
+                    }
+                );
+
+                PrintSuccess($"Successfully created full ASCII XML font definition '{fontName}' at '{fullOutputDir}'!");
+                PrintSuccess("You can compile it using: nkfont compile <path-to-folder> <output-file.nkf>");
             }
             else {
-                Directory.CreateDirectory(Path.Combine(fullOutputDir, "lowercase"));
-                mapContent = ReadTemplate("Map.xml");
-                string aNkgContent = ReadTemplate("a.nkg");
-                File.WriteAllText(Path.Combine(fullOutputDir, "lowercase", "a.nkg"), aNkgContent, System.Text.Encoding.UTF8);
+                NKWidgets.Status(
+                    $"Creating blank XML font definition for '{fontName}'...",
+                    ctx => {
+                        Directory.CreateDirectory(fullOutputDir);
+
+                        string manifestContent = ReadTemplate("manifest.nkfont");
+                        string configContent   = ReadTemplate("Config.xml").Replace("{FONT_NAME}", fontName);
+
+                        Directory.CreateDirectory(Path.Combine(fullOutputDir, "lowercase"));
+                        string mapContent  = ReadTemplate("Map.xml");
+                        string aNkgContent = ReadTemplate("a.nkg");
+                        File.WriteAllText(Path.Combine(fullOutputDir, "lowercase", "a.nkg"), aNkgContent, UTF8);
+
+                        File.WriteAllText(Path.Combine(fullOutputDir, "manifest.nkfont"), manifestContent, UTF8);
+                        File.WriteAllText(Path.Combine(fullOutputDir, "Config.xml"),      configContent,   UTF8);
+                        File.WriteAllText(Path.Combine(fullOutputDir, "Map.xml"),         mapContent,      UTF8);
+
+                        ctx.Success($"Successfully created blank XML font definition '{fontName}' at '{fullOutputDir}'!");
+                    }
+                );
+
+                PrintSuccess("You can compile it using: nkfont compile <path-to-folder> <output-file.nkf>");
             }
-
-            // Write common files
-            File.WriteAllText(Path.Combine(fullOutputDir, "manifest.nkfont"), manifestContent, System.Text.Encoding.UTF8);
-            File.WriteAllText(Path.Combine(fullOutputDir, "Config.xml"),      configContent,   System.Text.Encoding.UTF8);
-            File.WriteAllText(Path.Combine(fullOutputDir, "Map.xml"),         mapContent,      System.Text.Encoding.UTF8);
-
-            PrintSuccess($"Successfully created blank XML font definition '{fontName}' at '{fullOutputDir}'!");
-            PrintSuccess("You can compile it using: nkfont compile <path-to-folder> <output-file.nkf>");
         }
         catch (Exception ex) {
             PrintError($"Failed to create template: {ex.Message}");
@@ -739,7 +749,7 @@ internal static class Program {
             throw new FileNotFoundException($"Embedded template '{name}' not found. Resource attempted: {resourceName}");
         }
 
-        using var reader = new StreamReader(stream, System.Text.Encoding.UTF8);
+        using var reader = new StreamReader(stream, UTF8);
 
         return reader.ReadToEnd();
     }
@@ -787,46 +797,42 @@ internal static class Program {
             }
         }
 
-        // Dynamically calculate column widths (at least as wide as headers)
-        int colName    = Math.Max("FONT NAME".Length,   fontRows.Count > 0 ? fontRows.Max(x => x.Name.Length) : 0)    + 1;
-        int colAuthor  = Math.Max("AUTHOR".Length,      fontRows.Count > 0 ? fontRows.Max(x => x.Author.Length) : 0)  + 1;
-        int colLicense = Math.Max("LICENSE".Length,     fontRows.Count > 0 ? fontRows.Max(x => x.License.Length) : 0) + 1;
-        int colType    = Math.Max("TYPE/FORMAT".Length, fontRows.Count > 0 ? fontRows.Max(x => x.Type.Length) : 0)    + 1;
-        int colSource  = Math.Max("SOURCE".Length,      fontRows.Count > 0 ? fontRows.Max(x => x.Source.Length) : 0)  + 1;
+        if (fontRows.Count == 0) {
+            NKConsole.WriteLine("  No fonts available.", ConsoleColor.DarkGray);
+            System.Console.WriteLine();
 
-        // Print table headers
-        NKConsole.Write("  "     + "FONT NAME".PadRight(colName),   new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD));
-        NKConsole.Write("│ "     + "AUTHOR".PadRight(colAuthor),    new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD));
-        NKConsole.Write("│ "     + "LICENSE".PadRight(colLicense),  new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD));
-        NKConsole.Write("│ "     + "TYPE/FORMAT".PadRight(colType), new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD));
-        NKConsole.WriteLine("│ " + "SOURCE".PadRight(colSource), new NKStyle(ConsoleColor.Cyan,    styles: NKTextStyles.BOLD));
-
-        // Separator row
-        string sepLine = "  " + new string('─', colName)    +
-            "┼─"              + new string('─', colAuthor)  +
-            "┼─"              + new string('─', colLicense) +
-            "┼─"              + new string('─', colType)    +
-            "┼─"              + new string('─', colSource);
-
-        NKConsole.WriteLine(sepLine, ConsoleColor.DarkGray);
-
-        // Render table rows
-        foreach (var r in fontRows.OrderBy(x => x.Source).ThenBy(x => x.Name)) {
-            NKConsole.Write("  " + r.Name.PadRight(colName), new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
-            NKConsole.Write("│ ",                            ConsoleColor.DarkGray);
-            NKConsole.Write(r.Author.PadRight(colAuthor),    ConsoleColor.White);
-            NKConsole.Write("│ ",                            ConsoleColor.DarkGray);
-            NKConsole.Write(r.License.PadRight(colLicense),  ConsoleColor.Green);
-            NKConsole.Write("│ ",                            ConsoleColor.DarkGray);
-            NKConsole.Write(r.Type.PadRight(colType),        ConsoleColor.Cyan);
-            NKConsole.Write("│ ",                            ConsoleColor.DarkGray);
-            NKConsole.WriteLine(r.Source.PadRight(colSource), r.Source == "Built-in" ? ConsoleColor.Magenta : ConsoleColor.Blue);
+            return;
         }
 
+        var headers = new IElement[] {
+            new Text(new AnsiString("FONT NAME",   new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD))),
+            new Text(new AnsiString("AUTHOR",      new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD))),
+            new Text(new AnsiString("LICENSE",     new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD))),
+            new Text(new AnsiString("TYPE/FORMAT", new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD))),
+            new Text(new AnsiString("SOURCE",      new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD)))
+        };
+
+        var sorted = fontRows.OrderBy(x => x.Source).ThenBy(x => x.Name).ToList();
+        var rows   = new IReadOnlyList<IElement>[sorted.Count];
+
+        for (int i = 0; i < sorted.Count; i++) {
+            var r = sorted[i];
+
+            rows[i] = [
+                new Text(new AnsiString(r.Name,    new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD))),
+                new Text(new AnsiString(r.Author,  new NKStyle(ConsoleColor.White))),
+                new Text(new AnsiString(r.License, new NKStyle(ConsoleColor.Green))),
+                new Text(new AnsiString(r.Type,    new NKStyle(ConsoleColor.Cyan))),
+                new Text(new AnsiString(r.Source,  new NKStyle(r.Source == "Built-in" ? ConsoleColor.Magenta : ConsoleColor.Blue)))
+            ];
+        }
+
+        var table = new Table(headers, rows, NKTableStyle.GetMinimal());
+        NKWidgets.Render(table);
         System.Console.WriteLine();
     }
 
-    static void HandleGlyphs(string fontKey) {
+    static void HandleInspectFont(string fontKey) {
         var font = LoadFont(fontKey);
 
         if (font == null) {
@@ -846,42 +852,33 @@ internal static class Program {
         // Print Font Details Header
         NKConsole.WriteLine("Font Details:", new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
         NKConsole.WriteLine("─────────────", ConsoleColor.DarkYellow);
+        System.Console.WriteLine();
 
-        NKConsole.Write("  Name:            ", ConsoleColor.Cyan);
-        NKConsole.WriteLine(nkFont.Name, new NKStyle(ConsoleColor.White, styles: NKTextStyles.BOLD));
+        var detailsRows = new List<IReadOnlyList<IElement>> {
+            new IElement[] { new Text(new AnsiString("Name", new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Name, new NKStyle(ConsoleColor.White, styles: NKTextStyles.BOLD))) }
+        };
 
         if (!string.IsNullOrEmpty(nkFont.Info.Author)) {
-            NKConsole.Write("  Author:          ", ConsoleColor.Cyan);
-            NKConsole.WriteLine(nkFont.Info.Author, ConsoleColor.White);
+            detailsRows.Add([new Text(new AnsiString("Author", new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.Author, new NKStyle(ConsoleColor.White)))]);
         }
 
         if (!string.IsNullOrEmpty(nkFont.Info.LicenseType)) {
-            NKConsole.Write("  License Flags:    ", ConsoleColor.Cyan);
-            NKConsole.WriteLine(nkFont.Info.LicenseType, ConsoleColor.White);
+            detailsRows.Add([new Text(new AnsiString("License Flags", new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.LicenseType, new NKStyle(ConsoleColor.White)))]);
         }
 
         if (!string.IsNullOrEmpty(nkFont.Info.LicenseFile)) {
-            NKConsole.Write("  License File:    ", ConsoleColor.Cyan);
-            NKConsole.WriteLine(nkFont.Info.LicenseFile, ConsoleColor.White);
+            detailsRows.Add([new Text(new AnsiString("License File", new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.LicenseFile, new NKStyle(ConsoleColor.White)))]);
         }
 
-        NKConsole.Write("  Proportions:     ", ConsoleColor.Cyan);
-        NKConsole.WriteLine(nkFont.Info.ProportionType.ToString(), ConsoleColor.White);
+        detailsRows.Add([new Text(new AnsiString("Proportions",    new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.ProportionType.ToString(), new NKStyle(ConsoleColor.White)))]);
+        detailsRows.Add([new Text(new AnsiString("Ligatures",      new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.Ligatures ? "Yes" : "No",  new NKStyle(ConsoleColor.White)))]);
+        detailsRows.Add([new Text(new AnsiString("Leading",        new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.Leading.ToString(),        new NKStyle(ConsoleColor.White)))]);
+        detailsRows.Add([new Text(new AnsiString("Letter Spacing", new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.LetterSpacing.ToString(),  new NKStyle(ConsoleColor.White)))]);
+        detailsRows.Add([new Text(new AnsiString("Word Spacing",   new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.WordSpacing.ToString(),    new NKStyle(ConsoleColor.White)))]);
+        detailsRows.Add([new Text(new AnsiString("Total Glyphs",   new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Glyphs.Count.ToString(),        new NKStyle(ConsoleColor.Green, styles: NKTextStyles.BOLD)))]);
 
-        NKConsole.Write("  Ligatures:       ", ConsoleColor.Cyan);
-        NKConsole.WriteLine(nkFont.Info.Ligatures ? "Yes" : "No", ConsoleColor.White);
-
-        NKConsole.Write("  Leading:         ", ConsoleColor.Cyan);
-        NKConsole.WriteLine(nkFont.Info.Leading.ToString(), ConsoleColor.White);
-
-        NKConsole.Write("  Letter Spacing:  ", ConsoleColor.Cyan);
-        NKConsole.WriteLine(nkFont.Info.LetterSpacing.ToString(), ConsoleColor.White);
-
-        NKConsole.Write("  Word Spacing:    ", ConsoleColor.Cyan);
-        NKConsole.WriteLine(nkFont.Info.WordSpacing.ToString(), ConsoleColor.White);
-
-        NKConsole.Write("  Total Glyphs:    ", ConsoleColor.Cyan);
-        NKConsole.WriteLine(nkFont.Glyphs.Count.ToString(), new NKStyle(ConsoleColor.White, styles: NKTextStyles.BOLD));
+        var detailsTable = new Table(null, detailsRows, NKTableStyle.GetNormal(features: NKTableStyle.Features.VERTICAL_ELEMENT_SEPARATOR));
+        NKWidgets.Render(detailsTable);
         System.Console.WriteLine();
 
         // Print Table Header
@@ -889,56 +886,49 @@ internal static class Program {
         NKConsole.WriteLine("───────────────────────", ConsoleColor.DarkYellow);
         System.Console.WriteLine();
 
-        // Define Column Widths
-        const int colSymbol   = 14;
-        const int colType     = 12;
-        const int colSize     = 10;
-        const int colBaseline = 12;
+        var glyphHeaders = new IElement[] {
+            new Text(new AnsiString("SYMBOL",   new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD))),
+            new Text(new AnsiString("TYPE",     new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD))),
+            new Text(new AnsiString("SIZE",     new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD))),
+            new Text(new AnsiString("BASELINE", new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD))),
+            new Text(new AnsiString("STYLES",   new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD)))
+        };
 
-        // Print table header row
-        NKConsole.Write("  " + "SYMBOL".PadRight(colSymbol),     new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD));
-        NKConsole.Write("│ " + "TYPE".PadRight(colType),         new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD));
-        NKConsole.Write("│ " + "SIZE".PadRight(colSize),         new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD));
-        NKConsole.Write("│ " + "BASELINE".PadRight(colBaseline), new NKStyle(ConsoleColor.Cyan, styles: NKTextStyles.BOLD));
-        NKConsole.WriteLine("│ STYLES", new NKStyle(ConsoleColor.Cyan,                          styles: NKTextStyles.BOLD));
-
-        // Horizontal separator line
-        string sepLine = "  " + new string('─', colSymbol) + "┼" + new string('─', colType + 1) + "┼" + new string('─', colSize + 1) + "┼" + new string('─', colBaseline + 1) + "┼" + new string('─', 20);
-        NKConsole.WriteLine(sepLine, ConsoleColor.DarkGray);
-
-        // Sort Glyphs: Simple first sorted by char, then Ligatures sorted alphabetically
         var sortedGlyphs = nkFont.Glyphs
             .OrderBy(g => g.Key.IsLigature)
             .ThenBy(g => g.Key.IsSimple ? ((int)g.Key.SimpleSymbol).ToString("D5") : g.Key.LigatureSymbol)
             .ToList();
 
-        foreach (var (symbol, glyph) in sortedGlyphs) {
+        var glyphRows = new IReadOnlyList<IElement>[sortedGlyphs.Count];
+
+        for (int i = 0; i < sortedGlyphs.Count; i++) {
+            var (symbol, glyph) = sortedGlyphs[i];
             string symStr    = symbol.IsSimple ? FormatSymbol(symbol.SimpleSymbol) : FormatLigature(symbol.LigatureSymbol);
             string typeStr   = symbol.IsSimple ? "Simple" : "Ligature";
             string sizeStr   = $"{glyph.Width}x{glyph.Height}";
             string baseStr   = glyph.BaselineOffset.ToString();
             string stylesStr = symbol.Styles.Styles == NKTextStyles.NONE ? "None" : symbol.Styles.Styles.ToString();
 
-            // Print styled row
-            NKConsole.Write("  " + symStr.PadRight(colSymbol), new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
-
-            NKConsole.Write("│ ",                      ConsoleColor.DarkGray);
-            NKConsole.Write(typeStr.PadRight(colType), symbol.IsSimple ? ConsoleColor.White : ConsoleColor.Cyan);
-
-            NKConsole.Write("│ ",                      ConsoleColor.DarkGray);
-            NKConsole.Write(sizeStr.PadRight(colSize), ConsoleColor.Green);
-
-            NKConsole.Write("│ ",                          ConsoleColor.DarkGray);
-            NKConsole.Write(baseStr.PadRight(colBaseline), ConsoleColor.Magenta);
-
-            NKConsole.Write("│ ", ConsoleColor.DarkGray);
-            NKConsole.WriteLine(stylesStr, symbol.Styles.Styles == NKTextStyles.NONE ? ConsoleColor.DarkGray : ConsoleColor.Blue);
+            glyphRows[i] = [
+                new Text(new AnsiString(symStr,    new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD))),
+                new Text(new AnsiString(typeStr,   new NKStyle(symbol.IsSimple ? ConsoleColor.White : ConsoleColor.Cyan))),
+                new Text(new AnsiString(sizeStr,   new NKStyle(ConsoleColor.Green))),
+                new Text(new AnsiString(baseStr,   new NKStyle(ConsoleColor.Magenta))),
+                new Text(new AnsiString(stylesStr, new NKStyle(symbol.Styles.Styles == NKTextStyles.NONE ? ConsoleColor.DarkGray : ConsoleColor.Blue)))
+            ];
         }
 
+        var glyphsTable = new Table(
+            glyphHeaders,
+            glyphRows,
+            NKTableStyle.GetMinimal()
+        );
+
+        NKWidgets.Render(glyphsTable);
         System.Console.WriteLine();
     }
 
-    static void HandleInspect(string fontKey, string glyphInput) {
+    static void HandleInspectGlyph(string fontKey, string glyphInput) {
         var font = LoadFont(fontKey);
 
         if (font == null) {
@@ -967,11 +957,13 @@ internal static class Program {
             searchChar     = ' ';
             isSimpleSearch = true;
         }
-        else if (normalizedInput.Equals("[tab]", StringComparison.OrdinalIgnoreCase) || normalizedInput.Equals("tab", StringComparison.OrdinalIgnoreCase)) {
+        else if (normalizedInput.Equals("[tab]", StringComparison.OrdinalIgnoreCase) ||
+            normalizedInput.Equals("tab",        StringComparison.OrdinalIgnoreCase)) {
             searchChar     = '\t';
             isSimpleSearch = true;
         }
-        else if (normalizedInput.Equals("[newline]", StringComparison.OrdinalIgnoreCase) || normalizedInput.Equals("newline", StringComparison.OrdinalIgnoreCase)) {
+        else if (normalizedInput.Equals("[newline]", StringComparison.OrdinalIgnoreCase) ||
+            normalizedInput.Equals("newline",        StringComparison.OrdinalIgnoreCase)) {
             searchChar     = '\n';
             isSimpleSearch = true;
         }
@@ -1022,97 +1014,73 @@ internal static class Program {
         // Print Glyph Metadata
         NKConsole.WriteLine("Glyph Details:", new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
         NKConsole.WriteLine("──────────────", ConsoleColor.DarkYellow);
+        System.Console.WriteLine();
 
         string symStr = matchedSymbol.Value.IsSimple
             ? FormatSymbol(matchedSymbol.Value.SimpleSymbol)
             : FormatLigature(matchedSymbol.Value.LigatureSymbol);
 
-        NKConsole.Write("  Symbol:          ", ConsoleColor.Cyan);
-        NKConsole.WriteLine(symStr, new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
-
-        NKConsole.Write("  Type:            ", ConsoleColor.Cyan);
-        NKConsole.WriteLine(matchedSymbol.Value.IsSimple ? "Simple" : "Ligature", ConsoleColor.White);
-
-        NKConsole.Write("  Dimensions:      ", ConsoleColor.Cyan);
-        NKConsole.WriteLine($"{matchedGlyph.Width}x{matchedGlyph.Height}", ConsoleColor.Green);
-
-        NKConsole.Write("  Baseline Offset: ", ConsoleColor.Cyan);
-        NKConsole.WriteLine(matchedGlyph.BaselineOffset.ToString(), ConsoleColor.Magenta);
-
-        NKConsole.Write("  Styles:          ", ConsoleColor.Cyan);
-
         string stylesStr = matchedSymbol.Value.Styles.Styles == NKTextStyles.NONE
             ? "None"
             : matchedSymbol.Value.Styles.Styles.ToString();
 
-        NKConsole.WriteLine(stylesStr, matchedSymbol.Value.Styles.Styles == NKTextStyles.NONE ? ConsoleColor.DarkGray : ConsoleColor.Blue);
+        string alignPointsStr = matchedGlyph.AlignPoints.Any()
+            ? string.Join(", ", matchedGlyph.AlignPoints.Select(p => $"'{p.Character}' at {p.Position.X},{p.Position.Y}"))
+            : "None";
 
-        if (matchedGlyph.AlignPoints.Any()) {
-            NKConsole.Write("  Align Points:    ", ConsoleColor.Cyan);
-            var points = matchedGlyph.AlignPoints.Select(p => $"'{p.Character}' at {p.Position.X},{p.Position.Y}");
-            NKConsole.WriteLine(string.Join(", ", points), ConsoleColor.White);
-        }
-        else {
-            NKConsole.Write("  Align Points:    ", ConsoleColor.Cyan);
-            NKConsole.WriteLine("None", ConsoleColor.DarkGray);
-        }
+        var metaRows = new List<IReadOnlyList<IElement>> {
+            new IElement[] { new Text(new AnsiString("Symbol",          new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(symStr,                                               new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD))) },
+            new IElement[] { new Text(new AnsiString("Type",            new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(matchedSymbol.Value.IsSimple ? "Simple" : "Ligature", new NKStyle(ConsoleColor.White))) },
+            new IElement[] { new Text(new AnsiString("Dimensions",      new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString($"{matchedGlyph.Width}x{matchedGlyph.Height}",        new NKStyle(ConsoleColor.Green))) },
+            new IElement[] { new Text(new AnsiString("Baseline Offset", new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(matchedGlyph.BaselineOffset.ToString(),               new NKStyle(ConsoleColor.Magenta))) },
+            new IElement[] { new Text(new AnsiString("Styles",          new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(stylesStr,                                            new NKStyle(matchedSymbol.Value.Styles.Styles == NKTextStyles.NONE ? ConsoleColor.DarkGray : ConsoleColor.Blue))) },
+            new IElement[] { new Text(new AnsiString("Align Points",    new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(alignPointsStr,                                       new NKStyle(matchedGlyph.AlignPoints.Any() ? ConsoleColor.White : ConsoleColor.DarkGray))) }
+        };
 
+        var metaTable = new Table(null, metaRows, NKTableStyle.GetBorderless());
+        NKWidgets.Render(metaTable);
         System.Console.WriteLine();
 
         // Visual Representation
         NKConsole.WriteLine("Visual Representation:", new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
         NKConsole.WriteLine("──────────────────────", ConsoleColor.DarkYellow);
+        System.Console.WriteLine();
 
-        int baselineY = matchedGlyph.Height + matchedGlyph.BaselineOffset - 1;
+        int baselineY   = matchedGlyph.Height + matchedGlyph.BaselineOffset - 1;
+        var rowElements = new List<IElement>();
 
-        // Top Border
-        NKConsole.Write("  ┌",                               ConsoleColor.DarkGray);
-        NKConsole.Write(new string('─', matchedGlyph.Width), ConsoleColor.DarkGray);
-        NKConsole.WriteLine("┐", ConsoleColor.DarkGray);
-
-        // Rows
         for (int y = 0; y < matchedGlyph.Height; y++) {
-            NKConsole.Write("  │", ConsoleColor.DarkGray);
+            var cells = new List<AnsiChar>();
 
             for (int x = 0; x < matchedGlyph.Width; x++) {
                 var cell = matchedGlyph.Glyph[x, y];
 
                 switch (cell.Type) {
-                    case GlyphCellType.BACKGROUND: {
-                        NKConsole.Write("·", ConsoleColor.DarkGray);
-
-                        break;
-                    }
-                    case GlyphCellType.FOREGROUND: {
-                        NKConsole.Write("·", ConsoleColor.Blue);
-
-                        break;
-                    }
-                    case GlyphCellType.CHARACTER: {
-                        NKConsole.Write(cell.Character.ToString(), new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
-
-                        break;
-                    }
-                    default: {
-                        throw new ArgumentOutOfRangeException();
-                    }
+                    case GlyphCellType.BACKGROUND: cells.Add(new AnsiChar('·',            new NKStyle(ConsoleColor.DarkGray))); break;
+                    case GlyphCellType.FOREGROUND: cells.Add(new AnsiChar('·',            new NKStyle(ConsoleColor.Blue))); break;
+                    case GlyphCellType.CHARACTER:  cells.Add(new AnsiChar(cell.Character, new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD))); break;
                 }
             }
 
-            NKConsole.Write("│", ConsoleColor.DarkGray);
-
-            // Tag next to baseline row
             if (y == baselineY) {
-                NKConsole.Write("  <-- Baseline", new NKStyle(ConsoleColor.Magenta, styles: NKTextStyles.BOLD));
+                cells.Add(new AnsiChar(' ', NKStyle.Default));
+                cells.Add(new AnsiChar(' ', NKStyle.Default));
+
+                foreach (char ch in "<-- Baseline") {
+                    cells.Add(new AnsiChar(ch, new NKStyle(ConsoleColor.Magenta, styles: NKTextStyles.BOLD)));
+                }
             }
 
-            System.Console.WriteLine();
+            rowElements.Add(new Text(new AnsiString(cells)));
         }
 
-        // Bottom Border
-        NKConsole.Write("  └",                               ConsoleColor.DarkGray);
-        NKConsole.Write(new string('─', matchedGlyph.Width), ConsoleColor.DarkGray);
-        NKConsole.WriteLine("┘", ConsoleColor.DarkGray);
+        // var visualBorder = new Border(
+        //     element: new Flex(direction: FlexDirection.COLUMN, children: rowElements.ToArray()),
+        //     style: NKBorderStyle.GetRounded(),
+        //     padding: new Spacing(horizontal: Dimension.Chars(1), vertical: Dimension.Chars(0))
+        // );
+
+        NKWidgets.Render(new Flex(direction: FlexDirection.COLUMN, children: rowElements.ToArray()));
 
         // Baseline notes if outside grid
         if (baselineY >= matchedGlyph.Height) {
@@ -1241,29 +1209,35 @@ internal static class Program {
             return;
         }
 
-        PrintInfo($"Validating font file '{Path.GetFileName(fullPath)}'...");
-        var font = LoadFromFile(fullPath);
+        NKWidgets.Status(
+            $"Validating font file '{Path.GetFileName(fullPath)}'...",
+            ctx => {
+                var font = LoadFromFile(fullPath);
 
-        if (font == null) {
-            PrintError("Failed to load font. The file is not a valid FIGlet (.flf) or NeoKolors binary (.nkf) font.");
+                if (font == null) {
+                    ctx.Fail("Failed to load font. The file is not a valid FIGlet (.flf) or NeoKolors binary (.nkf) font.");
 
-            return;
-        }
+                    return;
+                }
 
-        string destFileName = Path.GetFileName(fullPath);
-        string destPath     = Path.Combine(FONTS_STORAGE_DIR, destFileName);
+                string destFileName = Path.GetFileName(fullPath);
+                string destPath     = Path.Combine(FONTS_STORAGE_DIR, destFileName);
 
-        try {
-            if (!Directory.Exists(FONTS_STORAGE_DIR)) {
-                Directory.CreateDirectory(FONTS_STORAGE_DIR);
+                ctx.Status = $"Importing font '{font.Name}' into internal storage...";
+
+                try {
+                    if (!Directory.Exists(FONTS_STORAGE_DIR)) {
+                        Directory.CreateDirectory(FONTS_STORAGE_DIR);
+                    }
+
+                    File.Copy(fullPath, destPath, overwrite: true);
+                    ctx.Success($"Successfully added font '{font.Name}' to internal storage at '{destPath}'!");
+                }
+                catch (Exception ex) {
+                    ctx.Fail($"Failed to save font to internal storage: {ex.Message}");
+                }
             }
-
-            File.Copy(fullPath, destPath, overwrite: true);
-            PrintSuccess($"Successfully added font '{font.Name}' to internal storage at '{destPath}'!");
-        }
-        catch (Exception ex) {
-            PrintError($"Failed to save font to internal storage: {ex.Message}");
-        }
+        );
     }
 
     static void HandleRemove(string fontName) {
@@ -1313,40 +1287,43 @@ internal static class Program {
             return;
         }
 
-        try {
-            var files        = Directory.GetFiles(logsDir, "*.log");
-            int deletedCount = 0;
-            int failedCount  = 0;
-
-            foreach (var file in files) {
+        NKWidgets.Status(
+            "Cleaning application log files...",
+            ctx => {
                 try {
-                    File.Delete(file);
-                    deletedCount++;
-                }
-                catch (IOException) {
-                    // Active log file might be locked by current process
-                    failedCount++;
-                }
-                catch (Exception) {
-                    failedCount++;
-                }
-            }
+                    var files        = Directory.GetFiles(logsDir, "*.log");
+                    int deletedCount = 0;
+                    int failedCount  = 0;
 
-            if (deletedCount > 0) {
-                PrintSuccess($"Successfully cleaned {deletedCount} log file(s).");
-            }
+                    foreach (var file in files) {
+                        try {
+                            File.Delete(file);
+                            deletedCount++;
+                        }
+                        catch (IOException) {
+                            // Active log file might be locked by current process
+                            failedCount++;
+                        }
+                        catch (Exception) {
+                            failedCount++;
+                        }
+                    }
 
-            if (failedCount > 0) {
-                PrintInfo($"{failedCount} active log file(s) are currently in use by the running tool and were not deleted.");
+                    if (deletedCount > 0) {
+                        ctx.Success($"Successfully cleaned {deletedCount} log file(s)." + (failedCount > 0 ? $" ({failedCount} active files preserved)" : ""));
+                    }
+                    else if (failedCount > 0) {
+                        ctx.Success($"{failedCount} active log file(s) are currently in use by the running tool and were preserved.");
+                    }
+                    else {
+                        ctx.Success("No log files to clean.");
+                    }
+                }
+                catch (Exception ex) {
+                    ctx.Fail($"Failed to clean logs: {ex.Message}");
+                }
             }
-
-            if (deletedCount == 0 && failedCount == 0) {
-                PrintInfo("No log files to clean.");
-            }
-        }
-        catch (Exception ex) {
-            PrintError($"Failed to clean logs: {ex.Message}");
-        }
+        );
     }
 
     static void PrintError(string msg) {

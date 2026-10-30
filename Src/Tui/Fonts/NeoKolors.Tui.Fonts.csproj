@@ -59,8 +59,4 @@
         </PackageReference>
         <PackageReference Include="protobuf-net" Version="3.4.30" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Coloring\" />
-    </ItemGroup>
 </Project>

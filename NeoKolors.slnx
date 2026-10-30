@@ -74,6 +74,7 @@
     <Folder Name="/Examples/">
         <File Path="Examples/ExampleApp.cs" />
         <File Path="Examples/ExampleGame2D.cs" />
+        <File Path="Examples/ExampleWidgets.cs" />
         <Project Path="Examples/Ascii/Ascii.csproj" />
         <Project Path="Examples/Neofetch/Neofetch.csproj" />
         <Project Path="Examples/Testing/Testing.csproj" />

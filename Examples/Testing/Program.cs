@@ -2,6 +2,7 @@ using System.Text;
 using NeoKolors.Common;
 using NeoKolors.Console;
 using NeoKolors.Tui.Fonts.Assets;
+using NeoKolors.Tui.Widgets.Live;
 using WinImports = NeoKolors.Console.WinImports;
 
 namespace Testing;
@@ -87,6 +88,11 @@ public static class Program {
 
         AssetsProvider.RegisterFonts();
 
+        var start    = DateTime.Now;
+        var progress = new TimeSpan(0, 0, 10);
+        
+        NKWidgets.Progress("hello", c => c.Value = (DateTime.Now - start) / progress);
+        
         var asdasd = "e\u0301";
 
         NKConsole.WriteLine(EscapeCodes.GetLink("https://youtube.com/", "You", "yt"));
