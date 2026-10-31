@@ -1,9 +1,7 @@
 // NeoKolors
 // Copyright (c) 2026 KryKom
 
-using NeoKolors.Tui.Lifecycle.Core;
-
-namespace NeoKolors.Tui.Lifecycle;
+namespace NeoKolors.Tui.Lifecycle.Core;
 
 /// <summary>
 /// Contract representing an object with an observable and manageable execution lifecycle.

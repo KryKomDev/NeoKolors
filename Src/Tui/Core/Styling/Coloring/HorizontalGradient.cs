@@ -20,14 +20,15 @@ public class HorizontalGradient : IColoringStrategy {
     }
 
     public NKColor GetColor(int currentX, int currentY, int width, int height) {
-        if (width <= 1 && height <= 1) return _colors[0];
+        if (width <= 1 && height <= 1)
+            return _colors[0];
 
         float score = currentX + currentY * _tilt;
 
         float minScore = Math.Min(0f, (height - 1) * _tilt);
         float maxScore = Math.Max(width - 1, width - 1 + (height - 1) * _tilt);
 
-        float range = maxScore - minScore;
+        float range    = maxScore - minScore;
         float fraction = range == 0 ? 0f : (score - minScore) / range;
 
         return NKColor.GetMultiStopColor(_colors, fraction);

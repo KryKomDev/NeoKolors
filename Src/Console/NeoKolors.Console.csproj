@@ -4,7 +4,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>preview</LangVersion>
-        <TargetFrameworks>net5.0;net8.0;netstandard2.1;net10.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;net10.0;net11.0</TargetFrameworks>
         <Platforms>AnyCPU</Platforms>
         <Configurations>Debug;Release</Configurations>
         <!--        <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>-->
@@ -47,10 +47,6 @@
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.4"/>
         <PackageReference Include="Implyzer" Version="2026.5.4" OutputItemType="Analyzer" ReferenceOutputAssembly="false">
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-        <PackageReference Include="Polyfill" Version="11.4.1">
-            <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="protobuf-net" Version="3.4.30"/>

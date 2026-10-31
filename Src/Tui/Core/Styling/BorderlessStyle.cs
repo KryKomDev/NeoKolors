@@ -11,7 +11,7 @@ namespace NeoKolors.Tui.Core;
 ///     decoration.
 /// </summary>
 public struct BorderlessStyle : IBorderStyle {
-    public void Draw(Rect2D rect, in ICharCanvas canvas, int z) { }
+    public void Draw(Rect2D rect, in ICharDrawer canvas, int z) { }
     public Rect2D GetContentBox(Size2D size) => new(Point2D.Zero, size);
     public Size2D GetBorderBox(Size2D size) => size;
 }

@@ -166,29 +166,6 @@ public interface ICharDrawer {
     public void DrawRect(AnsiChar c, int x, int y, int width, int height, int z);
 
     /// <summary>
-    /// Draws a border with the specified properties onto the canvas at a given position and dimensions.
-    /// </summary>
-    /// <param name="border">
-    /// The <see cref="NKBorderOld" /> defining the appearance of the border, including characters and styles.
-    /// </param>
-    /// <param name="x">
-    /// The x coordinate of the top-left corner where the border will be drawn.
-    /// </param>
-    /// <param name="y">
-    /// The y coordinate of the top-left corner where the border will be drawn.
-    /// </param>
-    /// <param name="width">
-    /// The width of the border enclosing the area.
-    /// </param>
-    /// <param name="height">
-    /// The height of the border enclosing the area.
-    /// </param>
-    /// <param name="z">
-    /// The z-index to use when drawing the border, determining its rendering order.
-    /// </param>
-    public void DrawBorder(NKBorderOld border, int x, int y, int width, int height, int z);
-
-    /// <summary>
     /// Clears the canvas by resetting all its content and associated state to their default values.
     /// This keeps the canvas dimensions.
     /// </summary>

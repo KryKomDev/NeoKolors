@@ -45,22 +45,22 @@ public static class AssetsProvider {
     /// <summary>
     /// Gets the built-in Standard FIGlet font.
     /// </summary>
-    public static NKFont? Standard => STANDARD ??= LoadFigletFont("standard");
+    public static NKFont? Standard => STANDARD ??= LoadFigletFont("Standard");
 
     /// <summary>
     /// Gets the built-in Slant FIGlet font.
     /// </summary>
-    public static NKFont? Slant => SLANT ??= LoadFigletFont("slant");
+    public static NKFont? Slant => SLANT ??= LoadFigletFont("Slant");
 
     /// <summary>
     /// Gets the built-in Shadow FIGlet font.
     /// </summary>
-    public static NKFont? Shadow => SHADOW ??= LoadFigletFont("shadow");
+    public static NKFont? Shadow => SHADOW ??= LoadFigletFont("Shadow");
 
     /// <summary>
     /// Gets the built-in Block FIGlet font.
     /// </summary>
-    public static NKFont? Block => BLOCK ??= LoadFigletFont("block");
+    public static NKFont? Block => BLOCK ??= LoadFigletFont("Block");
 
     /// <summary>
     /// Resolves and returns a Stream for the specified built-in font resource.
@@ -69,7 +69,18 @@ public static class AssetsProvider {
     /// <returns>A Stream for the embedded font resource, or null if not found.</returns>
     public static Stream? GetFontStream(string name) {
         var resourceName = $"NeoKolors.Tui.Fonts.Assets.{name}.nkf";
-        return ASSEMBLY.GetManifestResourceStream(resourceName);
+        var stream = ASSEMBLY.GetManifestResourceStream(resourceName);
+        if (stream != null) {
+            return stream;
+        }
+
+        // Fallback for subfolders (e.g. nkf/ or compiled/) when embedded without LogicalName
+        var suffix = $".{name}.nkf";
+        var matched = ASSEMBLY.GetManifestResourceNames()
+            .FirstOrDefault(r => r.EndsWith(suffix, StringComparison.OrdinalIgnoreCase) ||
+                                 r.Equals($"{name}.nkf", StringComparison.OrdinalIgnoreCase));
+
+        return matched != null ? ASSEMBLY.GetManifestResourceStream(matched) : null;
     }
 
     /// <summary>
@@ -104,9 +115,47 @@ public static class AssetsProvider {
     }
 
     private static NKFont? LoadFigletFont(string name) {
-        var resourceName = $"NeoKolors.Tui.Fonts.Assets.Figlet.{name}.flf";
+        var lowerName = name.ToLowerInvariant();
+        var resourceName = $"NeoKolors.Tui.Fonts.Assets.Figlet.{lowerName}.flf";
         using var stream = ASSEMBLY.GetManifestResourceStream(resourceName);
-        
-        return stream == null ? null : NKFontSerializer.DeserializeFiglet(stream, name);
+        if (stream == null) {
+            return null;
+        }
+
+        var effectiveMeta = new FigletMetadata();
+
+        // 1. Look for embedded directory manifest
+        string[] manifestNames = [
+            "NeoKolors.Tui.Fonts.Assets.Figlet.manifest.xml",
+            "NeoKolors.Tui.Fonts.Assets.Figlet.figlet.manifest.xml"
+        ];
+
+        foreach (var mfName in manifestNames) {
+            using var mfStream = ASSEMBLY.GetManifestResourceStream(mfName);
+            if (mfStream != null) {
+                var dict = FigletMetadata.FromManifestXml(mfStream);
+                if (dict.TryGetValue(name, out var mfMeta)) {
+                    effectiveMeta.MergeWith(mfMeta);
+                    break;
+                }
+            }
+        }
+
+        // 2. Look for embedded font sidecar
+        string[] sidecarNames = [
+            $"NeoKolors.Tui.Fonts.Assets.Figlet.{lowerName}.meta.xml",
+            $"NeoKolors.Tui.Fonts.Assets.Figlet.{lowerName}.xml"
+        ];
+
+        foreach (var scName in sidecarNames) {
+            using var scStream = ASSEMBLY.GetManifestResourceStream(scName);
+            if (scStream != null) {
+                var scMeta = FigletMetadata.FromXml(scStream);
+                effectiveMeta.MergeWith(scMeta);
+                break;
+            }
+        }
+
+        return NKFontSerializer.DeserializeFiglet(stream, name, metadata: effectiveMeta);
     }
 }

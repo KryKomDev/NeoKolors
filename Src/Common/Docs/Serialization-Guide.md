@@ -52,7 +52,7 @@ The class defines its own Protobuf surrogate:
 ```csharp
 [ProtoContract(Surrogate = typeof(NKColorSurrogate))]
 [StructLayout(LayoutKind.Explicit, Size = sizeof(uint))]
-public readonly record struct NKColor : IFormattable, IParsablePolyfill.IParsable<NKColor> { ... }
+public readonly record struct NKColor : IFormattable, IParsable<NKColor> { ... }
 
 [ProtoContract]
 public struct NKColorSurrogate {
@@ -94,7 +94,7 @@ public struct NKColorSurrogate {
 ```csharp
 [ProtoContract(Surrogate = typeof(NKStyleSurrogate))]
 [StructLayout(LayoutKind.Explicit, Size = sizeof(ulong) * 2)]
-public readonly record struct NKStyle : IFormattable, IParsablePolyfill.IParsable<NKStyle> { ... }
+public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> { ... }
 
 [ProtoContract]
 public struct NKStyleSurrogate {

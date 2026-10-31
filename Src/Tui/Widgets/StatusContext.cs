@@ -1,11 +1,10 @@
 // NeoKolors
 // Copyright (c) 2026 KryKom
 
-using NeoKolors.Tui.Core;
-using NeoKolors.Tui.Widgets.Elements;
-using NeoKolors.Tui.Widgets.Lifecycle;
+using NeoKolors.Tui.Elements;
+using NeoKolors.Tui.Lifecycle.Inline;
 
-namespace NeoKolors.Tui.Widgets.Live;
+namespace NeoKolors.Tui.Widgets;
 
 /// <summary>
 /// Execution context for managing active status spinners and completion states.

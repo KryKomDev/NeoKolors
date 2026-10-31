@@ -113,4 +113,42 @@ public class NKFontBinarySerializerTests {
         Assert.Equal("LICENSE.txt", deserializedFont.Info.LicenseFile);
         Assert.Equal("This is a custom license agreement.", deserializedFont.Info.LicenseContent);
     }
+
+    [Fact]
+    public void SerializeAndDeserialize_WithSourceFormatAndCustomMetadata_ShouldBePreserved() {
+        var metadata = new Dictionary<string, string> {
+            ["Year"] = "1993",
+            ["Category"] = "Shadowed",
+            ["Website"] = "https://example.com"
+        };
+
+        var info = new NKFontInfo(
+            "TestCustomMetaFont",
+            ligatures: false,
+            leading: 8,
+            letterSpacing: 2,
+            wordSpacing: 5,
+            variable: new NKFontVariableConfig(false),
+            author: "Glenn Chappell",
+            licenseType: "Attribution",
+            sourceFormat: "Figlet",
+            metadata: metadata
+        );
+
+        var originalFont = new NKFont(info, new Dictionary<NKGlyphSymbol, NKGlyph>());
+
+        using var memoryStream = new MemoryStream();
+        NKFontSerializer.SerializeBinary(originalFont, memoryStream);
+        memoryStream.Position = 0;
+
+        var deserializedFont = NKFontSerializer.DeserializeBinary(memoryStream);
+        Assert.NotNull(deserializedFont);
+        Assert.Equal("TestCustomMetaFont", deserializedFont.Info.Name);
+        Assert.Equal("Figlet", deserializedFont.Info.SourceFormat);
+        Assert.Equal("Glenn Chappell", deserializedFont.Info.Author);
+        Assert.Equal("Attribution", deserializedFont.Info.LicenseType);
+        Assert.Equal("1993", deserializedFont.Info.GetMetadata("Year"));
+        Assert.Equal("Shadowed", deserializedFont.Info.GetMetadata("category")); // case-insensitive check
+        Assert.Equal("https://example.com", deserializedFont.Info.GetMetadata("WEBSITE"));
+    }
 }

@@ -4,10 +4,8 @@
 using Metriks;
 using NeoKolors.Common;
 using NeoKolors.Tui.Core;
-using NeoKolors.Tui.Elements;
-using NeoKolors.Tui.Widgets.Elements;
 
-namespace NeoKolors.Tui.Widgets.Elements;
+namespace NeoKolors.Tui.Elements;
 
 /// <summary>
 /// A high-level declarative element combining an animated spinner and a dynamic status message,

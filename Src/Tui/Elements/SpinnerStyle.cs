@@ -1,7 +1,7 @@
 // NeoKolors
 // Copyright (c) 2026 KryKom
 
-namespace NeoKolors.Tui.Widgets.Elements;
+namespace NeoKolors.Tui.Elements;
 
 /// <summary>
 /// Defines the visual frame sequence and default animation interval for a terminal spinner.

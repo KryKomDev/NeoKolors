@@ -2,8 +2,6 @@
 // Copyright (c) 2025 KryKom
 
 using NeoKolors.Settings.Argument;
-using NeoKolors.Settings.Builder.Delegate;
-using NeoKolors.Settings.Builder.Info;
 
 namespace NeoKolors.Settings.Builder;
 

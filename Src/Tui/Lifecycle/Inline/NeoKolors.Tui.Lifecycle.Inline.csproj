@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>net8.0;net10.0;net11.0</TargetFrameworks>
+        <LangVersion>15</LangVersion>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+        <Authors>KryKom</Authors>
+        <Company>KryKom</Company>
+        <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
+        <PackageLicenseUrl>https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE</PackageLicenseUrl>
+        <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageIcon>Package-Icon.png</PackageIcon>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="\"/>
+        <None Include="../../../../LICENSE" Pack="true" PackagePath="\"/>
+        <None Include="../../../../Assets/Package-Icon.png" Pack="true" PackagePath="\"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="../Core/NeoKolors.Tui.Lifecycle.Core.csproj"/>
+        <ProjectReference Include="../../../Common/NeoKolors.Common.csproj"/>
+        <ProjectReference Include="..\..\Core\NeoKolors.Tui.Core.csproj" />
+        <ProjectReference Include="..\..\Elements\NeoKolors.Tui.Elements.csproj" />
+    </ItemGroup>
+
+</Project>
+

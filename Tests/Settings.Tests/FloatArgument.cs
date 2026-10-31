@@ -3,8 +3,6 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Settings.Argument.Exception;
-
 namespace NeoKolors.Settings.Tests;
 
 public class FloatArgumentTests {

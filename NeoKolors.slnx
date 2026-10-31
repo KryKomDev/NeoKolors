@@ -49,6 +49,7 @@
         <Project Path="Src/Tui/Lifecycle/Apps/NeoKolors.Tui.Lifecycle.Apps.csproj" />
         <Project Path="Src/Tui/Lifecycle/Game2D/NeoKolors.Tui.Lifecycle.Game2D.csproj" />
         <Project Path="Src/Tui/Lifecycle/Game3D/NeoKolors.Tui.Lifecycle.Game3D.csproj" />
+        <Project Path="Src/Tui/Lifecycle/Inline/NeoKolors.Tui.Lifecycle.Inline.csproj" />
     </Folder>
 
     <!--  Tests  -->

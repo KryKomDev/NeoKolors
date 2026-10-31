@@ -1,10 +1,9 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-using NeoKolors.Settings.Builder.Info;
 using OneOf;
 
-namespace NeoKolors.Settings.Builder.Xml;
+namespace NeoKolors.Settings.Builder;
 
 /// <summary>
 /// The XsdSettingsBuilder class is responsible for generating XML Schema Definitions (XSD)

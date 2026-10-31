@@ -539,7 +539,9 @@ public static class String {
         /// <param name="stringifier">A function to convert each element of the collection to a string.</param>
         /// <returns>A string consisting of the elements of the collection concatenated using the specified separator.</returns>
         /// <exception cref="ArgumentNullException">Thrown if the collection or stringifier is null.</exception>
+        #if NET9_0_OR_GREATER
         [OverloadResolutionPriority(-100)]
+        #endif
         public string Join(string separator,
             Func<TSource?, string?> stringifier) {
             List<string?> strings = [];

@@ -1,7 +1,7 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-namespace NeoKolors.Settings.Builder.Info;
+namespace NeoKolors.Settings.Builder;
 
 public interface ISettingsElementInfo<out TValue> : ISettingsElementInfo {
     public new TValue Value { get; }

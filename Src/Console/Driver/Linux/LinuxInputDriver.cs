@@ -23,33 +23,30 @@ namespace NeoKolors.Console;
 public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
     private static readonly NKLogger LOGGER = NKDebug.GetLogger<LinuxInputDriver>();
 
-    public event MouseEventHandler?    Mouse    = delegate { };
-    public event KeyEventHandler?      Key      = delegate { };
-    public event FocusInEventHandler?  FocusIn  = delegate { };
-    public event FocusOutEventHandler? FocusOut = delegate { };
-    public event ResizeEventHandler?   Resize   = delegate { };
-    public event PasteEventHandler?    Paste    = delegate { };
-    public event VTQueryResponseHandler? VTQuery = delegate { };
+    public event MouseEventHandler?      Mouse    = delegate { };
+    public event KeyEventHandler?        Key      = delegate { };
+    public event FocusInEventHandler?    FocusIn  = delegate { };
+    public event FocusOutEventHandler?   FocusOut = delegate { };
+    public event ResizeEventHandler?     Resize   = delegate { };
+    public event PasteEventHandler?      Paste    = delegate { };
+    public event VTQueryResponseHandler? VTQuery  = delegate { };
 
-    private bool _disposed;
-    private Thread? _inputThread;
-    private bool _isStopped = true;
-    private readonly LinuxTerminal _terminal;
-    private readonly LinuxInput _input;
-    private readonly LinuxAnsiParser _parser;
-    private readonly LockObject _queueLock = new();
-    private readonly Queue<VTQuery> _requestQueue = new();
-    private LinuxInputDriverConfig _config = null!;
-    private Size2D _lastSize;
+    private          bool                   _disposed;
+    private          Thread?                _inputThread;
+    private          bool                   _isStopped = true;
+    private readonly LinuxTerminal          _terminal;
+    private readonly LinuxInput             _input;
+    private readonly LinuxAnsiParser        _parser;
+    private readonly LockObject             _queueLock    = new();
+    private readonly Queue<VTQuery>         _requestQueue = new();
+    private          LinuxInputDriverConfig _config;
+    private          Size2D                 _lastSize;
 
-    private ReportedMouseEvents _activeMouseLevel = ReportedMouseEvents.NONE;
-    private MouseReportProtocol _activeMouseProtocol = MouseReportProtocol.X10;
-    private bool _activeFocusReporting;
-    private bool _activeBracketedPaste;
-
-#if NET6_0_OR_GREATER
+    private ReportedMouseEvents      _activeMouseLevel    = ReportedMouseEvents.NONE;
+    private MouseReportProtocol      _activeMouseProtocol = MouseReportProtocol.X10;
+    private bool                     _activeFocusReporting;
+    private bool                     _activeBracketedPaste;
     private PosixSignalRegistration? _sigwinchRegistration;
-#endif
 
     private event Action OnStopped = delegate { };
 
@@ -73,10 +70,10 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
     }
 
     public LinuxInputDriver(LinuxInputDriverConfig? config = null) {
-        _config = config ?? new LinuxInputDriverConfig();
+        _config   = config ?? new LinuxInputDriverConfig();
         _terminal = new LinuxTerminal(_config.CtrlCForceQuits);
-        _input = new LinuxInput();
-        _parser = new LinuxAnsiParser(_input, k => Key?.Invoke(k), _config.VTRequestTimeout, _config.RefreshInterval);
+        _input    = new LinuxInput();
+        _parser   = new LinuxAnsiParser(_input, k => Key?.Invoke(k), _config.VTRequestTimeout, _config.RefreshInterval);
 
         _config.PropertyChanged += HandleConfigChange;
 
@@ -113,20 +110,27 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
     private void HandleConfigChange(object? sender, PropertyChangedEventArgs e) {
         switch (e.PropertyName) {
             case nameof(Config.MouseReportLevel):
-            case nameof(Config.MouseReportProtocol):
+            case nameof(Config.MouseReportProtocol): {
                 ApplyMouseReporting();
+
                 break;
-            case nameof(Config.ReportFocus):
+            }
+            case nameof(Config.ReportFocus): {
                 ApplyFocusReporting();
+
                 break;
-            case nameof(Config.BracketedPaste):
+            }
+            case nameof(Config.BracketedPaste): {
                 ApplyBracketedPaste();
+
                 break;
+            }
         }
     }
 
     private void ApplyMouseReporting() {
         var targetLevel = _config.MouseReportLevel;
+
         var targetProtocol = targetLevel != ReportedMouseEvents.NONE
             ? _config.MouseReportProtocol
             : MouseReportProtocol.X10;
@@ -195,8 +199,11 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
             _                              => null,
         };
 
-        if (d != null) WriteTerminal(d);
-        if (e != null) WriteTerminal(e);
+        if (d != null)
+            WriteTerminal(d);
+
+        if (e != null)
+            WriteTerminal(e);
     }
 
     private static void SetMouseReportProtocol(MouseReportProtocol oldValue, MouseReportProtocol newValue) {
@@ -216,8 +223,11 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
             _                              => null,
         };
 
-        if (d != null) WriteTerminal(d);
-        if (e != null) WriteTerminal(e);
+        if (d != null)
+            WriteTerminal(d);
+
+        if (e != null)
+            WriteTerminal(e);
     }
 
     private static void WriteTerminal(string seq) {
@@ -246,21 +256,21 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
         ApplyFocusReporting();
         ApplyBracketedPaste();
 
-#if NET6_0_OR_GREATER
+        #if NET6_0_OR_GREATER
         try {
-#pragma warning disable CA1416
+            #pragma warning disable CA1416
             _sigwinchRegistration = PosixSignalRegistration.Create(PosixSignal.SIGWINCH, _ => OnWindowResized());
-#pragma warning restore CA1416
+            #pragma warning restore CA1416
         }
         catch (Exception ex) {
             LOGGER.Warn($"Failed to register SIGWINCH listener: {ex.Message}");
         }
-#endif
+        #endif
 
         _inputThread = new Thread(Intercept) {
             IsBackground = true,
-            Priority = ThreadPriority.BelowNormal,
-            Name = "NeoKolors Native Linux Input Interceptor"
+            Priority     = ThreadPriority.BelowNormal,
+            Name         = "NeoKolors Native Linux Input Interceptor"
         };
 
         _inputThread.Start();
@@ -285,10 +295,10 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
             _activeBracketedPaste = false;
         }
 
-#if NET6_0_OR_GREATER
+        #if NET6_0_OR_GREATER
         _sigwinchRegistration?.Dispose();
         _sigwinchRegistration = null;
-#endif
+        #endif
 
         LinuxTerminal.RestoreGlobalMode();
     }
@@ -346,6 +356,7 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
             return;
 
         var r = record.Value;
+
         switch (r.Type) {
             case AnsiRecordType.NONE:     break;
             case AnsiRecordType.KEY:      Key?.Invoke(r.Key); break;
@@ -357,6 +368,7 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
                     FocusIn?.Invoke();
                 else
                     FocusOut?.Invoke();
+
                 break;
             }
             default: break;
@@ -402,8 +414,10 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
     public Size2D GetSize() {
         if (LinuxTerminal.TryGetWindowSize(out var size)) {
             _lastSize = size;
+
             return size;
         }
+
         return _lastSize;
     }
 
@@ -414,8 +428,8 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
         Stop();
 
         if (!_isStopped) {
-            var waitStop = new ManualResetEventSlim(false);
-            Action handler = () => waitStop.Set();
+            var    waitStop = new ManualResetEventSlim(false);
+            Action handler  = () => waitStop.Set();
             OnStopped += handler;
 
             _input.WakeUp();

@@ -1,10 +1,6 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-using NeoKolors.Settings.Builder.Collection;
-using NeoKolors.Settings.Builder.Exception;
-using NeoKolors.Settings.Builder.Info;
-
 namespace NeoKolors.Settings.Builder;
 
 public struct NodeSwitch<TResult> {

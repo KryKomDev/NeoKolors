@@ -4,9 +4,8 @@
 using Metriks;
 using NeoKolors.Common;
 using NeoKolors.Tui.Core;
-using NeoKolors.Tui.Elements;
 
-namespace NeoKolors.Tui.Widgets.Elements;
+namespace NeoKolors.Tui.Elements;
 
 /// <summary>
 /// A declarative UI element that renders an animated terminal spinner.

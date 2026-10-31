@@ -3,7 +3,6 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Settings.Argument.Exception;
 using static NeoKolors.Settings.Argument.AllowedPathType;
 
 namespace NeoKolors.Settings.Tests;

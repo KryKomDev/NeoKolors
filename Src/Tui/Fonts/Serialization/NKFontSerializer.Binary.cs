@@ -135,7 +135,9 @@ public static partial class NKFontSerializer {
             Author         = info.Author,
             LicenseType    = info.LicenseType,
             LicenseFile    = info.LicenseFile,
-            LicenseContent = info.LicenseContent
+            LicenseContent = info.LicenseContent,
+            SourceFormat   = info.SourceFormat,
+            Metadata       = info.Metadata != null ? new Dictionary<string, string>(info.Metadata) : []
         };
 
         if (info.FontPropoInfo.Info.IsT1) {
@@ -176,7 +178,9 @@ public static partial class NKFontSerializer {
                 proto.Author,
                 proto.LicenseType,
                 proto.LicenseFile,
-                proto.LicenseContent
+                proto.LicenseContent,
+                proto.SourceFormat,
+                proto.Metadata
             )
             : new NKFontInfo(
                 proto.Name,
@@ -188,7 +192,9 @@ public static partial class NKFontSerializer {
                 proto.Author,
                 proto.LicenseType,
                 proto.LicenseFile,
-                proto.LicenseContent
+                proto.LicenseContent,
+                proto.SourceFormat,
+                proto.Metadata
             );
     }
 
@@ -327,6 +333,8 @@ internal class ProtoNKFontInfo {
     [ProtoMember(12)] public string? LicenseType     { get; set; }
     [ProtoMember(13)] public string? LicenseFile     { get; set; }
     [ProtoMember(14)] public string? LicenseContent  { get; set; }
+    [ProtoMember(15)] public string? SourceFormat    { get; set; }
+    [ProtoMember(16)] public Dictionary<string, string> Metadata { get; set; } = [];
 }
 
 [ProtoContract]

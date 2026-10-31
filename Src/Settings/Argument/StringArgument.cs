@@ -4,7 +4,6 @@
 //
 
 using System.Text.RegularExpressions;
-using NeoKolors.Settings.Argument.Exception;
 using static NeoKolors.Settings.Argument.StringFeatures;
 
 namespace NeoKolors.Settings.Argument;

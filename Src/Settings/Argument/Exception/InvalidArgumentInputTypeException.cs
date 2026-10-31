@@ -3,7 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
-namespace NeoKolors.Settings.Argument.Exception;
+namespace NeoKolors.Settings.Argument;
 
 public class InvalidArgumentInputTypeException : System.Exception {
     public InvalidArgumentInputTypeException(Type? expected, Type? actual) 

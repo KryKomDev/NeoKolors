@@ -95,7 +95,7 @@ public static class NKDebug {
     /// Configures the logger to output plain text messages without ANSI colors.
     /// </summary>
     public static void UseSimpleMessages() {
-        Logger.Writer = new TextLogWriter(System.Console.Out);
+        Logger.Writer = new TextLogWriter(Stdio.Out);
     }
 
     /// <summary>
@@ -110,7 +110,7 @@ public static class NKDebug {
     /// Retrieves the current output stream for logging messages.
     /// </summary>
     /// <returns>The <see cref="TextWriter"/> currently used for logging output, if available.</returns>
-    public static TextWriter GetOutput() => (Logger.Writer as TextLogWriter)?.Output ?? System.Console.Out;
+    public static TextWriter GetOutput() => (Logger.Writer as TextLogWriter)?.Output ?? Stdio.Out;
 
     /// <inheritdoc cref="NKLogger.SetLogAll"/>
     public static void SetLogAll() => Logger.SetLogAll();

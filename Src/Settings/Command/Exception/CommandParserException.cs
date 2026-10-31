@@ -5,7 +5,7 @@
 
 using static NeoKolors.Settings.Command.CommandParser;
 
-namespace NeoKolors.Settings.Command.Exception;
+namespace NeoKolors.Settings.Command;
 
 public class CommandParserException : System.Exception {
     private CommandParserException(string message) : base(message) { }

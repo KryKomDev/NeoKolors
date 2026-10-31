@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net11.0;net10.0;net8.0;net5.0;netstandard2.1</TargetFrameworks>
+        <TargetFrameworks>net8.0;net10.0;net11.0</TargetFrameworks>
         <LangVersion>15</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
@@ -27,13 +27,5 @@
         <ProjectReference Include="../../../Common/NeoKolors.Common.csproj"/>
         <ProjectReference Include="../../../Extensions/NeoKolors.Extensions.csproj"/>
     </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="Polyfill" Version="11.4.1">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
-    </ItemGroup>
-
 </Project>
 

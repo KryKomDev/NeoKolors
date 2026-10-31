@@ -1,8 +1,6 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-using NeoKolors.Settings.Builder.Delegate;
-
 namespace NeoKolors.Settings.Builder;
 
 public interface ISettingsBuilder<TResult> : ISettingsBuilder {

@@ -4,7 +4,6 @@
 //
 
 using System.Diagnostics.CodeAnalysis;
-using NeoKolors.Settings.Argument.Exception;
 using NeoKolors.Settings.Attributes;
 using static NeoKolors.Settings.Argument.AllowedPathType;
 

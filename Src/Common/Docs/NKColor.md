@@ -107,7 +107,7 @@ NKColor inverse = color.GetInverse();          // Blue
 ```csharp
 [ProtoContract(Surrogate = typeof(NKColorSurrogate))]
 [StructLayout(LayoutKind.Explicit, Size = sizeof(uint))]
-public readonly record struct NKColor : IFormattable, IParsablePolyfill.IParsable<NKColor>
+public readonly record struct NKColor : IFormattable, IParsable<NKColor>
 ```
 
 The surrogate directly packs and unpacks the 32-bit raw integer representation (`GetRaw()` and `FromRaw(uint)`), allowing `NKColor` to be used directly as a member in any Protobuf contract. For rules on extending or updating this struct without breaking binary compatibility, see the [Binary Serialization & Class Update Guide](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/Docs/Serialization-Guide.md).

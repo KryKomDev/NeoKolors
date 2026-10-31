@@ -4,7 +4,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <LangVersion>14</LangVersion>
-        <TargetFrameworks>net5.0;net8.0;netstandard2.1;net10.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;net10.0;net11.0</TargetFrameworks>
         <Platforms>AnyCPU</Platforms>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
@@ -52,10 +52,6 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="Portable.Xaml" Version="0.26.0"/>
-        <PackageReference Include="Polyfill" Version="11.4.1">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
     </ItemGroup>
 
     <ItemGroup>

@@ -7,9 +7,6 @@
             NK_ENABLE_NATIVE_IO
         </DefineConstants>
 
-        <PolyArgumentExceptions>true</PolyArgumentExceptions>
-        <PolyUseEmbeddedAttribute>true</PolyUseEmbeddedAttribute>
-
         <DefineConstants>$(DefineConstants.Replace('%0A', '').Replace('%0D', '').Replace(' ', ''))</DefineConstants>
 
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -21,6 +18,11 @@
         <MinVerMinimumMajorMinor>2026.3</MinVerMinimumMajorMinor>
         <MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
     </PropertyGroup>
+
+    <!-- Aliases -->
+    <ItemGroup Condition="$([MSBuild]::GetTargetFrameworkVersion('$(TargetFramework)', 2)) &lt; 9.0">
+        <Using Include="System.Object" Alias="Lock"/> 
+    </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="MinVer" Version="6.0.0">

@@ -17,7 +17,7 @@ namespace NeoKolors.Common;
 [ProtoContract(Surrogate = typeof(NKStyleSurrogate))]
 [StructLayout(LayoutKind.Explicit, Size = sizeof(ulong) * 2)]
 [SuppressMessage("ReSharper", "ShiftExpressionZeroLeftOperand")]
-public readonly record struct NKStyle : IFormattable, IParsablePolyfill.IParsable<NKStyle> {
+public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
 
     // field containing all the data for acceleration of some operations
     [FieldOffset(0)] private readonly ulong _raw0;

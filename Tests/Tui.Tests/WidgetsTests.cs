@@ -1,17 +1,9 @@
 // NeoKolors
 // Copyright (c) 2026 KryKom
 
-using Metriks;
-using NeoKolors.Common;
-using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Elements;
-using NeoKolors.Tui.Fonts;
 using NeoKolors.Tui.Fonts.Assets;
-using NeoKolors.Tui.Widgets.Elements;
-using NeoKolors.Tui.Widgets.Lifecycle;
-using NeoKolors.Tui.Widgets.Live;
-using NeoKolors.Tui.Widgets.Rendering;
-using Xunit;
+using NeoKolors.Tui.Lifecycle.Inline;
 
 namespace NeoKolors.Tui.Tests;
 

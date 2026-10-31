@@ -1,7 +1,7 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-namespace NeoKolors.Settings.Builder.Exception;
+namespace NeoKolors.Settings.Builder;
 
 public class SettingsExecutionException : System.Exception {
     private SettingsExecutionException(string message) : base(message) { }

@@ -53,9 +53,7 @@ try {
                         return (Assembly)loadFromStream.Invoke(alc, new[] { stream });
                     }
                 }
-                catch {
-                    
-                }
+                catch { }
             }
             
             return null;
@@ -80,8 +78,35 @@ if (taskType == null) {
 }
 
 var taskInstance = Activator.CreateInstance(taskType);
-taskType.GetProperty("BuildEngine").SetValue(taskInstance, BuildEngine);
-taskType.GetProperty("SourceDir").SetValue(taskInstance, SourceDir);
+taskType.GetProperty("BuildEngine")?.SetValue(taskInstance, BuildEngine);
+
+if (!string.IsNullOrEmpty(SourceDir)) {
+    taskType.GetProperty("SourceDir")?.SetValue(taskInstance, SourceDir);
+}
+
+if (!string.IsNullOrEmpty(OutputDir)) {
+    taskType.GetProperty("OutputDir")?.SetValue(taskInstance, OutputDir);
+}
+
+if (Fonts != null) {
+    var fontsProp = taskType.GetProperty("Fonts");
+    
+    if (fontsProp != null) {
+        if (fontsProp.PropertyType.IsInstanceOfType(Fonts)) {
+            fontsProp.SetValue(taskInstance, Fonts);
+        }
+        else {
+            var targetElemType = fontsProp.PropertyType.GetElementType() ?? typeof(ITaskItem);
+            var targetArray = Array.CreateInstance(targetElemType, Fonts.Length);
+            
+            for (int i = 0; i < Fonts.Length; i++) {
+                targetArray.SetValue(Fonts[i], i);
+            }
+           
+            fontsProp.SetValue(taskInstance, targetArray);
+        }
+    }
+}
 
 // Execute the compiled task
 var executeMethod = taskType.GetMethod("Execute");
@@ -93,10 +118,51 @@ if (executeMethod == null) {
 bool success = false;
 try {
     success = (bool)executeMethod.Invoke(taskInstance, null);
+    
+    if (success) {
+        var outputFilesProp = taskType.GetProperty("OutputFiles");
+        
+        if (outputFilesProp != null) {
+            var rawOutputs = outputFilesProp.GetValue(taskInstance);
+            
+            if (rawOutputs is ITaskItem[] directItems) {
+                OutputFiles = directItems;
+            } 
+            else if (rawOutputs is System.Collections.IEnumerable enumerable) {
+                var list = new List<ITaskItem>();
+               
+                foreach (var obj in enumerable) {
+                    if (obj is ITaskItem ti) {
+                        list.Add(ti);
+                    } 
+                    else if (obj != null) {
+                        var itemSpecProp = obj.GetType().GetProperty("ItemSpec");
+                        var itemSpec = itemSpecProp?.GetValue(obj)?.ToString() ?? string.Empty;
+                        var taskItem = new Microsoft.Build.Utilities.TaskItem(itemSpec);
+                        var cloneMethod = obj.GetType().GetMethod("CloneCustomMetadata");
+                       
+                        if (cloneMethod != null) {
+                            var metaDict = cloneMethod.Invoke(obj, null) as System.Collections.IDictionary;
+                          
+                            if (metaDict != null) {
+                                foreach (System.Collections.DictionaryEntry entry in metaDict) {
+                                    taskItem.SetMetadata(entry.Key.ToString(), entry.Value?.ToString());
+                                }
+                            }
+                        }
+                        list.Add(taskItem);
+                    }
+                }
+                OutputFiles = list.ToArray();
+            }
+        }
+    }
 } 
 catch (Exception ex) {
     Log.LogError("Critical Error executing CompileFontsTask: " + ex.Message + "\n" + ex.StackTrace);
 }
+
+OutputFiles ??= [];
 
 if (!success) {
     return false;

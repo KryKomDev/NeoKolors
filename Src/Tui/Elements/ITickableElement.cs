@@ -1,7 +1,7 @@
 // NeoKolors
 // Copyright (c) 2026 KryKom
 
-namespace NeoKolors.Tui.Widgets;
+namespace NeoKolors.Tui.Elements;
 
 /// <summary>
 /// Defines an element that receives periodic tick updates for animation or time-based transitions.

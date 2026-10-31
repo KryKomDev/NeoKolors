@@ -5,7 +5,6 @@
 
 using System.Collections;
 using System.Runtime.CompilerServices;
-using NeoKolors.Settings.Command.Exception;
 
 namespace NeoKolors.Settings.Command;
 

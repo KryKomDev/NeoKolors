@@ -1,7 +1,7 @@
 // NeoKolors
 // Copyright (c) 2026 KryKom
 
-namespace NeoKolors.Tui.Lifecycle;
+namespace NeoKolors.Tui.Lifecycle.Core;
 
 /// <summary>
 /// Defines the lifecycle states of an application, service, or game loop.

@@ -10,7 +10,7 @@ using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Elements;
 using NeoKolors.Tui.Fonts;
 using NeoKolors.Tui.Fonts.Assets;
-using NeoKolors.Tui.Widgets.Live;
+using NeoKolors.Tui.Widgets;
 using static System.Text.Encoding;
 using NKTableStyle = NeoKolors.Tui.Core.NKTableStyle;
 
@@ -766,13 +766,15 @@ internal static class Program {
         foreach (var value in FontAtlas.Values) {
             string author  = "-";
             string license = "-";
+            string type    = value.GetType().Name;
 
             if (value is Tui.Fonts.NKFont nkFont) {
                 author  = nkFont.Info.Author      ?? "-";
                 license = nkFont.Info.LicenseType ?? "-";
+                type    = !string.IsNullOrEmpty(nkFont.Info.SourceFormat) ? nkFont.Info.SourceFormat : "NKFont";
             }
 
-            fontRows.Add((value.Name, author, license, value.GetType().Name, "Built-in"));
+            fontRows.Add((value.Name, author, license, type, "Built-in"));
         }
 
         // Collect stored fonts
@@ -858,16 +860,24 @@ internal static class Program {
             new IElement[] { new Text(new AnsiString("Name", new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Name, new NKStyle(ConsoleColor.White, styles: NKTextStyles.BOLD))) }
         };
 
+        if (!string.IsNullOrEmpty(nkFont.Info.SourceFormat)) {
+            detailsRows.Add([new Text(new AnsiString("Source Format", new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.SourceFormat, new NKStyle(ConsoleColor.White)))]);
+        }
+
         if (!string.IsNullOrEmpty(nkFont.Info.Author)) {
             detailsRows.Add([new Text(new AnsiString("Author", new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.Author, new NKStyle(ConsoleColor.White)))]);
         }
 
         if (!string.IsNullOrEmpty(nkFont.Info.LicenseType)) {
-            detailsRows.Add([new Text(new AnsiString("License Flags", new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.LicenseType, new NKStyle(ConsoleColor.White)))]);
+            detailsRows.Add([new Text(new AnsiString("License", new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.LicenseType, new NKStyle(ConsoleColor.White)))]);
         }
 
         if (!string.IsNullOrEmpty(nkFont.Info.LicenseFile)) {
             detailsRows.Add([new Text(new AnsiString("License File", new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.LicenseFile, new NKStyle(ConsoleColor.White)))]);
+        }
+
+        foreach (var (k, v) in nkFont.Info.Metadata) {
+            detailsRows.Add([new Text(new AnsiString(k, new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(v, new NKStyle(ConsoleColor.White)))]);
         }
 
         detailsRows.Add([new Text(new AnsiString("Proportions",    new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.ProportionType.ToString(), new NKStyle(ConsoleColor.White)))]);
@@ -1024,7 +1034,7 @@ internal static class Program {
             ? "None"
             : matchedSymbol.Value.Styles.Styles.ToString();
 
-        string alignPointsStr = matchedGlyph.AlignPoints.Any()
+        string alignPointsStr = matchedGlyph.AlignPoints.Count != 0
             ? string.Join(", ", matchedGlyph.AlignPoints.Select(p => $"'{p.Character}' at {p.Position.X},{p.Position.Y}"))
             : "None";
 
@@ -1037,7 +1047,7 @@ internal static class Program {
             new IElement[] { new Text(new AnsiString("Align Points",    new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(alignPointsStr,                                       new NKStyle(matchedGlyph.AlignPoints.Any() ? ConsoleColor.White : ConsoleColor.DarkGray))) }
         };
 
-        var metaTable = new Table(null, metaRows, NKTableStyle.GetBorderless());
+        var metaTable = new Table(null, metaRows, NKTableStyle.GetNormal(features: NKTableStyle.Features.VERTICAL_ELEMENT_SEPARATOR));
         NKWidgets.Render(metaTable);
         System.Console.WriteLine();
 
@@ -1126,17 +1136,18 @@ internal static class Program {
                 return font;
         }
         else {
-            string[] possibleExtensions = { ".nkf", ".flf" };
+            string[] possibleExtensions = [".nkf", ".flf"];
 
             foreach (var ext in possibleExtensions) {
                 string pathWithExt = Path.Combine(FONTS_STORAGE_DIR, fontKey + ext);
 
-                if (File.Exists(pathWithExt)) {
-                    var font = LoadFromFile(pathWithExt);
+                if (!File.Exists(pathWithExt))
+                    continue;
 
-                    if (font != null)
-                        return font;
-                }
+                var font = LoadFromFile(pathWithExt);
+
+                if (font != null)
+                    return font;
             }
         }
 
@@ -1149,18 +1160,19 @@ internal static class Program {
         }
 
         // 4. Try loading as general XML path (directory or zip)
-        if (Directory.Exists(fontKey) || File.Exists(fontKey)) {
-            string fullPath = Path.GetFullPath(fontKey);
+        if (!Directory.Exists(fontKey) && !File.Exists(fontKey))
+            return null;
 
-            try {
-                var font = NKFontSerializer.DeserializeXml(fullPath);
+        string fullPath = Path.GetFullPath(fontKey);
 
-                if (font != null)
-                    return font;
-            }
-            catch {
-                // Ignore and fall through
-            }
+        try {
+            var font = NKFontSerializer.DeserializeXml(fullPath);
+
+            if (font != null)
+                return font;
+        }
+        catch {
+            // Ignore and fall through
         }
 
         return null;
@@ -1247,11 +1259,11 @@ internal static class Program {
             return;
         }
 
-        string[] candidates = {
+        string[] candidates = [
             fontName,
             fontName + ".nkf",
             fontName + ".flf"
-        };
+        ];
 
         bool deleted = false;
 

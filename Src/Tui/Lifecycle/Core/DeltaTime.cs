@@ -1,7 +1,7 @@
 // NeoKolors
 // Copyright (c) 2026 KryKom
 
-namespace NeoKolors.Tui.Lifecycle;
+namespace NeoKolors.Tui.Lifecycle.Core;
 
 /// <summary>
 /// Represents high-precision frame timing information passed to update and render routines.

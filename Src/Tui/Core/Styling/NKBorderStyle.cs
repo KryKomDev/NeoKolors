@@ -138,7 +138,7 @@ public record NKBorderStyle : IBorderStyle {
 
     private NKBorderStyle(bool isBorderless) => IsBorderless = isBorderless;
 
-    public void Draw(Rect2D rect, in ICharCanvas canvas, int z) {
+    public void Draw(Rect2D rect, in ICharDrawer canvas, int z) {
         if (IsBorderless || rect.SizeX <= 0 || rect.SizeY <= 0) return;
 
         int lx = rect.LowerX;
@@ -146,7 +146,7 @@ public record NKBorderStyle : IBorderStyle {
         int rx = rect.HigherX - 1;
         int by = rect.HigherY - 1;
 
-        if (rect.SizeX == 1 && rect.SizeY == 1) {
+        if (rect is { SizeX: 1, SizeY: 1 }) {
             canvas.Draw(TopLeft, lx, ly, z);
             return;
         }

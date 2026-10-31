@@ -2,12 +2,11 @@
 // Copyright (c) 2025 KryKom
 
 using Metriks;
-using NeoKolors.Console.Ansi;
 using static System.ConsoleModifiers;
 using static NeoKolors.Console.Ansi.MouseEventType;
 using static NeoKolors.Console.KeyModifiers;
 
-namespace NeoKolors.Console;
+namespace NeoKolors.Console.Ansi;
 
 internal static class MouseEventDecomposer {
     

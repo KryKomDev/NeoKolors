@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<FigletManifest>
+    <Font Name="Standard" Author="Glenn Chappell &amp; Ian Chai" LicenseType="Attribution / Permissive" SourceFormat="Figlet" Year="1993" Date="3/93">
+        <Description>Standard FIGlet font based on Frank's .sig</Description>
+    </Font>
+    <Font Name="Shadow" Author="Glenn Chappell" LicenseType="Attribution / Permissive" SourceFormat="Figlet" Year="1993" Date="6/93">
+        <Description>Shadow font by Glenn Chappell based on Standard &amp; SmShadow</Description>
+    </Font>
+    <Font Name="Slant" Author="Glenn Chappell" LicenseType="Attribution / Permissive" SourceFormat="Figlet" Year="1993" Date="3/93">
+        <Description>Slant font by Glenn Chappell based on Standard</Description>
+    </Font>
+    <Font Name="Block" Author="Glenn Chappell" LicenseType="Attribution / Permissive" SourceFormat="Figlet" Year="1993" Date="4/93">
+        <Description>Block font by Glenn Chappell, straight version of Lean</Description>
+    </Font>
+</FigletManifest>

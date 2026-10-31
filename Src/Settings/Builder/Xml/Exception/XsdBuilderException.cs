@@ -1,11 +1,9 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-namespace NeoKolors.Settings.Builder.Xml.Exception;
+namespace NeoKolors.Settings.Builder;
 
-using System;
-
-public class XsdBuilderException : Exception {
+public class XsdBuilderException : System.Exception {
     private XsdBuilderException(string message) : base($"Could not build XSD. {message}") { }
 
     public static XsdBuilderException ArgumentXsdIncompatible(string name) =>

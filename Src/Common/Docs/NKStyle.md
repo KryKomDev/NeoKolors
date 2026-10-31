@@ -99,7 +99,7 @@ NKStyle.AppendControlChars(sb, previousStyle, currentStyle);
 ```csharp
 [ProtoContract(Surrogate = typeof(NKStyleSurrogate))]
 [StructLayout(LayoutKind.Explicit, Size = sizeof(ulong) * 2)]
-public readonly record struct NKStyle : IFormattable, IParsablePolyfill.IParsable<NKStyle>
+public readonly record struct NKStyle : IFormattable, IParsable<NKStyle>
 ```
 
 The surrogate serializes the raw 64-bit integer words (`Raw0` and `Raw1`), ensuring high throughput and allowing `NKStyle` to be used directly in any Protobuf contract (such as [`AnsiStringSerializer`](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/AnsiStringSerializer.cs) and `NKFontSerializer`).

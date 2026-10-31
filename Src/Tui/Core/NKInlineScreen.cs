@@ -5,9 +5,8 @@ using System.Text;
 using Metriks;
 using NeoKolors.Common;
 using NeoKolors.Console;
-using NeoKolors.Tui.Core;
 
-namespace NeoKolors.Tui.Widgets.Rendering;
+namespace NeoKolors.Tui.Core;
 
 /// <summary>
 /// A high-performance double-buffered character canvas presenter specifically designed for inline console widgets.

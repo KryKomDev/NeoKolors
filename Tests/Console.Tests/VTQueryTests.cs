@@ -1,7 +1,7 @@
 using NeoKolors.Common;
 using NeoKolors.Console.Ansi;
 
-namespace NeoKolors.Console.Tests.Ansi;
+namespace NeoKolors.Console.Tests;
 
 public class VTQueryTests {
 

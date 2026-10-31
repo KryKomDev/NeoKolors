@@ -2,7 +2,7 @@ using System.Text;
 using NeoKolors.Common;
 using NeoKolors.Console;
 using NeoKolors.Tui.Fonts.Assets;
-using NeoKolors.Tui.Widgets.Live;
+using NeoKolors.Tui.Widgets;
 using WinImports = NeoKolors.Console.WinImports;
 
 namespace Testing;

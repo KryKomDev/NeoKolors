@@ -3,9 +3,8 @@
 
 using System.Runtime.CompilerServices;
 using NeoKolors.Settings.Argument;
-using NeoKolors.Settings.Builder.Xml.Exception;
 
-namespace NeoKolors.Settings.Builder.Info;
+namespace NeoKolors.Settings.Builder;
 
 public readonly struct ArgumentInfo : ISettingsElementInfo<IArgument>, IEquatable<ArgumentInfo> {
     

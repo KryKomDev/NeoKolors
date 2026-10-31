@@ -7,7 +7,7 @@ using V = NeoKolors.Tui.Core.VerticalAlign;
 
 namespace NeoKolors.Tui.Core;
 
-public readonly record struct NKAlign : IParsablePolyfill.IParsable<NKAlign> {
+public readonly record struct NKAlign : IParsable<NKAlign> {
     public H Horizontal { get; }
     public V Vertical   { get; }
 

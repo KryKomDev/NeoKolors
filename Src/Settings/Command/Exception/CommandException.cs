@@ -3,7 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
-namespace NeoKolors.Settings.Command.Exception;
+namespace NeoKolors.Settings.Command;
 
 public class CommandException : System.Exception {
     public CommandException(string? message) : base(message) { }

@@ -5,7 +5,6 @@
 
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using NeoKolors.Common;
 
 namespace NeoKolors.Console.Tests;
 

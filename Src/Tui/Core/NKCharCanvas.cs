@@ -214,10 +214,6 @@ public class NKCharCanvas : ICharCanvas {
             DrawHorizontalLine(c, x, yi, width, z);
         }
     }
-
-    public void DrawBorder(NKBorderOld border, int x, int y, int width, int height, int z) {
-        throw new NotImplementedException();
-    }
     
     #endregion
 

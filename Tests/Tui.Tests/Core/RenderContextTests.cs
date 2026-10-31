@@ -1072,8 +1072,8 @@ public class RenderContextTests {
         Assert.Equal(2,  spy.LastDrawRect.Value.Z);
 
         // DrawBorder
-        var border = NKBorderOld.GetAscii();
-        context.DrawBorder(border, 0, 0, 10, 5, 1);
+        var border = NKBorderStyle.GetAscii();
+        border.Draw(new Rect2D(0, 0, 10, 5), context, 1);
         Assert.NotNull(spy.LastDrawBorder);
         Assert.Equal(border, spy.LastDrawBorder.Value.Border);
         Assert.Equal(0,      spy.LastDrawBorder.Value.X);
@@ -1156,27 +1156,20 @@ public class RenderContextTests {
         public (AnsiChar C, int X, int Y, int Length, int Z)?                                  LastDrawVerticalLine   { get; private set; }
         public (AnsiChar C, int X, int Y, int Length, int Z)?                                  LastDrawHorizontalLine { get; private set; }
         public (AnsiChar C, int X, int Y, int Width, int Height, int Z)?                       LastDrawRect           { get; private set; }
-        public (NKBorderOld Border, int X, int Y, int Width, int Height, int Z)?               LastDrawBorder         { get; private set; }
+        public (NKBorderStyle Border, int X, int Y, int Width, int Height, int Z)?             LastDrawBorder         { get; private set; }
 
         public void Resize(Size2D size) => Size = size;
         public void ResetZ()            { }
         public void Dispose()           { }
 
         public void Draw(ICharCanvas canvas, int xOffset, int yOffset, int z) => LastDrawCanvas = (canvas, xOffset, yOffset, z);
-
         public void Draw(AnsiChar c, int xOffset, int yOffset, int z) => LastDrawChar = (c, xOffset, yOffset, z);
-
         public void Draw(AnsiString str, int xOffset, int yOffset, int z) => LastDrawString = (str, xOffset, yOffset, z);
-
         public void Draw(SKImage image, int xOffset, int yOffset, int xSize, int ySize, int zLayer, SKSamplingOptions samplingOptions = default) => LastDrawImage = (image, xOffset, yOffset, xSize, ySize, zLayer, samplingOptions);
-
         public void DrawVerticalLine(AnsiChar c, int x, int y, int length, int z) => LastDrawVerticalLine = (c, x, y, length, z);
-
         public void DrawHorizontalLine(AnsiChar c, int x, int y, int length, int z) => LastDrawHorizontalLine = (c, x, y, length, z);
-
         public void DrawRect(AnsiChar c, int x, int y, int width, int height, int z) => LastDrawRect = (c, x, y, width, height, z);
-
-        public void DrawBorder(NKBorderOld border, int x, int y, int width, int height, int z) => LastDrawBorder = (border, x, y, width, height, z);
+        public void DrawBorder(NKBorderStyle border, int x, int y, int width, int height, int z) => LastDrawBorder = (border, x, y, width, height, z);
 
         public void Clean() => CleanCalled = true;
     }

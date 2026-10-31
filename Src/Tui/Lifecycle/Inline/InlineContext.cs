@@ -3,7 +3,7 @@
 
 using System.Diagnostics;
 
-namespace NeoKolors.Tui.Widgets.Lifecycle;
+namespace NeoKolors.Tui.Lifecycle.Inline;
 
 /// <summary>
 /// Provides execution scope state, timing information, and control methods for an active inline widget session.

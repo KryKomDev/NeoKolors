@@ -4,7 +4,6 @@
 //
 
 using NeoKolors.Settings.Argument;
-using NeoKolors.Settings.Command.Exception;
 
 namespace NeoKolors.Settings.Command;
 

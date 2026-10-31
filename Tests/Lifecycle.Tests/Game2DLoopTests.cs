@@ -1,6 +1,7 @@
 // NeoKolors
 // Copyright (c) 2026 KryKom
 
+using NeoKolors.Tui.Lifecycle.Core;
 using NeoKolors.Tui.Lifecycle.Game2D;
 
 namespace NeoKolors.Tui.Lifecycle.Tests;

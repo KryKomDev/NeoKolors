@@ -3,7 +3,7 @@
 
 using System.Runtime.CompilerServices;
 
-namespace NeoKolors.Settings.Builder.Info;
+namespace NeoKolors.Settings.Builder;
 
 public readonly struct SettingsNodeInfo<TResult> : IEquatable<SettingsNodeInfo<TResult>> {
     

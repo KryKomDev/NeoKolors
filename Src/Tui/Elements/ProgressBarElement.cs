@@ -4,15 +4,14 @@
 using Metriks;
 using NeoKolors.Common;
 using NeoKolors.Tui.Core;
-using NeoKolors.Tui.Elements;
 
-namespace NeoKolors.Tui.Widgets.Elements;
+namespace NeoKolors.Tui.Elements;
 
 /// <summary>
 /// A declarative UI element that renders a configurable terminal progress bar.
 /// </summary>
 public class ProgressBarElement : IElement {
-    private static readonly char[] SmoothBlocks = [' ', '▏', '▎', '▍', '▌', '▋', '▊', '▉'];
+    private static readonly char[] SMOOTH_BLOCKS = [' ', '▏', '▎', '▍', '▌', '▋', '▊', '▉'];
 
     /// <summary>
     /// Gets or sets the current progress value.
@@ -145,7 +144,7 @@ public class ProgressBarElement : IElement {
             var drawn = fullBlocks;
 
             if (drawn < barWidth && fracIndex > 0) {
-                cells.Add(new AnsiChar(SmoothBlocks[fracIndex], filledStyle));
+                cells.Add(new AnsiChar(SMOOTH_BLOCKS[fracIndex], filledStyle));
                 drawn++;
             }
 

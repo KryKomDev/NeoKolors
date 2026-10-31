@@ -1,7 +1,10 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 
-namespace NeoKolors.Settings.Builder.Info;
+using System.Collections;
+using String = NeoKolors.Extensions.String;
+
+namespace NeoKolors.Settings.Builder;
 
 public readonly struct SettingsMethodOptionInfo {
     public string Name { get; }
@@ -22,7 +25,7 @@ public readonly struct SettingsMethodOptionInfo {
              </xsd:annotation>
              <xsd:complexType>
                  <xsd:sequence>
-                     {Option.Arguments.Select(a => a.ToXsd()).Join("\n").PadLinesLeft(12)}
+                     {String.Join((IEnumerable)Option.Arguments.Select(a => a.ToXsd()), "\n").PadLinesLeft(12)}
                  </xsd:sequence>
              </xsd:complexType>
          </xsd:element>

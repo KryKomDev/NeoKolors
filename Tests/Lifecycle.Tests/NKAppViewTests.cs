@@ -47,7 +47,6 @@ public class NKAppViewTests {
         public void DrawVerticalLine(AnsiChar c, int x, int y, int len, int z) { }
         public void DrawHorizontalLine(AnsiChar c, int x, int y, int len, int z) { }
         public void DrawRect(AnsiChar c, int x, int y, int w, int h, int z) { }
-        public void DrawBorder(NKBorderOld border, int x, int y, int w, int h, int z) { }
     }
 
     [Fact]

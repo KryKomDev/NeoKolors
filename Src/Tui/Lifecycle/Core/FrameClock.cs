@@ -3,7 +3,7 @@
 
 using System.Diagnostics;
 
-namespace NeoKolors.Tui.Lifecycle;
+namespace NeoKolors.Tui.Lifecycle.Core;
 
 /// <summary>
 /// A high-precision frame clock that measures frame intervals, tracks total running time,

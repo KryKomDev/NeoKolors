@@ -3,7 +3,6 @@
 // Copyright (c) 2025 KryKom
 // 
 
-using NeoKolors.Settings.Argument.Exception;
 using static NeoKolors.Settings.Tests.DummyEnum;
 
 namespace NeoKolors.Settings.Tests;

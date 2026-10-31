@@ -3,9 +3,6 @@
 
 using System.Runtime.CompilerServices;
 using NeoKolors.Settings.Argument;
-using NeoKolors.Settings.Builder.Delegate;
-using NeoKolors.Settings.Builder.Exception;
-using NeoKolors.Settings.Builder.Info;
 
 namespace NeoKolors.Settings.Builder;
 
@@ -62,11 +59,11 @@ public class SettingsMethodOption {
     public Context GetContext() => new(_arguments);
 
     /// <summary>
-    /// Gets an array of <see cref="ArgumentInfo"/> objects that represent the arguments
+    /// Gets an array of <see cref="NeoKolors.Settings.ArgumentInfo"/> objects that represent the arguments
     /// associated with the current settings method option.
     /// </summary>
     /// <value>
-    /// An array of <see cref="ArgumentInfo"/> containing the details of the arguments
+    /// An array of <see cref="NeoKolors.Settings.ArgumentInfo"/> containing the details of the arguments
     /// added to the settings method option.
     /// </value>
     public ArgumentInfo[] Arguments {

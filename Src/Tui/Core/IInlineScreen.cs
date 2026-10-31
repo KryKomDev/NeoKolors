@@ -1,9 +1,7 @@
 // NeoKolors
 // Copyright (c) 2026 KryKom
 
-using NeoKolors.Tui.Core;
-
-namespace NeoKolors.Tui.Widgets.Rendering;
+namespace NeoKolors.Tui.Core;
 
 /// <summary>
 /// Contract representing an inline terminal character screen that renders using relative cursor movements

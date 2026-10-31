@@ -6,11 +6,9 @@ using NeoKolors.Common;
 using NeoKolors.Console;
 using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Elements;
-using NeoKolors.Tui.Widgets.Elements;
-using NeoKolors.Tui.Widgets.Lifecycle;
-using NeoKolors.Tui.Widgets.Rendering;
+using NeoKolors.Tui.Lifecycle.Inline;
 
-namespace NeoKolors.Tui.Widgets.Live;
+namespace NeoKolors.Tui.Widgets;
 
 /// <summary>
 /// Convenient entry points and helper methods for rendering inline terminal widgets and live elements.

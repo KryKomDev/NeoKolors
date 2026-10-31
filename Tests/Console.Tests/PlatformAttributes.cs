@@ -4,7 +4,6 @@
 //
 
 using System.Runtime.InteropServices;
-using Xunit;
 
 namespace NeoKolors.Console.Tests;
 

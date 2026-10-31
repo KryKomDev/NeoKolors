@@ -13,11 +13,4 @@
       <ProjectReference Include="..\..\Src\Console\NeoKolors.Console.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Polyfill" Version="11.4.1">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
-    </ItemGroup>
-
 </Project>

@@ -5,8 +5,7 @@
 
 using System.Runtime.CompilerServices;
 using NeoKolors.Settings.Argument;
-using NeoKolors.Settings.Builder.Delegate;
-using NeoKolors.Settings.Command.Exception;
+using NeoKolors.Settings.Builder;
 
 namespace NeoKolors.Settings.Command;
 

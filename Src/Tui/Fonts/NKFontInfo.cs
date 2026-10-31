@@ -9,8 +9,8 @@ namespace NeoKolors.Tui.Fonts;
 
 public readonly record struct NKFontInfo {
     
-    
     public string         Name           { get; init; }
+    public string?        SourceFormat   { get; init; }
     public string?        Author         { get; init; }
     public string?        LicenseType    { get; init; }
     public string?        LicenseFile    { get; init; }
@@ -21,6 +21,7 @@ public readonly record struct NKFontInfo {
     public int            WordSpacing    { get; init; }
     public FontProportionsInfo FontPropoInfo { get; init; }
     public ProportionType ProportionType => FontPropoInfo.Type;
+    public IReadOnlyDictionary<string, string> Metadata { get; init; }
 
     public NKFontInfo(
         string  name,
@@ -32,18 +33,24 @@ public readonly record struct NKFontInfo {
         string? author = null,
         string? licenseType = null,
         string? licenseFile = null,
-        string? licenseContent = null)
+        string? licenseContent = null,
+        string? sourceFormat = "NKFont",
+        IReadOnlyDictionary<string, string>? metadata = null)
     {
         Name           = name;
         Ligatures      = ligatures;
         Leading        = leading;
         LetterSpacing  = letterSpacing;
         WordSpacing    = wordSpacing;
-        FontPropoInfo = new FontProportionsInfo(variable);
+        FontPropoInfo  = new FontProportionsInfo(variable);
         Author         = author;
         LicenseType    = licenseType;
         LicenseFile    = licenseFile;
         LicenseContent = licenseContent;
+        SourceFormat   = sourceFormat;
+        Metadata       = metadata != null 
+            ? new Dictionary<string, string>(metadata, StringComparer.OrdinalIgnoreCase) 
+            : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
     }
     
     public NKFontInfo(
@@ -56,7 +63,9 @@ public readonly record struct NKFontInfo {
         string? author = null,
         string? licenseType = null,
         string? licenseFile = null,
-        string? licenseContent = null)
+        string? licenseContent = null,
+        string? sourceFormat = "NKFont",
+        IReadOnlyDictionary<string, string>? metadata = null)
     {
         Name           = name;
         Ligatures      = ligatures;
@@ -68,11 +77,19 @@ public readonly record struct NKFontInfo {
         LicenseType    = licenseType;
         LicenseFile    = licenseFile;
         LicenseContent = licenseContent;
+        SourceFormat   = sourceFormat;
+        Metadata       = metadata != null 
+            ? new Dictionary<string, string>(metadata, StringComparer.OrdinalIgnoreCase) 
+            : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
     }
+
+    public string? GetMetadata(string key) => 
+        Metadata.TryGetValue(key, out var val) ? val : null;
 
     public override string ToString() => 
         $"NKFontInfo {{ " +
         $"Name: '{Name}', " +
+        $"SourceFormat: '{SourceFormat ?? "none"}', " +
         $"Author: '{Author}', " +
         $"LicenseType: '{LicenseType ?? (LicenseFile != null ? "Custom" : "none")}', " +
         $"LicenseFile: '{LicenseFile}', " +
@@ -84,6 +101,7 @@ public readonly record struct NKFontInfo {
             ProportionType.VARIABLE   => FontPropoInfo.AsVar .ToString(), 
             ProportionType.MONOSPACED => FontPropoInfo.AsMono.ToString(), 
             _                         => throw new IOp()
-        }} " +
+        }}, " +
+        $"MetadataCount: {Metadata.Count} " +
         $"}}";
 }

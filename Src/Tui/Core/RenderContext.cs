@@ -585,10 +585,6 @@ public class RenderContext : ICharDrawer {
     public void DrawRect(AnsiChar c, int xOffset, int yOffset, int width, int height, int z) {
         _canvas.DrawRect(c, _current.Origin.X + xOffset, _current.Origin.Y + yOffset, width, height, _current.ZIndex + z);
     }
-
-    public void DrawBorder(NKBorderOld border, int x, int y, int width, int height, int z) {
-        _canvas.DrawBorder(border, _current.Origin.X + x, _current.Origin.Y + y, width, height, _current.ZIndex + z);
-    }
     
     public void Clean() {
         _canvas.Clean();

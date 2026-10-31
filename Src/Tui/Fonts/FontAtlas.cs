@@ -9,7 +9,7 @@ namespace NeoKolors.Tui.Fonts;
 public static class FontAtlas {
     private static readonly NKLogger LOGGER = NKDebug.GetLogger("FontAtlas");
     
-    private static readonly Dictionary<string, IAsciiFont> FONTS = new();
+    private static readonly Dictionary<string, IAsciiFont> FONTS = new(StringComparer.OrdinalIgnoreCase);
 
     static FontAtlas() {
         foreach (var res in Assembly.GetCallingAssembly().GetManifestResourceNames()) {

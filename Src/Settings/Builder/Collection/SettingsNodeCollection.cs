@@ -1,13 +1,11 @@
 ﻿// NeoKolors
 // Copyright (c) 2025 KryKom
 //
+
 using System.Collections;
 using System.Runtime.CompilerServices;
-using NeoKolors.Settings.Builder.Delegate;
-using NeoKolors.Settings.Builder.Exception;
-using NeoKolors.Settings.Builder.Info;
 
-namespace NeoKolors.Settings.Builder.Collection;
+namespace NeoKolors.Settings.Builder;
 
 public class SettingsNodeCollection<TResult> : ISettingsNodeCollection<TResult> {
     

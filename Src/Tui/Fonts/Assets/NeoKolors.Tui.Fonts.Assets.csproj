@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <TargetFramework>netstandard2.1</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <LangVersion>14</LangVersion>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
@@ -33,32 +33,49 @@
         <None Include="CompileFontsTask.Code.cs" />
     </ItemGroup>
 
+    <!-- Static FIGlet font assets -->
     <ItemGroup>
-        <EmbeddedResource Include="Bytesized.nkf" />
-        <EmbeddedResource Include="Dummy.nkf" />
-        <EmbeddedResource Include="Future.nkf" />
         <EmbeddedResource Include="Figlet/*.flf" />
+        <EmbeddedResource Include="Figlet/*.xml" />
     </ItemGroup>
 
+    <!-- Font compilation configuration: control what to compile and where to output directly here -->
+    <PropertyGroup>
+        <!-- Default output directory for compiled .nkf files (relative to project directory or absolute) -->
+        <FontOutputDir Condition="'$(FontOutputDir)' == ''">nkf</FontOutputDir>
+    </PropertyGroup>
+
     <ItemGroup>
-      <PackageReference Include="Polyfill" Version="11.4.1">
-        <PrivateAssets>all</PrivateAssets>
-        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      </PackageReference>
+        <!-- Specify fonts to compile from this project.
+             Each item can be:
+             - A font folder name (e.g. "Bytesized")
+             - Optional metadata:
+                 - OutputPath="path/to/output.nkf" (overrides output file path)
+                 - OutputDir="path/to/dir" (overrides output directory)
+                 - FontName="CustomName" (overrides font name)
+             If no <Font> items are declared, the task auto-discovers font folders in SourceDir. -->
+        <Font Include="Bytesized" />
+        <Font Include="Future" />
+        <Font Include="Dummy" />
     </ItemGroup>
 
     <!-- Inline C# Task for Font Compilation -->
     <UsingTask TaskName="CompileFontsTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)/Microsoft.Build.Tasks.Core.dll">
         <ParameterGroup>
-            <SourceDir ParameterType="System.String" Required="true" />
+            <SourceDir ParameterType="System.String" Required="false" />
+            <OutputDir ParameterType="System.String" Required="false" />
+            <Fonts ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="false" />
             <FontsAssemblyPath ParameterType="System.String" Required="true" />
             <References ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+            <OutputFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
         </ParameterGroup>
         <Task>
             <Using Namespace="System" />
             <Using Namespace="System.IO" />
             <Using Namespace="System.Reflection" />
             <Using Namespace="System.Collections.Generic" />
+            <Using Namespace="Microsoft.Build.Framework" />
+            <Using Namespace="Microsoft.Build.Utilities" />
             <Code Type="Fragment" Language="cs" Source="$(MSBuildProjectDirectory)/CompileFontsTask.Code.cs" />
         </Task>
     </UsingTask>
@@ -68,6 +85,20 @@
             <!-- Resolve the path to the referenced NeoKolors.Tui.Fonts.dll assembly -->
             <FontsDllPath>../bin/$(Configuration)/$(TargetFramework)/NeoKolors.Tui.Fonts.dll</FontsDllPath>
         </PropertyGroup>
-        <CompileFontsTask SourceDir="$(ProjectDir)." FontsAssemblyPath="$(FontsDllPath)" References="@(ReferencePath)" />
+        <CompileFontsTask 
+            SourceDir="$(ProjectDir)." 
+            OutputDir="$(FontOutputDir)"
+            Fonts="@(Font)"
+            FontsAssemblyPath="$(FontsDllPath)" 
+            References="@(ReferencePath)">
+            <Output TaskParameter="OutputFiles" ItemName="CompiledFonts" />
+        </CompileFontsTask>
+
+        <ItemGroup>
+            <EmbeddedResource Include="@(CompiledFonts)">
+                <LogicalName>NeoKolors.Tui.Fonts.Assets.%(Filename)%(Extension)</LogicalName>
+            </EmbeddedResource>
+            <FileWrites Include="@(CompiledFonts)" />
+        </ItemGroup>
     </Target>
 </Project>

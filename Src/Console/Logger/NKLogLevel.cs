@@ -13,11 +13,12 @@ namespace NeoKolors.Console;
 [Flags]
 [HasFlagPrefix("Log")]
 public enum NKLogLevel {
-    NONE = 0,
-    CRITICAL = 1,
-    ERROR = 2,
-    WARNING = 4,
+    NONE        = 0,
+    CRITICAL    = 1,
+    ERROR       = 2,
+    WARNING     = 4,
     INFORMATION = 8,
-    DEBUG = 16,
-    TRACE = 32
+    DEBUG       = 16,
+    TRACE       = 32,
+    ALL         = CRITICAL | ERROR | WARNING | INFORMATION | DEBUG | TRACE
 }

@@ -2,6 +2,7 @@
 // Copyright (c) 2026 KryKom
 
 using System.Diagnostics;
+using NeoKolors.Tui.Lifecycle.Core;
 
 namespace NeoKolors.Tui.Lifecycle.Game2D;
 

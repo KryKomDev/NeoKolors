@@ -650,7 +650,7 @@ public class AnsiStringTests {
         Assert.True(bolded.GetStyleAt(0).Styles.HasFlag(BOLD));
 
         // NKColor setting
-        var colored = ansi + (NKColor)YELLOW;
+        var colored = ansi + YELLOW;
         Assert.Equal(YELLOW, colored.GetStyleAt(0).FColor.AsPalette);
     }
 }

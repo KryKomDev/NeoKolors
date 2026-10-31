@@ -3,8 +3,6 @@
 // Copyright (c) 2025 KryKom
 //
 
-using NeoKolors.Settings.Command.Exception;
-
 namespace NeoKolors.Settings.Command;
 
 public readonly struct NodeInfo {

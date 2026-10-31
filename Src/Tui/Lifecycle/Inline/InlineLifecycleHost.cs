@@ -7,10 +7,9 @@ using NeoKolors.Common;
 using NeoKolors.Console;
 using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Elements;
-using NeoKolors.Tui.Lifecycle;
-using NeoKolors.Tui.Widgets.Rendering;
+using NeoKolors.Tui.Lifecycle.Core;
 
-namespace NeoKolors.Tui.Widgets.Lifecycle;
+namespace NeoKolors.Tui.Lifecycle.Inline;
 
 /// <summary>
 /// A specialized lifecycle host that coordinates running and rendering inline widgets and element hierarchies

@@ -1,8 +1,7 @@
 ﻿using System.Xml;
 using System.Xml.Linq;
-using NeoKolors.Settings.Builder.Info;
 
-namespace NeoKolors.Settings.Builder.Xml;
+namespace NeoKolors.Settings.Builder;
 
 public class XmlSettingsReader<TResult> {
     private readonly SettingsNode<TResult> _node;

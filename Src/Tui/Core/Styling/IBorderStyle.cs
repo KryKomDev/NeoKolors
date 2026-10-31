@@ -13,7 +13,7 @@ public interface IBorderStyle {
     /// <param name="rect">The rectangular region where the border will be drawn.</param>
     /// <param name="canvas">The character canvas onto which the border will be rendered.</param>
     /// <param name="z">The z-layer of the border.</param>
-    public void Draw(Rect2D rect, in ICharCanvas canvas, int z);
+    public void Draw(Rect2D rect, in ICharDrawer canvas, int z);
 
     /// <summary>
     /// Calculates the content box dimensions by removing the border thickness from the given size.

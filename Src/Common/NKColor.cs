@@ -15,7 +15,7 @@ namespace NeoKolors.Common;
 /// </summary>
 [ProtoContract(Surrogate = typeof(NKColorSurrogate))]
 [StructLayout(LayoutKind.Explicit, Size = sizeof(uint))]
-public readonly record struct NKColor : IFormattable, IParsablePolyfill.IParsable<NKColor> {
+public readonly record struct NKColor : IFormattable, IParsable<NKColor> {
 
     /// <summary>
     /// Represents the underlying 32-bit unsigned integer value used to store the color data,

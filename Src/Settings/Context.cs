@@ -6,7 +6,7 @@
 using System.Collections;
 using System.Runtime.CompilerServices;
 using NeoKolors.Settings.Argument;
-using NeoKolors.Settings.Builder.Info;
+using NeoKolors.Settings.Builder;
 using ContextException = NeoKolors.Settings.Exception.ContextException;
 
 namespace NeoKolors.Settings;
