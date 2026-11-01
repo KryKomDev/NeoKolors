@@ -1073,7 +1073,8 @@ public class RenderContextTests {
 
         // DrawBorder
         var border = NKBorderStyle.GetAscii();
-        border.Draw(new Rect2D(0, 0, 10, 5), context, 1);
+        // border.Draw(new Rect2D(0, 0, 10, 5), context, 1);
+        spy.DrawBorder(border, 0, 0, 10, 5, 1);
         Assert.NotNull(spy.LastDrawBorder);
         Assert.Equal(border, spy.LastDrawBorder.Value.Border);
         Assert.Equal(0,      spy.LastDrawBorder.Value.X);

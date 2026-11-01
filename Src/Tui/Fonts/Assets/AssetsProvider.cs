@@ -87,6 +87,7 @@ public static class AssetsProvider {
     /// Registers the built-in font resources into the font atlas for later usage in the application.
     /// </summary>
     #if NK_FONTS_ENABLE_AUTO_REGISTRATION
+    #warning Enabling automatic registration of fonts in NeoKolors.Tui.Fonts.Assets can cause unpredictable behavior and should be used with caution.
     #pragma warning disable CA2255
     [ModuleInitializer]
     #pragma warning restore CA2255

@@ -237,43 +237,79 @@ internal static class Program {
         var listCommand = new Command("list", "List all available built-in fonts.");
         listCommand.SetAction(_ => { HandleList(); });
 
-        // 5. glyphs command
-        var glyphsFontArg = new Argument<string>("font") {
-            Description = "A built-in font name, compiled .nkf file, or raw XML font folder/zip."
-        };
-
-        var glyphsCommand = new Command("font", "List all glyphs contained inside a specified font.");
-        glyphsCommand.Arguments.Add(glyphsFontArg);
-
-        glyphsCommand.Aliases.Add("inspect-font");
-
-        glyphsCommand.SetAction(
-            parseResult => {
-                string font = parseResult.GetValue(glyphsFontArg) ?? string.Empty;
-                HandleInspectFont(font);
-            }
-        );
-
-        // 6. inspect command
+        // 5. inspect font command
         var inspectFontArg = new Argument<string>("font") {
             Description = "A built-in font name, compiled .nkf file, or raw XML font folder/zip."
         };
 
+        var inspectFontOnlyMetaSwitch = new Option<bool>("--only-meta", "-m", "--skip-glyphs") {
+            Description = "Only list font metadata."
+        };
+
+        var inspectFontOnlyGlyphsSwitch = new Option<bool>("--only-glyphs", "-g", "--skip-meta") {
+            Description = "Only list font glyphs."
+        };
+
+        var inspectFontCommand = new Command("font", "List all glyphs contained inside a specified font.");
+        inspectFontCommand.Arguments.Add(inspectFontArg);
+        inspectFontCommand.Add(inspectFontOnlyMetaSwitch);
+        inspectFontCommand.Add(inspectFontOnlyGlyphsSwitch);
+
+        inspectFontCommand.Aliases.Add("inspect-font");
+
+        inspectFontCommand.Validators.Add(
+            result => {
+                if (result.GetValue(inspectFontOnlyMetaSwitch) && result.GetValue(inspectFontOnlyGlyphsSwitch)) {
+                    result.AddError("Cannot specify both --only-meta and --only-glyphs.");
+                }
+            }
+        );
+
+        inspectFontCommand.SetAction(
+            parseResult => {
+                string font       = parseResult.GetValue(inspectFontArg) ?? string.Empty;
+                bool   skipMeta   = parseResult.GetValue(inspectFontOnlyGlyphsSwitch);
+                bool   skipGlyphs = parseResult.GetValue(inspectFontOnlyMetaSwitch);
+                HandleInspectFont(font, skipMeta, skipGlyphs);
+            }
+        );
+
+        // 6. inspect glyph command
         var inspectGlyphArg = new Argument<string>("glyph") {
             Description = "The character or string ligature representation of the glyph to inspect."
         };
 
-        var inspectCommand = new Command("glyph", "Inspect a single glyph within a font, showing its properties and rendering it visually.");
-        inspectCommand.Arguments.Add(inspectFontArg);
-        inspectCommand.Arguments.Add(inspectGlyphArg);
+        var inspectGlyphOnlyMetaSwitch = new Option<bool>("--only-meta", "-m", "--skip-glyph") {
+            Description = "Only list glyph metadata."
+        };
 
-        inspectCommand.Aliases.Add("inspect-glyph");
+        var inspectGlyphOnlyGlyphSwitch = new Option<bool>("--only-glyph", "-g", "--skip-meta") {
+            Description = "Only show glyph."
+        };
 
-        inspectCommand.SetAction(
+        var inspectGlyphCommand = new Command("glyph", "Inspect a single glyph within a font, showing its properties and rendering it visually.");
+        inspectGlyphCommand.Arguments.Add(inspectFontArg);
+        inspectGlyphCommand.Arguments.Add(inspectGlyphArg);
+        inspectGlyphCommand.Options.Add(inspectGlyphOnlyMetaSwitch);
+        inspectGlyphCommand.Options.Add(inspectGlyphOnlyGlyphSwitch);
+
+        inspectGlyphCommand.Aliases.Add("inspect-glyph");
+
+        inspectGlyphCommand.Validators.Add(
+            result => {
+                if (result.GetValue(inspectGlyphOnlyGlyphSwitch) && result.GetValue(inspectGlyphOnlyMetaSwitch)) {
+                    result.AddError("Cannot use --only-glyph and --only-meta together.");
+                }
+            }
+        );
+
+        inspectGlyphCommand.SetAction(
             parseResult => {
-                string font  = parseResult.GetValue(inspectFontArg)  ?? string.Empty;
-                string glyph = parseResult.GetValue(inspectGlyphArg) ?? string.Empty;
-                HandleInspectGlyph(font, glyph);
+                string font      = parseResult.GetValue(inspectFontArg)  ?? string.Empty;
+                string glyph     = parseResult.GetValue(inspectGlyphArg) ?? string.Empty;
+                bool   skipMeta  = parseResult.GetValue(inspectGlyphOnlyGlyphSwitch);
+                bool   skipGlyph = parseResult.GetValue(inspectGlyphOnlyMetaSwitch);
+                HandleInspectGlyph(font, glyph, skipMeta, skipGlyph);
             }
         );
 
@@ -328,8 +364,8 @@ internal static class Program {
         rootCommand.Subcommands.Add(displayCommand);
         rootCommand.Subcommands.Add(createCommand);
         rootCommand.Subcommands.Add(listCommand);
-        rootCommand.Subcommands.Add(glyphsCommand);
-        rootCommand.Subcommands.Add(inspectCommand);
+        rootCommand.Subcommands.Add(inspectFontCommand);
+        rootCommand.Subcommands.Add(inspectGlyphCommand);
         rootCommand.Subcommands.Add(addCommand);
         rootCommand.Subcommands.Add(removeCommand);
         rootCommand.Subcommands.Add(cleanLogsCommand);
@@ -834,7 +870,7 @@ internal static class Program {
         System.Console.WriteLine();
     }
 
-    static void HandleInspectFont(string fontKey) {
+    static void HandleInspectFont(string fontKey, bool skipMeta = false, bool skipGlyphs = false) {
         var font = LoadFont(fontKey);
 
         if (font == null) {
@@ -849,47 +885,162 @@ internal static class Program {
             return;
         }
 
+        if (skipMeta)
+            goto glyphs;
+
         System.Console.WriteLine();
 
         // Print Font Details Header
         NKConsole.WriteLine("Font Details:", new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
         NKConsole.WriteLine("─────────────", ConsoleColor.DarkYellow);
         System.Console.WriteLine();
-
+        
         var detailsRows = new List<IReadOnlyList<IElement>> {
-            new IElement[] { new Text(new AnsiString("Name", new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Name, new NKStyle(ConsoleColor.White, styles: NKTextStyles.BOLD))) }
+            new IElement[] {
+                new Text(new AnsiString("Name:", new NKStyle(ConsoleColor.Cyan))),
+                new Text(
+                    new AnsiString(
+                        nkFont.Name,
+                        new NKStyle(ConsoleColor.White, styles: NKTextStyles.BOLD)
+                    )
+                )
+            }
         };
 
         if (!string.IsNullOrEmpty(nkFont.Info.SourceFormat)) {
-            detailsRows.Add([new Text(new AnsiString("Source Format", new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.SourceFormat, new NKStyle(ConsoleColor.White)))]);
+            detailsRows.Add(
+                [
+                    new Text(new AnsiString("Source Format", new NKStyle(ConsoleColor.Cyan))),
+                    new Text(
+                        new AnsiString(nkFont.Info.SourceFormat, new NKStyle(ConsoleColor.White))
+                    )
+                ]
+            );
         }
 
         if (!string.IsNullOrEmpty(nkFont.Info.Author)) {
-            detailsRows.Add([new Text(new AnsiString("Author", new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.Author, new NKStyle(ConsoleColor.White)))]);
+            detailsRows.Add(
+                [
+                    new Text(new AnsiString("Author:", new NKStyle(ConsoleColor.Cyan))),
+                    new Text(new AnsiString(nkFont.Info.Author, new NKStyle(ConsoleColor.White)))
+                ]
+            );
         }
 
         if (!string.IsNullOrEmpty(nkFont.Info.LicenseType)) {
-            detailsRows.Add([new Text(new AnsiString("License", new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.LicenseType, new NKStyle(ConsoleColor.White)))]);
+            detailsRows.Add(
+                [
+                    new Text(new AnsiString("License:", new NKStyle(ConsoleColor.Cyan))),
+                    new Text(
+                        new AnsiString(nkFont.Info.LicenseType, new NKStyle(ConsoleColor.White))
+                    )
+                ]
+            );
         }
 
         if (!string.IsNullOrEmpty(nkFont.Info.LicenseFile)) {
-            detailsRows.Add([new Text(new AnsiString("License File", new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.LicenseFile, new NKStyle(ConsoleColor.White)))]);
+            detailsRows.Add(
+                [
+                    new Text(new AnsiString("License File", new NKStyle(ConsoleColor.Cyan))),
+                    new Text(
+                        new AnsiString(nkFont.Info.LicenseFile, new NKStyle(ConsoleColor.White))
+                    )
+                ]
+            );
         }
 
         foreach (var (k, v) in nkFont.Info.Metadata) {
-            detailsRows.Add([new Text(new AnsiString(k, new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(v, new NKStyle(ConsoleColor.White)))]);
+            detailsRows.Add(
+                [
+                    new Text(new AnsiString(k, new NKStyle(ConsoleColor.Cyan))),
+                    new Text(new AnsiString(v, new NKStyle(ConsoleColor.White)))
+                ]
+            );
         }
 
-        detailsRows.Add([new Text(new AnsiString("Proportions",    new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.ProportionType.ToString(), new NKStyle(ConsoleColor.White)))]);
-        detailsRows.Add([new Text(new AnsiString("Ligatures",      new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.Ligatures ? "Yes" : "No",  new NKStyle(ConsoleColor.White)))]);
-        detailsRows.Add([new Text(new AnsiString("Leading",        new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.Leading.ToString(),        new NKStyle(ConsoleColor.White)))]);
-        detailsRows.Add([new Text(new AnsiString("Letter Spacing", new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.LetterSpacing.ToString(),  new NKStyle(ConsoleColor.White)))]);
-        detailsRows.Add([new Text(new AnsiString("Word Spacing",   new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Info.WordSpacing.ToString(),    new NKStyle(ConsoleColor.White)))]);
-        detailsRows.Add([new Text(new AnsiString("Total Glyphs",   new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(nkFont.Glyphs.Count.ToString(),        new NKStyle(ConsoleColor.Green, styles: NKTextStyles.BOLD)))]);
+        detailsRows.Add(
+            [
+                new Text(new AnsiString("Proportions:", new NKStyle(ConsoleColor.Cyan))),
+                new Text(
+                    new AnsiString(
+                        nkFont.Info.ProportionType.ToString(),
+                        new NKStyle(ConsoleColor.White)
+                    )
+                )
+            ]
+        );
 
-        var detailsTable = new Table(null, detailsRows, NKTableStyle.GetNormal(features: NKTableStyle.Features.VERTICAL_ELEMENT_SEPARATOR));
+        detailsRows.Add(
+            [
+                new Text(new AnsiString("Ligatures:", new NKStyle(ConsoleColor.Cyan))),
+                new Text(
+                    new AnsiString(
+                        nkFont.Info.Ligatures ? "Yes" : "No",
+                        new NKStyle(ConsoleColor.White)
+                    )
+                )
+            ]
+        );
+
+        detailsRows.Add(
+            [
+                new Text(new AnsiString("Leading:", new NKStyle(ConsoleColor.Cyan))),
+                new Text(
+                    new AnsiString(nkFont.Info.Leading.ToString(), new NKStyle(ConsoleColor.White))
+                )
+            ]
+        );
+
+        detailsRows.Add(
+            [
+                new Text(new AnsiString("Letter Spacing:", new NKStyle(ConsoleColor.Cyan))),
+                new Text(
+                    new AnsiString(
+                        nkFont.Info.LetterSpacing.ToString(),
+                        new NKStyle(ConsoleColor.White)
+                    )
+                )
+            ]
+        );
+
+        detailsRows.Add(
+            [
+                new Text(new AnsiString("Word Spacing:", new NKStyle(ConsoleColor.Cyan))),
+                new Text(
+                    new AnsiString(
+                        nkFont.Info.WordSpacing.ToString(),
+                        new NKStyle(ConsoleColor.White)
+                    )
+                )
+            ]
+        );
+
+        detailsRows.Add(
+            [
+                new Text(new AnsiString("Total Glyphs:", new NKStyle(ConsoleColor.Cyan))),
+                new Text(
+                    new AnsiString(
+                        nkFont.Glyphs.Count.ToString(),
+                        new NKStyle(ConsoleColor.Green, styles: NKTextStyles.BOLD)
+                    )
+                )
+            ]
+        );
+
+        // var detailsTable = new Table(null, detailsRows, NKTableStyle.GetNormal(features: NKTableStyle.Features.VERTICAL_ELEMENT_SEPARATOR));
+        var detailsTable = new Table(
+            null,
+            detailsRows,
+            NKTableStyle.GetBorderless(),
+            columnAlignments: [HorizontalAlign.RIGHT, HorizontalAlign.LEFT]
+        );
         NKWidgets.Render(detailsTable);
         System.Console.WriteLine();
+
+        glyphs:
+
+        if (skipGlyphs)
+            return;
 
         // Print Table Header
         NKConsole.WriteLine("Glyphs Defined in Font:", new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
@@ -938,7 +1089,7 @@ internal static class Program {
         System.Console.WriteLine();
     }
 
-    static void HandleInspectGlyph(string fontKey, string glyphInput) {
+    static void HandleInspectGlyph(string fontKey, string glyphInput, bool skipMeta = false, bool skipGlyph = false) {
         var font = LoadFont(fontKey);
 
         if (font == null) {
@@ -1021,6 +1172,10 @@ internal static class Program {
             return;
         }
 
+        if (skipMeta) {
+            goto Glyph;
+        }
+
         // Print Glyph Metadata
         NKConsole.WriteLine("Glyph Details:", new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
         NKConsole.WriteLine("──────────────", ConsoleColor.DarkYellow);
@@ -1039,17 +1194,85 @@ internal static class Program {
             : "None";
 
         var metaRows = new List<IReadOnlyList<IElement>> {
-            new IElement[] { new Text(new AnsiString("Symbol",          new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(symStr,                                               new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD))) },
-            new IElement[] { new Text(new AnsiString("Type",            new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(matchedSymbol.Value.IsSimple ? "Simple" : "Ligature", new NKStyle(ConsoleColor.White))) },
-            new IElement[] { new Text(new AnsiString("Dimensions",      new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString($"{matchedGlyph.Width}x{matchedGlyph.Height}",        new NKStyle(ConsoleColor.Green))) },
-            new IElement[] { new Text(new AnsiString("Baseline Offset", new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(matchedGlyph.BaselineOffset.ToString(),               new NKStyle(ConsoleColor.Magenta))) },
-            new IElement[] { new Text(new AnsiString("Styles",          new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(stylesStr,                                            new NKStyle(matchedSymbol.Value.Styles.Styles == NKTextStyles.NONE ? ConsoleColor.DarkGray : ConsoleColor.Blue))) },
-            new IElement[] { new Text(new AnsiString("Align Points",    new NKStyle(ConsoleColor.Cyan))), new Text(new AnsiString(alignPointsStr,                                       new NKStyle(matchedGlyph.AlignPoints.Any() ? ConsoleColor.White : ConsoleColor.DarkGray))) }
+            new IElement[] {
+                new Text(new AnsiString("Symbol:", new NKStyle(ConsoleColor.Cyan))),
+                new Text(
+                    new AnsiString(
+                        symStr,
+                        new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD)
+                    )
+                )
+            },
+            new IElement[] {
+                new Text(new AnsiString("Type:", new NKStyle(ConsoleColor.Cyan))),
+                new Text(
+                    new AnsiString(
+                        matchedSymbol.Value.IsSimple ? "Simple" : "Ligature",
+                        new NKStyle(ConsoleColor.White)
+                    )
+                )
+            },
+            new IElement[] {
+                new Text(new AnsiString("Dimensions:", new NKStyle(ConsoleColor.Cyan))),
+                new Text(
+                    new AnsiString(
+                        $"{matchedGlyph.Width}x{matchedGlyph.Height}",
+                        new NKStyle(ConsoleColor.Green)
+                    )
+                )
+            },
+            new IElement[] {
+                new Text(new AnsiString("Baseline Offset:", new NKStyle(ConsoleColor.Cyan))),
+                new Text(
+                    new AnsiString(
+                        matchedGlyph.BaselineOffset.ToString(),
+                        new NKStyle(ConsoleColor.Magenta)
+                    )
+                )
+            },
+            new IElement[] {
+                new Text(new AnsiString("Styles:", new NKStyle(ConsoleColor.Cyan))),
+                new Text(
+                    new AnsiString(
+                        stylesStr,
+                        new NKStyle(
+                            matchedSymbol.Value.Styles.Styles == NKTextStyles.NONE
+                                ? ConsoleColor.DarkGray
+                                : ConsoleColor.Blue
+                        )
+                    )
+                )
+            },
+            new IElement[] {
+                new Text(new AnsiString("Align Points:", new NKStyle(ConsoleColor.Cyan))),
+                new Text(
+                    new AnsiString(
+                        alignPointsStr,
+                        new NKStyle(
+                            matchedGlyph.AlignPoints.Count != 0
+                                ? ConsoleColor.White
+                                : ConsoleColor.DarkGray
+                        )
+                    )
+                )
+            }
         };
 
-        var metaTable = new Table(null, metaRows, NKTableStyle.GetNormal(features: NKTableStyle.Features.VERTICAL_ELEMENT_SEPARATOR));
+        // var metaTable = new Table(null, metaRows, NKTableStyle.GetNormal(features: NKTableStyle.Features.VERTICAL_ELEMENT_SEPARATOR));
+        var metaTable = new Table(
+            null,
+            metaRows,
+            NKTableStyle.GetBorderless(),
+            columnAlignments: [HorizontalAlign.RIGHT, HorizontalAlign.LEFT]
+        );
         NKWidgets.Render(metaTable);
         System.Console.WriteLine();
+
+        Glyph:
+
+        if (skipGlyph) {
+            return;
+        }
 
         // Visual Representation
         NKConsole.WriteLine("Visual Representation:", new NKStyle(ConsoleColor.Yellow, styles: NKTextStyles.BOLD));
