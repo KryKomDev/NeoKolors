@@ -257,8 +257,12 @@ public static partial class ExceptionFormatter {
             sb.Append(":line ",                    dimStyle);
             sb.Append(frame.LineNumber.ToString(), format.LineNumberStyle);
 
-            if (format.ShowSourceSnippet && File.Exists(frame.FilePath)) {
-                AppendSourceSnippet(sb, frame.FilePath!, frame.LineNumber, format, indent);
+            if (format.ShowSourceSnippet) {
+                string? sourceFilePath = TryResolveSourceFilePath(frame.FilePath);
+
+                if (sourceFilePath != null) {
+                    AppendSourceSnippet(sb, sourceFilePath, displayPath, frame.LineNumber, format, indent);
+                }
             }
         }
 
@@ -342,9 +346,9 @@ public static partial class ExceptionFormatter {
         return list.ToArray();
     }
 
-    private static void AppendSourceSnippet(AnsiStringBuilder sb, string filePath, int targetLineNumber, ExceptionFormat format, string indent) {
+    private static void AppendSourceSnippet(AnsiStringBuilder sb, string sourceFilePath, string displayPath, int targetLineNumber, ExceptionFormat format, string indent) {
         try {
-            string[] lines       = File.ReadAllLines(filePath);
+            string[] lines       = File.ReadAllLines(sourceFilePath);
             int      targetIndex = targetLineNumber - 1;
 
             if (targetIndex < 0 || targetIndex >= lines.Length)
@@ -370,7 +374,7 @@ public static partial class ExceptionFormatter {
                 nonTargetSep = " │" + new string(' ', targetSep.Length - 2);
             }
 
-            string displayFilePath = format.ShowFilePath ? filePath : Path.GetFileName(filePath);
+            string displayFilePath = format.ShowFilePath ? displayPath : Path.GetFileName(displayPath);
             sb.AppendLine();
             sb.AppendLine();
             sb.Append(indent);
@@ -401,6 +405,58 @@ public static partial class ExceptionFormatter {
         catch {
             // Silently ignore snippet failures if file read errors occur
         }
+    }
+
+    private static string? TryResolveSourceFilePath(string? rawPath) {
+        if (string.IsNullOrWhiteSpace(rawPath)) {
+            return null;
+        }
+
+        try {
+            if (File.Exists(rawPath)) {
+                return rawPath;
+            }
+
+            string relativePath = rawPath;
+
+            // Handle SourceLink deterministic paths (e.g. /_/path/to/file or /_1/path/to/file)
+            if (rawPath.StartsWith("/_") || rawPath.StartsWith("\\_")) {
+                int nextSep = rawPath.IndexOfAny(['/', '\\'], 2);
+                relativePath = nextSep != -1 ? rawPath.Substring(nextSep + 1) : rawPath.TrimStart('/', '\\');
+            }
+            else if (rawPath.StartsWith('/') || rawPath.StartsWith('\\')) {
+                relativePath = rawPath.TrimStart('/', '\\');
+            }
+
+            string normalizedRel = relativePath.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
+
+            if (File.Exists(normalizedRel)) {
+                return Path.GetFullPath(normalizedRel);
+            }
+
+            var baseDirs = new[] { Directory.GetCurrentDirectory(), AppContext.BaseDirectory };
+
+            foreach (var baseDir in baseDirs) {
+                if (string.IsNullOrEmpty(baseDir)) {
+                    continue;
+                }
+
+                var dir = new DirectoryInfo(baseDir);
+
+                for (int depth = 0; depth < 10 && dir != null; depth++, dir = dir.Parent) {
+                    string candidate = Path.Combine(dir.FullName, normalizedRel);
+
+                    if (File.Exists(candidate)) {
+                        return candidate;
+                    }
+                }
+            }
+        }
+        catch {
+            // ignored
+        }
+
+        return null;
     }
 
     private static AnsiString ApplyBorder(AnsiString rawOutput, ExceptionFormat format) {
@@ -471,6 +527,14 @@ public static partial class ExceptionFormatter {
                 string rel = fullPath[currentDir.Length..].TrimStart('/', '\\');
 
                 return string.IsNullOrEmpty(rel) ? fullPath : rel;
+            }
+
+            if (fullPath.StartsWith("/_") || fullPath.StartsWith("\\_")) {
+                int nextSep = fullPath.IndexOfAny(['/', '\\'], 2);
+
+                if (nextSep != -1) {
+                    return fullPath[(nextSep + 1)..];
+                }
             }
         }
         catch {
