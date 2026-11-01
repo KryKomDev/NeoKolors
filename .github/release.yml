@@ -1,0 +1,44 @@
+changelog:
+  categories:
+    - title: "New Features"
+      labels:
+        - "feature"
+        - "enhancement"
+      commits:
+        - "feat:*"
+        - "feat(*):*"
+    - title: "Bug Fixes"
+      labels:
+        - "fix"
+        - "bug"
+      commits:
+        - "fix:*"
+        - "fix(*):*"
+    - title: "Performance Improvements"
+      labels:
+        - "performance"
+      commits:
+        - "perf:*"
+        - "perf(*):*"
+    - title: "Documentation"
+      labels:
+        - "documentation"
+      commits:
+        - "docs:*"
+        - "docs(*):*"
+        - "chore(docs):*"
+    - title: "Refactoring"
+      commits:
+        - "refactor:*"
+        - "refactor(*):*"
+    - title: "Maintenance and Dependencies"
+      labels:
+        - "dependencies"
+        - "maintenance"
+      commits:
+        - "chore:*"
+        - "chore(*):*"
+        - "build:*"
+        - "build(*):*"
+        - "ci:*"
+        - "ci(*):*"

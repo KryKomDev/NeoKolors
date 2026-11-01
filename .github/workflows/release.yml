@@ -7,18 +7,21 @@ on:
   workflow_dispatch:
     inputs:
       tag_name:
-        description: 'Tag name for release (e.g. v2026.3.0)'
+        description: 'Tag or Version to release (e.g. v2026.4.0 or 2026.4.0)'
         required: true
         type: string
       dry_run:
-        description: 'Dry run (do not publish to NuGet)'
+        description: 'Dry run (validate and pack, but do not publish to NuGet)'
         required: false
         type: boolean
         default: false
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 permissions:
-  contents: write
-  id-token: write
+  contents: read
 
 jobs:
   build-and-pack:
@@ -26,24 +29,38 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       release_tag: ${{ steps.version.outputs.tag }}
+      clean_version: ${{ steps.version.outputs.clean_version }}
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Determine Release Tag
+      - name: Resolve Version
         id: version
         shell: bash
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            TAG="${{ github.event.inputs.tag_name }}"
+            RAW_TAG="${{ github.event.inputs.tag_name }}"
           else
-            TAG="${{ github.ref_name }}"
+            RAW_TAG="${{ github.ref_name }}"
           fi
+          
+          # Normalize tag format (TAG with leading v, CLEAN_VER without)
+          if [[ "$RAW_TAG" =~ ^v ]]; then
+            TAG="$RAW_TAG"
+            CLEAN_VER="${RAW_TAG#v}"
+          else
+            TAG="v$RAW_TAG"
+            CLEAN_VER="$RAW_TAG"
+          fi
+          
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "clean_version=$CLEAN_VER" >> "$GITHUB_OUTPUT"
+          echo "MINVERVERSIONOVERRIDE=$CLEAN_VER" >> "$GITHUB_ENV"
+          echo "Releasing version: $CLEAN_VER (Tag: $TAG)"
 
-      - name: Setup .NET
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '11.0.x'
@@ -53,7 +70,11 @@ jobs:
         run: dotnet restore NeoKolors.slnx
 
       - name: Build Solution (Release)
-        run: dotnet build NeoKolors.slnx -c Release --no-restore
+        run: >-
+          dotnet build NeoKolors.slnx
+          -c Release
+          --no-restore
+          -p:ContinuousIntegrationBuild=true
 
       - name: Run Tests
         run: dotnet test NeoKolors.slnx -c Release --no-build
@@ -64,6 +85,7 @@ jobs:
           -c Release
           --no-build
           --output ./packages
+          -p:ContinuousIntegrationBuild=true
 
       - name: Upload Package Artifacts
         uses: actions/upload-artifact@v4
@@ -72,13 +94,59 @@ jobs:
           path: |
             ./packages/*.nupkg
             ./packages/*.snupkg
+          retention-days: 7
 
-  github-release:
-    name: Create GitHub Release
+  validate-packages:
+    name: Validate Packages
     needs: build-and-pack
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Download Packages
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-packages
+          path: ./packages
+
+      - name: Inspect Package Contents
+        shell: bash
+        run: |
+          echo "Checking generated packages:"
+          ls -la ./packages/
+          COUNT=$(ls -1 ./packages/*.nupkg 2>/dev/null | wc -l)
+          if [ "$COUNT" -eq 0 ]; then
+            echo "Error: No .nupkg packages found!"
+            exit 1
+          fi
+          echo "Found $COUNT NuGet package(s)."
+
+  attest-packages:
+    name: Attest Build Provenance
+    needs: [build-and-pack, validate-packages]
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      attestations: write
+      contents: read
+    steps:
+      - name: Download Packages
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-packages
+          path: ./packages
+
+      - name: Attest Provenance (SLSA)
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: './packages/*.nupkg'
+
+  github-release:
+    name: Create GitHub Release
+    needs: [build-and-pack, attest-packages]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Download Packages
@@ -87,19 +155,25 @@ jobs:
           name: nuget-packages
           path: ./packages
 
-      - name: Create Release
+      - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_TAG: ${{ needs.build-and-pack.outputs.release_tag }}
         shell: bash
         run: |
-          gh release create "$RELEASE_TAG" ./packages/* --generate-notes --title "Release $RELEASE_TAG"
+          gh release create "$RELEASE_TAG" ./packages/* \
+            --title "Release $RELEASE_TAG" \
+            --generate-notes
 
   publish-nuget:
-    name: Publish to NuGet
+    name: Publish to NuGet.org
     needs: [build-and-pack, github-release]
     runs-on: ubuntu-latest
+    environment: nuget-production
     if: ${{ github.event.inputs.dry_run != true && github.event.inputs.dry_run != 'true' }}
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Download Packages
         uses: actions/download-artifact@v4
@@ -107,19 +181,31 @@ jobs:
           name: nuget-packages
           path: ./packages
 
-      - name: Setup .NET
+      - name: Setup .NET SDK
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '11.0.x'
           dotnet-quality: 'preview'
 
-      - name: Push to NuGet
+      # Exchange GitHub Actions OIDC token for a short-lived NuGet API key
+      - name: NuGet Login (OIDC Trusted Publishing)
+        id: nuget-login
+        continue-on-error: true
+        uses: NuGet/login@v1
+
+      - name: Publish Packages to NuGet.org
         env:
-          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+          OIDC_KEY: ${{ steps.nuget-login.outputs.NUGET_API_KEY }}
+          SECRET_KEY: ${{ secrets.NUGET_API_KEY }}
+        shell: bash
         run: |
+          API_KEY="${OIDC_KEY:-$SECRET_KEY}"
+          if [ -z "$API_KEY" ]; then
+            echo "Error: Neither OIDC token nor NUGET_API_KEY secret is available."
+            exit 1
+          fi
+
           dotnet nuget push "./packages/*.nupkg" \
-            --api-key "$NUGET_API_KEY" \
+            --api-key "$API_KEY" \
             --source https://api.nuget.org/v3/index.json \
             --skip-duplicate
-
-
