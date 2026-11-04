@@ -3,7 +3,7 @@
 // Copyright (c) 2025 KryKom
 //
 
-namespace NeoKolors.Tui.Tests.Core;
+namespace NeoKolors.Tui.Core.Tests;
 
 public class CellInfoTests {
 

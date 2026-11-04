@@ -1,0 +1,18 @@
+<Project>
+    
+    <PropertyGroup>
+        <ParentDirectoryBuildPropsPath>$([MSBuild]::GetPathOfFileAbove('Directory.Build.props', '$(MSBuildThisFileDirectory)..\'))</ParentDirectoryBuildPropsPath>
+    </PropertyGroup>
+    
+    <ImportGroup>
+        <Import Project="$(ParentDirectoryBuildPropsPath)"/>
+    </ImportGroup>
+    
+    <ItemGroup>
+        <Using Include="Metriks"/>
+        <Using Include="NeoKolors.Common"/>
+        <Using Include="NeoKolors.Console"/>
+        <Using Include="NeoKolors.Extensions"/>
+    </ItemGroup>
+    
+</Project>

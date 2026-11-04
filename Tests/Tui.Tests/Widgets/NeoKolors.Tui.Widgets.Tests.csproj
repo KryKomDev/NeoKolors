@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <ItemGroup>
+        <ProjectReference Include="../../../Src/Tui/Widgets/NeoKolors.Tui.Widgets.csproj"/>
+        <ProjectReference Include="..\..\..\Src\Tui\Fonts\Assets\NeoKolors.Tui.Fonts.Assets.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <Using Include="NeoKolors.Tui.Core"/>
+        <Using Include="NeoKolors.Tui.Elements"/>
+        <Using Include="NeoKolors.Tui.Fonts"/>
+        <Using Include="NeoKolors.Tui.Widgets"/>
+    </ItemGroup>
+</Project>

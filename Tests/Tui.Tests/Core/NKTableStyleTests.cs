@@ -1,7 +1,7 @@
 // NeoKolors
 // Copyright (c) 2026 KryKom
 
-namespace NeoKolors.Tui.Tests.Core;
+namespace NeoKolors.Tui.Core.Tests;
 
 public class NKTableStyleTests {
 

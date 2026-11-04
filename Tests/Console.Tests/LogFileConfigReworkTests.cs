@@ -111,6 +111,7 @@ public class LogFileConfigReworkTests : IDisposable {
         logger.LogInformation("Test message for file integration");
 
         // Flush & Dispose provider to ensure file is closed
+        // ReSharper disable once DisposeOnUsingVariable
         provider.Dispose();
 
         Assert.True(File.Exists(logPath));

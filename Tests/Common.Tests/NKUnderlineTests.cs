@@ -18,7 +18,7 @@ public class NKUnderlineTests {
     [InlineData(NKUnderlineType.DASHED, "\e[4:5m")]
     public void UnderlineType_GetEscSeq_WithEscape_ReturnsExpected(NKUnderlineType type, string expected) {
         Assert.Equal(expected, NKUnderlineType.GetEscSeq(type));
-        Assert.Equal(expected, NKUnderlineType.GetEscSeq(type, true));
+        Assert.Equal(expected, NKUnderlineType.GetEscSeq(type, addEsc: true));
     }
 
     [Theory]

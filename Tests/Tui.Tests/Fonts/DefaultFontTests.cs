@@ -2,9 +2,7 @@
 // NeoKolors.Test
 // Copyright (c) 2025 KryKom
 
-using NeoKolors.Tui.Fonts;
-
-namespace NeoKolors.Tui.Tests.Fonts;
+namespace NeoKolors.Tui.Fonts.Tests;
 
 public class DefaultFontTests {
 

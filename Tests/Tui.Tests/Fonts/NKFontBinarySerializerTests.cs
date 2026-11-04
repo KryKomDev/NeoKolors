@@ -1,13 +1,11 @@
 // NeoKolors
 // Copyright (c) KryKom 2026
 
-using NeoKolors.Tui.Fonts;
-
-namespace NeoKolors.Tui.Tests.Fonts;
+namespace NeoKolors.Tui.Fonts.Tests;
 
 public class NKFontBinarySerializerTests {
 
-    private const string PATH = "NeoKolors.Tui.Tests.Fonts.Assets.Dummy.nkf";
+    private const string PATH = "NeoKolors.Tui.Fonts.Tests.Dummy.nkf";
 
     [Fact]
     public void SerializeAndDeserialize_ShouldBeIdentical() {

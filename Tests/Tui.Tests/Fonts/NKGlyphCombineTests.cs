@@ -1,10 +1,9 @@
 // NeoKolors
 // Copyright (c) KryKom 2026
 
-using NeoKolors.Tui.Fonts;
 using Drct = NeoKolors.Tui.Fonts.Xml.V3.XmlGlyphAlignDirection;
 
-namespace NeoKolors.Tui.Tests.Fonts;
+namespace NeoKolors.Tui.Fonts.Tests;
 
 public class NKGlyphCombineTests {
     private NKGlyph CreateGlyph(char c) {

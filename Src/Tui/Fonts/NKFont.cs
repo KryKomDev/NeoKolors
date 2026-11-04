@@ -1354,7 +1354,7 @@ public class NKFont : IAsciiFont {
             WasWrapped = wasWrapped;
         }
 
-        public RenderedLineInfo(int width, Token[] tokens) : this(width, tokens, null, false) { }
+        public RenderedLineInfo(int width, Token[] tokens) : this(width, tokens, null, wasWrapped: false) { }
     }
 
     private NKGlyph GetGlyphFromToken(Token token) {

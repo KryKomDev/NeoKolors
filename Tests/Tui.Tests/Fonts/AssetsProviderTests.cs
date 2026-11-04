@@ -3,7 +3,7 @@
 
 using NeoKolors.Tui.Fonts.Assets;
 
-namespace NeoKolors.Tui.Tests.Fonts;
+namespace NeoKolors.Tui.Fonts.Tests;
 
 public class AssetsProviderTests {
 

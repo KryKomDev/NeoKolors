@@ -2,10 +2,10 @@
 // NeoKolors.Test
 // Copyright (c) 2025 KryKom
 
-using NeoKolors.Tui.Fonts;
+using NeoKolors.Tui.Fonts.Assets;
 using static NeoKolors.Common.NKTextStyles;
 
-namespace NeoKolors.Tui.Tests.Fonts;
+namespace NeoKolors.Tui.Fonts.Tests;
 
 public class NKFontRenderingTests {
 
@@ -33,7 +33,7 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void PlaceString_ShouldRenderSpecificGlyphContent() {
-        var       font   = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        var       font   = AssetsProvider.Dummy;
         using var canvas = new NKCharCanvas(50, 20);
 
         // Render 'A' at (0,0)
@@ -64,7 +64,7 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void PlaceString_ShouldRenderLigatureExactly() {
-        var       font   = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        var       font   = AssetsProvider.Dummy;
         using var canvas = new NKCharCanvas(50, 20);
 
         // Render "->" at (0,0)
@@ -98,7 +98,7 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void PlaceString_ShouldHandleLineSpacing() {
-        var       font   = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        var       font   = AssetsProvider.Dummy;
         using var canvas = new NKCharCanvas(50, 20);
 
         // LineSpacing is 2. A height is 4.
@@ -115,7 +115,7 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void PlaceString_ShouldHandleWordSpacing() {
-        var       font   = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        var       font   = AssetsProvider.Dummy;
         using var canvas = new NKCharCanvas(100, 20);
 
         // WordSpacing is 5. Width of A is 8. CharSpacing is 2.
@@ -133,7 +133,7 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void PlaceString_WithAlignment_ShouldAffectPosition() {
-        var       font   = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        var       font   = AssetsProvider.Dummy;
         using var canvas = new NKCharCanvas(50, 10);
 
         // Render centered
@@ -172,7 +172,7 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void PlaceString_ShouldRenderEWithCaron() {
-        var       font   = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        var       font   = AssetsProvider.Dummy;
         using var canvas = new NKCharCanvas(10, 10);
 
         // Render ě with y-offset of 2 so the caron is not clipped off the top of the canvas
@@ -210,7 +210,7 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void GetSize_ShouldHandleOverflowingGlyphs() {
-        var font = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        var font = AssetsProvider.Dummy;
         Assert.NotNull(font);
 
         // Assert that measuring works and returns correct dimensions
@@ -225,7 +225,7 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void PlaceString_ShouldPreventClippingByAutomaticallyShiftingDown() {
-        var       font   = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        var       font   = AssetsProvider.Dummy;
         using var canvas = new NKCharCanvas(10, 10);
 
         // Render ě with y-offset of 0.
@@ -246,7 +246,7 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void PlaceString_ShouldNotApplyUnderlineAndStrikethroughStylesToLettersIfCustomGlyphsAvailable() {
-        var font = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        var font = AssetsProvider.Dummy;
         Assert.NotNull(font);
         Assert.NotNull(font.UnderlineGlyph);
         Assert.NotNull(font.StrikethroughGlyph);
@@ -277,7 +277,7 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void PlaceString_ShouldApplyStylesAndEffectsToGaps() {
-        var font = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        var font = AssetsProvider.Dummy;
         Assert.NotNull(font);
         Assert.NotNull(font.UnderlineGlyph);
         Assert.NotNull(font.StrikethroughGlyph);
@@ -309,7 +309,7 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void DrawString_InsideRenderContext_ShouldApplyOriginAndClip() {
-        var       font    = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        var       font    = AssetsProvider.Dummy;
         using var canvas  = new NKCharCanvas(20, 10);
         var       context = new RenderContext(canvas);
 
@@ -331,7 +331,7 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void DrawString_WithTextRenderingOptions_ShouldApplyColoringAndRender() {
-        var       font      = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        var       font      = AssetsProvider.Dummy;
         using var canvas    = new NKCharCanvas(50, 20);
         var       testColor = NKColor.FromRgb(0, 255, 128);
 
@@ -349,7 +349,7 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void DrawString_WithLigaturesDisabled_ShouldNotRenderLigature() {
-        var       font   = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        var       font   = AssetsProvider.Dummy;
         using var canvas = new NKCharCanvas(50, 20);
 
         var options = new TextRenderingOptions(
@@ -365,7 +365,7 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void DrawString_WithCustomLeading_ShouldOverrideLineSpacing() {
-        var       font   = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        var       font   = AssetsProvider.Dummy;
         using var canvas = new NKCharCanvas(50, 20);
 
         var options = new TextRenderingOptions(
@@ -386,7 +386,7 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void DrawString_WithWordSpacing_ShouldIncreaseWordGap() {
-        var       font          = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        var       font          = AssetsProvider.Dummy;
         using var canvasDefault = new NKCharCanvas(50, 20);
         using var canvasSpaced  = new NKCharCanvas(50, 20);
 
@@ -426,7 +426,7 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void DrawString_WithMonospacedProportions_ShouldSpaceEvenly() {
-        var       font   = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        var       font   = AssetsProvider.Dummy;
         using var canvas = new NKCharCanvas(50, 20);
 
         int monoAdvance = 15;
@@ -448,7 +448,7 @@ public class NKFontRenderingTests {
 
     [Fact]
     public void DrawString_WithJustifyText_ShouldExpandToFillBounds() {
-        var       font   = NKFontSerializer.ReadEmbedded<NKFontRenderingTests>(PATH);
+        var       font   = AssetsProvider.Dummy;
         using var canvas = new NKCharCanvas(40, 10);
         var       bounds = new Rect2D(0, 0, 35, 10);
 

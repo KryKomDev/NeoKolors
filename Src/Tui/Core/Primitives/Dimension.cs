@@ -43,12 +43,19 @@ public readonly union Dimension(Dimension.Fixed, Dimension.Grow, Dimension.Fit) 
         public static Fixed Max  { get; } = new(int.MaxValue, Units.CHARS);
 
         public int ToSize(int parent, Size2D screen) {
-            return Unit switch {
-                Units.CHARS   => (int)MathF.Round(Value),
-                Units.PERCENT => (int)MathF.Round(parent   / 100f * Value),
-                Units.VW      => (int)MathF.Round(screen.X / 100f * Value),
-                Units.VH      => (int)MathF.Round(screen.Y / 100f * Value),
+            float calculated = Unit switch {
+                Units.CHARS   => Value,
+                Units.PERCENT => parent   / 100f * Value,
+                Units.VW      => screen.X / 100f * Value,
+                Units.VH      => screen.Y / 100f * Value,
                 _             => throw new ArgumentOutOfRangeException()
+            };
+
+            return calculated switch {
+                float.NaN       => 0,
+                >= int.MaxValue => int.MaxValue,
+                <= int.MinValue => int.MinValue,
+                _               => (int)MathF.Round(calculated)
             };
         }
 
@@ -121,7 +128,7 @@ public readonly union Dimension(Dimension.Fixed, Dimension.Grow, Dimension.Fit) 
                 ? Math.Max(contentSize, g.Min.ToSize(parent, screen))
                 : Math.Clamp(
                     parent,
-                    Math.Max(contentSize, g.Min.ToSize(parent, screen)),
+                    Math.Max(contentSize,                                         g.Min.ToSize(parent, screen)),
                     Math.Max(Math.Max(contentSize, g.Min.ToSize(parent, screen)), g.Max.ToSize(parent, screen))
                 ),
             _ => 0

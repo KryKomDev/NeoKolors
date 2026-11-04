@@ -40,7 +40,7 @@ public readonly struct DeltaTime : IEquatable<DeltaTime> {
     /// <summary>
     /// Represents a zero time interval.
     /// </summary>
-    public static DeltaTime Zero => new(TimeSpan.Zero, TimeSpan.Zero, 0);
+    public static DeltaTime Zero => new(TimeSpan.Zero, TimeSpan.Zero, frameIndex: 0);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DeltaTime"/> struct.

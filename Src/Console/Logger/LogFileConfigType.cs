@@ -42,12 +42,4 @@ public enum LogFileConfigType {
     /// Ensures log files have distinct names to avoid overwriting existing logs.
     /// </summary>
     NEW_HASH_DATETIME = 5,
-
-    // Modern C# Naming Aliases
-    Custom = CUSTOM,
-    Replace = REPLACE,
-    Append = APPEND,
-    NewCount = NEW_COUNT,
-    NewDateTime = NEW_DATETIME,
-    NewHashDateTime = NEW_HASH_DATETIME
 }

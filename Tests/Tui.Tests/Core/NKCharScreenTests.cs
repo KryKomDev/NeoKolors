@@ -2,9 +2,8 @@
 // Copyright (c) 2026 KryKom
 
 using System.Text;
-using NeoKolors.Console;
 
-namespace NeoKolors.Tui.Tests.Core;
+namespace NeoKolors.Tui.Core.Tests;
 
 public class NKCharScreenTests {
 

@@ -114,8 +114,8 @@ public class RenderContext : ICharDrawer {
     /// <param name="canvas">The canvas to render to.</param>
     /// <param name="hitMap">Optional hit map to record interactive targets during render.</param>
     public RenderContext(ICharCanvas canvas, HitMap? hitMap = null) {
-        _canvas = canvas ?? throw new ArgumentNullException(nameof(canvas));
-        HitMap  = hitMap;
+        _canvas   = canvas ?? throw new ArgumentNullException(nameof(canvas));
+        HitMap    = hitMap;
     }
 
     // =========================================================================
@@ -265,7 +265,7 @@ public class RenderContext : ICharDrawer {
     /// <summary>
     /// Pushes a scope that enables writing outside of the current element's context area / clip boundaries.
     /// </summary>
-    public RenderScope PushUnclipped() => AllowOverflowScope(true);
+    public RenderScope PushUnclipped() => AllowOverflowScope(allow: true);
 
     /// <summary>
     /// Pushes a scope with the specified <see cref="AllowOverflow"/> setting.
@@ -549,7 +549,7 @@ public class RenderContext : ICharDrawer {
     //                        CELL LEVEL DRAWING PRIMITIVES
     // =========================================================================
     public Size2D                  Size => CanvasSize;
-    public IReadOnlyList2D<NKCell>? Data { get; }
+    public IReadOnlyList2D<NKCell> Data => Canvas.Data;
 
     public void Draw(ICharCanvas canvas, int xOffset, int yOffset, int z) {
         _canvas.Draw(canvas, _current.Origin.X + xOffset, _current.Origin.Y + yOffset, _current.ZIndex + z);

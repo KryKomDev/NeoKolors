@@ -371,7 +371,6 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
 
                 break;
             }
-            default: break;
         }
     }
 
@@ -429,7 +428,7 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
 
         if (!_isStopped) {
             var    waitStop = new ManualResetEventSlim(false);
-            Action handler  = () => waitStop.Set();
+            var handler  = () => waitStop.Set();
             OnStopped += handler;
 
             _input.WakeUp();

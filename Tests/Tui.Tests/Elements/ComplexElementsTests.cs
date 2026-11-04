@@ -1,9 +1,7 @@
 // NeoKolors.Test
 // Copyright (c) 2026 KryKom
 
-using NeoKolors.Tui.Elements;
-
-namespace NeoKolors.Tui.Tests.Elements;
+namespace NeoKolors.Tui.Elements.Tests;
 
 using CoreDimension = Dimension;
 using CoreSpacing = Spacing;

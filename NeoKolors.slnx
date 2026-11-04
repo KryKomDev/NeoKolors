@@ -60,8 +60,11 @@
         <Project Path="Tests/Common.Tests/NeoKolors.Common.Tests.csproj" />
         <Project Path="Tests/Console.Tests/NeoKolors.Console.Tests.csproj" />
         <Project Path="Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj" />
-        <Project Path="Tests/Tui.Tests/NeoKolors.Tui.Tests.csproj" />
-        <Project Path="Tests/Lifecycle.Tests/NeoKolors.Tui.Lifecycle.Tests.csproj" />
+        <Project Path="Tests/Tui.Tests/Core/NeoKolors.Tui.Core.Tests.csproj" />
+        <Project Path="Tests/Tui.Tests/Elements/NeoKolors.Tui.Elements.Tests.csproj" />
+        <Project Path="Tests/Tui.Tests/Fonts/NeoKolors.Tui.Fonts.Tests.csproj" />
+        <Project Path="Tests/Tui.Tests/Lifecycle/NeoKolors.Tui.Lifecycle.Tests.csproj" />
+        <Project Path="Tests/Tui.Tests/Widgets/NeoKolors.Tui.Widgets.Tests.csproj" />
     </Folder>
 
     <!--  Tools  -->

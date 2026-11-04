@@ -1,11 +1,10 @@
 // NeoKolors
 // Copyright (c) 2026 KryKom
 
-using NeoKolors.Tui.Elements;
 using NeoKolors.Tui.Fonts.Assets;
 using NeoKolors.Tui.Lifecycle.Inline;
 
-namespace NeoKolors.Tui.Tests;
+namespace NeoKolors.Tui.Widgets.Tests;
 
 public class WidgetsTests {
     [Fact]

@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Src\Tui\Lifecycle\Core\NeoKolors.Tui.Lifecycle.Core.csproj"/>
+        <ProjectReference Include="..\..\..\Src\Tui\Lifecycle\Apps\NeoKolors.Tui.Lifecycle.Apps.csproj"/>
+        <ProjectReference Include="..\..\..\Src\Tui\Lifecycle\Game2D\NeoKolors.Tui.Lifecycle.Game2D.csproj"/>
+        <ProjectReference Include="..\..\..\Src\Tui\Lifecycle\Game3D\NeoKolors.Tui.Lifecycle.Game3D.csproj"/>
+        <ProjectReference Include="..\..\..\Src\Tui\Core\NeoKolors.Tui.Core.csproj"/>
+        <ProjectReference Include="..\..\..\Src\Tui\Elements\NeoKolors.Tui.Elements.csproj"/>
+    </ItemGroup>
+
+</Project>

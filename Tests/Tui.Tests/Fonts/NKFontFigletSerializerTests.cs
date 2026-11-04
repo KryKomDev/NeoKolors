@@ -1,9 +1,8 @@
 using System.Text;
 using System.Xml.Serialization;
-using NeoKolors.Tui.Fonts;
 using NeoKolors.Tui.Fonts.Xml.V3;
 
-namespace NeoKolors.Tui.Tests.Fonts;
+namespace NeoKolors.Tui.Fonts.Tests;
 
 public class NKFontFigletSerializerTests {
 

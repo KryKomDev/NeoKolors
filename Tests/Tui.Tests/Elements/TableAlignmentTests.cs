@@ -1,12 +1,7 @@
 // NeoKolors
 // Copyright (c) 2026 KryKom
 
-using Metriks;
-using NeoKolors.Common;
-using NeoKolors.Tui.Core;
-using NeoKolors.Tui.Elements;
-
-namespace NeoKolors.Tui.Tests.Elements;
+namespace NeoKolors.Tui.Elements.Tests;
 
 public class TableAlignmentTests {
 
@@ -250,7 +245,7 @@ public class TableAlignmentTests {
                 new List2D<IElement>(new IElement[,] { { new Text(new AnsiString("X")) } })
             ),
             style: NKTableStyle.GetAscii(),
-            columnWidths: new Dimension[] { Dimension.Chars(6) },
+            columnWidths: new[] { Dimension.Chars(6) },
             columnAlignments: alignments
         );
 

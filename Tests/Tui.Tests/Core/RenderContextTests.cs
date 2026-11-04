@@ -3,7 +3,7 @@
 
 using SkiaSharp;
 
-namespace NeoKolors.Tui.Tests.Core;
+namespace NeoKolors.Tui.Core.Tests;
 
 public class RenderContextTests {
 

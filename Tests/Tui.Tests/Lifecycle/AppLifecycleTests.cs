@@ -60,12 +60,12 @@ public class AppLifecycleTests {
             }
         };
 
-        bool accepted = host.RequestClose(CloseReason.USER_REQUEST);
+        bool accepted = host.RequestClose(reason: CloseReason.USER_REQUEST);
         Assert.False(accepted);
         Assert.True(host.IsRunning);
 
         // System shutdown is not cancelled
-        accepted = host.RequestClose(CloseReason.SYSTEM_SHUTDOWN);
+        accepted = host.RequestClose(reason: CloseReason.SYSTEM_SHUTDOWN);
         Assert.True(accepted);
         Assert.False(host.IsRunning);
     }

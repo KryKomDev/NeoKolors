@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    
+    <ItemGroup>
+        <ProjectReference Include="..\..\..\Src\Common\NeoKolors.Common.csproj"/>
+        <ProjectReference Include="..\..\..\Src\Tui\Core\NeoKolors.Tui.Core.csproj"/>
+        <ProjectReference Include="..\..\..\Src\Tui\Fonts\NeoKolors.Tui.Fonts.csproj"/>
+        <ProjectReference Include="..\..\..\Src\Tui\Fonts\Assets\NeoKolors.Tui.Fonts.Assets.csproj"/>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <Using Include="NeoKolors.Tui.Core"/>
+        <Using Include="NeoKolors.Tui.Fonts"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="..\..\..\Src\Tui\Fonts\Assets\nkf\Dummy.nkf" Link="Dummy.nkf" />
+    </ItemGroup>
+    
+</Project>

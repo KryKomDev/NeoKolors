@@ -1,8 +1,6 @@
 // NeoKolors
 // Copyright (c) 2026 KryKom
 
-using Metriks;
-using NeoKolors.Common;
 using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Elements;
 using NeoKolors.Tui.Lifecycle.Apps;
