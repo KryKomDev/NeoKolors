@@ -80,6 +80,23 @@ dotnet run Examples/ExampleWidgets.cs
 
 ---
 
+### 4. [VTPaletteDetector.cs](./VTPaletteDetector.cs) &mdash; Terminal Palette Feature Detector
+
+Showcases querying the terminal's color palette capabilities and inspecting all 16 basic ANSI palette colors using OSC 4 escape sequences:
+
+- **OSC 4 Color Queries**: Demonstrates both batched multi-argument queries (`\e]4;0;?;1;?;...;15;?\a`) and on-demand single-color queries (`NKConsole.GetColorAsync` / `NKConsole.GetColorsAsync`).
+- **Terminal Parsing**: Parses X11 RGB specifications (`rgb:rrrr/gggg/bbbb`) into 24-bit `NKColor` representations.
+- **Visual Palette Inspection**: Formats a detailed table with color indices, names, hex values, RGB channels, live colored swatches, and contrast text samples.
+- **Palette Ribbons**: Prints standard (0–7) and high-intensity bright (8–15) horizontal color blocks.
+
+**Run Example:**
+
+```bash
+dotnet run Examples/VTPaletteDetector.cs
+```
+
+---
+
 ## Example Projects
 
 ### 3. [Neofetch](./Neofetch/) &mdash; System Information Display

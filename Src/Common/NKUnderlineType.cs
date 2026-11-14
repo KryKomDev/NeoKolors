@@ -15,9 +15,7 @@ public enum NKUnderlineType {
 
 public static class NKUnderlineTypeExtensions {
     extension(NKUnderlineType) {
-        public static string GetEscSeq(NKUnderlineType type, bool addEsc = true) {
-            return EscapeCodes.GetUnderline(type, addEsc);
-        }
+        public static string GetEscSeq(NKUnderlineType type, bool addEsc = true) => EscapeCodes.GetUnderline(type, addEsc);
 
         public static void AppendEscSeq(
             StringBuilder   sb,
@@ -31,9 +29,8 @@ public static class NKUnderlineTypeExtensions {
             NKUnderlineType prev,
             NKUnderlineType next,
             bool            addEsc = true
-        ) {
-            return prev == next ? string.Empty : EscapeCodes.GetUnderline(next, addEsc);
-        }
+        ) =>
+            prev == next ? string.Empty : EscapeCodes.GetUnderline(next, addEsc);
 
         public static void AppendEscSeq(
             StringBuilder   sb,

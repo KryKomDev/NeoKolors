@@ -16,7 +16,7 @@ public static class Program {
         " iure reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla "                          +
         "pariatur. Excepteur sint obcaecat cupiditat non proident, sunt in culpa qui "                        +
         "officia deserunt mollit anim id est laborum.";
-    
+
     public enum E {
         A = 0,
         B = 1,
@@ -28,7 +28,7 @@ public static class Program {
 
     static Program() {
         Console.OutputEncoding = Encoding.Unicode;
-        
+
         var logStream = new FileStream("./logs/log.blog", FileMode.Create, FileAccess.Write);
 
         NKDebug.Logger.Writer = new CompositeLogWriter(
@@ -90,12 +90,12 @@ public static class Program {
 
         var start    = DateTime.Now;
         var progress = new TimeSpan(0, 0, 10);
-        
+
         NKWidgets.Progress("hello", c => c.Value = (DateTime.Now - start) / progress);
-        
+
         var asdasd = "e\u0301";
 
-        NKConsole.WriteLine(EscapeCodes.GetLink("https://youtube.com/", "You", "yt"));
+        NKConsole.WriteLine(EscapeCodes.GetLink("https://youtube.com/", "You",  "yt"));
         NKConsole.WriteLine(EscapeCodes.GetLink("https://youtube.com/", "Tube", "yt"));
 
         NKConsole.ReadKey();
@@ -103,9 +103,8 @@ public static class Program {
         NKConsole.WriteLine(asdasd.Normalize(NormalizationForm.FormD));
         NKConsole.WriteLine(asdasd.Length);
 
-        foreach (var ca in asdasd) {
+        foreach (var ca in asdasd)
             Console.Write(ca);
-        }
 
         // ExceptionFormatter.ShowExceptionNamespace = false;
         // ExceptionFormatter.ShowMethodNamespace    = false;
@@ -115,7 +114,7 @@ public static class Program {
         ExceptionFormatter.StackTraceIndent = 3;
 
         NKConsole.WriteLine();
-        
+
         try {
             SomeOtherCkass.Crash();
         }

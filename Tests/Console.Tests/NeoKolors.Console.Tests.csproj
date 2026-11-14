@@ -3,15 +3,15 @@
     <PropertyGroup>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
-    
+
     <ItemGroup>
-        <ProjectReference Include="..\..\Src\Console\NeoKolors.Console.csproj" />
-        
-        <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.12" />
+        <ProjectReference Include="..\..\Src\Console\NeoKolors.Console.csproj"/>
+
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.12"/>
     </ItemGroup>
-    
+
     <ItemGroup>
         <Using Include="NeoKolors.Console"/>
     </ItemGroup>
-    
+
 </Project>

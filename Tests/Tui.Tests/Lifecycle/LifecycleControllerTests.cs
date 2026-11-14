@@ -16,19 +16,19 @@ public class LifecycleControllerTests {
 
     [Fact]
     public void Controller_Initialize_TransitionsToInitialized() {
-        var controller = new LifecycleController();
+        var controller  = new LifecycleController();
         var transitions = new List<LifecycleState>();
 
         controller.StateChanged += (_, args) => transitions.Add(args.NewState);
         controller.Initialize();
 
-        Assert.Equal(LifecycleState.INITIALIZED, controller.State);
+        Assert.Equal(LifecycleState.INITIALIZED,                                controller.State);
         Assert.Equal([LifecycleState.INITIALIZING, LifecycleState.INITIALIZED], transitions);
     }
 
     [Fact]
     public void Controller_Start_TransitionsToRunning() {
-        var controller = new LifecycleController();
+        var controller  = new LifecycleController();
         var transitions = new List<LifecycleState>();
 
         controller.StateChanged += (_, args) => transitions.Add(args.NewState);

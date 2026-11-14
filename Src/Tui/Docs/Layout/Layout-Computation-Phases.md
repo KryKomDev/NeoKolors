@@ -1,6 +1,7 @@
 ﻿# Layout Computation Phases
 
 There are three element layout computation phases in total:
+
 1. Minimum width layout computation
 2. Maximum width layout computation
 3. Render layout computation
@@ -10,7 +11,7 @@ There are three element layout computation phases in total:
 The minimum width layout is a layout where the content box has the [minimum intrinsic
 size](https://developer.mozilla.org/en-US/docs/Glossary/Intrinsic_Size#minimum_intrinsic_size).
 For example, in the case of a text element, this would be when the width of the content box
-is equal to the width of the longest word of the text. 
+is equal to the width of the longest word of the text.
 
 The minimum width layout is used when computing the layout of a parent element. The computation
 should also take into account the styles of the element.

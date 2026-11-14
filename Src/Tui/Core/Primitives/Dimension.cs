@@ -20,9 +20,7 @@ public readonly union Dimension(Dimension.Fixed, Dimension.Grow, Dimension.Fit) 
             Max = max;
         }
 
-        public (int Min, int Max) ToSize(int parent, Size2D screen) {
-            return (Min.ToSize(parent, screen), Max.ToSize(parent, screen));
-        }
+        public (int Min, int Max) ToSize(int parent, Size2D screen) => (Min.ToSize(parent, screen), Max.ToSize(parent, screen));
     }
 
     /// <summary>
@@ -43,7 +41,7 @@ public readonly union Dimension(Dimension.Fixed, Dimension.Grow, Dimension.Fit) 
         public static Fixed Max  { get; } = new(int.MaxValue, Units.CHARS);
 
         public int ToSize(int parent, Size2D screen) {
-            float calculated = Unit switch {
+            var calculated = Unit switch {
                 Units.CHARS   => Value,
                 Units.PERCENT => parent   / 100f * Value,
                 Units.VW      => screen.X / 100f * Value,
@@ -143,47 +141,38 @@ public readonly union Dimension(Dimension.Fixed, Dimension.Grow, Dimension.Fit) 
     public static Dimension Vw(float      value) => new(new Fixed(value, Fixed.Units.VW));
     public static Dimension Vh(float      value) => new(new Fixed(value, Fixed.Units.VH));
 
-    public static Dimension FitContent() {
-        return new Dimension(new Fit(Fixed.Zero, Fixed.Max));
-    }
+    public static Dimension FitContent() => new(new Fit(Fixed.Zero, Fixed.Max));
 
-    public static Dimension FitContent(Fixed min, Fixed max) {
-        return new Dimension(new Fit(min, max));
-    }
+    public static Dimension FitContent(Fixed min, Fixed max) => new(new Fit(min, max));
 
-    public static Dimension FitContent(float minChars, float maxChars = int.MaxValue) {
-        return new Dimension(
+    public static Dimension FitContent(float minChars, float maxChars = int.MaxValue) =>
+        new(
             new Fit(new Fixed(minChars, Fixed.Units.CHARS), new Fixed(maxChars, Fixed.Units.CHARS))
         );
-    }
 
-    public static Dimension Fr(int weight = 1, Fixed? min = null, Fixed? max = null) {
-        return new Dimension(new Grow(weight, min, max));
-    }
+    public static Dimension Fr(int weight = 1, Fixed? min = null, Fixed? max = null) => new(new Grow(weight, min, max));
 
-    public static Dimension Fr(int weight, float minChars, float maxChars = int.MaxValue) {
-        return new Dimension(
+    public static Dimension Fr(int weight, float minChars, float maxChars = int.MaxValue) =>
+        new(
             new Grow(
                 weight,
                 new Fixed(minChars, Fixed.Units.CHARS),
                 new Fixed(maxChars, Fixed.Units.CHARS)
             )
         );
-    }
 
     public static Dimension GrowTrack(
         int   weight   = 1,
         float minChars = 0,
         float maxChars = int.MaxValue
-    ) {
-        return new Dimension(
+    ) =>
+        new(
             new Grow(
                 weight,
                 new Fixed(minChars, Fixed.Units.CHARS),
                 new Fixed(maxChars, Fixed.Units.CHARS)
             )
         );
-    }
 
     public static implicit operator Dimension(int chars) => Chars(chars);
 

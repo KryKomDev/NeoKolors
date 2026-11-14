@@ -5,6 +5,6 @@ namespace NeoKolors.Console;
 
 public enum DecReqResponseType {
     NOT_SUPPORTED = 0,
-    ENABLED = 1,
-    DISABLED = 2
+    ENABLED       = 1,
+    DISABLED      = 2
 }

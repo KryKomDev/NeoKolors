@@ -7,23 +7,23 @@ using NeoKolors.Settings.Argument;
 namespace NeoKolors.Settings.Builder;
 
 public readonly struct ArgumentInfo : ISettingsElementInfo<IArgument>, IEquatable<ArgumentInfo> {
-    
-    public string Name { get; }
-    public IArgument Value { get; }
-    object? ISettingsElementInfo.Value => Value;
-    public string? Description { get; }
+
+    public string                Name        { get; }
+    public IArgument             Value       { get; }
+    object? ISettingsElementInfo.Value       => Value;
+    public string?               Description { get; }
 
     public ArgumentInfo(string name, IArgument value, string? description = null) {
-        Name = name;
-        Value = value;
+        Name        = name;
+        Value       = value;
         Description = description;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public override int GetHashCode() => Name.GetHashCode();
 
-    public bool Equals(ArgumentInfo other) => Name == other.Name && Value.Equals(other.Value) && Description == other.Description;
-    public override bool Equals(object? obj) => obj is ArgumentInfo other && Equals(other);
+    public          bool Equals(ArgumentInfo other) => Name == other.Name        && Value.Equals(other.Value) && Description == other.Description;
+    public override bool Equals(object?      obj)   => obj is ArgumentInfo other && Equals(other);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(ArgumentInfo left, ArgumentInfo right) => left.Equals(right);

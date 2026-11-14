@@ -8,76 +8,77 @@ using NeoKolors.Tui.Core;
 namespace NeoKolors.Tui.Elements;
 
 /// <summary>
-/// A declarative UI element that renders a configurable terminal progress bar.
+///     A declarative UI element that renders a configurable terminal progress bar.
 /// </summary>
 public class ProgressBarElement : IElement {
     private static readonly char[] SMOOTH_BLOCKS = [' ', '▏', '▎', '▍', '▌', '▋', '▊', '▉'];
 
     /// <summary>
-    /// Gets or sets the current progress value.
-    /// Default is 0.0.
+    ///     Gets or sets the current progress value.
+    ///     Default is 0.0.
     /// </summary>
     public Bindable<double> Value { get; set; } = 0.0;
 
     /// <summary>
-    /// Gets or sets the minimum progress value.
-    /// Default is 0.0.
+    ///     Gets or sets the minimum progress value.
+    ///     Default is 0.0.
     /// </summary>
     public Bindable<double> Min { get; set; } = 0.0;
 
     /// <summary>
-    /// Gets or sets the maximum progress value.
-    /// Default is 1.0.
+    ///     Gets or sets the maximum progress value.
+    ///     Default is 1.0.
     /// </summary>
     public Bindable<double> Max { get; set; } = 1.0;
 
     /// <summary>
-    /// Gets or sets an explicit width in columns for the progress bar.
-    /// If null, the progress bar fills the available parent width.
+    ///     Gets or sets an explicit width in columns for the progress bar.
+    ///     If null, the progress bar fills the available parent width.
     /// </summary>
     public Bindable<int?> Width { get; set; } = default;
 
     /// <summary>
-    /// Gets or sets the character used for completed portions of the bar.
-    /// Default is <c>'█'</c>.
+    ///     Gets or sets the character used for completed portions of the bar.
+    ///     Default is <c>'█'</c>.
     /// </summary>
     public Bindable<char> FilledChar { get; set; } = '█';
 
     /// <summary>
-    /// Gets or sets the character used for uncompleted portions of the bar.
-    /// Default is <c>'░'</c>.
+    ///     Gets or sets the character used for uncompleted portions of the bar.
+    ///     Default is <c>'░'</c>.
     /// </summary>
     public Bindable<char> EmptyChar { get; set; } = '░';
 
     /// <summary>
-    /// Gets or sets whether to display a percentage suffix (e.g. <c>" 75%"</c>).
-    /// Default is <c>true</c>.
+    ///     Gets or sets whether to display a percentage suffix (e.g. <c>" 75%"</c>).
+    ///     Default is <c>true</c>.
     /// </summary>
     public Bindable<bool> ShowPercentage { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the styling applied to the filled portion of the bar.
+    ///     Gets or sets the styling applied to the filled portion of the bar.
     /// </summary>
     public Bindable<NKStyle> FilledStyle { get; set; } = NKStyle.Default.WithFColor(NKColor.FromRgb(0, 220, 180));
 
     /// <summary>
-    /// Gets or sets the styling applied to the uncompleted portion of the bar.
+    ///     Gets or sets the styling applied to the uncompleted portion of the bar.
     /// </summary>
     public Bindable<NKStyle> EmptyStyle { get; set; } = NKStyle.Default.WithFColor(NKColor.FromRgb(80, 80, 80));
 
     /// <summary>
-    /// Gets or sets the styling applied to the percentage suffix.
+    ///     Gets or sets the styling applied to the percentage suffix.
     /// </summary>
     public Bindable<NKStyle> PercentageStyle { get; set; } = NKStyle.Default;
 
     /// <summary>
-    /// Gets or sets whether to use sub-cell fractional unicode block characters (1/8 increments) for ultra-smooth filling.
-    /// Default is <c>false</c>.
+    ///     Gets or sets whether to use sub-cell fractional unicode block characters (1/8
+    ///     increments) for ultra-smooth filling.
+    ///     Default is <c>false</c>.
     /// </summary>
     public Bindable<bool> UseSmoothBlocks { get; set; } = false;
 
     /// <summary>
-    /// Initializes a new instance of <see cref="ProgressBarElement"/>.
+    ///     Initializes a new instance of <see cref="ProgressBarElement" />.
     /// </summary>
     public ProgressBarElement(
         Bindable<double> value          = default,
@@ -102,14 +103,14 @@ public class ProgressBarElement : IElement {
             ShowPercentage = showPercentage;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Size2D Measure(LayoutContext context) {
         var w = Width.AsT ?? context.Parent.X;
 
         return new Size2D(Math.Max(1, w), 1);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Render(RenderContext context, Size2D parent) {
         var totalWidth = Width.AsT ?? parent.X;
 

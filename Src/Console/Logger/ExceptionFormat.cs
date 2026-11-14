@@ -7,60 +7,64 @@ using static NeoKolors.Common.NKConsoleColor;
 namespace NeoKolors.Console;
 
 /// <summary>
-/// Specifies the border rendering style for formatted exceptions.
+///     Specifies the border rendering style for formatted exceptions.
 /// </summary>
 public enum ExceptionBorderStyle {
     /// <summary>
-    /// Prefixes each line with a vertical bar highlight indicator.
+    ///     Prefixes each line with a vertical bar highlight indicator.
     /// </summary>
     LEFT_BAR,
 
     /// <summary>
-    /// Encloses the entire exception output inside a styled box frame.
+    ///     Encloses the entire exception output inside a styled box frame.
     /// </summary>
     BOX,
 
     /// <summary>
-    /// Renders without any surrounding border or highlight bars.
+    ///     Renders without any surrounding border or highlight bars.
     /// </summary>
     NONE
 }
 
 /// <summary>
-/// Specifies how file paths in stack traces are displayed.
+///     Specifies how file paths in stack traces are displayed.
 /// </summary>
 public enum PathFormatMode {
     /// <summary>
-    /// Displays the complete absolute path to the source file.
+    ///     Displays the complete absolute path to the source file.
     /// </summary>
     FULL_PATH,
 
     /// <summary>
-    /// Displays only the file name without any directory path.
+    ///     Displays only the file name without any directory path.
     /// </summary>
     FILE_NAME_ONLY,
 
     /// <summary>
-    /// Displays the path relative to the current working directory if possible.
+    ///     Displays the path relative to the current working directory if possible.
     /// </summary>
     RELATIVE_PATH
 }
 
 /// <summary>
-/// Contains configuration settings for styling, layout, filtering, and visual elements of formatted exceptions.
+///     Contains configuration settings for styling, layout, filtering, and visual elements of
+///     formatted exceptions.
 /// </summary>
 public class ExceptionFormat {
 
     // =================================== Styles =================================== //
 
-    /// <summary>Gets or sets the style of the exception type name (e.g. InvalidOperationException).</summary>
+    /// <summary>
+    ///     Gets or sets the style of the exception type name (e.g.
+    ///     InvalidOperationException).
+    /// </summary>
     public NKStyle ExceptionTypeStyle { get; set; } = new(YELLOW, styles: NKTextStyles.ITALIC);
 
     /// <summary>Gets or sets the style of the exception namespace prefix (e.g. System.IO.).</summary>
     public NKStyle ExceptionNamespaceStyle { get; set; } = new();
 
     /// <summary>Gets or sets the style of the exception message text.</summary>
-    public NKStyle MessageStyle { get; set; } = new(textColor: RED, styles: NKTextStyles.BOLD);
+    public NKStyle MessageStyle { get; set; } = new(RED, styles: NKTextStyles.BOLD);
 
     /// <summary>Gets or sets the style of the source file name in stack traces.</summary>
     public NKStyle FileNameStyle { get; set; } = new(BLUE, styles: NKTextStyles.BOLD);
@@ -121,7 +125,7 @@ public class ExceptionFormat {
     private ExceptionBorderStyle _borderStyle = ExceptionBorderStyle.LEFT_BAR;
 
     /// <summary>
-    /// Gets or sets the border rendering style (LeftBar, Box, or None).
+    ///     Gets or sets the border rendering style (LeftBar, Box, or None).
     /// </summary>
     public ExceptionBorderStyle BorderStyle {
         get => _borderStyle;
@@ -134,7 +138,7 @@ public class ExceptionFormat {
     private bool _showHighlight = true;
 
     /// <summary>
-    /// Gets or sets whether a left bar or box highlight decoration is displayed.
+    ///     Gets or sets whether a left bar or box highlight decoration is displayed.
     /// </summary>
     public bool ShowHighlight {
         get => _showHighlight;
@@ -162,7 +166,10 @@ public class ExceptionFormat {
     /// <summary>Gets or sets whether method declaring type namespaces are shown in stack traces.</summary>
     public bool ShowMethodNamespace { get; set; } = true;
 
-    /// <summary>Gets or sets whether full directory file paths are shown in stack traces. When false, only the file name is displayed.</summary>
+    /// <summary>
+    ///     Gets or sets whether full directory file paths are shown in stack traces. When
+    ///     false, only the file name is displayed.
+    /// </summary>
     public bool ShowFilePath { get; set; } = true;
 
     /// <summary>Gets or sets whether the exception message is displayed.</summary>
@@ -171,10 +178,16 @@ public class ExceptionFormat {
     /// <summary>Gets or sets whether stack traces are included in the output.</summary>
     public bool ShowStackTrace { get; set; } = true;
 
-    /// <summary>Gets or sets whether local source code context snippets are extracted and displayed.</summary>
+    /// <summary>
+    ///     Gets or sets whether local source code context snippets are extracted and
+    ///     displayed.
+    /// </summary>
     public bool ShowSourceSnippet { get; set; } = true;
 
-    /// <summary>Gets or sets the number of context lines to display before and after the target line in code snippets.</summary>
+    /// <summary>
+    ///     Gets or sets the number of context lines to display before and after the target
+    ///     line in code snippets.
+    /// </summary>
     public int SourceSnippetContextLines { get; set; } = 2;
 
     /// <summary>Gets or sets the pointer icon indicating the error line in code snippets.</summary>
@@ -198,7 +211,10 @@ public class ExceptionFormat {
     /// <summary>Gets or sets the maximum recursion depth for inner exceptions.</summary>
     public int MaxInnerExceptionDepth { get; set; } = 10;
 
-    /// <summary>Gets or sets the maximum number of stack trace frames to display (0 for unlimited).</summary>
+    /// <summary>
+    ///     Gets or sets the maximum number of stack trace frames to display (0 for
+    ///     unlimited).
+    /// </summary>
     public int MaxStackTraceDepth { get; set; } = 0;
 
     /// <summary>Gets or sets the number of indentation spaces for stack trace lines.</summary>
@@ -213,10 +229,16 @@ public class ExceptionFormat {
     /// <summary>Gets or sets how file paths are formatted in stack traces.</summary>
     public PathFormatMode PathFormat { get; set; } = PathFormatMode.FULL_PATH;
 
-    /// <summary>Gets or sets an optional custom predicate filter to select which stack frames to display.</summary>
+    /// <summary>
+    ///     Gets or sets an optional custom predicate filter to select which stack frames to
+    ///     display.
+    /// </summary>
     public Func<ParsedStackFrame, bool>? FrameFilter { get; set; }
 
-    /// <summary>Gets or sets an optional custom transformer function for file paths in stack traces.</summary>
+    /// <summary>
+    ///     Gets or sets an optional custom transformer function for file paths in stack
+    ///     traces.
+    /// </summary>
     public Func<string, string>? PathTransformer { get; set; }
 
     // ================================= Construct & Presets ================================= //
@@ -224,7 +246,7 @@ public class ExceptionFormat {
     public ExceptionFormat() { }
 
     /// <summary>
-    /// Creates a deep copy of an existing <see cref="ExceptionFormat"/> instance.
+    ///     Creates a deep copy of an existing <see cref="ExceptionFormat" /> instance.
     /// </summary>
     public ExceptionFormat(ExceptionFormat other) {
         ExceptionTypeStyle                    = other.ExceptionTypeStyle;
@@ -274,7 +296,10 @@ public class ExceptionFormat {
         PathTransformer           = other.PathTransformer;
     }
 
-    /// <summary>Standard balanced exception layout with colored highlight bar and source code snippets.</summary>
+    /// <summary>
+    ///     Standard balanced exception layout with colored highlight bar and source code
+    ///     snippets.
+    /// </summary>
     public static ExceptionFormat Default => new();
 
     /// <summary>Compact layout with single-line stack frames and framework frames filtered out.</summary>
@@ -287,7 +312,10 @@ public class ExceptionFormat {
             PathFormat         = PathFormatMode.FILE_NAME_ONLY
         };
 
-    /// <summary>Detailed layout with box border, HResult, data dictionary, and extended source code snippets.</summary>
+    /// <summary>
+    ///     Detailed layout with box border, HResult, data dictionary, and extended source
+    ///     code snippets.
+    /// </summary>
     public static ExceptionFormat Detailed =>
         new() {
             BorderStyle               = ExceptionBorderStyle.BOX,

@@ -4,11 +4,10 @@
 namespace NeoKolors.Console;
 
 /// <summary>
-/// Represents the various buttons and states of a mouse.
-/// This includes standard mouse buttons, additional buttons,
-/// scrolling actions, and release states for more detailed input handling.
-///
-/// <b>NOTE:</b> This enum is compliant with the Xterm mouse event encoding standard. 
+///     Represents the various buttons and states of a mouse.
+///     This includes standard mouse buttons, additional buttons,
+///     scrolling actions, and release states for more detailed input handling.
+///     <b>NOTE:</b> This enum is compliant with the Xterm mouse event encoding standard.
 /// </summary>
 public enum MouseButton {
     LEFT       = 0,
@@ -22,5 +21,5 @@ public enum MouseButton {
     MB8        = 0 + 128,
     MB9        = 1 + 128,
     MB10       = 2 + 128,
-    MB11       = 3 + 128,
+    MB11       = 3 + 128
 }

@@ -11,12 +11,12 @@ public class NKCharScreenTests {
     public void Constructor_ShouldInitializeCorrectly() {
         var screen = new NKCharScreen(10, 5);
         Assert.Equal(10, screen.Width);
-        Assert.Equal(5, screen.Height);
+        Assert.Equal(5,  screen.Height);
     }
 
     [Fact]
     public void Constructor_WithSize_ShouldInitializeCorrectly() {
-        var size = new Size2D(20, 10);
+        var size   = new Size2D(20, 10);
         var screen = new NKCharScreen(size);
         Assert.Equal(20, screen.Width);
         Assert.Equal(10, screen.Height);
@@ -25,13 +25,13 @@ public class NKCharScreenTests {
     [Fact]
     public void Render_ShouldNeverEmitNewlineCharacters() {
         var originalOutputDriver = NKConsole.OutputDriver;
-        var originalInputDriver = NKConsole.InputDriver;
+        var originalInputDriver  = NKConsole.InputDriver;
 
         var mockOutputDriver = new MockOutputDriver();
-        var mockInputDriver = new MockInputDriver();
+        var mockInputDriver  = new MockInputDriver();
 
         NKConsole.OutputDriver = mockOutputDriver;
-        NKConsole.InputDriver = mockInputDriver;
+        NKConsole.InputDriver  = mockInputDriver;
 
         try {
             var screen = new NKCharScreen(10, 5);
@@ -48,20 +48,20 @@ public class NKCharScreenTests {
         }
         finally {
             NKConsole.OutputDriver = originalOutputDriver;
-            NKConsole.InputDriver = originalInputDriver;
+            NKConsole.InputDriver  = originalInputDriver;
         }
     }
 
     [Fact]
     public void Render_SecondPassWithNoChanges_ShouldNotWrite() {
         var originalOutputDriver = NKConsole.OutputDriver;
-        var originalInputDriver = NKConsole.InputDriver;
+        var originalInputDriver  = NKConsole.InputDriver;
 
         var mockOutputDriver = new MockOutputDriver();
-        var mockInputDriver = new MockInputDriver();
+        var mockInputDriver  = new MockInputDriver();
 
         NKConsole.OutputDriver = mockOutputDriver;
-        NKConsole.InputDriver = mockInputDriver;
+        NKConsole.InputDriver  = mockInputDriver;
 
         try {
             var screen = new NKCharScreen(10, 5);
@@ -79,20 +79,20 @@ public class NKCharScreenTests {
         }
         finally {
             NKConsole.OutputDriver = originalOutputDriver;
-            NKConsole.InputDriver = originalInputDriver;
+            NKConsole.InputDriver  = originalInputDriver;
         }
     }
 
     [Fact]
     public void Render_DifferentialUpdate_ShouldOnlyOutputChangedCellCoordinates() {
         var originalOutputDriver = NKConsole.OutputDriver;
-        var originalInputDriver = NKConsole.InputDriver;
+        var originalInputDriver  = NKConsole.InputDriver;
 
         var mockOutputDriver = new MockOutputDriver();
-        var mockInputDriver = new MockInputDriver();
+        var mockInputDriver  = new MockInputDriver();
 
         NKConsole.OutputDriver = mockOutputDriver;
-        NKConsole.InputDriver = mockInputDriver;
+        NKConsole.InputDriver  = mockInputDriver;
 
         try {
             var screen = new NKCharScreen(20, 10);
@@ -108,12 +108,12 @@ public class NKCharScreenTests {
             var diffOutput = mockOutputDriver.Output.ToString();
             Assert.NotEmpty(diffOutput);
             Assert.Contains("\x1b[5;8H", diffOutput);
-            Assert.Contains("Z", diffOutput);
+            Assert.Contains("Z",         diffOutput);
             Assert.DoesNotContain("\n", diffOutput);
         }
         finally {
             NKConsole.OutputDriver = originalOutputDriver;
-            NKConsole.InputDriver = originalInputDriver;
+            NKConsole.InputDriver  = originalInputDriver;
         }
     }
 

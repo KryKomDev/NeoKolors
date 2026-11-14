@@ -11,52 +11,52 @@ using static NeoKolors.Console.NKLogLevel;
 namespace NeoKolors.Console;
 
 /// <summary>
-/// configures the NKLogger
+///     configures the NKLogger
 /// </summary>
 public struct LoggerConfig : ICloneable {
 
     /// <summary>
-    /// configures what messages will be logged
+    ///     configures what messages will be logged
     /// </summary>
     public NKLogLevel Level { get; set; } = CRITICAL | ERROR | WARNING | INFORMATION | DEBUG | TRACE;
 
     /// <summary>
-    /// defines the color of the fatal error messages
+    ///     defines the color of the fatal error messages
     /// </summary>
     public NKColor FatalColor { get; set; } = NKConsoleColor.DARK_RED;
 
     /// <summary>
-    /// defines the color of the error messages
+    ///     defines the color of the error messages
     /// </summary>
     public NKColor ErrorColor { get; set; } = NKConsoleColor.RED;
 
     /// <summary>
-    /// defines the color of the warning messages
+    ///     defines the color of the warning messages
     /// </summary>
     public NKColor WarnColor { get; set; } = NKConsoleColor.YELLOW;
 
     /// <summary>
-    /// defines the color of the info messages
+    ///     defines the color of the info messages
     /// </summary>
     public NKColor InfoColor { get; set; } = NKConsoleColor.GREEN;
 
     /// <summary>
-    /// defines the color of the debug messages
+    ///     defines the color of the debug messages
     /// </summary>
     public NKColor DebugColor { get; set; } = NKConsoleColor.BLUE;
 
     /// <summary>
-    /// defines the color of the trace messages
+    ///     defines the color of the trace messages
     /// </summary>
     public NKColor TraceColor { get; set; } = NKConsoleColor.GRAY;
 
     /// <summary>
-    /// defines the output stream of the logger
+    ///     defines the output stream of the logger
     /// </summary>
     internal TextWriterReference OutputReference { get; set; } = new(Stdio.Out);
 
     /// <summary>
-    /// defines the output stream of the logger
+    ///     defines the output stream of the logger
     /// </summary>
     public TextWriter Output {
         get => OutputReference.TextWriter;
@@ -64,47 +64,47 @@ public struct LoggerConfig : ICloneable {
     }
 
     /// <summary>
-    /// An optional stream where binary log records will be serialized and written.
+    ///     An optional stream where binary log records will be serialized and written.
     /// </summary>
     public Stream? BinaryOutput { get; set; } = null;
 
     /// <summary>
-    /// if true, prints simple uncolored messages
+    ///     if true, prints simple uncolored messages
     /// </summary>
     public bool SimpleMessages { get; set; } = false;
 
     /// <summary>
-    /// if true, hides the timestamp
+    ///     if true, hides the timestamp
     /// </summary>
     public bool HideTime { get; set; } = false;
 
     /// <summary>
-    /// Specifies the format used to display timestamps in log messages.
+    ///     Specifies the format used to display timestamps in log messages.
     /// </summary>
     public string TimeFormat { get; set; } = "HH:mm:ss";
 
     /// <summary>
-    /// Configures how log files are managed, including options such as replacing, appending,
-    /// or creating new files based on various strategies.
+    ///     Configures how log files are managed, including options such as replacing, appending,
+    ///     or creating new files based on various strategies.
     /// </summary>
     public LogFileConfig FileConfig {
         get;
         set {
             field = value;
 
-            if (value.Config != LogFileConfigType.CUSTOM) {
+            if (value.Config != LogFileConfigType.CUSTOM)
                 Output = value.CreateOutput();
-            }
         }
     } = LogFileConfig.Custom();
 
     /// <summary>
-    /// Configures the indentation style applied to logged messages.
+    ///     Configures the indentation style applied to logged messages.
     /// </summary>
     public OneOf<InlineIndent, Indent> IndentMessage { get; set; } = new InlineIndent();
 
     /// <summary>
-    /// Determines whether each log message is visually highlighted with a surrounding line for emphasis.
+    ///     Determines whether each log message is visually highlighted with a surrounding line for
+    ///     emphasis.
     /// </summary>
     public bool MessageHighlightLine { get; set; } = true;
 

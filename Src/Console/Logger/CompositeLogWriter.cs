@@ -4,7 +4,8 @@
 namespace NeoKolors.Console;
 
 /// <summary>
-/// A log writer that delegates log record writes to multiple underlying <see cref="ILogWriter"/> instances.
+///     A log writer that delegates log record writes to multiple underlying
+///     <see cref="ILogWriter" /> instances.
 /// </summary>
 public sealed class CompositeLogWriter : ILogWriter, IAsyncDisposable {
 
@@ -12,12 +13,13 @@ public sealed class CompositeLogWriter : ILogWriter, IAsyncDisposable {
     private          bool             _disposed;
 
     /// <summary>
-    /// Gets the list of underlying log writers.
+    ///     Gets the list of underlying log writers.
     /// </summary>
     public IReadOnlyList<ILogWriter> Writers => _writers;
 
     /// <summary>
-    /// Initializes a new instance of <see cref="CompositeLogWriter"/> with the specified log writers.
+    ///     Initializes a new instance of <see cref="CompositeLogWriter" /> with the specified log
+    ///     writers.
     /// </summary>
     public CompositeLogWriter(params ILogWriter[] writers) {
         if (writers != null) {
@@ -26,7 +28,8 @@ public sealed class CompositeLogWriter : ILogWriter, IAsyncDisposable {
     }
 
     /// <summary>
-    /// Initializes a new instance of <see cref="CompositeLogWriter"/> with the specified log writers.
+    ///     Initializes a new instance of <see cref="CompositeLogWriter" /> with the specified log
+    ///     writers.
     /// </summary>
     public CompositeLogWriter(IEnumerable<ILogWriter> writers) {
         if (writers != null) {
@@ -35,7 +38,7 @@ public sealed class CompositeLogWriter : ILogWriter, IAsyncDisposable {
     }
 
     /// <summary>
-    /// Adds a log writer to the composite writer.
+    ///     Adds a log writer to the composite writer.
     /// </summary>
     public CompositeLogWriter AddWriter(ILogWriter writer) {
         if (writer == null)
@@ -47,7 +50,7 @@ public sealed class CompositeLogWriter : ILogWriter, IAsyncDisposable {
     }
 
     /// <summary>
-    /// Writes a log record to all registered log writers.
+    ///     Writes a log record to all registered log writers.
     /// </summary>
     public void Write(NKLogRecord record) {
         if (_disposed)
@@ -64,7 +67,7 @@ public sealed class CompositeLogWriter : ILogWriter, IAsyncDisposable {
     }
 
     /// <summary>
-    /// Disposes all registered child log writers.
+    ///     Disposes all registered child log writers.
     /// </summary>
     public void Dispose() {
         if (_disposed)
@@ -80,7 +83,7 @@ public sealed class CompositeLogWriter : ILogWriter, IAsyncDisposable {
     }
 
     /// <summary>
-    /// Asynchronously disposes all registered child log writers.
+    ///     Asynchronously disposes all registered child log writers.
     /// </summary>
     public async ValueTask DisposeAsync() {
         if (_disposed)

@@ -25,7 +25,6 @@ public class RenderContextTests {
         Assert.Equal(new Size2D(30, 20),       context.CanvasSize);
         Assert.Equal(new Size2D(30, 20),       context.Size);
         Assert.Equal(new Rect2D(0, 0, 30, 20), context.CanvasBounds);
-        Assert.Null(context.Data);
     }
 
     [Fact]
@@ -200,7 +199,7 @@ public class RenderContextTests {
         using var canvas  = new NKCharCanvas(10, 10);
         var       context = new RenderContext(canvas);
 
-        for (int i = 1; i <= 5; i++) {
+        for (var i = 1; i <= 5; i++) {
             context.Save();
             context.Origin = new Point2D(i, i);
         }
@@ -434,7 +433,7 @@ public class RenderContextTests {
 
         // local (0, 0, 12, 5) + origin (2, 2) = global (2, 2, 14, 7)
         // intersection of (0, 0, 10, 10) and (2, 2, 14, 7) = (2, 2, 10, 7)
-        using (context.PushClip(new Rect2D(0, 0, 12, 5), intersect: true)) {
+        using (context.PushClip(new Rect2D(0, 0, 12, 5), true)) {
             Assert.Equal(new Rect2D(2, 2, 10, 7), context.Clip);
         }
 
@@ -450,7 +449,7 @@ public class RenderContextTests {
             Origin = new Point2D(2, 2)
         };
 
-        using (context.PushClip(new Rect2D(0, 0, 12, 5), intersect: false)) {
+        using (context.PushClip(new Rect2D(0, 0, 12, 5), false)) {
             Assert.Equal(new Rect2D(2, 2, 14, 7), context.Clip);
         }
 
@@ -490,13 +489,13 @@ public class RenderContextTests {
 
         context.Clip = new Rect2D(0, 0, 8, 8);
 
-        using (context.WithGlobalClip(new Rect2D(4, 4, 12, 12), intersect: true)) {
+        using (context.WithGlobalClip(new Rect2D(4, 4, 12, 12), true)) {
             Assert.Equal(new Rect2D(4, 4, 8, 8), context.Clip);
         }
 
         Assert.Equal(new Rect2D(0, 0, 8, 8), context.Clip);
 
-        using (context.WithGlobalClip(new Rect2D(4, 4, 12, 12), intersect: false)) {
+        using (context.WithGlobalClip(new Rect2D(4, 4, 12, 12), false)) {
             Assert.Equal(new Rect2D(4, 4, 12, 12), context.Clip);
         }
     }
@@ -589,17 +588,17 @@ public class RenderContextTests {
         using var canvas = new NKCharCanvas(10, 10);
 
         var context = new RenderContext(canvas) {
-            CurrentStyle = new NKStyle(textColor: ConsoleColor.Red)
+            CurrentStyle = new NKStyle(ConsoleColor.Red)
         };
 
-        var bgStyle = new NKStyle(textColor: NKColor.Inherit, backgroundColor: ConsoleColor.Blue);
+        var bgStyle = new NKStyle(NKColor.Inherit, ConsoleColor.Blue);
 
-        using (context.PushStyle(bgStyle, overrideCurrent: true)) {
+        using (context.PushStyle(bgStyle, true)) {
             Assert.Equal(new NKColor(ConsoleColor.Red),  context.CurrentStyle.FColor);
             Assert.Equal(new NKColor(ConsoleColor.Blue), context.CurrentStyle.BColor);
         }
 
-        Assert.Equal(new NKStyle(textColor: ConsoleColor.Red), context.CurrentStyle);
+        Assert.Equal(new NKStyle(ConsoleColor.Red), context.CurrentStyle);
     }
 
     [Fact]
@@ -607,16 +606,16 @@ public class RenderContextTests {
         using var canvas = new NKCharCanvas(10, 10);
 
         var context = new RenderContext(canvas) {
-            CurrentStyle = new NKStyle(textColor: ConsoleColor.Red)
+            CurrentStyle = new NKStyle(ConsoleColor.Red)
         };
 
         var bgStyle = new NKStyle(backgroundColor: ConsoleColor.Blue);
 
-        using (context.PushStyle(bgStyle, overrideCurrent: false)) {
+        using (context.PushStyle(bgStyle, false)) {
             Assert.Equal(bgStyle, context.CurrentStyle);
         }
 
-        Assert.Equal(new NKStyle(textColor: ConsoleColor.Red), context.CurrentStyle);
+        Assert.Equal(new NKStyle(ConsoleColor.Red), context.CurrentStyle);
     }
 
     [Fact]
@@ -624,15 +623,15 @@ public class RenderContextTests {
         using var canvas = new NKCharCanvas(10, 10);
 
         var context = new RenderContext(canvas) {
-            CurrentStyle = new NKStyle(textColor: ConsoleColor.Yellow)
+            CurrentStyle = new NKStyle(ConsoleColor.Yellow)
         };
 
-        using (context.WithStyle(new NKStyle(textColor: NKColor.Inherit, backgroundColor: ConsoleColor.DarkGray))) {
+        using (context.WithStyle(new NKStyle(NKColor.Inherit, ConsoleColor.DarkGray))) {
             Assert.Equal(new NKColor(ConsoleColor.Yellow),   context.CurrentStyle.FColor);
             Assert.Equal(new NKColor(ConsoleColor.DarkGray), context.CurrentStyle.BColor);
         }
 
-        Assert.Equal(new NKStyle(textColor: ConsoleColor.Yellow), context.CurrentStyle);
+        Assert.Equal(new NKStyle(ConsoleColor.Yellow), context.CurrentStyle);
     }
 
     [Fact]
@@ -725,7 +724,7 @@ public class RenderContextTests {
         var contentArea = new Rect2D(2,  3,  20, 20);
 
         // Without clipToContent
-        using (context.PushElementContext(elemBounds, contentArea, zIndex: 4, clipToContent: false, allowOverflow: false)) {
+        using (context.PushElementContext(elemBounds, contentArea, 4, false, false)) {
             Assert.Equal(new Point2D(12, 18), context.Origin); // (10+2, 15+3)
             Assert.Null(context.Clip);
             Assert.Equal(4, context.ZIndex);
@@ -734,7 +733,7 @@ public class RenderContextTests {
         }
 
         // With clipToContent and allowOverflow
-        using (context.PushElementContext(elemBounds, contentArea, zIndex: 6, clipToContent: true, allowOverflow: true)) {
+        using (context.PushElementContext(elemBounds, contentArea, 6, true, true)) {
             Assert.Equal(new Point2D(12, 18),        context.Origin);
             Assert.Equal(new Rect2D(12, 18, 30, 35), context.Clip);
             Assert.Equal(6,                          context.ZIndex);
@@ -757,13 +756,13 @@ public class RenderContextTests {
         var contextArea = new Rect2D(0, 0, 15, 15);
 
         using (context.PushScope(
-                offset: offset,
-                clip: localClip,
-                zIndex: 9,
-                style: style,
-                allowOverflow: true,
-                contextArea: contextArea,
-                intersectClip: false
+                offset,
+                localClip,
+                9,
+                style,
+                true,
+                contextArea,
+                false
             )) {
             Assert.Equal(new Point2D(6, 7),                 context.Origin); // 4+2, 4+3
             Assert.Equal(new Rect2D(7, 8, 16, 17),          context.Clip);   // 1+6, 1+7, 10+6, 10+7
@@ -1073,6 +1072,7 @@ public class RenderContextTests {
 
         // DrawBorder
         var border = NKBorderStyle.GetAscii();
+
         // border.Draw(new Rect2D(0, 0, 10, 5), context, 1);
         spy.DrawBorder(border, 0, 0, 10, 5, 1);
         Assert.NotNull(spy.LastDrawBorder);
@@ -1118,12 +1118,12 @@ public class RenderContextTests {
         Assert.Null(defaultState.ContextArea);
 
         var customState = new RenderState(
-            origin: new Point2D(3, 4),
-            clip: new Rect2D(1, 1, 5, 5),
-            zIndex: 10,
-            style: new NKStyle(ConsoleColor.Blue),
-            allowOverflow: true,
-            contextArea: new Rect2D(0, 0, 10, 10)
+            new Point2D(3, 4),
+            new Rect2D(1, 1, 5, 5),
+            10,
+            new NKStyle(ConsoleColor.Blue),
+            true,
+            new Rect2D(0, 0, 10, 10)
         );
 
         Assert.Equal(new Point2D(3, 4),              customState.Origin);
@@ -1163,14 +1163,14 @@ public class RenderContextTests {
         public void ResetZ()            { }
         public void Dispose()           { }
 
-        public void Draw(ICharCanvas canvas, int xOffset, int yOffset, int z) => LastDrawCanvas = (canvas, xOffset, yOffset, z);
-        public void Draw(AnsiChar c, int xOffset, int yOffset, int z) => LastDrawChar = (c, xOffset, yOffset, z);
-        public void Draw(AnsiString str, int xOffset, int yOffset, int z) => LastDrawString = (str, xOffset, yOffset, z);
-        public void Draw(SKImage image, int xOffset, int yOffset, int xSize, int ySize, int zLayer, SKSamplingOptions samplingOptions = default) => LastDrawImage = (image, xOffset, yOffset, xSize, ySize, zLayer, samplingOptions);
-        public void DrawVerticalLine(AnsiChar c, int x, int y, int length, int z) => LastDrawVerticalLine = (c, x, y, length, z);
-        public void DrawHorizontalLine(AnsiChar c, int x, int y, int length, int z) => LastDrawHorizontalLine = (c, x, y, length, z);
-        public void DrawRect(AnsiChar c, int x, int y, int width, int height, int z) => LastDrawRect = (c, x, y, width, height, z);
-        public void DrawBorder(NKBorderStyle border, int x, int y, int width, int height, int z) => LastDrawBorder = (border, x, y, width, height, z);
+        public void Draw(ICharCanvas            canvas, int xOffset, int yOffset, int z)                                                                          => LastDrawCanvas = (canvas, xOffset, yOffset, z);
+        public void Draw(AnsiChar               c,      int xOffset, int yOffset, int z)                                                                          => LastDrawChar = (c, xOffset, yOffset, z);
+        public void Draw(AnsiString             str,    int xOffset, int yOffset, int z)                                                                          => LastDrawString = (str, xOffset, yOffset, z);
+        public void Draw(SKImage                image,  int xOffset, int yOffset, int xSize,  int ySize, int zLayer, SKSamplingOptions samplingOptions = default) => LastDrawImage = (image, xOffset, yOffset, xSize, ySize, zLayer, samplingOptions);
+        public void DrawVerticalLine(AnsiChar   c,      int x,       int y,       int length, int z)             => LastDrawVerticalLine = (c, x, y, length, z);
+        public void DrawHorizontalLine(AnsiChar c,      int x,       int y,       int length, int z)             => LastDrawHorizontalLine = (c, x, y, length, z);
+        public void DrawRect(AnsiChar           c,      int x,       int y,       int width,  int height, int z) => LastDrawRect = (c, x, y, width, height, z);
+        public void DrawBorder(NKBorderStyle    border, int x,       int y,       int width,  int height, int z) => LastDrawBorder = (border, x, y, width, height, z);
 
         public void Clean() => CleanCalled = true;
     }

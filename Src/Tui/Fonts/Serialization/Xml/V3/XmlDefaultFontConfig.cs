@@ -8,12 +8,12 @@ using System.Xml.Serialization;
 namespace NeoKolors.Tui.Fonts.Xml.V3;
 
 public class XmlDefaultFontConfig {
-    
+
     [XmlIgnore] public XmlGlyphMask?              Mask              { get; set; }
     [XmlIgnore] public XmlGlyphAlign?             Align             { get; set; }
     [XmlIgnore] public XmlGlyphAlignPointReplace? AlignPointReplace { get; set; }
-    [XmlIgnore] public char[]                     AlignPointMarkers   { get; set; }
-    
+    [XmlIgnore] public char[]                     AlignPointMarkers { get; set; }
+
     [XmlElement("Mask")]
     public string MaskString {
         get => Mask?.ToString() ?? "";

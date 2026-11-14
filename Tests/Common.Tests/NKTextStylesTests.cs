@@ -118,28 +118,28 @@ public class NKTextStylesTests {
     [Fact]
     public void Static_GetEscSeq_WithInheritAndEsc() {
         // When next adds ITALIC but inherits BOLD
-        var seqWithEsc = NKTextStyles.GetEscSeq(BOLD, BOLD | ITALIC, BOLD, addEsc: true);
+        var seqWithEsc = NKTextStyles.GetEscSeq(BOLD, BOLD | ITALIC, BOLD, true);
         Assert.Equal("\e[3m", seqWithEsc);
 
-        var seqWithoutEsc = NKTextStyles.GetEscSeq(BOLD, BOLD | ITALIC, BOLD, addEsc: false);
+        var seqWithoutEsc = NKTextStyles.GetEscSeq(BOLD, BOLD | ITALIC, BOLD, false);
         Assert.Equal("3;", seqWithoutEsc);
 
         // No changes
-        var noChange = NKTextStyles.GetEscSeq(BOLD, BOLD, NONE, addEsc: true);
+        var noChange = NKTextStyles.GetEscSeq(BOLD, BOLD, NONE, true);
         Assert.Equal(string.Empty, noChange);
 
-        var noChangeNoEsc = NKTextStyles.GetEscSeq(BOLD, BOLD, NONE, addEsc: false);
+        var noChangeNoEsc = NKTextStyles.GetEscSeq(BOLD, BOLD, NONE, false);
         Assert.Equal(string.Empty, noChangeNoEsc);
     }
 
     [Fact]
     public void Static_GetEscSeq_Force_OverridesInherit() {
         // Without force, inherited style is ignored
-        var seqNormal = NKTextStyles.GetEscSeq(BOLD | ITALIC, BOLD, force: false, addEsc: true);
+        var seqNormal = NKTextStyles.GetEscSeq(BOLD | ITALIC, BOLD, false, true);
         Assert.Equal("\e[3m", seqNormal);
 
         // With force, inherit is cleared to NONE so both BOLD and ITALIC are emitted
-        var seqForced = NKTextStyles.GetEscSeq(BOLD | ITALIC, BOLD, force: true, addEsc: true);
+        var seqForced = NKTextStyles.GetEscSeq(BOLD | ITALIC, BOLD, true, true);
         Assert.Equal("\e[1;3m", seqForced);
     }
 
@@ -148,7 +148,7 @@ public class NKTextStylesTests {
         var seq = NONE.GetEscSeq(BOLD);
         Assert.Equal("\e[22m", seq);
 
-        var staticSeq = NKTextStyles.GetEscSeq(BOLD, NONE, NONE, addEsc: true);
+        var staticSeq = NKTextStyles.GetEscSeq(BOLD, NONE, NONE, true);
         Assert.Equal("\e[22m", staticSeq);
     }
 
@@ -157,7 +157,7 @@ public class NKTextStylesTests {
         var seq = NONE.GetEscSeq(FAINT);
         Assert.Equal("\e[22m", seq);
 
-        var staticSeq = NKTextStyles.GetEscSeq(FAINT, NONE, NONE, addEsc: true);
+        var staticSeq = NKTextStyles.GetEscSeq(FAINT, NONE, NONE, true);
         Assert.Equal("\e[22m", staticSeq);
     }
 
@@ -166,7 +166,7 @@ public class NKTextStylesTests {
         var seq = FAINT.GetEscSeq(BOLD);
         Assert.Equal("\e[22;2m", seq);
 
-        var staticSeq = NKTextStyles.GetEscSeq(BOLD, FAINT, NONE, addEsc: true);
+        var staticSeq = NKTextStyles.GetEscSeq(BOLD, FAINT, NONE, true);
         Assert.Equal("\e[22;2m", staticSeq);
     }
 
@@ -175,7 +175,7 @@ public class NKTextStylesTests {
         var seq = BOLD.GetEscSeq(FAINT);
         Assert.Equal("\e[22;1m", seq);
 
-        var staticSeq = NKTextStyles.GetEscSeq(FAINT, BOLD, NONE, addEsc: true);
+        var staticSeq = NKTextStyles.GetEscSeq(FAINT, BOLD, NONE, true);
         Assert.Equal("\e[22;1m", staticSeq);
     }
 
@@ -199,4 +199,5 @@ public class NKTextStylesTests {
     }
 
     #endregion
+
 }

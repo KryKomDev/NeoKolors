@@ -100,7 +100,7 @@ represents simple characters.
 
 Defines a family of glyphs that use two combined glyphs as a source of their visual content.
 The glyphs are automatically constructed from a specified glyph and glyphs of a group of characters
-that are specified to be applicable to the `Symbol` character. 
+that are specified to be applicable to the `Symbol` character.
 
 ### Properties
 
@@ -147,7 +147,6 @@ that are specified to be applicable to the `Symbol` character.
 | `letters-upper`             | All uppercase letters (vowels and consonants).              |
 | `letters-lower`             | All lowercase letters (vowels and consonants).              |
 | `letters`                   | All letters (vowels, consonants, upper, and lower).         |
-
 
 ### Example Definitions
 

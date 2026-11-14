@@ -7,7 +7,6 @@ namespace NeoKolors.Settings.Command;
 
 public class CommandException : System.Exception {
     public CommandException(string? message) : base(message) { }
-    
-    public static CommandException NoResultConstructor() => 
-        new($"Could not return result of command. Result builder is not initialized.");
+
+    public static CommandException NoResultConstructor() => new($"Could not return result of command. Result builder is not initialized.");
 }

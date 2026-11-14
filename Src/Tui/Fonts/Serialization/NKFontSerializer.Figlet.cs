@@ -7,9 +7,9 @@ namespace NeoKolors.Tui.Fonts;
 
 public static partial class NKFontSerializer {
     /// <summary>
-    /// Deserializes a FIGlet font (.flf) from a file path.
-    /// Automatically detects and applies any companion manifest (e.g. manifest.xml)
-    /// or sidecar metadata (e.g. [font].meta.xml) located in the font's directory.
+    ///     Deserializes a FIGlet font (.flf) from a file path.
+    ///     Automatically detects and applies any companion manifest (e.g. manifest.xml)
+    ///     or sidecar metadata (e.g. [font].meta.xml) located in the font's directory.
     /// </summary>
     public static NKFont? DeserializeFiglet(
         string          path,
@@ -91,7 +91,7 @@ public static partial class NKFontSerializer {
     }
 
     /// <summary>
-    /// Deserializes a FIGlet font (.flf) from a stream.
+    ///     Deserializes a FIGlet font (.flf) from a stream.
     /// </summary>
     public static NKFont? DeserializeFiglet(
         Stream          stream,
@@ -104,16 +104,16 @@ public static partial class NKFontSerializer {
         using var reader = new StreamReader(
             stream,
             System.Text.Encoding.UTF8,
-            detectEncodingFromByteOrderMarks: true,
-            bufferSize: 1024,
-            leaveOpen: true
+            true,
+            1024,
+            true
         );
 
         return DeserializeFiglet(reader, fontName, letterSpacing, wordSpacing, leading, metadata);
     }
 
     /// <summary>
-    /// Deserializes a FIGlet font (.flf) from a TextReader.
+    ///     Deserializes a FIGlet font (.flf) from a TextReader.
     /// </summary>
     public static NKFont? DeserializeFiglet(
         TextReader      reader,
@@ -247,7 +247,7 @@ public static partial class NKFontSerializer {
                 // If it's a zero-width character (sometimes space or null), handle gracefully
                 glyphs[NKGlyphSymbol.Simple((char)codePoint)] = new NKGlyph(
                     new GlyphCell[0, height],
-                    baselineOffset: 0
+                    0
                 );
 
                 return true;
@@ -270,7 +270,7 @@ public static partial class NKFontSerializer {
 
             glyphs[NKGlyphSymbol.Simple((char)codePoint)] = new NKGlyph(
                 cells,
-                baselineOffset: 0
+                0
             );
 
             return true;
@@ -324,27 +324,27 @@ public static partial class NKFontSerializer {
 
         var fontInfo = new NKFontInfo(
             fontName,
-            ligatures: false,
-            leading: finalLeading,
-            letterSpacing: finalLetterSpacing,
-            wordSpacing: finalWordSpacing,
-            variable: new NKFontVariableConfig(false),
-            author: effectiveMeta.Author,
-            licenseType: effectiveMeta.LicenseType,
-            licenseFile: effectiveMeta.LicenseFile,
-            licenseContent: effectiveMeta.LicenseContent,
-            sourceFormat: effectiveMeta.SourceFormat ?? "Figlet",
-            metadata: effectiveMeta.Custom
+            false,
+            finalLeading,
+            finalLetterSpacing,
+            finalWordSpacing,
+            new NKFontVariableConfig(false),
+            effectiveMeta.Author,
+            effectiveMeta.LicenseType,
+            effectiveMeta.LicenseFile,
+            effectiveMeta.LicenseContent,
+            effectiveMeta.SourceFormat ?? "Figlet",
+            effectiveMeta.Custom
         );
 
         return new NKFont(
             fontInfo,
             glyphs,
-            unknownSymbolGlyph: null,
-            strikethroughGlyph: null,
-            renderStrikethroughAboveLetters: true,
-            underlineGlyph: null,
-            renderUnderlineAboveLetters: true
+            null,
+            null,
+            true,
+            null,
+            true
         );
     }
 
@@ -369,8 +369,8 @@ public static partial class NKFontSerializer {
 
             // 1. Author detection
             if (string.IsNullOrWhiteSpace(meta.Author)) {
-                string? candidate = null;
-                var authorMatch = GetValueAfterPrefix(line, "author:", "creator:", "by:");
+                string? candidate   = null;
+                var     authorMatch = GetValueAfterPrefix(line, "author:", "creator:", "by:");
 
                 if (authorMatch != null) {
                     candidate = authorMatch;
@@ -512,7 +512,8 @@ public static partial class NKFontSerializer {
     }
 
     /// <summary>
-    /// Functional FIGlet font deserializer that avoids direct side-effects during execution and returns all collected diagnostic logs as values.
+    ///     Functional FIGlet font deserializer that avoids direct side-effects during execution
+    ///     and returns all collected diagnostic logs as values.
     /// </summary>
     public static NKFontDeserializationResult TryDeserializeFiglet(
         string          path,
@@ -545,7 +546,8 @@ public static partial class NKFontSerializer {
     }
 
     /// <summary>
-    /// Functional FIGlet font deserializer that avoids direct side-effects during execution and returns all collected diagnostic logs as values.
+    ///     Functional FIGlet font deserializer that avoids direct side-effects during execution
+    ///     and returns all collected diagnostic logs as values.
     /// </summary>
     public static NKFontDeserializationResult TryDeserializeFiglet(
         Stream          stream,

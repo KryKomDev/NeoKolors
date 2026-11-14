@@ -6,27 +6,27 @@ using static NeoKolors.Common.NKConsoleColor;
 
 namespace Neofetch;
 
-class Program {
+internal class Program {
 
     public const string LOGO = "{0}⠀⠀⠀⣤⣴⣾⣿⣿⣿⣿⣿⣶⡄{1}⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⡄\n" +
-                               "{0}⠀⠀⢀⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀{1}⠀⢰⣦⣄⣀⣀⣠⣴⣾⣿⠃\n" +
-                               "{0}⠀⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⡏⠀{1}⠀⣼⣿⣿⣿⣿⣿⣿⣿⣿⠀\n" +
-                               "{0}⠀⠀⣼⣿⡿⠿⠛⠻⠿⣿⣿⡇⠀{1}⠀⣿⣿⣿⣿⣿⣿⣿⣿⡿⠀\n" +
-                               "{0}⠀⠀⠉⠀⠀⠀ ⠀⠀⠀⠈⠁{1}⠀⢰⣿⣿⣿⣿⣿⣿⣿⣿⠇⠀\n" +
-                               "{2}⠀⠀⣠⣴⣶⣿⣿⣿⣷⣶⣤⠀⠀{1}⠀⠈⠉⠛⠛⠛⠉⠉⠀⠀⠀\n" +
-                               "{2}⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⡇{3}⠀⠀⣶⣦⣄⣀⣀⣀⣤⣤⣶⠀⠀\n" +
-                               "{2}⠀⣾⣿⣿⣿⣿⣿⣿⣿⣿⡇{3}⠀⢀⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀\n" +
-                               "{2}⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⠁{3}⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀\n" +
-                               "{2}⢠⣿⡿⠿⠛⠉⠉⠉⠛⠿⠀{3}⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⠁⠀⠀\n" +
-                               "{2}⠘⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀ {3}⠻⢿⣿⣿⣿⣿⣿⠿⠛⠀⠀⠀{4}";
+        "{0}⠀⠀⢀⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀{1}⠀⢰⣦⣄⣀⣀⣠⣴⣾⣿⠃\n"                        +
+        "{0}⠀⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⡏⠀{1}⠀⣼⣿⣿⣿⣿⣿⣿⣿⣿⠀\n"                        +
+        "{0}⠀⠀⣼⣿⡿⠿⠛⠻⠿⣿⣿⡇⠀{1}⠀⣿⣿⣿⣿⣿⣿⣿⣿⡿⠀\n"                        +
+        "{0}⠀⠀⠉⠀⠀⠀ ⠀⠀⠀⠈⠁{1}⠀⢰⣿⣿⣿⣿⣿⣿⣿⣿⠇⠀\n"                        +
+        "{2}⠀⠀⣠⣴⣶⣿⣿⣿⣷⣶⣤⠀⠀{1}⠀⠈⠉⠛⠛⠛⠉⠉⠀⠀⠀\n"                        +
+        "{2}⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⡇{3}⠀⠀⣶⣦⣄⣀⣀⣀⣤⣤⣶⠀⠀\n"                        +
+        "{2}⠀⣾⣿⣿⣿⣿⣿⣿⣿⣿⡇{3}⠀⢀⣿⣿⣿⣿⣿⣿⣿⣿⡟⠀⠀\n"                        +
+        "{2}⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⠁{3}⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⡇⠀⠀\n"                        +
+        "{2}⢠⣿⡿⠿⠛⠉⠉⠉⠛⠿⠀{3}⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⠁⠀⠀\n"                        +
+        "{2}⠘⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀ {3}⠻⢿⣿⣿⣿⣿⣿⠿⠛⠀⠀⠀{4}";
 
-    static void Main() {
+    private static void Main() {
         Console.OutputEncoding = Encoding.UTF8;
         Console.OpenStandardOutput();
         Console.WriteLine();
         NKConsole.WriteLineF(LOGO, RED, GREEN, BLUE, YELLOW, NKColor.Default);
         NKConsole.MoveCursor(28, -11);
-        string h = $"{Environment.UserDomainName}@{Environment.UserName}";
+        var h = $"{Environment.UserDomainName}@{Environment.UserName}";
         NKConsole.Write(h, ConsoleColor.Green);
         NKConsole.MoveCursor(^28, 1);
         NKConsole.Write(new string('─', h.Length), ConsoleColor.White);

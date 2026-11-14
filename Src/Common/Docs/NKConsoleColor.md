@@ -1,6 +1,8 @@
 # NKConsoleColor
 
-**[NKConsoleColor](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/NKConsoleColor.cs)** is an enum representing the 256-color palette index mapping commonly supported by virtual terminal emulators.
+**[NKConsoleColor](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/NKConsoleColor.cs)**
+is an enum representing the 256-color palette index mapping commonly supported by virtual terminal
+emulators.
 
 ---
 
@@ -10,7 +12,8 @@
 public enum NKConsoleColor : byte
 ```
 
-It is backed by a `byte` type to keep its memory footprint minimal and ensure that it can be stored directly within packed styling structures.
+It is backed by a `byte` type to keep its memory footprint minimal and ensure that it can be stored
+directly within packed styling structures.
 
 ---
 

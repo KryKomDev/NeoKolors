@@ -48,7 +48,7 @@ public class Text : IElement {
 
         var bounds = new Rect2D(Point2D.Zero, parent);
 
-        if (TextOptions.AsT is not null) {
+        if (TextOptions.AsT is not null)
             font.DrawString(
                 Content,
                 context,
@@ -56,8 +56,7 @@ public class Text : IElement {
                 TextOptions!,
                 z
             );
-        }
-        else {
+        else
             font.DrawString(
                 Content,
                 context,
@@ -67,19 +66,23 @@ public class Text : IElement {
                 overflow,
                 z
             );
-        }
     }
 
     public Size2D Measure(LayoutContext context) {
         if (AnsiString.IsNullOrEmpty(Content))
             return Size2D.Zero;
 
-        var font        = Font.AsT ?? new DefaultFont();
+        var font = Font.AsT ?? new DefaultFont();
+
         var contentSize = TextOptions.AsT is not null
             ? font.GetSize(Content, TextOptions.AsT)
             : font.GetSize(Content);
 
         var sizing = Sizing.AsT;
-        return sizing != default ? sizing.ToSize(context, contentSize, ungrown: true) : contentSize;
+
+        return sizing != default ? sizing.ToSize(context, contentSize, true) : contentSize;
     }
+    
+    public static implicit operator Text(string text) => new(new AnsiString(text));
+    public static implicit operator Text(AnsiString text) => new(text);
 }

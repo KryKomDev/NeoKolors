@@ -7,5 +7,5 @@ public enum MouseReportProtocol {
     X10,
     UTF8,
     SGR,
-    SGR_PIXELS,
+    SGR_PIXELS
 }

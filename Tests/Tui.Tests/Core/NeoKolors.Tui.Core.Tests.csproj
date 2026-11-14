@@ -1,5 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    
+
     <ItemGroup>
         <ProjectReference Include="..\..\..\Src\Tui\Core\NeoKolors.Tui.Core.csproj"/>
     </ItemGroup>
@@ -9,5 +9,5 @@
 
         <Using Include="NeoKolors.Tui.Core.NKTableStyle" Alias="NKTableStyle"/>
     </ItemGroup>
-    
+
 </Project>

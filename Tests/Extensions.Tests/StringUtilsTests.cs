@@ -10,7 +10,7 @@ using System.Collections;
 namespace NeoKolors.Extensions.Tests;
 
 public class StringUtilsTests {
-    
+
     [Fact]
     public void VisibleLength_ShouldReturnCorrectValue() {
         var s = "\e[38;2;1;1;1mHello\e[39m World\b";
@@ -44,19 +44,19 @@ public class StringUtilsTests {
     }
 
     [Theory]
-    [InlineData("Hello, World!", 0, 5, "Hello")]
+    [InlineData("Hello, World!", 0, 5,  "Hello")]
     [InlineData("Hello, World!", 7, 12, "World")]
-    [InlineData("Test", 1, 3, "es")]
-    [InlineData("ABC", 0, 1, "A")]
+    [InlineData("Test",          1, 3,  "es")]
+    [InlineData("ABC",           0, 1,  "A")]
     public void InRange_String_ValidRanges_ReturnsCorrectSubstring(string input, int start, int end, string expected) {
         Assert.Equal(expected, input.InRange(start, end));
     }
 
     [Theory]
     [InlineData("Test", -1, 2)]
-    [InlineData("Test", 0, 5)]
-    [InlineData("Test", 4, 4)]
-    [InlineData("Test", 3, 2)]
+    [InlineData("Test", 0,  5)]
+    [InlineData("Test", 4,  4)]
+    [InlineData("Test", 3,  2)]
     public void InRange_String_InvalidRanges_ThrowsArgumentOutOfRangeException(string input, int start, int end) {
         Assert.Throws<ArgumentOutOfRangeException>(() => input.InRange(start, end));
     }
@@ -78,18 +78,18 @@ public class StringUtilsTests {
     [InlineData(1, 4)]
     [InlineData(0, 4)]
     public void InRange_IEnumerable_ValidRanges_ReturnsCorrectElements(int start, int end) {
-        var input = new[] { 1, 2, 3, 4, 5 };
+        var input    = new[] { 1, 2, 3, 4, 5 };
         var expected = input[start..end];
-        var result = input.InRange(start, end);
-        
+        var result   = input.InRange(start, end);
+
         Assert.Equal(expected, result);
     }
 
     [Theory]
     [InlineData(-1, 3)]
-    [InlineData(0, 6)]
-    [InlineData(4, 3)]
-    [InlineData(5, 5)]
+    [InlineData(0,  6)]
+    [InlineData(4,  3)]
+    [InlineData(5,  5)]
     public void InRange_IEnumerable_InvalidRanges_ThrowsArgumentOutOfRangeException(int start, int end) {
         var input = new[] { 1, 2, 3, 4, 5 };
         Assert.Throws<ArgumentOutOfRangeException>(() => input.InRange(start, end).ToList());
@@ -97,21 +97,21 @@ public class StringUtilsTests {
 
     [Fact]
     public void InRange_IEnumerable_EmptyRange_ReturnsEmptySequence() {
-        var input = new[] { 1, 2, 3 };
+        var input  = new[] { 1, 2, 3 };
         var result = input.InRange(1, 1);
         Assert.Empty(result);
     }
 
     [Fact]
     public void InRange_IEnumerable_SingleElementExtraction_ReturnsCorrectElement() {
-        var input = new[] { 1, 2, 3, 4, 5 };
+        var input  = new[] { 1, 2, 3, 4, 5 };
         var result = input.InRange(2, 3);
         Assert.Equal([3], result);
     }
 
     [Fact]
     public void InRange_IEnumerable_WorksWithDifferentTypes() {
-        var input = new[] { "one", "two", "three", "four" };
+        var input  = new[] { "one", "two", "three", "four" };
         var result = input.InRange(1, 3);
         Assert.Equal(["two", "three"], result);
     }
@@ -119,8 +119,10 @@ public class StringUtilsTests {
     [Fact]
     public void InRange_IEnumerable_LazyEvaluation_WorksCorrectly() {
         var evaluated = false;
+
         IEnumerable<int> GetNumbers() {
             evaluated = true;
+
             yield return 1;
             yield return 2;
             yield return 3;
@@ -128,31 +130,31 @@ public class StringUtilsTests {
 
         var result = GetNumbers().InRange(0, 2);
         Assert.False(evaluated); // Not evaluated until enumerated
-        
+
         // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
         result.ToList(); // Force evaluation
         Assert.True(evaluated);
     }
 
-    
+
     [Fact]
     public void Join_WithSimpleCollection_JoinsCorrectly() {
         var numbers = new[] { 1, 2, 3, 4, 5 };
-        string result = numbers.Join(", ");
+        var result  = numbers.Join(", ");
         Assert.Equal("1, 2, 3, 4, 5", result);
     }
 
     [Fact]
     public void Join_WithEmptyCollection_ReturnsEmptyString() {
-        var empty = Array.Empty<int>();
-        string result = empty.Join(", ");
+        var empty  = Array.Empty<int>();
+        var result = empty.Join(", ");
         Assert.Equal("", result);
     }
 
     [Fact]
     public void Join_WithNullObjects_IncludesEmptyStrings() {
-        var items = new object?[] { "first", null, "third" };
-        string result = items.Join("|");
+        var items  = new object?[] { "first", null, "third" };
+        var result = items.Join("|");
         Assert.Equal("first||third", result);
     }
 
@@ -162,15 +164,15 @@ public class StringUtilsTests {
             new Point(1, 2),
             new Point(3, 4)
         };
-        
-        string result = points.Join("; ");
+
+        var result = points.Join("; ");
         Assert.Equal("(1,2); (3,4)", result);
     }
 
     [Fact]
     public void Join_WithEmptySeparator_ConcatenatesStrings() {
         var letters = new[] { "a", "b", "c" };
-        string result = letters.Join("");
+        var result  = letters.Join("");
         Assert.Equal("abc", result);
     }
 
@@ -179,29 +181,29 @@ public class StringUtilsTests {
     [InlineData("-")]
     [InlineData(" -> ")]
     public void Join_WithDifferentSeparators_JoinsCorrectly(string separator) {
-        var words = new[] { "one", "two", "three" };
-        string result = words.Join(separator);
+        var words  = new[] { "one", "two", "three" };
+        var result = words.Join(separator);
         Assert.Equal($"one{separator}two{separator}three", result);
     }
 
     [Fact]
     public void Join_WithCustomStringifier_ProcessesElementsCorrectly() {
         var numbers = new[] { 1, 2, 3 };
-        string result = numbers.Join(", ", n => $"Number{n}");
+        var result  = numbers.Join(", ", n => $"Number{n}");
         Assert.Equal("Number1, Number2, Number3", result);
     }
 
     [Fact]
     public void Join_WithNullStringifier_HandlesNullsCorrectly() {
-        var items = new[] { "a", "b", null, "d" };
-        string result = items.Join("|", s => s);
+        var items  = new[] { "a", "b", null, "d" };
+        var result = items.Join("|", s => s);
         Assert.Equal("a|b||d", result);
     }
 
     [Fact]
     public void Join_WithCustomStringifierReturningNull_HandlesNullsCorrectly() {
         var numbers = new[] { 1, 2, 3 };
-        string result = numbers.Join(",", n => n % 2 == 0 ? null : n.ToString());
+        var result  = numbers.Join(",", n => n % 2 == 0 ? null : n.ToString());
         Assert.Equal("1,,3", result);
     }
 
@@ -212,15 +214,15 @@ public class StringUtilsTests {
             new Point(3, 4),
             null
         };
-        
-        string result = points.Join("; ", p => p is null ? "null" : $"Point({p.X},{p.Y})");
+
+        var result = points.Join("; ", p => p is null ? "null" : $"Point({p.X},{p.Y})");
         Assert.Equal("Point(1,2); Point(3,4); null", result);
     }
 
     [Fact]
     public void Join_WithMixedTypes_JoinsCorrectly() {
-        var items = new ArrayList { 1, "two", 3.0, true };
-        string result = items.Join(", ");
+        var items  = new ArrayList { 1, "two", 3.0, true };
+        var result = items.Join(", ");
         Assert.Equal("1, two, 3, True", result);
     }
 
@@ -229,13 +231,13 @@ public class StringUtilsTests {
     }
 
     [Theory]
-    [InlineData(1, "I")]
-    [InlineData(4, "IV")]
-    [InlineData(9, "IX")]
-    [InlineData(49, "XLIX")]
-    [InlineData(99, "XCIX")]
-    [InlineData(499, "CDXCIX")]
-    [InlineData(999, "CMXCIX")]
+    [InlineData(1,    "I")]
+    [InlineData(4,    "IV")]
+    [InlineData(9,    "IX")]
+    [InlineData(49,   "XLIX")]
+    [InlineData(99,   "XCIX")]
+    [InlineData(499,  "CDXCIX")]
+    [InlineData(999,  "CMXCIX")]
     [InlineData(3999, "MMMCMXCIX")]
     [InlineData(2024, "MMXXIV")]
     public void ToRoman_BasicConversions_ReturnsCorrectRomanNumerals(int number, string expected) {
@@ -243,17 +245,17 @@ public class StringUtilsTests {
     }
 
     [Theory]
-    [InlineData(1, "i")]
-    [InlineData(4, "iv")]
-    [InlineData(9, "ix")]
-    [InlineData(49, "xlix")]
-    [InlineData(99, "xcix")]
-    [InlineData(499, "cdxcix")]
-    [InlineData(999, "cmxcix")]
+    [InlineData(1,    "i")]
+    [InlineData(4,    "iv")]
+    [InlineData(9,    "ix")]
+    [InlineData(49,   "xlix")]
+    [InlineData(99,   "xcix")]
+    [InlineData(499,  "cdxcix")]
+    [InlineData(999,  "cmxcix")]
     [InlineData(3999, "mmmcmxcix")]
     [InlineData(2024, "mmxxiv")]
     public void ToRoman_LowercaseConversions_ReturnsCorrectLowercaseRomanNumerals(int number, string expected) {
-        Assert.Equal(expected, string.ToRoman(number, lowercase: true));
+        Assert.Equal(expected, string.ToRoman(number, true));
     }
 
     [Theory]
@@ -280,9 +282,8 @@ public class StringUtilsTests {
             { 9, "IX" }
         };
 
-        foreach (var pair in expectedValues) {
+        foreach (var pair in expectedValues)
             Assert.Equal(pair.Value, string.ToRoman(pair.Key));
-        }
     }
 
     [Theory]
@@ -428,12 +429,12 @@ public class StringUtilsTests {
         var input = "";
         Assert.Equal("   ", input.PadCenter(3));
     }
-    
+
     [Theory]
     [InlineData("Hello {World}", "Hello World", "World")]
-    [InlineData("{a}{b}{c}", "abc", "a", "b", "c")]
-    [InlineData("{a}{b}{c}", "abc", "a", "b", "c", "d")]
-    [InlineData("{a}{b}{c}{d}", "abc{d}", "a", "b", "c")]
+    [InlineData("{a}{b}{c}",     "abc",         "a", "b", "c")]
+    [InlineData("{a}{b}{c}",     "abc",         "a", "b", "c", "d")]
+    [InlineData("{a}{b}{c}{d}",  "abc{d}",      "a", "b", "c")]
     public void StructFormat_ShouldReturnCorrectValue(string? input, string output, params object[]? args) {
         #pragma warning disable CA2254
         var o = input.StructuredFormat(args);
@@ -442,15 +443,15 @@ public class StringUtilsTests {
     }
 
     [Theory]
-    [InlineData("Hello\\nWorld", "Hello\nWorld")]
-    [InlineData("Tab\\tSpace", "Tab\tSpace")]
-    [InlineData("Backslash\\\\", "Backslash\\")]
-    [InlineData("Null\\0Char", "Null\0Char")]
-    [InlineData("Hex\\x41", "HexA")]
-    [InlineData("Unicode\\u0041", "UnicodeA")]
+    [InlineData("Hello\\nWorld",        "Hello\nWorld")]
+    [InlineData("Tab\\tSpace",          "Tab\tSpace")]
+    [InlineData("Backslash\\\\",        "Backslash\\")]
+    [InlineData("Null\\0Char",          "Null\0Char")]
+    [InlineData("Hex\\x41",             "HexA")]
+    [InlineData("Unicode\\u0041",       "UnicodeA")]
     [InlineData("Mixed\\n\\t\\\\\\x42", "Mixed\n\t\\B")]
-    [InlineData("Invalid\\xG", "Invalid\\xG")]
-    [InlineData("NotAnEscape\\", "NotAnEscape\\")]
+    [InlineData("Invalid\\xG",          "Invalid\\xG")]
+    [InlineData("NotAnEscape\\",        "NotAnEscape\\")]
     public void Unescape_ShouldReturnCorrectValue(string input, string expected) {
         Assert.Equal(expected, input.Unescape());
     }

@@ -36,9 +36,9 @@ public readonly struct Game2DFixedContext {
     public object? State { get; }
 
     public Game2DFixedContext(TimeSpan fixedDelta, ulong fixedTickIndex, object? state = null) {
-        FixedDelta = fixedDelta;
+        FixedDelta     = fixedDelta;
         FixedTickIndex = fixedTickIndex;
-        State = state;
+        State          = state;
     }
 }
 
@@ -57,7 +57,7 @@ public readonly struct Game2DUpdateContext {
     public object? State { get; }
 
     public Game2DUpdateContext(DeltaTime time, object? state = null) {
-        Time = time;
+        Time  = time;
         State = state;
     }
 }
@@ -90,9 +90,9 @@ public readonly struct Game2DRenderContext {
     public object? State { get; }
 
     public Game2DRenderContext(double alpha, DeltaTime time, Camera2D camera, object? state = null) {
-        Alpha = alpha;
-        Time = time;
+        Alpha  = alpha;
+        Time   = time;
         Camera = camera;
-        State = state;
+        State  = state;
     }
 }

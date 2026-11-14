@@ -1,7 +1,7 @@
 # NeoKolors TUI Type Hierarchy (UWP-Inspired)
 
 This document outlines a modern, desktop-grade UWP/WPF-inspired type hierarchy
-designed to fully replace the HTML-like elements in the NeoKolors TUI framework. 
+designed to fully replace the HTML-like elements in the NeoKolors TUI framework.
 
 By transitioning from HTML-style nodes (Div, Body, Text, etc.) to a stateful,
 template-driven desktop hierarchy (Panel, Page, TextBlock, etc.), NeoKolors
@@ -204,10 +204,11 @@ the HTML DOM and introduces core desktop layout patterns:
 
 Control visuals transition automatically based on interaction states,
 eliminating ad-hoc style updates:
+
 * **State Groups**:
-  * **CommonStates**: Normal, PointerOver (Hover), Pressed, Disabled
-  * **FocusStates**: Focused, Unfocused
-  * **SelectionStates**: Unselected, Selected
+    * **CommonStates**: Normal, PointerOver (Hover), Pressed, Disabled
+    * **FocusStates**: Focused, Unfocused
+    * **SelectionStates**: Unselected, Selected
 * **Visual States**: Defined in styling metadata. When a state changes (e.g.,
   cursor hovers over a Button), the control applies the associated property
   diffs (e.g. background color, border highlight).
@@ -216,6 +217,7 @@ eliminating ad-hoc style updates:
 
 Replaces CSS nesting selectors. Containers attach coordinate properties
 directly to their immediate child controls:
+
 * **Grid Controls**: Grid.Row, Grid.Column, Grid.RowSpan, Grid.ColumnSpan.
 * **Canvas Controls**: Canvas.Left, Canvas.Top.
 * **Relative Panel Controls**: RelativePanel.RightOf, RelativePanel.Below.
@@ -225,8 +227,9 @@ directly to their immediate child controls:
 ### 3.3 Routed Events System
 
 Propagates console interactions smoothly through the UI layout hierarchy:
-* **Tunneling (Preview)**: Standard input travels down from the root container
-  (Page) to the source element, giving parent containers intercept
+
+* **Tunneling (Preview)**: Standard input travels down from the root container (Page) to the source
+  element, giving parent containers intercept
   opportunities (e.g., PreviewKeyDown).
 * **Bubbling**: Once evaluated by the targeted element, events travel upwards
   to parent containers (e.g., mouse clicks, key actions).
@@ -241,6 +244,7 @@ new UWP type hierarchy.
 ### 4.1 Base Framework Types
 
 #### 4.1.1 Control
+
 The fundamental element for all interactive controls, containing unified hooks
 for state, focus, and input.
 
@@ -400,28 +404,28 @@ public abstract class Panel : Control<IElement[]> {
 * **SixelImage** (inherits from Control): Specifically designed to render
   pixel-perfect bitmap data to terminal buffers supporting Sixel hardware
   acceleration.
-  * **Source Type**: `SkiaSharp.SKImage` (providing robust native image
-    decoding and manipulation).
-  * **Properties**: `Source` (SKImage), `Stretch` (None, Fill, Uniform,
-    UniformToFill), `RenderQuality` (High, Medium, Low).
-  * **TUI Rendering**: Queries direct color pixels from the `SKImage`
-    structure, scales them using the desired interpolation filter to match
-    character cells/pixels, and translates the bitmap into raw terminal
-    Sixel byte streams via `canvas.PlaceSixel`.
+    * **Source Type**: `SkiaSharp.SKImage` (providing robust native image
+      decoding and manipulation).
+    * **Properties**: `Source` (SKImage), `Stretch` (None, Fill, Uniform,
+      UniformToFill), `RenderQuality` (High, Medium, Low).
+    * **TUI Rendering**: Queries direct color pixels from the `SKImage`
+      structure, scales them using the desired interpolation filter to match
+      character cells/pixels, and translates the bitmap into raw terminal
+      Sixel byte streams via `canvas.PlaceSixel`.
 
 ##### AsciiImage
 
 * **AsciiImage** (inherits from Control): Designed for retro, character-
   shading, or colored text-based representations (ASCII Art) on the
   standard terminal character grid.
-  * **Source Type**: `string` (multiline pre-rendered ASCII files) or
-    dynamic rasterization (taking an `SKImage` or `SKBitmap` and
-    down-sampling it at runtime).
-  * **Properties**: `Source` (string/SKImage), `Palette` (e.g.,
-    `"@#*+-:. "`), `ColorMode` (Grayscale, ANSI 16-color, Full TrueColor).
-  * **TUI Rendering**: Translates the image pixels or string layout directly
-    onto the `ICharCanvas` grid, mapping color density to specific character
-    weights in the selected `Palette`.
+    * **Source Type**: `string` (multiline pre-rendered ASCII files) or
+      dynamic rasterization (taking an `SKImage` or `SKBitmap` and
+      down-sampling it at runtime).
+    * **Properties**: `Source` (string/SKImage), `Palette` (e.g.,
+      `"@#*+-:. "`), `ColorMode` (Grayscale, ANSI 16-color, Full TrueColor).
+    * **TUI Rendering**: Translates the image pixels or string layout directly
+      onto the `ICharCanvas` grid, mapping color density to specific character
+      weights in the selected `Palette`.
 
 #### 4.2.2 Layout Panels (inheriting from Panel)
 

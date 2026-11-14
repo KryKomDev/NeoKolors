@@ -8,7 +8,7 @@ using NeoKolors.Tui.Lifecycle.Inline;
 namespace NeoKolors.Tui.Widgets;
 
 /// <summary>
-/// Execution context for updating an active inline progress bar.
+///     Execution context for updating an active inline progress bar.
 /// </summary>
 public class ProgressContext {
     private readonly ProgressBarElement _progressBar;
@@ -16,7 +16,7 @@ public class ProgressContext {
     private readonly InlineContext      _inlineContext;
 
     /// <summary>
-    /// Gets or sets the current progress value between 0.0 and 1.0.
+    ///     Gets or sets the current progress value between 0.0 and 1.0.
     /// </summary>
     public double Value {
         get => _progressBar.Value.AsT;
@@ -27,7 +27,7 @@ public class ProgressContext {
     }
 
     /// <summary>
-    /// Gets or sets the descriptive title/status displayed with the progress bar.
+    ///     Gets or sets the descriptive title/status displayed with the progress bar.
     /// </summary>
     public string Description {
         get => _descriptionSignal.Value;
@@ -38,12 +38,12 @@ public class ProgressContext {
     }
 
     /// <summary>
-    /// Gets the total elapsed time since the progress bar started.
+    ///     Gets the total elapsed time since the progress bar started.
     /// </summary>
     public TimeSpan ElapsedTime => _inlineContext.ElapsedTime;
 
     /// <summary>
-    /// Gets the cancellation token for the active operation.
+    ///     Gets the cancellation token for the active operation.
     /// </summary>
     public CancellationToken CancellationToken => _inlineContext.CancellationToken;
 
@@ -58,7 +58,7 @@ public class ProgressContext {
     }
 
     /// <summary>
-    /// Reports a progress update and immediately requests a screen redraw.
+    ///     Reports a progress update and immediately requests a screen redraw.
     /// </summary>
     /// <param name="progress">The progress value between 0.0 and 1.0.</param>
     public void Report(double progress) {
@@ -66,7 +66,7 @@ public class ProgressContext {
     }
 
     /// <summary>
-    /// Reports both a progress update and a description update simultaneously.
+    ///     Reports both a progress update and a description update simultaneously.
     /// </summary>
     /// <param name="progress">The progress value between 0.0 and 1.0.</param>
     /// <param name="description">The updated description message.</param>

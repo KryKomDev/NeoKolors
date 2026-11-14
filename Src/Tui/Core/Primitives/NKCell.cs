@@ -8,8 +8,8 @@ using OneOf.Types;
 namespace NeoKolors.Tui.Core;
 
 /// <summary>
-/// Represents a cell that contains a character (rune), along with its associated styling
-/// and a flag indicating whether it has changed.
+///     Represents a cell that contains a character (rune), along with its associated styling
+///     and a flag indicating whether it has changed.
 /// </summary>
 public readonly record struct NKCell {
 
@@ -36,24 +36,22 @@ public readonly record struct NKCell {
     public static OneOf<Success<NKCell>, Error> New(
         char    @char,
         NKStyle style
-    ) {
-        return char.IsSurrogate(@char)
+    ) =>
+        char.IsSurrogate(@char)
             ? new Error()
             : new Success<NKCell>(new NKCell(@char, style));
-    }
 
     public static NKCell[] FromString(AnsiString str) {
-        if (str == null) {
+        if (str == null)
             return [];
-        }
 
         var cells        = new NKCell[str.Length];
         var startIndices = StringInfo.ParseCombiningCharacters(str.Plain);
 
-        for (int i = 0; i < startIndices.Length; i++) {
-            int start         = startIndices[i];
-            int nextStart     = i + 1 < startIndices.Length ? startIndices[i + 1] : str.Length;
-            int clusterLength = nextStart - start;
+        for (var i = 0; i < startIndices.Length; i++) {
+            var start         = startIndices[i];
+            var nextStart     = i + 1 < startIndices.Length ? startIndices[i + 1] : str.Length;
+            var clusterLength = nextStart - start;
 
             if (clusterLength == 1) {
                 cells[start] = new NKCell(str[start], NKCellFlags.SINGLE);
@@ -61,9 +59,8 @@ public readonly record struct NKCell {
             else {
                 cells[start] = new NKCell(str[start], NKCellFlags.CLUSTER_START);
 
-                for (int j = 1; j < clusterLength; j++) {
+                for (var j = 1; j < clusterLength; j++)
                     cells[start + j] = new NKCell(str[start + j], NKCellFlags.CLUSTER_CONTINUE);
-                }
             }
         }
 
@@ -74,12 +71,11 @@ public readonly record struct NKCell {
         char    high,
         char    low,
         NKStyle style
-    ) {
-        return (
-            new NKCell(high, style, NKCellFlags.HIGH_SURROGATE),
-            new NKCell(low,  style, NKCellFlags.LOW_SURROGATE)
-        );
-    }
+    ) =>
+    (
+        new NKCell(high, style, NKCellFlags.HIGH_SURROGATE),
+        new NKCell(low,  style, NKCellFlags.LOW_SURROGATE)
+    );
 
     public static NKCell Default { get; } = new(' ', NKStyle.Default);
 

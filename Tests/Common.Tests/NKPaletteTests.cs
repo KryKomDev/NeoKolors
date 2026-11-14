@@ -17,13 +17,13 @@ public class NKPaletteTests {
         var palette = new NKPalette(colors);
 
         // Assert
-        Assert.Equal(5, palette.Length);
-        Assert.Equal(colors, palette.Colors);
+        Assert.Equal(5,                             palette.Length);
+        Assert.Equal(colors,                        palette.Colors);
         Assert.Equal((NKColor)NKConsoleColor.BLACK, palette.Base);
         Assert.Equal((NKColor)NKConsoleColor.WHITE, palette.Background);
-        Assert.Equal((NKColor)NKConsoleColor.RED, palette.Text);
+        Assert.Equal((NKColor)NKConsoleColor.RED,   palette.Text);
         Assert.Equal((NKColor)NKConsoleColor.GREEN, palette.TextSecondary);
-        Assert.Equal((NKColor)NKConsoleColor.BLUE, palette.Accent);
+        Assert.Equal((NKColor)NKConsoleColor.BLUE,  palette.Accent);
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public class NKPaletteTests {
         var palette = new NKPalette(url);
 
         // Assert
-        Assert.Equal(5, palette.Length);
+        Assert.Equal(5,         palette.Length);
         Assert.Equal(0xff0000u, palette[0]);
         Assert.Equal(0x00ff00u, palette[1]);
         Assert.Equal(0x0000ffu, palette[2]);

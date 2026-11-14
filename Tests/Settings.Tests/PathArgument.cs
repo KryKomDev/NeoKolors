@@ -10,7 +10,7 @@ namespace NeoKolors.Settings.Tests;
 public class PathArgumentTests {
 
     [Theory]
-    [InlineData("/path/")]  
+    [InlineData("/path/")]
     [InlineData("C:/path/")]
     [InlineData(@"\path\")]
     [InlineData(@"C:\path\")]
@@ -39,9 +39,9 @@ public class PathArgumentTests {
         var p = new PathArgument(allowedPathType: DIRECTORY | NOT_EXISTING);
         Assert.Throws<InvalidArgumentInputException>(() => p.Set(path));
     }
-    
+
     [Theory]
-    [InlineData("/path/")]  
+    [InlineData("/path/")]
     [InlineData("C:/path/")]
     [InlineData(@"\path\")]
     [InlineData(@"C:\path\")]

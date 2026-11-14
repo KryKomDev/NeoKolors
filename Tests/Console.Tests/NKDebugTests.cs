@@ -8,10 +8,10 @@ namespace NeoKolors.Console.Tests;
 [Collection("ConsoleTests")]
 public class NKDebugTests : IDisposable {
     private readonly StringWriter _stringWriter;
-    private readonly TextWriter _originalOutput;
+    private readonly TextWriter   _originalOutput;
 
     public NKDebugTests() {
-        _stringWriter = new StringWriter();
+        _stringWriter   = new StringWriter();
         _originalOutput = NKDebug.GetOutput();
         NKDebug.SetOutput(_stringWriter);
     }
@@ -73,15 +73,15 @@ public class NKDebugTests : IDisposable {
         // Arrange
         NKDebug.SetLogAll();
         const string template = "User {UserId} performed action {Action}";
-        const int userId = 123;
-        const string action = "Login";
+        const int    userId   = 123;
+        const string action   = "Login";
 
         // Act
         NKDebug.Info(template, userId, action);
 
         // Assert
         var output = _stringWriter.ToString();
-        Assert.Contains("123", output);
+        Assert.Contains("123",   output);
         Assert.Contains("Login", output);
     }
 
@@ -145,9 +145,9 @@ public class NKDebugTests : IDisposable {
 
         Assert.NotNull(logger);
         Assert.Equal("InheritTest", logger.Source);
-        Assert.Same(NKDebug.Logger, logger.Parent);
+        Assert.Same(NKDebug.Logger,        logger.Parent);
         Assert.Same(NKDebug.Logger.Writer, logger.Writer);
-        Assert.Equal(NKDebug.Logger.Level, logger.Level);
+        Assert.Equal(NKDebug.Logger.Level,   logger.Level);
         Assert.Equal(NKDebug.Logger.Enabled, logger.Enabled);
     }
 
@@ -168,27 +168,28 @@ public class NKDebugTests : IDisposable {
         logger.Warn("Warning from sync logger");
         var output = customSw.ToString();
         Assert.Contains("Warning from sync logger", output);
-        Assert.Contains("SyncTest", output);
+        Assert.Contains("SyncTest",                 output);
     }
 
     [Fact]
     public void GetLogger_ReflectsReplacingNKDebugLogger() {
         var originalLogger = NKDebug.Logger;
+
         try {
             var child = NKDebug.GetLogger("ReplacementTest");
 
-            using var sw = new StringWriter();
-            var newRootLogger = new NKLogger(new TextLogWriter(sw), level: NKLogLevel.ERROR);
+            using var sw            = new StringWriter();
+            var       newRootLogger = new NKLogger(new TextLogWriter(sw), level: NKLogLevel.ERROR);
             NKDebug.Logger = newRootLogger;
 
             // Existing child logger should immediately reflect the new root logger
-            Assert.Same(newRootLogger, child.Parent);
+            Assert.Same(newRootLogger,        child.Parent);
             Assert.Same(newRootLogger.Writer, child.Writer);
             Assert.Equal(NKLogLevel.ERROR, child.Level);
 
             child.Error("Error message from child");
             Assert.Contains("Error message from child", sw.ToString());
-            Assert.Contains("ReplacementTest", sw.ToString());
+            Assert.Contains("ReplacementTest",          sw.ToString());
         }
         finally {
             NKDebug.Logger = originalLogger;
@@ -204,7 +205,7 @@ public class NKDebugTests : IDisposable {
 
         // Override child's level locally
         child.Level = NKLogLevel.DEBUG;
-        Assert.Equal(NKLogLevel.DEBUG, child.Level);
+        Assert.Equal(NKLogLevel.DEBUG,                                            child.Level);
         Assert.Equal(NKLogLevel.CRITICAL | NKLogLevel.ERROR | NKLogLevel.WARNING, NKDebug.Logger.Level);
 
         // Reset child's level back to parent

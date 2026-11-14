@@ -9,15 +9,17 @@ using NeoKolors.Console;
 namespace NeoKolors.Tui.Core;
 
 /// <summary>
-/// A high-performance double-buffered character canvas presenter specifically designed for inline console widgets.
-/// Uses relative ANSI cursor sequences to overwrite previous lines without requiring full-screen alternate buffers.
+///     A high-performance double-buffered character canvas presenter specifically designed for
+///     inline console widgets.
+///     Uses relative ANSI cursor sequences to overwrite previous lines without requiring
+///     full-screen alternate buffers.
 /// </summary>
 public class NKInlineScreen : NKCharCanvas, IInlineScreen {
     private readonly StringBuilder _sb             = new();
     private readonly object        _renderLock     = new();
     private          int           _renderedHeight = 0;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public int RenderedHeight {
         get {
             lock (_renderLock) {
@@ -27,16 +29,18 @@ public class NKInlineScreen : NKCharCanvas, IInlineScreen {
     }
 
     /// <summary>
-    /// Initializes a new instance of <see cref="NKInlineScreen"/> with the specified dimensions.
+    ///     Initializes a new instance of <see cref="NKInlineScreen" /> with the specified
+    ///     dimensions.
     /// </summary>
     public NKInlineScreen(Size2D size) : base(Math.Max(1, size.X), Math.Max(1, size.Y)) { }
 
     /// <summary>
-    /// Initializes a new instance of <see cref="NKInlineScreen"/> with the specified width and height.
+    ///     Initializes a new instance of <see cref="NKInlineScreen" /> with the specified width
+    ///     and height.
     /// </summary>
     public NKInlineScreen(int width, int height) : base(Math.Max(1, width), Math.Max(1, height)) { }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Render() {
         lock (_renderLock) {
             _sb.Clear();
@@ -111,7 +115,7 @@ public class NKInlineScreen : NKCharCanvas, IInlineScreen {
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Finish(bool persist = true) {
         lock (_renderLock) {
             if (_renderedHeight == 0)

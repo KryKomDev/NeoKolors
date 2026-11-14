@@ -6,19 +6,19 @@
 namespace NeoKolors.Settings.Tests;
 
 public class LongArgumentTests {
-    
+
     [Fact]
     public void Set_ShouldWorkProperly() {
         var a = new LongArgument();
-        
+
         // try with double
         a.Set(1);
         Assert.Equal(1, a.Value);
-        
+
         // try with string
         a.Set("4");
         Assert.Equal(4, a.Value);
-        
+
         // try with another argument
         var b = new LongArgument();
         b.Set(7);
@@ -34,7 +34,7 @@ public class LongArgumentTests {
 
     [Fact]
     public void Set_ShouldThrowException_ForOutOfRangeValue() {
-        var a = new LongArgument(min: 0, max: 10);
+        var a = new LongArgument(0, 10);
         Assert.Throws<InvalidArgumentInputException>(() => a.Set(-1));
         Assert.Throws<InvalidArgumentInputException>(() => a.Set(11));
     }
@@ -53,9 +53,9 @@ public class LongArgumentTests {
     public void Equal_ShouldWorkProperly() {
         var a = new LongArgument();
         var b = new LongArgument(defaultValue: 1);
-        
+
         Assert.False(a.Equals(b));
-        
+
         b.Set(0);
         Assert.False(a.Equals(b));
 
@@ -65,19 +65,19 @@ public class LongArgumentTests {
 }
 
 public class ULongArgumentTests {
-    
+
     [Fact]
     public void Set_ShouldWorkProperly() {
         var a = new ULongArgument();
-        
+
         // try with double
         a.Set(1u);
         Assert.Equal(1u, a.Value);
-        
+
         // try with string
         a.Set("4");
         Assert.Equal(4u, a.Value);
-        
+
         // try with another argument
         var b = new ULongArgument();
         b.Set(7u);
@@ -113,9 +113,9 @@ public class ULongArgumentTests {
     public void Equal_ShouldWorkProperly() {
         var a = new ULongArgument();
         var b = new ULongArgument(defaultValue: 1u);
-        
+
         Assert.False(a.Equals(b));
-        
+
         b.Set(0u);
         Assert.False(a.Equals(b));
 

@@ -78,21 +78,19 @@ public readonly record struct NKGlyphSymbol {
     }
 
     private sealed class NKGlyphSymbolEqualityComparer : IEqualityComparer<NKGlyphSymbol> {
-        public bool Equals(NKGlyphSymbol x, NKGlyphSymbol y) {
-            return x._type == y._type                  &&
-                x._styles.Equals(y._styles)            &&
-                x._symbol_simple   == y._symbol_simple &&
-                x._symbol_ligature == y._symbol_ligature;
-        }
+        public bool Equals(NKGlyphSymbol x, NKGlyphSymbol y) =>
+            x._type == y._type                     &&
+            x._styles.Equals(y._styles)            &&
+            x._symbol_simple   == y._symbol_simple &&
+            x._symbol_ligature == y._symbol_ligature;
 
-        public int GetHashCode(NKGlyphSymbol obj) {
-            return HashCode.Combine(
+        public int GetHashCode(NKGlyphSymbol obj) =>
+            HashCode.Combine(
                 obj._type,
                 obj._styles,
                 obj._symbol_simple,
                 obj._symbol_ligature
             );
-        }
     }
 
     public static IEqualityComparer<NKGlyphSymbol> Comparer { get; } =

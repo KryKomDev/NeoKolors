@@ -2,30 +2,53 @@
 
 [![Build & Test](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/ci.yml?branch=main&style=for-the-badge&label=Build%20%26%20Test&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/ci.yml) [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Common?style=for-the-badge&labelColor=%232a313c&color=%23e051c6)](https://www.nuget.org/packages/NeoKolors.Common) [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Common?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://www.nuget.org/packages/NeoKolors.Common) [![License](https://img.shields.io/github/license/KryKomDev/NeoKolors?style=for-the-badge&labelColor=%232a313c&color=%2358a6ff)](https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE)
 
-`NeoKolors.Common` is the foundation library for the NeoKolors ecosystem. It provides optimized primitives, structures, and utilities for working with console colors, styles, ANSI sequences, and advanced graphic rendering formats like Sixel.
+`NeoKolors.Common` is the foundation library for the NeoKolors ecosystem. It provides optimized
+primitives, structures, and utilities for working with console colors, styles, ANSI sequences, and
+advanced graphic rendering formats like Sixel.
 
 ---
 
 ## Key Features
 
-- **Robust Color Models**: 
-  - [NKColor](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/NKColor.cs): A unified structure representing 24-bit TrueColor (RGB), custom alpha transparency, standard 16 console colors, 256 xterm console colors, or color inheritance.
-  - [NKConsoleColor](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/NKConsoleColor.cs): Extends standard console colors with support for the 6x6x6 RGB color cube and 24 grayscale levels.
-  - [NKPalette](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/NKPalette.cs): Custom terminal palette managers.
+- **Robust Color Models**:
+    - [NKColor](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/NKColor.cs): A
+      unified structure representing 24-bit TrueColor (RGB), custom alpha transparency, standard 16
+      console colors, 256 xterm console colors, or color inheritance.
+    - [NKConsoleColor](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/NKConsoleColor.cs):
+      Extends standard console colors with support for the 6x6x6 RGB color cube and 24 grayscale
+      levels.
+    - [NKPalette](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/NKPalette.cs):
+      Custom terminal palette managers.
 - **Memory-Optimized Styling**:
-  - [NKStyle](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/NKStyle.cs): Compresses foreground and background [NKColor](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/NKColor.cs) states and [TextStyles](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/TextStyles.cs) formatting into a single 64-bit integer (`long`), allowing lightweight and hyper-fast style mutations.
-  - [TextStyles](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/TextStyles.cs): Flag enums supporting Bold, Italic, Underline (with multiple [UnderlineType](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/UnderlineType.cs) modes), Faint, Negative, and Strikethrough.
+    - [NKStyle](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/NKStyle.cs):
+      Compresses foreground and
+      background [NKColor](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/NKColor.cs)
+      states
+      and [TextStyles](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/TextStyles.cs)
+      formatting into a single 64-bit integer (`long`), allowing lightweight and hyper-fast style
+      mutations.
+    - [TextStyles](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/TextStyles.cs):
+      Flag enums supporting Bold, Italic, Underline (with
+      multiple [UnderlineType](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/UnderlineType.cs)
+      modes), Faint, Negative, and Strikethrough.
 - **AnsiString Parsing**:
-  - [AnsiString](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/AnsiString.cs): An optimized text structure that parses raw console strings, preserving text styles and color codes across sub-ranges without breaking when measuring text layout boundaries.
+    - [AnsiString](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/AnsiString.cs):
+      An optimized text structure that parses raw console strings, preserving text styles and color
+      codes across sub-ranges without breaking when measuring text layout boundaries.
 - **Terminal Graphics & Utilities**:
-  - [SixelConverter](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/SixelConverter.cs): Encodes images into Sixel format byte streams, allowing graphical visual rendering directly inside compliant terminal windows.
-  - [EscapeCodes](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/EscapeCodes.cs): Core database of ANSI sequences for cursor movement, clearing options, styling modifiers, and terminal properties.
+    - [SixelConverter](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/SixelConverter.cs):
+      Encodes images into Sixel format byte streams, allowing graphical visual rendering directly
+      inside compliant terminal windows.
+    - [EscapeCodes](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/EscapeCodes.cs):
+      Core database of ANSI sequences for cursor movement, clearing options, styling modifiers, and
+      terminal properties.
 
 ---
 
 ## Core Types
 
 ### 1. NKColor
+
 Encapsulates true color, index color, default console colors, and inheritance values:
 
 ```csharp
@@ -42,6 +65,7 @@ var inheritColor = NKColor.Inherit;
 ```
 
 ### 2. NKStyle
+
 Bundles formatting for maximum speed:
 
 ```csharp
@@ -55,6 +79,7 @@ var style = new NKStyle(
 ```
 
 ### 3. AnsiString
+
 Parses ANSI codes to preserve visual segments:
 
 ```csharp

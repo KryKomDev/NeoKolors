@@ -23,13 +23,13 @@ public class VerticalGradient : IColoringStrategy {
         if (height <= 1 && width <= 1)
             return _colors[0];
 
-        float score = currentY + currentX * _tilt;
+        var score = currentY + currentX * _tilt;
 
-        float minScore = Math.Min(0f, (width - 1) * _tilt);
-        float maxScore = Math.Max(height - 1, height - 1 + (width - 1) * _tilt);
+        var minScore = Math.Min(0f, (width - 1) * _tilt);
+        var maxScore = Math.Max(height - 1, height - 1 + (width - 1) * _tilt);
 
-        float range    = maxScore - minScore;
-        float fraction = range == 0 ? 0f : (score - minScore) / range;
+        var range    = maxScore - minScore;
+        var fraction = range == 0 ? 0f : (score - minScore) / range;
 
         return NKColor.GetMultiStopColor(_colors, fraction);
     }

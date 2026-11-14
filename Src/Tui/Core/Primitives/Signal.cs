@@ -8,7 +8,9 @@ public sealed class Signal<T> {
 
     public event Action? Changed;
 
-    public Signal(T initial) => _value = initial;
+    public Signal(T initial) {
+        _value = initial;
+    }
 
     public T Value {
         get => _value;

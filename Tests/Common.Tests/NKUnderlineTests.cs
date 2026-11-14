@@ -18,7 +18,7 @@ public class NKUnderlineTests {
     [InlineData(NKUnderlineType.DASHED, "\e[4:5m")]
     public void UnderlineType_GetEscSeq_WithEscape_ReturnsExpected(NKUnderlineType type, string expected) {
         Assert.Equal(expected, NKUnderlineType.GetEscSeq(type));
-        Assert.Equal(expected, NKUnderlineType.GetEscSeq(type, addEsc: true));
+        Assert.Equal(expected, NKUnderlineType.GetEscSeq(type, true));
     }
 
     [Theory]
@@ -64,7 +64,7 @@ public class NKUnderlineTests {
     [Fact]
     public void UnderlineStyle_Default_InitializesCorrectly() {
         var style = default(NKUnderlineStyle);
-        Assert.Equal(NKColor.Default, style.Color);
+        Assert.Equal(NKColor.Default,        style.Color);
         Assert.Equal(NKUnderlineType.NORMAL, style.Type);
         Assert.False(style.InheritType);
     }
@@ -74,7 +74,7 @@ public class NKUnderlineTests {
         var color = NKColor.FromRgb(255, 0, 128);
         var style = new NKUnderlineStyle(color, NKUnderlineType.CURLY);
 
-        Assert.Equal(color, style.Color);
+        Assert.Equal(color,                 style.Color);
         Assert.Equal(NKUnderlineType.CURLY, style.Type);
         Assert.False(style.InheritType);
     }
@@ -82,12 +82,12 @@ public class NKUnderlineTests {
     [Fact]
     public void UnderlineStyle_PropertyInit_WorksCorrectly() {
         var style = new NKUnderlineStyle {
-            Color = new NKColor(RED),
-            Type = NKUnderlineType.DASHED,
+            Color       = new NKColor(RED),
+            Type        = NKUnderlineType.DASHED,
             InheritType = true
         };
 
-        Assert.Equal(new NKColor(RED), style.Color);
+        Assert.Equal(new NKColor(RED),       style.Color);
         Assert.Equal(NKUnderlineType.DASHED, style.Type);
         Assert.True(style.InheritType);
     }
@@ -99,7 +99,7 @@ public class NKUnderlineTests {
 
         var seq = style.GetEscSeq();
 
-        Assert.Contains("\e[4:3m", seq);
+        Assert.Contains("\e[4:3m",       seq);
         Assert.Contains(color.Underline, seq);
     }
 
@@ -118,36 +118,39 @@ public class NKUnderlineTests {
         var baseStyle = new NKUnderlineStyle(new NKColor(RED), NKUnderlineType.CURLY);
 
         // Other has Inherit color and DASHED type
-        var other = new NKUnderlineStyle(NKColor.Inherit, NKUnderlineType.DASHED);
+        var other   = new NKUnderlineStyle(NKColor.Inherit, NKUnderlineType.DASHED);
         var merged1 = baseStyle.With(other);
 
         // Color preserved from baseStyle because other is Inherit
         Assert.Equal(new NKColor(RED), merged1.Color);
+
         // Type overridden by other because other.InheritType is false
         Assert.Equal(NKUnderlineType.DASHED, merged1.Type);
 
         // When other has InheritType = true, it inherits type from baseStyle
         var otherInheritingType = new NKUnderlineStyle {
-            Color = new NKColor(GREEN),
-            Type = NKUnderlineType.THICK,
+            Color       = new NKColor(GREEN),
+            Type        = NKUnderlineType.THICK,
             InheritType = true
         };
+
         var merged2 = baseStyle.With(otherInheritingType);
 
-        Assert.Equal(new NKColor(GREEN), merged2.Color);
+        Assert.Equal(new NKColor(GREEN),    merged2.Color);
         Assert.Equal(NKUnderlineType.CURLY, merged2.Type);
     }
 
     [Fact]
     public void UnderlineStyle_ToString_ContainsExpectedText() {
         var style = new NKUnderlineStyle(new NKColor(BLUE), NKUnderlineType.CURLY);
-        var str = style.ToString();
+        var str   = style.ToString();
 
         Assert.Contains("NKUnderlineStyle", str);
-        Assert.Contains("Color", str);
-        Assert.Contains("Type", str);
-        Assert.Contains("CURLY", str);
+        Assert.Contains("Color",            str);
+        Assert.Contains("Type",             str);
+        Assert.Contains("CURLY",            str);
     }
 
     #endregion
+
 }

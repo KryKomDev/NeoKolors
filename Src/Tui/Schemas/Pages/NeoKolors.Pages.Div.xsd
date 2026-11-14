@@ -8,21 +8,22 @@
             xmlns:nkc="https://raw0.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/wip/NeoKolors.Tui/Schemas"
             targetNamespace="https://raw0.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/wip/NeoKolors.Tui/Schemas/Pages"
             elementFormDefault="qualified">
-    
+
     <xsd:include schemaLocation="NeoKolors.Pages.ElementGroups.xsd"/>
     <xsd:include schemaLocation="NeoKolors.Pages.AbstractElement.xsd"/>
     <xsd:include schemaLocation="../NeoKolors.Identifier.xsd"/>
-    
+
     <xsd:complexType name="Div" xml:base="nkc:AbstractElement">
         <xsd:annotation>
 
-            <xsd:documentation>A division elementOld. Works as a container for other elements.</xsd:documentation>
+            <xsd:documentation>A division elementOld. Works as a container for other elements.
+            </xsd:documentation>
         </xsd:annotation>
-        
+
         <xsd:sequence>
             <xsd:group ref="nk:ElementsAll" minOccurs="0" maxOccurs="unbounded"/>
         </xsd:sequence>
-        
+
         <xsd:attribute name="Id">
             <xsd:annotation>
                 <xsd:documentation>Defines the id of the elementOld.</xsd:documentation>
@@ -31,7 +32,7 @@
                 <xsd:restriction base="nkc:Identifier"/>
             </xsd:simpleType>
         </xsd:attribute>
-        
+
         <xsd:attribute name="Class">
             <xsd:annotation>
                 <xsd:documentation>Defines the class of the elementOld.</xsd:documentation>
@@ -41,5 +42,5 @@
             </xsd:simpleType>
         </xsd:attribute>
     </xsd:complexType>
-    
+
 </xsd:schema>

@@ -9,7 +9,7 @@ namespace NeoKolors.Tui.Fonts.Xml.V3;
 
 [XmlRoot("FontMap")]
 public class XmlFontMap {
-    
+
     [XmlElement("Component",     typeof(XmlComponentGlyphDef))]
     [XmlElement("Ligature",      typeof(XmlLigatureGlyphDef))]
     [XmlElement("Compound",      typeof(XmlCompoundGlyphDef))]

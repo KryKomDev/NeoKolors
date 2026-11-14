@@ -9,15 +9,17 @@ using static NeoKolors.Console.KeyModifiers;
 namespace NeoKolors.Console.Ansi;
 
 internal static class MouseEventDecomposer {
-    
+
     /// <summary>
-    /// Decomposes raw UTF-8 encoded mouse event data into detailed mouse event arguments.
+    ///     Decomposes raw UTF-8 encoded mouse event data into detailed mouse event arguments.
     /// </summary>
     /// <param name="type">The character representing the raw event type.</param>
     /// <param name="x">The character representing the raw X-coordinate.</param>
     /// <param name="y">The character representing the raw Y-coordinate.</param>
-    /// <returns>A <see cref="MouseEventArgs"/> instance containing the parsed mouse event type,
-    /// modifiers, movement status, and position.</returns>
+    /// <returns>
+    ///     A <see cref="MouseEventArgs" /> instance containing the parsed mouse event type,
+    ///     modifiers, movement status, and position.
+    /// </returns>
     internal static MouseEventArgs DecomposeUtf8(char type, char x, char y) {
         var t   = GetType(type  - 32);
         var pos = new Point2D(x - 33, y - 33);
@@ -26,13 +28,16 @@ internal static class MouseEventDecomposer {
     }
 
     /// <summary>
-    /// Decomposes raw console key information into a detailed representation of a mouse event.
+    ///     Decomposes raw console key information into a detailed representation of a mouse event.
     /// </summary>
     /// <param name="type">The raw character representing the mouse event type.</param>
     /// <param name="x">The raw character representing the X-coordinate.</param>
     /// <param name="y">The raw character representing the Y-coordinate.</param>
-    /// <returns>A <see cref="MouseEventArgs"/> instance containing the decomposed mouse event type, modifiers,
-    /// movement flag, and coordinates.</returns>
+    /// <returns>
+    ///     A <see cref="MouseEventArgs" /> instance containing the decomposed mouse event type,
+    ///     modifiers,
+    ///     movement flag, and coordinates.
+    /// </returns>
     internal static MouseEventArgs DecomposeUtf8(ConsoleKeyInfo type, ConsoleKeyInfo x, ConsoleKeyInfo y) {
         var t   = GetType(type.KeyChar           - 32);
         var pos = new Point2D(RemapCoordinate(x) - 1, RemapCoordinate(y) - 1);
@@ -41,14 +46,23 @@ internal static class MouseEventDecomposer {
     }
 
     /// <summary>
-    /// Decomposes SGR (Select Graphic Rendition) encoded mouse event data into detailed mouse event arguments.
+    ///     Decomposes SGR (Select Graphic Rendition) encoded mouse event data into detailed mouse
+    ///     event arguments.
     /// </summary>
-    /// <param name="type">An integer representing the raw event type, including button and modifier states.</param>
+    /// <param name="type">
+    ///     An integer representing the raw event type, including button and
+    ///     modifier states.
+    /// </param>
     /// <param name="x">The X-coordinate of the mouse event in absolute terms.</param>
     /// <param name="y">The Y-coordinate of the mouse event in absolute terms.</param>
-    /// <param name="f">A character indicating whether the event represents a button press ('M') or a button release ('m').</param>
-    /// <returns>A <see cref="MouseEventArgs"/> instance containing the parsed mouse event type,
-    /// modifiers, movement status, position, and release status.</returns>
+    /// <param name="f">
+    ///     A character indicating whether the event represents a button press ('M') or
+    ///     a button release ('m').
+    /// </param>
+    /// <returns>
+    ///     A <see cref="MouseEventArgs" /> instance containing the parsed mouse event type,
+    ///     modifiers, movement status, position, and release status.
+    /// </returns>
     internal static MouseEventArgs DecomposeSGR(int type, int x, int y, char f) {
         var t   = GetType(type);
         var pos = new Point2D(x - 1, y - 1);
@@ -58,13 +72,16 @@ internal static class MouseEventDecomposer {
     }
 
     /// <summary>
-    /// Retrieves the mouse event details, including button, modifiers, and movement status,
-    /// based on the provided type value.
+    ///     Retrieves the mouse event details, including button, modifiers, and movement status,
+    ///     based on the provided type value.
     /// </summary>
     /// <param name="type">An integer representing the encoded mouse event type.</param>
-    /// <returns>A tuple containing the mouse button (<see cref="MouseButton"/>),
-    /// modifiers (<see cref="ConsoleModifiers"/>), and a boolean indicating whether the event is a
-    /// movement event.</returns>
+    /// <returns>
+    ///     A tuple containing the mouse button (<see cref="MouseButton" />),
+    ///     modifiers (<see cref="ConsoleModifiers" />), and a boolean indicating whether the event
+    ///     is a
+    ///     movement event.
+    /// </returns>
     private static (MouseButton Btn, KeyModifiers Mods, bool Move) GetType(int type) {
         var flags = (MouseEventFlags)type;
         var shift = flags.GetHasShift();
@@ -82,9 +99,9 @@ internal static class MouseEventDecomposer {
     }
 
     /// <summary>
-    /// Maps a raw console key input to its corresponding coordinate value.
+    ///     Maps a raw console key input to its corresponding coordinate value.
     /// </summary>
-    /// <param name="k">The <see cref="ConsoleKeyInfo"/> instance representing the raw key input.</param>
+    /// <param name="k">The <see cref="ConsoleKeyInfo" /> instance representing the raw key input.</param>
     /// <returns>An integer representing the mapped coordinate value.</returns>
     private static int RemapCoordinate(ConsoleKeyInfo k) {
         if (k.Key == ConsoleKey.Backspace)
@@ -100,12 +117,18 @@ internal static class MouseEventDecomposer {
     #region LEGACY CODE
 
     /// <summary>
-    /// Decomposes raw console key information to generate detailed mouse event information.
+    ///     Decomposes raw console key information to generate detailed mouse event information.
     /// </summary>
-    /// <param name="rawEvType">The raw <see cref="ConsoleKeyInfo"/> representing the mouse event type.</param>
-    /// <param name="x">The raw <see cref="ConsoleKeyInfo"/> representing the X-coordinate.</param>
-    /// <param name="y">The raw <see cref="ConsoleKeyInfo"/> representing the Y-coordinate.</param>
-    /// <returns>A <see cref="MouseEventInfo"/> instance containing the decomposed mouse event type, modifiers, and coordinates.</returns>
+    /// <param name="rawEvType">
+    ///     The raw <see cref="ConsoleKeyInfo" /> representing the mouse event
+    ///     type.
+    /// </param>
+    /// <param name="x">The raw <see cref="ConsoleKeyInfo" /> representing the X-coordinate.</param>
+    /// <param name="y">The raw <see cref="ConsoleKeyInfo" /> representing the Y-coordinate.</param>
+    /// <returns>
+    ///     A <see cref="MouseEventInfo" /> instance containing the decomposed mouse event
+    ///     type, modifiers, and coordinates.
+    /// </returns>
     [Obsolete($"Use {nameof(MouseEventDecomposer)}.{nameof(DecomposeUtf8)} instead.")]
     private static MouseEventInfo LEGACY__DecomposeUtf8(ConsoleKeyInfo rawEvType, ConsoleKeyInfo x, ConsoleKeyInfo y) {
         DecomposeX10(rawEvType.KeyChar, out var type, out var mods);
@@ -114,13 +137,19 @@ internal static class MouseEventDecomposer {
     }
 
     /// <summary>
-    /// Decomposes raw SGR mouse input values into detailed mouse event information.
+    ///     Decomposes raw SGR mouse input values into detailed mouse event information.
     /// </summary>
     /// <param name="rawEvType">The raw integer value representing the mouse event type.</param>
     /// <param name="x">The X-coordinate of the mouse event.</param>
     /// <param name="y">The Y-coordinate of the mouse event.</param>
-    /// <param name="press">A boolean indicating whether the event involves a press action. Pressed = 'M', released = 'm', in case of none and movement -> 'M'</param>
-    /// <returns>A <see cref="MouseEventInfo"/> instance containing the decomposed mouse event type, modifiers, and coordinates.</returns>
+    /// <param name="press">
+    ///     A boolean indicating whether the event involves a press action. Pressed
+    ///     = 'M', released = 'm', in case of none and movement -> 'M'
+    /// </param>
+    /// <returns>
+    ///     A <see cref="MouseEventInfo" /> instance containing the decomposed mouse event
+    ///     type, modifiers, and coordinates.
+    /// </returns>
     [Obsolete($"Use {nameof(MouseEventDecomposer)}.{nameof(DecomposeSGR)} instead.")]
     private static MouseEventInfo LEGACY__DecomposeSGR(int rawEvType, int x, int y, bool press) {
         DecomposeSGR(rawEvType, press, out var type, out var mods);
@@ -132,7 +161,7 @@ internal static class MouseEventDecomposer {
         // char = 32 + button + motion * 32 + shift * 4 + alt * 8 + ctrl * 16;
         // 0 = left, 1 = middle, 2 = right, 3 = release, wheel up = 64, wheel down = 65
 
-        int raw = GetModifiers(rawEvType - 32, out var wheel, out var moved, out var ctrl, out var alt, out var shift);
+        var raw = GetModifiers(rawEvType - 32, out var wheel, out var moved, out var ctrl, out var alt, out var shift);
 
         // compute modifiers
         mods = (shift ? Shift : 0) | (alt ? Alt : 0) | (ctrl ? Control : 0);
@@ -166,7 +195,7 @@ internal static class MouseEventDecomposer {
         // char = 32 + button + motion * 32 + shift * 4 + alt * 8 + ctrl * 16;
         // 0 = left, 1 = middle, 2 = right, 3 = release, wheel up = 64, wheel down = 65
 
-        int raw = GetModifiers(rawEvType, out var wheel, out var moved, out var ctrl, out var alt, out var shift);
+        var raw = GetModifiers(rawEvType, out var wheel, out var moved, out var ctrl, out var alt, out var shift);
 
         // compute modifiers
         mods = (shift ? Shift : 0) | (alt ? Alt : 0) | (ctrl ? Control : 0);
@@ -271,4 +300,5 @@ internal static class MouseEventDecomposer {
     private static ConsoleModifiers None => 0;
 
     #endregion
+
 }

@@ -23,10 +23,9 @@ public class NKFontRenderingTests {
             Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "../../../Fonts/Assets/Dummy.nkf")
         };
 
-        foreach (var path in searchPaths) {
+        foreach (var path in searchPaths)
             if (File.Exists(path))
                 return Path.GetFullPath(path);
-        }
 
         throw new FileNotFoundException("Could not find Dummy.nkf test font.");
     }
@@ -155,17 +154,15 @@ public class NKFontRenderingTests {
         // Text "Test" width is likely > 0.
         // We just check that it's NOT at 0,0 and IS somewhere else.
 
-        bool drawn = false;
+        var drawn = false;
 
-        for (int x = 0; x < canvas.Width; x++) {
-            for (int y = 0; y < canvas.Height; y++) {
-                if (canvas.Data[x, y].Char != ' ') {
-                    drawn = true;
+        for (var x = 0; x < canvas.Width; x++)
+        for (var y = 0; y < canvas.Height; y++)
+            if (canvas.Data[x, y].Char != ' ') {
+                drawn = true;
 
-                    break;
-                }
+                break;
             }
-        }
 
         Assert.True(drawn, "Canvas should contain centered text.");
     }
@@ -260,15 +257,14 @@ public class NKFontRenderingTests {
         // Assert that every rendered cell (letters and effects) has underline and strikethrough styles suppressed
         var renderedAny = false;
 
-        for (int x = 0; x < canvas.Width; x++) {
-            for (int y = 0; y < canvas.Height; y++) {
-                var c = canvas.Data[x, y];
+        for (var x = 0; x < canvas.Width; x++)
+        for (var y = 0; y < canvas.Height; y++) {
+            var c = canvas.Data[x, y];
 
-                if (c.Char != ' ') {
-                    renderedAny = true;
-                    Assert.False(c.Style.Styles.HasFlag(UNDERLINE));
-                    Assert.False(c.Style.Styles.HasFlag(STRIKETHROUGH));
-                }
+            if (c.Char != ' ') {
+                renderedAny = true;
+                Assert.False(c.Style.Styles.HasFlag(UNDERLINE));
+                Assert.False(c.Style.Styles.HasFlag(STRIKETHROUGH));
             }
         }
 
@@ -314,7 +310,7 @@ public class NKFontRenderingTests {
         var       context = new RenderContext(canvas);
 
         // Shift origin by (5, 2) and clip locally so only global x in [8, 12] is rendered
-        using (context.PushScope(offset: new Point2D(5, 2), clip: new Rect2D(3, 0, 7, 6))) {
+        using (context.PushScope(new Point2D(5, 2), new Rect2D(3, 0, 7, 6))) {
             font!.DrawString("A", context);
         }
 
@@ -336,8 +332,8 @@ public class NKFontRenderingTests {
         var       testColor = NKColor.FromRgb(0, 255, 128);
 
         var options = new TextRenderingOptions(
-            horizontalAlign: HorizontalAlign.LEFT,
-            verticalAlign: VerticalAlign.TOP,
+            HorizontalAlign.LEFT,
+            VerticalAlign.TOP,
             coloring: ColoringStrategies.Solid(testColor)
         );
 
@@ -353,7 +349,7 @@ public class NKFontRenderingTests {
         using var canvas = new NKCharCanvas(50, 20);
 
         var options = new TextRenderingOptions(
-            spacing: new FontSpacingInfo(ligatures: false)
+            spacing: new FontSpacingInfo(false)
         );
 
         font!.DrawString("->", canvas, options);
@@ -399,25 +395,23 @@ public class NKFontRenderingTests {
         font.DrawString("A A", canvasSpaced, options);
 
         // Find the start of the second 'A' in both canvases
-        int firstCharEnd      = 7; // 'A' width
-        int secondAColDefault = -1;
-        int secondAColSpaced  = -1;
+        var firstCharEnd      = 7; // 'A' width
+        var secondAColDefault = -1;
+        var secondAColSpaced  = -1;
 
-        for (int x = firstCharEnd; x < 50; x++) {
+        for (var x = firstCharEnd; x < 50; x++)
             if (canvasDefault.Data[x, 0].Char == '_') {
                 secondAColDefault = x;
 
                 break;
             }
-        }
 
-        for (int x = firstCharEnd; x < 50; x++) {
+        for (var x = firstCharEnd; x < 50; x++)
             if (canvasSpaced.Data[x, 0].Char == '_') {
                 secondAColSpaced = x;
 
                 break;
             }
-        }
 
         Assert.True(secondAColDefault > 0,                 "Default second 'A' found");
         Assert.True(secondAColSpaced  > 0,                 "Spaced second 'A' found");
@@ -429,7 +423,7 @@ public class NKFontRenderingTests {
         var       font   = AssetsProvider.Dummy;
         using var canvas = new NKCharCanvas(50, 20);
 
-        int monoAdvance = 15;
+        var monoAdvance = 15;
 
         var options = new TextRenderingOptions(
             proportions: new FontProportionsInfo(new NKFontMonospacedConfig(monoAdvance, monoAdvance, false)),
@@ -458,7 +452,7 @@ public class NKFontRenderingTests {
 
         font!.DrawString("A A", canvas, bounds, options);
 
-        var measuredSize = font.GetSize(new AnsiString("A A"), options, maxWidth: 35);
+        var measuredSize = font.GetSize(new AnsiString("A A"), options, 35);
         Assert.Equal(35, measuredSize.X);
     }
 }

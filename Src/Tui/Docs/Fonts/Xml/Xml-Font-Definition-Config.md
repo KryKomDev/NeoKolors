@@ -13,7 +13,7 @@
 | `Variable`      | Configuration of the variable font. Cannot be combined with `Monospaced`.    | True (if not using `Monospaced`) |
 | `Defaults`      | Default configuration of the font.                                           | False                            |
 
-### Name 
+### Name
 
 The name of the font in a string value satisfying the regex: `(\w|\.|_|-|)+`.
 
@@ -35,7 +35,7 @@ A boolean specifying whether the font uses ligatures.
 
 ### IntrinsicBold
 
-If `true` the font renderer applies the effect intrinsically, that means the bold 
+If `true` the font renderer applies the effect intrinsically, that means the bold
 style is applied to the glyph characters directly. If `false` the font uses custom
 glyphs for bold characters.
 
@@ -87,7 +87,7 @@ The `Defaults` element contains default configuration for glyph definitions.
 | `Align`             | The default value for the `Align` property.             | False    |
 | `Mask`              | The default value for the `Mask` property.              | False    |
 | `AlignPointReplace` | The default value for the `AlignPointReplace` property. | False    |
-| `AlignPointMarkers`   | The default value for the `AlignPointMarkers` property.   | False    |
+| `AlignPointMarkers` | The default value for the `AlignPointMarkers` property. | False    |
 
 #### Align
 
@@ -96,12 +96,12 @@ The default value for the `Align` property of [Compound](Xml-Font-Definition-Map
 
 #### Mask
 
-The default value for the `Mask` property. For more see: 
+The default value for the `Mask` property. For more see:
 [Mask](Xml-Glyph-Definition-Properties.md).
 
 #### AlignPointReplace
 
-The default value for the `AlignPointReplace` property. For more 
+The default value for the `AlignPointReplace` property. For more
 see: [AlignPointReplace](Xml-Glyph-Definition-Properties.md).
 
 #### AlignPointMarkers

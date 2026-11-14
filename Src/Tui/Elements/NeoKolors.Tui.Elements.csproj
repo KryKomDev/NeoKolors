@@ -28,7 +28,7 @@
         <ProjectReference Include="../../Common/NeoKolors.Common.csproj"/>
         <ProjectReference Include="../../Console/NeoKolors.Console.csproj"/>
         <ProjectReference Include="../Core/NeoKolors.Tui.Core.csproj"/>
-        <ProjectReference Include="..\Fonts\NeoKolors.Tui.Fonts.csproj" />
+        <ProjectReference Include="..\Fonts\NeoKolors.Tui.Fonts.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

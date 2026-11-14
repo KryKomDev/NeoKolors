@@ -29,5 +29,5 @@
             </xsd:simpleType>
         </xsd:attribute>
     </xsd:complexType>
-    
+
 </xsd:schema>

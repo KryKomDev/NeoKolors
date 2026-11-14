@@ -8,12 +8,13 @@ using Microsoft.Extensions.Logging;
 namespace NeoKolors.Console;
 
 /// <summary>
-/// Extension methods for configuring NeoKolors logging with <see cref="ILoggingBuilder"/> and <see cref="ILoggerFactory"/>.
+///     Extension methods for configuring NeoKolors logging with <see cref="ILoggingBuilder" />
+///     and <see cref="ILoggerFactory" />.
 /// </summary>
 public static class NKLoggingBuilderExtensions {
 
     /// <summary>
-    /// Adds NeoKolors logging provider to the <see cref="ILoggingBuilder"/>.
+    ///     Adds NeoKolors logging provider to the <see cref="ILoggingBuilder" />.
     /// </summary>
     public static ILoggingBuilder AddNeoKolors(this ILoggingBuilder builder) {
         if (builder == null)
@@ -25,7 +26,8 @@ public static class NKLoggingBuilderExtensions {
     }
 
     /// <summary>
-    /// Adds NeoKolors logging provider to the <see cref="ILoggingBuilder"/> with custom logger options.
+    ///     Adds NeoKolors logging provider to the <see cref="ILoggingBuilder" /> with custom
+    ///     logger options.
     /// </summary>
     public static ILoggingBuilder AddNeoKolors(this ILoggingBuilder builder, Action<NKLoggerOptions> configure) {
         ArgumentNullException.ThrowIfNull(builder);
@@ -46,7 +48,8 @@ public static class NKLoggingBuilderExtensions {
     }
 
     /// <summary>
-    /// Adds NeoKolors logging provider to the <see cref="ILoggingBuilder"/> with custom logger options instance.
+    ///     Adds NeoKolors logging provider to the <see cref="ILoggingBuilder" /> with custom
+    ///     logger options instance.
     /// </summary>
     public static ILoggingBuilder AddNeoKolors(this ILoggingBuilder builder, NKLoggerOptions options) {
         ArgumentNullException.ThrowIfNull(builder);
@@ -64,7 +67,8 @@ public static class NKLoggingBuilderExtensions {
     }
 
     /// <summary>
-    /// Adds NeoKolors logging provider to the <see cref="ILoggingBuilder"/> with custom ANSI logger configuration.
+    ///     Adds NeoKolors logging provider to the <see cref="ILoggingBuilder" /> with custom ANSI
+    ///     logger configuration.
     /// </summary>
     public static ILoggingBuilder AddNeoKolors(this ILoggingBuilder builder, Action<AnsiLoggerConfig> configureAnsi) {
         if (builder == null)
@@ -86,7 +90,7 @@ public static class NKLoggingBuilderExtensions {
     }
 
     /// <summary>
-    /// Adds NeoKolors logging provider to the <see cref="ILoggerFactory"/>.
+    ///     Adds NeoKolors logging provider to the <see cref="ILoggerFactory" />.
     /// </summary>
     public static ILoggerFactory AddNeoKolors(this ILoggerFactory factory, NKLoggerOptions? options = null) {
         if (factory == null)
@@ -98,7 +102,8 @@ public static class NKLoggingBuilderExtensions {
     }
 
     /// <summary>
-    /// Adds NeoKolors logging provider to the <see cref="ILoggerFactory"/> with custom ANSI logger configuration.
+    ///     Adds NeoKolors logging provider to the <see cref="ILoggerFactory" /> with custom ANSI
+    ///     logger configuration.
     /// </summary>
     public static ILoggerFactory AddNeoKolors(this ILoggerFactory factory, Action<AnsiLoggerConfig> configureAnsi) {
         if (factory == null)
@@ -122,7 +127,7 @@ public static class NKLoggingBuilderExtensions {
     }
 
     /// <summary>
-    /// Adds NeoKolors logging provider configured to write to a log file.
+    ///     Adds NeoKolors logging provider configured to write to a log file.
     /// </summary>
     public static ILoggingBuilder AddNeoKolorsFile(this ILoggingBuilder builder, LogFileConfig fileConfig, TextLoggerConfig? textConfig = null) {
         if (builder == null)
@@ -132,7 +137,7 @@ public static class NKLoggingBuilderExtensions {
     }
 
     /// <summary>
-    /// Adds NeoKolors logging provider configured to write to a log file path.
+    ///     Adds NeoKolors logging provider configured to write to a log file path.
     /// </summary>
     public static ILoggingBuilder AddNeoKolorsFile(this ILoggingBuilder builder, string filePath, bool append = true) {
         if (builder == null)

@@ -9,7 +9,7 @@
         <TargetFrameworks>net8.0;net10.0;net11.0</TargetFrameworks>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        
+
         <PackageProjectUrl>https://github.com/KryKomDev/NeoKolors</PackageProjectUrl>
         <PackageLicense>LICENSE</PackageLicense>
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
@@ -22,14 +22,13 @@
 
         <SuppressTfmSupportBuildWarnings>true</SuppressTfmSupportBuildWarnings>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <ProjectReference Include="..\Common\NeoKolors.Common.csproj"/>
         <ProjectReference Include="..\Console\NeoKolors.Console.csproj"/>
     </ItemGroup>
 
 
-    
     <ItemGroup>
         <None Include="README.md" Pack="true" PackagePath="\"/>
         <None Include="../../LICENSE" Pack="true" PackagePath="\"/>
@@ -41,5 +40,6 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Implyzer" Version="2026.5.4"/>
     </ItemGroup>
 </Project>

@@ -9,14 +9,13 @@ using System.Xml.Serialization;
 namespace NeoKolors.Tui.Fonts.Xml.V3;
 
 public class XmlUnderlineGlyphDef : XmlGlyphDef {
-    
-    [XmlIgnore] 
-    public XmlGlyphMask? Mask { get; set; }
+
+    [XmlIgnore] public XmlGlyphMask? Mask { get; set; }
 
     [XmlAttribute("File")]         public string File         { get; set; }
     [XmlAttribute("Baseline")]     public int    Baseline     { get; set; }
     [XmlAttribute("AboveLetters")] public bool   AboveLetters { get; set; }
-    
+
     [XmlAttribute("Mask")]
     [DefaultValue(null)]
     public string MaskString {

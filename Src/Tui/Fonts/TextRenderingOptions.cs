@@ -8,12 +8,12 @@ namespace NeoKolors.Tui.Fonts;
 public class TextRenderingOptions {
 
     /// <summary>
-    /// Gets or sets the horizontal alignment option for text rendering.
+    ///     Gets or sets the horizontal alignment option for text rendering.
     /// </summary>
     public HorizontalAlign HorizontalAlign { get; set; }
 
     /// <summary>
-    /// Gets or sets the vertical alignment option for text rendering.
+    ///     Gets or sets the vertical alignment option for text rendering.
     /// </summary>
     public VerticalAlign VerticalAlign { get; set; }
 
@@ -25,7 +25,7 @@ public class TextRenderingOptions {
     public bool Overflow { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether text should be justified when rendered.
+    ///     Gets or sets a value indicating whether text should be justified when rendered.
     /// </summary>
     public bool JustifyText { get; set; }
 
@@ -49,7 +49,7 @@ public class TextRenderingOptions {
     public FontProportionsInfo? Proportions { get; set; }
 
     /// <summary>
-    /// Gets or sets the font spacing configuration used during text rendering.
+    ///     Gets or sets the font spacing configuration used during text rendering.
     /// </summary>
     public FontSpacingInfo? Spacing { get; set; }
 

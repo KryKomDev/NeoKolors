@@ -17,5 +17,5 @@ public enum MouseEventType {
     RIGHT_DRAG,
     MOVE,
     WHEEL_UP,
-    WHEEL_DOWN,
+    WHEEL_DOWN
 }

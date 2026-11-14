@@ -8,7 +8,7 @@ using NeoKolors.Tui.Core;
 namespace NeoKolors.Tui.Elements;
 
 public class ListItem : IElement {
-    public required Bindable<IElement>   Element    { get; init; }
+    public required Bindable<IElement>    Element    { get; init; }
     public          Bindable<AnsiString?> Point      { get; init; } = default;
     public          Bindable<NKStyle?>    PointStyle { get; init; } = default;
 
@@ -30,9 +30,7 @@ public class ListItem : IElement {
         PointStyle = pointStyle;
     }
 
-    public Size2D Measure(LayoutContext context) {
-        return Element.AsT?.Measure(context) ?? Size2D.Zero;
-    }
+    public Size2D Measure(LayoutContext context) => Element.AsT?.Measure(context) ?? Size2D.Zero;
 
     public void Render(RenderContext context, Size2D parent) {
         Element.AsT?.Render(context, parent);

@@ -28,7 +28,7 @@
 
     <!-- Aliases -->
     <ItemGroup Condition="$([MSBuild]::GetTargetFrameworkVersion('$(TargetFramework)', 2)) &lt; 9.0">
-        <Using Include="System.Object" Alias="Lock"/> 
+        <Using Include="System.Object" Alias="Lock"/>
     </ItemGroup>
 
     <ItemGroup>

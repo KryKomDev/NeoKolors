@@ -40,8 +40,24 @@ public class NKBorderStyleTests {
         var s7 = new NKStyle(ConsoleColor.White);
         var s8 = new NKStyle(ConsoleColor.DarkGray);
 
-        var border = new NKBorderStyle('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
-            s1, s2, s3, s4, s5, s6, s7, s8);
+        var border = new NKBorderStyle(
+            'A',
+            'B',
+            'C',
+            'D',
+            'E',
+            'F',
+            'G',
+            'H',
+            s1,
+            s2,
+            s3,
+            s4,
+            s5,
+            s6,
+            s7,
+            s8
+        );
 
         Assert.Equal('A', border.TopLeft.Char);
         Assert.Equal(s1,  border.TopLeft.Style);
@@ -70,7 +86,7 @@ public class NKBorderStyleTests {
 
     [Fact]
     public void Constructor_8CharsSingleStyle_AssignsAllElements() {
-        var style = new NKStyle(ConsoleColor.Magenta);
+        var style  = new NKStyle(ConsoleColor.Magenta);
         var border = new NKBorderStyle('1', '2', '3', '4', '5', '6', '7', '8', style);
 
         Assert.Equal('1', border.TopLeft.Char);
@@ -149,50 +165,50 @@ public class NKBorderStyleTests {
 
         var border = NKBorderStyle.GetInset(shadow, highlight);
 
-        Assert.Equal('┌', border.TopLeft.Char);
+        Assert.Equal('┌',    border.TopLeft.Char);
         Assert.Equal(shadow, border.TopLeft.Style);
 
-        Assert.Equal('─', border.Top.Char);
+        Assert.Equal('─',    border.Top.Char);
         Assert.Equal(shadow, border.Top.Style);
 
-        Assert.Equal('┐', border.TopRight.Char);
+        Assert.Equal('┐',       border.TopRight.Char);
         Assert.Equal(highlight, border.TopRight.Style);
 
-        Assert.Equal('│', border.Right.Char);
+        Assert.Equal('│',       border.Right.Char);
         Assert.Equal(highlight, border.Right.Style);
 
-        Assert.Equal('┘', border.BottomRight.Char);
+        Assert.Equal('┘',       border.BottomRight.Char);
         Assert.Equal(highlight, border.BottomRight.Style);
 
-        Assert.Equal('─', border.Bottom.Char);
+        Assert.Equal('─',       border.Bottom.Char);
         Assert.Equal(highlight, border.Bottom.Style);
 
-        Assert.Equal('└', border.BottomLeft.Char);
+        Assert.Equal('└',    border.BottomLeft.Char);
         Assert.Equal(shadow, border.BottomLeft.Style);
 
-        Assert.Equal('│', border.Left.Char);
+        Assert.Equal('│',    border.Left.Char);
         Assert.Equal(shadow, border.Left.Style);
     }
 
     [Fact]
     public void GetInset_ColorOverload_AssignsCorrectShading() {
-        var shadow    = NKColor.FromRgb(30, 30, 30);
+        var shadow    = NKColor.FromRgb(30,  30,  30);
         var highlight = NKColor.FromRgb(200, 200, 200);
-        var bckg      = NKColor.FromRgb(10, 10, 10);
+        var bckg      = NKColor.FromRgb(10,  10,  10);
 
         var border = NKBorderStyle.GetInset(shadow, highlight, bckg);
 
-        var expectedShadow    = new NKStyle(shadow, bckg);
+        var expectedShadow    = new NKStyle(shadow,    bckg);
         var expectedHighlight = new NKStyle(highlight, bckg);
 
-        Assert.Equal(expectedShadow, border.TopLeft.Style);
-        Assert.Equal(expectedShadow, border.Top.Style);
+        Assert.Equal(expectedShadow,    border.TopLeft.Style);
+        Assert.Equal(expectedShadow,    border.Top.Style);
         Assert.Equal(expectedHighlight, border.TopRight.Style);
         Assert.Equal(expectedHighlight, border.Right.Style);
         Assert.Equal(expectedHighlight, border.BottomRight.Style);
         Assert.Equal(expectedHighlight, border.Bottom.Style);
-        Assert.Equal(expectedShadow, border.BottomLeft.Style);
-        Assert.Equal(expectedShadow, border.Left.Style);
+        Assert.Equal(expectedShadow,    border.BottomLeft.Style);
+        Assert.Equal(expectedShadow,    border.Left.Style);
     }
 
     [Fact]
@@ -202,28 +218,28 @@ public class NKBorderStyleTests {
 
         var border = NKBorderStyle.GetOutset(shadow, highlight);
 
-        Assert.Equal('┌', border.TopLeft.Char);
+        Assert.Equal('┌',       border.TopLeft.Char);
         Assert.Equal(highlight, border.TopLeft.Style);
 
-        Assert.Equal('─', border.Top.Char);
+        Assert.Equal('─',       border.Top.Char);
         Assert.Equal(highlight, border.Top.Style);
 
-        Assert.Equal('┐', border.TopRight.Char);
+        Assert.Equal('┐',    border.TopRight.Char);
         Assert.Equal(shadow, border.TopRight.Style);
 
-        Assert.Equal('│', border.Right.Char);
+        Assert.Equal('│',    border.Right.Char);
         Assert.Equal(shadow, border.Right.Style);
 
-        Assert.Equal('┘', border.BottomRight.Char);
+        Assert.Equal('┘',    border.BottomRight.Char);
         Assert.Equal(shadow, border.BottomRight.Style);
 
-        Assert.Equal('─', border.Bottom.Char);
+        Assert.Equal('─',    border.Bottom.Char);
         Assert.Equal(shadow, border.Bottom.Style);
 
-        Assert.Equal('└', border.BottomLeft.Char);
+        Assert.Equal('└',       border.BottomLeft.Char);
         Assert.Equal(highlight, border.BottomLeft.Style);
 
-        Assert.Equal('│', border.Left.Char);
+        Assert.Equal('│',       border.Left.Char);
         Assert.Equal(highlight, border.Left.Style);
     }
 
@@ -281,7 +297,7 @@ public class NKBorderStyleTests {
 
     [Fact]
     public void Draw_WithRect2D_RendersPerimeterAccurately() {
-        var border = NKBorderStyle.GetAscii();
+        var       border = NKBorderStyle.GetAscii();
         using var canvas = new NKCharCanvas(10, 10);
 
         // Draw a 5x4 box at (2, 3): columns [2..6], rows [3..6]
@@ -294,36 +310,30 @@ public class NKBorderStyleTests {
         Assert.Equal('+', canvas.Data[6, 6].Char); // BottomRight
 
         // Top edge
-        for (int x = 3; x <= 5; x++) {
+        for (var x = 3; x <= 5; x++)
             Assert.Equal('-', canvas.Data[x, 3].Char);
-        }
 
         // Bottom edge
-        for (int x = 3; x <= 5; x++) {
+        for (var x = 3; x <= 5; x++)
             Assert.Equal('-', canvas.Data[x, 6].Char);
-        }
 
         // Left edge
-        for (int y = 4; y <= 5; y++) {
+        for (var y = 4; y <= 5; y++)
             Assert.Equal('|', canvas.Data[2, y].Char);
-        }
 
         // Right edge
-        for (int y = 4; y <= 5; y++) {
+        for (var y = 4; y <= 5; y++)
             Assert.Equal('|', canvas.Data[6, y].Char);
-        }
 
         // Inside should remain empty
-        for (int y = 4; y <= 5; y++) {
-            for (int x = 3; x <= 5; x++) {
-                Assert.Equal(' ', canvas.Data[x, y].Char);
-            }
-        }
+        for (var y = 4; y <= 5; y++)
+        for (var x = 3; x <= 5; x++)
+            Assert.Equal(' ', canvas.Data[x, y].Char);
     }
 
     [Fact]
     public void Draw_2x2_RendersFourCornersOnly() {
-        var border = NKBorderStyle.GetAscii();
+        var       border = NKBorderStyle.GetAscii();
         using var canvas = new NKCharCanvas(5, 5);
 
         // 2x2 box at (1, 1): columns [1, 2], rows [1, 2]
@@ -337,7 +347,7 @@ public class NKBorderStyleTests {
 
     [Fact]
     public void Draw_1x1_RendersTopLeftOnly() {
-        var border = NKBorderStyle.GetAscii();
+        var       border = NKBorderStyle.GetAscii();
         using var canvas = new NKCharCanvas(5, 5);
 
         border.Draw(new Rect2D(1, 1, 2, 2), canvas, 0);
@@ -349,7 +359,7 @@ public class NKBorderStyleTests {
 
     [Fact]
     public void Draw_DegenerateOrBorderless_DoesNotDraw() {
-        var border = NKBorderStyle.GetAscii();
+        var       border = NKBorderStyle.GetAscii();
         using var canvas = new NKCharCanvas(5, 5);
 
         // Zero size
@@ -362,4 +372,3 @@ public class NKBorderStyleTests {
         Assert.Equal(' ', canvas.Data[0, 0].Char);
     }
 }
-

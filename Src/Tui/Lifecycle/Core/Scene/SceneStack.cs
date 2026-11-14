@@ -4,15 +4,15 @@
 namespace NeoKolors.Tui.Lifecycle.Core;
 
 /// <summary>
-/// A stack-based scene manager supporting stacked scenes (e.g. pause menus over gameplay)
-/// and full scene transitions.
+///     A stack-based scene manager supporting stacked scenes (e.g. pause menus over gameplay)
+///     and full scene transitions.
 /// </summary>
 /// <typeparam name="TContext">The context type passed during scene transitions and updates.</typeparam>
 public class SceneStack<TContext> : ISceneManager<TContext> {
-    private readonly Stack<IScene<TContext>> _stack = new();
-    private readonly Lock _syncRoot = new();
+    private readonly Stack<IScene<TContext>> _stack    = new();
+    private readonly Lock                    _syncRoot = new();
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public IScene<TContext>? CurrentScene {
         get {
             lock (_syncRoot) {
@@ -21,7 +21,7 @@ public class SceneStack<TContext> : ISceneManager<TContext> {
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public int SceneCount {
         get {
             lock (_syncRoot) {
@@ -30,7 +30,7 @@ public class SceneStack<TContext> : ISceneManager<TContext> {
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void PushScene(IScene<TContext> scene, TContext context) {
         ArgumentNullException.ThrowIfNull(scene);
 
@@ -45,12 +45,11 @@ public class SceneStack<TContext> : ISceneManager<TContext> {
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public IScene<TContext>? PopScene(TContext context) {
         lock (_syncRoot) {
-            if (_stack.Count == 0) {
+            if (_stack.Count == 0)
                 return null;
-            }
 
             var popped = _stack.Pop();
             popped.OnExit(context);
@@ -64,7 +63,7 @@ public class SceneStack<TContext> : ISceneManager<TContext> {
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void SwitchScene(IScene<TContext> scene, TContext context) {
         ArgumentNullException.ThrowIfNull(scene);
 
@@ -79,7 +78,7 @@ public class SceneStack<TContext> : ISceneManager<TContext> {
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Update(TContext context, DeltaTime time) {
         var activeScene = CurrentScene;
         activeScene?.OnUpdate(context, time);

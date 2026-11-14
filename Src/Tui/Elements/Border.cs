@@ -38,9 +38,8 @@ public class Border : IElement {
         var actualParent  = parent;
         var sizing        = Sizing.AsT;
 
-        if (sizing != default) {
-            actualParent = sizing.ToSize(layoutContext, parent, ungrown: false);
-        }
+        if (sizing != default)
+            actualParent = sizing.ToSize(layoutContext, parent, false);
 
         var margin = Margin.AsT.Resolve(layoutContext);
         var style  = Style.AsT;
@@ -52,13 +51,12 @@ public class Border : IElement {
             Math.Max(0, actualParent.Y - margin.Vertical)
         );
 
-        if (style is not null && borderSize is { X: > 0, Y: > 0 }) {
+        if (style is not null && borderSize is { X: > 0, Y: > 0 })
             style.Draw(
                 new Rect2D(context.Origin + borderOrigin, borderSize),
                 context.Canvas,
                 context.ZIndex
             );
-        }
 
         var contentBox  = style?.GetContentBox(borderSize) ?? new Rect2D(Point2D.Zero, borderSize);
         var contentSize = new Size2D(contentBox.SizeX, contentBox.SizeY);
@@ -77,8 +75,8 @@ public class Border : IElement {
             return;
 
         using var _ = context.PushScope(
-            offset: childOffset,
-            clip: new Rect2D(Point2D.Zero,        childSize),
+            childOffset,
+            new Rect2D(Point2D.Zero,              childSize),
             contextArea: new Rect2D(Point2D.Zero, childSize)
         );
 
@@ -86,8 +84,8 @@ public class Border : IElement {
     }
 
     public Size2D Measure(LayoutContext context) {
-        var margin  = Margin.AsT.Resolve(context, ungrown: true);
-        var padding = Padding.AsT.Resolve(context, ungrown: true);
+        var margin  = Margin.AsT.Resolve(context, true);
+        var padding = Padding.AsT.Resolve(context, true);
         var style   = Style.AsT;
 
         var borderOverhead = style?.GetBorderBox(Size2D.Zero) ?? Size2D.Zero;
@@ -99,17 +97,15 @@ public class Border : IElement {
         var sizing          = Sizing.AsT;
 
         if (sizing != default) {
-            if (sizing.Width.Value is Dimension.Fixed fixedW) {
+            if (sizing.Width.Value is Dimension.Fixed fixedW)
                 availableParent = availableParent with {
                     X = fixedW.ToSize(context.Parent.X, context.Screen)
                 };
-            }
 
-            if (sizing.Height.Value is Dimension.Fixed fixedH) {
+            if (sizing.Height.Value is Dimension.Fixed fixedH)
                 availableParent = availableParent with {
                     Y = fixedH.ToSize(context.Parent.Y, context.Screen)
                 };
-            }
         }
 
         var childAvailable = new Size2D(
@@ -119,7 +115,7 @@ public class Border : IElement {
 
         var childElement = Element.AsT;
 
-        var childDesired = childElement?.Measure(new LayoutContext(childAvailable, context.Screen)) 
+        var childDesired = childElement?.Measure(new LayoutContext(childAvailable, context.Screen))
             ?? Size2D.Zero;
 
         var innerBox = new Size2D(
@@ -134,6 +130,6 @@ public class Border : IElement {
             borderBox.Y + margin.Vertical
         );
 
-        return sizing != default ? sizing.ToSize(context, naturalSize, ungrown: false) : naturalSize;
+        return sizing != default ? sizing.ToSize(context, naturalSize, false) : naturalSize;
     }
 }

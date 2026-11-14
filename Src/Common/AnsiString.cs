@@ -47,9 +47,7 @@ public sealed class AnsiString :
     ///     Implicitly converts a plain string to an unstyled <see cref="AnsiString" />
     ///     .
     /// </summary>
-    public static implicit operator AnsiString?(string? c) {
-        return c is null ? null : new(c);
-    }
+    public static implicit operator AnsiString?(string? c) => c is null ? null : new AnsiString(c);
 
     #endregion
 
@@ -72,25 +70,19 @@ public sealed class AnsiString :
     /// <summary>
     ///     Gets the plain text value without ANSI escape sequences.
     /// </summary>
-    public string Plain {
-        get { return _text; }
-    }
+    public string Plain => _text;
 
     /// <summary>
     ///     Gets an immutable array containing style markers applied to the text.
     ///     Each style marker represents a specific style, including its start
     ///     and end positions within the text.
     /// </summary>
-    public ImmutableArray<StyleMarker> Styles {
-        get { return [.. _styles]; }
-    }
+    public ImmutableArray<StyleMarker> Styles => [.. _styles];
 
     /// <summary>
     ///     Gets the number of characters in the string.
     /// </summary>
-    public int Length {
-        get { return _text.Length; }
-    }
+    public int Length => _text.Length;
 
     /// <summary>
     ///     Gets the <see cref="AnsiChar" /> at the specified index, containing both
@@ -148,7 +140,7 @@ public sealed class AnsiString :
     public AnsiString(IEnumerable<AnsiChar> chars) {
         ArgumentNullException.ThrowIfNull(chars);
 
-        int capacity = chars switch {
+        var capacity = chars switch {
             AnsiChar[] ca                    => ca.Length,
             ICollection<AnsiChar> c          => c.Count,
             IReadOnlyCollection<AnsiChar> rc => rc.Count,
@@ -194,13 +186,12 @@ public sealed class AnsiString :
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool HasStyleChanged(NKStyle current, NKStyle next) {
-        return current.FColor          != next.FColor
-            || current.BColor          != next.BColor
-            || current.Styles          != next.Styles
-            || current.Underline.Type  != next.Underline.Type
-            || current.Underline.Color != next.Underline.Color;
-    }
+    private static bool HasStyleChanged(NKStyle current, NKStyle next) =>
+        current.FColor             != next.FColor
+        || current.BColor          != next.BColor
+        || current.Styles          != next.Styles
+        || current.Underline.Type  != next.Underline.Type
+        || current.Underline.Color != next.Underline.Color;
 
     /// <summary>
     ///     Represents a styled string with ANSI-compatible formatting.
@@ -248,9 +239,7 @@ public sealed class AnsiString :
     /// </summary>
     /// <param name="style">The new style to apply.</param>
     /// <returns>A new <see cref="AnsiString" /> instance.</returns>
-    public AnsiString ApplyStyle(NKStyle style) {
-        return new AnsiString(_text, style);
-    }
+    public AnsiString ApplyStyle(NKStyle style) => new(_text, style);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where the style of a range starting
@@ -261,9 +250,7 @@ public sealed class AnsiString :
     /// <param name="style">The new style to apply.</param>
     /// <param name="startIndex">The zero-based starting index of the range.</param>
     /// <returns>A new <see cref="AnsiString" /> instance.</returns>
-    public AnsiString ApplyStyle(NKStyle style, int startIndex) {
-        return ApplyStyle(style, startIndex, _text.Length - startIndex);
-    }
+    public AnsiString ApplyStyle(NKStyle style, int startIndex) => ApplyStyle(style, startIndex, _text.Length - startIndex);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where the style of a specific range
@@ -322,9 +309,7 @@ public sealed class AnsiString :
     /// </summary>
     /// <param name="style">The style attributes to add.</param>
     /// <returns>A new <see cref="AnsiString" /> instance.</returns>
-    public AnsiString AddStyle(NKStyle style) {
-        return AddStyle(style, 0, _text.Length);
-    }
+    public AnsiString AddStyle(NKStyle style) => AddStyle(style, 0, _text.Length);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where the specified style is
@@ -335,9 +320,7 @@ public sealed class AnsiString :
     /// <param name="style">The style attributes to add.</param>
     /// <param name="startIndex">The zero-based starting index of the range.</param>
     /// <returns>A new <see cref="AnsiString" /> instance.</returns>
-    public AnsiString AddStyle(NKStyle style, int startIndex) {
-        return AddStyle(style, startIndex, _text.Length - startIndex);
-    }
+    public AnsiString AddStyle(NKStyle style, int startIndex) => AddStyle(style, startIndex, _text.Length - startIndex);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where the specified style is
@@ -399,9 +382,7 @@ public sealed class AnsiString :
     ///     is modified using
     ///     the specified delegate.
     /// </summary>
-    public AnsiString ModifyStyle(Func<NKStyle, NKStyle> modifier) {
-        return ModifyStyle(modifier, 0, _text.Length);
-    }
+    public AnsiString ModifyStyle(Func<NKStyle, NKStyle> modifier) => ModifyStyle(modifier, 0, _text.Length);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where the style of each character
@@ -409,9 +390,7 @@ public sealed class AnsiString :
     ///     <paramref name="startIndex" /> to the end is modified using the specified
     ///     delegate.
     /// </summary>
-    public AnsiString ModifyStyle(Func<NKStyle, NKStyle> modifier, int startIndex) {
-        return ModifyStyle(modifier, startIndex, _text.Length - startIndex);
-    }
+    public AnsiString ModifyStyle(Func<NKStyle, NKStyle> modifier, int startIndex) => ModifyStyle(modifier, startIndex, _text.Length - startIndex);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where the style of each character
@@ -441,9 +420,7 @@ public sealed class AnsiString :
     ///     is modified using
     ///     the specified delegate, passing the character index.
     /// </summary>
-    public AnsiString ModifyStyle(Func<NKStyle, int, NKStyle> modifier) {
-        return ModifyStyle(modifier, 0, _text.Length);
-    }
+    public AnsiString ModifyStyle(Func<NKStyle, int, NKStyle> modifier) => ModifyStyle(modifier, 0, _text.Length);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where the style of each character
@@ -452,9 +429,7 @@ public sealed class AnsiString :
     ///     delegate,
     ///     passing the character index.
     /// </summary>
-    public AnsiString ModifyStyle(Func<NKStyle, int, NKStyle> modifier, int startIndex) {
-        return ModifyStyle(modifier, startIndex, _text.Length - startIndex);
-    }
+    public AnsiString ModifyStyle(Func<NKStyle, int, NKStyle> modifier, int startIndex) => ModifyStyle(modifier, startIndex, _text.Length - startIndex);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where the style of each character
@@ -500,9 +475,7 @@ public sealed class AnsiString :
     ///     updated for the
     ///     entire string, preserving background color and text styles.
     /// </summary>
-    public AnsiString SetFColor(NKColor color) {
-        return SetFColor(color, 0, _text.Length);
-    }
+    public AnsiString SetFColor(NKColor color) => SetFColor(color, 0, _text.Length);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where only the foreground color is
@@ -510,9 +483,7 @@ public sealed class AnsiString :
     ///     <paramref name="startIndex" /> to the end, preserving background color and
     ///     text styles.
     /// </summary>
-    public AnsiString SetFColor(NKColor color, int startIndex) {
-        return SetFColor(color, startIndex, _text.Length - startIndex);
-    }
+    public AnsiString SetFColor(NKColor color, int startIndex) => SetFColor(color, startIndex, _text.Length - startIndex);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where only the foreground color is
@@ -537,9 +508,7 @@ public sealed class AnsiString :
     ///     updated for the
     ///     entire string, preserving text color and text styles.
     /// </summary>
-    public AnsiString SetBColor(NKColor color) {
-        return SetBColor(color, 0, _text.Length);
-    }
+    public AnsiString SetBColor(NKColor color) => SetBColor(color, 0, _text.Length);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where only the background color is
@@ -547,9 +516,7 @@ public sealed class AnsiString :
     ///     <paramref name="startIndex" /> to the end, preserving text color and text
     ///     styles.
     /// </summary>
-    public AnsiString SetBColor(NKColor color, int startIndex) {
-        return SetBColor(color, startIndex, _text.Length - startIndex);
-    }
+    public AnsiString SetBColor(NKColor color, int startIndex) => SetBColor(color, startIndex, _text.Length - startIndex);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where only the background color is
@@ -574,9 +541,7 @@ public sealed class AnsiString :
     ///     for the entire
     ///     string, preserving text color and background color.
     /// </summary>
-    public AnsiString SetStyles(NKTextStyles styles) {
-        return SetStyles(styles, 0, _text.Length);
-    }
+    public AnsiString SetStyles(NKTextStyles styles) => SetStyles(styles, 0, _text.Length);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where the text style flags are set
@@ -584,9 +549,7 @@ public sealed class AnsiString :
     ///     <paramref name="startIndex" /> to the end, preserving text color and
     ///     background color.
     /// </summary>
-    public AnsiString SetStyles(NKTextStyles styles, int startIndex) {
-        return SetStyles(styles, startIndex, _text.Length - startIndex);
-    }
+    public AnsiString SetStyles(NKTextStyles styles, int startIndex) => SetStyles(styles, startIndex, _text.Length - startIndex);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where the text style flags are set
@@ -611,18 +574,14 @@ public sealed class AnsiString :
     ///     flags are added
     ///     (bitwise OR) for the entire string.
     /// </summary>
-    public AnsiString AddStyles(NKTextStyles styles) {
-        return AddStyles(styles, 0, _text.Length);
-    }
+    public AnsiString AddStyles(NKTextStyles styles) => AddStyles(styles, 0, _text.Length);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where the specified text style
     ///     flags are added
     ///     (bitwise OR) from <paramref name="startIndex" /> to the end.
     /// </summary>
-    public AnsiString AddStyles(NKTextStyles styles, int startIndex) {
-        return AddStyles(styles, startIndex, _text.Length - startIndex);
-    }
+    public AnsiString AddStyles(NKTextStyles styles, int startIndex) => AddStyles(styles, startIndex, _text.Length - startIndex);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where the specified text style
@@ -647,18 +606,14 @@ public sealed class AnsiString :
     ///     flags are removed
     ///     (bitwise AND NOT) for the entire string.
     /// </summary>
-    public AnsiString RemoveStyles(NKTextStyles styles) {
-        return RemoveStyles(styles, 0, _text.Length);
-    }
+    public AnsiString RemoveStyles(NKTextStyles styles) => RemoveStyles(styles, 0, _text.Length);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where the specified text style
     ///     flags are removed
     ///     (bitwise AND NOT) from <paramref name="startIndex" /> to the end.
     /// </summary>
-    public AnsiString RemoveStyles(NKTextStyles styles, int startIndex) {
-        return RemoveStyles(styles, startIndex, _text.Length - startIndex);
-    }
+    public AnsiString RemoveStyles(NKTextStyles styles, int startIndex) => RemoveStyles(styles, startIndex, _text.Length - startIndex);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where the specified text style
@@ -683,18 +638,14 @@ public sealed class AnsiString :
     ///     flags are toggled
     ///     (bitwise XOR) for the entire string.
     /// </summary>
-    public AnsiString ToggleStyles(NKTextStyles styles) {
-        return ToggleStyles(styles, 0, _text.Length);
-    }
+    public AnsiString ToggleStyles(NKTextStyles styles) => ToggleStyles(styles, 0, _text.Length);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where the specified text style
     ///     flags are toggled
     ///     (bitwise XOR) from <paramref name="startIndex" /> to the end.
     /// </summary>
-    public AnsiString ToggleStyles(NKTextStyles styles, int startIndex) {
-        return ToggleStyles(styles, startIndex, _text.Length - startIndex);
-    }
+    public AnsiString ToggleStyles(NKTextStyles styles, int startIndex) => ToggleStyles(styles, startIndex, _text.Length - startIndex);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where the specified text style
@@ -719,17 +670,14 @@ public sealed class AnsiString :
     ///     non-inherit
     ///     attributes of existing styles for the entire string.
     /// </summary>
-    public AnsiString OverrideStyle(NKStyle style) {
-        return OverrideStyle(style, 0, _text.Length);
-    }
+    public AnsiString OverrideStyle(NKStyle style) => OverrideStyle(style, 0, _text.Length);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where the specified style overrides
-    ///     non-inherit attributes of existing styles from <paramref name="startIndex" /> to the end.
+    ///     non-inherit attributes of existing styles from <paramref name="startIndex" /> to the
+    ///     end.
     /// </summary>
-    public AnsiString OverrideStyle(NKStyle style, int startIndex) {
-        return OverrideStyle(style, startIndex, _text.Length - startIndex);
-    }
+    public AnsiString OverrideStyle(NKStyle style, int startIndex) => OverrideStyle(style, startIndex, _text.Length - startIndex);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> where the specified style overrides
@@ -834,9 +782,7 @@ public sealed class AnsiString :
     ///     instance.
     /// </param>
     /// <returns>A new <see cref="AnsiString" /> instance.</returns>
-    public AnsiString Substring(int startIndex) {
-        return Substring(startIndex, _text.Length - startIndex);
-    }
+    public AnsiString Substring(int startIndex) => Substring(startIndex, _text.Length - startIndex);
 
     /// <summary>
     ///     Returns a new <see cref="AnsiString" /> that is a substring of this
@@ -910,106 +856,78 @@ public sealed class AnsiString :
     /// <summary>
     ///     Concatenates two <see cref="AnsiString" /> instances.
     /// </summary>
-    public static AnsiString operator +(AnsiString? str0, AnsiString? str1) {
-        return Concat(str0, str1);
-    }
+    public static AnsiString operator +(AnsiString? str0, AnsiString? str1) => Concat(str0, str1);
 
     /// <summary>
     ///     Concatenates an <see cref="AnsiString" /> and a plain string.
     /// </summary>
-    public static AnsiString operator +(AnsiString? str0, string? str1) {
-        return Concat(str0, new AnsiString(str1 ?? string.Empty));
-    }
+    public static AnsiString operator +(AnsiString? str0, string? str1) => Concat(str0, new AnsiString(str1 ?? string.Empty));
 
     /// <summary>
     ///     Concatenates a plain string and an <see cref="AnsiString" />.
     /// </summary>
-    public static AnsiString operator +(string? str0, AnsiString? str1) {
-        return Concat(new AnsiString(str0 ?? string.Empty), str1);
-    }
+    public static AnsiString operator +(string? str0, AnsiString? str1) => Concat(new AnsiString(str0 ?? string.Empty), str1);
 
     /// <summary>
     ///     Concatenates an <see cref="AnsiString" /> and a character.
     /// </summary>
-    public static AnsiString operator +(AnsiString? str, char c) {
-        return Concat(str, new AnsiString(c.ToString()));
-    }
+    public static AnsiString operator +(AnsiString? str, char c) => Concat(str, new AnsiString(c.ToString()));
 
     /// <summary>
     ///     Concatenates a character and an <see cref="AnsiString" />.
     /// </summary>
-    public static AnsiString operator +(char c, AnsiString? str) {
-        return Concat(new AnsiString(c.ToString()), str);
-    }
+    public static AnsiString operator +(char c, AnsiString? str) => Concat(new AnsiString(c.ToString()), str);
 
     /// <summary>
     ///     Concatenates an <see cref="AnsiString" /> and an <see cref="AnsiChar" />.
     /// </summary>
-    public static AnsiString operator +(AnsiString? str, AnsiChar c) {
-        return Concat(str, new AnsiString([c]));
-    }
+    public static AnsiString operator +(AnsiString? str, AnsiChar c) => Concat(str, new AnsiString([c]));
 
     /// <summary>
     ///     Concatenates an <see cref="AnsiChar" /> and an <see cref="AnsiString" />.
     /// </summary>
-    public static AnsiString operator +(AnsiChar c, AnsiString? str) {
-        return Concat(new AnsiString([c]), str);
-    }
+    public static AnsiString operator +(AnsiChar c, AnsiString? str) => Concat(new AnsiString([c]), str);
 
     /// <summary>
     ///     Composes an <see cref="NKStyle" /> onto an <see cref="AnsiString" />.
     /// </summary>
-    public static AnsiString operator +(AnsiString? str, NKStyle style) {
-        return str?.AddStyle(style) ?? new AnsiString();
-    }
+    public static AnsiString operator +(AnsiString? str, NKStyle style) => str?.AddStyle(style) ?? new AnsiString();
 
     /// <summary>
     ///     Composes an <see cref="NKStyle" /> onto an <see cref="AnsiString" />.
     /// </summary>
-    public static AnsiString operator +(NKStyle style, AnsiString? str) {
-        return str?.AddStyle(style) ?? new AnsiString();
-    }
+    public static AnsiString operator +(NKStyle style, AnsiString? str) => str?.AddStyle(style) ?? new AnsiString();
 
     /// <summary>
     ///     Adds <see cref="NKTextStyles" /> to an <see cref="AnsiString" />.
     /// </summary>
-    public static AnsiString operator +(AnsiString? str, NKTextStyles styles) {
-        return str?.AddStyles(styles) ?? new AnsiString();
-    }
+    public static AnsiString operator +(AnsiString? str, NKTextStyles styles) => str?.AddStyles(styles) ?? new AnsiString();
 
     /// <summary>
     ///     Sets text color on an <see cref="AnsiString" />.
     /// </summary>
-    public static AnsiString operator +(AnsiString? str, NKColor color) {
-        return str?.SetFColor(color) ?? new AnsiString();
-    }
+    public static AnsiString operator +(AnsiString? str, NKColor color) => str?.SetFColor(color) ?? new AnsiString();
 
     /// <summary>
     ///     Returns a copy of this string converted to uppercase, preserving all
     ///     styles.
     /// </summary>
     /// <returns>A new <see cref="AnsiString" /> instance.</returns>
-    public AnsiString ToUpper() {
-        return new AnsiString(_text.ToUpper(), [.. _styles]);
-    }
+    public AnsiString ToUpper() => new(_text.ToUpper(), [.. _styles]);
 
     /// <summary>
     ///     Returns a copy of this string converted to lowercase, preserving all
     ///     styles.
     /// </summary>
     /// <returns>A new <see cref="AnsiString" /> instance.</returns>
-    public AnsiString ToLower() {
-        return new AnsiString(_text.ToLower(), [.. _styles]);
-    }
+    public AnsiString ToLower() => new(_text.ToLower(), [.. _styles]);
 
     /// <summary>
     ///     Removes all leading and trailing white-space characters from the current
     ///     string.
     /// </summary>
     /// <returns>A new <see cref="AnsiString" /> instance.</returns>
-    public AnsiString Trim() {
-        return TrimStart().TrimEnd();
-    }
+    public AnsiString Trim() => TrimStart().TrimEnd();
 
     /// <summary>
     ///     Removes all leading and trailing occurrences of a set of characters
@@ -1018,9 +936,7 @@ public sealed class AnsiString :
     /// </summary>
     /// <param name="trimChars">An array of Unicode characters to remove, or null.</param>
     /// <returns>A new <see cref="AnsiString" /> instance.</returns>
-    public AnsiString Trim(params char[] trimChars) {
-        return TrimStart(trimChars).TrimEnd(trimChars);
-    }
+    public AnsiString Trim(params char[] trimChars) => TrimStart(trimChars).TrimEnd(trimChars);
 
     /// <summary>
     ///     Removes all leading white-space characters from the current string.
@@ -1086,69 +1002,53 @@ public sealed class AnsiString :
         return Substring(0, i + 1);
     }
 
-    public bool Contains(char value) {
-        return _text.Contains(value);
-    }
+    public bool Contains(char value) => _text.Contains(value);
 
     /// <summary>
     ///     Returns a value indicating whether a specified substring occurs within this
     ///     string.
     /// </summary>
-    public bool Contains(string value) {
-        return _text.Contains(value);
-    }
+    public bool Contains(string value) => _text.Contains(value);
 
     /// <summary>
     ///     Determines whether the beginning of this string instance matches the
     ///     specified string.
     /// </summary>
-    public bool StartsWith(string value) {
-        return _text.StartsWith(value);
-    }
+    public bool StartsWith(string value) => _text.StartsWith(value);
 
     /// <summary>
     ///     Determines whether the end of this string instance matches the specified
     ///     string.
     /// </summary>
-    public bool EndsWith(string value) {
-        return _text.EndsWith(value);
-    }
+    public bool EndsWith(string value) => _text.EndsWith(value);
 
     /// <summary>
     ///     Returns the zero-based index of the first occurrence of the specified
     ///     string in this
     ///     instance.
     /// </summary>
-    public int IndexOf(string value) {
-        return _text.IndexOf(value, StringComparison.Ordinal);
-    }
+    public int IndexOf(string value) => _text.IndexOf(value, StringComparison.Ordinal);
 
     /// <summary>
     ///     Returns the zero-based index of the first occurrence of the specified
     ///     character in this
     ///     instance.
     /// </summary>
-    public int IndexOf(char value) {
-        return _text.IndexOf(value);
-    }
+    public int IndexOf(char value) => _text.IndexOf(value);
 
     /// <summary>
     ///     Returns the zero-based index of the last occurrence of the specified string
     ///     in this
     ///     instance.
     /// </summary>
-    public int LastIndexOf(string value) {
-        return _text.LastIndexOf(value, StringComparison.Ordinal);
-    }
+    public int LastIndexOf(string value) => _text.LastIndexOf(value, StringComparison.Ordinal);
 
     /// <summary>
     ///     Returns the zero-based index of the last occurrence of the specified
     ///     character in this
     ///     instance.
     /// </summary>
-    public int LastIndexOf(char value) {
-        return _text.LastIndexOf(value);
-    }
+    public int LastIndexOf(char value) => _text.LastIndexOf(value);
 
     /// <summary>
     ///     Returns a new string in which all occurrences of a specified Unicode
@@ -1162,9 +1062,7 @@ public sealed class AnsiString :
     ///     The character to replace all occurrences of <paramref name="oldChar" />.
     /// </param>
     /// <returns>A new <see cref="AnsiString" /> instance.</returns>
-    public AnsiString Replace(char oldChar, char newChar) {
-        return new AnsiString(_text.Replace(oldChar, newChar), [.. _styles]);
-    }
+    public AnsiString Replace(char oldChar, char newChar) => new(_text.Replace(oldChar, newChar), [.. _styles]);
 
     /// <summary>
     ///     Returns a new string in which all occurrences of a specified string in the
@@ -1266,9 +1164,7 @@ public sealed class AnsiString :
     /// <param name="startIndex">The zero-based index position of the insertion.</param>
     /// <param name="value">The string to insert.</param>
     /// <returns>A new <see cref="AnsiString" /> instance.</returns>
-    public AnsiString Insert(int startIndex, string value) {
-        return Concat(Substring(0, startIndex), new AnsiString(value)) + Substring(startIndex);
-    }
+    public AnsiString Insert(int startIndex, string value) => Concat(Substring(0, startIndex), new AnsiString(value)) + Substring(startIndex);
 
     /// <summary>
     ///     Returns a new string in which all the characters in the current instance,
@@ -1278,9 +1174,7 @@ public sealed class AnsiString :
     /// </summary>
     /// <param name="startIndex">The zero-based position to begin deleting characters.</param>
     /// <returns>A new <see cref="AnsiString" /> instance.</returns>
-    public AnsiString Remove(int startIndex) {
-        return Substring(0, startIndex);
-    }
+    public AnsiString Remove(int startIndex) => Substring(0, startIndex);
 
     /// <summary>
     ///     Returns a new string in which a specified number of characters in the
@@ -1290,9 +1184,7 @@ public sealed class AnsiString :
     /// <param name="startIndex">The zero-based position to begin deleting characters.</param>
     /// <param name="count">The number of characters to delete.</param>
     /// <returns>A new <see cref="AnsiString" /> instance.</returns>
-    public AnsiString Remove(int startIndex, int count) {
-        return Substring(0, startIndex) + Substring(startIndex + count);
-    }
+    public AnsiString Remove(int startIndex, int count) => Substring(0, startIndex) + Substring(startIndex + count);
 
     /// <summary>
     ///     Returns a new string that right-aligns the characters in this instance by
@@ -1301,9 +1193,7 @@ public sealed class AnsiString :
     /// </summary>
     /// <param name="totalWidth">The number of characters in the resulting string.</param>
     /// <returns>A new <see cref="AnsiString" /> instance.</returns>
-    public AnsiString PadLeft(int totalWidth) {
-        return PadLeft(totalWidth, ' ');
-    }
+    public AnsiString PadLeft(int totalWidth) => PadLeft(totalWidth, ' ');
 
     /// <summary>
     ///     Returns a new string that right-aligns the characters in this instance by
@@ -1329,9 +1219,7 @@ public sealed class AnsiString :
     /// </summary>
     /// <param name="totalWidth">The number of characters in the resulting string.</param>
     /// <returns>A new <see cref="AnsiString" /> instance.</returns>
-    public AnsiString PadRight(int totalWidth) {
-        return PadRight(totalWidth, ' ');
-    }
+    public AnsiString PadRight(int totalWidth) => PadRight(totalWidth, ' ');
 
     /// <summary>
     ///     Returns a new string that left-aligns the characters in this instance by
@@ -1600,9 +1488,7 @@ public sealed class AnsiString :
             yield return this[i];
     }
 
-    IEnumerator IEnumerable.GetEnumerator() {
-        return GetEnumerator();
-    }
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     /// <summary>
     ///     Indicates whether the current object is equal to another
@@ -1632,9 +1518,7 @@ public sealed class AnsiString :
     /// <summary>
     ///     Determines whether the specified object is equal to the current object.
     /// </summary>
-    public override bool Equals(object? obj) {
-        return ReferenceEquals(this, obj) || (obj is AnsiString other && Equals(other));
-    }
+    public override bool Equals(object? obj) => ReferenceEquals(this, obj) || (obj is AnsiString other && Equals(other));
 
     /// <summary>
     ///     Serves as the default hash function.
@@ -1655,29 +1539,21 @@ public sealed class AnsiString :
     /// <summary>
     ///     Compares two <see cref="AnsiString" /> instances for equality.
     /// </summary>
-    public static bool operator ==(AnsiString? left, AnsiString? right) {
-        return Equals(left, right);
-    }
+    public static bool operator ==(AnsiString? left, AnsiString? right) => Equals(left, right);
 
     /// <summary>
     ///     Compares two <see cref="AnsiString" /> instances for inequality.
     /// </summary>
-    public static bool operator !=(AnsiString? left, AnsiString? right) {
-        return !Equals(left, right);
-    }
+    public static bool operator !=(AnsiString? left, AnsiString? right) => !Equals(left, right);
 
     /// <summary>
     ///     Creates a shallow copy of the <see cref="AnsiString" />.
     ///     Note that since the class is immutable, this is mostly for interface
     ///     compliance.
     /// </summary>
-    public AnsiString Clone() {
-        return new AnsiString(_text, [.. _styles]);
-    }
+    public AnsiString Clone() => new(_text, [.. _styles]);
 
-    object ICloneable.Clone() {
-        return Clone();
-    }
+    object ICloneable.Clone() => Clone();
 
     /// <summary>
     ///     Returns a string that represents the current <see cref="AnsiString" />,
@@ -1719,9 +1595,7 @@ public sealed class AnsiString :
         return sb.ToString();
     }
 
-    public static implicit operator string?(AnsiString? value) {
-        return value?.ToString();
-    }
+    public static implicit operator string?(AnsiString? value) => value?.ToString();
 
     #endregion
 
@@ -1740,9 +1614,7 @@ public sealed class AnsiString :
         public int     Index { get; }
         public NKStyle Style { get; }
 
-        public static StyleMarker Default {
-            get { return new(-1, NKStyle.Default); }
-        }
+        public static StyleMarker Default => new(-1, NKStyle.Default);
     }
 
     private class StyleMarkerComparer : IComparer<StyleMarker> {

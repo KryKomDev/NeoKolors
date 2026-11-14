@@ -25,19 +25,19 @@ public readonly record struct NKAlign : IParsable<NKAlign> {
             return false;
         }
 
-        (result, bool success) = s switch {
+        (result, var success) = s switch {
             "left"         => (new NKAlign(H.LEFT,   V.CENTER), true),
-            "top"          => (new NKAlign(H.CENTER, V.TOP),    true),
+            "top"          => (new NKAlign(H.CENTER, V.TOP), true),
             "right"        => (new NKAlign(H.RIGHT,  V.CENTER), true),
             "bottom"       => (new NKAlign(H.CENTER, V.BOTTOM), true),
             "center"       => (new NKAlign(H.CENTER, V.CENTER), true),
-            "top-left"     => (new NKAlign(H.LEFT,   V.TOP),    true),
-            "top-right"    => (new NKAlign(H.RIGHT,  V.TOP),    true),
+            "top-left"     => (new NKAlign(H.LEFT,   V.TOP), true),
+            "top-right"    => (new NKAlign(H.RIGHT,  V.TOP), true),
             "bottom-left"  => (new NKAlign(H.LEFT,   V.BOTTOM), true),
             "bottom-right" => (new NKAlign(H.RIGHT,  V.BOTTOM), true),
             _              => (default, false)
         };
-        
+
         return success;
     }
 
@@ -49,8 +49,8 @@ public readonly record struct NKAlign : IParsable<NKAlign> {
     public static NKAlign Parse(string? s, IFormatProvider? provider) {
         ArgumentNullException.ThrowIfNull(s);
 
-        return TryParse(s, provider, out var result) 
-            ? result 
+        return TryParse(s, provider, out var result)
+            ? result
             : throw new FormatException($"Alignment '{s}' not in correct format.");
     }
 

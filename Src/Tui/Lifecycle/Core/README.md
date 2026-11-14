@@ -2,7 +2,8 @@
 
 [![Build & Test](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/ci.yml?branch=main&style=for-the-badge&label=Build%20%26%20Test&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/ci.yml) [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Tui.Lifecycle.Core?style=for-the-badge&labelColor=%232a313c&color=%23e051c6)](https://www.nuget.org/packages/NeoKolors.Tui.Lifecycle.Core) [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Tui.Lifecycle.Core?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://www.nuget.org/packages/NeoKolors.Tui.Lifecycle.Core) [![License](https://img.shields.io/github/license/KryKomDev/NeoKolors?style=for-the-badge&labelColor=%232a313c&color=%2358a6ff)](https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE)
 
-`NeoKolors.Tui.Lifecycle.Core` provides the core lifecycle management, frame timing, deterministic time-step accumulation, and scene management for NeoKolors applications and games.
+`NeoKolors.Tui.Lifecycle.Core` provides the core lifecycle management, frame timing, deterministic
+time-step accumulation, and scene management for NeoKolors applications and games.
 
 ---
 
@@ -11,6 +12,7 @@
 ### 1. State Machine (`ILifecycle` & `LifecycleController`)
 
 The `LifecycleController` manages execution states:
+
 - `INITIALIZED`: Application created, ready to start.
 - `RUNNING`: Main execution and render loop active.
 - `PAUSED`: Execution suspended (e.g. window minimized or backgrounded).
@@ -37,7 +39,8 @@ controller.Stop();
 
 ### 2. High-Precision Frame Timing (`FrameClock`)
 
-`FrameClock` calculates exact delta time between ticks, monitors frame rates, and computes smoothed FPS averages:
+`FrameClock` calculates exact delta time between ticks, monitors frame rates, and computes smoothed
+FPS averages:
 
 ```csharp
 using NeoKolors.Tui.Lifecycle.Core;
@@ -58,7 +61,9 @@ while (isRunning) {
 
 ### 3. Deterministic Physics (`FixedTimestepAccumulator`)
 
-When developing games or deterministic animations, render frame rates may fluctuate while physics/logic must run at an exact constant interval (e.g. 60 Hz). `FixedTimestepAccumulator` consumes variable frame delta times and executes exact fixed updates:
+When developing games or deterministic animations, render frame rates may fluctuate while
+physics/logic must run at an exact constant interval (e.g. 60 Hz). `FixedTimestepAccumulator`
+consumes variable frame delta times and executes exact fixed updates:
 
 ```csharp
 using NeoKolors.Tui.Lifecycle.Core;

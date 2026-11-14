@@ -19,12 +19,12 @@ public enum NKCellFlags : ushort {
     CLUSTER                        = 0b1000,
     [ExcludeFlag] CLUSTER_START    = 0b1000,
     [ExcludeFlag] CLUSTER_CONTINUE = 0b1100,
-    
+
     /// <summary>
-    /// This flag indicates that the cell is transparent, meaning the cell will
-    /// not be drawn onto the canvas.
+    ///     This flag indicates that the cell is transparent, meaning the cell will
+    ///     not be drawn onto the canvas.
     /// </summary>
-    TRANSPARENT = 0b10000,
+    TRANSPARENT = 0b10000
 }
 
 public static partial class NKCellFlagsExtensions {

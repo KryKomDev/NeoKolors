@@ -26,8 +26,8 @@ public class LogFileConfigReworkTests : IDisposable {
 
     [Fact]
     public void Replace_CreatesOrOverwritesFile() {
-        string logPath = Path.Combine(_tempDirectory, "test_replace.log");
-        var fileConfig = LogFileConfig.Replace(logPath);
+        string logPath    = Path.Combine(_tempDirectory, "test_replace.log");
+        var    fileConfig = LogFileConfig.Replace(logPath);
 
         using (var writer = fileConfig.CreateOutput()) {
             writer.WriteLine("Initial Line");
@@ -47,8 +47,8 @@ public class LogFileConfigReworkTests : IDisposable {
 
     [Fact]
     public void Append_AppendsContentToFile() {
-        string logPath = Path.Combine(_tempDirectory, "test_append.log");
-        var fileConfig = LogFileConfig.Append(logPath);
+        string logPath    = Path.Combine(_tempDirectory, "test_append.log");
+        var    fileConfig = LogFileConfig.Append(logPath);
 
         using (var writer = fileConfig.CreateOutput()) {
             writer.WriteLine("Line 1");
@@ -66,13 +66,14 @@ public class LogFileConfigReworkTests : IDisposable {
     [Fact]
     public void NewCount_GeneratesSequentialFiles_WithoutConfigFile() {
         string templatePath = Path.Combine(_tempDirectory, "app_{0}.log");
-        var config1 = LogFileConfig.NewCount(templatePath);
+        var    config1      = LogFileConfig.NewCount(templatePath);
 
         using (var writer = config1.CreateOutput()) {
             writer.WriteLine("Log 1");
         }
 
         var config2 = LogFileConfig.NewCount(templatePath);
+
         using (var writer = config2.CreateOutput()) {
             writer.WriteLine("Log 2");
         }
@@ -89,8 +90,8 @@ public class LogFileConfigReworkTests : IDisposable {
         using var sw1 = new StringWriter();
         using var sw2 = new StringWriter();
 
-        var writer1 = new TextLogWriter(sw1);
-        var writer2 = new TextLogWriter(sw2);
+        var       writer1   = new TextLogWriter(sw1);
+        var       writer2   = new TextLogWriter(sw2);
         using var composite = new CompositeLogWriter(writer1, writer2);
 
         var logger = new NKLogger(composite, "CompositeTest");
@@ -103,10 +104,10 @@ public class LogFileConfigReworkTests : IDisposable {
     [Fact]
     public void NKLoggerOptions_UseFileLogging_ConfiguresFileAndConsole() {
         string logPath = Path.Combine(_tempDirectory, "combined.log");
-        var options = new NKLoggerOptions().UseFileLogging(logPath);
+        var    options = new NKLoggerOptions().UseFileLogging(logPath);
 
         using var provider = new NKLoggerProvider(options);
-        var logger = provider.CreateLogger("IntegrationTest");
+        var       logger   = provider.CreateLogger("IntegrationTest");
 
         logger.LogInformation("Test message for file integration");
 

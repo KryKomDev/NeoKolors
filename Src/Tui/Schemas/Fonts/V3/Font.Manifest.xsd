@@ -8,9 +8,9 @@
             targetNamespace="https://krykomdev.github.io/NeoKolors/Schemas/Fonts/v3/"
             elementFormDefault="qualified"
             attributeFormDefault="qualified">
-    
+
     <xsd:include schemaLocation="Font.Common.xsd"/>
-    
+
     <xsd:element name="FontManifest">
         <xsd:complexType>
             <xsd:all>
@@ -19,13 +19,13 @@
                         <xsd:restriction base="nk:Version"/>
                     </xsd:simpleType>
                 </xsd:element>
-                
+
                 <xsd:element name="Config">
                     <xsd:simpleType>
                         <xsd:restriction base="xsd:anyURI"/>
                     </xsd:simpleType>
-                </xsd:element>                
-                
+                </xsd:element>
+
                 <xsd:element name="Map">
                     <xsd:simpleType>
                         <xsd:restriction base="xsd:anyURI"/>

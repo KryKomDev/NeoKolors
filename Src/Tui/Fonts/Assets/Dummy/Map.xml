@@ -59,30 +59,30 @@
     <Component Symbol=":" File="special/colon.nkg"/>
     <Component Symbol="," File="special/comma.nkg"/>
     <Component Symbol="." File="special/dot.nkg"/>
-    
-    <Component Symbol="ˇ" File="diacritics/grave.nkg"      Id="grave"/>
-    <Component Symbol="´" File="diacritics/accent.nkg"     Id="accent"/>
+
+    <Component Symbol="ˇ" File="diacritics/grave.nkg" Id="grave"/>
+    <Component Symbol="´" File="diacritics/accent.nkg" Id="accent"/>
     <Component Symbol="'" File="diacritics/apostrophe.nkg" Id="apostrophe" Baseline="2"/>
-    <Component Symbol="°" File="diacritics/circle.nkg"     Id="circle"/>
-    <Component Symbol="¨" File="diacritics/umlaut.nkg"     Id="umlaut"/>
-    
+    <Component Symbol="°" File="diacritics/circle.nkg" Id="circle"/>
+    <Component Symbol="¨" File="diacritics/umlaut.nkg" Id="umlaut"/>
+
     <AutoCompound Symbol="ˇ" Base="grave" Align="top">
         <ApplicableChars>CcDdEeLlNnRrSsTtZz</ApplicableChars>
     </AutoCompound>
-    
+
     <AutoCompound Symbol="´" Base="accent" Align="top">
         <ApplicableGroup>basic-vowels</ApplicableGroup>
     </AutoCompound>
-    
+
     <AutoCompound Symbol="¨" Base="umlaut" Align="top">
         <ApplicableGroup>basic-vowels</ApplicableGroup>
     </AutoCompound>
 
     <Compound Symbol="ů" Main="u" Secondary="circle"/>
     <Compound Symbol="Ů" Main="U" Secondary="circle"/>
-    
+
     <Ligature Symbol="->" File="ligatures/arr-right.nkg"/>
-    
+
     <Strikethrough File="effects/strikethrough.nkg" Baseline="1" AboveLetters="true"/>
-    <Underline     File="effects/underline.nkg"     Baseline="-1"/>
+    <Underline File="effects/underline.nkg" Baseline="-1"/>
 </FontMap> 

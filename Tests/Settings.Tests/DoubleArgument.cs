@@ -6,19 +6,19 @@
 namespace NeoKolors.Settings.Tests;
 
 public class DoubleArgumentTests {
-    
+
     [Fact]
     public void Set_ShouldWorkProperly() {
         var a = new DoubleArgument();
-        
+
         // try with double
         a.Set(1.23);
         Assert.Equal(1.23, a.Value);
-        
+
         // try with string
         a.Set("4.56");
         Assert.Equal(4.56, a.Value);
-        
+
         // try with another argument
         var b = new DoubleArgument();
         b.Set(7.89);
@@ -34,7 +34,7 @@ public class DoubleArgumentTests {
 
     [Fact]
     public void Set_ShouldThrowException_ForOutOfRangeValue() {
-        var a = new DoubleArgument(min: 0, max: 10);
+        var a = new DoubleArgument(0, 10);
         Assert.Throws<InvalidArgumentInputException>(() => a.Set(-1));
         Assert.Throws<InvalidArgumentInputException>(() => a.Set(11));
     }
@@ -53,9 +53,9 @@ public class DoubleArgumentTests {
     public void Equal_ShouldWorkProperly() {
         var a = new DoubleArgument();
         var b = new DoubleArgument(defaultValue: 1.23);
-        
+
         Assert.False(a.Equals(b));
-        
+
         b.Set(0);
         Assert.False(a.Equals(b));
 

@@ -6,7 +6,7 @@
 namespace NeoKolors.Common;
 
 /// <summary>
-/// represents the default color in <see cref="NKColor"/>
+///     represents the default color in <see cref="NKColor" />
 /// </summary>
 [StructLayout(LayoutKind.Explicit, Size = 0)]
 public record struct DefaultColor;

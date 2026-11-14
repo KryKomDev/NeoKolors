@@ -21,7 +21,7 @@ public class Table : IElement {
     public Bindable<Spacing>                         Margin                   { get; init; } = default;
 
     /// <summary>
-    ///     Convenience alias for <see cref="Data"/>.
+    ///     Convenience alias for <see cref="Data" />.
     /// </summary>
     public Bindable<IReadOnlyList2D<IElement>> Rows {
         get => Data;
@@ -131,26 +131,24 @@ public class Table : IElement {
         if (rows == null || rows.Count == 0)
             return new List2D<IElement>();
 
-        int numRows = rows.Count;
-        int numCols = 0;
+        var numRows = rows.Count;
+        var numCols = 0;
 
-        for (int r = 0; r < numRows; r++) {
+        for (var r = 0; r < numRows; r++)
             if (rows[r] != null && rows[r].Count > numCols)
                 numCols = rows[r].Count;
-        }
 
         var list = new List2D<IElement>(numCols, numRows);
         list.Resize(numCols, numRows);
 
-        for (int r = 0; r < numRows; r++) {
+        for (var r = 0; r < numRows; r++) {
             var row = rows[r];
 
             if (row == null)
                 continue;
 
-            for (int c = 0; c < row.Count; c++) {
+            for (var c = 0; c < row.Count; c++)
                 list[c, r] = row[c];
-            }
         }
 
         return list;
@@ -160,26 +158,24 @@ public class Table : IElement {
         if (columns == null || columns.Count == 0)
             return new List2D<IElement>();
 
-        int numCols = columns.Count;
-        int numRows = 0;
+        var numCols = columns.Count;
+        var numRows = 0;
 
-        for (int c = 0; c < numCols; c++) {
+        for (var c = 0; c < numCols; c++)
             if (columns[c] != null && columns[c].Count > numRows)
                 numRows = columns[c].Count;
-        }
 
         var list = new List2D<IElement>(numCols, numRows);
         list.Resize(numCols, numRows);
 
-        for (int c = 0; c < numCols; c++) {
+        for (var c = 0; c < numCols; c++) {
             var col = columns[c];
 
             if (col == null)
                 continue;
 
-            for (int r = 0; r < col.Count; r++) {
+            for (var r = 0; r < col.Count; r++)
                 list[c, r] = col[r];
-            }
         }
 
         return list;
@@ -201,10 +197,10 @@ public class Table : IElement {
         if (headers != null) {
             headerElements = new IElement[headers.Count];
 
-            for (int i = 0; i < headers.Count; i++) {
-                var hAlign = (headerAlignments != null && i < headerAlignments.Count)
+            for (var i = 0; i < headers.Count; i++) {
+                var hAlign = headerAlignments != null && i < headerAlignments.Count
                     ? headerAlignments[i]
-                    : (columnAlignments != null && i < columnAlignments.Count)
+                    : columnAlignments != null && i < columnAlignments.Count
                         ? columnAlignments[i]
                         : HorizontalAlign.LEFT;
 
@@ -218,33 +214,32 @@ public class Table : IElement {
         var dataElements = new List2D<IElement>(data.XCount, data.YCount);
         dataElements.Resize(data.XCount, data.YCount);
 
-        for (int c = 0; c < data.XCount; c++) {
-            var colAlign = (columnAlignments != null && c < columnAlignments.Count)
+        for (var c = 0; c < data.XCount; c++) {
+            var colAlign = columnAlignments != null && c < columnAlignments.Count
                 ? columnAlignments[c]
                 : HorizontalAlign.LEFT;
 
-            var vAlign = (columnVerticalAlignments != null && c < columnVerticalAlignments.Count)
+            var vAlign = columnVerticalAlignments != null && c < columnVerticalAlignments.Count
                 ? columnVerticalAlignments[c]
                 : VerticalAlign.TOP;
 
-            for (int r = 0; r < data.YCount; r++) {
+            for (var r = 0; r < data.YCount; r++)
                 dataElements[c, r] = new Text(
                     new AnsiString(data[c, r]),
                     textAlign: new NKAlign(colAlign, vAlign)
                 );
-            }
         }
 
         return new Table(
-            headers: headerElements,
-            data: dataElements,
-            style: style,
-            columnWidths: columnWidths,
-            columnAlignments: columnAlignments,
-            cellPadding: cellPadding,
-            margin: margin,
-            headerAlignments: headerAlignments,
-            columnVerticalAlignments: columnVerticalAlignments
+            headerElements,
+            dataElements,
+            style,
+            columnWidths,
+            columnAlignments,
+            cellPadding,
+            margin,
+            headerAlignments,
+            columnVerticalAlignments
         );
     }
 
@@ -275,10 +270,10 @@ public class Table : IElement {
         if (headers != null) {
             headerElements = new IElement[headers.Count];
 
-            for (int i = 0; i < headers.Count; i++) {
-                var hAlign = (headerAlignments != null && i < headerAlignments.Count)
+            for (var i = 0; i < headers.Count; i++) {
+                var hAlign = headerAlignments != null && i < headerAlignments.Count
                     ? headerAlignments[i]
-                    : (columnAlignments != null && i < columnAlignments.Count)
+                    : columnAlignments != null && i < columnAlignments.Count
                         ? columnAlignments[i]
                         : HorizontalAlign.LEFT;
 
@@ -289,29 +284,28 @@ public class Table : IElement {
             }
         }
 
-        int numRows = rows.Count;
-        int numCols = 0;
+        var numRows = rows.Count;
+        var numCols = 0;
 
-        for (int r = 0; r < numRows; r++) {
+        for (var r = 0; r < numRows; r++)
             if (rows[r] != null && rows[r].Count > numCols)
                 numCols = rows[r].Count;
-        }
 
         var dataElements = new List2D<IElement>(numCols, numRows);
         dataElements.Resize(numCols, numRows);
 
-        for (int r = 0; r < numRows; r++) {
+        for (var r = 0; r < numRows; r++) {
             var row = rows[r];
 
             if (row == null)
                 continue;
 
-            for (int c = 0; c < row.Count; c++) {
-                var colAlign = (columnAlignments != null && c < columnAlignments.Count)
+            for (var c = 0; c < row.Count; c++) {
+                var colAlign = columnAlignments != null && c < columnAlignments.Count
                     ? columnAlignments[c]
                     : HorizontalAlign.LEFT;
 
-                var vAlign = (columnVerticalAlignments != null && c < columnVerticalAlignments.Count)
+                var vAlign = columnVerticalAlignments != null && c < columnVerticalAlignments.Count
                     ? columnVerticalAlignments[c]
                     : VerticalAlign.TOP;
 
@@ -323,15 +317,15 @@ public class Table : IElement {
         }
 
         return new Table(
-            headers: headerElements,
-            data: dataElements,
-            style: style,
-            columnWidths: columnWidths,
-            columnAlignments: columnAlignments,
-            cellPadding: cellPadding,
-            margin: margin,
-            headerAlignments: headerAlignments,
-            columnVerticalAlignments: columnVerticalAlignments
+            headerElements,
+            dataElements,
+            style,
+            columnWidths,
+            columnAlignments,
+            cellPadding,
+            margin,
+            headerAlignments,
+            columnVerticalAlignments
         );
     }
 
@@ -350,34 +344,31 @@ public class Table : IElement {
         IReadOnlyList<IElement>?   headers,
         IReadOnlyList2D<IElement>? data
     ) {
-        bool hasHeader = headers is { Count: > 0 };
-        int  dataCols  = data?.XCount ?? 0;
-        int  dataRows  = data?.YCount ?? 0;
+        var hasHeader = headers is { Count: > 0 };
+        var dataCols  = data?.XCount ?? 0;
+        var dataRows  = data?.YCount ?? 0;
 
-        int rowCount = (hasHeader ? 1 : 0) + dataRows;
-        int colCount = Math.Max(hasHeader ? headers!.Count : 0, dataCols);
+        var rowCount = (hasHeader ? 1 : 0) + dataRows;
+        var colCount = Math.Max(hasHeader ? headers!.Count : 0, dataCols);
 
         if (rowCount == 0 || colCount == 0)
             return (new IElement?[0, 0], 0, 0, false);
 
         var matrix = new IElement?[rowCount, colCount];
 
-        int startRow = 0;
+        var startRow = 0;
 
         if (hasHeader) {
-            for (int c = 0; c < headers!.Count; c++)
+            for (var c = 0; c < headers!.Count; c++)
                 matrix[0, c] = headers[c];
 
             startRow = 1;
         }
 
-        if (data != null) {
-            for (int r = 0; r < dataRows; r++) {
-                for (int c = 0; c < dataCols; c++) {
-                    matrix[startRow + r, c] = data[c, r];
-                }
-            }
-        }
+        if (data != null)
+            for (var r = 0; r < dataRows; r++)
+            for (var c = 0; c < dataCols; c++)
+                matrix[startRow + r, c] = data[c, r];
 
         return (matrix, rowCount, colCount, hasHeader);
     }
@@ -394,53 +385,48 @@ public class Table : IElement {
         var colWidths  = new int[numCols];
         var rowHeights = new int[numRows];
 
-        for (int r = 0; r < numRows; r++) {
-            for (int c = 0; c < numCols; c++) {
-                var cell = matrix[r, c];
+        for (var r = 0; r < numRows; r++)
+        for (var c = 0; c < numCols; c++) {
+            var cell = matrix[r, c];
 
-                if (cell != null) {
-                    var desired = cell.Measure(context);
-                    int w       = desired.X + cellPadding.Horizontal;
-                    int h       = desired.Y + cellPadding.Vertical;
+            if (cell != null) {
+                var desired = cell.Measure(context);
+                var w       = desired.X + cellPadding.Horizontal;
+                var h       = desired.Y + cellPadding.Vertical;
 
-                    if (w > colWidths[c])
-                        colWidths[c] = w;
+                if (w > colWidths[c])
+                    colWidths[c] = w;
 
-                    if (h > rowHeights[r])
-                        rowHeights[r] = h;
-                }
-                else {
-                    if (cellPadding.Horizontal > colWidths[c])
-                        colWidths[c] = cellPadding.Horizontal;
+                if (h > rowHeights[r])
+                    rowHeights[r] = h;
+            }
+            else {
+                if (cellPadding.Horizontal > colWidths[c])
+                    colWidths[c] = cellPadding.Horizontal;
 
-                    if (cellPadding.Vertical > rowHeights[r])
-                        rowHeights[r] = cellPadding.Vertical;
-                }
+                if (cellPadding.Vertical > rowHeights[r])
+                    rowHeights[r] = cellPadding.Vertical;
             }
         }
 
-        if (colDefs != null) {
-            for (int c = 0; c < numCols && c < colDefs.Count; c++) {
+        if (colDefs != null)
+            for (var c = 0; c < numCols && c < colDefs.Count; c++) {
                 var dim      = colDefs[c];
-                int resolved = dim.Resolve(context.Parent.X, context.Screen, colWidths[c], ungrown);
+                var resolved = dim.Resolve(context.Parent.X, context.Screen, colWidths[c], ungrown);
 
                 if (resolved > 0)
                     colWidths[c] = resolved;
             }
-        }
 
-        for (int r = 0; r < numRows; r++) {
+        for (var r = 0; r < numRows; r++)
             if (rowHeights[r] < 1)
                 rowHeights[r] = 1;
-        }
 
         var elements = new Size2D[numRows, numCols];
 
-        for (int r = 0; r < numRows; r++) {
-            for (int c = 0; c < numCols; c++) {
-                elements[r, c] = new Size2D(colWidths[c], rowHeights[r]);
-            }
-        }
+        for (var r = 0; r < numRows; r++)
+        for (var c = 0; c < numCols; c++)
+            elements[r, c] = new Size2D(colWidths[c], rowHeights[r]);
 
         return elements;
     }
@@ -451,8 +437,8 @@ public class Table : IElement {
         if (numRows == 0 || numCols == 0)
             return Size2D.Zero;
 
-        var margin      = Margin.AsT.Resolve(context, ungrown: true);
-        var cellPadding = CellPadding.AsT.Resolve(context, ungrown: true);
+        var margin      = Margin.AsT.Resolve(context, true);
+        var cellPadding = CellPadding.AsT.Resolve(context, true);
 
         var elements = BuildCellSizes(
             matrix,
@@ -461,7 +447,7 @@ public class Table : IElement {
             ColumnWidths.AsT,
             cellPadding,
             context,
-            ungrown: true
+            true
         );
 
         var style     = Style.AsT ?? NKTableStyle.GetRounded();
@@ -487,16 +473,16 @@ public class Table : IElement {
             }
             else {
                 var cAligns = ColumnAlignments.AsT;
-                h = (cAligns != null && col < cAligns.Count) ? cAligns[col] : DefaultAlignment.AsT;
+                h = cAligns != null && col < cAligns.Count ? cAligns[col] : DefaultAlignment.AsT;
             }
         }
         else {
             var cAligns = ColumnAlignments.AsT;
-            h = (cAligns != null && col < cAligns.Count) ? cAligns[col] : DefaultAlignment.AsT;
+            h = cAligns != null && col < cAligns.Count ? cAligns[col] : DefaultAlignment.AsT;
         }
 
         var vAligns = ColumnVerticalAlignments.AsT;
-        var v       = (vAligns != null && col < vAligns.Count) ? vAligns[col] : DefaultVerticalAlignment.AsT;
+        var v       = vAligns != null && col < vAligns.Count ? vAligns[col] : DefaultVerticalAlignment.AsT;
 
         return (h, v);
     }
@@ -518,7 +504,7 @@ public class Table : IElement {
             ColumnWidths.AsT,
             cellPadding,
             layoutContext,
-            ungrown: false
+            false
         );
 
         var style = Style.AsT ?? NKTableStyle.GetRounded();
@@ -529,10 +515,10 @@ public class Table : IElement {
 
         var offsets = style.GetElementOffsets(elements);
 
-        for (int r = 0; r < numRows; r++) {
-            bool isHeader = hasHeader && r == 0;
+        for (var r = 0; r < numRows; r++) {
+            var isHeader = hasHeader && r == 0;
 
-            for (int c = 0; c < numCols; c++) {
+            for (var c = 0; c < numCols; c++) {
                 var cell = matrix[r, c];
 
                 if (cell is null)
@@ -555,19 +541,19 @@ public class Table : IElement {
 
                 var desired = cell.Measure(new LayoutContext(childAreaSize, context.Size));
 
-                int renderW = Math.Min(childAreaSize.X, desired.X);
-                int renderH = Math.Min(childAreaSize.Y, desired.Y);
+                var renderW = Math.Min(childAreaSize.X, desired.X);
+                var renderH = Math.Min(childAreaSize.Y, desired.Y);
 
                 if (renderW <= 0 || renderH <= 0)
                     continue;
 
-                int offsetX = hAlign switch {
+                var offsetX = hAlign switch {
                     HorizontalAlign.CENTER => Math.Max(0, childAreaSize.X - renderW) / 2,
                     HorizontalAlign.RIGHT  => Math.Max(0, childAreaSize.X - renderW),
                     _                      => 0
                 };
 
-                int offsetY = vAlign switch {
+                var offsetY = vAlign switch {
                     VerticalAlign.CENTER => Math.Max(0, childAreaSize.Y - renderH) / 2,
                     VerticalAlign.BOTTOM => Math.Max(0, childAreaSize.Y - renderH),
                     _                    => 0
@@ -577,8 +563,8 @@ public class Table : IElement {
                 var childRenderSize = new Size2D(renderW, renderH);
 
                 using (context.PushScope(
-                        offset: childOffset,
-                        clip: new Rect2D(Point2D.Zero,        childRenderSize),
+                        childOffset,
+                        new Rect2D(Point2D.Zero,              childRenderSize),
                         contextArea: new Rect2D(Point2D.Zero, childRenderSize)
                     )) {
                     cell.Render(context, childRenderSize);

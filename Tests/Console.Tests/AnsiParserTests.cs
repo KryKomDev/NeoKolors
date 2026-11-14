@@ -1,34 +1,33 @@
+using NeoKolors.Common;
 using NeoKolors.Console.Ansi;
 using NeoKolors.Extensions;
 
 namespace NeoKolors.Console.Tests;
 
+[Collection("ConsoleTests")]
 public class AnsiParserTests {
 
     private class MockAnsiParser : AnsiParser {
-        
+
         private readonly Queue<KeyEventArgs> _input = new();
-        public bool Released { get; private set; }
-        public bool ReleaseSuccess { get; private set; }
+        public           bool                Released       { get; private set; }
+        public           bool                ReleaseSuccess { get; private set; }
 
         public MockAnsiParser(params string[] sequences) {
-            foreach (var seq in sequences) {
-                foreach (var c in seq) {
-                    _input.Enqueue(new KeyEventArgs(ConsoleKeyInfo.FromChar(c)));
-                }
-            }
+            foreach (var seq in sequences)
+            foreach (var c in seq)
+                _input.Enqueue(new KeyEventArgs(ConsoleKeyInfo.FromChar(c)));
         }
 
         public override bool Peek() => _input.Count > 0;
 
-        public override KeyEventArgs Read() {
-            return _input.Count == 0 
-                ? new KeyEventArgs(KeyCode.NONE, KeyModifiers.NONE, '\0') 
+        public override KeyEventArgs Read() =>
+            _input.Count == 0
+                ? new KeyEventArgs(KeyCode.NONE, KeyModifiers.NONE, '\0')
                 : _input.Dequeue();
-        }
 
         public override void ReleaseRead(bool success) {
-            Released = true;
+            Released       = true;
             ReleaseSuccess = success;
         }
     }
@@ -41,9 +40,9 @@ public class AnsiParserTests {
 
         Assert.NotNull(record);
         Assert.Equal(AnsiRecordType.MOUSE, record.Value.Type);
-        Assert.Equal(MouseButton.LEFT, record.Value.Mouse.Button);
-        Assert.Equal(9, record.Value.Mouse.Position.X);
-        Assert.Equal(19, record.Value.Mouse.Position.Y);
+        Assert.Equal(MouseButton.LEFT,     record.Value.Mouse.Button);
+        Assert.Equal(9,                    record.Value.Mouse.Position.X);
+        Assert.Equal(19,                   record.Value.Mouse.Position.Y);
         Assert.True(record.Value.Mouse.IsPress);
         Assert.False(record.Value.Mouse.Released);
         Assert.False(record.Value.Mouse.Moved);
@@ -57,9 +56,9 @@ public class AnsiParserTests {
 
         Assert.NotNull(record);
         Assert.Equal(AnsiRecordType.MOUSE, record.Value.Type);
-        Assert.Equal(MouseButton.LEFT, record.Value.Mouse.Button);
-        Assert.Equal(9, record.Value.Mouse.Position.X);
-        Assert.Equal(19, record.Value.Mouse.Position.Y);
+        Assert.Equal(MouseButton.LEFT,     record.Value.Mouse.Button);
+        Assert.Equal(9,                    record.Value.Mouse.Position.X);
+        Assert.Equal(19,                   record.Value.Mouse.Position.Y);
         Assert.True(record.Value.Mouse.Released);
         Assert.True(record.Value.Mouse.IsRelease);
         Assert.False(record.Value.Mouse.Moved);
@@ -73,9 +72,9 @@ public class AnsiParserTests {
 
         Assert.NotNull(record);
         Assert.Equal(AnsiRecordType.MOUSE, record.Value.Type);
-        Assert.Equal(MouseButton.RELEASE, record.Value.Mouse.Button);
-        Assert.Equal(14, record.Value.Mouse.Position.X);
-        Assert.Equal(24, record.Value.Mouse.Position.Y);
+        Assert.Equal(MouseButton.RELEASE,  record.Value.Mouse.Button);
+        Assert.Equal(14,                   record.Value.Mouse.Position.X);
+        Assert.Equal(24,                   record.Value.Mouse.Position.Y);
         Assert.True(record.Value.Mouse.Moved);
         Assert.False(record.Value.Mouse.Released);
         Assert.True(record.Value.Mouse.IsHover);
@@ -89,9 +88,9 @@ public class AnsiParserTests {
 
         Assert.NotNull(record);
         Assert.Equal(AnsiRecordType.MOUSE, record.Value.Type);
-        Assert.Equal(MouseButton.LEFT, record.Value.Mouse.Button);
-        Assert.Equal(11, record.Value.Mouse.Position.X);
-        Assert.Equal(21, record.Value.Mouse.Position.Y);
+        Assert.Equal(MouseButton.LEFT,     record.Value.Mouse.Button);
+        Assert.Equal(11,                   record.Value.Mouse.Position.X);
+        Assert.Equal(21,                   record.Value.Mouse.Position.Y);
         Assert.True(record.Value.Mouse.Moved);
         Assert.False(record.Value.Mouse.Released);
         Assert.False(record.Value.Mouse.IsHover);
@@ -122,9 +121,9 @@ public class AnsiParserTests {
 
         Assert.NotNull(recordPress);
         Assert.Equal(AnsiRecordType.MOUSE, recordPress.Value.Type);
-        Assert.Equal(MouseButton.LEFT, recordPress.Value.Mouse.Button);
-        Assert.Equal(9, recordPress.Value.Mouse.Position.X);
-        Assert.Equal(19, recordPress.Value.Mouse.Position.Y);
+        Assert.Equal(MouseButton.LEFT,     recordPress.Value.Mouse.Button);
+        Assert.Equal(9,                    recordPress.Value.Mouse.Position.X);
+        Assert.Equal(19,                   recordPress.Value.Mouse.Position.Y);
         Assert.True(recordPress.Value.Mouse.IsPress);
 
         // \e[M + '#' (35 -> Button 3 = Release) + '*' (42) + '4' (52)
@@ -133,9 +132,9 @@ public class AnsiParserTests {
 
         Assert.NotNull(recordRel);
         Assert.Equal(AnsiRecordType.MOUSE, recordRel.Value.Type);
-        Assert.Equal(MouseButton.RELEASE, recordRel.Value.Mouse.Button);
-        Assert.Equal(9, recordRel.Value.Mouse.Position.X);
-        Assert.Equal(19, recordRel.Value.Mouse.Position.Y);
+        Assert.Equal(MouseButton.RELEASE,  recordRel.Value.Mouse.Button);
+        Assert.Equal(9,                    recordRel.Value.Mouse.Position.X);
+        Assert.Equal(19,                   recordRel.Value.Mouse.Position.Y);
         Assert.True(recordRel.Value.Mouse.IsRelease);
     }
 
@@ -147,7 +146,7 @@ public class AnsiParserTests {
 
         Assert.NotNull(record);
         Assert.Equal(AnsiRecordType.VT_QUERY, record.Value.Type);
-        Assert.Equal(VTType.VT420, record.Value.Query.PrimaryDAResponse!.Value.Type);
+        Assert.Equal(VTType.VT420,            record.Value.Query.PrimaryDAResponse!.Value.Type);
         Assert.True(record.Value.Query.PrimaryDAResponse.Value.Capabilities!.Value.HasFlag(VTCapabilities.COL_132));
         Assert.True(record.Value.Query.PrimaryDAResponse.Value.Capabilities!.Value.HasFlag(VTCapabilities.PRINTER));
     }
@@ -159,8 +158,8 @@ public class AnsiParserTests {
         var record = parser.Parse();
 
         Assert.NotNull(record);
-        Assert.Equal(AnsiRecordType.VT_QUERY, record.Value.Type);
-        Assert.Equal(1, (int)record.Value.Query.DecMode);
+        Assert.Equal(AnsiRecordType.VT_QUERY,     record.Value.Type);
+        Assert.Equal(1,                           (int)record.Value.Query.DecMode);
         Assert.Equal(DecReqResponseType.DISABLED, record.Value.Query.DecResponse);
     }
 
@@ -172,7 +171,7 @@ public class AnsiParserTests {
 
         Assert.NotNull(record);
         Assert.Equal(AnsiRecordType.KEY, record.Value.Type);
-        Assert.Equal('A', record.Value.Key.Char);
+        Assert.Equal('A',                record.Value.Key.Char);
         Assert.True(parser.Released);
         Assert.True(parser.ReleaseSuccess);
     }
@@ -183,8 +182,8 @@ public class AnsiParserTests {
         var recordUp = parserUp.Parse();
         Assert.NotNull(recordUp);
         Assert.Equal(AnsiRecordType.KEY, recordUp.Value.Type);
-        Assert.Equal(KeyCode.ARROW_UP, recordUp.Value.Key.Key);
-        Assert.Equal(KeyModifiers.NONE, recordUp.Value.Key.Modifiers);
+        Assert.Equal(KeyCode.ARROW_UP,   recordUp.Value.Key.Key);
+        Assert.Equal(KeyModifiers.NONE,  recordUp.Value.Key.Modifiers);
 
         var parserDown = new MockAnsiParser("\e[B");
         var recordDown = parserDown.Parse();
@@ -208,8 +207,8 @@ public class AnsiParserTests {
         var parserCtrlUp = new MockAnsiParser("\e[1;5A");
         var recordCtrlUp = parserCtrlUp.Parse();
         Assert.NotNull(recordCtrlUp);
-        Assert.Equal(AnsiRecordType.KEY, recordCtrlUp.Value.Type);
-        Assert.Equal(KeyCode.ARROW_UP, recordCtrlUp.Value.Key.Key);
+        Assert.Equal(AnsiRecordType.KEY,     recordCtrlUp.Value.Type);
+        Assert.Equal(KeyCode.ARROW_UP,       recordCtrlUp.Value.Key.Key);
         Assert.Equal(KeyModifiers.LEFT_CTRL, recordCtrlUp.Value.Key.Modifiers);
 
         // \e[1;2B -> Shift + ArrowDown
@@ -248,7 +247,7 @@ public class AnsiParserTests {
         var recordF1 = parserF1.Parse();
         Assert.NotNull(recordF1);
         Assert.Equal(AnsiRecordType.KEY, recordF1.Value.Type);
-        Assert.Equal(KeyCode.F1, recordF1.Value.Key.Key);
+        Assert.Equal(KeyCode.F1,         recordF1.Value.Key.Key);
     }
 
     [Fact]
@@ -272,7 +271,7 @@ public class AnsiParserTests {
         var recordPaste = parserPaste.Parse();
         Assert.NotNull(recordPaste);
         Assert.Equal(AnsiRecordType.PASTE, recordPaste.Value.Type);
-        Assert.Equal("Hello NeoKolors!", recordPaste.Value.Pasted);
+        Assert.Equal("Hello NeoKolors!",   recordPaste.Value.Pasted);
     }
 
     [Fact]
@@ -282,7 +281,54 @@ public class AnsiParserTests {
         var recordAlt = parserAlt.Parse();
         Assert.NotNull(recordAlt);
         Assert.Equal(AnsiRecordType.KEY, recordAlt.Value.Type);
-        Assert.Equal(KeyCode.A, recordAlt.Value.Key.Key);
+        Assert.Equal(KeyCode.A,          recordAlt.Value.Key.Key);
         Assert.True(recordAlt.Value.Key.Modifiers.HasFlag(KeyModifiers.LEFT_ALT));
     }
+
+    [Fact]
+    public void Parse_Osc4_SingleColor_BEL_Success() {
+        var parser = new MockAnsiParser("\e]4;1;rgb:ffff/0000/0000\a");
+        var result = parser.Parse(VTQuery.RequestRedefineColor(1), out var response);
+
+        Assert.Equal(AnsiParser.ParserResult.SUCCESS, result);
+        Assert.NotNull(response);
+        Assert.Equal(VTQueryType.OSC, response.Value.Type);
+        Assert.Equal(EscapeCodes.OscMode.REDEFINE_COLOR, response.Value.OscMode);
+        Assert.Equal(1, response.Value.RedefineColorResponse.Index);
+        Assert.Equal(NKColor.FromRgb(255, 0, 0), response.Value.RedefineColorResponse.Color);
+    }
+
+    [Fact]
+    public void Parse_Osc4_SingleColor_ST_Success() {
+        var parser = new MockAnsiParser("\e]4;1;rgb:0000/ffff/0000\e\\");
+        var result = parser.Parse(VTQuery.RequestRedefineColor(1), out var response);
+
+        Assert.Equal(AnsiParser.ParserResult.SUCCESS, result);
+        Assert.NotNull(response);
+        Assert.Equal(1, response.Value.RedefineColorResponse.Index);
+        Assert.Equal(NKColor.FromRgb(0, 255, 0), response.Value.RedefineColorResponse.Color);
+    }
+
+    [Fact]
+    public void Parse_Osc4_MultiColor_BEL_Success() {
+        var parser = new MockAnsiParser("\e]4;0;rgb:0000/0000/0000;1;rgb:ffff/0000/0000\a");
+        var result = parser.Parse(VTQuery.RequestRedefineColors(0, 1), out var response);
+
+        Assert.Equal(AnsiParser.ParserResult.SUCCESS, result);
+        Assert.NotNull(response);
+        Assert.Equal(2, response.Value.RedefineColorsResponse.Count);
+        Assert.Equal(NKColor.FromRgb(0, 0, 0), response.Value.RedefineColorsResponse[0]);
+        Assert.Equal(NKColor.FromRgb(255, 0, 0), response.Value.RedefineColorsResponse[1]);
+    }
+
+    [Fact]
+    public void Parse_Osc10_ForegroundColor_Success() {
+        var parser = new MockAnsiParser("\e]10;rgb:aaaa/bbbb/cccc\a");
+        var result = parser.Parse(VTQuery.RequestOsc(EscapeCodes.OscMode.CHANGE_TEXT_FORG_COLOR), out var response);
+
+        Assert.Equal(AnsiParser.ParserResult.SUCCESS, result);
+        Assert.NotNull(response);
+        Assert.Equal(NKColor.FromRgb(0xaa, 0xbb, 0xcc), response.Value.OscResponse);
+    }
+
 }

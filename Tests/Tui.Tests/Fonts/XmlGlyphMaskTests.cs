@@ -8,7 +8,7 @@ using NeoKolors.Tui.Fonts.Xml.V3;
 namespace NeoKolors.Tui.Fonts.Tests;
 
 public class XmlGlyphMaskTests {
-    
+
     [Fact]
     public void TryParse_SimpleValues_ShouldWork() {
         Assert.True(XmlGlyphMask.TryParse("forg", out var mask));
@@ -38,8 +38,8 @@ public class XmlGlyphMaskTests {
         Assert.True(XmlGlyphMask.TryParse("custom-forg: 'xyz', custom-bckg: 'abc', bckg", out var mask));
         Assert.NotNull(mask);
         Assert.Equal(XmlSpaceMask.BACKGROUND, mask.Value.SpaceConf);
-        Assert.Equal(['x', 'y', 'z'], mask.Value.MapForg);
-        Assert.Equal(['a', 'b', 'c'], mask.Value.MapBckg);
+        Assert.Equal(['x', 'y', 'z'],         mask.Value.MapForg);
+        Assert.Equal(['a', 'b', 'c'],         mask.Value.MapBckg);
     }
 
     [Fact]
@@ -55,8 +55,8 @@ public class XmlGlyphMaskTests {
 
     [Fact]
     public void TryParse_InvalidValues_ShouldFail() {
-        Assert.False(XmlGlyphMask.TryParse("forg, bckg", out _));
-        Assert.False(XmlGlyphMask.TryParse("unknown", out _));
+        Assert.False(XmlGlyphMask.TryParse("forg, bckg",       out _));
+        Assert.False(XmlGlyphMask.TryParse("unknown",          out _));
         Assert.False(XmlGlyphMask.TryParse("custom-forg: abc", out _)); // missing quotes
     }
 
@@ -65,6 +65,6 @@ public class XmlGlyphMaskTests {
         Assert.True(XmlGlyphMask.TryParse("custom-forg: 'a,b', bckg", out var mask));
         Assert.NotNull(mask);
         Assert.Equal(XmlSpaceMask.BACKGROUND, mask.Value.SpaceConf);
-        Assert.Equal(['a', ',', 'b'], mask.Value.MapForg);
+        Assert.Equal(['a', ',', 'b'],         mask.Value.MapForg);
     }
 }

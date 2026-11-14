@@ -12,19 +12,19 @@ public class LoggerConfigTests {
     [Fact]
     public void ParameterizedConstructor_WithLogFileConfig_SetsCorrectValues() {
         // Arrange
-        var fileConfig = LogFileConfig.Custom();
+        var fileConfig  = LogFileConfig.Custom();
         var customLevel = CRITICAL | ERROR;
 
         // Act
         var config = new LoggerConfig(
-            level: customLevel,
+            customLevel,
             fileConfig: fileConfig,
             simpleMessages: true
         );
 
         // Assert
         Assert.Equal(customLevel, config.Level);
-        Assert.Equal(fileConfig, config.FileConfig);
+        Assert.Equal(fileConfig,  config.FileConfig);
         Assert.True(config.SimpleMessages);
     }
 
@@ -32,7 +32,7 @@ public class LoggerConfigTests {
     public void Clone_CreatesDeepCopy() {
         // Arrange
         var original = new LoggerConfig(
-            level: ERROR | WARNING,
+            ERROR | WARNING,
             simpleMessages: true,
             hideTime: true,
             timeFormat: "custom-format",
@@ -43,10 +43,10 @@ public class LoggerConfigTests {
         var cloned = (LoggerConfig)original.Clone();
 
         // Assert
-        Assert.Equal(original.Level, cloned.Level);
+        Assert.Equal(original.Level,          cloned.Level);
         Assert.Equal(original.SimpleMessages, cloned.SimpleMessages);
-        Assert.Equal(original.HideTime, cloned.HideTime);
-        Assert.Equal(original.TimeFormat, cloned.TimeFormat);
+        Assert.Equal(original.HideTime,       cloned.HideTime);
+        Assert.Equal(original.TimeFormat,     cloned.TimeFormat);
 
         // Verify they are separate instances
         cloned.Level = CRITICAL;
@@ -56,7 +56,7 @@ public class LoggerConfigTests {
     [Fact]
     public void IndentMessage_InlineIndent_SetsCorrectly() {
         // Arrange
-        var config = new LoggerConfig();
+        var config       = new LoggerConfig();
         var inlineIndent = new LoggerConfig.InlineIndent();
 
         // Act
@@ -79,13 +79,13 @@ public class LoggerConfigTests {
         // Assert
         Assert.True(config.IndentMessage.IsT1);
         Assert.Equal(indent, config.IndentMessage.AsT1);
-        Assert.Equal(4, config.IndentMessage.AsT1.Spaces);
+        Assert.Equal(4,      config.IndentMessage.AsT1.Spaces);
     }
 
     [Fact]
     public void FileConfig_SetProperty_UpdatesOutputIfNotCustom() {
         // Arrange
-        var config = new LoggerConfig();
+        var config     = new LoggerConfig();
         var fileConfig = LogFileConfig.Replace("test.log");
 
         // Act
@@ -93,6 +93,7 @@ public class LoggerConfigTests {
 
         // Assert
         Assert.Equal(fileConfig, config.FileConfig);
+
         // Note: The actual output change would depend on the LogFileConfig.CreateOutput() implementation
     }
 

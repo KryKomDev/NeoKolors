@@ -11,7 +11,7 @@ public class SelectionListArgumentTests {
 
     [Fact]
     public void Ctor_ShouldInitializeProperly() {
-        var a = new SelectionListArgument<int>(1, 2 ,3);
+        var a = new SelectionListArgument<int>(1, 2, 3);
         Assert.Equal([1, 2, 3], a.Options);
     }
 
@@ -19,12 +19,14 @@ public class SelectionListArgumentTests {
     public void Ctor_ShouldInitializeProperly_DefaultValues() {
         var a = new SelectionListArgument<int>([1, 2, 3], 1, 2);
         Assert.Equal([1, 2, 3], a.Options);
-        Assert.Equal([1, 2], a.DefaultSelected);
-        Assert.Equal([1, 2], a.Value);
+        Assert.Equal([1, 2],    a.DefaultSelected);
+        Assert.Equal([1, 2],    a.Value);
 
-        Assert.Throws<InvalidArgumentInputException>(() => {
-            var b = new SelectionListArgument<int>([1, 2, 3], 4);
-        });
+        Assert.Throws<InvalidArgumentInputException>(
+            () => {
+                var b = new SelectionListArgument<int>([1, 2, 3], 4);
+            }
+        );
     }
 
     [Fact]
@@ -33,14 +35,14 @@ public class SelectionListArgumentTests {
         Assert.Equal([A, B, C, D], a.Options);
         a = SelectionListArgument<int>.FromEnum(A, B);
         Assert.Equal([A, B, C, D], a.Options);
-        Assert.Equal([A, B], a.DefaultSelected);
-        Assert.Equal([A, B], a.Value);
+        Assert.Equal([A, B],       a.DefaultSelected);
+        Assert.Equal([A, B],       a.Value);
     }
 
     [Theory]
-    [InlineData(new[] {A, B}, new[] {A, B, C, D})]
-    [InlineData(new[] {A, B, C, D, A, B}, new DummyEnum[] { })]
-    [InlineData(new DummyEnum[] { }, new[] {A, B})]
+    [InlineData(new[] { A, B },             new[] { A, B, C, D })]
+    [InlineData(new[] { A, B, C, D, A, B }, new DummyEnum[] { })]
+    [InlineData(new DummyEnum[] { },        new[] { A, B })]
     internal void Reset_ShouldWorkProperly(DummyEnum[] values, DummyEnum[] defaultValues) {
         var a = SelectionListArgument<int>.FromEnum(defaultValues);
         a.Set(values);

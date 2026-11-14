@@ -75,7 +75,7 @@ public class JitterFont : DefaultFont {
     private static string RandomizeString(string input) {
         var sb = new StringBuilder();
 
-        for (int i = 0; i < input.Length; i++) {
+        for (var i = 0; i < input.Length; i++) {
             var c = input[i];
             sb.Append(char.IsWhiteSpace(c) ? c : GetChar());
         }

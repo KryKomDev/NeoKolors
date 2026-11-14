@@ -5,4 +5,9 @@
 
 namespace NeoKolors.Settings.Tests;
 
-public enum DummyEnum { A, B, C, D }
+public enum DummyEnum {
+    A,
+    B,
+    C,
+    D
+}

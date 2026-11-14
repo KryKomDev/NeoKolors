@@ -10,26 +10,26 @@ namespace NeoKolors.Settings.Tests;
 public class SingleSelectArgumentTests {
 
     [Theory]
-    [InlineData(new[] {A, B, C, D}, 3)]
-    [InlineData(new[] {A, B}, 0)]
+    [InlineData(new[] { A, B, C, D }, 3)]
+    [InlineData(new[] { A, B },       0)]
     public void Ctor_IndexDefault_ShouldInitializeProperly(DummyEnum[] values, int index) {
         var a = new SingleSelectArgument<DummyEnum>(values, index);
-        Assert.Equal(values, a.Options);
-        Assert.Equal(index, a.Index);
+        Assert.Equal(values,        a.Options);
+        Assert.Equal(index,         a.Index);
         Assert.Equal(values[index], a.Value);
     }
 
     [Theory]
-    [InlineData(new[] {A, B, C, D}, B)]
-    [InlineData(new[] {A, B}, A)]
+    [InlineData(new[] { A, B, C, D }, B)]
+    [InlineData(new[] { A, B },       A)]
     public void Ctor_ValueDefault_ShouldInitializeProperly(DummyEnum[] values, DummyEnum @default) {
         var a = new SingleSelectArgument<DummyEnum>(values, @default);
-        Assert.Equal(values, a.Options);
+        Assert.Equal(values,   a.Options);
         Assert.Equal(@default, a.Value);
     }
 
     [Theory]
-    [InlineData(new[] {A, C, D}, B)]
+    [InlineData(new[] { A, C, D },   B)]
     [InlineData(new DummyEnum[] { }, A)]
     public void Ctor_ValueNotContained_Throws(DummyEnum[] values, DummyEnum @default) {
         Assert.Throws<InvalidArgumentInputException>(() => new SingleSelectArgument<DummyEnum>(values, @default));

@@ -11,32 +11,33 @@ using NeoKolors.Extensions;
 namespace NeoKolors.Tui.Fonts.Xml.V3;
 
 public class XmlAutoCompoundGlyphDef : XmlGlyphDef {
-    
+
     [XmlIgnore] public char                 Symbol      { get; set; }
     [XmlIgnore] public XmlGlyphAlign?       Align       { get; set; }
     [XmlIgnore] public XmlGlyphAlignPoint[] AlignPoints { get; set; }
-    [XmlIgnore] public NKTextStyles           Styles      { get; set; }
-    
+    [XmlIgnore] public NKTextStyles         Styles      { get; set; }
+
     [XmlAttribute("Base")]       public string Base       { get; set; }
     [XmlAttribute("IsBaseMain")] public bool   IsBaseMain { get; set; }
-    
+
     [XmlAttribute("SecondaryAfterBase")]
-    [DefaultValue(false)] 
+    [DefaultValue(false)]
     public bool SecondaryAfterBase { get; set; }
 
     [XmlAttribute("Symbol")]
     public string SymbolString {
         get => Symbol.ToString();
         set {
-            if (char.TryParseEsc(value, out char c)) {
+            if (char.TryParseEsc(value, out var c)) {
                 Symbol = c;
+
                 return;
             }
-            
+
             NKFontSerializer.LOGGER.Error($"The string '{value}' is not valid for Symbol.");
         }
     }
-    
+
     [XmlAttribute("Align")]
     public string AlignString {
         get => Align.ToString() ?? "none";
@@ -53,14 +54,14 @@ public class XmlAutoCompoundGlyphDef : XmlGlyphDef {
     [XmlElement("ApplicableGroup", typeof(XmlAutoCompoundApplicableGroup))]
     [XmlElement("ApplicableChars", typeof(XmlAutoCompoundApplicableChars))]
     public XmlAutoCompoundApplicable[] Applicable { get; set; } = [];
-    
+
     [XmlAttribute("Styles")]
     [DefaultValue("NONE")]
     public string StylesString {
         get => Styles.ToString().ToLowerInvariant();
         set => Styles = Enum.Parse<NKTextStyles>(value.ToUpperInvariant().Replace('-', '_'));
     }
-    
+
     public XmlAutoCompoundGlyphDef() {
         Base        = null!;
         AlignPoints = [];

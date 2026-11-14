@@ -9,6 +9,7 @@ public class NKGlyphCombineTests {
     private NKGlyph CreateGlyph(char c) {
         var glyph = new GlyphCell[1, 1];
         glyph[0, 0] = GlyphCell.Char(c);
+
         return new NKGlyph(glyph, 0);
     }
 
@@ -19,8 +20,8 @@ public class NKGlyphCombineTests {
 
         var combined = NKGlyph.Combine(g1, g2, Drct.RIGHT);
 
-        Assert.Equal(2, combined.Width);
-        Assert.Equal(1, combined.Height);
+        Assert.Equal(2,   combined.Width);
+        Assert.Equal(1,   combined.Height);
         Assert.Equal('A', combined.Glyph[0, 0].Character);
         Assert.Equal('B', combined.Glyph[1, 0].Character);
     }
@@ -32,8 +33,8 @@ public class NKGlyphCombineTests {
 
         var combined = NKGlyph.Combine(g1, g2, Drct.TOP);
 
-        Assert.Equal(1, combined.Width);
-        Assert.Equal(2, combined.Height);
+        Assert.Equal(1,   combined.Width);
+        Assert.Equal(2,   combined.Height);
         Assert.Equal('B', combined.Glyph[0, 0].Character);
         Assert.Equal('A', combined.Glyph[0, 1].Character);
     }
@@ -48,8 +49,8 @@ public class NKGlyphCombineTests {
         // A at (0,0)
         // B at (1,1)
         // Size 2x2
-        Assert.Equal(2, combined.Width);
-        Assert.Equal(2, combined.Height);
+        Assert.Equal(2,   combined.Width);
+        Assert.Equal(2,   combined.Height);
         Assert.Equal('A', combined.Glyph[0, 0].Character);
         Assert.Equal('B', combined.Glyph[1, 1].Character);
     }
@@ -81,6 +82,7 @@ public class NKGlyphCombineTests {
         var combined = NKGlyph.Combine(g1, g2, 'x');
 
         Assert.NotNull(combined);
+
         // The main glyph 'g1' is at y=0, so baseline should be main's baseline (1).
         Assert.Equal(1, combined.BaselineOffset);
     }

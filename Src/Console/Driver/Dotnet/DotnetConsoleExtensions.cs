@@ -4,17 +4,18 @@
 // //
 
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Metriks;
 using NeoKolors.Extensions;
 
 namespace NeoKolors.Console;
 
 public static class DotnetConsoleExtensions {
-    
+
     extension(Stdio) {
-        
+
         /// <summary>
-        /// Retrieves the current dimensions of the console buffer as a 2D size structure.
+        ///     Retrieves the current dimensions of the console buffer as a 2D size structure.
         /// </summary>
         /// <returns>A Size2D structure representing the width and height of the console buffer.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -28,7 +29,7 @@ public static class DotnetConsoleExtensions {
         }
 
         /// <summary>
-        /// Retrieves the current dimensions of the console window as a 2D size structure.
+        ///     Retrieves the current dimensions of the console window as a 2D size structure.
         /// </summary>
         /// <returns>A Size2D structure representing the width and height of the console window.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -42,7 +43,7 @@ public static class DotnetConsoleExtensions {
         }
 
         /// <summary>
-        /// Retrieves the current dimensions of the console buffer as a 2D size structure.
+        ///     Retrieves the current dimensions of the console buffer as a 2D size structure.
         /// </summary>
         /// <returns>A Size2D structure representing the width and height of the console buffer.</returns>
         public static Size2D BufferSize {
@@ -51,7 +52,7 @@ public static class DotnetConsoleExtensions {
         }
 
         /// <summary>
-        /// Retrieves the current dimensions of the console window as a 2D size structure.
+        ///     Retrieves the current dimensions of the console window as a 2D size structure.
         /// </summary>
         /// <returns>A Size2D structure representing the width and height of the console window.</returns>
         public static Size2D WindowSize {
@@ -60,31 +61,60 @@ public static class DotnetConsoleExtensions {
         }
 
         /// <summary>
-        /// Reads the next key press or an input character from the console input stream,
-        /// with an option to intercept the key press.
+        ///     Reads the next key press or an input character from the console input stream,
+        ///     with an option to intercept the key press.
         /// </summary>
-        /// <param name="intercept">A boolean value indicating whether the key press should be intercepted.
-        /// If true, the key press will not appear in the console. Defaults to false.</param>
-        /// <returns>A ConsoleKeyInfo structure representing the key press, or null if no key is
-        /// available or input is redirected.</returns>
+        /// <param name="intercept">
+        ///     A boolean value indicating whether the key press should be intercepted.
+        ///     If true, the key press will not appear in the console. Defaults to false.
+        /// </param>
+        /// <returns>
+        ///     A ConsoleKeyInfo structure representing the key press, or null if no key is
+        ///     available or input is redirected.
+        /// </returns>
         public static ConsoleKeyInfo? ReadKeyU(bool intercept = false) {
             if (!Stdio.IsInputRedirected)
                 return Stdio.ReadKey(intercept);
 
             var c = Stdio.Read();
-            
-            return c == -1 
+
+            return c == -1
                 ? null
                 : ConsoleKeyInfo.FromChar((char)c);
         }
 
         /// <summary>
-        /// Determines whether there is any input available to be read from the console input stream.
+        ///     Determines whether there is any input available to be read from the console input
+        ///     stream.
         /// </summary>
         /// <returns>true if input can be read; otherwise, false.</returns>
-        public static bool PeekU()
-            => Stdio.IsInputRedirected
-                ? Stdio.In.Peek() != -1
-                : Stdio.KeyAvailable; 
+        public static bool PeekU() {
+            if (!Stdio.IsInputRedirected) {
+                try {
+                    return Stdio.KeyAvailable;
+                }
+                catch (InvalidOperationException) {
+                    return false;
+                }
+            }
+
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+                var handle = WinImports.GetStdIn();
+                if (handle != 0 && handle != -1) {
+                    if (WinImports.PeekNamedPipe(handle, 0, 0, 0, out var avail, 0))
+                        return avail > 0;
+                }
+            }
+            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux)) {
+                unsafe {
+                    var pfd = new LinuxImports.PollFd { fd = 0, events = LinuxImports.POLLIN };
+                    var res = LinuxImports.poll(&pfd, 1, 0);
+                    if (res > 0 && (pfd.revents & LinuxImports.POLLIN) != 0)
+                        return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

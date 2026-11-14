@@ -8,5 +8,5 @@ public enum MouseReportLevel {
     PRESS,
     PRESS_RELEASE,
     DRAG,
-    ALL,
+    ALL
 }

@@ -6,6 +6,6 @@
 namespace NeoKolors.Settings.Argument;
 
 public class ArgumentInputFormatException : FormatException {
-    public ArgumentInputFormatException(Type targetType, string sourceValue, string message) 
+    public ArgumentInputFormatException(Type targetType, string sourceValue, string message)
         : base($"Could not parse source value '{sourceValue}' to {targetType}. {message}") { }
 }

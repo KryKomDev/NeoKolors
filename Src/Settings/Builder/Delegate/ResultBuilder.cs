@@ -6,4 +6,5 @@
 namespace NeoKolors.Settings.Builder;
 
 public delegate TResult ResultBuilder<out TResult>(in Context context);
+
 public delegate object? ResultBuilder(in Context context);

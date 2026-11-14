@@ -7,14 +7,14 @@ using NeoKolors.Tui.Lifecycle.Inline;
 namespace NeoKolors.Tui.Widgets;
 
 /// <summary>
-/// Execution context for managing active status spinners and completion states.
+///     Execution context for managing active status spinners and completion states.
 /// </summary>
 public class StatusContext {
     private readonly StatusElement _element;
     private readonly InlineContext _inlineContext;
 
     /// <summary>
-    /// Gets or sets the active status message.
+    ///     Gets or sets the active status message.
     /// </summary>
     public string Status {
         get => _element.Text.AsT;
@@ -25,12 +25,12 @@ public class StatusContext {
     }
 
     /// <summary>
-    /// Gets the total elapsed time since the status started.
+    ///     Gets the total elapsed time since the status started.
     /// </summary>
     public TimeSpan ElapsedTime => _inlineContext.ElapsedTime;
 
     /// <summary>
-    /// Gets the cancellation token for the active operation.
+    ///     Gets the cancellation token for the active operation.
     /// </summary>
     public CancellationToken CancellationToken => _inlineContext.CancellationToken;
 
@@ -40,7 +40,7 @@ public class StatusContext {
     }
 
     /// <summary>
-    /// Marks the status operation as successfully completed with an optional message.
+    ///     Marks the status operation as successfully completed with an optional message.
     /// </summary>
     public void Success(string? message = null) {
         if (message != null)
@@ -51,7 +51,7 @@ public class StatusContext {
     }
 
     /// <summary>
-    /// Marks the status operation as failed with an optional error message.
+    ///     Marks the status operation as failed with an optional error message.
     /// </summary>
     public void Fail(string? message = null) {
         if (message != null)

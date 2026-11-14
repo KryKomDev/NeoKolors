@@ -10,15 +10,15 @@ public class BoolArgumentTests {
     [Fact]
     public void Set_ShouldWorkProperly() {
         var a = new BoolArgument();
-        
+
         // try with bool
         a.Set(true);
         Assert.True(a.Value);
-        
+
         // try with string
         a.Set("faLsE");
         Assert.False(a.Value);
-        
+
         // try with another argument
         var b = new BoolArgument();
         b.Set(true);
@@ -28,7 +28,7 @@ public class BoolArgumentTests {
 
     [Fact]
     public void Reset_ShouldWorkProperly() {
-        var a = new BoolArgument(defaultValue: true);
+        var a = new BoolArgument(true);
         Assert.True(a.Value);
         a.Set(false);
         Assert.False(a.Value);
@@ -40,9 +40,9 @@ public class BoolArgumentTests {
     public void Equal_ShouldWorkProperly() {
         var a = new BoolArgument();
         var b = new BoolArgument(true);
-        
+
         Assert.False(a.Equals(b));
-        
+
         b.Set(false);
         Assert.False(a.Equals(b));
 

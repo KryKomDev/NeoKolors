@@ -3,12 +3,14 @@
 // Copyright (c) 2025 KryKom
 //
 
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Text;
 using Metriks;
 using NeoKolors.Common;
 using NeoKolors.Console.Ansi;
+using NeoKolors.Console.Exceptions;
 using OneOf;
 using static NeoKolors.Console.BoolStrings;
 using ArgumentException = System.ArgumentException;
@@ -597,10 +599,11 @@ public static partial class NKConsole {
 
         InputDriver.Key      += OnKey;
         InputDriver.Mouse    += OnMouse;
-        InputDriver.FocusIn  += OnFocusIn;
-        InputDriver.FocusOut += OnFocusOut;
-        InputDriver.Paste    += OnPaste;
-        InputDriver.VTQuery  += OnVTQuery;
+        InputDriver.FocusIn        += OnFocusIn;
+        InputDriver.FocusOut       += OnFocusOut;
+        InputDriver.Paste          += OnPaste;
+        InputDriver.VTQuery        += OnVTQuery;
+        InputDriver.VTQueryTimeout += OnVTQueryTimeout;
 
         InputDriver.Start();
     }
@@ -616,20 +619,22 @@ public static partial class NKConsole {
 
         InputDriver.Stop();
 
-        InputDriver.Key      -= OnKey;
-        InputDriver.Mouse    -= OnMouse;
-        InputDriver.FocusIn  -= OnFocusIn;
-        InputDriver.FocusOut -= OnFocusOut;
-        InputDriver.Paste    -= OnPaste;
-        InputDriver.VTQuery  -= OnVTQuery;
+        InputDriver.Key            -= OnKey;
+        InputDriver.Mouse          -= OnMouse;
+        InputDriver.FocusIn        -= OnFocusIn;
+        InputDriver.FocusOut       -= OnFocusOut;
+        InputDriver.Paste          -= OnPaste;
+        InputDriver.VTQuery        -= OnVTQuery;
+        InputDriver.VTQueryTimeout -= OnVTQueryTimeout;
     }
 
-    private static void OnKey(KeyEventArgs     k) => Key(k);
-    private static void OnMouse(MouseEventArgs m) => Mouse(m);
-    private static void OnFocusIn()               => FocusIn();
-    private static void OnFocusOut()              => FocusOut();
-    private static void OnPaste(string    s)      => Paste(s);
-    private static void OnVTQuery(VTQuery r)      => VTQueryResponse(r);
+    private static void OnKey(KeyEventArgs     k)                                 => Key(k);
+    private static void OnMouse(MouseEventArgs m)                                 => Mouse(m);
+    private static void OnFocusIn()                                               => FocusIn();
+    private static void OnFocusOut()                                              => FocusOut();
+    private static void OnPaste(string    s)                                      => Paste(s);
+    private static void OnVTQuery(VTQuery r)                                      => VTQueryResponse(r);
+    private static void OnVTQueryTimeout(VTQuery r, AnsiParser.ParserResult reason) => VTQueryTimeout(r, reason);
 
     #endregion
 
@@ -690,181 +695,601 @@ public static partial class NKConsole {
         }
     }
 
-    /// <summary>
-    /// Reads characters from the console until one of the specified characters is encountered.
-    /// Returns the string composed of all characters read before the specified character is found.
-    /// </summary>
-    /// <param name="last"></param>
-    /// <param name="oneOf">
-    ///     An array of characters that act as delimiters; reading stops when one of these characters is encountered.
-    /// </param>
-    /// <param name="intercept">
-    ///     If true, the read characters are read from the console without being displayed.
-    ///     If false, the characters will be displayed as they are typed.
-    /// </param>
-    /// <returns>
-    /// A string containing all characters read before encountering a specified delimiter character.
-    /// </returns>
-    public static string ReadUntil(out char last, bool intercept = false, params char[] oneOf) {
-        var    key = Stdio.ReadKey(intercept);
-        string s   = "";
+    private static bool TryReadKey(out ConsoleKeyInfo key, TimeSpan timeout, bool intercept, CancellationToken cancellationToken = default) {
+        var sw = Stopwatch.StartNew();
 
-        while (!oneOf.Contains(key.KeyChar)) {
-            s   += key.KeyChar;
-            key =  Stdio.ReadKey(intercept);
+        while (sw.Elapsed < timeout) {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            if (Stdio.PeekU()) {
+                var k = Stdio.ReadKeyU(intercept);
+                if (k.HasValue) {
+                    key = k.Value;
+                    return true;
+                }
+            }
+
+            Thread.Sleep(1);
         }
 
-        last = key.KeyChar;
-
-        return s;
+        key = default;
+        return false;
     }
 
     /// <summary>
-    /// Reads characters from the console until the specified character is encountered.
-    /// All characters read, including the termination character, are discarded if interception is enabled.
+    ///     Attempts to read characters from the console until any of the specified delimiter characters is encountered,
+    ///     or until the specified timeout expires or cancellation is requested.
     /// </summary>
-    /// <param name="c">The character at which to stop reading input.</param>
-    /// <param name="intercept">
-    /// If true, the characters entered will not be displayed in the console.
-    /// If false, the characters will be visible as they are typed.
-    /// </param>
-    /// <returns>A string containing all characters entered up to, but not including, the specified character.</returns>
-    public static string ReadUntil(char c, bool intercept = false) {
-        var    key = Stdio.ReadKey(intercept);
-        string s   = "";
+    public static bool TryReadUntil(
+        [NotNullWhen(true)] out string? result,
+        out char                        last,
+        TimeSpan                        timeout,
+        bool                            intercept,
+        CancellationToken               cancellationToken,
+        params char[]                   oneOf
+    ) {
+        var s  = new StringBuilder();
+        var sw = Stopwatch.StartNew();
 
-        while (key.KeyChar != c) {
-            s   += key.KeyChar;
-            key =  Stdio.ReadKey(intercept);
+        while (sw.Elapsed < timeout) {
+            cancellationToken.ThrowIfCancellationRequested();
+            var remaining = timeout - sw.Elapsed;
+            if (remaining <= TimeSpan.Zero)
+                break;
+
+            if (!TryReadKey(out var key, remaining, intercept, cancellationToken))
+                break;
+
+            if (oneOf.Contains(key.KeyChar)) {
+                last   = key.KeyChar;
+                result = s.ToString();
+                return true;
+            }
+
+            s.Append(key.KeyChar);
         }
 
-        return s;
+        last   = ' ';
+        result = null;
+        return false;
     }
 
     /// <summary>
-    /// Returns true if the alternate console buffer is enabled.
+    ///     Attempts to read characters from the console until any of the specified delimiter characters is encountered,
+    ///     or until the specified timeout expires.
     /// </summary>
-    public static bool GetAltBufState() => GetAltBufStateAsync().Result;
+    public static bool TryReadUntil(
+        [NotNullWhen(true)] out string? result,
+        out char                        last,
+        TimeSpan                        timeout,
+        bool                            intercept = false,
+        params char[]                   oneOf
+    ) => TryReadUntil(out result, out last, timeout, intercept, default, oneOf);
 
     /// <summary>
-    /// Returns true if the alternate console buffer is enabled.
+    ///     Reads characters from the console until any of the specified delimiter characters is encountered,
+    ///     or throws a <see cref="VTQueryTimeoutException"/> if the timeout expires.
     /// </summary>
-    public static async Task<bool> GetAltBufStateAsync() {
-        OutputDriver.Write(EscapeCodes.REQUEST_ALTBUF_STATE);
+    public static string ReadUntil(
+        out char          last,
+        TimeSpan          timeout,
+        bool              intercept,
+        CancellationToken cancellationToken,
+        params char[]     oneOf
+    ) {
+        if (TryReadUntil(out var res, out last, timeout, intercept, cancellationToken, oneOf))
+            return res;
 
-        // If multithreaded input interception is not enabled
+        throw new VTQueryTimeoutException($"Timed out after {timeout.TotalMilliseconds:F0}ms waiting for console input matching '{string.Join(", ", oneOf)}'.");
+    }
+
+    /// <summary>
+    ///     Reads characters from the console until any of the specified delimiter characters is encountered,
+    ///     or throws a <see cref="VTQueryTimeoutException"/> if the timeout expires.
+    /// </summary>
+    public static string ReadUntil(out char last, TimeSpan timeout, bool intercept = false, params char[] oneOf) =>
+        ReadUntil(out last, timeout, intercept, default, oneOf);
+
+    /// <summary>
+    ///     Reads characters from the console until any of the specified delimiter characters is encountered.
+    /// </summary>
+    public static string ReadUntil(out char last, bool intercept = false, params char[] oneOf) =>
+        ReadUntil(out last, DefaultQueryTimeout, intercept, oneOf);
+
+    /// <summary>
+    ///     Reads characters from the console until the specified character is encountered,
+    ///     or throws a <see cref="VTQueryTimeoutException"/> if the timeout expires.
+    /// </summary>
+    public static string ReadUntil(char c, TimeSpan timeout, bool intercept = false) =>
+        ReadUntil(out _, timeout, intercept, c);
+
+    /// <summary>
+    ///     Reads characters from the console until the specified character is encountered.
+    /// </summary>
+    public static string ReadUntil(char c, bool intercept = false) =>
+        ReadUntil(out _, DefaultQueryTimeout, intercept, c);
+
+    /// <summary>
+    ///     Returns true if the alternate console buffer is enabled.
+    /// </summary>
+    public static bool GetAltBufState(TimeSpan? timeout = null) => GetAltBufStateAsync(timeout).Result;
+
+    /// <summary>
+    ///     Returns true if the alternate console buffer is enabled.
+    /// </summary>
+    public static async Task<bool> GetAltBufStateAsync(TimeSpan? timeout = null, CancellationToken cancellationToken = default) {
+        cancellationToken.ThrowIfCancellationRequested();
+        var effectiveTimeout = timeout ?? DefaultQueryTimeout;
+        var query            = VTQuery.RequestDec(EscapeCodes.DecMode.ALTERNATE_BUFFER);
+
         if (!InterceptInput) {
-            var res = ReadUntil('y');
+            OutputDriver.Write(EscapeCodes.REQUEST_ALTBUF_STATE);
+            if (!TryReadUntil(out var res, out _, effectiveTimeout, true, cancellationToken, 'y'))
+                throw new VTQueryTimeoutException(in query, effectiveTimeout);
 
-            return res[8] == '1';
+            return res.Length > 8 && res[8] == '1';
         }
 
-        var tcs = new TaskCompletionSource<bool>();
+        var tcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        cts.CancelAfter(effectiveTimeout);
 
-        VTQueryResponseHandler? h = null;
+        VTQueryResponseHandler? h  = null;
+        VTQueryTimeoutHandler?  th = null;
+
+        void Cleanup() {
+            VTQueryResponse -= h;
+            VTQueryTimeout  -= th;
+        }
 
         h = a => {
-            if (a.Type != VTQueryType.DEC || a.DecMode == EscapeCodes.DecMode.ALTERNATE_BUFFER)
+            if (a.Type != VTQueryType.DEC || a.DecMode != EscapeCodes.DecMode.ALTERNATE_BUFFER)
                 return;
 
-            VTQueryResponse -= h;
-            tcs.SetResult(a.DecResponse == DecReqResponseType.ENABLED);
+            Cleanup();
+            tcs.TrySetResult(a.DecResponse == DecReqResponseType.ENABLED);
+        };
+
+        th = (req, reason) => {
+            if (req.Matches(query)) {
+                Cleanup();
+                tcs.TrySetException(new VTQueryTimeoutException(in query, effectiveTimeout, $"VTQuery failed: {reason}"));
+            }
         };
 
         VTQueryResponse += h;
+        VTQueryTimeout  += th;
+        InputDriver.RequestVTQuery(query);
+
+        await using var reg = cts.Token.Register(() => {
+            Cleanup();
+            InputDriver.CancelVTQuery(query);
+            if (cancellationToken.IsCancellationRequested)
+                tcs.TrySetCanceled(cancellationToken);
+            else
+                tcs.TrySetException(new VTQueryTimeoutException(in query, effectiveTimeout));
+        });
 
         return await tcs.Task;
     }
 
     /// <summary>
-    /// Retrieves the current size of the console window in pixels as a tuple containing
-    /// the width and height.
+    ///     Retrieves the current size of the console window in pixels as a tuple containing the width and height.
     /// </summary>
-    /// <returns>
-    /// A tuple where the first value is the width in pixels and the second
-    /// value is the height in pixels of the console window.
-    /// </returns>
-    public static Size2D GetBuffSizePx() => GetBuffSizePxAsync().Result;
+    public static Size2D GetBuffSizePx(TimeSpan? timeout = null) => GetBuffSizePxAsync(timeout).Result;
 
     /// <summary>
-    /// Retrieves the current size of the console window in pixels as a tuple containing
-    /// the width and height.
+    ///     Retrieves the current size of the console window in pixels as a tuple containing the width and height.
     /// </summary>
-    /// <returns>
-    /// A tuple where the first value is the width in pixels and the second
-    /// value is the height in pixels of the console window.
-    /// </returns>
-    public static async Task<Size2D> GetBuffSizePxAsync() => await GetWinReqAsync(EscapeCodes.REPORT_BUFF_SIZE_PX, EscapeCodes.WinOpts.BUFF_SIZE_PX);
+    public static async Task<Size2D> GetBuffSizePxAsync(TimeSpan? timeout = null, CancellationToken cancellationToken = default) =>
+        await GetWinReqAsync(EscapeCodes.REPORT_BUFF_SIZE_PX, EscapeCodes.WinOpts.BUFF_SIZE_PX, timeout, cancellationToken);
 
     /// <summary>
-    /// Retrieves the current size of the console window in pixels as a tuple containing
-    /// the width and height.
+    ///     Retrieves the current character cell size in pixels as a tuple containing width and height.
     /// </summary>
-    /// <returns>
-    /// A tuple where the first value is the width in pixels and the second
-    /// value is the height in pixels of the console window.
-    /// </returns>
-    public static Size2D GetCellSizePx() => GetCellSizePxAsync().Result;
+    public static Size2D GetCellSizePx(TimeSpan? timeout = null) => GetCellSizePxAsync(timeout).Result;
 
     /// <summary>
-    /// Retrieves the current size of the console window in pixels as a tuple containing
-    /// the width and height.
+    ///     Retrieves the current character cell size in pixels as a tuple containing width and height.
     /// </summary>
-    /// <returns>
-    /// A tuple where the first value is the width in pixels and the second
-    /// value is the height in pixels of the console window.
-    /// </returns>
-    public static async Task<Size2D> GetCellSizePxAsync() => await GetWinReqAsync(EscapeCodes.REPORT_CHAR_CELL_SIZE_PX, EscapeCodes.WinOpts.CHAR_CELL_SIZE_PX);
+    public static async Task<Size2D> GetCellSizePxAsync(TimeSpan? timeout = null, CancellationToken cancellationToken = default) =>
+        await GetWinReqAsync(EscapeCodes.REPORT_CHAR_CELL_SIZE_PX, EscapeCodes.WinOpts.CHAR_CELL_SIZE_PX, timeout, cancellationToken);
 
     /// <summary>
-    /// Retrieves the current size of the console window in pixels as a tuple containing
-    /// the width and height.
+    ///     Retrieves the current buffer size in characters as a tuple containing width and height.
     /// </summary>
-    /// <returns>
-    /// A tuple where the first value is the width in pixels and the second
-    /// value is the height in pixels of the console window.
-    /// </returns>
-    public static Size2D GetBuffSizeCh() => GetBuffSizeChAsync().Result;
+    public static Size2D GetBuffSizeCh(TimeSpan? timeout = null) => GetBuffSizeChAsync(timeout).Result;
 
     /// <summary>
-    /// Retrieves the current size of the console window in pixels as a tuple containing
-    /// the width and height.
+    ///     Retrieves the current buffer size in characters as a tuple containing width and height.
     /// </summary>
-    /// <returns>
-    /// A tuple where the first value is the width in pixels and the second
-    /// value is the height in pixels of the console window.
-    /// </returns>
-    public static async Task<Size2D> GetBuffSizeChAsync() => await GetWinReqAsync(EscapeCodes.REPORT_BUFF_SIZE_CH, EscapeCodes.WinOpts.BUFF_SIZE_CH);
+    public static async Task<Size2D> GetBuffSizeChAsync(TimeSpan? timeout = null, CancellationToken cancellationToken = default) =>
+        await GetWinReqAsync(EscapeCodes.REPORT_BUFF_SIZE_CH, EscapeCodes.WinOpts.BUFF_SIZE_CH, timeout, cancellationToken);
 
-    private static async Task<Size2D> GetWinReqAsync(string escSeq, EscapeCodes.WinOpts type) {
-        // If input interception is not enabled
+    private static async Task<Size2D> GetWinReqAsync(
+        string                  escSeq,
+        EscapeCodes.WinOpts     type,
+        TimeSpan?               timeout           = null,
+        CancellationToken       cancellationToken = default
+    ) {
+        cancellationToken.ThrowIfCancellationRequested();
+        var effectiveTimeout = timeout ?? DefaultQueryTimeout;
+        var query            = VTQuery.RequestWin(type);
+
         if (!InterceptInput) {
             OutputDriver.Write(escSeq);
-            var res   = ReadUntil('t', true);
+            if (!TryReadUntil(out var res, out var last, effectiveTimeout, true, cancellationToken, 't'))
+                throw new VTQueryTimeoutException(in query, effectiveTimeout);
+
             var split = res.Split(';');
+            if (split.Length < 3)
+                throw new InvalidOperationException($"Invalid window request response: {res}");
 
             return new Size2D(int.Parse(split[2]), int.Parse(split[1]));
         }
 
-        InputDriver.RequestVTQuery(VTQuery.RequestWin(type));
+        var tcs = new TaskCompletionSource<Size2D>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        cts.CancelAfter(effectiveTimeout);
 
-        var tcs = new TaskCompletionSource<Size2D>();
+        VTQueryResponseHandler? h  = null;
+        VTQueryTimeoutHandler?  th = null;
 
-        VTQueryResponseHandler? h = null;
+        void Cleanup() {
+            VTQueryResponse -= h;
+            VTQueryTimeout  -= th;
+        }
 
         h = a => {
             if (a.Type != VTQueryType.WIN || a.WinMode != type)
                 return;
 
-            VTQueryResponse -= h;
-
+            Cleanup();
             var res = a.WinResponse;
-            tcs.SetResult(new Size2D(res.X, res.Y));
+            tcs.TrySetResult(new Size2D(res.X, res.Y));
+        };
+
+        th = (req, reason) => {
+            if (req.Matches(query)) {
+                Cleanup();
+                tcs.TrySetException(new VTQueryTimeoutException(in query, effectiveTimeout, $"VTQuery failed: {reason}"));
+            }
         };
 
         VTQueryResponse += h;
+        VTQueryTimeout  += th;
+        InputDriver.RequestVTQuery(query);
+
+        await using var reg = cts.Token.Register(() => {
+            Cleanup();
+            InputDriver.CancelVTQuery(query);
+            if (cancellationToken.IsCancellationRequested)
+                tcs.TrySetCanceled(cancellationToken);
+            else
+                tcs.TrySetException(new VTQueryTimeoutException(in query, effectiveTimeout));
+        });
 
         return await tcs.Task;
+    }
+
+    /// <summary>
+    ///     Retrieves the defined terminal color for the specified palette color.
+    /// </summary>
+    public static NKColor GetColor(NKConsoleColor color, TimeSpan? timeout = null) =>
+        GetColorAsync(color, timeout).Result;
+
+    /// <summary>
+    ///     Retrieves the defined terminal color for the specified palette index.
+    /// </summary>
+    public static NKColor GetColor(int colorIndex, TimeSpan? timeout = null) =>
+        GetColorAsync(colorIndex, timeout).Result;
+
+    /// <summary>
+    ///     Asynchronously retrieves the defined terminal color for the specified palette color.
+    /// </summary>
+    public static async Task<NKColor> GetColorAsync(
+        NKConsoleColor    color,
+        TimeSpan?         timeout           = null,
+        CancellationToken cancellationToken = default
+    ) => await GetColorAsync((int)color, timeout, cancellationToken);
+
+    /// <summary>
+    ///     Asynchronously retrieves the defined terminal color for the specified palette index.
+    /// </summary>
+    public static async Task<NKColor> GetColorAsync(
+        int               colorIndex,
+        TimeSpan?         timeout           = null,
+        CancellationToken cancellationToken = default
+    ) {
+        cancellationToken.ThrowIfCancellationRequested();
+        var effectiveTimeout = timeout ?? DefaultQueryTimeout;
+        var query            = VTQuery.RequestRedefineColor(colorIndex);
+
+        if (!InterceptInput) {
+            OutputDriver.Write(query.GetEscSeq());
+            if (!TryReadUntil(out var res, out var last, effectiveTimeout, true, cancellationToken, '\a', '\\'))
+                throw new VTQueryTimeoutException(in query, effectiveTimeout);
+
+            var seq = res + last;
+            if (seq.StartsWith('\e'))
+                seq = seq[1..];
+
+            if (AnsiParser.ExtractResult_Osc(seq, in query, out var parsed))
+                return parsed.Value.RedefineColorResponse.Color;
+
+            throw new InvalidOperationException($"Failed to parse color query response: {seq}");
+        }
+
+        var tcs = new TaskCompletionSource<NKColor>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        cts.CancelAfter(effectiveTimeout);
+
+        VTQueryResponseHandler? h  = null;
+        VTQueryTimeoutHandler?  th = null;
+
+        void Cleanup() {
+            VTQueryResponse -= h;
+            VTQueryTimeout  -= th;
+        }
+
+        h = a => {
+            if (a.Type != VTQueryType.OSC || a.OscMode != EscapeCodes.OscMode.REDEFINE_COLOR)
+                return;
+
+            if (a.Arguments.Count > 0 && a.Arguments[0] != colorIndex)
+                return;
+
+            Cleanup();
+            tcs.TrySetResult(a.RedefineColorResponse.Color);
+        };
+
+        th = (req, reason) => {
+            if (req.Matches(query)) {
+                Cleanup();
+                tcs.TrySetException(new VTQueryTimeoutException(in query, effectiveTimeout, $"VTQuery failed: {reason}"));
+            }
+        };
+
+        VTQueryResponse += h;
+        VTQueryTimeout  += th;
+        InputDriver.RequestVTQuery(query);
+
+        await using var reg = cts.Token.Register(() => {
+            Cleanup();
+            InputDriver.CancelVTQuery(query);
+            if (cancellationToken.IsCancellationRequested)
+                tcs.TrySetCanceled(cancellationToken);
+            else
+                tcs.TrySetException(new VTQueryTimeoutException(in query, effectiveTimeout));
+        });
+
+        return await tcs.Task;
+    }
+
+    /// <summary>
+    ///     Retrieves the defined terminal colors for multiple palette indices.
+    /// </summary>
+    public static IReadOnlyDictionary<int, NKColor> GetColors(params int[] colorIndices) =>
+        GetColorsAsync(colorIndices, null).Result;
+
+    /// <summary>
+    ///     Retrieves the defined terminal colors for multiple palette indices with a specified timeout.
+    /// </summary>
+    public static IReadOnlyDictionary<int, NKColor> GetColors(TimeSpan? timeout, params int[] colorIndices) =>
+        GetColorsAsync(colorIndices, timeout).Result;
+
+    /// <summary>
+    ///     Retrieves the defined terminal colors for multiple palette colors.
+    /// </summary>
+    public static IReadOnlyDictionary<NKConsoleColor, NKColor> GetColors(params NKConsoleColor[] colors) =>
+        GetColorsAsync(colors, null).Result;
+
+    /// <summary>
+    ///     Retrieves the defined terminal colors for multiple palette colors with a specified timeout.
+    /// </summary>
+    public static IReadOnlyDictionary<NKConsoleColor, NKColor> GetColors(TimeSpan? timeout, params NKConsoleColor[] colors) =>
+        GetColorsAsync(colors, timeout).Result;
+
+    /// <summary>
+    ///     Asynchronously retrieves the defined terminal colors for multiple palette indices.
+    /// </summary>
+    public static Task<IReadOnlyDictionary<int, NKColor>> GetColorsAsync(params int[] colorIndices) =>
+        GetColorsAsync(colorIndices, null, default);
+
+    /// <summary>
+    ///     Asynchronously retrieves the defined terminal colors for multiple palette indices with a timeout.
+    /// </summary>
+    public static async Task<IReadOnlyDictionary<int, NKColor>> GetColorsAsync(
+        int[]             colorIndices,
+        TimeSpan?         timeout           = null,
+        CancellationToken cancellationToken = default
+    ) {
+        if (colorIndices.Length == 0)
+            return new Dictionary<int, NKColor>();
+
+        cancellationToken.ThrowIfCancellationRequested();
+        var effectiveTimeout = timeout ?? DefaultQueryTimeout;
+        var query            = VTQuery.RequestRedefineColors(colorIndices);
+        var expectedSet      = new HashSet<int>(colorIndices);
+        var result           = new Dictionary<int, NKColor>();
+
+        if (!InterceptInput) {
+            var sw = Stopwatch.StartNew();
+            OutputDriver.Write(query.GetEscSeq());
+
+            while (result.Count < expectedSet.Count) {
+                cancellationToken.ThrowIfCancellationRequested();
+                var remaining = effectiveTimeout - sw.Elapsed;
+                if (remaining <= TimeSpan.Zero) {
+                    if (result.Count > 0)
+                        return result;
+                    throw new VTQueryTimeoutException(in query, effectiveTimeout);
+                }
+
+                if (!TryReadUntil(out var res, out var last, remaining, true, cancellationToken, '\a', '\\')) {
+                    if (result.Count > 0)
+                        return result;
+                    throw new VTQueryTimeoutException(in query, effectiveTimeout);
+                }
+
+                var seq = res + last;
+                if (seq.StartsWith('\e'))
+                    seq = seq[1..];
+
+                if (AnsiParser.ExtractResult_Osc(seq, in query, out var parsed)) {
+                    foreach (var (idx, col) in parsed.Value.RedefineColorsResponse)
+                        result[idx] = col;
+                }
+                else {
+                    break;
+                }
+            }
+
+            return result;
+        }
+
+        var tcs = new TaskCompletionSource<IReadOnlyDictionary<int, NKColor>>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        cts.CancelAfter(effectiveTimeout);
+
+        VTQueryResponseHandler? h  = null;
+        VTQueryTimeoutHandler?  th = null;
+
+        void Cleanup() {
+            VTQueryResponse -= h;
+            VTQueryTimeout  -= th;
+        }
+
+        h = a => {
+            if (a.Type != VTQueryType.OSC || a.OscMode != EscapeCodes.OscMode.REDEFINE_COLOR)
+                return;
+
+            foreach (var (idx, col) in a.RedefineColorsResponse) {
+                if (expectedSet.Contains(idx))
+                    result[idx] = col;
+            }
+
+            if (result.Count >= expectedSet.Count) {
+                Cleanup();
+                tcs.TrySetResult(result);
+            }
+        };
+
+        th = (req, reason) => {
+            if (req.Matches(query)) {
+                Cleanup();
+                if (result.Count > 0)
+                    tcs.TrySetResult(result);
+                else
+                    tcs.TrySetException(new VTQueryTimeoutException(in query, effectiveTimeout, $"VTQuery failed: {reason}"));
+            }
+        };
+
+        VTQueryResponse += h;
+        VTQueryTimeout  += th;
+        InputDriver.RequestVTQuery(query);
+
+        await using var reg = cts.Token.Register(() => {
+            Cleanup();
+            InputDriver.CancelVTQuery(query);
+            if (result.Count > 0) {
+                tcs.TrySetResult(result);
+            }
+            else if (cancellationToken.IsCancellationRequested) {
+                tcs.TrySetCanceled(cancellationToken);
+            }
+            else {
+                tcs.TrySetException(new VTQueryTimeoutException(in query, effectiveTimeout));
+            }
+        });
+
+        return await tcs.Task;
+    }
+
+    /// <summary>
+    ///     Asynchronously retrieves the defined terminal colors for multiple palette colors.
+    /// </summary>
+    public static Task<IReadOnlyDictionary<NKConsoleColor, NKColor>> GetColorsAsync(params NKConsoleColor[] colors) =>
+        GetColorsAsync(colors, null, default);
+
+    /// <summary>
+    ///     Asynchronously retrieves the defined terminal colors for multiple palette colors.
+    /// </summary>
+    public static async Task<IReadOnlyDictionary<NKConsoleColor, NKColor>> GetColorsAsync(
+        NKConsoleColor[]  colors,
+        TimeSpan?         timeout           = null,
+        CancellationToken cancellationToken = default
+    ) {
+        var indices = colors.Select(c => (int)c).ToArray();
+        var result  = await GetColorsAsync(indices, timeout, cancellationToken);
+
+        return result.ToDictionary(kv => (NKConsoleColor)kv.Key, kv => kv.Value);
+    }
+
+    // --- Non-throwing TryGet convenience APIs ---
+
+    /// <summary>
+    ///     Attempts to retrieve the defined terminal color for the specified palette color without throwing on timeout.
+    /// </summary>
+    public static bool TryGetColor(NKConsoleColor color, out NKColor result, TimeSpan? timeout = null) =>
+        TryGetColor((int)color, out result, timeout);
+
+    /// <summary>
+    ///     Attempts to retrieve the defined terminal color for the specified palette index without throwing on timeout.
+    /// </summary>
+    public static bool TryGetColor(int colorIndex, out NKColor result, TimeSpan? timeout = null) {
+        try {
+            result = GetColor(colorIndex, timeout);
+            return true;
+        }
+        catch (Exception) {
+            result = default;
+            return false;
+        }
+    }
+
+    /// <summary>
+    ///     Attempts to asynchronously retrieve the defined terminal color for the specified palette color.
+    /// </summary>
+    public static async Task<(bool Success, NKColor Color)> TryGetColorAsync(
+        NKConsoleColor    color,
+        TimeSpan?         timeout           = null,
+        CancellationToken cancellationToken = default
+    ) => await TryGetColorAsync((int)color, timeout, cancellationToken);
+
+    /// <summary>
+    ///     Attempts to asynchronously retrieve the defined terminal color for the specified palette index.
+    /// </summary>
+    public static async Task<(bool Success, NKColor Color)> TryGetColorAsync(
+        int               colorIndex,
+        TimeSpan?         timeout           = null,
+        CancellationToken cancellationToken = default
+    ) {
+        try {
+            var col = await GetColorAsync(colorIndex, timeout, cancellationToken);
+            return (true, col);
+        }
+        catch (Exception) {
+            return (false, default);
+        }
+    }
+
+    /// <summary>
+    ///     Attempts to asynchronously retrieve the defined terminal colors for multiple palette indices.
+    /// </summary>
+    public static async Task<(bool Success, IReadOnlyDictionary<int, NKColor> Colors)> TryGetColorsAsync(
+        int[]             colorIndices,
+        TimeSpan?         timeout           = null,
+        CancellationToken cancellationToken = default
+    ) {
+        try {
+            var res = await GetColorsAsync(colorIndices, timeout, cancellationToken);
+
+            return (res.Count > 0, res);
+        }
+        catch (Exception) {
+            return (false, new Dictionary<int, NKColor>());
+        }
     }
 }
 

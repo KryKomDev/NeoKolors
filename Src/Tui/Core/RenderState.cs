@@ -7,36 +7,40 @@ using NeoKolors.Common;
 namespace NeoKolors.Tui.Core;
 
 /// <summary>
-/// Represents an immutable snapshot of the rendering state in the <see cref="RenderContext"/> state stack.
+///     Represents an immutable snapshot of the rendering state in the
+///     <see cref="RenderContext" /> state stack.
 /// </summary>
 public readonly record struct RenderState {
     /// <summary>
-    /// The coordinate translation offset relative to the canvas origin.
+    ///     The coordinate translation offset relative to the canvas origin.
     /// </summary>
     public Point2D Origin { get; init; }
 
     /// <summary>
-    /// The clipping boundary in global canvas coordinates. If null, no clip is applied beyond canvas bounds.
+    ///     The clipping boundary in global canvas coordinates. If null, no clip is applied beyond
+    ///     canvas bounds.
     /// </summary>
     public Rect2D? Clip { get; init; }
 
     /// <summary>
-    /// The active z-index priority for drawing operations.
+    ///     The active z-index priority for drawing operations.
     /// </summary>
     public int ZIndex { get; init; }
 
     /// <summary>
-    /// The active base style applied to rendered text and cells.
+    ///     The active base style applied to rendered text and cells.
     /// </summary>
     public NKStyle Style { get; init; }
 
     /// <summary>
-    /// Flag indicating whether drawing operations are permitted to write outside the current element's clip/context area.
+    ///     Flag indicating whether drawing operations are permitted to write outside the current
+    ///     element's clip/context area.
     /// </summary>
     public bool AllowOverflow { get; init; }
 
     /// <summary>
-    /// The designated context area bounds of the current element (in global canvas coordinates).
+    ///     The designated context area bounds of the current element (in global canvas
+    ///     coordinates).
     /// </summary>
     public Rect2D? ContextArea { get; init; }
 

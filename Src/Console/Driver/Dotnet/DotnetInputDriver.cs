@@ -1,7 +1,6 @@
 // NeoKolors
 // Copyright (c) 2025 KryKom
 
-using System.ComponentModel;
 using Metriks;
 using NeoKolors.Console.Ansi;
 using static NeoKolors.Common.EscapeCodes;
@@ -9,34 +8,40 @@ using static NeoKolors.Common.EscapeCodes;
 namespace NeoKolors.Console;
 
 /// <summary>
-/// Represents the .NET input driver implementation for handling console input events.
+///     Represents the .NET input driver implementation for handling console input events.
 /// </summary>
 /// <remarks>
-/// This class is responsible for managing and processing console input events such as keyboard input,
-/// mouse events, focus events, paste events, and terminal queries. It uses pure ANSI parsing for decoding
-/// and interpreting input sequences. This driver is designed to work in conjunction with the NeoKolors
-/// console framework.
+///     This class is responsible for managing and processing console input events such as
+///     keyboard input,
+///     mouse events, focus events, paste events, and terminal queries. It uses pure ANSI
+///     parsing for decoding
+///     and interpreting input sequences. This driver is designed to work in conjunction with
+///     the NeoKolors
+///     console framework.
 /// </remarks>
 public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
     private static readonly NKLogger LOGGER = NKDebug.GetLogger("DotnetInputDriver");
 
-    public event MouseEventHandler? Mouse = delegate { };
-    public event KeyEventHandler? Key = delegate { };
-    public event FocusInEventHandler? FocusIn = delegate { };
-    public event FocusOutEventHandler? FocusOut = delegate { };
-    public event ResizeEventHandler? Resize = delegate { };
-    public event PasteEventHandler? Paste = delegate { };
-    public event VTQueryResponseHandler? VTQuery = delegate { };
+    public event MouseEventHandler?      Mouse    = delegate { };
+    public event KeyEventHandler?        Key      = delegate { };
+    public event FocusInEventHandler?    FocusIn  = delegate { };
+    public event FocusOutEventHandler?   FocusOut = delegate { };
+    public event ResizeEventHandler?     Resize   = delegate { };
+    public event PasteEventHandler?      Paste    = delegate { };
+    public event VTQueryResponseHandler? VTQuery        = delegate { };
+    public event VTQueryTimeoutHandler?  VTQueryTimeout = delegate { };
 
-    private bool _disposed = false;
-    private Thread? _inputThread;
-    private bool _isStopped = true;
-    private readonly DotnetAnsiParser _parser;
-    private readonly LockObject _queueLock = new();
-    private readonly Queue<VTQuery> _requestQueue = new();
-    private DotnetInputDriverConfig? _config = null!;
+    private readonly record struct QueuedVTRequest(VTQuery Query, int Attempts);
 
-    private ReportedMouseEvents _activeMouseLevel = ReportedMouseEvents.NONE;
+    private          bool                     _disposed = false;
+    private          Thread?                  _inputThread;
+    private          bool                     _isStopped = true;
+    private readonly DotnetAnsiParser         _parser;
+    private readonly LockObject               _queueLock    = new();
+    private readonly Queue<QueuedVTRequest>   _requestQueue = new();
+    private DotnetInputDriverConfig _config;
+
+    private ReportedMouseEvents _activeMouseLevel    = ReportedMouseEvents.NONE;
     private MouseReportProtocol _activeMouseProtocol = MouseReportProtocol.X10;
 
     private event Action OnStopped = delegate { };
@@ -44,50 +49,46 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
     public bool IsRunning { get; private set; }
 
     public DotnetInputDriverConfig Config {
-        get => _config!;
+        get => _config;
         set {
-            if (_config != null)
-                _config.PropertyChanged -= HandleConfigChange;
-
+            ArgumentNullException.ThrowIfNull(value);
+            var old = _config;
             _config = value;
-
-            if (_config != null) {
-                _config.PropertyChanged += HandleConfigChange;
-                ApplyMouseReporting();
-            }
+            ApplyConfigDiff(old, value);
         }
     }
 
-    private void HandleConfigChange(object? sender, PropertyChangedEventArgs e) {
-        LOGGER.Debug($"Config change: {e.PropertyName}");
+    private void ApplyConfigDiff(DotnetInputDriverConfig? old, DotnetInputDriverConfig current) {
+        if (old == null || old.MouseReportLevel != current.MouseReportLevel || old.MouseReportProtocol != current.MouseReportProtocol)
+            ApplyMouseReporting();
 
-        switch (e.PropertyName) {
-            case nameof(Config.MouseReportLevel):
-            case nameof(Config.MouseReportProtocol): {
-                ApplyMouseReporting();
-                break;
+        if (old == null || old.CtrlCForceQuits != current.CtrlCForceQuits) {
+            try {
+                Stdio.TreatControlCAsInput = !current.CtrlCForceQuits;
             }
-            default: {
-                LOGGER.Warn($"Unhandled config change: {e.PropertyName}");
-                break;
+            catch (Exception ex) {
+                LOGGER.Warn($"Failed to set TreatControlCAsInput: {ex.Message}");
             }
         }
     }
 
     public DotnetInputDriver(DotnetInputDriverConfig? config = null) {
-        _parser = new DotnetAnsiParser(HandleUnused);
-        Config = config ?? new DotnetInputDriverConfig();
+        _config = config ?? new DotnetInputDriverConfig();
+        _parser = new DotnetAnsiParser(HandleUnused, _config.VTRequestTimeout);
 
         try {
-            Stdio.TreatControlCAsInput = !Config.CtrlCForceQuits;
+            Stdio.TreatControlCAsInput = !_config.CtrlCForceQuits;
         }
         catch (Exception ex) {
             LOGGER.Warn($"Failed to set TreatControlCAsInput: {ex.Message}");
         }
+
+        ApplyMouseReporting();
     }
 
     private void ApplyMouseReporting() {
         var targetLevel = _config!.MouseReportLevel;
+
         var targetProtocol = targetLevel != ReportedMouseEvents.NONE
             ? _config.MouseReportProtocol
             : MouseReportProtocol.X10;
@@ -119,14 +120,27 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
         if (!IsRunning)
             return;
 
-        foreach (var k in keys) {
+        foreach (var k in keys)
             Key?.Invoke(new KeyEventArgs(k));
-        }
     }
 
     public void RequestVTQuery(VTQuery request) {
         lock (_queueLock) {
-            _requestQueue.Enqueue(request);
+            _requestQueue.Enqueue(new QueuedVTRequest(request, 0));
+        }
+    }
+
+    public bool CancelVTQuery(VTQuery request) {
+        lock (_queueLock) {
+            var list = _requestQueue.ToList();
+            var removed = list.RemoveAll(q => q.Query.Equals(request)) > 0;
+            if (removed) {
+                _requestQueue.Clear();
+                foreach (var item in list)
+                    _requestQueue.Enqueue(item);
+            }
+
+            return removed;
         }
     }
 
@@ -139,8 +153,8 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
 
         _inputThread = new Thread(Intercept) {
             IsBackground = true,
-            Priority = ThreadPriority.BelowNormal,
-            Name = "NeoKolors .NET Input Interceptor"
+            Priority     = ThreadPriority.BelowNormal,
+            Name         = "NeoKolors .NET Input Interceptor"
         };
 
         _inputThread.Start();
@@ -157,12 +171,10 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
         while (IsRunning) {
             // try to get some input
             try {
-                if (Stdio.PeekU()) {
+                if (Stdio.PeekU())
                     ProcessInput(_parser.Parse());
-                }
-                else {
+                else
                     Thread.Sleep(1);
-                }
             }
             catch (Exception e) when (e is InvalidOperationException or EndOfStreamException) {
                 break;
@@ -203,12 +215,12 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
     }
 
     private void ProcessRequests() {
-        Queue<VTQuery>? currentRequests = null;
+        Queue<QueuedVTRequest>? currentRequests = null;
 
         // copy the queue
         lock (_queueLock) {
             if (_requestQueue.Count != 0) {
-                currentRequests = new Queue<VTQuery>(_requestQueue);
+                currentRequests = new Queue<QueuedVTRequest>(_requestQueue);
                 _requestQueue.Clear();
             }
         }
@@ -217,30 +229,37 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
         if (currentRequests == null)
             return;
 
-        var failed = new List<VTQuery>();
+        var retried = new List<QueuedVTRequest>();
 
         // process individual requests
-        foreach (var request in currentRequests) {
-            NKConsole.Write(request.GetEscSeq());
+        foreach (var item in currentRequests) {
+            NKConsole.Write(item.Query.GetEscSeq());
 
-            var parserResult = _parser.Parse(in request, out var response);
+            var query = item.Query;
+            var parserResult = _parser.Parse(in query, out var response);
 
             LOGGER.Debug(parserResult);
 
             // determine if the request should be repeated
-            if (parserResult == AnsiParser.ParserResult.SUCCESS)
+            if (parserResult == AnsiParser.ParserResult.SUCCESS) {
                 VTQuery?.Invoke(response!.Value);
-            else
-                failed.Add(request);
+            }
+            else if (item.Attempts < Config.VTRequestMaxRetries) {
+                retried.Add(item with { Attempts = item.Attempts + 1 });
+            }
+            else {
+                LOGGER.Warn($"VTQuery {item.Query.Type} failed with {parserResult} after {item.Attempts + 1} attempts.");
+                VTQueryTimeout?.Invoke(item.Query, parserResult);
+            }
         }
 
-        if (failed.Count == 0)
+        if (retried.Count == 0)
             return;
 
-        // Enqueue back failed requests
+        // Enqueue back retried requests
         lock (_queueLock) {
-            foreach (var f in failed)
-                _requestQueue.Enqueue(f);
+            foreach (var r in retried)
+                _requestQueue.Enqueue(r);
         }
     }
 
@@ -262,7 +281,7 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
         Stop();
 
         if (!_isStopped) {
-            var are = new AutoResetEvent(false);
+            var are     = new AutoResetEvent(false);
             var handler = void () => are.Set();
 
             OnStopped += handler;
@@ -292,7 +311,7 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
             MouseReportProtocol.UTF8       => MOUSE_EV_UTF8_OFF,
             MouseReportProtocol.SGR        => MOUSE_EV_SGR_OFF,
             MouseReportProtocol.SGR_PIXELS => MOUSE_EV_SGR_PIXELS_OFF,
-            _                              => throw new ArgumentOutOfRangeException(nameof(oldValue), oldValue, null),
+            _                              => throw new ArgumentOutOfRangeException(nameof(oldValue), oldValue, null)
         };
 
         var e = newValue switch {
@@ -300,7 +319,7 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
             MouseReportProtocol.UTF8       => MOUSE_EV_UTF8_ON,
             MouseReportProtocol.SGR        => MOUSE_EV_SGR_ON,
             MouseReportProtocol.SGR_PIXELS => MOUSE_EV_SGR_PIXELS_ON,
-            _                              => throw new ArgumentOutOfRangeException(nameof(newValue), newValue, null),
+            _                              => throw new ArgumentOutOfRangeException(nameof(newValue), newValue, null)
         };
 
         // disable the original protocol
@@ -325,7 +344,7 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
             <= ReportedMouseEvents.RELEASE => MOUSE_EV_ON_PR_OFF,
             <= ReportedMouseEvents.DRAG    => MOUSE_EV_ON_PRD_OFF,
             <= ReportedMouseEvents.ALL     => MOUSE_EV_ON_ALL_OFF,
-            _                              => throw new ArgumentOutOfRangeException(nameof(oldValue), oldValue, null),
+            _                              => throw new ArgumentOutOfRangeException(nameof(oldValue), oldValue, null)
         };
 
         var e = newValue switch {
@@ -334,7 +353,7 @@ public class DotnetInputDriver : IInputDriver<DotnetInputDriverConfig> {
             <= ReportedMouseEvents.RELEASE => MOUSE_EV_ON_PR_ON,
             <= ReportedMouseEvents.DRAG    => MOUSE_EV_ON_PRD_ON,
             <= ReportedMouseEvents.ALL     => MOUSE_EV_ON_ALL_ON,
-            _                              => throw new ArgumentOutOfRangeException(nameof(newValue), newValue, null),
+            _                              => throw new ArgumentOutOfRangeException(nameof(newValue), newValue, null)
         };
 
         // disable the original level

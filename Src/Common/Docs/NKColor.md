@@ -1,12 +1,17 @@
 # NKColor Deep Dive
 
-**[NKColor](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/NKColor.cs)** is the core color representation structure in the NeoKolors ecosystem. It is designed to be high-performance, memory-efficient, and fully compatible with modern terminals (supporting 24-bit TrueColor RGB, 8-bit ANSI colors, and special layout inheritance states).
+**[NKColor](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/NKColor.cs)** is the
+core color representation structure in the NeoKolors ecosystem. It is designed to be
+high-performance, memory-efficient, and fully compatible with modern terminals (supporting 24-bit
+TrueColor RGB, 8-bit ANSI colors, and special layout inheritance states).
 
 ---
 
 ## 1. Memory Layout and Efficiency
 
-Unlike typical color classes that allocate objects on the heap, `NKColor` is implemented as an explicit layout record struct of size `uint` (32 bits). This layout makes it extremely cache-friendly and allows it to be copied by value with zero allocation overhead.
+Unlike typical color classes that allocate objects on the heap, `NKColor` is implemented as an
+explicit layout record struct of size `uint` (32 bits). This layout makes it extremely
+cache-friendly and allows it to be copied by value with zero allocation overhead.
 
 ```csharp
 [StructLayout(LayoutKind.Explicit, Size = sizeof(uint))]
@@ -14,7 +19,9 @@ public readonly record struct NKColor : IFormattable, IParsable<NKColor>
 ```
 
 The underlying bits are packed as follows:
-- **Bits 0–23 (Lower 24 bits)**: Store the color channel information (RGB values or the 8-bit palette index).
+
+- **Bits 0–23 (Lower 24 bits)**: Store the color channel information (RGB values or the 8-bit
+  palette index).
 - **Bits 24–31 (Upper 8 bits)**: Store the **Color Type** metadata byte.
 - Remaining bits are unused or reserved.
 
@@ -35,9 +42,11 @@ An `NKColor` instance can represent four distinct color states, defined by the `
 
 ## 3. Pattern Matching and Value Resolution
 
-To prevent boxing when extracting the color type, `NKColor` provides allocation-free pattern matching methods (`Match` and `Switch`):
+To prevent boxing when extracting the color type, `NKColor` provides allocation-free pattern
+matching methods (`Match` and `Switch`):
 
 ### Using `Match<T>`
+
 ```csharp
 string description = myColor.Match(
     @default => "Using default terminal color",
@@ -68,7 +77,8 @@ ConsoleColor systemColor = (ConsoleColor)red;
 
 ## 5. String Formatting and ANSI Escape Codes
 
-The `ToString` method is heavily optimized to return the correct ANSI escape sequences for text coloring based on the color's type and the requested formatting flag:
+The `ToString` method is heavily optimized to return the correct ANSI escape sequences for text
+coloring based on the color's type and the requested formatting flag:
 
 | Format Code                 | Description                                 | Example Output      |
 |-----------------------------|---------------------------------------------|---------------------|
@@ -82,7 +92,10 @@ The `ToString` method is heavily optimized to return the correct ANSI escape seq
 ## 6. Utilities and Interpolation
 
 ### Linear Interpolation (`Lerp`)
-You can smoothly transition between two RGB colors using the static `Lerp` method. This is perfect for custom gradients:
+
+You can smoothly transition between two RGB colors using the static `Lerp` method. This is perfect
+for custom gradients:
+
 ```csharp
 NKColor start = NKColor.FromRgb(255, 0, 0); // Red
 NKColor end   = NKColor.FromRgb(0, 0, 255); // Blue
@@ -92,7 +105,10 @@ NKColor half = NKColor.Lerp(start, end, 0.5f);
 ```
 
 ### Color Inverse
-The `GetInverse()` method returns the bitwise inverse of an RGB color, or maps the opposite index for palette colors:
+
+The `GetInverse()` method returns the bitwise inverse of an RGB color, or maps the opposite index
+for palette colors:
+
 ```csharp
 NKColor color = NKColor.FromRgb(255, 255, 0); // Yellow
 NKColor inverse = color.GetInverse();          // Blue
@@ -110,4 +126,7 @@ NKColor inverse = color.GetInverse();          // Blue
 public readonly record struct NKColor : IFormattable, IParsable<NKColor>
 ```
 
-The surrogate directly packs and unpacks the 32-bit raw integer representation (`GetRaw()` and `FromRaw(uint)`), allowing `NKColor` to be used directly as a member in any Protobuf contract. For rules on extending or updating this struct without breaking binary compatibility, see the [Binary Serialization & Class Update Guide](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/Docs/Serialization-Guide.md).
+The surrogate directly packs and unpacks the 32-bit raw integer representation (`GetRaw()` and
+`FromRaw(uint)`), allowing `NKColor` to be used directly as a member in any Protobuf contract. For
+rules on extending or updating this struct without breaking binary compatibility, see
+the [Binary Serialization & Class Update Guide](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/Docs/Serialization-Guide.md).

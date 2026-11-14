@@ -1,6 +1,8 @@
 # Tutorial: TUI Quick-Start Guide
 
-This tutorial walks you through building your first interactive Text User Interface (TUI) application using **NeoKolors.Tui**. We will create an interactive counter dashboard with button clicks, mouse handling, and responsive resizing.
+This tutorial walks you through building your first interactive Text User Interface (TUI)
+application using **NeoKolors.Tui**. We will create an interactive counter dashboard with button
+clicks, mouse handling, and responsive resizing.
 
 ---
 
@@ -157,4 +159,5 @@ Execute your new TUI application from your terminal:
 dotnet run
 ```
 
-You can now click the button with your mouse, watch the counter increment, resize your terminal window to see responsive reflowing, and press `Escape` or `q` to cleanly exit!
+You can now click the button with your mouse, watch the counter increment, resize your terminal
+window to see responsive reflowing, and press `Escape` or `q` to cleanly exit!

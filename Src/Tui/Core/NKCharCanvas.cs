@@ -62,9 +62,8 @@ public class NKCharCanvas : ICharCanvas {
             yOffset                 >= YSize ||
             xOffset + canvas.Size.X < 0      ||
             yOffset + canvas.Size.Y < 0
-        ) {
+        )
             return;
-        }
 
         var xs = xOffset.BottomClamp(0);
         var ys = yOffset.BottomClamp(0);
@@ -73,29 +72,24 @@ public class NKCharCanvas : ICharCanvas {
 
         // clear clusters
 
-        if (xOffset > 0) {
-            for (int yi = ys; yi < ye; yi++) {
+        if (xOffset > 0)
+            for (var yi = ys; yi < ye; yi++)
                 ClearClusterLeft(xOffset, yi);
-            }
-        }
 
         var r = xOffset + canvas.Size.X;
 
-        if (r < XSize - 1) {
-            for (int yi = ys; yi < ye; yi++) {
+        if (r < XSize - 1)
+            for (var yi = ys; yi < ye; yi++)
                 ClearClusterRight(r, yi);
-            }
-        }
 
         // draw
-        for (int x = xs; x < xe; x++) {
-            for (int y = ys; y < ye; y++) {
-                if (_zLay[x, y] > z || canvas.Data[x - xOffset, y - yOffset].Flags.GetIsTransparent())
-                    continue;
+        for (var x = xs; x < xe; x++)
+        for (var y = ys; y < ye; y++) {
+            if (_zLay[x, y] > z || canvas.Data[x - xOffset, y - yOffset].Flags.GetIsTransparent())
+                continue;
 
-                _data[x, y] = canvas.Data[x - xOffset, y - yOffset];
-                _zLay[x, y] = z;
-            }
+            _data[x, y] = canvas.Data[x - xOffset, y - yOffset];
+            _zLay[x, y] = z;
         }
     }
 
@@ -105,9 +99,8 @@ public class NKCharCanvas : ICharCanvas {
             xOffset >= XSize ||
             yOffset >= YSize ||
             z       < _zLay[xOffset, yOffset]
-        ) {
+        )
             return;
-        }
 
         ClearCluster(xOffset, yOffset);
 
@@ -125,7 +118,7 @@ public class NKCharCanvas : ICharCanvas {
         if (yOffset + lines.Length < 0)
             return;
 
-        for (int y = yOffset.BottomClamp(0); y < (yOffset + lines.Length).TopClamp(YSize); y++) {
+        for (var y = yOffset.BottomClamp(0); y < (yOffset + lines.Length).TopClamp(YSize); y++) {
             var line = lines[y - yOffset];
 
             if (xOffset > 0 && xOffset < XSize)
@@ -136,7 +129,7 @@ public class NKCharCanvas : ICharCanvas {
 
             var cells = NKCell.FromString(line);
 
-            for (int x = xOffset.BottomClamp(0); x < (xOffset + cells.Length).TopClamp(XSize); x++) {
+            for (var x = xOffset.BottomClamp(0); x < (xOffset + cells.Length).TopClamp(XSize); x++) {
                 if (_zLay[x, y] > z)
                     continue;
 
@@ -162,12 +155,12 @@ public class NKCharCanvas : ICharCanvas {
                 SamplingOptions = samplingOptions,
                 ZLayer          = zLayer,
                 Position        = new Point2D(xOffset, yOffset),
-                Size            = new Size2D(xSize, ySize),
+                Size            = new Size2D(xSize, ySize)
             }
         );
 
-        for (int x = xOffset.BottomClamp(0); x < (xOffset + xSize).TopClamp(XSize); x++)
-        for (int y = yOffset.BottomClamp(0); y < (yOffset + ySize).TopClamp(YSize); y++) {
+        for (var x = xOffset.BottomClamp(0); x < (xOffset + xSize).TopClamp(XSize); x++)
+        for (var y = yOffset.BottomClamp(0); y < (yOffset + ySize).TopClamp(YSize); y++) {
             if (_zLay[x, y] > zLayer)
                 continue;
 
@@ -179,7 +172,7 @@ public class NKCharCanvas : ICharCanvas {
         if (x < 0 || x >= XSize || y < 0 || y >= YSize)
             return;
 
-        for (int yi = y.BottomClamp(0); yi < (y + length).TopClamp(YSize); yi++) {
+        for (var yi = y.BottomClamp(0); yi < (y + length).TopClamp(YSize); yi++) {
             if (_zLay[x, yi] > z)
                 continue;
 
@@ -199,7 +192,7 @@ public class NKCharCanvas : ICharCanvas {
         if (x + length < XSize)
             ClearClusterRight(x + length, y);
 
-        for (int xi = x.BottomClamp(0); xi < (x + length).TopClamp(XSize); xi++) {
+        for (var xi = x.BottomClamp(0); xi < (x + length).TopClamp(XSize); xi++) {
             if (_zLay[xi, y] > z)
                 continue;
 
@@ -210,11 +203,10 @@ public class NKCharCanvas : ICharCanvas {
     }
 
     public void DrawRect(AnsiChar c, int x, int y, int width, int height, int z) {
-        for (int yi = y.BottomClamp(0); yi < (y + height).TopClamp(YSize); yi++) {
+        for (var yi = y.BottomClamp(0); yi < (y + height).TopClamp(YSize); yi++)
             DrawHorizontalLine(c, x, yi, width, z);
-        }
     }
-    
+
     #endregion
 
     #region Helper Methods
@@ -223,61 +215,55 @@ public class NKCharCanvas : ICharCanvas {
         if (!_data[x, y].Flags.GetIsCluster())
             return;
 
-        for (int xi = x; xi >= 0; xi--) {
+        for (var xi = x; xi >= 0; xi--) {
             _data[xi, y] = NKCell.Default with { Style = _data[xi, y].Style };
 
             if (_data[xi, y].Flags.GetIsClusterStart() ||
                 (xi - 1 >= 0 && !_data[xi - 1, y].Flags.GetIsCluster())
-            ) {
+            )
                 break;
-            }
         }
 
         if (x + 1 < XSize && !_data[x + 1, y].Flags.GetIsClusterContinuation())
             return;
 
-        for (int xi = x + 1; xi < XSize; xi++) {
+        for (var xi = x + 1; xi < XSize; xi++) {
             _data[xi, y] = NKCell.Default with { Style = _data[xi, y].Style };
 
             if (xi + 1 <= XSize                        ||
                 !_data[xi + 1, y].Flags.GetIsCluster() ||
                 _data[xi + 1, y].Flags.GetIsClusterStart()
-            ) {
+            )
                 break;
-            }
         }
     }
-    
-    private void ClearClusterLeft(int x, int y) {
-        if (!_data[x, y].Flags.GetIsCluster()) {
-            return;
-        }
 
-        for (int xi = x; xi >= 0; xi--) {
+    private void ClearClusterLeft(int x, int y) {
+        if (!_data[x, y].Flags.GetIsCluster())
+            return;
+
+        for (var xi = x; xi >= 0; xi--) {
             _data[xi, y] = NKCell.Default with { Style = _data[xi, y].Style };
 
             if (_data[xi, y].Flags.GetIsClusterStart() ||
                 (xi - 1 >= 0 && !_data[xi - 1, y].Flags.GetIsCluster())
-            ) {
+            )
                 break;
-            }
         }
     }
 
     private void ClearClusterRight(int x, int y) {
-        if (!_data[x, y].Flags.GetIsCluster()) {
+        if (!_data[x, y].Flags.GetIsCluster())
             return;
-        }
 
-        for (int xi = x; xi < XSize; xi++) {
+        for (var xi = x; xi < XSize; xi++) {
             _data[xi, y] = NKCell.Default with { Style = _data[xi, y].Style };
 
             if (xi + 1 <= XSize                        ||
                 !_data[xi + 1, y].Flags.GetIsCluster() ||
                 _data[xi + 1, y].Flags.GetIsClusterStart()
-            ) {
+            )
                 break;
-            }
         }
     }
 

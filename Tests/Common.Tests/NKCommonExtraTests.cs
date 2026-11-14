@@ -12,9 +12,9 @@ public class NKCommonExtraTests {
 
         // Assert
         Assert.Equal(NKColor.ColorType.RGB, inverse.Type);
-        Assert.Equal(255 - 100, (byte)(inverse.AsRgb >> 16));
-        Assert.Equal(255 - 150, (byte)(inverse.AsRgb >> 8));
-        Assert.Equal(255 - 200, (byte)inverse.AsRgb);
+        Assert.Equal(255 - 100,             (byte)(inverse.AsRgb >> 16));
+        Assert.Equal(255 - 150,             (byte)(inverse.AsRgb >> 8));
+        Assert.Equal(255 - 200,             (byte)inverse.AsRgb);
     }
 
     [Fact]
@@ -27,7 +27,7 @@ public class NKCommonExtraTests {
 
         // Assert
         Assert.Equal(NKColor.ColorType.CONSOLE_COLOR, inverse.Type);
-        Assert.Equal(NKConsoleColor.DARK_GRAY, inverse.AsPalette); // (0 + 8) % 16 = 8
+        Assert.Equal(NKConsoleColor.DARK_GRAY,        inverse.AsPalette); // (0 + 8) % 16 = 8
     }
 
     [Fact]
@@ -36,7 +36,7 @@ public class NKCommonExtraTests {
         var c2 = new NKColor(0x123456);
         var c3 = new NKColor(0x654321);
 
-        Assert.True(c1 == c2);
+        Assert.True(c1  == c2);
         Assert.False(c1 == c3);
         Assert.True(c1.Equals(c2));
     }
@@ -44,7 +44,7 @@ public class NKCommonExtraTests {
     [Fact]
     public void TextStyles_Flags_WorkAsExpected() {
         var styles = NKTextStyles.BOLD | NKTextStyles.ITALIC;
-        
+
         Assert.True(styles.HasFlag(NKTextStyles.BOLD));
         Assert.True(styles.HasFlag(NKTextStyles.ITALIC));
         Assert.False(styles.HasFlag(NKTextStyles.UNDERLINE));

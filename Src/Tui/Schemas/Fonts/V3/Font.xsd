@@ -1,7 +1,7 @@
 ﻿<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
             targetNamespace="https://krykomdev.github.io/NeoKolors/Schemas/Fonts/v3/"
             elementFormDefault="qualified">
-    
+
     <xsd:include schemaLocation="Font.Common.xsd"/>
     <xsd:include schemaLocation="Font.Config.xsd"/>
     <xsd:include schemaLocation="Font.Manifest.xsd"/>

@@ -15,9 +15,9 @@ public readonly record struct MouseEventArgs {
     public bool         Moved     { get; init; }
 
     public bool IsHover   => Button == MouseButton.RELEASE && Moved;
-    public bool IsPress   => !Released && !Moved;
-    public bool IsRelease =>  Released && !Moved;
-    
+    public bool IsPress   => !Released                     && !Moved;
+    public bool IsRelease => Released                      && !Moved;
+
     public MouseEventArgs(MouseButton button, KeyModifiers modifiers, Point2D position, bool released, bool moved) {
         Button    = button;
         Position  = position;
@@ -25,9 +25,9 @@ public readonly record struct MouseEventArgs {
         Released  = released;
         Moved     = moved;
     }
-    
+
     public override string ToString() =>
-        $"{(Released ? "Released " : "")}" +
+        $"{(Released ? "Released " : "")}"                                                             +
         $"{(Moved && Button == MouseButton.RELEASE ? "Moved" : Moved ? $"Dragged {Button}" : Button)}" +
         $" at {Position} with {Modifiers}";
 }

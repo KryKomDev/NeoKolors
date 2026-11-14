@@ -8,6 +8,5 @@ using NeoKolors.Settings.Attributes;
 namespace NeoKolors.Settings;
 
 public static class Extensions {
-    public static string GetDisplayName(this Type t) => 
-        DisplayTypeAttribute.GetName(t);
+    public static string GetDisplayName(this Type t) => DisplayTypeAttribute.GetName(t);
 }

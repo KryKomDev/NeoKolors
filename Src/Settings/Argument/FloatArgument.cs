@@ -10,26 +10,26 @@ namespace NeoKolors.Settings.Argument;
 
 [DisplayType("float")]
 public class FloatArgument : IArgument<float>, IXsdArgument {
-    public float MinValue { get; }
-    public float MaxValue { get; }
-    public float DefaultValue { get; }
+    public float                 MinValue       { get; }
+    public float                 MaxValue       { get; }
+    public float                 DefaultValue   { get; }
     public Func<float, string?>? CustomValidate { get; }
-    
+
     public float Value { get; private set; }
 
     public FloatArgument(
-        float min = float.MinValue, 
-        float max = float.MaxValue, 
-        float defaultValue = 0, 
-        Func<float, string?>? customValidate = null) 
-    {
-        MinValue = Math.Min(min, max);
-        MaxValue = Math.Max(min, max);
+        float                 min            = float.MinValue,
+        float                 max            = float.MaxValue,
+        float                 defaultValue   = 0,
+        Func<float, string?>? customValidate = null
+    ) {
+        MinValue       = Math.Min(min, max);
+        MaxValue       = Math.Max(min, max);
         CustomValidate = customValidate;
         Set(defaultValue);
         DefaultValue = defaultValue;
     }
-    
+
     public void Set(object? value) {
         if (value is float i) {
             Validate(i);
@@ -37,6 +37,7 @@ public class FloatArgument : IArgument<float>, IXsdArgument {
         }
         else if (value is string s) {
             float v;
+
             try {
                 v = float.Parse(s);
             }
@@ -46,7 +47,7 @@ public class FloatArgument : IArgument<float>, IXsdArgument {
             catch (OverflowException e) {
                 throw new ArgumentInputFormatException(typeof(float), s, e.Message);
             }
-            
+
             Validate(v);
             Value = v;
         }
@@ -65,13 +66,14 @@ public class FloatArgument : IArgument<float>, IXsdArgument {
 
     public void Set(string value) {
         float f;
+
         try {
             f = float.Parse(value, CultureInfo.InvariantCulture);
         }
         catch (System.Exception e) {
             throw new ArgumentInputFormatException(typeof(float), value, e.Message);
         }
-        
+
         Validate(f);
         Value = f;
     }
@@ -86,108 +88,129 @@ public class FloatArgument : IArgument<float>, IXsdArgument {
          </xsd:simpleType>
          """;
 
-    public float Get() => Value;
-    object IArgument.Get() => Get();
-    public float GetDefault() => DefaultValue;
-    object IArgument.GetDefault() => GetDefault();
-    public void Reset() => Value = DefaultValue;
-    public IArgument<float> Clone() => (IArgument<float>)MemberwiseClone();
-    IArgument IArgument.Clone() => Clone();
+    public float            Get()        => Value;
+    object IArgument.       Get()        => Get();
+    public float            GetDefault() => DefaultValue;
+    object IArgument.       GetDefault() => GetDefault();
+    public void             Reset()      => Value = DefaultValue;
+    public IArgument<float> Clone()      => (IArgument<float>)MemberwiseClone();
+    IArgument IArgument.    Clone()      => Clone();
 
     /// <summary>
-    /// sets the value of the argument without having to use the <see cref="Set(float)"/> method
+    ///     sets the value of the argument without having to use the <see cref="Set(float)" />
+    ///     method
     /// </summary>
     /// <example>
-    /// <code>
+    ///     <code>
     /// argument &lt;&lt;= 123;
     /// // argument.Value is now 123
     /// </code>
     /// </example>
     public static FloatArgument operator <<(FloatArgument argument, float value) {
         argument.Set(value);
+
         return argument;
     }
-    
+
     public static FloatArgument operator +(FloatArgument argument, float value) {
         argument.Set(argument.Value + value);
+
         return argument;
     }
-    
+
     public static FloatArgument operator +(float value, FloatArgument argument) {
         argument.Set(value + argument.Value);
+
         return argument;
     }
 
     public static FloatArgument operator -(FloatArgument argument, float value) {
         argument.Set(argument.Value - value);
+
         return argument;
     }
-    
+
     public static FloatArgument operator -(float value, FloatArgument argument) {
         argument.Set(value - argument.Value);
+
         return argument;
     }
-    
+
     public static FloatArgument operator *(FloatArgument argument, float value) {
         argument.Set(argument.Value * value);
+
         return argument;
     }
-    
+
     public static FloatArgument operator *(float value, FloatArgument argument) {
         argument.Set(value * argument.Value);
+
         return argument;
     }
 
     public static FloatArgument operator /(FloatArgument argument, float value) {
         argument.Set(argument.Value / value);
+
         return argument;
     }
-    
+
     public static FloatArgument operator /(float value, FloatArgument argument) {
         argument.Set(value / argument.Value);
+
         return argument;
     }
-    
+
     public static FloatArgument operator %(FloatArgument argument, float value) {
         argument.Set(argument.Value % value);
+
         return argument;
     }
-    
+
     public static FloatArgument operator %(float value, FloatArgument argument) {
         argument.Set(value % argument.Value);
+
         return argument;
     }
 
     public static FloatArgument operator ++(FloatArgument argument) {
         argument.Set(argument.Value + 1);
+
         return argument;
     }
 
     public static FloatArgument operator --(FloatArgument argument) {
         argument.Set(argument.Value - 1);
+
         return argument;
     }
-    
+
     public static implicit operator float(FloatArgument argument) => argument.Value;
-    public static implicit operator FloatArgument(float value) => new() { Value = value };
+    public static implicit operator FloatArgument(float value)    => new() { Value = value };
 
     private void Validate(float value) {
-        if (value < MinValue) throw new InvalidArgumentInputException($"Value was less then the smallest allowed value ({MinValue}).");
-        if (value > MaxValue) throw new InvalidArgumentInputException($"Value was greater then the greatest allowed value ({MaxValue}).");
-        string? res = CustomValidate?.Invoke(value);
-        if (res != null) throw new InvalidArgumentInputException(res);
+        if (value < MinValue)
+            throw new InvalidArgumentInputException($"Value was less then the smallest allowed value ({MinValue}).");
+
+        if (value > MaxValue)
+            throw new InvalidArgumentInputException($"Value was greater then the greatest allowed value ({MaxValue}).");
+
+        var res = CustomValidate?.Invoke(value);
+
+        if (res != null)
+            throw new InvalidArgumentInputException(res);
     }
 
     public bool Equals(IArgument? other) {
         const float tolerance = 0.00000001f;
-        return other is FloatArgument f && 
-               Math.Abs(Get() - f.Get()) < tolerance && 
-               Math.Abs(DefaultValue - f.DefaultValue) < tolerance &&
-               Math.Abs(MinValue - f.MinValue) < tolerance &&
-               Math.Abs(MaxValue - f.MaxValue) < tolerance &&
-               CustomValidate == f.CustomValidate;
+
+        return other is FloatArgument f                         &&
+            Math.Abs(Get()        - f.Get())        < tolerance &&
+            Math.Abs(DefaultValue - f.DefaultValue) < tolerance &&
+            Math.Abs(MinValue     - f.MinValue)     < tolerance &&
+            Math.Abs(MaxValue     - f.MaxValue)     < tolerance &&
+            CustomValidate                          == f.CustomValidate;
     }
-    
+
     public override string ToString() => $"{{\"type\": \"float\", \"value\": {Value}, \"default-value\": {DefaultValue}, \"min\": {MinValue}, \"max\": {MaxValue}}}";
-    object ICloneable.Clone() => Clone();
+    object ICloneable.     Clone()    => Clone();
 }

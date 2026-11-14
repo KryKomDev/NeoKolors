@@ -12,6 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using HasFlagExtension;
 using System.Collections;
+using System.Globalization;
 using static NeoKolors.Console.NKConsole.VTPlatform;
 
 namespace NeoKolors.Console;
@@ -19,13 +20,13 @@ namespace NeoKolors.Console;
 public static partial class NKConsole {
 
     /// <summary>
-    /// Represents the platform or terminal emulator where the virtual terminal
-    /// is currently being executed.
+    ///     Represents the platform or terminal emulator where the virtual terminal
+    ///     is currently being executed.
     /// </summary>
     /// <remarks>
-    /// This enum categorizes various terminal environments to enable context-aware
-    /// behavior within different terminal emulators. It includes platforms such as
-    /// Windows Terminal, VS Code, Apple Terminal, and others.
+    ///     This enum categorizes various terminal environments to enable context-aware
+    ///     behavior within different terminal emulators. It includes platforms such as
+    ///     Windows Terminal, VS Code, Apple Terminal, and others.
     /// </remarks>
     [FlagGroup("Windows", "Is")]
     [FlagGroup("Linux",   "Is")]
@@ -38,27 +39,27 @@ public static partial class NKConsole {
         [FlagGroup("Windows")] MINTTY,
         [FlagGroup("Windows")] CON_EMU,
 
-        [FlagGroup("Windows")] [FlagGroup("Linux")] [FlagGroup("MacOs")]
+        [FlagGroup("Windows"), FlagGroup("Linux"), FlagGroup("MacOs")]
         VSCODE,
 
         [FlagGroup("MacOs")] APPLE_TERMINAL,
 
-        [FlagGroup("Windows")] [FlagGroup("Linux")] [FlagGroup("MacOs")]
+        [FlagGroup("Windows"), FlagGroup("Linux"), FlagGroup("MacOs")]
         JETBRAINS,
 
-        [FlagGroup("Windows")] [FlagGroup("Linux")] [FlagGroup("MacOs")]
+        [FlagGroup("Windows"), FlagGroup("Linux"), FlagGroup("MacOs")]
         TMUX,
 
-        [FlagGroup("Windows")] [FlagGroup("Linux")] [FlagGroup("MacOs")]
+        [FlagGroup("Windows"), FlagGroup("Linux"), FlagGroup("MacOs")]
         XTERM,
 
         [FlagGroup("Linux")] LINUX_TTY,
 
-        [FlagGroup("Linux")] [FlagGroup("MacOs")]
+        [FlagGroup("Linux"), FlagGroup("MacOs")]
         GNU_SCREEN,
 
         ITERM,
-        GENERIC,
+        GENERIC
     }
 
     public readonly record struct VTInfo {
@@ -74,7 +75,7 @@ public static partial class NKConsole {
     }
 
     /// <summary>
-    /// Detects the name of the current virtual terminal or terminal emulator.
+    ///     Detects the name of the current virtual terminal or terminal emulator.
     /// </summary>
     /// <returns>A string representing the name of the terminal.</returns>
     public static VTInfo GetVTInfo() {
@@ -258,7 +259,8 @@ public static partial class NKConsole {
                     if (name.Contains("rider")    || name.Contains("idea")     || name.Contains("clion")    ||
                         name.Contains("webstorm") || name.Contains("phpstorm") || name.Contains("pycharm")  ||
                         name.Contains("rubymine") || name.Contains("goland")   || name.Contains("datagrip") ||
-                        name.Contains("studio")   || name.Contains("jetbrains")) {
+                        name.Contains("studio")   || name.Contains("jetbrains")
+                    ) {
                         return true;
                     }
                 }
@@ -322,7 +324,8 @@ public static partial class NKConsole {
                         name.Contains("phpstorm")  || name.Contains("pycharm")  ||
                         name.Contains("rubymine")  || name.Contains("goland")   ||
                         name.Contains("datagrip")  || name.Contains("studio")   ||
-                        name.Contains("jetbrains") || name.Contains("fleet")) {
+                        name.Contains("jetbrains") || name.Contains("fleet")
+                    ) {
                         return new VTInfo(JETBRAINS);
                     }
 
@@ -338,7 +341,7 @@ public static partial class NKConsole {
 
         var consoleWindow = GetConsoleWindow();
 
-        if (consoleWindow == IntPtr.Zero)
+        if (consoleWindow == nint.Zero)
             return null;
 
         string className = GetWindowClassName(consoleWindow).ToLowerInvariant();
@@ -401,7 +404,7 @@ public static partial class NKConsole {
 
         // D. Fallback: walk the parent process tree of the current process
         try {
-            int currentPid = Process.GetCurrentProcess().Id;
+            int currentPid = Environment.ProcessId;
             int parentId   = currentPid;
             int depth      = 0;
 
@@ -415,7 +418,8 @@ public static partial class NKConsole {
                     if (name.Contains("rider")    || name.Contains("idea")     || name.Contains("clion")    ||
                         name.Contains("webstorm") || name.Contains("phpstorm") || name.Contains("pycharm")  ||
                         name.Contains("rubymine") || name.Contains("goland")   || name.Contains("datagrip") ||
-                        name.Contains("studio")   || name.Contains("jetbrains")) {
+                        name.Contains("studio")   || name.Contains("jetbrains")
+                    ) {
                         return new VTInfo(JETBRAINS);
                     }
 
@@ -444,12 +448,11 @@ public static partial class NKConsole {
 
     #if DEBUG || NK_VT_DIAGNOSTICS
 
-    public static void DumpDiagnostics() {
-        var logPath = @"C:\Users\krystof\Desktop\projects\Libs\NeoKolors\Examples\Testing\diagnostics.log";
-        var sb      = new System.Text.StringBuilder();
+    public static void DumpDiagnostics(string logPath) {
+        var sb = new System.Text.StringBuilder();
         sb.AppendLine("=== DIAGNOSTICS ===");
         sb.AppendLine($"OS: {Environment.OSVersion.VersionString}");
-        sb.AppendLine($"Current Time: {DateTime.Now}");
+        sb.AppendLine(CultureInfo.InvariantCulture, $"Current Time: {DateTime.Now}");
 
         sb.AppendLine("\n--- Environment Variables ---");
 
@@ -459,8 +462,8 @@ public static partial class NKConsole {
 
             if (key.Contains("WT")      || key.Contains("TERM")      || key.Contains("IDEA")  ||
                 key.Contains("RIDER")   || key.Contains("JETBRAINS") || key.Contains("COLOR") ||
-                key.Contains("SESSION") || key.Contains("PROMPT")) 
-            {
+                key.Contains("SESSION") || key.Contains("PROMPT")
+            ) {
                 sb.AppendLine($"{key} = {val}");
             }
         }
@@ -490,7 +493,7 @@ public static partial class NKConsole {
             var consoleWindow = GetConsoleWindow();
             sb.AppendLine($"ConsoleWindow HWND: {consoleWindow}");
 
-            if (consoleWindow != IntPtr.Zero) {
+            if (consoleWindow != nint.Zero) {
                 GetWindowThreadProcessId(consoleWindow, out uint processId);
                 sb.AppendLine($"ConsoleWindow Owner PID: {processId}");
 

@@ -8,8 +8,8 @@ public interface ISettingsElementInfo<out TValue> : ISettingsElementInfo {
 }
 
 public interface ISettingsElementInfo {
-    public string Name { get; }
-    public object? Value { get; }
+    public string  Name        { get; }
+    public object? Value       { get; }
     public string? Description { get; }
-    public string ToXsd();
+    public string  ToXsd();
 }

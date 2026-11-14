@@ -26,8 +26,9 @@ public static partial class NKFontSerializer {
     private const string MAP_FILE_NAME      = "map.nkfm";
 
     /// <summary>
-    /// Reads an embedded font resource from the specified assembly and deserializes it into an NKFont.
-    /// Supports both binary (NKFB) and legacy XML ZIP archive formats.
+    ///     Reads an embedded font resource from the specified assembly and deserializes it into an
+    ///     NKFont.
+    ///     Supports both binary (NKFB) and legacy XML ZIP archive formats.
     /// </summary>
     public static NKFont? ReadEmbedded(string path, Assembly assembly) {
         using var stream = assembly.GetManifestResourceStream(path);
@@ -47,13 +48,13 @@ public static partial class NKFontSerializer {
             return DeserializeXmlArchive(stream);
 
         var buffer = new byte[4];
-        int read   = stream.Read(buffer, 0, 4);
+        var read   = stream.Read(buffer, 0, 4);
         stream.Position = startPos;
 
         if (read != 4)
             return DeserializeXmlArchive(stream);
 
-        uint magic = (uint)(buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24));
+        var magic = (uint)(buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24));
 
         return magic == BINARY_MAGIC
             ? DeserializeBinary(stream)
@@ -61,7 +62,8 @@ public static partial class NKFontSerializer {
     }
 
     /// <summary>
-    /// Reads an embedded font resource from the specified assembly and deserializes it into an NKFont.
+    ///     Reads an embedded font resource from the specified assembly and deserializes it into an
+    ///     NKFont.
     /// </summary>
     public static NKFont? ReadEmbedded<TAssemblyType>(string path) => ReadEmbedded(path, typeof(TAssemblyType).Assembly);
 
@@ -79,21 +81,34 @@ public static partial class NKFontSerializer {
     }
 
     /// <summary>
-    /// Deserializes an NKFont object from the specified XML resource path. The path can reference
-    /// a local file or a remote resource accessible via HTTP/HTTPS.
+    ///     Deserializes an NKFont object from the specified XML resource path. The path can
+    ///     reference
+    ///     a local file or a remote resource accessible via HTTP/HTTPS.
     /// </summary>
-    /// <param name="path">The path to the XML resource containing font data. It can be a file path or a URI.</param>
-    /// <returns>An <see cref="NKFont"/> object deserialized from the XML resource, or null if the deserialization
-    /// fails.</returns>
+    /// <param name="path">
+    ///     The path to the XML resource containing font data. It can be a file path
+    ///     or a URI.
+    /// </param>
+    /// <returns>
+    ///     An <see cref="NKFont" /> object deserialized from the XML resource, or null if the
+    ///     deserialization
+    ///     fails.
+    /// </returns>
     public static NKFont? DeserializeXml(string path) => DeserializeXmlAsync(path).Result;
 
     /// <summary>
-    /// Deserializes an NKFont object from the specified path asynchronously.
-    /// The path can reference a file, a directory, or a URI.
+    ///     Deserializes an NKFont object from the specified path asynchronously.
+    ///     The path can reference a file, a directory, or a URI.
     /// </summary>
-    /// <param name="path">The path or URI to the font resource. Can be a local path or a remote URL.</param>
-    /// <returns>A task representing the asynchronous operation. The task result is an <see cref="NKFont"/> object
-    /// deserialized from the specified path or null if deserialization fails.</returns>
+    /// <param name="path">
+    ///     The path or URI to the font resource. Can be a local path or a remote
+    ///     URL.
+    /// </param>
+    /// <returns>
+    ///     A task representing the asynchronous operation. The task result is an
+    ///     <see cref="NKFont" /> object
+    ///     deserialized from the specified path or null if deserialization fails.
+    /// </returns>
     public static async Task<NKFont?> DeserializeXmlAsync(string path) {
         if (!Uri.TryCreate(path, UriKind.RelativeOrAbsolute, out var uri)) {
             LOGGER.Error($"Cannot resolve path format '{path}'.");
@@ -102,15 +117,13 @@ public static partial class NKFontSerializer {
         }
 
         string? localPath = null;
-        bool    isWeb     = false;
+        var     isWeb     = false;
 
         if (uri.IsAbsoluteUri) {
-            if (uri.IsFile) {
+            if (uri.IsFile)
                 localPath = uri.LocalPath;
-            }
-            else if (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps) {
+            else if (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps)
                 isWeb = true;
-            }
         }
         else {
             localPath = path;
@@ -143,21 +156,33 @@ public static partial class NKFontSerializer {
     }
 
     /// <summary>
-    /// Deserializes an NKFont object from the specified XML archive stream.
-    /// The archive is expected to contain the necessary font configuration, glyph definitions, and related resources.
+    ///     Deserializes an NKFont object from the specified XML archive stream.
+    ///     The archive is expected to contain the necessary font configuration, glyph definitions,
+    ///     and related resources.
     /// </summary>
-    /// <param name="archive">A stream representing the XML archive containing font data and metadata.</param>
-    /// <returns>An <see cref="NKFont"/> object constructed from the contents of the archive, or <c>null</c> if
-    /// deserialization fails.</returns>
+    /// <param name="archive">
+    ///     A stream representing the XML archive containing font data and
+    ///     metadata.
+    /// </param>
+    /// <returns>
+    ///     An <see cref="NKFont" /> object constructed from the contents of the archive, or
+    ///     <c>null</c> if
+    ///     deserialization fails.
+    /// </returns>
     public static NKFont? DeserializeXmlArchive(Stream archive) => DeserializeXmlArchiveAsync(archive).Result;
 
     /// <summary>
-    /// Deserializes an NKFont object asynchronously from the provided stream containing a font archive in XML format.
+    ///     Deserializes an NKFont object asynchronously from the provided stream containing a font
+    ///     archive in XML format.
     /// </summary>
     /// <param name="archive">The stream containing the XML-based font archive to deserialize.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="NKFont"/>
-    /// object if deserialization succeeds; otherwise, null if the required entries in the archive are missing or an
-    /// error occurs.</returns>
+    /// <returns>
+    ///     A task that represents the asynchronous operation. The task result contains an
+    ///     <see cref="NKFont" />
+    ///     object if deserialization succeeds; otherwise, null if the required entries in the
+    ///     archive are missing or an
+    ///     error occurs.
+    /// </returns>
     public static async Task<NKFont?> DeserializeXmlArchiveAsync(Stream archive) {
         ZipArchiveEntry? configEntry;
         ZipArchiveEntry? mapEntry;
@@ -195,16 +220,15 @@ public static partial class NKFontSerializer {
         if (!string.IsNullOrEmpty(config.LicenseFile)) {
             var licenseEntry = zip.GetEntry(config.LicenseFile.Replace('\\', '/'));
 
-            if (licenseEntry == null) {
+            if (licenseEntry == null)
+
                 // Try case-insensitive lookup
-                foreach (var entry in zip.Entries) {
+                foreach (var entry in zip.Entries)
                     if (entry.FullName.Replace('\\', '/').Equals(config.LicenseFile.Replace('\\', '/'), StringComparison.OrdinalIgnoreCase)) {
                         licenseEntry = entry;
 
                         break;
                     }
-                }
-            }
 
             if (licenseEntry != null) {
                 await using var stream = licenseEntry.Open();
@@ -250,15 +274,13 @@ public static partial class NKFontSerializer {
             var normalizedPath = filePath.Replace('\\', '/');
             var entry          = zipArchive.GetEntry(normalizedPath) ?? zipArchive.GetEntry(filePath);
 
-            if (entry == null) {
-                foreach (var e in zipArchive.Entries) {
+            if (entry == null)
+                foreach (var e in zipArchive.Entries)
                     if (e.FullName.Replace('\\', '/').Equals(normalizedPath, StringComparison.OrdinalIgnoreCase)) {
                         entry = e;
 
                         break;
                     }
-                }
-            }
 
             if (entry != null) {
                 await using var stream = entry.Open();
@@ -276,11 +298,14 @@ public static partial class NKFontSerializer {
     }
 
     /// <summary>
-    /// Deserializes an NKFont object from a directory containing XML font resources.
-    /// The directory must include a manifest file or the default config and map files.
+    ///     Deserializes an NKFont object from a directory containing XML font resources.
+    ///     The directory must include a manifest file or the default config and map files.
     /// </summary>
     /// <param name="path">The path to the directory containing the font resources.</param>
-    /// <returns>An <see cref="NKFont"/> object deserialized from the directory, or null if deserialization fails.</returns>
+    /// <returns>
+    ///     An <see cref="NKFont" /> object deserialized from the directory, or null if
+    ///     deserialization fails.
+    /// </returns>
     private static async Task<NKFont?> DeserializeXmlDir(string path) {
         var manifestPath = Path.Combine(path, MANIFEST_FILE_NAME);
 
@@ -317,12 +342,10 @@ public static partial class NKFontSerializer {
         if (!string.IsNullOrEmpty(config.LicenseFile)) {
             var licensePath = Path.IsPathRooted(config.LicenseFile) ? config.LicenseFile : Path.Combine(path, config.LicenseFile);
 
-            if (File.Exists(licensePath)) {
+            if (File.Exists(licensePath))
                 config.LicenseContent = await File.ReadAllTextAsync(licensePath);
-            }
-            else {
+            else
                 LOGGER.Error($"License file '{config.LicenseFile}' not found.");
-            }
         }
 
         var map = await DeserializeMapAsync(File.Open(mapPath, FileMode.Open));
@@ -368,12 +391,19 @@ public static partial class NKFontSerializer {
     }
 
     /// <summary>
-    /// Combines the specified font configuration and glyph definitions into a single NKFont object.
+    ///     Combines the specified font configuration and glyph definitions into a single NKFont
+    ///     object.
     /// </summary>
     /// <param name="config">The configuration for the font, specifying metadata and settings.</param>
-    /// <param name="glyphDefs">An array of tuples containing glyph definitions and their corresponding line data.</param>
-    /// <returns>An <see cref="NKFont"/> object constructed from the provided configuration and glyphs, or null if the
-    /// assembly fails.</returns>
+    /// <param name="glyphDefs">
+    ///     An array of tuples containing glyph definitions and their
+    ///     corresponding line data.
+    /// </param>
+    /// <returns>
+    ///     An <see cref="NKFont" /> object constructed from the provided configuration and glyphs,
+    ///     or null if the
+    ///     assembly fails.
+    /// </returns>
     private static NKFont? AssembleFont(XmlFontConfig config, XmlDefTuple[] glyphDefs) {
         // see Docs/Eng/Fonts/Xml/Xml-Font-Compilation.md
         // here starts stage 2
@@ -384,24 +414,23 @@ public static partial class NKFontSerializer {
 
         NKGlyph? underlineGlyph     = null;
         NKGlyph? strikethroughGlyph = null;
-        bool     underlineAbove     = false;
-        bool     strikethroughAbove = false;
+        var      underlineAbove     = false;
+        var      strikethroughAbove = false;
 
         // stage 2 steps 2 and 3
-        for (int i = 0; i < glyphDefs.Length; i++) {
+        for (var i = 0; i < glyphDefs.Length; i++) {
             var g = glyphDefs[i];
 
             switch (g.Def) {
                 case XmlComponentGlyphDef component: {
                     var node = new GlyphDefNode(component, g.Lines);
 
-                    if (component.IsIdDefined) {
+                    if (component.IsIdDefined)
                         if (!idTable.TryAdd(component.Id, node)) {
                             LOGGER.Error($"A glyph with the same id ('{component.Id}') already exists.");
 
                             return null;
                         }
-                    }
 
                     var symbol = NKGlyphSymbol.Simple(component.Symbol, (NKStyle)component.Styles);
 
@@ -416,13 +445,12 @@ public static partial class NKFontSerializer {
                 case XmlCompoundGlyphDef compound: {
                     var node = new GlyphDefNode(compound, g.Lines);
 
-                    if (compound.IsIdDefined) {
+                    if (compound.IsIdDefined)
                         if (!idTable.TryAdd(compound.Id, node)) {
                             LOGGER.Error($"A glyph with the same id ('{compound.Id}') already exists.");
 
                             return null;
                         }
-                    }
 
                     var symbol = NKGlyphSymbol.Simple(compound.Symbol, (NKStyle)compound.Styles);
 
@@ -437,13 +465,12 @@ public static partial class NKFontSerializer {
                 case XmlLigatureGlyphDef ligature: {
                     var node = new GlyphDefNode(ligature, g.Lines);
 
-                    if (ligature.IsIdDefined) {
+                    if (ligature.IsIdDefined)
                         if (!idTable.TryAdd(ligature.Id, node)) {
                             LOGGER.Error($"A glyph with the same id ('{ligature.Id}') already exists.");
 
                             return null;
                         }
-                    }
 
                     var symbol = NKGlyphSymbol.Ligature(ligature.Symbol, (NKStyle)ligature.Styles);
 
@@ -570,13 +597,13 @@ public static partial class NKFontSerializer {
         }
 
         return new NKFont(
-            info: CreateFontInfo(config),
-            glyphs: glyphs,
-            unknownSymbolGlyph: null,
-            strikethroughGlyph: strikethroughGlyph,
-            renderStrikethroughAboveLetters: strikethroughAbove,
-            underlineGlyph: underlineGlyph,
-            renderUnderlineAboveLetters: underlineAbove
+            CreateFontInfo(config),
+            glyphs,
+            null,
+            strikethroughGlyph,
+            strikethroughAbove,
+            underlineGlyph,
+            underlineAbove
         );
     }
 
@@ -606,15 +633,13 @@ public static partial class NKFontSerializer {
                     component.Baseline
                 );
 
-                if (r.IsT1) {
+                if (r.IsT1)
                     return new Error<string>(
                         $"Could not assemble component glyph with ID '{component.Id}'. {r.AsT1.Value}"
                     );
-                }
 
-                foreach (var w in r.AsT0.Value.Warnings) {
+                foreach (var w in r.AsT0.Value.Warnings)
                     LOGGER.Warn($"While compiling component glyph '{component.Id}', the following occured: {w}");
-                }
 
                 node.Glyph = r.AsT0.Value.Glyph;
 
@@ -631,15 +656,13 @@ public static partial class NKFontSerializer {
                     ligature.Baseline
                 );
 
-                if (r.IsT1) {
+                if (r.IsT1)
                     return new Error<string>(
                         $"Could not assemble component glyph with ID '{ligature.Id}'. {r.AsT1.Value}"
                     );
-                }
 
-                foreach (var w in r.AsT0.Value.Warnings) {
+                foreach (var w in r.AsT0.Value.Warnings)
                     LOGGER.Warn($"While compiling ligature glyph '{ligature.Id}', the following occured: {w}");
-                }
 
                 node.Glyph = r.AsT0.Value.Glyph;
 
@@ -675,11 +698,10 @@ public static partial class NKFontSerializer {
                     compound.Align ?? config.Defaults.Align ?? new XmlGlyphAlign(XmlGlyphAlignDirection.TOP)
                 );
 
-                if (res.IsT1) {
+                if (res.IsT1)
                     return new Error<string>(
                         $"While compiling the compound glyph '{compound.Id}', the following occured: {res.AsT1.Value}"
                     );
-                }
 
                 node.Glyph = res.AsT0.Value;
 
@@ -727,21 +749,18 @@ public static partial class NKFontSerializer {
         foreach (var ap in alignPoints)
             apc.Add(new AlignPoint(ap.Id, ap.Position));
 
-        foreach (var ap in detectedAlignPoints.AlignPoints) {
-            if (!apc.Add(ap)) {
+        foreach (var ap in detectedAlignPoints.AlignPoints)
+            if (!apc.Add(ap))
                 warns.Add(
                     $"Couldn't add align-point at {ap.Position}. " +
                     $"An align-point with the same ID ('{ap.Character}') already exists."
                 );
-            }
-        }
 
-        foreach (var ap in detectedAlignPoints.Failed) {
+        foreach (var ap in detectedAlignPoints.Failed)
             warns.Add(
                 $"Couldn't add align-point at {ap.Position}. " +
                 $"An align-point with the same ID ('{ap.Character}') already exists."
             );
-        }
 
         var m = mask ?? config.Defaults.Mask ?? new XmlGlyphMask();
 
@@ -759,9 +778,8 @@ public static partial class NKFontSerializer {
 
         (glyph, var offset) = rr.AsT0.Value;
 
-        foreach (var ap in apc) {
+        foreach (var ap in apc)
             ap.SetPosition(ap.Position - offset);
-        }
 
         var bottomTrim  = lines.Length - offset.Y - glyph.GetLength(1);
         var newBaseline = baseline     - bottomTrim;
@@ -800,7 +818,7 @@ public static partial class NKFontSerializer {
 
     private static OneOf<Success<GlyphDefNode>, Error<string>> ResolveReference(
         string                                  @ref,
-        NKTextStyles                              styles,
+        NKTextStyles                            styles,
         Dictionary<NKGlyphSymbol, GlyphDefNode> symbolTable,
         Dictionary<string, GlyphDefNode>        idTable
     ) {
@@ -836,7 +854,7 @@ public static partial class NKFontSerializer {
 
     private static OneOf<Success<GlyphDefNode>, Error<string>> GetBestMatch(
         List<KeyValuePair<NKGlyphSymbol, GlyphDefNode>> matches,
-        NKTextStyles                                      styles
+        NKTextStyles                                    styles
     ) {
         var           maxMatch = 0;
         GlyphDefNode? match    = null;
@@ -866,17 +884,15 @@ public static partial class NKFontSerializer {
         NKGlyph        secondary,
         XmlGlyphAlign? align
     ) {
-        if (align is not { } a) {
+        if (align is not { } a)
             return new Error<string>("Could not resolve glyph alignment.");
-        }
 
         var glyph = a.IsDirection
             ? NKGlyph.Combine(main, secondary, a.Direction)
             : NKGlyph.Combine(main, secondary, a.Char);
 
-        if (glyph is null) {
+        if (glyph is null)
             return new Error<string>("Could not combine glyphs.");
-        }
 
         return new Success<NKGlyph>(glyph);
     }
@@ -888,7 +904,7 @@ public static partial class NKFontSerializer {
                 config.Ligatures,
                 config.Leading,
                 config.LetterSpacing,
-                mono.WordSpacing ?? (mono.LetterWidth + config.LetterSpacing + 1),
+                mono.WordSpacing ?? mono.LetterWidth + config.LetterSpacing + 1,
                 new NKFontMonospacedConfig(mono.LetterWidth, mono.LetterHeight, mono.AlignToGrid),
                 config.Author,
                 config.LicenseType,
@@ -936,14 +952,20 @@ public static partial class NKFontSerializer {
 
 
     /// <summary>
-    /// Deserializes an object of the specified flags <typeparamref name="TResult"/> from a given XML stream.
+    ///     Deserializes an object of the specified flags <typeparamref name="TResult" /> from a
+    ///     given XML stream.
     /// </summary>
     /// <typeparam name="TResult">The flags of the object to be deserialized.</typeparam>
     /// <param name="stream">The input stream containing the XML content to deserialize.</param>
     /// <param name="fail">Creates an exception in case of deserialization failure.</param>
-    /// <returns>An instance of <typeparamref name="TResult"/> deserialized from the provided stream.</returns>
-    /// <exception cref="XmlException">Thrown when deserialization fails due to malformed XML or an error in the
-    /// XML content.</exception>
+    /// <returns>
+    ///     An instance of <typeparamref name="TResult" /> deserialized from the provided
+    ///     stream.
+    /// </returns>
+    /// <exception cref="XmlException">
+    ///     Thrown when deserialization fails due to malformed XML or an error in the
+    ///     XML content.
+    /// </exception>
     private static TResult Deserialize<TResult>(Stream stream, Func<Exception> fail) {
         var serializer = new XmlSerializer(typeof(TResult));
 
@@ -953,14 +975,20 @@ public static partial class NKFontSerializer {
     }
 
     /// <summary>
-    /// Deserializes an object of the specified flags <typeparamref name="TResult"/> from a given XML stream.
+    ///     Deserializes an object of the specified flags <typeparamref name="TResult" /> from a
+    ///     given XML stream.
     /// </summary>
     /// <typeparam name="TResult">The flags of the object to be deserialized.</typeparam>
     /// <param name="stream">The input stream containing the XML content to deserialize.</param>
     /// <param name="fail">Creates an exception in case of deserialization failure.</param>
-    /// <returns>An instance of <typeparamref name="TResult"/> deserialized from the provided stream.</returns>
-    /// <exception cref="XmlException">Thrown when deserialization fails due to malformed XML or an error in the
-    /// XML content.</exception>
+    /// <returns>
+    ///     An instance of <typeparamref name="TResult" /> deserialized from the provided
+    ///     stream.
+    /// </returns>
+    /// <exception cref="XmlException">
+    ///     Thrown when deserialization fails due to malformed XML or an error in the
+    ///     XML content.
+    /// </exception>
     private static ValueTask<TResult> DeserializeAsync<TResult>(Stream stream, Func<Exception> fail) {
         var serializer = new XmlSerializer(typeof(TResult));
 

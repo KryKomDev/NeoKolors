@@ -8,11 +8,11 @@ public class DefaultFontTests {
 
     [Fact]
     public void DrawString_ShouldPlaceText_OnCharCanvas() {
-        var font = new DefaultFont();
+        var       font   = new DefaultFont();
         using var canvas = new NKCharCanvas(10, 5);
-        
+
         font.DrawString("Hello", canvas);
-        
+
         Assert.Equal('H', canvas.Data[0, 0].Char);
         Assert.Equal('e', canvas.Data[1, 0].Char);
         Assert.Equal('o', canvas.Data[4, 0].Char);
@@ -20,22 +20,22 @@ public class DefaultFontTests {
 
     [Fact]
     public void DrawString_WithNewlines_ShouldHandleVerticalPlacement() {
-        var font = new DefaultFont();
+        var       font   = new DefaultFont();
         using var canvas = new NKCharCanvas(10, 5);
-        
+
         font.DrawString("A\nB", canvas);
-        
+
         Assert.Equal('A', canvas.Data[0, 0].Char);
         Assert.Equal('B', canvas.Data[0, 1].Char);
     }
-    
+
     [Fact]
     public void GetSize_ShouldReturnCorrectSize() {
         var font = new DefaultFont();
         var size = font.GetSize("ABC");
         Assert.Equal(3, size.X);
         Assert.Equal(1, size.Y);
-        
+
         var minSize = font.GetMinSize("A\nBC");
         Assert.Equal(2, minSize.X); // max line length is 2 ('BC')
         Assert.Equal(2, minSize.Y); // 2 lines
@@ -43,11 +43,12 @@ public class DefaultFontTests {
 
     [Fact]
     public void DrawString_WithTextRenderingOptions_String_ShouldRenderCorrectly() {
-        var font = new DefaultFont();
+        var       font   = new DefaultFont();
         using var canvas = new NKCharCanvas(10, 5);
+
         var options = new TextRenderingOptions(
-            horizontalAlign: HorizontalAlign.CENTER,
-            verticalAlign: VerticalAlign.CENTER
+            HorizontalAlign.CENTER,
+            VerticalAlign.CENTER
         );
 
         font.DrawString("Hi", canvas, new Rect2D(0, 0, 10, 5), options);
@@ -60,31 +61,33 @@ public class DefaultFontTests {
 
     [Fact]
     public void DrawString_WithTextRenderingOptions_AnsiString_ShouldRenderAndApplyColoring() {
-        var font = new DefaultFont();
-        using var canvas = new NKCharCanvas(10, 5);
-        var solidColor = NKColor.FromRgb(255, 0, 0);
+        var       font       = new DefaultFont();
+        using var canvas     = new NKCharCanvas(10, 5);
+        var       solidColor = NKColor.FromRgb(255, 0, 0);
+
         var options = new TextRenderingOptions(
-            horizontalAlign: HorizontalAlign.LEFT,
-            verticalAlign: VerticalAlign.TOP,
+            HorizontalAlign.LEFT,
+            VerticalAlign.TOP,
             coloring: ColoringStrategies.Solid(solidColor)
         );
 
         var ansi = new AnsiString("OK");
         font.DrawString(ansi, canvas, new Rect2D(0, 0, 10, 5), options);
 
-        Assert.Equal('O', canvas.Data[0, 0].Char);
-        Assert.Equal('K', canvas.Data[1, 0].Char);
+        Assert.Equal('O',        canvas.Data[0, 0].Char);
+        Assert.Equal('K',        canvas.Data[1, 0].Char);
         Assert.Equal(solidColor, canvas.Data[0, 0].Style.FColor);
         Assert.Equal(solidColor, canvas.Data[1, 0].Style.FColor);
     }
 
     [Fact]
     public void DrawString_WithTextRenderingOptions_WithoutBounds_ShouldUseDrawerSize() {
-        var font = new DefaultFont();
+        var       font   = new DefaultFont();
         using var canvas = new NKCharCanvas(10, 5);
+
         var options = new TextRenderingOptions(
-            horizontalAlign: HorizontalAlign.RIGHT,
-            verticalAlign: VerticalAlign.TOP
+            HorizontalAlign.RIGHT,
+            VerticalAlign.TOP
         );
 
         font.DrawString("AB", canvas, options);
@@ -96,8 +99,9 @@ public class DefaultFontTests {
 
     [Fact]
     public void DrawString_WithWordWrapHard_ShouldWrapCharacters() {
-        var font = new DefaultFont();
+        var       font   = new DefaultFont();
         using var canvas = new NKCharCanvas(4, 5);
+
         var options = new TextRenderingOptions(
             wordWrap: WordWrapType.HARD
         );
@@ -113,8 +117,9 @@ public class DefaultFontTests {
 
     [Fact]
     public void DrawString_WithLeading_ShouldApplyVerticalLineSpacing() {
-        var font = new DefaultFont();
+        var       font   = new DefaultFont();
         using var canvas = new NKCharCanvas(10, 10);
+
         var options = new TextRenderingOptions(
             spacing: new FontSpacingInfo(leading: 3)
         );
@@ -129,8 +134,9 @@ public class DefaultFontTests {
 
     [Fact]
     public void DrawString_WithLetterSpacing_ShouldAddGapsBetweenChars() {
-        var font = new DefaultFont();
+        var       font   = new DefaultFont();
         using var canvas = new NKCharCanvas(10, 5);
+
         var options = new TextRenderingOptions(
             spacing: new FontSpacingInfo(letterSpacing: 2)
         );
@@ -146,8 +152,9 @@ public class DefaultFontTests {
 
     [Fact]
     public void DrawString_WithWordSpacing_ShouldExpandSpaces() {
-        var font = new DefaultFont();
+        var       font   = new DefaultFont();
         using var canvas = new NKCharCanvas(10, 5);
+
         var options = new TextRenderingOptions(
             spacing: new FontSpacingInfo(wordSpacing: 2)
         );
@@ -164,8 +171,9 @@ public class DefaultFontTests {
 
     [Fact]
     public void DrawString_WithJustifyText_SingleLine_ShouldDistributeSpaces() {
-        var font = new DefaultFont();
+        var       font   = new DefaultFont();
         using var canvas = new NKCharCanvas(9, 5);
+
         var options = new TextRenderingOptions(
             justifyText: true
         );
@@ -182,6 +190,7 @@ public class DefaultFontTests {
     [Fact]
     public void GetSize_WithTextRenderingOptions_ShouldReflectSpacingAndWrap() {
         var font = new DefaultFont();
+
         var options = new TextRenderingOptions(
             wordWrap: WordWrapType.HARD,
             spacing: new FontSpacingInfo(leading: 2, letterSpacing: 1)
@@ -192,7 +201,7 @@ public class DefaultFontTests {
         // Line 0: "AB" -> 'A', 'B' -> length 1 + 1 + 1 = 3 <= 4
         // Line 1: "CD" -> 'C', 'D' -> length 3 <= 4
         // Height: 2 lines with leading 2 = (2 - 1) * 2 + 1 = 3
-        var size = font.GetSize(new AnsiString("ABCD"), options, maxWidth: 4);
+        var size = font.GetSize(new AnsiString("ABCD"), options, 4);
 
         Assert.Equal(3, size.X);
         Assert.Equal(3, size.Y);
@@ -240,21 +249,21 @@ public class DefaultFontTests {
         // Line 1: "12345" (5)
         // Line 2: "67890" (5)
         // Line 3: "ABC" (3)
-        var size = font.GetSize("12345 67890\nABC", maxWidth: 5);
+        var size = font.GetSize("12345 67890\nABC", 5);
         Assert.Equal(5, size.X);
         Assert.Equal(3, size.Y);
 
         // Empty string with maxWidth should return Zero
-        Assert.Equal(Size2D.Zero, font.GetSize("", maxWidth: 10));
+        Assert.Equal(Size2D.Zero, font.GetSize("", 10));
     }
 
     [Fact]
     public void DrawString_AnsiString_WithNewlinesAndMaxWidth_ShouldRenderCorrectlyWithoutDesync() {
-        var font = new DefaultFont();
+        var       font   = new DefaultFont();
         using var canvas = new NKCharCanvas(10, 5);
 
         var ansi = new AnsiString("AB\nCD");
-        font.DrawString(ansi, canvas, maxWidth: 10);
+        font.DrawString(ansi, canvas, 10);
 
         Assert.Equal('A', canvas.Data[0, 0].Char);
         Assert.Equal('B', canvas.Data[1, 0].Char);
@@ -264,7 +273,7 @@ public class DefaultFontTests {
 
     [Fact]
     public void DrawString_WithBounds_BottomAlignment_ShouldRenderAtBottom() {
-        var font = new DefaultFont();
+        var       font   = new DefaultFont();
         using var canvas = new NKCharCanvas(10, 5);
 
         // Single line in 5-high bounds, bottom aligned: row 4
@@ -272,8 +281,8 @@ public class DefaultFontTests {
             new AnsiString("Bottom"),
             canvas,
             new Rect2D(0, 0, 10, 5),
-            horizontalAlign: HorizontalAlign.LEFT,
-            verticalAlign: VerticalAlign.BOTTOM
+            HorizontalAlign.LEFT,
+            VerticalAlign.BOTTOM
         );
 
         Assert.Equal('B', canvas.Data[0, 4].Char);
@@ -283,15 +292,15 @@ public class DefaultFontTests {
 
     [Fact]
     public void DrawString_WithBounds_MultiLine_ShouldRenderAllLines() {
-        var font = new DefaultFont();
+        var       font   = new DefaultFont();
         using var canvas = new NKCharCanvas(10, 5);
 
         font.DrawString(
             new AnsiString("Row1\nRow2\nRow3"),
             canvas,
             new Rect2D(0, 0, 10, 5),
-            horizontalAlign: HorizontalAlign.LEFT,
-            verticalAlign: VerticalAlign.TOP
+            HorizontalAlign.LEFT,
+            VerticalAlign.TOP
         );
 
         Assert.Equal('R', canvas.Data[0, 0].Char);
@@ -302,4 +311,3 @@ public class DefaultFontTests {
         Assert.Equal('3', canvas.Data[3, 2].Char);
     }
 }
-

@@ -77,18 +77,19 @@ public interface IAsciiFont {
     );
 
     /// <summary>
-    /// Draws a string onto a canvas using the specified character drawer, position, and depth.
+    ///     Draws a string onto a canvas using the specified character drawer, position, and depth.
     /// </summary>
     /// <param name="str">
-    /// The string to be drawn. It can either be a plain or styled ANSI string depending on the method overload used.
+    ///     The string to be drawn. It can either be a plain or styled ANSI string depending on the
+    ///     method overload used.
     /// </param>
     /// <param name="drawer">
-    /// The character drawer responsible for rendering the string onto the canvas.
+    ///     The character drawer responsible for rendering the string onto the canvas.
     /// </param>
     /// <param name="bounds">The rectangular boundary within which the string is drawn.</param>
     /// <param name="options">The rendering options for the string.</param>
     /// <param name="z">
-    /// The depth order for rendering the string. Defaults to 0 if not provided.
+    ///     The depth order for rendering the string. Defaults to 0 if not provided.
     /// </param>
     public void DrawString(
         string               str,
@@ -99,8 +100,9 @@ public interface IAsciiFont {
     );
 
     /// <summary>
-    /// Draws a string onto a canvas using the specified character drawer and text rendering options,
-    /// using the drawer's bounds as the rendering boundaries.
+    ///     Draws a string onto a canvas using the specified character drawer and text rendering
+    ///     options,
+    ///     using the drawer's bounds as the rendering boundaries.
     /// </summary>
     /// <param name="str">The string to be drawn.</param>
     /// <param name="drawer">The character drawer responsible for rendering the string.</param>
@@ -111,7 +113,8 @@ public interface IAsciiFont {
         ICharDrawer          drawer,
         TextRenderingOptions options,
         int                  z = 0
-    ) => DrawString(str, drawer, new Rect2D(Point2D.Zero, drawer.Size), options, z);
+    ) =>
+        DrawString(str, drawer, new Rect2D(Point2D.Zero, drawer.Size), options, z);
 
     /// <summary>
     ///     Renders a string onto a canvas using the specified drawer, position, and depth.
@@ -199,18 +202,19 @@ public interface IAsciiFont {
     );
 
     /// <summary>
-    /// Draws a string onto a canvas using the specified character drawer, position, and depth.
+    ///     Draws a string onto a canvas using the specified character drawer, position, and depth.
     /// </summary>
     /// <param name="str">
-    /// The string to be drawn. It can either be a plain or styled ANSI string depending on the method overload used.
+    ///     The string to be drawn. It can either be a plain or styled ANSI string depending on the
+    ///     method overload used.
     /// </param>
     /// <param name="drawer">
-    /// The character drawer responsible for rendering the string onto the canvas.
+    ///     The character drawer responsible for rendering the string onto the canvas.
     /// </param>
     /// <param name="bounds">The rectangular boundary within which the string is drawn.</param>
     /// <param name="options">The rendering options for the string.</param>
     /// <param name="z">
-    /// The depth order for rendering the string. Defaults to 0 if not provided.
+    ///     The depth order for rendering the string. Defaults to 0 if not provided.
     /// </param>
     public void DrawString(
         AnsiString           str,
@@ -221,8 +225,9 @@ public interface IAsciiFont {
     );
 
     /// <summary>
-    /// Draws a styled ANSI string onto a canvas using the specified character drawer and text rendering options,
-    /// using the drawer's bounds as the rendering boundaries.
+    ///     Draws a styled ANSI string onto a canvas using the specified character drawer and text
+    ///     rendering options,
+    ///     using the drawer's bounds as the rendering boundaries.
     /// </summary>
     /// <param name="str">The ANSI string to be drawn.</param>
     /// <param name="drawer">The character drawer responsible for rendering the string.</param>
@@ -233,7 +238,8 @@ public interface IAsciiFont {
         ICharDrawer          drawer,
         TextRenderingOptions options,
         int                  z = 0
-    ) => DrawString(str, drawer, new Rect2D(Point2D.Zero, drawer.Size), options, z);
+    ) =>
+        DrawString(str, drawer, new Rect2D(Point2D.Zero, drawer.Size), options, z);
 
     /// <summary>
     ///     Calculates the size of the string if the longest word in the string is the maximum
@@ -294,14 +300,14 @@ public interface IAsciiFont {
     public Size2D GetSize(AnsiString str, int maxWidth);
 
     /// <summary>
-    ///     Calculates the size required to render the provided string using the given text rendering options.
+    ///     Calculates the size required to render the provided string using the given text
+    ///     rendering options.
     /// </summary>
     /// <param name="str">The string to measure.</param>
     /// <param name="options">The text rendering options.</param>
     /// <param name="maxWidth">Optional maximum width constraint.</param>
-    /// <returns>A <see cref="Size2D"/> object representing the size of the string.</returns>
-    public Size2D GetSize(AnsiString str, TextRenderingOptions options, int? maxWidth = null) =>
-        maxWidth.HasValue ? GetSize(str, maxWidth.Value) : GetSize(str);
+    /// <returns>A <see cref="Size2D" /> object representing the size of the string.</returns>
+    public Size2D GetSize(AnsiString str, TextRenderingOptions options, int? maxWidth = null) => maxWidth.HasValue ? GetSize(str, maxWidth.Value) : GetSize(str);
 
     /// <summary>
     ///     Returns the default char font. This font will render a character as it is.

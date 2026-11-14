@@ -1,15 +1,20 @@
 ﻿# NeoKolors XAML Format Reference
 
-NeoKolors features a declarative, XML-based XAML (Extensible Application Markup Language) 
-parser implemented in [XamlElementLoader](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/Dom/XamlElementLoader.cs). This format allows you to design rich terminal user interfaces (TUIs) declaratively, separating view layouts from backing logic.
+NeoKolors features a declarative, XML-based XAML (Extensible Application Markup Language)
+parser implemented
+in [XamlElementLoader](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/Dom/XamlElementLoader.cs).
+This format allows you to design rich terminal user interfaces (TUIs) declaratively, separating view
+layouts from backing logic.
 
 ---
 
 ## 1. Document Structure & Setup
 
-A NeoKolors XAML file represents a single UI visual tree hierarchy. It typically begins with a container root node (like a `Page` or `Grid`) and maps to a corresponding partial code-behind class.
+A NeoKolors XAML file represents a single UI visual tree hierarchy. It typically begins with a
+container root node (like a `Page` or `Grid`) and maps to a corresponding partial code-behind class.
 
 ### Example Root Declaration
+
 ```xml
 <Page x:Class="DashBoard.MainView" 
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
@@ -20,8 +25,11 @@ A NeoKolors XAML file represents a single UI visual tree hierarchy. It typically
 ```
 
 ### Key Directives
-* **`x:Class`**: Mapped target code-behind class that defines the backing logic. During bootstrapping, this tells the parser which backing class instance handles runtime events.
-* **`x:Name` / `Name` / `Id`**: Registers a unique identifier for the control. Elements with IDs can be referenced programmatically in code-behind or targeted by relative panel layout rules.
+
+* **`x:Class`**: Mapped target code-behind class that defines the backing logic. During
+  bootstrapping, this tells the parser which backing class instance handles runtime events.
+* **`x:Name` / `Name` / `Id`**: Registers a unique identifier for the control. Elements with IDs can
+  be referenced programmatically in code-behind or targeted by relative panel layout rules.
 
 ---
 
@@ -52,7 +60,8 @@ The following element tags are registered by default in the parser:
 
 ## 3. Styling & Presentation Properties
 
-Properties can be styled either directly via XML attributes on control elements or within `<Setter>` tags.
+Properties can be styled either directly via XML attributes on control elements or within `<Setter>`
+tags.
 
 ### Standard Styling Attributes
 
@@ -73,11 +82,15 @@ Properties can be styled either directly via XML attributes on control elements 
 
 ## 4. Layout Metrics & Units
 
-Unlike standard pixel layouts, NeoKolors calculates layout geometry in character cells. Supported units parsed by the layout engine (described in [Dimenstions.md](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/md/Dimenstions.md)) include:
+Unlike standard pixel layouts, NeoKolors calculates layout geometry in character cells. Supported
+units parsed by the layout engine (described
+in [Dimenstions.md](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Tui/md/Dimenstions.md))
+include:
 
-* **Character cells (`ch`)**: Explicit grid units. E.g. `Width="25ch"`. (If no unit suffix is defined, `ch` is assumed).
+* **Character cells (`ch`)**: Explicit grid units. E.g. `Width="25ch"`. (If no unit suffix is
+  defined, `ch` is assumed).
 * **Percentage (`%`)**: Dimensions relative to parent boundary bounds. E.g. `Height="50%"`.
-* **Viewport Metrics (`vw` / `vh` / `vmin` / `vmax`)**: Size bounds relative to the current 
+* **Viewport Metrics (`vw` / `vh` / `vmin` / `vmax`)**: Size bounds relative to the current
   terminal screen size.
 * **Special Metrics**:
     * `auto`: Automatic layout determination based on contents.
@@ -92,25 +105,31 @@ Certain layout panels locate and scale child elements through attached attribute
 the parent container class.
 
 ### 5.1 Grid Properties
+
 A `Grid` determines row and column bounds using attached integer and span values:
+
 * **`Grid.Row`**: The row index (0-indexed) where the control resides.
 * **`Grid.Column`**: The column index (0-indexed) where the control resides.
 * **`Grid.RowSpan`**: The number of grid rows the control spans vertically.
 * **`Grid.ColumnSpan`**: The number of grid columns the control spans horizontally.
 
 *Example:*
+
 ```xml
 <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Content="Spanning Footer" />
 ```
 
 ### 5.2 RelativePanel Properties
+
 A `RelativePanel` positions child controls relative to siblings using their ID coordinates:
+
 * **`RelativePanel.RightOf`**: Places the control directly to the right of the target element ID.
 * **`RelativePanel.Below`**: Places the control directly below the target element ID.
 * **`RelativePanel.LeftOf`**: Places the control directly to the left of the target element ID.
 * **`RelativePanel.Above`**: Places the control directly above the target element ID.
 
 *Example:*
+
 ```xml
 <TextBox x:Name="SearchBox" Width="20" />
 <Button Content="Submit" RelativePanel.RightOf="SearchBox" />
@@ -120,16 +139,22 @@ A `RelativePanel` positions child controls relative to siblings using their ID c
 
 ## 6. Styling Triggers & Visual States
 
-To support dynamic interface reactions (like mouse hovers or keyboard focus), elements support inline styling
-triggers. Triggers evaluate runtime state values (using `IsHovered`, `IsFocused`, etc.) and dynamically overlay
+To support dynamic interface reactions (like mouse hovers or keyboard focus), elements support
+inline styling
+triggers. Triggers evaluate runtime state values (using `IsHovered`, `IsFocused`, etc.) and
+dynamically overlay
 overriding setters.
 
 ### Trigger Schema
+
 Triggers are nested within the `<ControlName.Triggers>` block:
+
 * `<Trigger Property="[StateProperty]" Value="[StateValue]">`: Defines target trigger criteria.
-* `<Trigger.Setters>`: Contains one or more `<Setter>` declarations applied while the trigger remains active.
+* `<Trigger.Setters>`: Contains one or more `<Setter>` declarations applied while the trigger
+  remains active.
 
 ### Trigger Demo Example
+
 ```xml
 <Button Content="Interactive Button" Border="Normal">
     <Button.Triggers>
@@ -160,12 +185,15 @@ Interactive events on controls are declared inside XAML markup and dynamically w
 backing logic in your mapped code-behind class (indicated by the root `x:Class` target).
 
 ### Markup Binding
+
 ```xml
 <Button Content="Click Here" OnClick="OnButtonClicked" />
 ```
 
 ### Backing Code-Behind Handler
+
 In the corresponding partial class:
+
 ```csharp
 namespace DashBoard;
 
@@ -177,5 +205,5 @@ public partial class MainView {
 }
 ```
 
-The loader automatically matches signature and invokes delegate registration using 
+The loader automatically matches signature and invokes delegate registration using
 reflection (handling standard events or custom handlers bound to backing structures).

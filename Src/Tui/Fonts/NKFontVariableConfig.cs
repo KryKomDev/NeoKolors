@@ -4,10 +4,10 @@
 namespace NeoKolors.Tui.Fonts;
 
 public readonly record struct NKFontVariableConfig {
-    
+
     /// <summary>
-    /// Specifies whether kerning is enabled for the font.
-    /// Kerning adjusts the spacing between characters to improve visual appearance.
+    ///     Specifies whether kerning is enabled for the font.
+    ///     Kerning adjusts the spacing between characters to improve visual appearance.
     /// </summary>
     public bool Kerning { get; init; }
 

@@ -6,23 +6,27 @@ using NeoKolors.Tui.Core;
 namespace NeoKolors.Tui.Elements;
 
 /// <summary>
-/// Provides fluent modifier extension methods for making any element interactive.
+///     Provides fluent modifier extension methods for making any element interactive.
 /// </summary>
 public static class ElementMouseExtensions {
 
     /// <summary>
-    /// Configures or wraps this element in a <see cref="MouseRegion"/> that responds to clicks.
+    ///     Configures or wraps this element in a <see cref="MouseRegion" /> that responds to
+    ///     clicks.
     /// </summary>
     public static MouseRegion OnClick(this IElement element, Action<ElementMouseEventArgs> onClick) {
         if (element is MouseRegion mr) {
             mr.OnClick = onClick;
+
             return mr;
         }
-        return new(element, onClick: onClick);
+
+        return new MouseRegion(element, onClick);
     }
 
     /// <summary>
-    /// Configures or wraps this element in a <see cref="MouseRegion"/> that responds to cursor enter and leave events.
+    ///     Configures or wraps this element in a <see cref="MouseRegion" /> that responds to
+    ///     cursor enter and leave events.
     /// </summary>
     public static MouseRegion OnHover(
         this IElement                  element,
@@ -30,15 +34,21 @@ public static class ElementMouseExtensions {
         Action<ElementMouseEventArgs>? onMouseLeave = null
     ) {
         if (element is MouseRegion mr) {
-            if (onMouseEnter != null) mr.OnMouseEnter = onMouseEnter;
-            if (onMouseLeave != null) mr.OnMouseLeave = onMouseLeave;
+            if (onMouseEnter != null)
+                mr.OnMouseEnter = onMouseEnter;
+
+            if (onMouseLeave != null)
+                mr.OnMouseLeave = onMouseLeave;
+
             return mr;
         }
-        return new(element, onMouseEnter: onMouseEnter, onMouseLeave: onMouseLeave);
+
+        return new MouseRegion(element, onMouseEnter: onMouseEnter, onMouseLeave: onMouseLeave);
     }
 
     /// <summary>
-    /// Configures or wraps this element in a <see cref="MouseRegion"/> that responds to mouse button press and release.
+    ///     Configures or wraps this element in a <see cref="MouseRegion" /> that responds to mouse
+    ///     button press and release.
     /// </summary>
     public static MouseRegion OnButton(
         this IElement                  element,
@@ -46,32 +56,43 @@ public static class ElementMouseExtensions {
         Action<ElementMouseEventArgs>? onMouseUp   = null
     ) {
         if (element is MouseRegion mr) {
-            if (onMouseDown != null) mr.OnMouseDown = onMouseDown;
-            if (onMouseUp != null) mr.OnMouseUp = onMouseUp;
+            if (onMouseDown != null)
+                mr.OnMouseDown = onMouseDown;
+
+            if (onMouseUp != null)
+                mr.OnMouseUp = onMouseUp;
+
             return mr;
         }
-        return new(element, onMouseDown: onMouseDown, onMouseUp: onMouseUp);
+
+        return new MouseRegion(element, onMouseDown: onMouseDown, onMouseUp: onMouseUp);
     }
 
     /// <summary>
-    /// Configures or wraps this element in a <see cref="MouseRegion"/> that responds to mouse wheel scrolling.
+    ///     Configures or wraps this element in a <see cref="MouseRegion" /> that responds to mouse
+    ///     wheel scrolling.
     /// </summary>
     public static MouseRegion OnScroll(this IElement element, Action<ElementMouseEventArgs> onScroll) {
         if (element is MouseRegion mr) {
             mr.OnScroll = onScroll;
+
             return mr;
         }
-        return new(element, onScroll: onScroll);
+
+        return new MouseRegion(element, onScroll: onScroll);
     }
 
     /// <summary>
-    /// Configures or wraps this element in a <see cref="MouseRegion"/> with the specified hit-test behavior.
+    ///     Configures or wraps this element in a <see cref="MouseRegion" /> with the specified
+    ///     hit-test behavior.
     /// </summary>
     public static MouseRegion WithHitBehavior(this IElement element, HitTestBehavior behavior) {
         if (element is MouseRegion mr) {
             mr.Behavior = behavior;
+
             return mr;
         }
-        return new(element, behavior: behavior);
+
+        return new MouseRegion(element, behavior: behavior);
     }
 }

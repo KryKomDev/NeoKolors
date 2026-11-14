@@ -13,18 +13,21 @@ public class BinaryLogWriter : ILogWriter, IAsyncDisposable {
     }
 
     /// <summary>
-    /// Creates a <see cref="BinaryLogWriter"/> configured with a log file configuration.
+    ///     Creates a <see cref="BinaryLogWriter" /> configured with a log file configuration.
     /// </summary>
     public static BinaryLogWriter CreateFromFile(LogFileConfig fileConfig) {
         var stream = fileConfig.CreateStream();
+
         return new BinaryLogWriter(stream);
     }
 
     /// <summary>
-    /// Creates a <see cref="BinaryLogWriter"/> writing binary log records to the specified file path.
+    ///     Creates a <see cref="BinaryLogWriter" /> writing binary log records to the specified
+    ///     file path.
     /// </summary>
     public static BinaryLogWriter CreateFromFile(string filePath, bool append = true) {
         var fileConfig = append ? LogFileConfig.Append(filePath) : LogFileConfig.Replace(filePath);
+
         return CreateFromFile(fileConfig);
     }
 
@@ -42,27 +45,27 @@ public class BinaryLogWriter : ILogWriter, IAsyncDisposable {
     }
 
     public void Dispose() {
-        if (_disposed) 
+        if (_disposed)
             return;
-        
+
         _output?.Dispose();
-        
+
         _output   = null;
         _disposed = true;
-        
+
         GC.SuppressFinalize(this);
     }
 
     public async ValueTask DisposeAsync() {
-        if (_disposed) 
+        if (_disposed)
             return;
-        
+
         if (_output != null)
             await _output.DisposeAsync();
 
         _output   = null;
         _disposed = true;
-        
+
         GC.SuppressFinalize(this);
     }
 }

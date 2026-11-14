@@ -27,7 +27,7 @@ public interface IGame2DScene : IScene<Game2DUpdateContext> {
 ///     passes.
 /// </summary>
 public class Game2DSceneStack : SceneStack<Game2DUpdateContext> {
-    
+
     /// <summary>
     ///     Gets the current active 2D game scene, or <c>null</c> if no 2D scene is active.
     /// </summary>

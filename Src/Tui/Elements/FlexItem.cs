@@ -33,9 +33,7 @@ public class FlexItem : IElement {
         AlignSelf = alignSelf;
     }
 
-    public Size2D Measure(LayoutContext context) {
-        return Element.AsT?.Measure(context) ?? Size2D.Zero;
-    }
+    public Size2D Measure(LayoutContext context) => Element.AsT?.Measure(context) ?? Size2D.Zero;
 
     public void Render(RenderContext context, Size2D parent) {
         Element.AsT?.Render(context, parent);

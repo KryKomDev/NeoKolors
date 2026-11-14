@@ -1,6 +1,8 @@
 # NeoKolors Logging & Diagnostics Guide
 
-The **NeoKolors** logging engine provides high-performance ANSI-styled console output, file logging (plain text and binary), structured log record serialization, and seamless integration with `Microsoft.Extensions.Logging.Abstractions` and .NET Dependency Injection (`IServiceCollection`).
+The **NeoKolors** logging engine provides high-performance ANSI-styled console output, file logging
+(plain text and binary), structured log record serialization, and seamless integration with
+`Microsoft.Extensions.Logging.Abstractions` and .NET Dependency Injection (`IServiceCollection`).
 
 ---
 
@@ -22,7 +24,8 @@ The logging system consists of several modular components:
 
 ## 2. Using `NKLogger` with .NET Dependency Injection
 
-NeoKolors integrates natively with `Microsoft.Extensions.Logging`. You can register NeoKolors in any generic host, Web API, Worker Service, or `ServiceCollection`.
+NeoKolors integrates natively with `Microsoft.Extensions.Logging`. You can register NeoKolors in any
+generic host, Web API, Worker Service, or `ServiceCollection`.
 
 ### 2.1 Basic DI Registration
 
@@ -156,13 +159,15 @@ var dateTimeConfig = LogFileConfig.NewDatetime("./logs/app_{0}.log");
 var hashConfig = LogFileConfig.NewHash("./logs/app_{0}.log");
 ```
 
-> **Note**: `LogFileConfig.NewCount` is completely stateless—it scans existing files in the target directory to determine the next sequential index without creating hidden `.nklog` tracking files.
+> **Note**: `LogFileConfig.NewCount` is completely stateless—it scans existing files in the target
+> directory to determine the next sequential index without creating hidden `.nklog` tracking files.
 
 ---
 
 ## 6. Multi-Target Logging (`CompositeLogWriter`)
 
-To direct log output to multiple destinations (for example, printing ANSI output to console while appending plain text to a file):
+To direct log output to multiple destinations (for example, printing ANSI output to console while
+appending plain text to a file):
 
 ```csharp
 using NeoKolors.Console;
@@ -195,7 +200,8 @@ var logger = provider.CreateLogger("OrderService");
 
 ### 7.1 Rich Exception Formatting
 
-`AnsiLogWriter` integrates with `ExceptionFormatter` to format exception stack traces with syntax-highlighted frames, parameters, and inner exception trees.
+`AnsiLogWriter` integrates with `ExceptionFormatter` to format exception stack traces with
+syntax-highlighted frames, parameters, and inner exception trees.
 
 ```csharp
 try {

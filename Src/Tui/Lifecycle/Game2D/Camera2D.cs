@@ -84,10 +84,9 @@ public class Camera2D {
     /// <returns>
     ///     <c>true</c> if the box overlaps the visible camera bounds; otherwise, <c>false</c>.
     /// </returns>
-    public bool IsAabbVisible(float minX, float minY, float maxX, float maxY) {
-        return maxX >= VisibleWorldMinX &&
-            minX    <= VisibleWorldMaxX &&
-            maxY    >= VisibleWorldMinY &&
-            minY    <= VisibleWorldMaxY;
-    }
+    public bool IsAabbVisible(float minX, float minY, float maxX, float maxY) =>
+        maxX >= VisibleWorldMinX &&
+        minX <= VisibleWorldMaxX &&
+        maxY >= VisibleWorldMinY &&
+        minY <= VisibleWorldMaxY;
 }

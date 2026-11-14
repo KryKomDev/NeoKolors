@@ -3,12 +3,12 @@ using SkiaSharp;
 namespace NeoKolors.Common.Tests;
 
 public class SixelConverterTests {
-    
+
     [Fact]
     public void ToSixel_ReturnsEmpty_ForNullOrEmptyBitmap() {
-        var nullSixel = SixelConverter.ToSixel(null!);
+        var       nullSixel   = SixelConverter.ToSixel(null!);
         using var emptyBitmap = new SKBitmap();
-        var emptySixel = emptyBitmap.ToSixel();
+        var       emptySixel  = emptyBitmap.ToSixel();
 
         Assert.Equal(string.Empty, nullSixel);
         Assert.Equal(string.Empty, emptySixel);
@@ -17,6 +17,7 @@ public class SixelConverterTests {
     [Fact]
     public void ToSixel_ReturnsValidSixelString_ForSimpleBitmap() {
         using var bitmap = new SKBitmap(10, 10);
+
         using (var canvas = new SKCanvas(bitmap)) {
             canvas.Clear(SKColors.Red);
         }
@@ -39,7 +40,7 @@ public class SixelConverterTests {
         Assert.NotNull(sixel);
         Assert.StartsWith("\eP0;1;q", sixel);
         Assert.EndsWith("\e\\", sixel);
-        
+
         // Should not contain any color application commands if fully transparent
         // But palette might still be emitted if logic is simple.
         // The current implementation emits palette only for used colors?
@@ -49,7 +50,7 @@ public class SixelConverterTests {
     [Fact]
     public void ToSixel_RespectsAlphaThreshold() {
         using var bitmap = new SKBitmap(1, 1);
-        
+
         // Semi-transparent color (Alpha = 100)
         bitmap.SetPixel(0, 0, new SKColor(255, 0, 0, 100));
 
@@ -77,6 +78,7 @@ public class SixelConverterTests {
     [Fact]
     public void ToSixel_UsesRunLengthEncoding() {
         using var bitmap = new SKBitmap(10, 1);
+
         using (var canvas = new SKCanvas(bitmap)) {
             canvas.Clear(SKColors.Green);
         }
@@ -92,7 +94,6 @@ public class SixelConverterTests {
 
     [Fact]
     public void ToSixel_HandlesMultiBand() {
-        
         // Height 12 needs 2 bands (6 rows each)
         using var bitmap = new SKBitmap(1, 12);
         bitmap.Erase(SKColors.White);
@@ -105,17 +106,16 @@ public class SixelConverterTests {
 
     [Fact]
     public void ToSixel_FallbacksToQuantization_ForManyColors() {
-        
-        using var bitmap = new SKBitmap(17, 16);
-        var colorCount = 0;
+        using var bitmap     = new SKBitmap(17, 16);
+        var       colorCount = 0;
+
         for (var y = 0; y < 16; y++)
         for (var x = 0; x < 17; x++) {
-            
             // Generate unique colors
             // Just varying R and G slightly
             var r = (byte)(colorCount % 256);
             var g = (byte)(colorCount / 256);
-            var b = (byte)((x + y) % 256);
+            var b = (byte)((x + y)    % 256);
 
             // Ensure they are actually distinct if possible, or just trust the loop produces enough variance
             // Easier: Use a set to verify we generated enough unique inputs for the test
@@ -125,8 +125,11 @@ public class SixelConverterTests {
             // Let's just increment R, G, B components.
             // R goes 0-255. G goes 0-255.
             // If we set B=1, we get another 256.
-            bitmap.SetPixel(x, y,
-                colorCount < 256 ? new SKColor((byte)colorCount, 0, 0) : new SKColor((byte)(colorCount - 256), 10, 0));
+            bitmap.SetPixel(
+                x,
+                y,
+                colorCount < 256 ? new SKColor((byte)colorCount, 0, 0) : new SKColor((byte)(colorCount - 256), 10, 0)
+            );
 
             colorCount++;
         }

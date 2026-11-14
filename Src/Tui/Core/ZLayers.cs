@@ -4,11 +4,12 @@
 namespace NeoKolors.Tui.Core;
 
 /// <summary>
-/// Provides predefined constants for z-index layers used to manage rendering order of visual elements.
+///     Provides predefined constants for z-index layers used to manage rendering order of
+///     visual elements.
 /// </summary>
 /// <remarks>
-/// The constants in this class define rendering priorities for common UI elements,
-/// ensuring a consistent stacking order across the application.
+///     The constants in this class define rendering priorities for common UI elements,
+///     ensuring a consistent stacking order across the application.
 /// </remarks>
 public static class ZLayers {
     public const int BACKGROUND = 0;

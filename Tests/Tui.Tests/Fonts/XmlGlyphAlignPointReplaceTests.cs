@@ -72,27 +72,27 @@ public class XmlGlyphAlignPointReplaceTests {
         Assert.True(XmlGlyphAlignPointReplace.TryParse("forg: 'a', bckg: 'b', none", out var replace));
         Assert.NotNull(replace);
         Assert.Equal(XmlGlyphAlignPointReplaceType.NONE, replace.Value.Default);
-        Assert.Equal(['a'], replace.Value.CustomForg);
-        Assert.Equal(['b'], replace.Value.CustomBckg);
+        Assert.Equal(['a'],                              replace.Value.CustomForg);
+        Assert.Equal(['b'],                              replace.Value.CustomBckg);
     }
 
     [Fact]
     public void TryParse_InvalidValues_ShouldFail() {
-        Assert.False(XmlGlyphAlignPointReplace.TryParse("forg, bckg", out _));
-        Assert.False(XmlGlyphAlignPointReplace.TryParse("custom: 'a'", out _)); // missing second quote
+        Assert.False(XmlGlyphAlignPointReplace.TryParse("forg, bckg",       out _));
+        Assert.False(XmlGlyphAlignPointReplace.TryParse("custom: 'a'",      out _)); // missing second quote
         Assert.False(XmlGlyphAlignPointReplace.TryParse("custom: 'a' 'bc'", out _)); // length mismatch
     }
 
     [Fact]
     public void ToString_ShouldBeReversible() {
-        string input = "forg: 'a', bckg: 'b', none";
+        var input = "forg: 'a', bckg: 'b', none";
         Assert.True(XmlGlyphAlignPointReplace.TryParse(input, out var replace));
         Assert.NotNull(replace);
-        string output = replace.Value.ToString();
+        var output = replace.Value.ToString();
         Assert.True(XmlGlyphAlignPointReplace.TryParse(output, out var replace2));
         Assert.NotNull(replace2);
-        
-        Assert.Equal(replace.Value.Default, replace2.Value.Default);
+
+        Assert.Equal(replace.Value.Default,    replace2.Value.Default);
         Assert.Equal(replace.Value.CustomForg, replace2.Value.CustomForg);
         Assert.Equal(replace.Value.CustomBckg, replace2.Value.CustomBckg);
     }

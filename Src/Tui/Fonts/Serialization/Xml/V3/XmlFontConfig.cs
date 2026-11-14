@@ -12,28 +12,28 @@ namespace NeoKolors.Tui.Fonts.Xml.V3;
 public class XmlFontConfig {
 
     private string _name;
-    
+
     public string Name {
         get => _name;
-        set => _name = !string.IsNullOrEmpty(value) && Regex.IsMatch(value, @"(\w|\.|_|-|)+") 
-            ? value 
-            : throw new IOp();
+        set =>
+            _name = !string.IsNullOrEmpty(value) && Regex.IsMatch(value, @"(\w|\.|_|-|)+")
+                ? value
+                : throw new IOp();
     }
-    
-    public bool Ligatures     { get; set; }
-    public string? Author     { get; set; }
+
+    public bool    Ligatures   { get; set; }
+    public string? Author      { get; set; }
     public string? LicenseType { get; set; }
     public string? LicenseFile { get; set; }
 
-    [XmlIgnore]
-    public string? LicenseContent { get; set; }
-    public int  Leading       { get; set; }
-    public int  LetterSpacing { get; set; }
-    
+    [XmlIgnore] public string? LicenseContent { get; set; }
+    public             int     Leading        { get; set; }
+    public             int     LetterSpacing  { get; set; }
+
     [XmlElement("Monospace", typeof(XmlMonospacedFontConfig))]
     [XmlElement("Variable",  typeof(XmlVariableFontConfig))]
     public XmlFontSpacing FontSpacing { get; set; }
-    
+
     public XmlDefaultFontConfig Defaults { get; set; }
 
     public XmlFontConfig() {

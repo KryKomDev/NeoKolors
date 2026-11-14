@@ -8,7 +8,8 @@ using NeoKolors.Tui.Core;
 namespace NeoKolors.Tui.Fonts;
 
 /// <summary>
-/// Represents a font that does not convert strings to any glyph form but simply places the string.
+///     Represents a font that does not convert strings to any glyph form but simply places the
+///     string.
 /// </summary>
 public class DefaultFont : IAsciiFont {
     public virtual string Name => "Default";
@@ -17,11 +18,10 @@ public class DefaultFont : IAsciiFont {
         if (string.IsNullOrEmpty(str))
             return;
 
-        string[] lines = str.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
+        var lines = str.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
 
-        for (int y = 0; y < lines.Length; y++) {
+        for (var y = 0; y < lines.Length; y++)
             drawer.Draw(new AnsiString(lines[y]), position.X, position.Y + y, z);
-        }
     }
 
     public virtual void DrawString(string str, ICharDrawer drawer, int maxWidth, Point2D position = default, int z = 0) {
@@ -80,7 +80,7 @@ public class DefaultFont : IAsciiFont {
 
         var lines = str.Split('\n');
 
-        for (int y = 0; y < lines.Length; y++) {
+        for (var y = 0; y < lines.Length; y++) {
             var line = lines[y];
 
             if (line.Length > 0 && line.Plain.EndsWith('\r'))
@@ -96,9 +96,8 @@ public class DefaultFont : IAsciiFont {
 
         var wrappedLines = WrapLines(str, maxWidth, WordWrapType.WORD);
 
-        for (int y = 0; y < wrappedLines.Length; y++) {
+        for (var y = 0; y < wrappedLines.Length; y++)
             drawer.Draw(wrappedLines[y].Line, position.X, position.Y + y, z);
-        }
     }
 
     public virtual void DrawString(
@@ -115,7 +114,7 @@ public class DefaultFont : IAsciiFont {
 
         var wrappedLines = WrapLines(str, bounds.SizeX, WordWrapType.WORD);
 
-        int y = verticalAlign switch {
+        var y = verticalAlign switch {
             VerticalAlign.TOP    => 0,
             VerticalAlign.CENTER => Math.Max(0, bounds.SizeY - wrappedLines.Length) / 2,
             VerticalAlign.BOTTOM => Math.Max(0, bounds.SizeY - wrappedLines.Length),
@@ -129,7 +128,7 @@ public class DefaultFont : IAsciiFont {
             _                      => throw new ArgumentOutOfRangeException(nameof(horizontalAlign), horizontalAlign, null)
         };
 
-        for (int l = 0; l < wrappedLines.Length; l++) {
+        for (var l = 0; l < wrappedLines.Length; l++) {
             if (!overflow) {
                 if (y < bounds.LowerY) {
                     y++;
@@ -160,18 +159,18 @@ public class DefaultFont : IAsciiFont {
         if (bounds.SizeX <= 0 || bounds.SizeY <= 0)
             return;
 
-        int leading       = options.Spacing != null && options.Spacing.Leading > 0 ? options.Spacing.Leading : 1;
-        int letterSpacing = options.Spacing != null ? Math.Max(0, options.Spacing.LetterSpacing) : 0;
-        int wordSpacing   = options.Spacing != null ? Math.Max(0, options.Spacing.WordSpacing) : 0;
+        var leading       = options.Spacing != null && options.Spacing.Leading > 0 ? options.Spacing.Leading : 1;
+        var letterSpacing = options.Spacing != null ? Math.Max(0, options.Spacing.LetterSpacing) : 0;
+        var wordSpacing   = options.Spacing != null ? Math.Max(0, options.Spacing.WordSpacing) : 0;
 
         var wrappedLines = WrapLines(str, bounds.SizeX, options.WordWrap, letterSpacing, wordSpacing);
 
         if (wrappedLines.Length == 0)
             return;
 
-        int actualHeight = (wrappedLines.Length - 1) * leading + 1;
+        var actualHeight = (wrappedLines.Length - 1) * leading + 1;
 
-        int y = options.VerticalAlign switch {
+        var y = options.VerticalAlign switch {
             VerticalAlign.TOP    => 0,
             VerticalAlign.CENTER => Math.Max(0, bounds.SizeY - actualHeight) / 2,
             VerticalAlign.BOTTOM => Math.Max(0, bounds.SizeY - actualHeight),
@@ -193,26 +192,25 @@ public class DefaultFont : IAsciiFont {
             )
         };
 
-        for (int l = 0; l < wrappedLines.Length; l++) {
-            int lineY = y + l * leading;
+        for (var l = 0; l < wrappedLines.Length; l++) {
+            var lineY = y + l * leading;
 
             if (!options.Overflow && (lineY < bounds.LowerY || lineY >= bounds.HigherY))
                 continue;
 
             var (s, wasWrapped) = wrappedLines[l];
-            bool shouldJustify = options.JustifyText && (wasWrapped || (wrappedLines.Length == 1 && options.JustifyText));
+            var shouldJustify = options.JustifyText && (wasWrapped || (wrappedLines.Length == 1 && options.JustifyText));
 
-            if (shouldJustify && bounds.SizeX > 0) {
+            if (shouldJustify && bounds.SizeX > 0)
                 s = JustifyLine(s, bounds.SizeX, letterSpacing, wordSpacing);
-            }
 
-            int lineWidth = ComputeLineWidth(s, letterSpacing, wordSpacing);
+            var lineWidth = ComputeLineWidth(s, letterSpacing, wordSpacing);
             var x         = computeXOffset(bounds.SizeX, lineWidth) + bounds.LowerX;
 
-            int curX = x;
+            var curX = x;
 
-            for (int i = 0; i < s.Length; i++) {
-                char c = s[i].Char;
+            for (var i = 0; i < s.Length; i++) {
+                var c = s[i].Char;
 
                 if (c is '\r' or '\n')
                     continue;
@@ -277,7 +275,7 @@ public class DefaultFont : IAsciiFont {
 
                     break;
                 }
-                
+
                 case WordWrapType.WORD:
                 default: {
                     WrapLine_Word(line);
@@ -290,15 +288,15 @@ public class DefaultFont : IAsciiFont {
         return result.ToArray();
 
         void WrapLine_Hard(AnsiString line) {
-            int start = 0;
+            var start = 0;
 
             while (start < line.Length) {
-                int count    = 0;
-                int currentW = 0;
+                var count    = 0;
+                var currentW = 0;
 
                 while (start + count < line.Length) {
-                    char c     = line[start + count].Char;
-                    int  charW = c == ' ' ? 1 + wordSpacing : 1 + letterSpacing;
+                    var c     = line[start + count].Char;
+                    var charW = c == ' ' ? 1 + wordSpacing : 1 + letterSpacing;
 
                     if (count > 0 && currentW + charW > maxWidth)
                         break;
@@ -310,7 +308,7 @@ public class DefaultFont : IAsciiFont {
                 if (count == 0)
                     count = 1;
 
-                bool wasWrapped = start + count < line.Length;
+                var wasWrapped = start + count < line.Length;
                 result.Add((line.Substring(start, count), wasWrapped));
                 start += count;
             }
@@ -320,30 +318,28 @@ public class DefaultFont : IAsciiFont {
             if (letterSpacing == 0 && wordSpacing == 0) {
                 var chopped = line.Chop(maxWidth);
 
-                if (chopped.Length == 0) {
+                if (chopped.Length == 0)
                     result.Add((AnsiString.Empty, false));
-                }
-                else {
-                    for (int i = 0; i < chopped.Length; i++) {
-                        bool wasWrapped = i < chopped.Length - 1;
+                else
+                    for (var i = 0; i < chopped.Length; i++) {
+                        var wasWrapped = i < chopped.Length - 1;
                         result.Add((chopped[i], wasWrapped));
                     }
-                }
             }
             else {
                 var tokens       = SplitWordsAndSpaces(line);
                 var currentLine  = new List<AnsiChar>();
-                int currentLineW = 0;
+                var currentLineW = 0;
 
-                for (int i = 0; i < tokens.Count; i++) {
+                for (var i = 0; i < tokens.Count; i++) {
                     var token  = tokens[i];
-                    int tokenW = ComputeTokenWidth(token, letterSpacing, wordSpacing);
+                    var tokenW = ComputeTokenWidth(token, letterSpacing, wordSpacing);
 
                     if (currentLine.Count > 0 && currentLineW + tokenW > maxWidth && !IsAllSpaces(token)) {
                         TrimTrailingSpaces(currentLine);
-                        
+
                         result.Add((new AnsiString(currentLine), true));
-                        
+
                         currentLine  = [];
                         currentLineW = 0;
 
@@ -370,12 +366,12 @@ public class DefaultFont : IAsciiFont {
         if (str.Length == 0)
             return tokens;
 
-        var  current = new List<AnsiChar> { str[0] };
-        bool inSpace = str[0].Char == ' ';
+        var current = new List<AnsiChar> { str[0] };
+        var inSpace = str[0].Char == ' ';
 
-        for (int i = 1; i < str.Length; i++) {
-            var  ac      = str[i];
-            bool isSpace = ac.Char == ' ';
+        for (var i = 1; i < str.Length; i++) {
+            var ac      = str[i];
+            var isSpace = ac.Char == ' ';
 
             if (isSpace == inSpace) {
                 current.Add(ac);
@@ -395,9 +391,8 @@ public class DefaultFont : IAsciiFont {
     private static bool IsAllSpaces(List<AnsiChar> token) => token.Count > 0 && token[0].Char == ' ';
 
     private static void TrimTrailingSpaces(List<AnsiChar> list) {
-        while (list.Count > 0 && list[^1].Char == ' ') {
+        while (list.Count > 0 && list[^1].Char == ' ')
             list.RemoveAt(list.Count - 1);
-        }
     }
 
     private static int ComputeTokenWidth(List<AnsiChar> token, int letterSpacing, int wordSpacing) {
@@ -414,10 +409,10 @@ public class DefaultFont : IAsciiFont {
         if (str.Length == 0)
             return 0;
 
-        int w = 0;
+        var w = 0;
 
-        for (int i = 0; i < str.Length; i++) {
-            char c = str[i].Char;
+        for (var i = 0; i < str.Length; i++) {
+            var c = str[i].Char;
 
             if (c is '\r' or '\n')
                 continue;
@@ -425,9 +420,8 @@ public class DefaultFont : IAsciiFont {
             w += c == ' ' ? 1 + wordSpacing : 1 + letterSpacing;
         }
 
-        if (str.Length > 0 && str[^1].Char != ' ' && letterSpacing > 0 && w > 0) {
+        if (str.Length > 0 && str[^1].Char != ' ' && letterSpacing > 0 && w > 0)
             w -= letterSpacing;
-        }
 
         return w;
     }
@@ -436,11 +430,11 @@ public class DefaultFont : IAsciiFont {
         if (targetWidth <= 0 || line.Length == 0)
             return line;
 
-        var     words       = new List<List<AnsiChar>>();
-        var     currentWord = new List<AnsiChar>();
-        NKStyle spaceStyle  = NKStyle.Default;
+        var words       = new List<List<AnsiChar>>();
+        var currentWord = new List<AnsiChar>();
+        var spaceStyle  = NKStyle.Default;
 
-        for (int i = 0; i < line.Length; i++) {
+        for (var i = 0; i < line.Length; i++) {
             var ac = line[i];
 
             if (ac.Char == ' ') {
@@ -456,44 +450,42 @@ public class DefaultFont : IAsciiFont {
             }
         }
 
-        if (currentWord.Count > 0) {
+        if (currentWord.Count > 0)
             words.Add(currentWord);
-        }
 
         if (words.Count <= 1)
             return line;
 
-        int wordsWidth = 0;
+        var wordsWidth = 0;
 
         foreach (var w in words) {
-            int wLen   = w.Count;
-            int wWidth = wLen + Math.Max(0, wLen - 1) * letterSpacing;
+            var wLen   = w.Count;
+            var wWidth = wLen + Math.Max(0, wLen - 1) * letterSpacing;
             wordsWidth += wWidth;
         }
 
-        int availableSpace = targetWidth - wordsWidth;
-        int gaps           = words.Count - 1;
+        var availableSpace = targetWidth - wordsWidth;
+        var gaps           = words.Count - 1;
 
-        int spaceAdvance    = 1 + wordSpacing;
-        int totalSpaceCount = availableSpace / spaceAdvance;
+        var spaceAdvance    = 1 + wordSpacing;
+        var totalSpaceCount = availableSpace / spaceAdvance;
 
         if (totalSpaceCount < gaps)
             return line;
 
-        int baseSpaces = totalSpaceCount / gaps;
-        int remainder  = totalSpaceCount % gaps;
+        var baseSpaces = totalSpaceCount / gaps;
+        var remainder  = totalSpaceCount % gaps;
 
         var result = new List<AnsiChar>(targetWidth);
 
-        for (int i = 0; i < words.Count; i++) {
+        for (var i = 0; i < words.Count; i++) {
             result.AddRange(words[i]);
 
             if (i < gaps) {
-                int spacesToAdd = baseSpaces + (i < remainder ? 1 : 0);
+                var spacesToAdd = baseSpaces + (i < remainder ? 1 : 0);
 
-                for (int s = 0; s < spacesToAdd; s++) {
+                for (var s = 0; s < spacesToAdd; s++)
                     result.Add(new AnsiChar(' ', spaceStyle));
-                }
             }
         }
 
@@ -506,12 +498,11 @@ public class DefaultFont : IAsciiFont {
 
         var normalized = str.Replace("\r\n", "\n").Replace('\r', '\n');
         var words      = normalized.Split(' ', '\n');
-        int maxLength  = 0;
+        var maxLength  = 0;
 
-        for (int i = 0; i < words.Length; i++) {
+        for (var i = 0; i < words.Length; i++)
             if (words[i].Length > maxLength)
                 maxLength = words[i].Length;
-        }
 
         return maxLength <= 0
             ? Size2D.Zero
@@ -523,29 +514,26 @@ public class DefaultFont : IAsciiFont {
             return Size2D.Zero;
 
         var lines = str.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
-        int maxW  = 0;
+        var maxW  = 0;
 
-        for (int i = 0; i < lines.Length; i++) {
+        for (var i = 0; i < lines.Length; i++)
             if (lines[i].Length > maxW)
                 maxW = lines[i].Length;
-        }
 
         return new Size2D(maxW, lines.Length);
     }
 
-    public Size2D GetSize(string str, int maxWidth) {
-        return string.IsNullOrEmpty(str) || maxWidth <= 0
+    public Size2D GetSize(string str, int maxWidth) =>
+        string.IsNullOrEmpty(str) || maxWidth <= 0
             ? Size2D.Zero
             : GetSize(new AnsiString(str), maxWidth);
-    }
 
     public Size2D GetMinSize(AnsiString str) => GetMinSize(str.Plain);
 
-    public Size2D GetSize(AnsiString str) {
-        return AnsiString.IsNullOrEmpty(str)
+    public Size2D GetSize(AnsiString str) =>
+        AnsiString.IsNullOrEmpty(str)
             ? Size2D.Zero
             : GetSize(str.Plain);
-    }
 
     public Size2D GetSize(AnsiString str, int maxWidth) {
         if (AnsiString.IsNullOrEmpty(str) || maxWidth <= 0)
@@ -556,12 +544,11 @@ public class DefaultFont : IAsciiFont {
         if (wrapped.Length == 0)
             return Size2D.Zero;
 
-        int maxW = 0;
+        var maxW = 0;
 
-        for (int i = 0; i < wrapped.Length; i++) {
+        for (var i = 0; i < wrapped.Length; i++)
             if (wrapped[i].Line.Length > maxW)
                 maxW = wrapped[i].Line.Length;
-        }
 
         return new Size2D(maxW, wrapped.Length);
     }
@@ -570,32 +557,31 @@ public class DefaultFont : IAsciiFont {
         if (AnsiString.IsNullOrEmpty(str))
             return Size2D.Zero;
 
-        int width = maxWidth ?? int.MaxValue;
+        var width = maxWidth ?? int.MaxValue;
 
         if (width <= 0)
             return Size2D.Zero;
 
-        int leading       = options.Spacing != null && options.Spacing.Leading > 0 ? options.Spacing.Leading : 1;
-        int letterSpacing = options.Spacing != null ? Math.Max(0, options.Spacing.LetterSpacing) : 0;
-        int wordSpacing   = options.Spacing != null ? Math.Max(0, options.Spacing.WordSpacing) : 0;
+        var leading       = options.Spacing != null && options.Spacing.Leading > 0 ? options.Spacing.Leading : 1;
+        var letterSpacing = options.Spacing != null ? Math.Max(0, options.Spacing.LetterSpacing) : 0;
+        var wordSpacing   = options.Spacing != null ? Math.Max(0, options.Spacing.WordSpacing) : 0;
 
         var wrappedLines = WrapLines(str, width, options.WordWrap, letterSpacing, wordSpacing);
 
         if (wrappedLines.Length == 0)
             return Size2D.Zero;
 
-        int totalHeight = (wrappedLines.Length - 1) * leading + 1;
-        int maxW        = 0;
+        var totalHeight = (wrappedLines.Length - 1) * leading + 1;
+        var maxW        = 0;
 
-        for (int i = 0; i < wrappedLines.Length; i++) {
+        for (var i = 0; i < wrappedLines.Length; i++) {
             var (line, wasWrapped) = wrappedLines[i];
-            bool shouldJustify = options.JustifyText && (wasWrapped || (wrappedLines.Length == 1 && options.JustifyText));
+            var shouldJustify = options.JustifyText && (wasWrapped || (wrappedLines.Length == 1 && options.JustifyText));
 
-            if (shouldJustify && width < int.MaxValue) {
+            if (shouldJustify && width < int.MaxValue)
                 line = JustifyLine(line, width, letterSpacing, wordSpacing);
-            }
 
-            int lineW = ComputeLineWidth(line, letterSpacing, wordSpacing);
+            var lineW = ComputeLineWidth(line, letterSpacing, wordSpacing);
             maxW = Math.Max(maxW, lineW);
         }
 

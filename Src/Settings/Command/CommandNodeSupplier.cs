@@ -6,4 +6,5 @@
 namespace NeoKolors.Settings.Command;
 
 public delegate ICommandNode<TResult> CommandNodeSupplier<TResult>(in ICommandNode<TResult> node);
+
 public delegate ICommandNode CommandNodeSupplier(in ICommandNode node);

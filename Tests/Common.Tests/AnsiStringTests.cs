@@ -46,7 +46,7 @@ public class AnsiStringTests {
 
     [Fact]
     public void Constructor_StringAndStyle_InheritedProperties_ResolvesAgainstDefault() {
-        var style = new NKStyle(textColor: NKColor.Inherit, styles: BOLD);
+        var style = new NKStyle(NKColor.Inherit, styles: BOLD);
         var ansi  = new AnsiString("Hello", style);
 
         Assert.Single(ansi.Styles);
@@ -61,24 +61,26 @@ public class AnsiStringTests {
 
         Assert.Equal("Hello", ansi.Plain);
         Assert.Empty(ansi.Styles);
-        Assert.Equal("Hello", ansi.ToString());
+        Assert.Equal("Hello",         ansi.ToString());
         Assert.Equal(NKStyle.Default, ansi.GetStyleAt(0));
     }
 
     [Fact]
     public void Constructor_Chars_InheritedColors_CreatesSingleMarker() {
         var redStyle     = new NKStyle(RED);
-        var inheritStyle = new NKStyle(textColor: NKColor.Inherit);
+        var inheritStyle = new NKStyle(NKColor.Inherit);
+
         var chars = new[] {
             new AnsiChar('A', redStyle),
             new AnsiChar('B', inheritStyle),
             new AnsiChar('C', inheritStyle),
             new AnsiChar('D', redStyle)
         };
+
         var ansi = new AnsiString(chars);
 
         Assert.Single(ansi.Styles);
-        Assert.Equal(0, ansi.Styles[0].Index);
+        Assert.Equal(0,        ansi.Styles[0].Index);
         Assert.Equal(redStyle, ansi.Styles[0].Style);
         Assert.Equal(redStyle, ansi.GetStyleAt(0));
         Assert.Equal(redStyle, ansi.GetStyleAt(1));
@@ -88,17 +90,19 @@ public class AnsiStringTests {
 
     [Fact]
     public void Constructor_Chars_InheritedStyles_CreatesNoRedundantMarkers() {
-        var baseStyle    = new NKStyle(RED, styles: BOLD);
-        var inheritStyle = new NKStyle(textColor: NKColor.Inherit, inheritedStyles: BOLD);
+        var baseStyle    = new NKStyle(RED,             styles: BOLD);
+        var inheritStyle = new NKStyle(NKColor.Inherit, inheritedStyles: BOLD);
+
         var chars = new[] {
             new AnsiChar('A', baseStyle),
             new AnsiChar('B', inheritStyle),
             new AnsiChar('C', baseStyle)
         };
+
         var ansi = new AnsiString(chars);
 
         Assert.Single(ansi.Styles);
-        Assert.Equal(0, ansi.Styles[0].Index);
+        Assert.Equal(0,         ansi.Styles[0].Index);
         Assert.Equal(baseStyle, ansi.GetStyleAt(1));
         Assert.Equal(baseStyle, ansi.GetStyleAt(2));
     }
@@ -114,19 +118,20 @@ public class AnsiStringTests {
             new AnsiChar('5', NKStyle.Default),
             new AnsiChar('6', NKStyle.Default)
         };
+
         var ansi = new AnsiString(chars);
 
         // Marker at index 2 (RED), marker at index 4 (Default)
-        Assert.Equal(2, ansi.Styles.Length);
-        Assert.Equal(2, ansi.Styles[0].Index);
-        Assert.Equal(RED, ansi.Styles[0].Style.FColor.AsPalette);
-        Assert.Equal(4, ansi.Styles[1].Index);
+        Assert.Equal(2,               ansi.Styles.Length);
+        Assert.Equal(2,               ansi.Styles[0].Index);
+        Assert.Equal(RED,             ansi.Styles[0].Style.FColor.AsPalette);
+        Assert.Equal(4,               ansi.Styles[1].Index);
         Assert.Equal(NKStyle.Default, ansi.Styles[1].Style);
 
         Assert.Equal(NKStyle.Default, ansi.GetStyleAt(0));
         Assert.Equal(NKStyle.Default, ansi.GetStyleAt(1));
-        Assert.Equal(RED, ansi.GetStyleAt(2).FColor.AsPalette);
-        Assert.Equal(RED, ansi.GetStyleAt(3).FColor.AsPalette);
+        Assert.Equal(RED,             ansi.GetStyleAt(2).FColor.AsPalette);
+        Assert.Equal(RED,             ansi.GetStyleAt(3).FColor.AsPalette);
         Assert.Equal(NKStyle.Default, ansi.GetStyleAt(4));
         Assert.Equal(NKStyle.Default, ansi.GetStyleAt(5));
     }
@@ -209,9 +214,8 @@ public class AnsiStringTests {
 
         Assert.NotEmpty(lines);
 
-        foreach (var line in lines) {
+        foreach (var line in lines)
             Assert.True(line.Length <= 11);
-        }
 
         Assert.Equal("Hello world", lines[0].Plain);
         Assert.Equal("this is a",   lines[1].Plain);
@@ -285,9 +289,8 @@ public class AnsiStringTests {
 
         var list = new List<AnsiChar>();
 
-        foreach (var c in ansi) {
+        foreach (var c in ansi)
             list.Add(c);
-        }
 
         Assert.Equal(2,     list.Count);
         Assert.Equal('A',   list[0].Char);
@@ -319,9 +322,8 @@ public class AnsiStringTests {
 
         Assert.Equal("abble", replaced.Plain);
 
-        foreach (var c in replaced) {
+        foreach (var c in replaced)
             Assert.Equal(style, c.Style);
-        }
     }
 
     [Fact]
@@ -549,10 +551,9 @@ public class AnsiStringTests {
     [Fact]
     public void SetFColor_PreservesBackgroundAndStyles() {
         var originalStyle = new NKStyle(
-            textColor: RED,
-            backgroundColor:
+            RED,
             BLUE,
-            styles: BOLD
+            BOLD
         );
 
         var ansi = new AnsiString("Test", originalStyle);
@@ -567,7 +568,7 @@ public class AnsiStringTests {
 
     [Fact]
     public void SetBColor_PreservesForegroundAndStyles() {
-        var originalStyle = new NKStyle(textColor: RED, backgroundColor: BLUE, styles: BOLD);
+        var originalStyle = new NKStyle(RED, BLUE, BOLD);
         var ansi          = new AnsiString("Test", originalStyle);
 
         var updated = ansi.SetBColor(YELLOW);
@@ -580,7 +581,7 @@ public class AnsiStringTests {
 
     [Fact]
     public void TextStyles_Add_Remove_Toggle_WorkCorrectly() {
-        var originalStyle = new NKStyle(textColor: RED, styles: BOLD);
+        var originalStyle = new NKStyle(RED, styles: BOLD);
         var ansi          = new AnsiString("Test", originalStyle);
 
         // Add ITALIC
@@ -615,10 +616,10 @@ public class AnsiStringTests {
 
     [Fact]
     public void OverrideStyle_AppliesOnlyNonInheritedProperties() {
-        var initial = new NKStyle(textColor: RED, backgroundColor: BLUE, styles: BOLD);
+        var initial = new NKStyle(RED, BLUE, BOLD);
         var ansi    = new AnsiString("Test", initial);
 
-        var overrider = new NKStyle(textColor: GREEN, backgroundColor: NKColor.Inherit); // b is Inherit
+        var overrider = new NKStyle(GREEN, NKColor.Inherit); // b is Inherit
         var result    = ansi.OverrideStyle(overrider);
 
         var style = result.GetStyleAt(0);

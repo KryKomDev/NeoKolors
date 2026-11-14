@@ -6,17 +6,18 @@
 namespace NeoKolors.Settings.Command;
 
 public readonly struct Usage {
-    public List<Usage> NodeUsages { get; }
-    public List<ParamInfo> ThisUsage { get; }
-    
+    public List<Usage>     NodeUsages { get; }
+    public List<ParamInfo> ThisUsage  { get; }
+
     public Usage() {
         NodeUsages = [];
-        ThisUsage = [];
+        ThisUsage  = [];
     }
 
     public override string ToString() {
-        string s = ThisUsage.Join(" ");
+        var s = ThisUsage.Join(" ");
         s += NodeUsages.Join(" ");
+
         return s;
     }
 }

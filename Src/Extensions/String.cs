@@ -12,15 +12,16 @@ using JetBrains.Annotations;
 namespace NeoKolors.Extensions;
 
 public static class String {
-    
+
     /// <summary>
-    /// Error message indicating that the specified padding length must be non-negative
-    /// and greater than or equal to the length of the string.
+    ///     Error message indicating that the specified padding length must be non-negative
+    ///     and greater than or equal to the length of the string.
     /// </summary>
     private const string PAD_INV_MSG = "Padding length must be non-negative and greater or equal to the string length.";
-    
+
     /// <summary>
-    /// formats the string using the <see cref="string.Format(System.IFormatProvider?,string,object?)"/>
+    ///     formats the string using the
+    ///     <see cref="string.Format(System.IFormatProvider?,string,object?)" />
     /// </summary>
     /// <param name="format">the string to format</param>
     /// <param name="args">the arguments for the string</param>
@@ -29,47 +30,54 @@ public static class String {
     public static string Format(
         [StringSyntax(StringSyntaxAttribute.CompositeFormat)]
         this string format,
-        params object[] args) =>
+        params object[] args
+    ) =>
         string.Format(CultureInfo.InvariantCulture, format, args);
 
     extension(string s) {
         /// <summary>
-        /// returns the total count of the printable / visible characters contained by the string
-        /// (for example, ansi escape characters are not counted)
+        ///     returns the total count of the printable / visible characters contained by the string
+        ///     (for example, ansi escape characters are not counted)
         /// </summary>
         [System.Diagnostics.Contracts.Pure]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetPlainLength() =>
-            Regex.Replace(s, @"\e\[[^m]*m", "").Length;
+        public int GetPlainLength() => Regex.Replace(s, @"\e\[[^m]*m", "").Length;
 
         /// <summary>
-        /// capitalizes all the words within the string
+        ///     capitalizes all the words within the string
         /// </summary>
         /// <exception cref="ArgumentNullException">the string is null</exception>
         [System.Diagnostics.Contracts.Pure]
         public string Capitalize() {
-            if (s is null) throw new ArgumentNullException(nameof(s));
-            if (s.Length == 0) return "";
-            if (s.Length == 1) return s.ToUpper();
+            if (s is null)
+                throw new ArgumentNullException(nameof(s));
 
-            string[] words = s.Split(' ');
+            if (s.Length == 0)
+                return "";
 
-            for (int i = 0; i < words.Length; i++) {
-                if (string.IsNullOrEmpty(words[i])) continue;
+            if (s.Length == 1)
+                return s.ToUpper();
 
-                char[] letters = words[i].ToCharArray();
+            var words = s.Split(' ');
 
-                if (letters.Length <= 0) continue;
+            for (var i = 0; i < words.Length; i++) {
+                if (string.IsNullOrEmpty(words[i]))
+                    continue;
+
+                var letters = words[i].ToCharArray();
+
+                if (letters.Length <= 0)
+                    continue;
 
                 letters[0] = char.ToUpper(letters[0]);
-                words[i] = new string(letters);
+                words[i]   = new string(letters);
             }
 
             return string.Join(" ", words);
         }
 
         /// <summary>
-        /// makes the first letter of the string capital
+        ///     makes the first letter of the string capital
         /// </summary>
         /// <exception cref="ArgumentNullException">the input string is null</exception>
         [System.Diagnostics.Contracts.Pure]
@@ -78,11 +86,13 @@ public static class String {
                 null => throw new ArgumentNullException(nameof(s)),
                 ""   => "",
                 _ => string.Concat(
-                    s[0].ToString().ToUpper(cultureInfo ?? CultureInfo.InvariantCulture), s.Substring(1))
+                    s[0].ToString().ToUpper(cultureInfo ?? CultureInfo.InvariantCulture),
+                    s.Substring(1)
+                )
             };
 
         /// <summary>
-        /// makes the first letter of the string lowercase
+        ///     makes the first letter of the string lowercase
         /// </summary>
         /// <exception cref="ArgumentNullException">the input string is null</exception>
         [System.Diagnostics.Contracts.Pure]
@@ -91,91 +101,100 @@ public static class String {
                 null => throw new ArgumentNullException(nameof(s)),
                 ""   => "",
                 _ => string.Concat(
-                    s[0].ToString().ToLower(cultureInfo ?? CultureInfo.InvariantCulture), s.Substring(1))
+                    s[0].ToString().ToLower(cultureInfo ?? CultureInfo.InvariantCulture),
+                    s.Substring(1)
+                )
             };
 
         /// <summary>
-        /// creates a substring between the indices, including startIndex, excluding endIndex
+        ///     creates a substring between the indices, including startIndex, excluding endIndex
         /// </summary>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// startIndex or endIndex is out of range, startIndex is greater than endIndex
+        ///     startIndex or endIndex is out of range, startIndex is greater than endIndex
         /// </exception>
         public string InRange(int startIndex, int endIndex) {
             if (startIndex < 0 || startIndex >= s.Length)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), "Start index is out of range.");
+
             if (endIndex < 0 || endIndex >= s.Length)
                 throw new ArgumentOutOfRangeException(nameof(endIndex), "End index is out of range.");
+
             if (startIndex > endIndex)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), "Start index is larger than the end index");
+
             return s.Substring(startIndex, endIndex - startIndex);
         }
 
         /// <summary>
-        /// chops the string into multiple string with a maximum length
+        ///     chops the string into multiple string with a maximum length
         /// </summary>
         /// <param name="maxLength">the maximum length of a single string</param>
         [System.Diagnostics.Contracts.Pure]
         public string[] Chop(int maxLength) {
             if (maxLength <= 0)
                 throw new ArgumentOutOfRangeException(nameof(maxLength));
-            
-            if (string.IsNullOrWhiteSpace(s)) 
+
+            if (string.IsNullOrWhiteSpace(s))
                 return [];
 
-            List<string> lines = [];
-            int lastBreak = 0;
-            int? lastSpace = null;
-        
-            for (int i = 0; i < s.Length; i++) {
+            List<string> lines     = [];
+            var          lastBreak = 0;
+            int?         lastSpace = null;
+
+            for (var i = 0; i < s.Length; i++) {
                 if (s[i] is '\n' or '\r') {
                     lines.Add(s[lastBreak..i]);
-                    if (s[i] == '\r' && i + 1 < s.Length && s[i + 1] == '\n') {
+
+                    if (s[i] == '\r' && i + 1 < s.Length && s[i + 1] == '\n')
                         i++;
-                    }
+
                     lastBreak = i + 1;
                     lastSpace = null;
+
                     continue;
                 }
 
-                if (s[i] == ' ') {
+                if (s[i] == ' ')
                     lastSpace = i;
-                }
-            
+
                 if (i - lastBreak + 1 > maxLength) {
                     if (lastSpace.HasValue && lastSpace.Value > lastBreak) {
                         lines.Add(s[lastBreak..lastSpace.Value]);
                         lastBreak = lastSpace.Value + 1;
-                        i = lastSpace.Value;
+                        i         = lastSpace.Value;
                     }
                     else {
                         lines.Add(s[lastBreak..i]);
                         lastBreak = i;
-                        i = lastBreak - 1;
+                        i         = lastBreak - 1;
                     }
+
                     lastSpace = null;
                 }
             }
 
-            if (lastBreak < s.Length) {
+            if (lastBreak < s.Length)
                 lines.Add(s[lastBreak..]);
-            }
-            else if (lastBreak == s.Length && s.Length > 0 && s[^1] is '\n' or '\r') {
+            else if (lastBreak == s.Length && s.Length > 0 && s[^1] is '\n' or '\r')
                 lines.Add("");
-            }
-        
+
             return lines.ToArray();
         }
 
         /// <summary>
-        /// Pads the specified string on the right with spaces until the total
-        /// visible length of the string reaches the given padding length.
-        /// ANSI escape characters or other non-printable elements are not considered in the length.
+        ///     Pads the specified string on the right with spaces until the total
+        ///     visible length of the string reaches the given padding length.
+        ///     ANSI escape characters or other non-printable elements are not considered in the
+        ///     length.
         /// </summary>
         /// <param name="pad">The total visible length to achieve after padding.</param>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// Thrown when the padding length is less than the string length.
+        ///     Thrown when the padding length is less than the string length.
         /// </exception>
-        /// <returns>The input string padded with spaces on the right to meet the specified visible length.</returns>
+        /// <returns>
+        ///     The input string padded with spaces on the right to meet the specified visible
+        ///     length.
+        /// </returns>
         [System.Diagnostics.Contracts.Pure]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string VisiblePadRight(int pad) =>
@@ -184,15 +203,19 @@ public static class String {
                 : throw new ArgumentOutOfRangeException(nameof(pad), PAD_INV_MSG);
 
         /// <summary>
-        /// Pads the specified string on the left with spaces until the total
-        /// visible length of the string reaches the given padding length.
-        /// ANSI escape characters or other non-printable elements are not considered in the length.
+        ///     Pads the specified string on the left with spaces until the total
+        ///     visible length of the string reaches the given padding length.
+        ///     ANSI escape characters or other non-printable elements are not considered in the
+        ///     length.
         /// </summary>
         /// <param name="pad">The total visible length to achieve after padding.</param>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// Thrown when the padding length is less than the string length.
+        ///     Thrown when the padding length is less than the string length.
         /// </exception>
-        /// <returns>The input string padded with spaces on the left to meet the specified visible length.</returns>
+        /// <returns>
+        ///     The input string padded with spaces on the left to meet the specified visible
+        ///     length.
+        /// </returns>
         [System.Diagnostics.Contracts.Pure]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string VisiblePadLeft(int pad) =>
@@ -201,281 +224,326 @@ public static class String {
                 : throw new ArgumentOutOfRangeException(nameof(pad), PAD_INV_MSG);
 
         /// <summary>
-        /// Pads the specified string in the center with spaces until the total
-        /// visible length of the string reaches the given padding length.
-        /// ANSI escape characters or other non-printable elements are not considered in the length.
+        ///     Pads the specified string in the center with spaces until the total
+        ///     visible length of the string reaches the given padding length.
+        ///     ANSI escape characters or other non-printable elements are not considered in the
+        ///     length.
         /// </summary>
         /// <param name="pad">The total visible length to achieve after padding.</param>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// Thrown when the padding length is less than the string length.
+        ///     Thrown when the padding length is less than the string length.
         /// </exception>
-        /// <returns>The input string padded with spaces in the center to meet the specified visible length.</returns>
+        /// <returns>
+        ///     The input string padded with spaces in the center to meet the specified visible
+        ///     length.
+        /// </returns>
         [System.Diagnostics.Contracts.Pure]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string VisiblePadCenter(int pad) =>
             pad >= s.GetPlainLength()
-                ? new string(' ', (int)(Math.Floor((pad - s.GetPlainLength()) / 2f))) + s +
-                new string(' ', (int)(Math.Ceiling((pad - s.GetPlainLength()) / 2f)))
+                ? new string(' ', (int)Math.Floor((pad   - s.GetPlainLength()) / 2f)) + s +
+                new string(' ',   (int)Math.Ceiling((pad - s.GetPlainLength()) / 2f))
                 : throw new ArgumentOutOfRangeException(nameof(pad), PAD_INV_MSG);
 
         /// <summary>
-        /// Pads the specified string in the center with spaces until the total
-        /// length of the string reaches the given padding length.
+        ///     Pads the specified string in the center with spaces until the total
+        ///     length of the string reaches the given padding length.
         /// </summary>
         /// <param name="pad">The total visible length to achieve after padding.</param>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// Thrown when the padding length is less than the string length.
+        ///     Thrown when the padding length is less than the string length.
         /// </exception>
-        /// <returns>The input string padded with spaces in the center to meet the specified visible length.</returns>
+        /// <returns>
+        ///     The input string padded with spaces in the center to meet the specified visible
+        ///     length.
+        /// </returns>
         [System.Diagnostics.Contracts.Pure]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public string PadCenter(int pad) =>
             pad >= s.Length
-                ? new string(' ', (int)(Math.Floor((pad - s.Length) / 2f))) + s +
-                new string(' ', (int)(Math.Ceiling((pad - s.Length) / 2f)))
+                ? new string(' ', (int)Math.Floor((pad   - s.Length) / 2f)) + s +
+                new string(' ',   (int)Math.Ceiling((pad - s.Length) / 2f))
                 : throw new ArgumentOutOfRangeException(nameof(pad), PAD_INV_MSG);
 
         /// <summary>
-        /// Returns a substring from the specified string, ensuring safe boundary handling
-        /// by adjusting the start and count parameters to fit within the valid range of the string.
+        ///     Returns a substring from the specified string, ensuring safe boundary handling
+        ///     by adjusting the start and count parameters to fit within the valid range of the
+        ///     string.
         /// </summary>
         /// <param name="start">The zero-based starting character position of the substring.</param>
         /// <param name="count">The number of characters to retrieve from the starting position.</param>
-        /// <returns>A substring based on the specified start and count parameters, adjusted for safe boundary conditions.</returns>
+        /// <returns>
+        ///     A substring based on the specified start and count parameters, adjusted for safe
+        ///     boundary conditions.
+        /// </returns>
         [System.Diagnostics.Contracts.Pure]
         public string SafeSubstring(int start, int count) {
-            start = start >= s.Length ? s.Length : start < 0 ? 0 : start;
-            count = count < 0 ? 0 : count + start >= s.Length ? s.Length - start : count;
+            start = start >= s.Length
+                ? s.Length
+                : start < 0
+                    ? 0
+                    : start;
+
+            count = count < 0
+                ? 0
+                : count + start >= s.Length
+                    ? s.Length - start
+                    : count;
+
             return s.Substring(start, count);
         }
 
         /// <summary>
-        /// Determines whether the specified string contains any special characters.
-        /// Special characters are defined as characters that are neither letters nor digits.
+        ///     Determines whether the specified string contains any special characters.
+        ///     Special characters are defined as characters that are neither letters nor digits.
         /// </summary>
         /// <returns>
-        /// <c>true</c> if the string contains special characters; otherwise, <c>false</c>.
+        ///     <c>true</c> if the string contains special characters; otherwise, <c>false</c>.
         /// </returns>
         [System.Diagnostics.Contracts.Pure]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool ContainsSpecial() =>
-            !string.IsNullOrEmpty(s) && s.Any(c => !(char.IsLetter(c) || char.IsDigit(c)));
+        public bool ContainsSpecial() => !string.IsNullOrEmpty(s) && s.Any(c => !(char.IsLetter(c) || char.IsDigit(c)));
 
         /// <summary>
-        /// Determines whether the specified string contains any numeric characters.
+        ///     Determines whether the specified string contains any numeric characters.
         /// </summary>
         /// <returns>True if the string contains at least one numeric character; otherwise, false.</returns>
         [System.Diagnostics.Contracts.Pure]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool ContainsNumber() =>
-            !string.IsNullOrEmpty(s) && s.Any(char.IsDigit);
+        public bool ContainsNumber() => !string.IsNullOrEmpty(s) && s.Any(char.IsDigit);
 
         /// <summary>
-        /// Determines if the given string contains at least one letter.
+        ///     Determines if the given string contains at least one letter.
         /// </summary>
         /// <returns>True if the string contains at least one letter; otherwise, false.</returns>
         [System.Diagnostics.Contracts.Pure]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool ContainsLetter() =>
-            !string.IsNullOrEmpty(s) && s.Any(char.IsLetter);
+        public bool ContainsLetter() => !string.IsNullOrEmpty(s) && s.Any(char.IsLetter);
 
         /// <summary>
-        /// Determines whether the provided string contains at least one uppercase character.
+        ///     Determines whether the provided string contains at least one uppercase character.
         /// </summary>
         /// <returns>True if the string contains one or more uppercase characters; otherwise, false.</returns>
         [System.Diagnostics.Contracts.Pure]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool ContainsUpper() =>
-            !string.IsNullOrEmpty(s) && s.Any(char.IsUpper);
+        public bool ContainsUpper() => !string.IsNullOrEmpty(s) && s.Any(char.IsUpper);
 
         /// <summary>
-        /// Determines whether the specified string contains any lowercase characters.
+        ///     Determines whether the specified string contains any lowercase characters.
         /// </summary>
         /// <returns>
-        /// <c>true</c> if the specified string contains at least one lowercase character; otherwise, <c>false</c>.
+        ///     <c>true</c> if the specified string contains at least one lowercase character;
+        ///     otherwise, <c>false</c>.
         /// </returns>
         [System.Diagnostics.Contracts.Pure]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool ContainsLower() =>
-            !string.IsNullOrEmpty(s) && s.Any(char.IsLower);
+        public bool ContainsLower() => !string.IsNullOrEmpty(s) && s.Any(char.IsLower);
 
         /// <summary>
-        /// Determines whether the specified string is a valid identifier.
-        /// A valid identifier is non-empty, contains only letters, digits, underscores, or '@',
-        /// and does not start with a digit.
+        ///     Determines whether the specified string is a valid identifier.
+        ///     A valid identifier is non-empty, contains only letters, digits, underscores, or '@',
+        ///     and does not start with a digit.
         /// </summary>
         /// <returns>True if the string is a valid identifier; otherwise, false.</returns>
         [System.Diagnostics.Contracts.Pure]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsValidIdentifier() =>
-            !string.IsNullOrEmpty(s) && s.All(c => char.IsLetterOrDigit(c) || c is '_' or '@') && !char.IsDigit(s[0]);
+        public bool IsValidIdentifier() => !string.IsNullOrEmpty(s) && s.All(c => char.IsLetterOrDigit(c) || c is '_' or '@') && !char.IsDigit(s[0]);
 
         /// <summary>
-        /// Determines whether the given string consists solely of alphabetic characters.
+        ///     Determines whether the given string consists solely of alphabetic characters.
         /// </summary>
-        /// <returns>True if the string is not null, not empty, and contains only letters; otherwise, false.</returns>
+        /// <returns>
+        ///     True if the string is not null, not empty, and contains only letters; otherwise,
+        ///     false.
+        /// </returns>
         [System.Diagnostics.Contracts.Pure]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsWord() =>
-            !string.IsNullOrEmpty(s) && s.All(char.IsLetter);
+        public bool IsWord() => !string.IsNullOrEmpty(s) && s.All(char.IsLetter);
 
         /// <summary>
-        /// Determines whether a string is non-empty and begins with an uppercase character,
-        /// followed by only lowercase characters.
+        ///     Determines whether a string is non-empty and begins with an uppercase character,
+        ///     followed by only lowercase characters.
         /// </summary>
         /// <returns>True if the string is a capital word, otherwise false.</returns>
         [System.Diagnostics.Contracts.Pure]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IsCapitalWord() =>
-            s.IsWord() && s.FirstAndAll(char.IsUpper, char.IsLower);
+        public bool IsCapitalWord() => s.IsWord() && s.FirstAndAll(char.IsUpper, char.IsLower);
 
         /// <summary>
-        /// Pads each line of the given string to the left by the specified number of spaces.
-        /// Optionally skips padding the first line.
+        ///     Pads each line of the given string to the left by the specified number of spaces.
+        ///     Optionally skips padding the first line.
         /// </summary>
         /// <param name="pad">The number of spaces to pad to the left of each line.</param>
         /// <param name="padFirst">A boolean indicating whether to pad the first line or not.</param>
         /// <returns>The input string with each line padded to the left as specified.</returns>
         [System.Diagnostics.Contracts.Pure]
         public string PadLinesLeft(int pad, bool padFirst = false) {
-            string[] lines = s.Split('\n');
-            for (int i = padFirst ? 0 : 1; i < lines.Length; i++)
+            var lines = s.Split('\n');
+
+            for (var i = padFirst ? 0 : 1; i < lines.Length; i++)
                 lines[i] = new string(' ', pad) + lines[i];
+
             return lines.Join("\n");
         }
 
         /// <summary>
-        /// Removes non-printable or non-visible characters such as ANSI escape codes from the given string.
+        ///     Removes non-printable or non-visible characters such as ANSI escape codes from the
+        ///     given string.
         /// </summary>
         /// <returns>A new string containing only printable and visible characters.</returns>
         public string GetPlain() => Regex.Replace(s, @"\e\[[^m]*m", ""); // TODO: Add more non-printable characters
 
         /// <summary>
-        /// Returns a substring from the beginning of the string up to (but not including) the first occurrence of the specified character.
-        /// If the character is not found, the entire string is returned.
+        ///     Returns a substring from the beginning of the string up to (but not including) the
+        ///     first occurrence of the specified character.
+        ///     If the character is not found, the entire string is returned.
         /// </summary>
         /// <param name="c">The character at which to stop extracting the substring.</param>
-        /// <returns>A substring that ends just before the specified character or the entire string if the character is not found.</returns>
+        /// <returns>
+        ///     A substring that ends just before the specified character or the entire string if
+        ///     the character is not found.
+        /// </returns>
         [Pure]
         public string SubstringUntil(char c) {
-            for (int i = 0; i < s.Length; i++) {
+            for (var i = 0; i < s.Length; i++)
                 if (s[i] == c)
                     return s[..i];
-            }
 
             return s;
         }
 
         /// <summary>
-        /// Retrieves the substring that appears after the first occurrence of the specified character in the input string.
+        ///     Retrieves the substring that appears after the first occurrence of the specified
+        ///     character in the input string.
         /// </summary>
         /// <param name="c">The character to search for in the string.</param>
-        /// <returns>The substring starting from the first occurrence of the specified character, or the original string if the character is not found.</returns>
+        /// <returns>
+        ///     The substring starting from the first occurrence of the specified character, or
+        ///     the original string if the character is not found.
+        /// </returns>
         [Pure]
         public string SubstringAfter(char c) {
-            for (int i = 0; i < s.Length; i++) {
+            for (var i = 0; i < s.Length; i++)
                 if (s[i] == c)
                     return s[i..];
-            }
 
             return s;
         }
 
         /// <summary>
-        /// Extracts a substring located between two specified characters within the string.
+        ///     Extracts a substring located between two specified characters within the string.
         /// </summary>
         /// <param name="startChar">The character that denotes the starting boundary of the substring.</param>
         /// <param name="endChar">The character that denotes the ending boundary of the substring.</param>
-        /// <param name="excludeStart">Determines whether the starting character should be excluded from the result.</param>
-        /// <param name="excludeEnd">Determines whether the ending character should be excluded from the result.</param>
-        /// <returns>A substring located between the specified start and end characters, or the original string if the boundary characters are not found.</returns>
+        /// <param name="excludeStart">
+        ///     Determines whether the starting character should be excluded
+        ///     from the result.
+        /// </param>
+        /// <param name="excludeEnd">
+        ///     Determines whether the ending character should be excluded from
+        ///     the result.
+        /// </param>
+        /// <returns>
+        ///     A substring located between the specified start and end characters, or the
+        ///     original string if the boundary characters are not found.
+        /// </returns>
         [Pure]
         public string SubstringBetween(
             char startChar,
             char endChar,
             bool excludeStart = false,
-            bool excludeEnd = false) 
-        {
-            int start = s.IndexOf(startChar);
-            
-            if (start == -1) 
+            bool excludeEnd   = false
+        ) {
+            var start = s.IndexOf(startChar);
+
+            if (start == -1)
                 return s;
 
-            int end = s.IndexOf(endChar, start + 1);
-            
-            if (end == -1) 
+            var end = s.IndexOf(endChar, start + 1);
+
+            if (end == -1)
                 return s[start..];
 
-            int actualStart = excludeStart ? start + 1 : start;
-            int actualEnd = excludeEnd ? end : end + 1;
+            var actualStart = excludeStart ? start   + 1 : start;
+            var actualEnd   = excludeEnd ? end : end + 1;
 
             return s.Substring(actualStart, Math.Max(0, actualEnd - actualStart));
         }
 
         /// <summary>
-        /// Gets the total count of printable or visible characters in the string,
-        /// excluding any non-printable characters such as ANSI escape sequences.
+        ///     Gets the total count of printable or visible characters in the string,
+        ///     excluding any non-printable characters such as ANSI escape sequences.
         /// </summary>
         public int PlainLength => s.GetPlainLength();
 
         /// <summary>
-        /// Removes non-printable or non-visible characters such as ANSI escape codes from the given string.
+        ///     Removes non-printable or non-visible characters such as ANSI escape codes from the
+        ///     given string.
         /// </summary>
         /// <returns>A new string containing only printable and visible characters.</returns>
         public string Plain => s.GetPlain();
 
         /// <summary>
-        /// Trims the string to the specified length if it exceeds the given limit.
+        ///     Trims the string to the specified length if it exceeds the given limit.
         /// </summary>
         /// <param name="length">The maximum allowable length of the string.</param>
-        /// <returns>The trimmed string if its length exceeds the specified limit; otherwise, the original string.</returns>
-        public string Trim(int length) {
-            return length < 0
+        /// <returns>
+        ///     The trimmed string if its length exceeds the specified limit; otherwise, the
+        ///     original string.
+        /// </returns>
+        public string Trim(int length) =>
+            length < 0
                 ? throw new ArgumentOutOfRangeException(nameof(length), "Length must be greater than or equal to zero.")
                 : s.Length <= length
                     ? s
                     : s[..length];
-        }
 
         /// <summary>
-        /// Shortens the string to the specified length by truncating from the middle and replacing the
-        /// truncated portion with an ellipsis ('…').
+        ///     Shortens the string to the specified length by truncating from the middle and replacing
+        ///     the
+        ///     truncated portion with an ellipsis ('…').
         /// </summary>
         /// <param name="length">The desired maximum length of the string, including the ellipsis.</param>
-        /// <returns>A string shortened to the specified length with an ellipsis, or the original
-        /// string if its length is less than or equal to the specified length.</returns>
+        /// <returns>
+        ///     A string shortened to the specified length with an ellipsis, or the original
+        ///     string if its length is less than or equal to the specified length.
+        /// </returns>
         public string Shrink(int length) {
             if (s.Length <= length)
                 return s;
 
-            int hl = length / 2;
+            var hl = length / 2;
+
             return s[..(length - hl)] + "…" + s[^hl..];
         }
 
         /// <summary>
-        /// Unescapes the specified string by replacing escape sequences with their corresponding characters.
-        /// Supports standard escape sequences (e.g., \n, \t) and hexadecimal/Unicode escapes (\x, \u).
+        ///     Unescapes the specified string by replacing escape sequences with their corresponding
+        ///     characters.
+        ///     Supports standard escape sequences (e.g., \n, \t) and hexadecimal/Unicode escapes (\x,
+        ///     \u).
         /// </summary>
         /// <returns>A new string with all escape sequences replaced by their corresponding characters.</returns>
         [Pure]
         public string Unescape() {
-            if (string.IsNullOrEmpty(s)) 
+            if (string.IsNullOrEmpty(s))
                 return s;
 
             StringBuilder sb = new(s.Length);
-            
-            for (int i = 0; i < s.Length; i++) {
+
+            for (var i = 0; i < s.Length; i++)
                 if (s[i] == '\\' && i + 1 < s.Length) {
-                    bool success = false;
-                    
+                    var success = false;
+
                     // Try longest possible sequences first (max length for \x and \u is 6)
-                    for (int len = Math.Min(6, s.Length - i); len >= 2; len--) {
-                        if (!char.TryParseEsc(s.Substring(i, len), out char c)) 
+                    for (var len = Math.Min(6, s.Length - i); len >= 2; len--) {
+                        if (!char.TryParseEsc(s.Substring(i, len), out var c))
                             continue;
 
                         sb.Append(c);
-                        i += len - 1;
-                        success = true;
+                        i       += len - 1;
+                        success =  true;
+
                         break;
                     }
 
@@ -485,7 +553,6 @@ public static class String {
                 else {
                     sb.Append(s[i]);
                 }
-            }
 
             return sb.ToString();
         }
@@ -493,17 +560,19 @@ public static class String {
 
 
     /// <summary>
-    /// joins the stringified objects from the collection using the separator
+    ///     joins the stringified objects from the collection using the separator
     /// </summary>
     public static string Join(this IEnumerable collection, string separator) {
         List<string?> strings = [];
+
         foreach (var c in collection) {
             if (c is null) {
                 strings.Add("");
+
                 continue;
             }
 
-            string? s = c.ToString();
+            var s = c.ToString();
             strings.Add(s ?? "");
         }
 
@@ -515,17 +584,19 @@ public static class String {
     /// <typeparam name="TSource">The type of the elements in the collection.</typeparam>
     extension<TSource>(IEnumerable<TSource> collection) {
         /// <summary>
-        /// joins the stringified objects from the collection using the separator
+        ///     joins the stringified objects from the collection using the separator
         /// </summary>
         public string Join(string separator) {
             List<string?> strings = [];
+
             foreach (var c in collection) {
                 if (c is null) {
                     strings.Add("");
+
                     continue;
                 }
 
-                string? s = c.ToString();
+                var s = c.ToString();
                 strings.Add(s ?? "");
             }
 
@@ -533,54 +604,65 @@ public static class String {
         }
 
         /// <summary>
-        /// Concatenates the elements of a specified collection using the specified separator.
+        ///     Concatenates the elements of a specified collection using the specified separator.
         /// </summary>
-        /// <param name="separator">The string separator to insert between each element of the collection.</param>
+        /// <param name="separator">
+        ///     The string separator to insert between each element of the
+        ///     collection.
+        /// </param>
         /// <param name="stringifier">A function to convert each element of the collection to a string.</param>
-        /// <returns>A string consisting of the elements of the collection concatenated using the specified separator.</returns>
+        /// <returns>
+        ///     A string consisting of the elements of the collection concatenated using the
+        ///     specified separator.
+        /// </returns>
         /// <exception cref="ArgumentNullException">Thrown if the collection or stringifier is null.</exception>
         #if NET9_0_OR_GREATER
         [OverloadResolutionPriority(-100)]
         #endif
-        public string Join(string separator,
-            Func<TSource?, string?> stringifier) {
+        public string Join(
+            string                  separator,
+            Func<TSource?, string?> stringifier
+        ) {
             List<string?> strings = [];
+
             foreach (var c in collection) {
-                string? s = stringifier(c);
+                var s = stringifier(c);
                 strings.Add(s ?? "");
             }
 
             return string.Join(separator, strings);
         }
     }
-    
+
     extension(string) {
-        
+
         /// <summary>
-        /// Converts an integer to its Roman numeral representation.
-        /// Supports values from 1 to 3999.
+        ///     Converts an integer to its Roman numeral representation.
+        ///     Supports values from 1 to 3999.
         /// </summary>
         /// <param name="number">The integer to be converted to Roman numerals.</param>
-        /// <param name="lowercase">Specifies whether to return the result in the lowercase. Default is false.</param>
+        /// <param name="lowercase">
+        ///     Specifies whether to return the result in the lowercase. Default is
+        ///     false.
+        /// </param>
         /// <returns>A string representing the Roman numeral equivalent of the given number.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// Thrown when the supplied number is lower than 1 or greater than 3999.
+        ///     Thrown when the supplied number is lower than 1 or greater than 3999.
         /// </exception>
         [System.Diagnostics.Contracts.Pure]
         public static string ToRoman(int number, bool lowercase = false) {
-            if (number is < 1 or > 3999) {
+            if (number is < 1 or > 3999)
                 throw new ArgumentOutOfRangeException(
-                    nameof(number), 
+                    nameof(number),
                     "Maximum supported value is 3999."
                 );
-            }
 
-            string output = "";
+            var output = "";
 
-            int units = number % 10;
-            int tens = number / 10 % 10;
-            int hundreds = number / 100 % 10;
-            int thousands = number / 1000 % 10;
+            var units     = number        % 10;
+            var tens      = number / 10   % 10;
+            var hundreds  = number / 100  % 10;
+            var thousands = number / 1000 % 10;
 
             switch (thousands) {
                 case 0: break;
@@ -635,39 +717,44 @@ public static class String {
     }
 
     /// <summary>
-    /// Formats the given string by replacing placeholders in the style of {PropertyName} or {PropertyName:Format}
-    /// with the corresponding formatted values from the provided arguments.
+    ///     Formats the given string by replacing placeholders in the style of {PropertyName} or
+    ///     {PropertyName:Format}
+    ///     with the corresponding formatted values from the provided arguments.
     /// </summary>
     /// <param name="s">The string containing the placeholders to format.</param>
     /// <param name="args">An array of arguments used to replace the placeholders.</param>
     /// <returns>The formatted string with placeholders replaced by their corresponding values.</returns>
     public static string StructuredFormat([StructuredMessageTemplate] this string? s, params object[]? args) {
-        if (s is null) throw new ArgumentNullException(nameof(s));
-        if (string.IsNullOrEmpty(s) || args == null || args.Length == 0) return s;
+        if (s is null)
+            throw new ArgumentNullException(nameof(s));
 
-        string result = s;
+        if (string.IsNullOrEmpty(s) || args == null || args.Length == 0)
+            return s;
+
+        var result = s;
 
         // Find all structured placeholders in the format {PropertyName} or {PropertyName:Format}
         var matches = Regex.Matches(s, @"\{([^}:]+)(?::([^}]*))?\}");
 
-        for (int i = 0; i < Math.Min(matches.Count, args.Length); i++) {
-            var match = matches[i];
-            string placeholder = match.Value; // e.g., "{Name}" or "{Value:F2}"
-            string? formatSpecifier = match.Groups[2].Success ? match.Groups[2].Value : null; // e.g., "F2" or null
+        for (var i = 0; i < Math.Min(matches.Count, args.Length); i++) {
+            var match           = matches[i];
+            var placeholder     = match.Value;                                            // e.g., "{Name}" or "{Value:F2}"
+            var formatSpecifier = match.Groups[2].Success ? match.Groups[2].Value : null; // e.g., "F2" or null
 
             // Format the argument
             string formattedValue;
+
             if (!string.IsNullOrEmpty(formatSpecifier) && args[i] is IFormattable formattable)
                 formattedValue = formattable.ToString(formatSpecifier, CultureInfo.InvariantCulture);
             else
                 formattedValue = args[i].ToString() ?? "";
 
             // Replace the first occurrence of this placeholder
-            int placeholderIndex = result.IndexOf(placeholder, StringComparison.Ordinal);
-            if (placeholderIndex >= 0) {
+            var placeholderIndex = result.IndexOf(placeholder, StringComparison.Ordinal);
+
+            if (placeholderIndex >= 0)
                 result = result[..placeholderIndex] + formattedValue +
                     result[(placeholderIndex + placeholder.Length)..];
-            }
         }
 
         return result;
@@ -675,11 +762,13 @@ public static class String {
 
     extension(StringBuilder sb) {
         public void AppendIf(bool condition, string? value) {
-            if (condition) sb.Append(value);
+            if (condition)
+                sb.Append(value);
         }
-        
+
         public void AppendLineIf(bool condition, string? value) {
-            if (condition) sb.AppendLine(value);
+            if (condition)
+                sb.AppendLine(value);
         }
     }
 }

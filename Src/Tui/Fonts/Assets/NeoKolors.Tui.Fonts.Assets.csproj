@@ -14,7 +14,7 @@
         <RepositoryUrl>https://github.com/KryKomDev/NeoKolors</RepositoryUrl>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageIcon>Package-Icon.png</PackageIcon>
-        
+
         <DefineConstants>$(DefineConstants)</DefineConstants>
     </PropertyGroup>
 
@@ -23,20 +23,20 @@
         <None Include="../../../../LICENSE" Pack="true" PackagePath="\"/>
         <None Include="../../../../Assets/Package-Icon.png" Pack="true" PackagePath="\"/>
     </ItemGroup>
-    
+
     <ItemGroup>
-        <ProjectReference Include="../NeoKolors.Tui.Fonts.csproj" />
+        <ProjectReference Include="../NeoKolors.Tui.Fonts.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Compile Remove="CompileFontsTask.Code.cs" />
-        <None Include="CompileFontsTask.Code.cs" />
+        <Compile Remove="CompileFontsTask.Code.cs"/>
+        <None Include="CompileFontsTask.Code.cs"/>
     </ItemGroup>
 
     <!-- Static FIGlet font assets -->
     <ItemGroup>
-        <EmbeddedResource Include="Figlet/*.flf" />
-        <EmbeddedResource Include="Figlet/*.xml" />
+        <EmbeddedResource Include="Figlet/*.flf"/>
+        <EmbeddedResource Include="Figlet/*.xml"/>
     </ItemGroup>
 
     <!-- Font compilation configuration: control what to compile and where to output directly here -->
@@ -54,29 +54,29 @@
                  - OutputDir="path/to/dir" (overrides output directory)
                  - FontName="CustomName" (overrides font name)
              If no <Font> items are declared, the task auto-discovers font folders in SourceDir. -->
-        <Font Include="Bytesized" />
-        <Font Include="Future" />
-        <Font Include="Dummy" />
+        <Font Include="Bytesized"/>
+        <Font Include="Future"/>
+        <Font Include="Dummy"/>
     </ItemGroup>
 
     <!-- Inline C# Task for Font Compilation -->
     <UsingTask TaskName="CompileFontsTask" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)/Microsoft.Build.Tasks.Core.dll">
         <ParameterGroup>
-            <SourceDir ParameterType="System.String" Required="false" />
-            <OutputDir ParameterType="System.String" Required="false" />
-            <Fonts ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="false" />
-            <FontsAssemblyPath ParameterType="System.String" Required="true" />
-            <References ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
-            <OutputFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+            <SourceDir ParameterType="System.String" Required="false"/>
+            <OutputDir ParameterType="System.String" Required="false"/>
+            <Fonts ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="false"/>
+            <FontsAssemblyPath ParameterType="System.String" Required="true"/>
+            <References ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true"/>
+            <OutputFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true"/>
         </ParameterGroup>
         <Task>
-            <Using Namespace="System" />
-            <Using Namespace="System.IO" />
-            <Using Namespace="System.Reflection" />
-            <Using Namespace="System.Collections.Generic" />
-            <Using Namespace="Microsoft.Build.Framework" />
-            <Using Namespace="Microsoft.Build.Utilities" />
-            <Code Type="Fragment" Language="cs" Source="$(MSBuildProjectDirectory)/CompileFontsTask.Code.cs" />
+            <Using Namespace="System"/>
+            <Using Namespace="System.IO"/>
+            <Using Namespace="System.Reflection"/>
+            <Using Namespace="System.Collections.Generic"/>
+            <Using Namespace="Microsoft.Build.Framework"/>
+            <Using Namespace="Microsoft.Build.Utilities"/>
+            <Code Type="Fragment" Language="cs" Source="$(MSBuildProjectDirectory)/CompileFontsTask.Code.cs"/>
         </Task>
     </UsingTask>
 
@@ -85,20 +85,20 @@
             <!-- Resolve the path to the referenced NeoKolors.Tui.Fonts.dll assembly -->
             <FontsDllPath>../bin/$(Configuration)/$(TargetFramework)/NeoKolors.Tui.Fonts.dll</FontsDllPath>
         </PropertyGroup>
-        <CompileFontsTask 
-            SourceDir="$(ProjectDir)." 
-            OutputDir="$(FontOutputDir)"
-            Fonts="@(Font)"
-            FontsAssemblyPath="$(FontsDllPath)" 
-            References="@(ReferencePath)">
-            <Output TaskParameter="OutputFiles" ItemName="CompiledFonts" />
+        <CompileFontsTask
+                SourceDir="$(ProjectDir)."
+                OutputDir="$(FontOutputDir)"
+                Fonts="@(Font)"
+                FontsAssemblyPath="$(FontsDllPath)"
+                References="@(ReferencePath)">
+            <Output TaskParameter="OutputFiles" ItemName="CompiledFonts"/>
         </CompileFontsTask>
 
         <ItemGroup>
             <EmbeddedResource Include="@(CompiledFonts)">
                 <LogicalName>NeoKolors.Tui.Fonts.Assets.%(Filename)%(Extension)</LogicalName>
             </EmbeddedResource>
-            <FileWrites Include="@(CompiledFonts)" />
+            <FileWrites Include="@(CompiledFonts)"/>
         </ItemGroup>
     </Target>
 </Project>

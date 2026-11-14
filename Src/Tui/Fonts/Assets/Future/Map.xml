@@ -83,7 +83,7 @@
     <Component Symbol="´" Id="accent" File="diacritics/accent.nkg"/>
     <Component Symbol="¨" Id="umlaut" File="diacritics/umlaut.nkg"/>
     <Component Symbol="ˇ" Id="caron" File="diacritics/caron.nkg"/>
-    
+
     <AutoCompound Symbol="´" Base="accent" Align="top">
         <ApplicableGroup>basic-vowels</ApplicableGroup>
     </AutoCompound>
@@ -95,7 +95,7 @@
     <AutoCompound Symbol="¨" Base="umlaut" Align="top">
         <ApplicableGroup>basic-vowels</ApplicableGroup>
     </AutoCompound>
-    
+
     <Component Symbol="0" File="digits/0.nkg"/>
     <Component Symbol="1" File="digits/1.nkg"/>
     <Component Symbol="2" File="digits/2.nkg"/>

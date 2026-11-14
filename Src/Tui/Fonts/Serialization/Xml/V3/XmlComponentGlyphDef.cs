@@ -11,32 +11,31 @@ using NeoKolors.Extensions;
 namespace NeoKolors.Tui.Fonts.Xml.V3;
 
 public class XmlComponentGlyphDef : XmlGlyphDef {
-    
+
     private string? _id;
-    
-    [XmlIgnore] 
-    public bool IsIdDefined => _id != null;
-    
-    [XmlAttribute("File")] 
-    public string File { get; set; }
-    
+
+    [XmlIgnore] public bool IsIdDefined => _id != null;
+
+    [XmlAttribute("File")] public string File { get; set; }
+
     [XmlIgnore] public XmlGlyphAlignPoint[]       AlignPoints       { get; set; }
     [XmlIgnore] public char[]?                    AlignPointMarkers { get; set; }
     [XmlIgnore] public XmlGlyphAlignPointReplace? AlignPointReplace { get; set; }
     [XmlIgnore] public char                       Symbol            { get; set; }
     [XmlIgnore] public XmlGlyphMask?              Mask              { get; set; }
-    [XmlIgnore] public NKTextStyles                 Styles            { get; set; }
+    [XmlIgnore] public NKTextStyles               Styles            { get; set; }
 
     [XmlAttribute("Symbol")]
     public string SymbolString {
         get => Symbol.ToString();
         set {
-            if (char.TryParseEsc(value, out char c)) {
+            if (char.TryParseEsc(value, out var c)) {
                 Symbol = c;
                 _id    = value;
+
                 return;
             }
-            
+
             NKFontSerializer.LOGGER.Error($"The string '{value}' is not valid for Symbol.");
         }
     }
@@ -78,11 +77,11 @@ public class XmlComponentGlyphDef : XmlGlyphDef {
         get => Mask.ToString() ?? "null";
         set => Mask = XmlGlyphMask.TryParse(value, out var mask) ? mask.Value : null;
     }
-    
+
     [XmlAttribute("Baseline")]
     [DefaultValue(0)]
     public int Baseline { get; set; }
-    
+
     [XmlAttribute("Styles")]
     [DefaultValue("NONE")]
     public string StylesString {

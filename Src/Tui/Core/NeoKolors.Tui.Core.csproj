@@ -31,10 +31,10 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="HasFlagExtension.Generator" Version="2026.4.0" />
+        <PackageReference Include="HasFlagExtension.Generator" Version="2026.4.0"/>
         <PackageReference Include="Polyfill" Version="11.4.5">
-          <PrivateAssets>all</PrivateAssets>
-          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
         <PackageReference Include="System.Text.Encodings.Web" Version="10.0.12"/>
     </ItemGroup>

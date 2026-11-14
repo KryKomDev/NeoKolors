@@ -89,19 +89,19 @@ public class CharTests {
     }
 
     [Theory]
-    [InlineData('b', false)]
-    [InlineData('c', false)]
-    [InlineData('d', false)]
-    [InlineData('f', false)]
-    [InlineData('g', false)]
-    [InlineData('B', false)]
-    [InlineData('C', false)]
-    [InlineData('D', false)]
-    [InlineData('F', false)]
-    [InlineData('G', false)]
-    [InlineData('1', false)]
-    [InlineData('!', false)]
-    [InlineData(' ', false)]
+    [InlineData('b',  false)]
+    [InlineData('c',  false)]
+    [InlineData('d',  false)]
+    [InlineData('f',  false)]
+    [InlineData('g',  false)]
+    [InlineData('B',  false)]
+    [InlineData('C',  false)]
+    [InlineData('D',  false)]
+    [InlineData('F',  false)]
+    [InlineData('G',  false)]
+    [InlineData('1',  false)]
+    [InlineData('!',  false)]
+    [InlineData(' ',  false)]
     [InlineData('\n', false)]
     public void IsVowel_NonVowels_ReturnsFalse(char c, bool expected) {
         Assert.Equal(expected, char.IsVowel(c));
@@ -234,23 +234,23 @@ public class CharTests {
     }
 
     [Theory]
-    [InlineData('a', false)]
-    [InlineData('e', false)]
-    [InlineData('i', false)]
-    [InlineData('o', false)]
-    [InlineData('u', false)]
-    [InlineData('y', false)]
-    [InlineData('A', false)]
-    [InlineData('E', false)]
-    [InlineData('I', false)]
-    [InlineData('O', false)]
-    [InlineData('U', false)]
-    [InlineData('Y', false)]
-    [InlineData('1', false)]
-    [InlineData('2', false)]
-    [InlineData('!', false)]
-    [InlineData('@', false)]
-    [InlineData(' ', false)]
+    [InlineData('a',  false)]
+    [InlineData('e',  false)]
+    [InlineData('i',  false)]
+    [InlineData('o',  false)]
+    [InlineData('u',  false)]
+    [InlineData('y',  false)]
+    [InlineData('A',  false)]
+    [InlineData('E',  false)]
+    [InlineData('I',  false)]
+    [InlineData('O',  false)]
+    [InlineData('U',  false)]
+    [InlineData('Y',  false)]
+    [InlineData('1',  false)]
+    [InlineData('2',  false)]
+    [InlineData('!',  false)]
+    [InlineData('@',  false)]
+    [InlineData(' ',  false)]
     [InlineData('\n', false)]
     public void IsConsonant_VowelsAndNonLetters_ReturnsFalse(char c, bool expected) {
         Assert.Equal(expected, char.IsConsonant(c));
@@ -326,8 +326,8 @@ public class CharTests {
     [InlineData('!', '!', null)]
     public void Separate_CharactersWithoutDiacritics_ReturnsBaseCharAndNullDiacritic(char input, char expectedBase, char? expectedDiacritic) {
         var result = char.SeparateDiacritics(input);
-        
-        Assert.Equal(expectedBase, result.BaseChar);
+
+        Assert.Equal(expectedBase,      result.BaseChar);
         Assert.Equal(expectedDiacritic, result.Diacritics);
     }
 
@@ -337,17 +337,17 @@ public class CharTests {
         var result = char.SeparateDiacritics('á');
         Assert.Equal('a', result.BaseChar);
         Assert.NotNull(result.Diacritics);
-        
+
         // Test é (e with acute accent)
         result = char.SeparateDiacritics('é');
         Assert.Equal('e', result.BaseChar);
         Assert.NotNull(result.Diacritics);
-        
+
         // Test ñ (n with tilde)
         result = char.SeparateDiacritics('ñ');
         Assert.Equal('n', result.BaseChar);
         Assert.NotNull(result.Diacritics);
-        
+
         // Test ç (c with cedilla)
         result = char.SeparateDiacritics('ç');
         Assert.Equal('c', result.BaseChar);
@@ -360,7 +360,7 @@ public class CharTests {
         var result = char.SeparateDiacritics('Á');
         Assert.Equal('A', result.BaseChar);
         Assert.NotNull(result.Diacritics);
-        
+
         // Test É (uppercase E with acute accent)
         result = char.SeparateDiacritics('É');
         Assert.Equal('E', result.BaseChar);
@@ -375,16 +375,17 @@ public class CharTests {
     [InlineData('å')] // a with ring above
     public void Separate_DifferentDiacritics_ReturnsBaseAWithDifferentDiacritics(char input) {
         var result = char.SeparateDiacritics(input);
-        
+
         Assert.Equal('a', result.BaseChar);
         Assert.NotNull(result.Diacritics);
+
         // Each should have different diacritic marks
     }
 
     [Fact]
     public void Separate_Space_ReturnsSpaceAndNullDiacritic() {
         var result = char.SeparateDiacritics(' ');
-        
+
         Assert.Equal(' ', result.BaseChar);
         Assert.Null(result.Diacritics);
     }
@@ -392,7 +393,7 @@ public class CharTests {
     [Fact]
     public void Separate_Newline_ReturnsNewlineAndNullDiacritic() {
         var result = char.SeparateDiacritics('\n');
-        
+
         Assert.Equal('\n', result.BaseChar);
         Assert.Null(result.Diacritics);
     }
@@ -433,7 +434,7 @@ public class CharTests {
     [InlineData('\u0327', '¸')]
     [InlineData('\u030A', '˚')]
     public void ToSpacing_And_ToCombining_RoundtripCorrectly(char combining, char spacing) {
-        Assert.Equal(spacing, char.ToSpacing(combining));
+        Assert.Equal(spacing,   char.ToSpacing(combining));
         Assert.Equal(combining, char.ToCombining(spacing));
     }
 
@@ -448,20 +449,20 @@ public class CharTests {
     #region ParseEsc and TryParseEsc Tests
 
     [Theory]
-    [InlineData("a", 'a')]
-    [InlineData("\\a", '\a')]
-    [InlineData("\\b", '\b')]
-    [InlineData("\\e", '\e')]
-    [InlineData("\\f", '\f')]
-    [InlineData("\\n", '\n')]
-    [InlineData("\\r", '\r')]
-    [InlineData("\\t", '\t')]
-    [InlineData("\\v", '\v')]
-    [InlineData("\\\\", '\\')]
-    [InlineData("\\'", '\'')]
-    [InlineData("\\\"", '\"')]
-    [InlineData("\\0", '\0')]
-    [InlineData("\\x41", 'A')]
+    [InlineData("a",       'a')]
+    [InlineData("\\a",     '\a')]
+    [InlineData("\\b",     '\b')]
+    [InlineData("\\e",     '\e')]
+    [InlineData("\\f",     '\f')]
+    [InlineData("\\n",     '\n')]
+    [InlineData("\\r",     '\r')]
+    [InlineData("\\t",     '\t')]
+    [InlineData("\\v",     '\v')]
+    [InlineData("\\\\",    '\\')]
+    [InlineData("\\'",     '\'')]
+    [InlineData("\\\"",    '\"')]
+    [InlineData("\\0",     '\0')]
+    [InlineData("\\x41",   'A')]
     [InlineData("\\u0042", 'B')]
     public void TryParseEsc_ValidEscapes_ReturnsCorrectChar(string input, char expected) {
         Assert.True(char.TryParseEsc(input, out var result));
@@ -498,11 +499,12 @@ public class CharTests {
     [InlineData('\'', "\\'")]
     [InlineData('\"', "\\\"")]
     [InlineData('\0', "\\0")]
-    [InlineData('A', "A")]
-    [InlineData('z', "z")]
+    [InlineData('A',  "A")]
+    [InlineData('z',  "z")]
     public void ToStringEsc_ReturnsCorrectEscapedString(char input, string expected) {
         Assert.Equal(expected, char.ToStringEsc(input));
     }
 
     #endregion
+
 }

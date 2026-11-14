@@ -11,10 +11,10 @@ public static partial class NKFontSerializer {
     private const byte BINARY_VERSION = 3;          // Version 3 utilizes Protobuf
 
     /// <summary>
-    /// Serializes an <see cref="NKFont"/> instance into a binary stream using Protobuf.
+    ///     Serializes an <see cref="NKFont" /> instance into a binary stream using Protobuf.
     /// </summary>
     public static void SerializeBinary(NKFont font, Stream stream) {
-        using var writer = new BinaryWriter(stream, System.Text.Encoding.UTF8, leaveOpen: true);
+        using var writer = new BinaryWriter(stream, System.Text.Encoding.UTF8, true);
         writer.Write(BINARY_MAGIC);
         writer.Write(BINARY_VERSION);
         writer.Flush();
@@ -24,10 +24,10 @@ public static partial class NKFontSerializer {
     }
 
     /// <summary>
-    /// Deserializes an <see cref="NKFont"/> instance from a binary stream using Protobuf.
+    ///     Deserializes an <see cref="NKFont" /> instance from a binary stream using Protobuf.
     /// </summary>
     public static NKFont? DeserializeBinary(Stream stream) {
-        using var reader = new BinaryReader(stream, System.Text.Encoding.UTF8, leaveOpen: true);
+        using var reader = new BinaryReader(stream, System.Text.Encoding.UTF8, true);
 
         if (reader.ReadUInt32() != BINARY_MAGIC) {
             LOGGER.Error("Invalid binary font magic header.");
@@ -49,7 +49,7 @@ public static partial class NKFontSerializer {
     }
 
     /// <summary>
-    /// Serializes an <see cref="NKFont"/> instance into a binary file.
+    ///     Serializes an <see cref="NKFont" /> instance into a binary file.
     /// </summary>
     public static void SerializeBinary(NKFont font, string path) {
         using var stream = File.Create(path);
@@ -57,7 +57,7 @@ public static partial class NKFontSerializer {
     }
 
     /// <summary>
-    /// Deserializes an <see cref="NKFont"/> instance from a binary file.
+    ///     Deserializes an <see cref="NKFont" /> instance from a binary file.
     /// </summary>
     public static NKFont? DeserializeBinary(string path) {
         if (!File.Exists(path)) {
@@ -84,14 +84,13 @@ public static partial class NKFontSerializer {
             Glyphs                          = new List<ProtoGlyphEntry>(font.Glyphs.Count)
         };
 
-        foreach (var kvp in font.Glyphs) {
+        foreach (var kvp in font.Glyphs)
             proto.Glyphs.Add(
                 new ProtoGlyphEntry {
                     Symbol = ToProto(kvp.Key),
                     Glyph  = ToProto(kvp.Value)
                 }
             );
-        }
 
         return proto;
     }
@@ -104,9 +103,8 @@ public static partial class NKFontSerializer {
             var symbol = ToDomain(entry.Symbol);
             var glyph  = ToDomain(entry.Glyph);
 
-            if (glyph != null) {
+            if (glyph != null)
                 glyphs[symbol] = glyph;
-            }
         }
 
         var unknownGlyph       = ToDomain(proto.UnknownSymbolGlyph);
@@ -155,11 +153,12 @@ public static partial class NKFontSerializer {
     }
 
     private static NKFontInfo ToDomain(ProtoNKFontInfo proto) {
-        var  propoType = (FontProportionsInfo.ProportionType)proto.ProportionType;
-        bool isMono    = !propoType.HasFlag(FontProportionsInfo.ProportionType.VARIABLE);
+        var propoType = (FontProportionsInfo.ProportionType)proto.ProportionType;
+        var isMono    = !propoType.HasFlag(FontProportionsInfo.ProportionType.VARIABLE);
 
-        int monoDefaultWordSpacing = proto.MonoGlyphWidth + proto.LetterSpacing + 1;
-        int wordSpacing = isMono && proto.WordSpacing <= proto.LetterSpacing
+        var monoDefaultWordSpacing = proto.MonoGlyphWidth + proto.LetterSpacing + 1;
+
+        var wordSpacing = isMono && proto.WordSpacing <= proto.LetterSpacing
             ? monoDefaultWordSpacing
             : proto.WordSpacing;
 
@@ -210,20 +209,19 @@ public static partial class NKFontSerializer {
             AlignPoints    = new List<ProtoAlignPoint>(glyph.AlignPoints.Count)
         };
 
-        for (int x = 0; x < glyph.Width; x++) {
-            for (int y = 0; y < glyph.Height; y++) {
-                var cell = glyph.Glyph[x, y];
+        for (var x = 0; x < glyph.Width; x++)
+        for (var y = 0; y < glyph.Height; y++) {
+            var cell = glyph.Glyph[x, y];
 
-                proto.Cells.Add(
-                    new ProtoGlyphCell {
-                        Type      = (int)cell.Type,
-                        Character = cell.Type == GlyphCellType.CHARACTER ? cell.Character : '\0'
-                    }
-                );
-            }
+            proto.Cells.Add(
+                new ProtoGlyphCell {
+                    Type      = (int)cell.Type,
+                    Character = cell.Type == GlyphCellType.CHARACTER ? cell.Character : '\0'
+                }
+            );
         }
 
-        foreach (var ap in glyph.AlignPoints) {
+        foreach (var ap in glyph.AlignPoints)
             proto.AlignPoints.Add(
                 new ProtoAlignPoint {
                     Character = ap.Character,
@@ -231,7 +229,6 @@ public static partial class NKFontSerializer {
                     Y         = ap.Position.Y
                 }
             );
-        }
 
         return proto;
     }
@@ -241,28 +238,26 @@ public static partial class NKFontSerializer {
             return null;
 
         var grid = new GlyphCell[proto.Width, proto.Height];
-        int idx  = 0;
+        var idx  = 0;
 
-        for (int x = 0; x < proto.Width; x++) {
-            for (int y = 0; y < proto.Height; y++) {
-                if (idx < proto.Cells.Count) {
-                    var cell = proto.Cells[idx++];
+        for (var x = 0; x < proto.Width; x++)
+        for (var y = 0; y < proto.Height; y++)
+            if (idx < proto.Cells.Count) {
+                var cell = proto.Cells[idx++];
 
-                    grid[x, y] = (GlyphCellType)cell.Type switch {
-                        GlyphCellType.FOREGROUND => GlyphCell.Foreground,
-                        GlyphCellType.BACKGROUND => GlyphCell.Background,
-                        _                        => GlyphCell.Char((char)cell.Character)
-                    };
-                }
-                else {
-                    grid[x, y] = GlyphCell.Background;
-                }
+                grid[x, y] = (GlyphCellType)cell.Type switch {
+                    GlyphCellType.FOREGROUND => GlyphCell.Foreground,
+                    GlyphCellType.BACKGROUND => GlyphCell.Background,
+                    _                        => GlyphCell.Char((char)cell.Character)
+                };
             }
-        }
+            else {
+                grid[x, y] = GlyphCell.Background;
+            }
 
         var alignPoints = new AlignPoint[proto.AlignPoints.Count];
 
-        for (int i = 0; i < proto.AlignPoints.Count; i++) {
+        for (var i = 0; i < proto.AlignPoints.Count; i++) {
             var ap = proto.AlignPoints[i];
             alignPoints[i] = new AlignPoint((char)ap.Character, new Metriks.Point2D(ap.X, ap.Y));
         }
@@ -270,14 +265,13 @@ public static partial class NKFontSerializer {
         return new NKGlyph(grid, proto.BaselineOffset, alignPoints);
     }
 
-    private static ProtoNKGlyphSymbol ToProto(NKGlyphSymbol symbol) {
-        return new ProtoNKGlyphSymbol {
+    private static ProtoNKGlyphSymbol ToProto(NKGlyphSymbol symbol) =>
+        new() {
             Type           = symbol.Type,
             Styles         = symbol.Styles,
             SimpleSymbol   = symbol.IsSimple ? symbol.SimpleSymbol : '\0',
             LigatureSymbol = symbol.IsLigature ? symbol.LigatureSymbol : null
         };
-    }
 
     private static NKGlyphSymbol ToDomain(ProtoNKGlyphSymbol proto) {
         return proto.Type switch {
@@ -319,22 +313,22 @@ internal class ProtoGlyphEntry {
 
 [ProtoContract]
 internal class ProtoNKFontInfo {
-    [ProtoMember(1)]  public string  Name            { get; set; } = string.Empty;
-    [ProtoMember(2)]  public bool    Ligatures       { get; set; }
-    [ProtoMember(3)]  public int     Leading         { get; set; }
-    [ProtoMember(4)]  public int     LetterSpacing   { get; set; }
-    [ProtoMember(5)]  public int     WordSpacing     { get; set; }
-    [ProtoMember(6)]  public int     ProportionType  { get; set; }
-    [ProtoMember(7)]  public int     MonoGlyphWidth  { get; set; }
-    [ProtoMember(8)]  public int     MonoGlyphHeight { get; set; }
-    [ProtoMember(9)]  public bool    MonoAlignToGrid { get; set; }
-    [ProtoMember(10)] public bool    VarKerning      { get; set; }
-    [ProtoMember(11)] public string? Author          { get; set; }
-    [ProtoMember(12)] public string? LicenseType     { get; set; }
-    [ProtoMember(13)] public string? LicenseFile     { get; set; }
-    [ProtoMember(14)] public string? LicenseContent  { get; set; }
-    [ProtoMember(15)] public string? SourceFormat    { get; set; }
-    [ProtoMember(16)] public Dictionary<string, string> Metadata { get; set; } = [];
+    [ProtoMember(1)]  public string                     Name            { get; set; } = string.Empty;
+    [ProtoMember(2)]  public bool                       Ligatures       { get; set; }
+    [ProtoMember(3)]  public int                        Leading         { get; set; }
+    [ProtoMember(4)]  public int                        LetterSpacing   { get; set; }
+    [ProtoMember(5)]  public int                        WordSpacing     { get; set; }
+    [ProtoMember(6)]  public int                        ProportionType  { get; set; }
+    [ProtoMember(7)]  public int                        MonoGlyphWidth  { get; set; }
+    [ProtoMember(8)]  public int                        MonoGlyphHeight { get; set; }
+    [ProtoMember(9)]  public bool                       MonoAlignToGrid { get; set; }
+    [ProtoMember(10)] public bool                       VarKerning      { get; set; }
+    [ProtoMember(11)] public string?                    Author          { get; set; }
+    [ProtoMember(12)] public string?                    LicenseType     { get; set; }
+    [ProtoMember(13)] public string?                    LicenseFile     { get; set; }
+    [ProtoMember(14)] public string?                    LicenseContent  { get; set; }
+    [ProtoMember(15)] public string?                    SourceFormat    { get; set; }
+    [ProtoMember(16)] public Dictionary<string, string> Metadata        { get; set; } = [];
 }
 
 [ProtoContract]

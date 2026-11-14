@@ -10,20 +10,20 @@
         <Platforms>AnyCPU</Platforms>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     </PropertyGroup>
-    
+
     <ItemGroup>
-        <ProjectReference Include="..\..\Src\Common\NeoKolors.Common.csproj" />
-        <ProjectReference Include="..\..\Src\Console\NeoKolors.Console.csproj" />
-        <ProjectReference Include="..\..\Src\Tui\NeoKolors.Tui.csproj" />
-        <ProjectReference Include="..\..\Src\Tui\Core\NeoKolors.Tui.Core.csproj" />
-        <ProjectReference Include="..\..\Src\Tui\Elements\NeoKolors.Tui.Elements.csproj" />
-        <ProjectReference Include="..\..\Src\Tui\Lifecycle\Core\NeoKolors.Tui.Lifecycle.Core.csproj" />
-        <ProjectReference Include="..\..\Src\Tui\Lifecycle\Apps\NeoKolors.Tui.Lifecycle.Apps.csproj" />
-        <ProjectReference Include="..\..\Src\Tui\Widgets\NeoKolors.Tui.Widgets.csproj" />
+        <ProjectReference Include="..\..\Src\Common\NeoKolors.Common.csproj"/>
+        <ProjectReference Include="..\..\Src\Console\NeoKolors.Console.csproj"/>
+        <ProjectReference Include="..\..\Src\Tui\NeoKolors.Tui.csproj"/>
+        <ProjectReference Include="..\..\Src\Tui\Core\NeoKolors.Tui.Core.csproj"/>
+        <ProjectReference Include="..\..\Src\Tui\Elements\NeoKolors.Tui.Elements.csproj"/>
+        <ProjectReference Include="..\..\Src\Tui\Lifecycle\Core\NeoKolors.Tui.Lifecycle.Core.csproj"/>
+        <ProjectReference Include="..\..\Src\Tui\Lifecycle\Apps\NeoKolors.Tui.Lifecycle.Apps.csproj"/>
+        <ProjectReference Include="..\..\Src\Tui\Widgets\NeoKolors.Tui.Widgets.csproj"/>
     </ItemGroup>
-    
+
     <ItemGroup>
-      <PackageReference Include="Brigadier.NET" Version="2.0.15-beta" />
+        <PackageReference Include="Brigadier.NET" Version="2.0.15-beta"/>
     </ItemGroup>
 
 </Project>

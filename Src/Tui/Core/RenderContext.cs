@@ -6,8 +6,10 @@ using SkiaSharp;
 namespace NeoKolors.Tui.Core;
 
 /// <summary>
-/// Provides a scoped immediate-mode rendering context with an internal state stack architecture for drawing onto <see cref="ICharCanvas"/>.
-/// Supports coordinate translations, hierarchical clipping, z-index layering, style cascaded overrides, and writing outside element context areas.
+///     Provides a scoped immediate-mode rendering context with an internal state stack
+///     architecture for drawing onto <see cref="ICharCanvas" />.
+///     Supports coordinate translations, hierarchical clipping, z-index layering, style
+///     cascaded overrides, and writing outside element context areas.
 /// </summary>
 public class RenderContext : ICharDrawer {
     private readonly ICharCanvas        _canvas;
@@ -15,47 +17,47 @@ public class RenderContext : ICharDrawer {
     private          RenderState        _current    = new();
 
     /// <summary>
-    /// Gets the underlying canvas that this render context writes to.
+    ///     Gets the underlying canvas that this render context writes to.
     /// </summary>
     public ICharCanvas Canvas => _canvas;
 
     /// <summary>
-    /// Gets the width of the underlying canvas.
+    ///     Gets the width of the underlying canvas.
     /// </summary>
     public int CanvasWidth => _canvas.Width;
 
     /// <summary>
-    /// Gets the height of the underlying canvas.
+    ///     Gets the height of the underlying canvas.
     /// </summary>
     public int CanvasHeight => _canvas.Height;
 
     /// <summary>
-    /// Gets the size of the underlying canvas.
+    ///     Gets the size of the underlying canvas.
     /// </summary>
     public Size2D CanvasSize => _canvas.Size;
 
     /// <summary>
-    /// Gets the full boundary area of the underlying canvas.
+    ///     Gets the full boundary area of the underlying canvas.
     /// </summary>
     public Rect2D CanvasBounds => new(0, 0, _canvas.Width, _canvas.Height);
 
     /// <summary>
-    /// Gets the current depth of the internal state stack.
+    ///     Gets the current depth of the internal state stack.
     /// </summary>
     public int StateDepth => _stateStack.Count;
 
     /// <summary>
-    /// Gets the current depth of the internal state stack (alias for StateDepth).
+    ///     Gets the current depth of the internal state stack (alias for StateDepth).
     /// </summary>
     public int SaveCount => _stateStack.Count;
 
     /// <summary>
-    /// Gets the current render state.
+    ///     Gets the current render state.
     /// </summary>
     public RenderState CurrentState => _current;
 
     /// <summary>
-    /// Gets or sets the current coordinate origin translation in global canvas space.
+    ///     Gets or sets the current coordinate origin translation in global canvas space.
     /// </summary>
     public Point2D Origin {
         get => _current.Origin;
@@ -63,7 +65,7 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Gets or sets the current clip rectangle in global canvas space.
+    ///     Gets or sets the current clip rectangle in global canvas space.
     /// </summary>
     public Rect2D? Clip {
         get => _current.Clip;
@@ -71,7 +73,7 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Gets or sets the current z-index priority for drawing operations.
+    ///     Gets or sets the current z-index priority for drawing operations.
     /// </summary>
     public int ZIndex {
         get => _current.ZIndex;
@@ -79,7 +81,7 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Gets or sets the current active styling applied to rendered elements and text.
+    ///     Gets or sets the current active styling applied to rendered elements and text.
     /// </summary>
     public NKStyle CurrentStyle {
         get => _current.Style;
@@ -87,8 +89,10 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Gets or sets whether drawing operations are permitted to write outside the current element's context area / clip boundaries.
-    /// When set to true, clipping to <see cref="Clip"/> or <see cref="ContextArea"/> is bypassed, bounded only by the physical canvas dimensions.
+    ///     Gets or sets whether drawing operations are permitted to write outside the current
+    ///     element's context area / clip boundaries.
+    ///     When set to true, clipping to <see cref="Clip" /> or <see cref="ContextArea" /> is
+    ///     bypassed, bounded only by the physical canvas dimensions.
     /// </summary>
     public bool AllowOverflow {
         get => _current.AllowOverflow;
@@ -96,7 +100,8 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Gets or sets the designated context area bounds of the current element (in global canvas space).
+    ///     Gets or sets the designated context area bounds of the current element (in global
+    ///     canvas space).
     /// </summary>
     public Rect2D? ContextArea {
         get => _current.ContextArea;
@@ -104,18 +109,19 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Gets or sets the active hit map used to record interactive spatial regions during the render pass.
+    ///     Gets or sets the active hit map used to record interactive spatial regions during the
+    ///     render pass.
     /// </summary>
     public HitMap? HitMap { get; set; }
 
     /// <summary>
-    /// Initializes a new instance of <see cref="RenderContext"/> for the specified canvas.
+    ///     Initializes a new instance of <see cref="RenderContext" /> for the specified canvas.
     /// </summary>
     /// <param name="canvas">The canvas to render to.</param>
     /// <param name="hitMap">Optional hit map to record interactive targets during render.</param>
     public RenderContext(ICharCanvas canvas, HitMap? hitMap = null) {
-        _canvas   = canvas ?? throw new ArgumentNullException(nameof(canvas));
-        HitMap    = hitMap;
+        _canvas = canvas ?? throw new ArgumentNullException(nameof(canvas));
+        HitMap  = hitMap;
     }
 
     // =========================================================================
@@ -123,9 +129,9 @@ public class RenderContext : ICharDrawer {
     // =========================================================================
 
     /// <summary>
-    /// Pushes a copy of the current state onto the state stack and returns a disposable scope.
+    ///     Pushes a copy of the current state onto the state stack and returns a disposable scope.
     /// </summary>
-    /// <returns>A <see cref="RenderScope"/> that restores the previous state when disposed.</returns>
+    /// <returns>A <see cref="RenderScope" /> that restores the previous state when disposed.</returns>
     public RenderScope Save() {
         _stateStack.Push(_current);
 
@@ -133,29 +139,27 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Restores the most recently saved state from the state stack.
+    ///     Restores the most recently saved state from the state stack.
     /// </summary>
     /// <exception cref="InvalidOperationException">Thrown when the state stack is empty.</exception>
     public void Restore() {
-        if (_stateStack.Count == 0) {
+        if (_stateStack.Count == 0)
             throw new InvalidOperationException("Cannot restore render state: state stack is empty.");
-        }
 
         _current = _stateStack.Pop();
     }
 
     /// <summary>
-    /// Restores the state stack to the specified target depth.
+    ///     Restores the state stack to the specified target depth.
     /// </summary>
     /// <param name="targetDepth">The target state depth.</param>
     public void RestoreToDepth(int targetDepth) {
-        while (_stateStack.Count > targetDepth) {
+        while (_stateStack.Count > targetDepth)
             _current = _stateStack.Pop();
-        }
     }
 
     /// <summary>
-    /// Resets the context to its initial default state, clearing the entire state stack.
+    ///     Resets the context to its initial default state, clearing the entire state stack.
     /// </summary>
     public void Reset() {
         _stateStack.Clear();
@@ -167,7 +171,7 @@ public class RenderContext : ICharDrawer {
     // =========================================================================
 
     /// <summary>
-    /// Pushes a new state with custom parameter overrides and returns a disposable scope.
+    ///     Pushes a new state with custom parameter overrides and returns a disposable scope.
     /// </summary>
     public RenderScope PushScope(
         Point2D? offset        = null,
@@ -182,32 +186,32 @@ public class RenderContext : ICharDrawer {
 
         var newOrigin = _current.Origin + (offset ?? Point2D.Zero);
 
-        Rect2D? newClip = _current.Clip;
+        var newClip = _current.Clip;
 
         if (clip.HasValue) {
             var globalClip = clip.Value + newOrigin;
 
-            newClip = (intersectClip && _current.Clip.HasValue)
+            newClip = intersectClip && _current.Clip.HasValue
                 ? IntersectAreas(_current.Clip.Value, globalClip)
                 : globalClip;
         }
 
-        Rect2D? newContextArea = contextArea.HasValue ? (contextArea.Value + newOrigin) : _current.ContextArea;
+        var newContextArea = contextArea.HasValue ? contextArea.Value + newOrigin : _current.ContextArea;
 
         _current = new RenderState(
-            origin: newOrigin,
-            clip: newClip,
-            zIndex: zIndex ?? _current.ZIndex,
-            style: style.HasValue ? _current.Style.With(style.Value) : _current.Style,
-            allowOverflow: allowOverflow ?? _current.AllowOverflow,
-            contextArea: newContextArea
+            newOrigin,
+            newClip,
+            zIndex ?? _current.ZIndex,
+            style.HasValue ? _current.Style.With(style.Value) : _current.Style,
+            allowOverflow ?? _current.AllowOverflow,
+            newContextArea
         );
 
         return scope;
     }
 
     /// <summary>
-    /// Pushes a coordinate translation offset relative to the current origin.
+    ///     Pushes a coordinate translation offset relative to the current origin.
     /// </summary>
     public RenderScope PushOffset(Point2D offset) {
         var scope = Save();
@@ -217,12 +221,12 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Pushes a coordinate translation offset relative to the current origin.
+    ///     Pushes a coordinate translation offset relative to the current origin.
     /// </summary>
     public RenderScope PushOffset(int dx, int dy) => PushOffset(new Point2D(dx, dy));
 
     /// <summary>
-    /// Pushes an absolute origin in canvas coordinate space.
+    ///     Pushes an absolute origin in canvas coordinate space.
     /// </summary>
     public RenderScope PushOrigin(Point2D absoluteOrigin) {
         var scope = Save();
@@ -232,7 +236,7 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Pushes a local clipping rectangle (relative to current origin).
+    ///     Pushes a local clipping rectangle (relative to current origin).
     /// </summary>
     public RenderScope PushClip(Rect2D localClip, bool intersect = true) {
         var scope      = Save();
@@ -248,7 +252,7 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Pushes an absolute clipping rectangle in global canvas coordinates.
+    ///     Pushes an absolute clipping rectangle in global canvas coordinates.
     /// </summary>
     public RenderScope PushGlobalClip(Rect2D globalClip, bool intersect = true) {
         var scope = Save();
@@ -263,12 +267,13 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Pushes a scope that enables writing outside of the current element's context area / clip boundaries.
+    ///     Pushes a scope that enables writing outside of the current element's context area /
+    ///     clip boundaries.
     /// </summary>
-    public RenderScope PushUnclipped() => AllowOverflowScope(allow: true);
+    public RenderScope PushUnclipped() => AllowOverflowScope(true);
 
     /// <summary>
-    /// Pushes a scope with the specified <see cref="AllowOverflow"/> setting.
+    ///     Pushes a scope with the specified <see cref="AllowOverflow" /> setting.
     /// </summary>
     public RenderScope AllowOverflowScope(bool allow = true) {
         var scope = Save();
@@ -278,7 +283,7 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Pushes a specific z-index value onto the stack.
+    ///     Pushes a specific z-index value onto the stack.
     /// </summary>
     public RenderScope PushZIndex(int zIndex) {
         var scope = Save();
@@ -288,7 +293,7 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Pushes a z-index delta added to the current z-index.
+    ///     Pushes a z-index delta added to the current z-index.
     /// </summary>
     public RenderScope PushZIndexDelta(int delta) {
         var scope = Save();
@@ -298,7 +303,7 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Pushes a new style, overriding active styles.
+    ///     Pushes a new style, overriding active styles.
     /// </summary>
     public RenderScope PushStyle(NKStyle style, bool overrideCurrent = true) {
         var scope = Save();
@@ -308,7 +313,7 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Pushes a foreground text color modifier.
+    ///     Pushes a foreground text color modifier.
     /// </summary>
     public RenderScope PushForeground(NKColor color) {
         var scope = Save();
@@ -318,7 +323,7 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Pushes a background color modifier.
+    ///     Pushes a background color modifier.
     /// </summary>
     public RenderScope PushBackground(NKColor color) {
         var scope = Save();
@@ -328,7 +333,7 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Pushes a text style modifier flags.
+    ///     Pushes a text style modifier flags.
     /// </summary>
     public RenderScope PushTextStyle(NKTextStyles textStyles) {
         var scope = Save();
@@ -338,7 +343,8 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Pushes a global scope (Origin = (0,0), Clip = null, AllowOverflow = true) for unconstrained canvas drawing.
+    ///     Pushes a global scope (Origin = (0,0), Clip = null, AllowOverflow = true) for
+    ///     unconstrained canvas drawing.
     /// </summary>
     public RenderScope PushGlobal() {
         var scope = Save();
@@ -348,7 +354,7 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Pushes a context scope configured for the designated element context area.
+    ///     Pushes a context scope configured for the designated element context area.
     /// </summary>
     /// <param name="elementBounds">The render bounds of the element.</param>
     /// <param name="contentArea">The content box of the element relative to its bounds.</param>
@@ -367,12 +373,12 @@ public class RenderContext : ICharDrawer {
         var globalContent = contentArea         + elementBounds.Lower;
 
         _current = new RenderState(
-            origin: origin,
-            clip: clipToContent ? globalContent : null,
-            zIndex: zIndex,
-            style: _current.Style,
-            allowOverflow: allowOverflow,
-            contextArea: globalContent
+            origin,
+            clipToContent ? globalContent : null,
+            zIndex,
+            _current.Style,
+            allowOverflow,
+            globalContent
         );
 
         return scope;
@@ -398,61 +404,65 @@ public class RenderContext : ICharDrawer {
     // =========================================================================
 
     /// <summary>
-    /// Converts a local coordinate point to global canvas coordinates.
+    ///     Converts a local coordinate point to global canvas coordinates.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Point2D ToCanvas(Point2D localPoint) => _current.Origin + localPoint;
 
     /// <summary>
-    /// Converts local coordinates to global canvas coordinates.
+    ///     Converts local coordinates to global canvas coordinates.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Point2D ToCanvas(int localX, int localY) => new(_current.Origin.X + localX, _current.Origin.Y + localY);
 
     /// <summary>
-    /// Converts a global canvas coordinate point to local space.
+    ///     Converts a global canvas coordinate point to local space.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Point2D ToLocal(Point2D canvasPoint) => new(canvasPoint.X - _current.Origin.X, canvasPoint.Y - _current.Origin.Y);
 
     /// <summary>
-    /// Converts global canvas coordinates to local space.
+    ///     Converts global canvas coordinates to local space.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Point2D ToLocal(int canvasX, int canvasY) => new(canvasX - _current.Origin.X, canvasY - _current.Origin.Y);
 
     /// <summary>
-    /// Converts a local rectangular area to global canvas space.
+    ///     Converts a local rectangular area to global canvas space.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Rect2D ToCanvas(Rect2D localArea) => new(localArea.Lower + _current.Origin, localArea.Higher + _current.Origin);
 
     /// <summary>
-    /// Converts a global canvas rectangular area to local coordinate space.
+    ///     Converts a global canvas rectangular area to local coordinate space.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Rect2D ToLocal(Rect2D canvasArea) => new(canvasArea.Lower - _current.Origin, canvasArea.Higher - _current.Origin);
 
     /// <summary>
-    /// Checks whether the local coordinate is currently visible under active clipping and canvas boundaries.
+    ///     Checks whether the local coordinate is currently visible under active clipping and
+    ///     canvas boundaries.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsPointVisible(Point2D localPoint) => IsCanvasPointVisible(_current.Origin.X + localPoint.X, _current.Origin.Y + localPoint.Y);
 
     /// <summary>
-    /// Checks whether the local coordinates are currently visible under active clipping and canvas boundaries.
+    ///     Checks whether the local coordinates are currently visible under active clipping and
+    ///     canvas boundaries.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsPointVisible(int localX, int localY) => IsCanvasPointVisible(_current.Origin.X + localX, _current.Origin.Y + localY);
 
     /// <summary>
-    /// Checks whether the global canvas coordinate point is currently visible under active clipping and canvas boundaries.
+    ///     Checks whether the global canvas coordinate point is currently visible under active
+    ///     clipping and canvas boundaries.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsCanvasPointVisible(Point2D canvasPoint) => IsCanvasPointVisible(canvasPoint.X, canvasPoint.Y);
 
     /// <summary>
-    /// Checks whether the global canvas coordinates are currently visible under active clipping and canvas boundaries.
+    ///     Checks whether the global canvas coordinates are currently visible under active
+    ///     clipping and canvas boundaries.
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsCanvasPointVisible(int canvasX, int canvasY) {
@@ -470,7 +480,7 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Returns the effective clipping region in global canvas space.
+    ///     Returns the effective clipping region in global canvas space.
     /// </summary>
     public Rect2D GetEffectiveClip() {
         var canvasArea = CanvasBounds;
@@ -482,13 +492,13 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Calculates the intersection of two rectangular areas.
+    ///     Calculates the intersection of two rectangular areas.
     /// </summary>
     internal static Rect2D IntersectAreas(Rect2D a, Rect2D b) {
-        int lx = Math.Max(a.LowerX, b.LowerX);
-        int ly = Math.Max(a.LowerY, b.LowerY);
-        int hx = Math.Min(a.HigherX, b.HigherX);
-        int hy = Math.Min(a.HigherY, b.HigherY);
+        var lx = Math.Max(a.LowerX, b.LowerX);
+        var ly = Math.Max(a.LowerY, b.LowerY);
+        var hx = Math.Min(a.HigherX, b.HigherX);
+        var hy = Math.Min(a.HigherY, b.HigherY);
 
         if (hx <= lx || hy <= ly)
             return new Rect2D(lx, ly, lx, ly);
@@ -497,8 +507,10 @@ public class RenderContext : ICharDrawer {
     }
 
     /// <summary>
-    /// Registers an interactive hit target for mouse event handling within the current render scope.
-    /// The bounds are converted to global coordinates and intersected with the effective clipping region.
+    ///     Registers an interactive hit target for mouse event handling within the current render
+    ///     scope.
+    ///     The bounds are converted to global coordinates and intersected with the effective
+    ///     clipping region.
     /// </summary>
     public void RegisterHitTarget(
         object?                        element,
@@ -585,7 +597,7 @@ public class RenderContext : ICharDrawer {
     public void DrawRect(AnsiChar c, int xOffset, int yOffset, int width, int height, int z) {
         _canvas.DrawRect(c, _current.Origin.X + xOffset, _current.Origin.Y + yOffset, width, height, _current.ZIndex + z);
     }
-    
+
     public void Clean() {
         _canvas.Clean();
     }

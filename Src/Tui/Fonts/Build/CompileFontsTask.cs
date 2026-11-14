@@ -7,43 +7,44 @@ using Microsoft.Build.Utilities;
 namespace NeoKolors.Tui.Fonts.Build;
 
 /// <summary>
-/// A compiled MSBuild task that deserializes raw XML fonts and compiles them
-/// into pre-validated binary Protobuf (.nkf) font assets.
+///     A compiled MSBuild task that deserializes raw XML fonts and compiles them
+///     into pre-validated binary Protobuf (.nkf) font assets.
 /// </summary>
 public class CompileFontsTask : Microsoft.Build.Utilities.Task {
 
     /// <summary>
-    /// Base directory containing the font source folders and compiled assets.
-    /// If not specified, defaults to the current working directory.
+    ///     Base directory containing the font source folders and compiled assets.
+    ///     If not specified, defaults to the current working directory.
     /// </summary>
     public string? SourceDir { get; set; }
 
     /// <summary>
-    /// Default output directory for compiled .nkf files.
-    /// If relative, it is resolved against SourceDir.
-    /// If not specified, defaults to SourceDir.
+    ///     Default output directory for compiled .nkf files.
+    ///     If relative, it is resolved against SourceDir.
+    ///     If not specified, defaults to SourceDir.
     /// </summary>
     public string? OutputDir { get; set; }
 
     /// <summary>
-    /// The list of fonts to compile. Each item can be a font name or folder path.
-    /// Supported metadata per item:
-    /// - OutputPath / OutputFile / TargetFile: specific destination file path or directory.
-    /// - OutputDir / OutputDirectory: destination directory override for this font.
-    /// - FontName / Name: custom name for the font asset.
-    /// If not specified or empty, falls back to discovering font directories in SourceDir,
-    /// or default known fonts ("Bytesized", "Future", "Dummy").
+    ///     The list of fonts to compile. Each item can be a font name or folder path.
+    ///     Supported metadata per item:
+    ///     - OutputPath / OutputFile / TargetFile: specific destination file path or directory.
+    ///     - OutputDir / OutputDirectory: destination directory override for this font.
+    ///     - FontName / Name: custom name for the font asset.
+    ///     If not specified or empty, falls back to discovering font directories in SourceDir,
+    ///     or default known fonts ("Bytesized", "Future", "Dummy").
     /// </summary>
     public ITaskItem[]? Fonts { get; set; }
 
     /// <summary>
-    /// If true, forces recompilation of all fonts regardless of whether output files are up to date.
-    /// Defaults to false.
+    ///     If true, forces recompilation of all fonts regardless of whether output files are up to
+    ///     date.
+    ///     Defaults to false.
     /// </summary>
     public bool ForceRebuild { get; set; }
 
     /// <summary>
-    /// The list of compiled font files (.nkf) generated or validated by this task.
+    ///     The list of compiled font files (.nkf) generated or validated by this task.
     /// </summary>
     [Output]
     public ITaskItem[] OutputFiles { get; set; } = [];
@@ -57,11 +58,11 @@ public class CompileFontsTask : Microsoft.Build.Utilities.Task {
     );
 
     public override bool Execute() {
-        string baseDir = string.IsNullOrWhiteSpace(SourceDir)
+        var baseDir = string.IsNullOrWhiteSpace(SourceDir)
             ? Directory.GetCurrentDirectory()
             : Path.GetFullPath(SourceDir);
 
-        string resolvedOutputDir = string.IsNullOrWhiteSpace(OutputDir)
+        var resolvedOutputDir = string.IsNullOrWhiteSpace(OutputDir)
             ? baseDir
             : Path.IsPathRooted(OutputDir)
                 ? OutputDir
@@ -79,11 +80,9 @@ public class CompileFontsTask : Microsoft.Build.Utilities.Task {
         var outputList = new List<ITaskItem>();
 
         try {
-            foreach (var fontItem in itemsToProcess) {
-                if (!ProcessFont(fontItem, baseDir, resolvedOutputDir, outputList)) {
+            foreach (var fontItem in itemsToProcess)
+                if (!ProcessFont(fontItem, baseDir, resolvedOutputDir, outputList))
                     return false;
-                }
-            }
 
             OutputFiles = outputList.ToArray();
 
@@ -104,36 +103,33 @@ public class CompileFontsTask : Microsoft.Build.Utilities.Task {
 
         if (Fonts is { Length: > 0 }) {
             foreach (var item in Fonts) {
-                string spec = item.ItemSpec?.Trim() ?? string.Empty;
+                var spec = item.ItemSpec?.Trim() ?? string.Empty;
 
-                if (string.IsNullOrEmpty(spec)) {
+                if (string.IsNullOrEmpty(spec))
                     continue;
-                }
 
-                string fullSourcePath = Path.IsPathRooted(spec)
+                var fullSourcePath = Path.IsPathRooted(spec)
                     ? Path.GetFullPath(spec)
                     : Path.GetFullPath(Path.Combine(baseDir, spec));
 
-                string sourceDir = File.Exists(fullSourcePath) && !Directory.Exists(fullSourcePath)
+                var sourceDir = File.Exists(fullSourcePath) && !Directory.Exists(fullSourcePath)
                     ? Path.GetDirectoryName(fullSourcePath) ?? fullSourcePath
                     : fullSourcePath;
 
-                string fontName = item.GetMetadata("FontName");
+                var fontName = item.GetMetadata("FontName");
 
-                if (string.IsNullOrWhiteSpace(fontName)) {
+                if (string.IsNullOrWhiteSpace(fontName))
                     fontName = item.GetMetadata("Name");
-                }
 
-                if (string.IsNullOrWhiteSpace(fontName)) {
+                if (string.IsNullOrWhiteSpace(fontName))
                     fontName = Path.GetFileName(
                         sourceDir.TrimEnd(
                             Path.DirectorySeparatorChar,
                             Path.AltDirectorySeparatorChar
                         )
                     );
-                }
 
-                string? outPath = item.GetMetadata("OutputPath");
+                var outPath = item.GetMetadata("OutputPath");
 
                 if (string.IsNullOrWhiteSpace(outPath))
                     outPath = item.GetMetadata("OutputFile");
@@ -141,18 +137,18 @@ public class CompileFontsTask : Microsoft.Build.Utilities.Task {
                 if (string.IsNullOrWhiteSpace(outPath))
                     outPath = item.GetMetadata("TargetFile");
 
-                string? outDir = item.GetMetadata("OutputDir");
+                var outDir = item.GetMetadata("OutputDir");
 
                 if (string.IsNullOrWhiteSpace(outDir))
                     outDir = item.GetMetadata("OutputDirectory");
 
                 result.Add(
                     new FontEntry(
-                        SourceDir: sourceDir,
-                        FontName: fontName,
-                        ExplicitOutputPath: string.IsNullOrWhiteSpace(outPath) ? null : outPath,
-                        ExplicitOutputDir: string.IsNullOrWhiteSpace(outDir) ? null : outDir,
-                        OriginalItem: item
+                        sourceDir,
+                        fontName,
+                        string.IsNullOrWhiteSpace(outPath) ? null : outPath,
+                        string.IsNullOrWhiteSpace(outDir) ? null : outDir,
+                        item
                     )
                 );
             }
@@ -163,19 +159,19 @@ public class CompileFontsTask : Microsoft.Build.Utilities.Task {
                 var subDirs = Directory.GetDirectories(baseDir);
 
                 foreach (var dir in subDirs) {
-                    bool isFont = File.Exists(Path.Combine(dir, "manifest.nkfont")) ||
-                        File.Exists(Path.Combine(dir,           "Config.xml"));
+                    var isFont = File.Exists(Path.Combine(dir, "manifest.nkfont")) ||
+                        File.Exists(Path.Combine(dir,          "Config.xml"));
 
                     if (isFont) {
-                        string name = Path.GetFileName(dir);
+                        var name = Path.GetFileName(dir);
 
                         result.Add(
                             new FontEntry(
-                                SourceDir: dir,
-                                FontName: name,
-                                ExplicitOutputPath: null,
-                                ExplicitOutputDir: null,
-                                OriginalItem: null
+                                dir,
+                                name,
+                                null,
+                                null,
+                                null
                             )
                         );
                     }
@@ -187,19 +183,18 @@ public class CompileFontsTask : Microsoft.Build.Utilities.Task {
                 string[] defaultFonts = ["Bytesized", "Future", "Dummy"];
 
                 foreach (var name in defaultFonts) {
-                    string dir = Path.Combine(baseDir, name);
+                    var dir = Path.Combine(baseDir, name);
 
-                    if (Directory.Exists(dir)) {
+                    if (Directory.Exists(dir))
                         result.Add(
                             new FontEntry(
-                                SourceDir: dir,
-                                FontName: name,
-                                ExplicitOutputPath: null,
-                                ExplicitOutputDir: null,
-                                OriginalItem: null
+                                dir,
+                                name,
+                                null,
+                                null,
+                                null
                             )
                         );
-                    }
                 }
             }
         }
@@ -229,15 +224,13 @@ public class CompileFontsTask : Microsoft.Build.Utilities.Task {
             if (outputPath.EndsWith(Path.DirectorySeparatorChar.ToString())    ||
                 outputPath.EndsWith(Path.AltDirectorySeparatorChar.ToString()) ||
                 Directory.Exists(outputPath)
-            ) {
+            )
                 outputPath = Path.Combine(outputPath, $"{font.FontName}.nkf");
-            }
-            else if (!Path.HasExtension(outputPath)) {
+            else if (!Path.HasExtension(outputPath))
                 outputPath += ".nkf";
-            }
         }
         else if (!string.IsNullOrEmpty(font.ExplicitOutputDir)) {
-            string customDir = Path.IsPathRooted(font.ExplicitOutputDir)
+            var customDir = Path.IsPathRooted(font.ExplicitOutputDir)
                 ? font.ExplicitOutputDir
                 : Path.GetFullPath(Path.Combine(baseDir, font.ExplicitOutputDir));
 
@@ -247,14 +240,13 @@ public class CompileFontsTask : Microsoft.Build.Utilities.Task {
             outputPath = Path.Combine(defaultOutputDir, $"{font.FontName}.nkf");
         }
 
-        string? outDir = Path.GetDirectoryName(outputPath);
+        var outDir = Path.GetDirectoryName(outputPath);
 
-        if (!string.IsNullOrEmpty(outDir) && !Directory.Exists(outDir)) {
+        if (!string.IsNullOrEmpty(outDir) && !Directory.Exists(outDir))
             Directory.CreateDirectory(outDir);
-        }
 
         // Check if output is already up-to-date
-        bool needsRebuild = ForceRebuild || !File.Exists(outputPath);
+        var needsRebuild = ForceRebuild || !File.Exists(outputPath);
 
         if (!needsRebuild) {
             var outputWriteTime = File.GetLastWriteTimeUtc(outputPath);
@@ -265,13 +257,12 @@ public class CompileFontsTask : Microsoft.Build.Utilities.Task {
                     "*",
                     SearchOption.AllDirectories
                 )
-            ) {
+            )
                 if (File.GetLastWriteTimeUtc(file) > outputWriteTime) {
                     needsRebuild = true;
 
                     break;
                 }
-            }
         }
 
         if (!needsRebuild) {
@@ -301,17 +292,14 @@ public class CompileFontsTask : Microsoft.Build.Utilities.Task {
 
         var result = NKFontSerializer.TryDeserializeXml(font.SourceDir);
 
-        foreach (var info in result.Infos) {
+        foreach (var info in result.Infos)
             Log.LogMessage(MessageImportance.Normal, "[CompileFont] " + info);
-        }
 
-        foreach (var warning in result.Warnings) {
+        foreach (var warning in result.Warnings)
             Log.LogWarning("[CompileFont] " + warning);
-        }
 
-        foreach (var error in result.Errors) {
+        foreach (var error in result.Errors)
             Log.LogError("[CompileFont] " + error);
-        }
 
         if (!result.Success || result.Font == null) {
             Log.LogError(

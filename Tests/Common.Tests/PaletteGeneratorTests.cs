@@ -19,13 +19,13 @@ public class PaletteGeneratorTests {
     public void Generate_AllPaletteTypes_CreatesValidPalette(PaletteGenerator.PaletteType type) {
         // Arrange
         var options = new PaletteGenerator.PaletteGeneratorOptions(
-            type: type,
-            count: 6,
-            seed: 42,
-            baseColor: NKColor.FromRgb(0x34, 0x98, 0xdb),
-            hueVariance: 10,
-            satFactor: 0.9,
-            lightFactor: 0.95
+            type,
+            6,
+            42,
+            NKColor.FromRgb(0x34, 0x98, 0xdb),
+            10,
+            0.9,
+            0.95
         );
 
         // Act
@@ -34,9 +34,9 @@ public class PaletteGeneratorTests {
         // Assert
         Assert.Equal(6, palette.Length);
         Assert.NotNull(palette.Colors);
-        foreach (var color in palette.Colors) {
+
+        foreach (var color in palette.Colors)
             Assert.True(color.IsRgb);
-        }
     }
 
     [Fact]
@@ -53,17 +53,17 @@ public class PaletteGeneratorTests {
     public void Generate_WithDeterministicSeed_ProducesSameResult() {
         // Arrange
         var options1 = new PaletteGenerator.PaletteGeneratorOptions(
-            type: PaletteGenerator.PaletteType.SINUSOIDAL,
-            count: 8,
-            seed: 12345,
-            baseColor: NKColor.FromRgb(255, 100, 50)
+            PaletteGenerator.PaletteType.SINUSOIDAL,
+            8,
+            12345,
+            NKColor.FromRgb(255, 100, 50)
         );
 
         var options2 = new PaletteGenerator.PaletteGeneratorOptions(
-            type: PaletteGenerator.PaletteType.SINUSOIDAL,
-            count: 8,
-            seed: 12345,
-            baseColor: NKColor.FromRgb(255, 100, 50)
+            PaletteGenerator.PaletteType.SINUSOIDAL,
+            8,
+            12345,
+            NKColor.FromRgb(255, 100, 50)
         );
 
         // Act
@@ -78,10 +78,10 @@ public class PaletteGeneratorTests {
     public void Generate_WithConsoleBaseColor_Succeeds() {
         // Arrange
         var options = new PaletteGenerator.PaletteGeneratorOptions(
-            type: PaletteGenerator.PaletteType.TRIANGLE,
-            count: 5,
-            seed: 99,
-            baseColor: NKConsoleColor.RED
+            PaletteGenerator.PaletteType.TRIANGLE,
+            5,
+            99,
+            NKConsoleColor.RED
         );
 
         // Act

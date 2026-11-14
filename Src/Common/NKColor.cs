@@ -11,18 +11,18 @@ using ProtoBuf;
 namespace NeoKolors.Common;
 
 /// <summary>
-/// color structure that can hold every color supported by the console (+ARGB colors) 
+///     color structure that can hold every color supported by the console (+ARGB colors)
 /// </summary>
 [ProtoContract(Surrogate = typeof(NKColorSurrogate))]
 [StructLayout(LayoutKind.Explicit, Size = sizeof(uint))]
 public readonly record struct NKColor : IFormattable, IParsable<NKColor> {
 
     /// <summary>
-    /// Represents the underlying 32-bit unsigned integer value used to store the color data,
-    /// including the color type and the specific color information.
-    /// The color type is encoded in the upper 2 bits of the value.
-    /// The lower 24 bits are used to store the actual color information.
-    /// 6 bits remain unused...
+    ///     Represents the underlying 32-bit unsigned integer value used to store the color data,
+    ///     including the color type and the specific color information.
+    ///     The color type is encoded in the upper 2 bits of the value.
+    ///     The lower 24 bits are used to store the actual color information.
+    ///     6 bits remain unused...
     /// </summary>
     [FieldOffset(0)] private readonly uint _value;
 
@@ -90,12 +90,12 @@ public readonly record struct NKColor : IFormattable, IParsable<NKColor> {
     #endregion
 
     /// <summary>
-    /// Returns a new color with the default console value.
+    ///     Returns a new color with the default console value.
     /// </summary>
     public static NKColor Default => new(ColorType.DEFAULT);
 
     /// <summary>
-    /// Returns a new color that indicates that the color should be inherited (not overriden).
+    ///     Returns a new color that indicates that the color should be inherited (not overriden).
     /// </summary>
     public static NKColor Inherit => new(ColorType.INHERIT);
 
@@ -141,15 +141,13 @@ public readonly record struct NKColor : IFormattable, IParsable<NKColor> {
 
     public bool Equals(NKColor? other) => other.HasValue && _value == other.Value._value;
 
-    public override int GetHashCode() {
-        return _value.GetHashCode();
-    }
+    public override int GetHashCode() => _value.GetHashCode();
 
     #region Escape Sequences
 
     /// <summary>
-    /// Represents the ANSI control string or textual representation
-    /// of the foreground color associated with the current <see cref="NKColor"/> instance.
+    ///     Represents the ANSI control string or textual representation
+    ///     of the foreground color associated with the current <see cref="NKColor" /> instance.
     /// </summary>
     public string Text =>
         Match(
@@ -160,8 +158,8 @@ public readonly record struct NKColor : IFormattable, IParsable<NKColor> {
         );
 
     /// <summary>
-    /// Returns the ANSI escape code or control character string representing
-    /// the background color associated with the current <see cref="NKColor"/> instance.
+    ///     Returns the ANSI escape code or control character string representing
+    ///     the background color associated with the current <see cref="NKColor" /> instance.
     /// </summary>
     public string Bckg =>
         Match(
@@ -248,7 +246,7 @@ public readonly record struct NKColor : IFormattable, IParsable<NKColor> {
     #region Union Methods
 
     /// <summary>
-    /// Executes specific actions based on the type of the color.
+    ///     Executes specific actions based on the type of the color.
     /// </summary>
     /// <param name="default">Action to execute when the color is of type DefaultColor.</param>
     /// <param name="rgb">Action to execute when the color is an RGB value.</param>
@@ -271,7 +269,7 @@ public readonly record struct NKColor : IFormattable, IParsable<NKColor> {
     }
 
     /// <summary>
-    /// Applies different processing logic based on the type of color.
+    ///     Applies different processing logic based on the type of color.
     /// </summary>
     /// <typeparam name="T">The return type of the processing logic.</typeparam>
     /// <param name="default">Function to execute when the color is a default color.</param>
@@ -298,17 +296,20 @@ public readonly record struct NKColor : IFormattable, IParsable<NKColor> {
     #endregion
 
     /// <summary>
-    /// Displays a 6x6x6 RGB color cube in the console by rendering each color in its RGB representation.
-    /// Each cube layer corresponds to a block of the RGB spectrum, using 6 levels of granularity per axis.
+    ///     Displays a 6x6x6 RGB color cube in the console by rendering each color in its RGB
+    ///     representation.
+    ///     Each cube layer corresponds to a block of the RGB spectrum, using 6 levels of
+    ///     granularity per axis.
     /// </summary>
     /// <remarks>
-    /// The method outputs each color in the cube with its corresponding RGB foreground and background colors.
-    /// Layers are separated by blank lines, providing better visual differentiation.
+    ///     The method outputs each color in the cube with its corresponding RGB foreground and
+    ///     background colors.
+    ///     Layers are separated by blank lines, providing better visual differentiation.
     /// </remarks>
     public static void PrintColorCube() {
-        for (int z = 0; z < 6; z++) {
-            for (int y = 0; y < 6; y++) {
-                for (int x = 0; x < 6; x++) {
+        for (var z = 0; z < 6; z++) {
+            for (var y = 0; y < 6; y++) {
+                for (var x = 0; x < 6; x++) {
                     var r = (byte)(z * 255 / 5);
                     var g = (byte)(y * 255 / 5);
                     var b = (byte)(x * 255 / 5);
@@ -333,11 +334,10 @@ public readonly record struct NKColor : IFormattable, IParsable<NKColor> {
 
     public static NKColor Parse([NotNullWhen(true)] string? s) => Parse(s, CultureInfo.InvariantCulture);
 
-    public static NKColor Parse([NotNullWhen(true)] string? s, IFormatProvider? provider) {
-        return TryParse(s, provider, out var result)
+    public static NKColor Parse([NotNullWhen(true)] string? s, IFormatProvider? provider) =>
+        TryParse(s, provider, out var result)
             ? result
             : throw new FormatException($"Invalid color: {s}");
-    }
 
     public static bool TryParse([NotNullWhen(true)] string? s, out NKColor result) => TryParse(s, CultureInfo.InvariantCulture, out result);
 
@@ -353,7 +353,7 @@ public readonly record struct NKColor : IFormattable, IParsable<NKColor> {
         if (trimmed.StartsWith('#')) {
             var hex = trimmed[1..];
 
-            if (uint.TryParse(hex, NumberStyles.HexNumber, null, out uint rgb)) {
+            if (uint.TryParse(hex, NumberStyles.HexNumber, null, out var rgb)) {
                 result = FromRgb(rgb);
 
                 return true;
@@ -392,15 +392,20 @@ public readonly record struct NKColor : IFormattable, IParsable<NKColor> {
     #region Color Manipulation
 
     /// <summary>
-    /// Performs linear interpolation (Lerp) between two RGB colors based on a specified fraction.
+    ///     Performs linear interpolation (Lerp) between two RGB colors based on a specified
+    ///     fraction.
     /// </summary>
     /// <param name="start">The starting color as an NKColor in RGB format.</param>
     /// <param name="end">The ending color as an NKColor in RGB format.</param>
-    /// <param name="fraction">The interpolation factor, where 0 represents the start color and 1
-    /// represents the end color. Values outside the range [0, 1] will be clamped.</param>
+    /// <param name="fraction">
+    ///     The interpolation factor, where 0 represents the start color and 1
+    ///     represents the end color. Values outside the range [0, 1] will be clamped.
+    /// </param>
     /// <returns>The interpolated NKColor as an RGB value.</returns>
-    /// <exception cref="InvalidOperationException">Thrown when either the start or end color (or both) are
-    /// not in RGB format.</exception>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown when either the start or end color (or both) are
+    ///     not in RGB format.
+    /// </exception>
     public static NKColor Lerp(NKColor start, NKColor end, float fraction) {
         if (!start.IsRgb && !end.IsRgb)
             throw new InvalidOperationException("Both colors must be RGB to use Linear Interpolation (Lerp).");
@@ -409,9 +414,9 @@ public readonly record struct NKColor : IFormattable, IParsable<NKColor> {
         var e = end.AsRgb;
 
         fraction = Math.Clamp(fraction, 0f, 1f);
-        byte r = (byte)(s.R + (e.R - s.R) * fraction);
-        byte g = (byte)(s.G + (e.G - s.G) * fraction);
-        byte b = (byte)(s.B + (e.B - s.B) * fraction);
+        var r = (byte)(s.R + (e.R - s.R) * fraction);
+        var g = (byte)(s.G + (e.G - s.G) * fraction);
+        var b = (byte)(s.B + (e.B - s.B) * fraction);
 
         return FromRgb(r, g, b);
     }
@@ -429,11 +434,11 @@ public readonly record struct NKColor : IFormattable, IParsable<NKColor> {
             return colors[^1];
 
         // Determine which segment we are in
-        float segmentValue = fraction * (colors.Length - 1);
-        int   segmentIndex = (int)Math.Floor(segmentValue);
+        var segmentValue = fraction * (colors.Length - 1);
+        var segmentIndex = (int)Math.Floor(segmentValue);
 
         // Determine how far we are into that specific segment
-        float localFraction = segmentValue - segmentIndex;
+        var localFraction = segmentValue - segmentIndex;
 
         return Lerp(colors[segmentIndex], colors[segmentIndex + 1], localFraction);
     }
@@ -441,14 +446,14 @@ public readonly record struct NKColor : IFormattable, IParsable<NKColor> {
     public NKColor GetInverse() {
         switch (Type) {
             case ColorType.RGB: {
-                byte r = (byte)(_value >> 16);
-                byte g = (byte)(_value >> 08);
-                byte b = (byte)_value;
+                var r = (byte)(_value >> 16);
+                var g = (byte)(_value >> 08);
+                var b = (byte)_value;
 
                 return FromRgb((byte)(255 - r), (byte)(255 - g), (byte)(255 - b));
             }
             case ColorType.CONSOLE_COLOR: {
-                byte c = (byte)(_value & 0x000000ff);
+                var c = (byte)(_value & 0x000000ff);
 
                 return new NKColor((NKConsoleColor)((c + 8) % 16));
             }
@@ -499,6 +504,6 @@ public readonly record struct NKColor : IFormattable, IParsable<NKColor> {
 public struct NKColorSurrogate {
     [ProtoMember(1)] public uint Value { get; set; }
 
-    public static implicit operator NKColorSurrogate(NKColor color) => new() { Value = color.GetRaw() };
+    public static implicit operator NKColorSurrogate(NKColor color)     => new() { Value = color.GetRaw() };
     public static implicit operator NKColor(NKColorSurrogate surrogate) => NKColor.FromRaw(surrogate.Value);
 }

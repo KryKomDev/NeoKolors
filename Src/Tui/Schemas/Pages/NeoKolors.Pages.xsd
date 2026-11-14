@@ -9,9 +9,9 @@
             elementFormDefault="qualified">
 
     <xsd:include schemaLocation="NeoKolors.Pages.Body.xsd"/>
-    
+
     <xsd:elementOld name="Body" flags="nk:Body">
-        
+
     </xsd:elementOld>
-    
+
 </xsd:schema>

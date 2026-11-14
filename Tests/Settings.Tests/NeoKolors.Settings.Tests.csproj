@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <ItemGroup>
-        <ProjectReference Include="..\..\Src\Settings\NeoKolors.Settings.csproj" />
+        <ProjectReference Include="..\..\Src\Settings\NeoKolors.Settings.csproj"/>
     </ItemGroup>
 
     <ItemGroup>

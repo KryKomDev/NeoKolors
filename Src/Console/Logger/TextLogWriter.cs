@@ -9,8 +9,10 @@ using static NeoKolors.Console.NKLogLevel;
 namespace NeoKolors.Console;
 
 /// <summary>
-/// A concrete implementation of the <see cref="ILogWriter"/> interface that writes log records
-/// to a specified <see cref="TextWriter"/> output stream, with customizable formatting options.
+///     A concrete implementation of the <see cref="ILogWriter" /> interface that writes log
+///     records
+///     to a specified <see cref="TextWriter" /> output stream, with customizable formatting
+///     options.
 /// </summary>
 public sealed class TextLogWriter : ILogWriter, IAsyncDisposable {
 
@@ -22,7 +24,7 @@ public sealed class TextLogWriter : ILogWriter, IAsyncDisposable {
     private const string DEBUG_LABEL    = "[ debug ]";
 
     private bool _disposed = false;
-    
+
     public TextWriter       Output { get; set; }
     public TextLoggerConfig Config { get; set; }
 
@@ -32,25 +34,27 @@ public sealed class TextLogWriter : ILogWriter, IAsyncDisposable {
     }
 
     /// <summary>
-    /// Creates a <see cref="TextLogWriter"/> configured with a log file.
+    ///     Creates a <see cref="TextLogWriter" /> configured with a log file.
     /// </summary>
     public static TextLogWriter CreateFromFile(LogFileConfig fileConfig, TextLoggerConfig? config = null) {
         var output = fileConfig.CreateOutput();
+
         return new TextLogWriter(output, config);
     }
 
     /// <summary>
-    /// Creates a <see cref="TextLogWriter"/> writing to the specified log file path.
+    ///     Creates a <see cref="TextLogWriter" /> writing to the specified log file path.
     /// </summary>
     public static TextLogWriter CreateFromFile(string filePath, TextLoggerConfig? config = null, bool append = true) {
         var fileConfig = append ? LogFileConfig.Append(filePath) : LogFileConfig.Replace(filePath);
+
         return CreateFromFile(fileConfig, config);
     }
 
     public void Write(NKLogRecord record) {
         if (_disposed)
             return;
-        
+
         var sb = new StringBuilder();
 
         // append time
@@ -70,7 +74,7 @@ public sealed class TextLogWriter : ILogWriter, IAsyncDisposable {
 
         // write to output
         Output.WriteLine(sb.ToString());
-        
+
         // flush output
         Output.Flush();
     }
@@ -94,19 +98,20 @@ public sealed class TextLogWriter : ILogWriter, IAsyncDisposable {
     private static string GetSource(NKLogRecord record) {
         if (record is { Source: not null, EventId: not null }) {
             var eventId = record.EventId.Value;
-            string idStr = !string.IsNullOrEmpty(eventId.Name) ? $"{eventId.Id}:{eventId.Name}" : eventId.Id.ToString();
+            var idStr   = !string.IsNullOrEmpty(eventId.Name) ? $"{eventId.Id}:{eventId.Name}" : eventId.Id.ToString();
+
             return $"{record.Source}:{idStr}";
         }
-        
-        if (record.Source != null) {
+
+        if (record.Source != null)
             return record.Source;
-        }
-        
+
         if (record.EventId != null) {
             var eventId = record.EventId.Value;
+
             return !string.IsNullOrEmpty(eventId.Name) ? $"{eventId.Id}:{eventId.Name}" : eventId.Id.ToString();
         }
-        
+
         return string.Empty;
     }
 
@@ -129,9 +134,8 @@ public sealed class TextLogWriter : ILogWriter, IAsyncDisposable {
 
             var lines = msg.Replace("\r\n", "\n").Split('\n');
 
-            if (lines.Length < 1) {
+            if (lines.Length < 1)
                 return string.Empty;
-            }
 
             var indent = new string(' ', Config.Indentation.Indent.Value);
 
@@ -144,15 +148,14 @@ public sealed class TextLogWriter : ILogWriter, IAsyncDisposable {
             sb.AppendLine(lines[0]);
 
             // indent all other lines
-            for (int i = 1; i < lines.Length; i++) {
+            for (var i = 1; i < lines.Length; i++) {
                 sb.Append(indent);
                 sb.AppendLine(lines[i]);
             }
         }
         else {
-            if (Config.Indentation.AlwaysIndentFirstLine) {
+            if (Config.Indentation.AlwaysIndentFirstLine)
                 sb.AppendLine();
-            }
 
             return msg;
         }
@@ -161,20 +164,20 @@ public sealed class TextLogWriter : ILogWriter, IAsyncDisposable {
     }
 
     public void Dispose() {
-        if (_disposed) 
+        if (_disposed)
             return;
-        
+
         Output.Dispose();
-        
+
         _disposed = true;
     }
 
     public async ValueTask DisposeAsync() {
-        if (_disposed) 
+        if (_disposed)
             return;
-        
+
         await Output.DisposeAsync();
-        
+
         _disposed = true;
     }
 }

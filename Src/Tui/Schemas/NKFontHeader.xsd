@@ -7,9 +7,9 @@
             xmlns:nk="https://raw0.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/NKFontHeader.xsd"
             targetNamespace="https://raw0.githubusercontent.com/KryKomDev/NeoKolors/refs/heads/main/NeoKolors.Tui/Schemas/NKFontHeader.xsd"
             elementFormDefault="qualified">
-    
+
     <!-- char font header -->
-    
+
     <xsd:elementOld name="NKCFont">
         <xsd:complexType>
             <xsd:all>
@@ -20,8 +20,8 @@
             </xsd:all>
         </xsd:complexType>
     </xsd:elementOld>
-    
-    
+
+
     <!-- image font header -->
 
     <xsd:elementOld name="NKIFont">
@@ -34,10 +34,10 @@
             </xsd:all>
         </xsd:complexType>
     </xsd:elementOld>
-    
-    
+
+
     <!-- header -->
-    
+
     <xsd:complexType name="Header">
         <xsd:all>
             <xsd:elementOld name="Version">
@@ -70,10 +70,10 @@
             </xsd:elementOld>
         </xsd:all>
     </xsd:complexType>
-    
-    
+
+
     <!-- spacing -->
-    
+
     <xsd:complexType name="Dimensions">
         <xsd:all>
             <xsd:elementOld name="LetterSpacing" flags="xsd:int"/>
@@ -82,10 +82,10 @@
             <xsd:elementOld name="LineSize" flags="xsd:int"/>
         </xsd:all>
     </xsd:complexType>
-    
-    
+
+
     <!-- glyph settings -->
-    
+
     <xsd:complexType name="GlyphConf">
         <xsd:all>
             <xsd:elementOld name="MissingGlyphMode" default="skip">
@@ -106,7 +106,7 @@
                     </xsd:restriction>
                 </xsd:simpleType>
             </xsd:elementOld>
-            
+
             <xsd:elementOld name="Ligatures" minOccurs="0" default="0">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:int">
@@ -117,10 +117,10 @@
             </xsd:elementOld>
         </xsd:all>
     </xsd:complexType>
-    
-    
+
+
     <!-- settings for character font glyph definitions -->
-    
+
     <xsd:complexType name="CharFontConf">
         <xsd:all>
             <xsd:elementOld name="GlyphDefStartMarker" flags="xsd:string" default="[[["/>
@@ -145,10 +145,10 @@
             </xsd:elementOld>
         </xsd:all>
     </xsd:complexType>
-    
-    
+
+
     <!-- settings for image font glyph definitions -->
-    
+
     <xsd:complexType name="ImgFontConf">
         <xsd:all>
             <xsd:elementOld name="GlyphWidth">
@@ -159,7 +159,7 @@
                     </xsd:restriction>
                 </xsd:simpleType>
             </xsd:elementOld>
-            
+
             <xsd:elementOld name="GlyphHeight">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:int">
@@ -168,13 +168,13 @@
                     </xsd:restriction>
                 </xsd:simpleType>
             </xsd:elementOld>
-            
+
             <xsd:elementOld name="Mono">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:boolean"/>
                 </xsd:simpleType>
             </xsd:elementOld>
-            
+
             <xsd:elementOld name="Layout">
                 <xsd:simpleType>
                     <xsd:restriction base="xsd:string"/>
@@ -182,11 +182,11 @@
             </xsd:elementOld>
         </xsd:all>
     </xsd:complexType>
-    
+
     <xsd:complexType name="a">
         <xsd:choice>
             <xsd:elementOld name="a1a" flags="xsd:int" maxOccurs="unbounded"/>
         </xsd:choice>
     </xsd:complexType>
-    
+
 </xsd:schema>

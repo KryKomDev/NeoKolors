@@ -7,8 +7,7 @@ namespace NeoKolors.Console;
 
 public class PropertyChangedEventTrackingArgs<T> :
     PropertyChangedEventArgs,
-    IPropertyChangedEventTrackingArgs<T> 
-{
+    IPropertyChangedEventTrackingArgs<T> {
 
     public T? OldValue { get; }
     public T? NewValue { get; }

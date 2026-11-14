@@ -41,10 +41,10 @@ public class FlexLayoutTests {
         var context = new LayoutContext(parent, screen);
 
         var spacing = new CoreSpacing(
-            top: CoreDimension.Chars(2),
-            bottom: CoreDimension.Chars(3),
-            left: CoreDimension.Chars(4),
-            right: CoreDimension.Chars(5)
+            CoreDimension.Chars(2),
+            CoreDimension.Chars(3),
+            CoreDimension.Chars(4),
+            CoreDimension.Chars(5)
         );
 
         var resolved = spacing.Resolve(context);
@@ -64,12 +64,12 @@ public class FlexLayoutTests {
         var parent  = new Size2D(100, 50);
         var context = new LayoutContext(parent, screen);
 
-        var text1 = new Text(content: new AnsiString("Hello"));  // Length = 5, Height = 1
-        var text2 = new Text(content: new AnsiString("World!")); // Length = 6, Height = 1
+        var text1 = new Text(new AnsiString("Hello"));  // Length = 5, Height = 1
+        var text2 = new Text(new AnsiString("World!")); // Length = 6, Height = 1
 
         var flex = new Flex(
-            children: new Element[] { text1, text2 },
-            direction: FlexDirection.ROW,
+            new Element[] { text1, text2 },
+            FlexDirection.ROW,
             gap: 2
         );
 
@@ -86,12 +86,12 @@ public class FlexLayoutTests {
         var parent  = new Size2D(100, 50);
         var context = new LayoutContext(parent, screen);
 
-        var text1 = new Text(content: new AnsiString("Line1"));       // Length = 5, Height = 1
-        var text2 = new Text(content: new AnsiString("LongerLine2")); // Length = 11, Height = 1
+        var text1 = new Text(new AnsiString("Line1"));       // Length = 5, Height = 1
+        var text2 = new Text(new AnsiString("LongerLine2")); // Length = 11, Height = 1
 
         var flex = new Flex(
-            children: new Element[] { text1, text2 },
-            direction: FlexDirection.COLUMN,
+            new Element[] { text1, text2 },
+            FlexDirection.COLUMN,
             gap: 1
         );
 
@@ -107,15 +107,15 @@ public class FlexLayoutTests {
         using var canvas        = new NKCharCanvas(30, 5);
         var       renderContext = new RenderContext(canvas);
 
-        var text1 = new Text(content: new AnsiString("Left"));
-        var text2 = new Text(content: new AnsiString("Right"));
+        var text1 = new Text(new AnsiString("Left"));
+        var text2 = new Text(new AnsiString("Right"));
 
         var flex = new Flex(
-            children: new Element[] {
-                Flex.Item(text1, grow: 1),
-                Flex.Item(text2, grow: 1)
+            new Element[] {
+                Flex.Item(text1, 1),
+                Flex.Item(text2, 1)
             },
-            direction: FlexDirection.ROW,
+            FlexDirection.ROW,
             gap: 0
         );
 
@@ -130,13 +130,13 @@ public class FlexLayoutTests {
         var screen  = new Size2D(100, 50);
         var context = new LayoutContext(new Size2D(50, 20), screen);
 
-        var text = new Text(content: new AnsiString("Content")); // 7x1
+        var text = new Text(new AnsiString("Content")); // 7x1
 
         var border = new Border(
-            element: text,
-            padding: new CoreSpacing(CoreDimension.Chars(1)), // +2 horizontally, +2 vertically
-            margin: new CoreSpacing(CoreDimension.Chars(2)),  // +4 horizontally, +4 vertically
-            style: NKBorderStyle.GetAscii()                   // +2 horizontally, +2 vertically
+            text,
+            new CoreSpacing(CoreDimension.Chars(1)), // +2 horizontally, +2 vertically
+            new CoreSpacing(CoreDimension.Chars(2)), // +4 horizontally, +4 vertically
+            NKBorderStyle.GetAscii()                 // +2 horizontally, +2 vertically
         );
 
         var size = border.Measure(context);
@@ -163,7 +163,7 @@ public class FlexLayoutTests {
         var context = new LayoutContext(parent, screen);
 
         var box = new FlexBox(
-            sizing: (45, 12),
+            (45, 12),
             new Text(new AnsiString("Short"))
         );
 
@@ -175,10 +175,10 @@ public class FlexLayoutTests {
     [Fact]
     public void FlexBox_EmptyWithSizing_ReturnsSizing() {
         var screen  = new Size2D(100, 50);
-        var parent  = new Size2D(80, 40);
+        var parent  = new Size2D(80,  40);
         var context = new LayoutContext(parent, screen);
 
-        var box = new FlexBox { Sizing = Sizing.Fixed(35, 15) };
+        var box      = new FlexBox { Sizing = Sizing.Fixed(35, 15) };
         var measured = box.Measure(context);
 
         Assert.Equal(35, measured.X);
@@ -188,15 +188,16 @@ public class FlexLayoutTests {
     [Fact]
     public void FlexBox_WithWidthOnlySizing_AdaptsHeightToContent() {
         var screen  = new Size2D(100, 50);
-        var parent  = new Size2D(80, 40);
+        var parent  = new Size2D(80,  40);
         var context = new LayoutContext(parent, screen);
 
         var text1 = new Text(new AnsiString("Row1")); // height 1
         var text2 = new Text(new AnsiString("Row2")); // height 1
 
         var box = FlexBox.Column(
-            sizing: Sizing.FromWidth(CoreDimension.Chars(50)),
-            text1, text2
+            Sizing.FromWidth(CoreDimension.Chars(50)),
+            text1,
+            text2
         );
 
         var measured = box.Measure(context);
@@ -207,7 +208,7 @@ public class FlexLayoutTests {
     [Fact]
     public void FlexBox_WithPercentageSizing_ResolvesAgainstParent() {
         var screen  = new Size2D(100, 50);
-        var parent  = new Size2D(80, 40);
+        var parent  = new Size2D(80,  40);
         var context = new LayoutContext(parent, screen);
 
         var box = new FlexBox {
@@ -229,12 +230,12 @@ public class FlexLayoutTests {
 
         // Box constrained to width 20, with justify content END
         var box = new FlexBox(
-            sizing: (20, 5),
-            children: new Element[] { text1, text2 }
+            (20, 5),
+            new Element[] { text1, text2 }
         ) {
-            Direction = FlexDirection.ROW,
+            Direction      = FlexDirection.ROW,
             JustifyContent = JustifyContent.END,
-            Gap = 1
+            Gap            = 1
         };
 
         box.Render(renderContext, new Size2D(80, 20));
@@ -242,9 +243,9 @@ public class FlexLayoutTests {
         // Total content width: "Left"(4) + gap(1) + "Right"(5) = 10
         // Free space in 20 chars = 10. Justify END puts Left at X=10, Right at X=15.
         // It should NOT justify to the outer 80 canvas width.
-        Assert.Equal('L', canvas.Data[10, 0].Char); // 'L' at x=10
-        Assert.Equal('R', canvas.Data[15, 0].Char); // 'R' at x=15
-        Assert.Equal(NKCell.Default, canvas.Data[70, 0]); // x=70 is untouched
+        Assert.Equal('L',            canvas.Data[10, 0].Char); // 'L' at x=10
+        Assert.Equal('R',            canvas.Data[15, 0].Char); // 'R' at x=15
+        Assert.Equal(NKCell.Default, canvas.Data[70, 0]);      // x=70 is untouched
     }
 
     [Fact]
@@ -255,12 +256,12 @@ public class FlexLayoutTests {
 
         // Status bar with GrowTrack / Auto width and 3 items
         var box = new FlexBox(
-            sizing: new Sizing(CoreDimension.GrowTrack(), CoreDimension.Chars(1)),
+            new Sizing(CoreDimension.GrowTrack(), CoreDimension.Chars(1)),
             new Text(new AnsiString("Title")),
             new Text(new AnsiString("Status")),
             new Text(new AnsiString("Quit"))
         ) {
-            Direction = FlexDirection.ROW,
+            Direction      = FlexDirection.ROW,
             JustifyContent = JustifyContent.SPACE_BETWEEN
         };
 
@@ -276,7 +277,7 @@ public class FlexLayoutTests {
         var context = new LayoutContext(parent, screen);
 
         var topBar = new Border(
-            element: new Flex(
+            new Flex(
                 direction: FlexDirection.ROW,
                 justifyContent: JustifyContent.SPACE_BETWEEN,
                 children: new Element[] {
@@ -289,6 +290,7 @@ public class FlexLayoutTests {
         );
 
         var measured = topBar.Measure(context);
+
         // Border: 2 overhead horizontally (rounded corners) + child desired (100 - 2 = 98) => 100
         Assert.Equal(100, measured.X);
         Assert.Equal(3,   measured.Y); // 1 content + 2 border = 3
@@ -301,7 +303,7 @@ public class FlexLayoutTests {
         var context = new LayoutContext(parent, screen);
 
         var border = new Border(
-            element: new Text(new AnsiString("Inside")),
+            new Text(new AnsiString("Inside")),
             style: NKBorderStyle.GetRounded(),
             sizing: Sizing.Fixed(50, 6)
         );

@@ -4,11 +4,12 @@
 namespace NeoKolors.Tui.Elements;
 
 /// <summary>
-/// Defines the visual frame sequence and default animation interval for a terminal spinner.
+///     Defines the visual frame sequence and default animation interval for a terminal
+///     spinner.
 /// </summary>
 public record SpinnerStyle(IReadOnlyList<string> Frames, TimeSpan Interval) {
     /// <summary>
-    /// Classic braille dots spinner.
+    ///     Classic braille dots spinner.
     /// </summary>
     public static SpinnerStyle Dots { get; } = new(
         ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"],
@@ -16,7 +17,7 @@ public record SpinnerStyle(IReadOnlyList<string> Frames, TimeSpan Interval) {
     );
 
     /// <summary>
-    /// Rotating line / slash spinner.
+    ///     Rotating line / slash spinner.
     /// </summary>
     public static SpinnerStyle Line { get; } = new(
         ["-", "\\", "|", "/"],
@@ -24,7 +25,7 @@ public record SpinnerStyle(IReadOnlyList<string> Frames, TimeSpan Interval) {
     );
 
     /// <summary>
-    /// Rotating circle quarter quadrants.
+    ///     Rotating circle quarter quadrants.
     /// </summary>
     public static SpinnerStyle Circle { get; } = new(
         ["◐", "◓", "◑", "◒"],
@@ -32,7 +33,7 @@ public record SpinnerStyle(IReadOnlyList<string> Frames, TimeSpan Interval) {
     );
 
     /// <summary>
-    /// Smooth pulsating vertical bar.
+    ///     Smooth pulsating vertical bar.
     /// </summary>
     public static SpinnerStyle Pulse { get; } = new(
         ["█", "▉", "▊", "▋", "▌", "▍", "▎", "▏", "▎", "▍", "▌", "▋", "▊", "▉"],
@@ -40,7 +41,7 @@ public record SpinnerStyle(IReadOnlyList<string> Frames, TimeSpan Interval) {
     );
 
     /// <summary>
-    /// Bouncing bar inside brackets.
+    ///     Bouncing bar inside brackets.
     /// </summary>
     public static SpinnerStyle BouncingBar { get; } = new(
         ["[    ]", "[=   ]", "[==  ]", "[=== ]", "[====]", "[ ===]", "[  ==]", "[   =]", "[    ]"],
@@ -48,7 +49,7 @@ public record SpinnerStyle(IReadOnlyList<string> Frames, TimeSpan Interval) {
     );
 
     /// <summary>
-    /// Rotating arc quadrants.
+    ///     Rotating arc quadrants.
     /// </summary>
     public static SpinnerStyle Arc { get; } = new(
         ["◜", "◠", "◝", "◞", "◡", "◟"],
@@ -56,7 +57,7 @@ public record SpinnerStyle(IReadOnlyList<string> Frames, TimeSpan Interval) {
     );
 
     /// <summary>
-    /// Eight-stage braille pattern spinner.
+    ///     Eight-stage braille pattern spinner.
     /// </summary>
     public static SpinnerStyle Braille { get; } = new(
         ["⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷"],
@@ -64,7 +65,7 @@ public record SpinnerStyle(IReadOnlyList<string> Frames, TimeSpan Interval) {
     );
 
     /// <summary>
-    /// Standard 7-bit ASCII spinner.
+    ///     Standard 7-bit ASCII spinner.
     /// </summary>
     public static SpinnerStyle Ascii { get; } = new(
         ["|", "/", "-", "\\"],
@@ -72,7 +73,7 @@ public record SpinnerStyle(IReadOnlyList<string> Frames, TimeSpan Interval) {
     );
 
     /// <summary>
-    /// Clock face emoji spinner.
+    ///     Clock face emoji spinner.
     /// </summary>
     public static SpinnerStyle Clock { get; } = new(
         ["🕐", "🕑", "🕒", "🕓", "🕔", "🕕", "🕖", "🕗", "🕘", "🕙", "🕚", "🕛"],
@@ -80,7 +81,7 @@ public record SpinnerStyle(IReadOnlyList<string> Frames, TimeSpan Interval) {
     );
 
     /// <summary>
-    /// Rotating compass arrows spinner.
+    ///     Rotating compass arrows spinner.
     /// </summary>
     public static SpinnerStyle Arrow { get; } = new(
         ["←", "↖", "↑", "↗", "→", "↘", "↓", "↙"],

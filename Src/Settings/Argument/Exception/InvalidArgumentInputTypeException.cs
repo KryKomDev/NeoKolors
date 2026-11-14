@@ -6,6 +6,6 @@
 namespace NeoKolors.Settings.Argument;
 
 public class InvalidArgumentInputTypeException : System.Exception {
-    public InvalidArgumentInputTypeException(Type? expected, Type? actual) 
+    public InvalidArgumentInputTypeException(Type? expected, Type? actual)
         : base($"Tried to set argument of type '{expected?.FullName}' with input of type '{actual?.FullName}'") { }
 }

@@ -6,7 +6,7 @@ using System.Xml.Linq;
 namespace NeoKolors.Tui.Fonts;
 
 /// <summary>
-/// Represents metadata associated with a FIGlet (.flf) font.
+///     Represents metadata associated with a FIGlet (.flf) font.
 /// </summary>
 public class FigletMetadata {
     public string?                    Author         { get; set; }
@@ -20,7 +20,8 @@ public class FigletMetadata {
     public Dictionary<string, string> Custom         { get; } = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Merges another metadata object into this instance, overriding existing values where specified.
+    ///     Merges another metadata object into this instance, overriding existing values where
+    ///     specified.
     /// </summary>
     public void MergeWith(FigletMetadata? other) {
         if (other == null)
@@ -50,13 +51,12 @@ public class FigletMetadata {
         if (other.Leading.HasValue)
             Leading = other.Leading;
 
-        foreach (var (k, v) in other.Custom) {
+        foreach (var (k, v) in other.Custom)
             Custom[k] = v;
-        }
     }
 
     /// <summary>
-    /// Parses a single metadata XML document representing one font (e.g. sidecar file).
+    ///     Parses a single metadata XML document representing one font (e.g. sidecar file).
     /// </summary>
     public static FigletMetadata? FromXml(Stream stream) {
         try {
@@ -74,7 +74,7 @@ public class FigletMetadata {
     }
 
     /// <summary>
-    /// Parses a manifest XML document containing metadata for multiple fonts.
+    ///     Parses a manifest XML document containing metadata for multiple fonts.
     /// </summary>
     public static Dictionary<string, FigletMetadata> FromManifestXml(Stream stream) {
         var result = new Dictionary<string, FigletMetadata>(StringComparer.OrdinalIgnoreCase);
@@ -87,7 +87,7 @@ public class FigletMetadata {
                 return result;
 
             foreach (var fontElem in root.Elements()) {
-                string? name = fontElem.Attribute("Name")?.Value
+                var name = fontElem.Attribute("Name")?.Value
                     ?? fontElem.Attribute("name")?.Value
                     ?? fontElem.Attribute("File")?.Value
                     ?? fontElem.Attribute("file")?.Value;
@@ -108,19 +108,19 @@ public class FigletMetadata {
     public static FigletMetadata ParseFontElement(XElement element) {
         // 1. Attributes
         var meta = new FigletMetadata {
-            Author      = element.Attribute("Author")?.Value ?? element.Attribute("author")?.Value,
-            
+            Author = element.Attribute("Author")?.Value ?? element.Attribute("author")?.Value,
+
             LicenseType = element.Attribute("LicenseType")?.Value
                 ?? element.Attribute("licenseType")?.Value
                 ?? element.Attribute("License")?.Value
                 ?? element.Attribute("license")?.Value,
-            
+
             LicenseFile = element.Attribute("LicenseFile")?.Value
                 ?? element.Attribute("licenseFile")?.Value,
-            
+
             LicenseContent = element.Attribute("LicenseContent")?.Value
                 ?? element.Attribute("licenseContent")?.Value,
-            
+
             SourceFormat = element.Attribute("SourceFormat")?.Value
                 ?? element.Attribute("sourceFormat")?.Value
                 ?? element.Attribute("Format")?.Value
@@ -131,29 +131,26 @@ public class FigletMetadata {
         if (
             int.TryParse(
                 element.Attribute("LetterSpacing")?.Value ?? element.Attribute("letterSpacing")?.Value,
-                out int ls
+                out var ls
             )
-        ) {
+        )
             meta.LetterSpacing = ls;
-        }
 
         if (
             int.TryParse(
                 element.Attribute("WordSpacing")?.Value ?? element.Attribute("wordSpacing")?.Value,
-                out int ws
+                out var ws
             )
-        ) {
+        )
             meta.WordSpacing = ws;
-        }
 
         if (
             int.TryParse(
                 element.Attribute("Leading")?.Value ?? element.Attribute("leading")?.Value,
-                out int ld
+                out var ld
             )
-        ) {
+        )
             meta.Leading = ld;
-        }
 
         foreach (var attr in element.Attributes()) {
             var attrName = attr.Name.LocalName;
@@ -170,9 +167,8 @@ public class FigletMetadata {
                 attrName.Equals("LetterSpacing",  StringComparison.OrdinalIgnoreCase) ||
                 attrName.Equals("WordSpacing",    StringComparison.OrdinalIgnoreCase) ||
                 attrName.Equals("Leading",        StringComparison.OrdinalIgnoreCase)
-            ) {
+            )
                 continue;
-            }
 
             meta.Custom[attrName] = attr.Value;
         }
@@ -216,21 +212,21 @@ public class FigletMetadata {
             else if (
                 childName.Equals("LetterSpacing", StringComparison.OrdinalIgnoreCase) &&
                 !meta.LetterSpacing.HasValue                                          &&
-                int.TryParse(child.Value.Trim(), out int cls)
+                int.TryParse(child.Value.Trim(), out var cls)
             ) {
                 meta.LetterSpacing = cls;
             }
             else if (
                 childName.Equals("WordSpacing", StringComparison.OrdinalIgnoreCase) &&
                 !meta.WordSpacing.HasValue                                          &&
-                int.TryParse(child.Value.Trim(), out int cws)
+                int.TryParse(child.Value.Trim(), out var cws)
             ) {
                 meta.WordSpacing = cws;
             }
             else if (
                 childName.Equals("Leading", StringComparison.OrdinalIgnoreCase) &&
                 !meta.Leading.HasValue                                          &&
-                int.TryParse(child.Value.Trim(), out int cld)
+                int.TryParse(child.Value.Trim(), out var cld)
             ) {
                 meta.Leading = cld;
             }
@@ -243,12 +239,10 @@ public class FigletMetadata {
 
                         var v = sub.Attribute("Value")?.Value ?? sub.Attribute("value")?.Value;
 
-                        if (!string.IsNullOrEmpty(k)) {
+                        if (!string.IsNullOrEmpty(k))
                             meta.Custom[k] = v ?? sub.Value.Trim();
-                        }
-                        else if (!sub.HasElements) {
+                        else if (!sub.HasElements)
                             meta.Custom[sub.Name.LocalName] = sub.Value.Trim();
-                        }
                     }
                 }
                 else {
@@ -258,9 +252,8 @@ public class FigletMetadata {
 
                     var v = child.Attribute("Value")?.Value ?? child.Attribute("value")?.Value;
 
-                    if (!string.IsNullOrEmpty(k)) {
+                    if (!string.IsNullOrEmpty(k))
                         meta.Custom[k] = v ?? child.Value.Trim();
-                    }
                 }
             }
             else if (childName.Equals("Item", StringComparison.OrdinalIgnoreCase)) {
@@ -270,12 +263,10 @@ public class FigletMetadata {
 
                 var v = child.Attribute("Value")?.Value ?? child.Attribute("value")?.Value;
 
-                if (!string.IsNullOrEmpty(k)) {
+                if (!string.IsNullOrEmpty(k))
                     meta.Custom[k] = v ?? child.Value.Trim();
-                }
-                else if (!child.HasElements) {
+                else if (!child.HasElements)
                     meta.Custom[child.Name.LocalName] = child.Value.Trim();
-                }
             }
             else if (!child.HasElements) {
                 meta.Custom[childName] = child.Value.Trim();

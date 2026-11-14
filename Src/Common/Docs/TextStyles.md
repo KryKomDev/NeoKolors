@@ -1,6 +1,8 @@
 # Text Styles and Effects
 
-**[TextStyles](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/TextStyles.cs)** is a bit-flag enum that defines styling effects and text decorations on terminal cells. These map directly to Standard ECMA-48 Graphic Rendition (SGR) escape codes.
+**[TextStyles](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/TextStyles.cs)**
+is a bit-flag enum that defines styling effects and text decorations on terminal cells. These map
+directly to Standard ECMA-48 Graphic Rendition (SGR) escape codes.
 
 ---
 
@@ -26,7 +28,10 @@ public enum TextStyles : byte
 
 ## 2. Fluently Applying Styles to Strings
 
-The **[StringEffects](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/StringEffects.cs)** class provides fluent, chainable extension methods on standard strings. This allows you to apply styling tags and colors inline for console writing:
+The
+**[StringEffects](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/StringEffects.cs)**
+class provides fluent, chainable extension methods on standard strings. This allows you to apply
+styling tags and colors inline for console writing:
 
 ```csharp
 using NeoKolors.Common;
@@ -38,6 +43,7 @@ Console.WriteLine(warningText);
 ```
 
 ### Supported Fluent Styling Methods:
+
 - `.Bold()`
 - `.Faint()`
 - `.Italic()`

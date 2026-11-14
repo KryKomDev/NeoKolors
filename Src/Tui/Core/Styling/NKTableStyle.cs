@@ -503,7 +503,7 @@ public record NKTableStyle : ITableStyle {
     ///     Initializes a new instance of the <see cref="NKTableStyle" /> record with default ASCII
     ///     characters and all features enabled.
     /// </summary>
-    public NKTableStyle() : this('|', '-', '+', style: default, enabledFeatures: DEFAULT) { }
+    public NKTableStyle() : this('|', '-', '+', default, DEFAULT) { }
 
     #endregion
 

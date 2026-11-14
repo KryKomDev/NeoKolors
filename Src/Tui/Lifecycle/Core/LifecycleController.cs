@@ -4,13 +4,14 @@
 namespace NeoKolors.Tui.Lifecycle.Core;
 
 /// <summary>
-/// A thread-safe, robust state machine implementation for managing component and application lifecycles.
+///     A thread-safe, robust state machine implementation for managing component and
+///     application lifecycles.
 /// </summary>
 public class LifecycleController : ILifecycle {
-    private readonly object _syncRoot = new();
-    private LifecycleState _state = LifecycleState.CREATED;
+    private readonly object         _syncRoot = new();
+    private          LifecycleState _state    = LifecycleState.CREATED;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public LifecycleState State {
         get {
             lock (_syncRoot) {
@@ -19,26 +20,26 @@ public class LifecycleController : ILifecycle {
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool IsRunning => State == LifecycleState.RUNNING;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool IsPaused => State == LifecycleState.PAUSED;
 
     /// <summary>
-    /// Gets the synchronization root object.
+    ///     Gets the synchronization root object.
     /// </summary>
     public object SyncRoot => _syncRoot;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public event EventHandler<LifecycleStateChangedEventArgs>? StateChanged;
 
     /// <summary>
-    /// Occurs immediately before a state transition begins.
+    ///     Occurs immediately before a state transition begins.
     /// </summary>
     public event EventHandler<LifecycleStateChangedEventArgs>? StateChanging;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Initialize() {
         TransitionTo(LifecycleState.INITIALIZING);
         OnInitializing();
@@ -46,12 +47,11 @@ public class LifecycleController : ILifecycle {
         OnInitialized();
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Start() {
         lock (_syncRoot) {
-            if (_state == LifecycleState.CREATED) {
+            if (_state == LifecycleState.CREATED)
                 Initialize();
-            }
         }
 
         TransitionTo(LifecycleState.STARTING);
@@ -60,12 +60,11 @@ public class LifecycleController : ILifecycle {
         OnStarted();
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Pause() {
         lock (_syncRoot) {
-            if (_state != LifecycleState.RUNNING) {
+            if (_state != LifecycleState.RUNNING)
                 return;
-            }
         }
 
         TransitionTo(LifecycleState.PAUSING);
@@ -74,12 +73,11 @@ public class LifecycleController : ILifecycle {
         OnPaused();
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Resume() {
         lock (_syncRoot) {
-            if (_state != LifecycleState.PAUSED) {
+            if (_state != LifecycleState.PAUSED)
                 return;
-            }
         }
 
         TransitionTo(LifecycleState.RESUMING);
@@ -88,12 +86,11 @@ public class LifecycleController : ILifecycle {
         OnResumed();
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Stop() {
         lock (_syncRoot) {
-            if (_state is LifecycleState.STOPPED or LifecycleState.DISPOSED or LifecycleState.STOPPING) {
+            if (_state is LifecycleState.STOPPED or LifecycleState.DISPOSED or LifecycleState.STOPPING)
                 return;
-            }
         }
 
         TransitionTo(LifecycleState.STOPPING);
@@ -102,43 +99,42 @@ public class LifecycleController : ILifecycle {
         OnStopped();
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Dispose() {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
     /// <summary>
-    /// Protected dispose pattern implementation.
+    ///     Protected dispose pattern implementation.
     /// </summary>
     protected virtual void Dispose(bool disposing) {
         lock (_syncRoot) {
-            if (_state is LifecycleState.DISPOSING or LifecycleState.DISPOSED) {
+            if (_state is LifecycleState.DISPOSING or LifecycleState.DISPOSED)
                 return;
-            }
         }
 
         TransitionTo(LifecycleState.DISPOSING);
-        if (disposing) {
+
+        if (disposing)
             OnDisposing();
-        }
+
         TransitionTo(LifecycleState.DISPOSED);
     }
 
     /// <summary>
-    /// Safely transitions the state and triggers associated events.
+    ///     Safely transitions the state and triggers associated events.
     /// </summary>
     protected void TransitionTo(LifecycleState newState) {
-        LifecycleState previousState;
+        LifecycleState                 previousState;
         LifecycleStateChangedEventArgs args;
 
         lock (_syncRoot) {
-            if (_state == newState) {
+            if (_state == newState)
                 return;
-            }
 
             previousState = _state;
-            args = new LifecycleStateChangedEventArgs(previousState, newState);
+            args          = new LifecycleStateChangedEventArgs(previousState, newState);
             StateChanging?.Invoke(this, args);
             _state = newState;
         }
@@ -148,14 +144,14 @@ public class LifecycleController : ILifecycle {
 
     // Virtual extension hooks
     protected virtual void OnInitializing() { }
-    protected virtual void OnInitialized() { }
-    protected virtual void OnStarting() { }
-    protected virtual void OnStarted() { }
-    protected virtual void OnPausing() { }
-    protected virtual void OnPaused() { }
-    protected virtual void OnResuming() { }
-    protected virtual void OnResumed() { }
-    protected virtual void OnStopping() { }
-    protected virtual void OnStopped() { }
-    protected virtual void OnDisposing() { }
+    protected virtual void OnInitialized()  { }
+    protected virtual void OnStarting()     { }
+    protected virtual void OnStarted()      { }
+    protected virtual void OnPausing()      { }
+    protected virtual void OnPaused()       { }
+    protected virtual void OnResuming()     { }
+    protected virtual void OnResumed()      { }
+    protected virtual void OnStopping()     { }
+    protected virtual void OnStopped()      { }
+    protected virtual void OnDisposing()    { }
 }

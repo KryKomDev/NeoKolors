@@ -1,12 +1,17 @@
 # NKStyle Deep Dive
 
-**[NKStyle](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/NKStyle.cs)** manages text and cell styling in the NeoKolors ecosystem. It packages foreground colors, background colors, and active text decorations (such as bold, italic, underline, or blinking) into a single optimized 64-bit container.
+**[NKStyle](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/NKStyle.cs)**
+manages text and cell styling in the NeoKolors ecosystem. It packages foreground colors, background
+colors, and active text decorations (such as bold, italic, underline, or blinking) into a single
+optimized 64-bit container.
 
 ---
 
 ## 1. Internal Bit-Packed Representation
 
-To support high-frequency terminal drawing, `NKStyle` is structured as a bit-packed layout that fits inside a single 64-bit unsigned integer (`ulong`). This minimizes cache misses and simplifies comparison operations.
+To support high-frequency terminal drawing, `NKStyle` is structured as a bit-packed layout that fits
+inside a single 64-bit unsigned integer (`ulong`). This minimizes cache misses and simplifies
+comparison operations.
 
 ```csharp
 [StructLayout(LayoutKind.Explicit, Size = sizeof(ulong))]
@@ -14,19 +19,25 @@ public record struct NKStyle : IFormattable, IParsable<NKStyle>
 ```
 
 ### Bit Fields Layout
+
 The 64 bits of `_raw` are packed as follows:
+
 - **Bits 0–23**: Foreground color (`FColor`) value.
 - **Bits 24–47**: Background color (`BColor`) value.
 - **Bits 48–55**: Text style flags (`Styles`) mapped from the `TextStyles` enum.
-- **Bits 56**: Foreground Color Switch (`FCSw`) indicating whether the color is a custom RGB color or a standard console color.
-- **Bits 57**: Background Color Switch (`BCSw`) indicating whether the color is custom RGB or console color.
+- **Bits 56**: Foreground Color Switch (`FCSw`) indicating whether the color is a custom RGB color
+  or a standard console color.
+- **Bits 57**: Background Color Switch (`BCSw`) indicating whether the color is custom RGB or
+  console color.
 - **Bits 58–63**: Unused/reserved.
 
 ---
 
 ## 2. Text Styles Flags (`TextStyles`)
 
-Text styles are represented by the flag enum **[TextStyles](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/TextStyles.cs)**, which maps directly to ANSI graphic rendition escape codes:
+Text styles are represented by the flag enum
+**[TextStyles](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/TextStyles.cs)**,
+which maps directly to ANSI graphic rendition escape codes:
 
 ```csharp
 [Flags]
@@ -45,6 +56,7 @@ public enum TextStyles : byte
 ```
 
 You can toggle styles using standard bitwise operations or fluent chainable extensions:
+
 ```csharp
 var boldItalic = TextStyles.Bold | TextStyles.Italic;
 ```
@@ -73,9 +85,12 @@ customStyle.Styles |= TextStyles.Italic; // Add italic effect
 
 ## 4. High-Performance Style Transitions
 
-When rendering strings to the console, writing raw ANSI escape sequences for every single cell is extremely slow. `NKStyle` solves this by computing **minimal difference transition sequences** using the `GetControlChars()` method.
+When rendering strings to the console, writing raw ANSI escape sequences for every single cell is
+extremely slow. `NKStyle` solves this by computing **minimal difference transition sequences** using
+the `GetControlChars()` method.
 
-This method compares the style of a previous character cell against the target cell style and outputs the shortest possible ANSI string to achieve the change:
+This method compares the style of a previous character cell against the target cell style and
+outputs the shortest possible ANSI string to achieve the change:
 
 ```csharp
 var sb = new StringBuilder();
@@ -86,8 +101,11 @@ NKStyle.AppendControlChars(sb, previousStyle, currentStyle);
 ```
 
 ### Transition Optimization Rules:
-- If both foreground and background colors are identical to the previous cell, no color codes are written.
-- If text style effects are disabled (e.g., bold was active and is now inactive), a reset sequence (`\e[0m`) is emitted, and other properties are re-applied.
+
+- If both foreground and background colors are identical to the previous cell, no color codes are
+  written.
+- If text style effects are disabled (e.g., bold was active and is now inactive), a reset sequence
+  (`\e[0m`) is emitted, and other properties are re-applied.
 - If a style is added (e.g., adding italic), only the specific addition code is written (`\e[3m`).
 
 ---
@@ -102,6 +120,10 @@ NKStyle.AppendControlChars(sb, previousStyle, currentStyle);
 public readonly record struct NKStyle : IFormattable, IParsable<NKStyle>
 ```
 
-The surrogate serializes the raw 64-bit integer words (`Raw0` and `Raw1`), ensuring high throughput and allowing `NKStyle` to be used directly in any Protobuf contract (such as [`AnsiStringSerializer`](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/AnsiStringSerializer.cs) and `NKFontSerializer`).
+The surrogate serializes the raw 64-bit integer words (`Raw0` and `Raw1`), ensuring high throughput
+and allowing `NKStyle` to be used directly in any Protobuf contract (such as [
+`AnsiStringSerializer`](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/AnsiStringSerializer.cs)
+and `NKFontSerializer`).
 
-For architectural details, update procedures, and best practices, consult the [Binary Serialization & Class Update Guide](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/Docs/Serialization-Guide.md).
+For architectural details, update procedures, and best practices, consult
+the [Binary Serialization & Class Update Guide](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Common/Docs/Serialization-Guide.md).

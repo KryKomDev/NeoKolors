@@ -6,7 +6,7 @@ using NeoKolors.Common;
 namespace NeoKolors.Tui.Core;
 
 public sealed record CellInfo(char? Char, NKStyle Style, bool Changed, int ZIndex) {
-    
+
     private const int DEFAULT_Z = int.MinValue;
 
     public char? Char {
@@ -16,7 +16,7 @@ public sealed record CellInfo(char? Char, NKStyle Style, bool Changed, int ZInde
                 return;
 
             Changed = true;
-            field = value;
+            field   = value;
         }
     } = Char;
 
@@ -27,7 +27,7 @@ public sealed record CellInfo(char? Char, NKStyle Style, bool Changed, int ZInde
                 return;
 
             Changed = true;
-            field = value;
+            field   = value;
         }
     } = Style;
 
@@ -38,16 +38,16 @@ public sealed record CellInfo(char? Char, NKStyle Style, bool Changed, int ZInde
                 return;
 
             Changed = true;
-            field = value;
+            field   = value;
         }
     } = ZIndex;
 
     public bool Changed { get; private set; } = Changed;
 
     public void SetUpdated() => Changed = false;
-    
+
     public static CellInfo Default => GetDefault();
-    public static CellInfo Null => GetNull(DEFAULT_Z);
+    public static CellInfo Null    => GetNull(DEFAULT_Z);
 
     public static CellInfo GetNull(int z) => new(null, NKStyle.Default, true, z);
 

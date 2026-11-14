@@ -3,9 +3,9 @@
 
 ### New Rules
 
-Rule ID | Category | Severity | Notes
---------|----------|----------|-------
-NKXAML001 | XamlCompiler | Error | XamlSourceGenerator
-NKXAML002 | XamlCompiler | Error | XamlSourceGenerator
-NKXAML003 | XamlCompiler | Error | XamlSourceGenerator
-NKXAML004 | XamlCompiler | Error | XamlSourceGenerator
+ Rule ID   | Category     | Severity | Notes               
+-----------|--------------|----------|---------------------
+ NKXAML001 | XamlCompiler | Error    | XamlSourceGenerator 
+ NKXAML002 | XamlCompiler | Error    | XamlSourceGenerator 
+ NKXAML003 | XamlCompiler | Error    | XamlSourceGenerator 
+ NKXAML004 | XamlCompiler | Error    | XamlSourceGenerator 

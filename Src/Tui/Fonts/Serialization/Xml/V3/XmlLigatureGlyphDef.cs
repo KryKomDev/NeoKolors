@@ -11,23 +11,20 @@ using NeoKolors.Extensions;
 namespace NeoKolors.Tui.Fonts.Xml.V3;
 
 public class XmlLigatureGlyphDef : XmlGlyphDef {
-    
+
     private string? _id;
-    
-    [XmlIgnore] 
-    public bool IsIdDefined => _id != null;
-    
-    [XmlAttribute("File")] 
-    public string File { get; set; }
-    
+
+    [XmlIgnore] public bool IsIdDefined => _id != null;
+
+    [XmlAttribute("File")] public string File { get; set; }
+
     [XmlIgnore] public XmlGlyphAlignPoint[]       AlignPoints       { get; set; }
     [XmlIgnore] public char[]?                    AlignPointMarkers { get; set; }
     [XmlIgnore] public XmlGlyphAlignPointReplace? AlignPointReplace { get; set; }
     [XmlIgnore] public XmlGlyphMask?              Mask              { get; set; }
-    [XmlIgnore] public NKTextStyles                 Styles            { get; set; }
+    [XmlIgnore] public NKTextStyles               Styles            { get; set; }
 
-    [XmlAttribute("Symbol")]
-    public string Symbol { get; set; }
+    [XmlAttribute("Symbol")] public string Symbol { get; set; }
 
     [XmlAttribute("Id")]
     [DefaultValue(null)]
@@ -66,11 +63,11 @@ public class XmlLigatureGlyphDef : XmlGlyphDef {
         get => Mask.ToString() ?? "null";
         set => Mask = XmlGlyphMask.TryParse(value, out var mask) ? mask.Value : null;
     }
-    
+
     [XmlAttribute("Baseline")]
     [DefaultValue(0)]
     public int Baseline { get; set; }
-    
+
     [XmlAttribute("Styles")]
     [DefaultValue("NONE")]
     public string StylesString {
@@ -79,9 +76,9 @@ public class XmlLigatureGlyphDef : XmlGlyphDef {
     }
 
     public XmlLigatureGlyphDef() {
-        Symbol          = null!;
-        File            = null!;
-        AlignPoints     = [];
-        Styles          = NKTextStyles.NONE;
+        Symbol      = null!;
+        File        = null!;
+        AlignPoints = [];
+        Styles      = NKTextStyles.NONE;
     }
 }

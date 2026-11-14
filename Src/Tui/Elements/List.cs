@@ -67,36 +67,36 @@ public class List : IElement {
         if (items is null || items.Count == 0)
             return Size2D.Zero;
 
-        var margin  = Margin.AsT.Resolve(context, ungrown: true);
-        var padding = Padding.AsT.Resolve(context, ungrown: true);
+        var margin  = Margin.AsT.Resolve(context, true);
+        var padding = Padding.AsT.Resolve(context, true);
 
         var overheadX = margin.Horizontal + padding.Horizontal;
         var overheadY = margin.Vertical   + padding.Vertical;
 
-        int pointGap = PointGap.AsT;
-        int gap      = Gap.AsT;
+        var pointGap = PointGap.AsT;
+        var gap      = Gap.AsT;
 
-        int count         = items.Count;
-        int maxPointWidth = 0;
+        var count         = items.Count;
+        var maxPointWidth = 0;
 
-        for (int i = 0; i < count; i++) {
+        for (var i = 0; i < count; i++) {
             var pt = GetPointFor(items[i], i + 1);
 
             if (pt.Length > maxPointWidth)
                 maxPointWidth = pt.Length;
         }
 
-        int pointPrefix = maxPointWidth + pointGap;
+        var pointPrefix = maxPointWidth + pointGap;
 
         var availableForChild = new Size2D(
             Math.Max(0, context.Parent.X - overheadX - pointPrefix),
             Math.Max(0, context.Parent.Y - overheadY)
         );
 
-        int maxContentWidth = 0;
-        int totalHeight     = 0;
+        var maxContentWidth = 0;
+        var totalHeight     = 0;
 
-        for (int i = 0; i < count; i++) {
+        for (var i = 0; i < count; i++) {
             var item = items[i];
 
             if (item is null)
@@ -110,9 +110,8 @@ public class List : IElement {
             totalHeight += childDesired.Y;
         }
 
-        if (count > 1) {
+        if (count > 1)
             totalHeight += (count - 1) * gap;
-        }
 
         return new Size2D(
             maxContentWidth + pointPrefix + overheadX,
@@ -140,33 +139,33 @@ public class List : IElement {
         if (contentSize.X <= 0 || contentSize.Y <= 0)
             return;
 
-        int pointGap = PointGap.AsT;
-        int gap      = Gap.AsT;
-        int count    = items.Count;
+        var pointGap = PointGap.AsT;
+        var gap      = Gap.AsT;
+        var count    = items.Count;
 
-        int maxPointWidth = 0;
+        var maxPointWidth = 0;
         var pointStrings  = new AnsiString[count];
 
-        for (int i = 0; i < count; i++) {
+        for (var i = 0; i < count; i++) {
             pointStrings[i] = GetPointFor(items[i], i + 1);
 
             if (pointStrings[i].Length > maxPointWidth)
                 maxPointWidth = pointStrings[i].Length;
         }
 
-        int pointPrefix = maxPointWidth + pointGap;
+        var pointPrefix = maxPointWidth + pointGap;
         var childWidth  = Math.Max(0, contentSize.X - pointPrefix);
 
-        int currentY = 0;
+        var currentY = 0;
 
-        for (int i = 0; i < count; i++) {
+        for (var i = 0; i < count; i++) {
             var item = items[i];
 
             if (item is null)
                 continue;
 
             var childDesired = item.Measure(new LayoutContext(new Size2D(childWidth, contentSize.Y), context.Size));
-            int itemHeight   = Math.Max(1, childDesired.Y);
+            var itemHeight   = Math.Max(1, childDesired.Y);
 
             // Draw bullet / marker (right-aligned inside maxPointWidth)
             var pt      = pointStrings[i];
@@ -186,8 +185,8 @@ public class List : IElement {
             var childSize   = new Size2D(childWidth, itemHeight);
 
             using (context.PushScope(
-                    offset: childOffset,
-                    clip: new Rect2D(Point2D.Zero,       childSize),
+                    childOffset,
+                    new Rect2D(Point2D.Zero,              childSize),
                     contextArea: new Rect2D(Point2D.Zero, childSize)
                 )) {
                 item.Render(context, childSize);

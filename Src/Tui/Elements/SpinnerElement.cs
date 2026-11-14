@@ -8,29 +8,29 @@ using NeoKolors.Tui.Core;
 namespace NeoKolors.Tui.Elements;
 
 /// <summary>
-/// A declarative UI element that renders an animated terminal spinner.
+///     A declarative UI element that renders an animated terminal spinner.
 /// </summary>
 public class SpinnerElement : IElement, ITickableElement {
     private TimeSpan _accumulatedTime;
 
     /// <summary>
-    /// Gets or sets the spinner animation style preset.
-    /// Default is <see cref="SpinnerStyle.Dots"/>.
+    ///     Gets or sets the spinner animation style preset.
+    ///     Default is <see cref="SpinnerStyle.Dots" />.
     /// </summary>
     public Bindable<SpinnerStyle> Style { get; set; } = SpinnerStyle.Dots;
 
     /// <summary>
-    /// Gets or sets the styling applied to each spinner frame.
+    ///     Gets or sets the styling applied to each spinner frame.
     /// </summary>
     public Bindable<NKStyle> FrameStyle { get; set; } = NKStyle.Default;
 
     /// <summary>
-    /// Gets or sets the index of the currently active animation frame.
+    ///     Gets or sets the index of the currently active animation frame.
     /// </summary>
     public int FrameIndex { get; set; }
 
     /// <summary>
-    /// Initializes a new instance of <see cref="SpinnerElement"/>.
+    ///     Initializes a new instance of <see cref="SpinnerElement" />.
     /// </summary>
     public SpinnerElement(
         Bindable<SpinnerStyle> style      = default,
@@ -44,7 +44,7 @@ public class SpinnerElement : IElement, ITickableElement {
     }
 
     /// <summary>
-    /// Advances the spinner by one frame manually.
+    ///     Advances the spinner by one frame manually.
     /// </summary>
     public void Step() {
         var frames = Style.AsT.Frames;
@@ -53,7 +53,7 @@ public class SpinnerElement : IElement, ITickableElement {
             FrameIndex = (FrameIndex + 1) % frames.Count;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Tick(TimeSpan delta) {
         var style = Style.AsT;
 
@@ -69,7 +69,7 @@ public class SpinnerElement : IElement, ITickableElement {
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public Size2D Measure(LayoutContext context) {
         var frames = Style.AsT.Frames;
 
@@ -81,7 +81,7 @@ public class SpinnerElement : IElement, ITickableElement {
         return new Size2D(frame.Length, 1);
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Render(RenderContext context, Size2D parent) {
         var frames = Style.AsT.Frames;
 

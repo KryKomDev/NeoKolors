@@ -78,9 +78,8 @@ public class Game2DLoop : LifecycleController {
     ///     Runs the 2D game loop continuously until stopped or canceled.
     /// </summary>
     public void Run(CancellationToken cancellationToken = default) {
-        if (!IsRunning) {
+        if (!IsRunning)
             Start();
-        }
 
         Clock.Reset();
         Accumulator.Reset();
@@ -109,11 +108,10 @@ public class Game2DLoop : LifecycleController {
                 continue;
 
             var remaining = targetFrameTime - elapsed;
-            int sleepMs   = (int)remaining.TotalMilliseconds;
+            var sleepMs   = (int)remaining.TotalMilliseconds;
 
-            if (sleepMs > 0) {
+            if (sleepMs > 0)
                 Thread.Sleep(sleepMs);
-            }
         }
     }
 
@@ -134,7 +132,7 @@ public class Game2DLoop : LifecycleController {
         Accumulator.Accumulate(time.Delta);
 
         // 3. Process fixed simulation steps
-        while (Accumulator.Step(out TimeSpan stepDelta)) {
+        while (Accumulator.Step(out var stepDelta)) {
             _fixedTickCount++;
             var fixedCtx = new Game2DFixedContext(stepDelta, _fixedTickCount, UserState);
             FixedUpdating?.Invoke(fixedCtx);

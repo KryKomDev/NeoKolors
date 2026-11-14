@@ -1,5 +1,7 @@
-﻿// NeoKolors
-// Copyright (c) 2025 KryKom
+//
+// NeoKolors
+// Copyright (c) 2026 KryKom
+//
 
 using Implyzer;
 using Metriks;
@@ -8,20 +10,20 @@ using NeoKolors.Console.Ansi;
 namespace NeoKolors.Console;
 
 /// <summary>
-/// Defines an interface that represents an input driver for processing console input events.
+///     Defines an interface that represents an input driver for processing console input events.
 /// </summary>
 public interface IInputDriver<TConfig> : IInputDriver where TConfig : InputDriverConfig {
     public new TConfig Config { get; set; }
-    
+
     InputDriverConfig IInputDriver.Config {
         get => Config;
-        set => Config = value as TConfig 
-            ?? throw new InvalidCastException($"Config must be of type {typeof(TConfig).FullName}"); 
+        set => Config = value as TConfig
+            ?? throw new InvalidCastException($"Config must be of type {typeof(TConfig).FullName}");
     }
 }
 
 /// <summary>
-/// Defines an interface that represents an input driver for processing console input events.
+///     Defines an interface that represents an input driver for processing console input events.
 /// </summary>
 [IndirectImpl(typeof(IInputDriver<>))]
 public interface IInputDriver : IDisposable {
@@ -33,26 +35,41 @@ public interface IInputDriver : IDisposable {
     public event ResizeEventHandler?     Resize;
     public event PasteEventHandler?      Paste;
     public event VTQueryResponseHandler? VTQuery;
-
+    public event VTQueryTimeoutHandler?  VTQueryTimeout;
 
     public bool IsRunning { get; }
 
     public InputDriverConfig Config { get; set; }
 
     /// <summary>
-    /// Sends a VT (Virtual Terminal) query request to the driver.
-    /// This method initiates a request for specific terminal states or features based on the provided query type.
+    ///     Sends a VT (Virtual Terminal) query request to the driver.
+    ///     This method initiates a request for specific terminal states or features based on the
+    ///     provided query type.
     /// </summary>
-    /// <param name="request">The <see cref="VTQuery"/> object defining the type of query to send to the terminal.</param>
+    /// <param name="request">
+    ///     The <see cref="VTQuery" /> object defining the type of query to send
+    ///     to the terminal.
+    /// </param>
     public void RequestVTQuery(VTQuery request);
+
+    /// <summary>
+    ///     Cancels a pending VT query request, removing it from the request queue.
+    /// </summary>
+    /// <param name="request">The query request to cancel.</param>
+    /// <returns><c>true</c> if the request was found and removed; otherwise, <c>false</c>.</returns>
+    public bool CancelVTQuery(VTQuery request);
 
     public void Start();
     public void Stop();
 
     /// <summary>
-    /// Retrieves the current size of the console or terminal associated with the input driver.
-    /// This method provides the dimensions as a 2D-size object, typically representing rows and columns.
+    ///     Retrieves the current size of the console or terminal associated with the input driver.
+    ///     This method provides the dimensions as a 2D-size object, typically representing rows
+    ///     and columns.
     /// </summary>
-    /// <returns>A <see cref="Size2D"/> object representing the current width and height of the terminal.</returns>
+    /// <returns>
+    ///     A <see cref="Size2D" /> object representing the current width and height of the
+    ///     terminal.
+    /// </returns>
     public Size2D GetSize();
 }

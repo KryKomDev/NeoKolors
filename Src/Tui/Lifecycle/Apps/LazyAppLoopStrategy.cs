@@ -4,26 +4,27 @@
 namespace NeoKolors.Tui.Lifecycle.Apps;
 
 /// <summary>
-/// A zero-CPU idle loop strategy that sleeps until user input, window events, or explicit invalidations wake it up.
+///     A zero-CPU idle loop strategy that sleeps until user input, window events, or explicit
+///     invalidations wake it up.
 /// </summary>
 public sealed class LazyAppLoopStrategy : IAppLoopStrategy, IDisposable {
     private readonly AutoResetEvent _wakeSignal = new(false);
-    private bool _disposed;
+    private          bool           _disposed;
 
     /// <summary>
-    /// Gets or sets an optional periodic heartbeat timeout (e.g. for background timers or cursor blinking).
-    /// Default is <c>null</c> (wait indefinitely until signaled).
+    ///     Gets or sets an optional periodic heartbeat timeout (e.g. for background timers or
+    ///     cursor blinking).
+    ///     Default is <c>null</c> (wait indefinitely until signaled).
     /// </summary>
     public TimeSpan? HeartbeatInterval { get; set; }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void SignalWakeup() {
-        if (!_disposed) {
+        if (!_disposed)
             _wakeSignal.Set();
-        }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Run(IAppLifecycleHost host, IAppView view, CancellationToken cancellationToken = default) {
         ArgumentNullException.ThrowIfNull(host);
         ArgumentNullException.ThrowIfNull(view);
@@ -38,21 +39,22 @@ public sealed class LazyAppLoopStrategy : IAppLoopStrategy, IDisposable {
             if (host.IsPaused) {
                 // Sleep while paused
                 Thread.Sleep(50);
+
                 continue;
             }
 
-            int timeoutMs = HeartbeatInterval.HasValue ? (int)HeartbeatInterval.Value.TotalMilliseconds : Timeout.Infinite;
+            var timeoutMs = HeartbeatInterval.HasValue ? (int)HeartbeatInterval.Value.TotalMilliseconds : Timeout.Infinite;
 
             try {
                 // Wait for input or invalidation signal
                 _wakeSignal.WaitOne(timeoutMs);
-            } catch (ObjectDisposedException) {
+            }
+            catch (ObjectDisposedException) {
                 break;
             }
 
-            if (!host.IsRunning || cancellationToken.IsCancellationRequested) {
+            if (!host.IsRunning || cancellationToken.IsCancellationRequested)
                 break;
-            }
 
             // Only render if dirty or invalidation occurred
             if (view.IsDirty) {
@@ -62,7 +64,7 @@ public sealed class LazyAppLoopStrategy : IAppLoopStrategy, IDisposable {
         }
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Dispose() {
         if (!_disposed) {
             _disposed = true;

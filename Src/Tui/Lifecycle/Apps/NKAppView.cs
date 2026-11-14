@@ -1,24 +1,24 @@
 // NeoKolors
 // Copyright (c) 2026 KryKom
 
-using Metriks;
 using NeoKolors.Tui.Core;
 using NeoKolors.Tui.Elements;
 
 namespace NeoKolors.Tui.Lifecycle.Apps;
 
 /// <summary>
-/// Default implementation of <see cref="IAppView"/> that renders an <see cref="IElement"/> hierarchy
-/// onto an <see cref="ICharScreen"/> using <see cref="RenderContext"/>.
+///     Default implementation of <see cref="IAppView" /> that renders an
+///     <see cref="IElement" /> hierarchy
+///     onto an <see cref="ICharScreen" /> using <see cref="RenderContext" />.
 /// </summary>
 public class NKAppView : IAppView {
-    private readonly object _syncRoot = new();
-    private IElement _rootElement;
-    private ICharScreen _screen;
-    private bool _isDirty = true;
+    private readonly object      _syncRoot = new();
+    private          IElement    _rootElement;
+    private          ICharScreen _screen;
+    private          bool        _isDirty = true;
 
     /// <summary>
-    /// Gets or sets the root visual element rendered by this view.
+    ///     Gets or sets the root visual element rendered by this view.
     /// </summary>
     public IElement RootElement {
         get {
@@ -28,15 +28,17 @@ public class NKAppView : IAppView {
         }
         set {
             ArgumentNullException.ThrowIfNull(value);
+
             lock (_syncRoot) {
                 _rootElement = value;
             }
+
             Invalidate();
         }
     }
 
     /// <summary>
-    /// Gets or sets the output character screen target.
+    ///     Gets or sets the output character screen target.
     /// </summary>
     public ICharScreen Screen {
         get {
@@ -46,29 +48,33 @@ public class NKAppView : IAppView {
         }
         set {
             ArgumentNullException.ThrowIfNull(value);
+
             lock (_syncRoot) {
                 _screen = value;
             }
+
             Invalidate();
         }
     }
 
     /// <summary>
-    /// Gets or sets the interactive hit map used to register click and mouse regions.
+    ///     Gets or sets the interactive hit map used to register click and mouse regions.
     /// </summary>
     public HitMap? HitMap { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the canvas buffer is cleaned before rendering. Default is <c>true</c>.
+    ///     Gets or sets a value indicating whether the canvas buffer is cleaned before rendering.
+    ///     Default is <c>true</c>.
     /// </summary>
     public bool ClearBeforeRender { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets a value indicating whether the dirty flag is automatically reset upon successful rendering. Default is <c>true</c>.
+    ///     Gets or sets a value indicating whether the dirty flag is automatically reset upon
+    ///     successful rendering. Default is <c>true</c>.
     /// </summary>
     public bool AutoResetDirty { get; set; } = true;
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public bool IsDirty {
         get {
             lock (_syncRoot) {
@@ -83,53 +89,52 @@ public class NKAppView : IAppView {
     }
 
     /// <summary>
-    /// Occurs immediately before rendering commences.
+    ///     Occurs immediately before rendering commences.
     /// </summary>
     public event Action? BeforeRender;
 
     /// <summary>
-    /// Occurs immediately after rendering and screen flush completes.
+    ///     Occurs immediately after rendering and screen flush completes.
     /// </summary>
     public event Action? AfterRender;
 
     /// <summary>
-    /// Occurs whenever the view is invalidated.
+    ///     Occurs whenever the view is invalidated.
     /// </summary>
     public event Action? Invalidated;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="NKAppView"/> class.
+    ///     Initializes a new instance of the <see cref="NKAppView" /> class.
     /// </summary>
     /// <param name="rootElement">The root UI element.</param>
     /// <param name="screen">The character screen destination.</param>
     /// <param name="hitMap">Optional hit map for mouse interaction dispatch.</param>
     public NKAppView(IElement rootElement, ICharScreen screen, HitMap? hitMap = null) {
         _rootElement = rootElement ?? throw new ArgumentNullException(nameof(rootElement));
-        _screen = screen ?? throw new ArgumentNullException(nameof(screen));
-        HitMap = hitMap;
+        _screen      = screen      ?? throw new ArgumentNullException(nameof(screen));
+        HitMap       = hitMap;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Invalidate() {
         IsDirty = true;
         Invalidated?.Invoke();
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void ResetDirty() {
         IsDirty = false;
     }
 
-    /// <inheritdoc/>
+    /// <inheritdoc />
     public void Render() {
         lock (_syncRoot) {
             BeforeRender?.Invoke();
 
-            if (ClearBeforeRender) {
+            if (ClearBeforeRender)
                 _screen.Clean();
-            }
 
-            Size2D screenSize = _screen.Size;
+            var screenSize    = _screen.Size;
             var layoutContext = new LayoutContext(screenSize, screenSize);
             _rootElement.Measure(layoutContext);
 
@@ -140,9 +145,8 @@ public class NKAppView : IAppView {
 
             _screen.Render();
 
-            if (AutoResetDirty) {
+            if (AutoResetDirty)
                 _isDirty = false;
-            }
 
             AfterRender?.Invoke();
         }

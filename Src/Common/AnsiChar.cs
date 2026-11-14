@@ -11,7 +11,7 @@ public readonly record struct AnsiChar {
         Char  = c;
         Style = style;
     }
-    
-    public static implicit operator char   (AnsiChar ansiChar) => ansiChar.Char;
+
+    public static implicit operator char(AnsiChar    ansiChar) => ansiChar.Char;
     public static implicit operator NKStyle(AnsiChar ansiChar) => ansiChar.Style;
 }

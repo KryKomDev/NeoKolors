@@ -105,25 +105,19 @@ public class NKStyleTests {
         var style = NKStyle.Parse(input);
         Assert.Equal(expectedStyles, style.Styles);
 
-        if (expectedF is NKConsoleColor fConsole) {
+        if (expectedF is NKConsoleColor fConsole)
             Assert.Equal((NKColor)fConsole, style.FColor);
-        }
-        else if (expectedF is int fInt) {
+        else if (expectedF is int fInt)
             Assert.Equal((NKColor)fInt, style.FColor);
-        }
-        else if (input.Contains("f#default")) {
+        else if (input.Contains("f#default"))
             Assert.True(style.IsFColorDefault);
-        }
 
-        if (expectedB is NKConsoleColor bConsole) {
+        if (expectedB is NKConsoleColor bConsole)
             Assert.Equal((NKColor)bConsole, style.BColor);
-        }
-        else if (expectedB is int bInt) {
+        else if (expectedB is int bInt)
             Assert.Equal((NKColor)bInt, style.BColor);
-        }
-        else if (input.Contains("b#inherit")) {
+        else if (input.Contains("b#inherit"))
             Assert.True(style.IsBColorInherit);
-        }
     }
 
     [Fact]
@@ -190,35 +184,35 @@ public class NKStyleTests {
         Assert.True(s1.IsBColorConsole);
 
         var s2 = s1 with { FColor = rgbColor, BColor = inheritColor };
-        Assert.Equal(rgbColor, s2.GetFColor());
+        Assert.Equal(rgbColor,     s2.GetFColor());
         Assert.Equal(inheritColor, s2.GetBColor());
         Assert.True(s2.IsFColorCustom);
         Assert.True(s2.IsBColorInherit);
 
         var s3 = new NKStyle { FColor = inheritColor, BColor = rgbColor };
         Assert.Equal(inheritColor, s3.FColor);
-        Assert.Equal(rgbColor, s3.BColor);
+        Assert.Equal(rgbColor,     s3.BColor);
     }
 
     [Fact]
     public void StyleMode_IsIndependentOfColors() {
         var style = new NKStyle {
-            FColor = NKColor.FromRgb(255, 0, 128),
-            BColor = new NKColor(CYAN),
-            Styles = BOLD,
+            FColor          = NKColor.FromRgb(255, 0, 128),
+            BColor          = new NKColor(CYAN),
+            Styles          = BOLD,
             InheritedStyles = ITALIC
         };
 
         Assert.Equal(NKColor.FromRgb(255, 0, 128), style.FColor);
-        Assert.Equal((NKColor)CYAN, style.BColor);
-        Assert.Equal(BOLD, style.Styles);
-        Assert.Equal(ITALIC, style.InheritedStyles);
+        Assert.Equal((NKColor)CYAN,                style.BColor);
+        Assert.Equal(BOLD,                         style.Styles);
+        Assert.Equal(ITALIC,                       style.InheritedStyles);
 
         var updated = style with { FColor = NKColor.Default };
         Assert.Equal(NKColor.Default, updated.FColor);
-        Assert.Equal((NKColor)CYAN, updated.BColor);
-        Assert.Equal(BOLD, updated.Styles);
-        Assert.Equal(ITALIC, updated.InheritedStyles);
+        Assert.Equal((NKColor)CYAN,   updated.BColor);
+        Assert.Equal(BOLD,            updated.Styles);
+        Assert.Equal(ITALIC,          updated.InheritedStyles);
     }
 
     [Fact]
@@ -249,18 +243,18 @@ public class NKStyleTests {
         Assert.Equal(ITALIC, withItalic.Styles);
 
         // Inheriting BOLD from previous style
-        var inherited = style.WithStyles(ITALIC, inheritedStyles: BOLD);
+        var inherited = style.WithStyles(ITALIC, BOLD);
         Assert.Equal(BOLD | ITALIC, inherited.Styles);
     }
 
     [Fact]
     public void Underline_And_UColor_Properties_WorkCorrectly() {
         var underline = new NKUnderlineStyle(new NKColor(RED), NKUnderlineType.CURLY);
-        var style = new NKStyle { Underline = underline };
+        var style     = new NKStyle { Underline = underline };
 
         Assert.Equal(NKUnderlineType.CURLY, style.Underline.Type);
-        Assert.Equal(new NKColor(RED), style.Underline.Color);
-        Assert.Equal(new NKColor(RED), style.UColor);
+        Assert.Equal(new NKColor(RED),      style.Underline.Color);
+        Assert.Equal(new NKColor(RED),      style.UColor);
 
         var updatedUColor = style with { UColor = new NKColor(GREEN) };
         Assert.Equal(new NKColor(GREEN), updatedUColor.UColor);
@@ -268,13 +262,13 @@ public class NKStyleTests {
 
         var withUnderline = style.WithUnderline(new NKUnderlineStyle(new NKColor(BLUE), NKUnderlineType.DOTTED));
         Assert.Equal(NKUnderlineType.DOTTED, withUnderline.Underline.Type);
-        Assert.Equal(new NKColor(BLUE), withUnderline.Underline.Color);
+        Assert.Equal(new NKColor(BLUE),      withUnderline.Underline.Color);
     }
 
     [Fact]
     public void OperatorShiftLeft_BehavesAsWith() {
-        var baseStyle  = new NKStyle(RED,  BLACK,           BOLD);
-        var overrider  = new NKStyle(BLUE, NKColor.Inherit, ITALIC);
+        var baseStyle = new NKStyle(RED,  BLACK,           BOLD);
+        var overrider = new NKStyle(BLUE, NKColor.Inherit, ITALIC);
 
         var result = baseStyle << overrider;
 
@@ -294,29 +288,30 @@ public class NKStyleTests {
         var esc = NKStyle.GetEscSeq(style);
         Assert.StartsWith("\e[", esc);
         Assert.EndsWith("m", esc);
-        Assert.Contains("1", esc);      // BOLD
-        Assert.Contains("38;5;9", esc); // RED
+        Assert.Contains("1",       esc); // BOLD
+        Assert.Contains("38;5;9",  esc); // RED
         Assert.Contains("48;5;12", esc); // BLUE
     }
 
     [Fact]
     public void GetEscSeq_WithUnderlineTransition_EmitsUnderline() {
         var prev = new NKStyle(RED, BLACK);
+
         var next = prev with {
             Underline = new NKUnderlineStyle(new NKColor(GREEN), NKUnderlineType.CURLY)
         };
 
         var esc = NKStyle.GetEscSeq(prev, next);
-        Assert.Contains("4:3", esc);     // CURLY underline
+        Assert.Contains("4:3",     esc); // CURLY underline
         Assert.Contains("58;5;10", esc); // GREEN underline color
     }
 
     [Fact]
     public void GetEscSeq_BoldAndFaintTransitions_EmitsCorrectSequences() {
-        var bold = new NKStyle(styles: BOLD);
-        var faint = new NKStyle(styles: FAINT);
+        var bold      = new NKStyle(styles: BOLD);
+        var faint     = new NKStyle(styles: FAINT);
         var boldFaint = new NKStyle(styles: BOLD | FAINT);
-        var def = NKStyle.Default;
+        var def       = NKStyle.Default;
 
         // BOLD -> Default (turns off bold, must not turn on faint)
         Assert.Equal("\e[22m", NKStyle.GetEscSeq(bold, def));
@@ -361,13 +356,13 @@ public class NKStyleTests {
         ms.Position = 0;
         var deserialized = ProtoBuf.Serializer.Deserialize<NKStyle>(ms);
 
-        Assert.Equal(original, deserialized);
-        Assert.Equal(original.Raw0, deserialized.Raw0);
-        Assert.Equal(original.Raw1, deserialized.Raw1);
-        Assert.Equal(original.FColor, deserialized.FColor);
-        Assert.Equal(original.BColor, deserialized.BColor);
-        Assert.Equal(original.Styles, deserialized.Styles);
+        Assert.Equal(original,                 deserialized);
+        Assert.Equal(original.Raw0,            deserialized.Raw0);
+        Assert.Equal(original.Raw1,            deserialized.Raw1);
+        Assert.Equal(original.FColor,          deserialized.FColor);
+        Assert.Equal(original.BColor,          deserialized.BColor);
+        Assert.Equal(original.Styles,          deserialized.Styles);
         Assert.Equal(original.InheritedStyles, deserialized.InheritedStyles);
-        Assert.Equal(original.Underline, deserialized.Underline);
+        Assert.Equal(original.Underline,       deserialized.Underline);
     }
 }

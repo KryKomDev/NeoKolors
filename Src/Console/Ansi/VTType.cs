@@ -6,9 +6,9 @@
 namespace NeoKolors.Console.Ansi;
 
 /// <summary>
-/// Represents various types of VT (Video Terminal) models with specific characteristics
-/// and capabilities. These values correspond to different terminal generations, each
-/// offering distinct features and levels of compatibility.
+///     Represents various types of VT (Video Terminal) models with specific characteristics
+///     and capabilities. These values correspond to different terminal generations, each
+///     offering distinct features and levels of compatibility.
 /// </summary>
 public enum VTType {
     VT05,
@@ -29,5 +29,5 @@ public enum VTType {
     VT420,
     VT510,
     VT520,
-    VT525,
+    VT525
 }

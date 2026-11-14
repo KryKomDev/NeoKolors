@@ -1,88 +1,89 @@
 <Solution>
 
     <!--  Libs  -->
+    
+    <Folder Name="/Src/"/>
 
     <Folder Name="/Src/Extensions/">
-        <Project Path="Src/Extensions/NeoKolors.Extensions.csproj" />
+        <Project Path="Src/Extensions/NeoKolors.Extensions.csproj"/>
     </Folder>
-    <Folder Name="/Src/" />
-    
+
     <Folder Name="/Src/Common/">
-        <Project Path="Src/Common/NeoKolors.Common.csproj" />
+        <Project Path="Src/Common/NeoKolors.Common.csproj"/>
     </Folder>
-    
+
     <Folder Name="/Src/Console/">
-        <Project Path="Src/Console/NeoKolors.Console.csproj" />
+        <Project Path="Src/Console/NeoKolors.Console.csproj"/>
     </Folder>
-    
+
     <Folder Name="/Src/Settings/">
-        <Project Path="Src/Settings/NeoKolors.Settings.csproj" />
+        <Project Path="Src/Settings/NeoKolors.Settings.csproj"/>
     </Folder>
-    
+
     <Folder Name="/Src/Tui/">
-        <Project Path="Src/Tui/NeoKolors.Tui.csproj" />
+        <Project Path="Src/Tui/NeoKolors.Tui.csproj"/>
     </Folder>
-    
+
     <Folder Name="/Src/Tui/Core/">
-        <Project Path="Src/Tui/Core/NeoKolors.Tui.Core.csproj" />
+        <Project Path="Src/Tui/Core/NeoKolors.Tui.Core.csproj"/>
     </Folder>
-    
+
     <Folder Name="/Src/Tui/Elements/">
-        <Project Path="Src/Tui/Elements/NeoKolors.Tui.Elements.csproj" />
+        <Project Path="Src/Tui/Elements/NeoKolors.Tui.Elements.csproj"/>
     </Folder>
-    
+
     <Folder Name="/Src/Tui/Fonts/">
-        <Project Path="Src/Tui/Fonts/NeoKolors.Tui.Fonts.csproj" />
-        <Project Path="Src/Tui/Fonts/Assets/NeoKolors.Tui.Fonts.Assets.csproj" />
+        <Project Path="Src/Tui/Fonts/NeoKolors.Tui.Fonts.csproj"/>
+        <Project Path="Src/Tui/Fonts/Assets/NeoKolors.Tui.Fonts.Assets.csproj"/>
     </Folder>
-    
+
     <Folder Name="/Src/Tui/Generators/">
-        <Project Path="Src/Tui/Generators/NeoKolors.Tui.Generators.csproj" />
+        <Project Path="Src/Tui/Generators/NeoKolors.Tui.Generators.csproj"/>
     </Folder>
-    
+
     <Folder Name="/Src/Tui/Widgets/">
-        <Project Path="Src/Tui/Widgets/NeoKolors.Tui.Widgets.csproj" />
+        <Project Path="Src/Tui/Widgets/NeoKolors.Tui.Widgets.csproj"/>
     </Folder>
 
     <Folder Name="/Src/Tui/Lifecycle/">
-        <Project Path="Src/Tui/Lifecycle/Core/NeoKolors.Tui.Lifecycle.Core.csproj" />
-        <Project Path="Src/Tui/Lifecycle/Apps/NeoKolors.Tui.Lifecycle.Apps.csproj" />
-        <Project Path="Src/Tui/Lifecycle/Game2D/NeoKolors.Tui.Lifecycle.Game2D.csproj" />
-        <Project Path="Src/Tui/Lifecycle/Game3D/NeoKolors.Tui.Lifecycle.Game3D.csproj" />
-        <Project Path="Src/Tui/Lifecycle/Inline/NeoKolors.Tui.Lifecycle.Inline.csproj" />
+        <Project Path="Src/Tui/Lifecycle/Core/NeoKolors.Tui.Lifecycle.Core.csproj"/>
+        <Project Path="Src/Tui/Lifecycle/Apps/NeoKolors.Tui.Lifecycle.Apps.csproj"/>
+        <Project Path="Src/Tui/Lifecycle/Game2D/NeoKolors.Tui.Lifecycle.Game2D.csproj"/>
+        <Project Path="Src/Tui/Lifecycle/Game3D/NeoKolors.Tui.Lifecycle.Game3D.csproj"/>
+        <Project Path="Src/Tui/Lifecycle/Inline/NeoKolors.Tui.Lifecycle.Inline.csproj"/>
     </Folder>
 
     <!--  Tests  -->
-    
-    <Folder Name="/Tests/">
 
-        <Project Path="Tests/Extensions.Tests/NeoKolors.Extensions.Tests.csproj" />
-        <Project Path="Tests/Common.Tests/NeoKolors.Common.Tests.csproj" />
-        <Project Path="Tests/Console.Tests/NeoKolors.Console.Tests.csproj" />
-        <Project Path="Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj" />
-        <Project Path="Tests/Tui.Tests/Core/NeoKolors.Tui.Core.Tests.csproj" />
-        <Project Path="Tests/Tui.Tests/Elements/NeoKolors.Tui.Elements.Tests.csproj" />
-        <Project Path="Tests/Tui.Tests/Fonts/NeoKolors.Tui.Fonts.Tests.csproj" />
-        <Project Path="Tests/Tui.Tests/Lifecycle/NeoKolors.Tui.Lifecycle.Tests.csproj" />
-        <Project Path="Tests/Tui.Tests/Widgets/NeoKolors.Tui.Widgets.Tests.csproj" />
+    <Folder Name="/Tests/">
+        <Project Path="Tests/Extensions.Tests/NeoKolors.Extensions.Tests.csproj"/>
+        <Project Path="Tests/Common.Tests/NeoKolors.Common.Tests.csproj"/>
+        <Project Path="Tests/Console.Tests/NeoKolors.Console.Tests.csproj"/>
+        <Project Path="Tests/Settings.Tests/NeoKolors.Settings.Tests.csproj"/>
+        <Project Path="Tests/Tui.Tests/Core/NeoKolors.Tui.Core.Tests.csproj"/>
+        <Project Path="Tests/Tui.Tests/Elements/NeoKolors.Tui.Elements.Tests.csproj"/>
+        <Project Path="Tests/Tui.Tests/Fonts/NeoKolors.Tui.Fonts.Tests.csproj"/>
+        <Project Path="Tests/Tui.Tests/Lifecycle/NeoKolors.Tui.Lifecycle.Tests.csproj"/>
+        <Project Path="Tests/Tui.Tests/Widgets/NeoKolors.Tui.Widgets.Tests.csproj"/>
     </Folder>
 
     <!--  Tools  -->
-    
+
     <Folder Name="/Tools/">
-        <Project Path="Tools/NKFont/NeoKolors.Tools.NKFont.csproj" />
+        <Project Path="Tools/NKFont/NeoKolors.Tools.NKFont.csproj"/>
     </Folder>
 
     <!--  Examples  -->
-    
+
     <Folder Name="/Examples/">
-        <File Path="Examples/ExampleApp.cs" />
-        <File Path="Examples/ExampleGame2D.cs" />
-        <File Path="Examples/ExampleWidgets.cs" />
-        <Project Path="Examples/Ascii/Ascii.csproj" />
-        <Project Path="Examples/Neofetch/Neofetch.csproj" />
-        <Project Path="Examples/Testing/Testing.csproj" />
-        <Project Path="Examples/WeekNumber/WeekNumber.csproj" />
+        <File Path="Examples/ExampleApp.cs"/>
+        <File Path="Examples/ExampleGame2D.cs"/>
+        <File Path="Examples/ExampleWidgets.cs"/>
+        <File Path="Examples/VTPaletteDetector.cs"/>
+        <Project Path="Examples/Ascii/Ascii.csproj"/>
+        <Project Path="Examples/Neofetch/Neofetch.csproj"/>
+        <Project Path="Examples/Testing/Testing.csproj"/>
+        <Project Path="Examples/WeekNumber/WeekNumber.csproj"/>
     </Folder>
-    
+
 </Solution>

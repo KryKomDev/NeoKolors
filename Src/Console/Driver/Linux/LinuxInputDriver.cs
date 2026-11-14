@@ -5,7 +5,6 @@
 
 #if NK_ENABLE_NATIVE_IO
 
-using System.ComponentModel;
 using System.Diagnostics;
 #if NET6_0_OR_GREATER
 using System.Runtime.InteropServices;
@@ -17,8 +16,10 @@ using static NeoKolors.Common.EscapeCodes;
 namespace NeoKolors.Console;
 
 /// <summary>
-/// Native Linux input driver utilizing POSIX libc termios, poll(), and direct STDIN reading
-/// for zero-syscall-overhead input multiplexing, real-time mouse tracking, and SIGWINCH resizing.
+///     Native Linux input driver utilizing POSIX libc termios, poll(), and direct STDIN
+///     reading
+///     for zero-syscall-overhead input multiplexing, real-time mouse tracking, and SIGWINCH
+///     resizing.
 /// </summary>
 public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
     private static readonly NKLogger LOGGER = NKDebug.GetLogger<LinuxInputDriver>();
@@ -29,7 +30,10 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
     public event FocusOutEventHandler?   FocusOut = delegate { };
     public event ResizeEventHandler?     Resize   = delegate { };
     public event PasteEventHandler?      Paste    = delegate { };
-    public event VTQueryResponseHandler? VTQuery  = delegate { };
+    public event VTQueryResponseHandler? VTQuery        = delegate { };
+    public event VTQueryTimeoutHandler?  VTQueryTimeout = delegate { };
+
+    private readonly record struct QueuedVTRequest(VTQuery Query, int Attempts);
 
     private          bool                   _disposed;
     private          Thread?                _inputThread;
@@ -38,7 +42,7 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
     private readonly LinuxInput             _input;
     private readonly LinuxAnsiParser        _parser;
     private readonly LockObject             _queueLock    = new();
-    private readonly Queue<VTQuery>         _requestQueue = new();
+    private readonly Queue<QueuedVTRequest> _requestQueue = new();
     private          LinuxInputDriverConfig _config;
     private          Size2D                 _lastSize;
 
@@ -55,18 +59,22 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
     public LinuxInputDriverConfig Config {
         get => _config;
         set {
-            if (_config != null)
-                _config.PropertyChanged -= HandleConfigChange;
-
+            ArgumentNullException.ThrowIfNull(value);
+            var old = _config;
             _config = value;
-
-            if (_config != null) {
-                _config.PropertyChanged += HandleConfigChange;
-                ApplyMouseReporting();
-                ApplyFocusReporting();
-                ApplyBracketedPaste();
-            }
+            ApplyConfigDiff(old, value);
         }
+    }
+
+    private void ApplyConfigDiff(LinuxInputDriverConfig? old, LinuxInputDriverConfig current) {
+        if (old == null || old.MouseReportLevel != current.MouseReportLevel || old.MouseReportProtocol != current.MouseReportProtocol)
+            ApplyMouseReporting();
+
+        if (old == null || old.ReportFocus != current.ReportFocus)
+            ApplyFocusReporting();
+
+        if (old == null || old.BracketedPaste != current.BracketedPaste)
+            ApplyBracketedPaste();
     }
 
     public LinuxInputDriver(LinuxInputDriverConfig? config = null) {
@@ -75,58 +83,40 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
         _input    = new LinuxInput();
         _parser   = new LinuxAnsiParser(_input, k => Key?.Invoke(k), _config.VTRequestTimeout, _config.RefreshInterval);
 
-        _config.PropertyChanged += HandleConfigChange;
-
-        if (!LinuxTerminal.TryGetWindowSize(out _lastSize)) {
+        if (!LinuxTerminal.TryGetWindowSize(out _lastSize))
             _lastSize = new Size2D(80, 25);
-        }
 
-        if (_config.CtrlCForceQuits) {
+        if (_config.CtrlCForceQuits)
             Key += a => {
                 if (a is { Down: true, Key: KeyCode.C } && a.Modifiers.GetHasCtrl()) {
                     LinuxTerminal.RestoreGlobalMode();
                     Process.GetCurrentProcess().Kill();
                 }
             };
-        }
+
+        ApplyMouseReporting();
+        ApplyFocusReporting();
+        ApplyBracketedPaste();
     }
 
     /// <summary>
-    /// Backwards compatibility constructor supporting <see cref="DotnetInputDriverConfig"/>.
+    ///     Backwards compatibility constructor supporting <see cref="DotnetInputDriverConfig" />.
     /// </summary>
     public LinuxInputDriver(DotnetInputDriverConfig? config) : this(
         config != null
-            ? new LinuxInputDriverConfig(
-                config.ReportFocus,
-                config.ReportResize,
-                config.BracketedPaste,
-                config.MouseReportLevel,
-                config.MouseReportProtocol,
-                config.CtrlCForceQuits
-            )
+            ? new LinuxInputDriverConfig {
+                ReportFocus = config.ReportFocus,
+                ReportResize = config.ReportResize,
+                BracketedPaste = config.BracketedPaste,
+                MouseReportLevel = config.MouseReportLevel,
+                MouseReportProtocol = config.MouseReportProtocol,
+                CtrlCForceQuits = config.CtrlCForceQuits,
+                RefreshInterval = config.RefreshInterval,
+                VTRequestTimeout = config.VTRequestTimeout,
+                VTRequestMaxRetries = config.VTRequestMaxRetries
+            }
             : null
     ) { }
-
-    private void HandleConfigChange(object? sender, PropertyChangedEventArgs e) {
-        switch (e.PropertyName) {
-            case nameof(Config.MouseReportLevel):
-            case nameof(Config.MouseReportProtocol): {
-                ApplyMouseReporting();
-
-                break;
-            }
-            case nameof(Config.ReportFocus): {
-                ApplyFocusReporting();
-
-                break;
-            }
-            case nameof(Config.BracketedPaste): {
-                ApplyBracketedPaste();
-
-                break;
-            }
-        }
-    }
 
     private void ApplyMouseReporting() {
         var targetLevel = _config.MouseReportLevel;
@@ -187,7 +177,7 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
             <= ReportedMouseEvents.RELEASE => MOUSE_EV_ON_PR_OFF,
             <= ReportedMouseEvents.DRAG    => MOUSE_EV_ON_PRD_OFF,
             <= ReportedMouseEvents.ALL     => MOUSE_EV_ON_ALL_OFF,
-            _                              => null,
+            _                              => null
         };
 
         var e = newValue switch {
@@ -196,7 +186,7 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
             <= ReportedMouseEvents.RELEASE => MOUSE_EV_ON_PR_ON,
             <= ReportedMouseEvents.DRAG    => MOUSE_EV_ON_PRD_ON,
             <= ReportedMouseEvents.ALL     => MOUSE_EV_ON_ALL_ON,
-            _                              => null,
+            _                              => null
         };
 
         if (d != null)
@@ -212,7 +202,7 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
             MouseReportProtocol.UTF8       => MOUSE_EV_UTF8_OFF,
             MouseReportProtocol.SGR        => MOUSE_EV_SGR_OFF,
             MouseReportProtocol.SGR_PIXELS => MOUSE_EV_SGR_PIXELS_OFF,
-            _                              => null,
+            _                              => null
         };
 
         var e = newValue switch {
@@ -220,7 +210,7 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
             MouseReportProtocol.UTF8       => MOUSE_EV_UTF8_ON,
             MouseReportProtocol.SGR        => MOUSE_EV_SGR_ON,
             MouseReportProtocol.SGR_PIXELS => MOUSE_EV_SGR_PIXELS_ON,
-            _                              => null,
+            _                              => null
         };
 
         if (d != null)
@@ -241,7 +231,21 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
 
     public void RequestVTQuery(VTQuery request) {
         lock (_queueLock) {
-            _requestQueue.Enqueue(request);
+            _requestQueue.Enqueue(new QueuedVTRequest(request, 0));
+        }
+    }
+
+    public bool CancelVTQuery(VTQuery request) {
+        lock (_queueLock) {
+            var list = _requestQueue.ToList();
+            var removed = list.RemoveAll(q => q.Query.Equals(request)) > 0;
+            if (removed) {
+                _requestQueue.Clear();
+                foreach (var item in list)
+                    _requestQueue.Enqueue(item);
+            }
+
+            return removed;
         }
     }
 
@@ -306,18 +310,16 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
     private void Intercept() {
         _isStopped = false;
 
-        while (IsRunning) {
+        while (IsRunning)
             try {
-                if (_input.PollAndBuffer(timeoutMs: 20)) {
+                if (_input.PollAndBuffer(20))
                     while (IsRunning && _parser.Peek()) {
                         var record = _parser.Parse();
                         ProcessInput(record);
                     }
-                }
 
-                if (_config.ReportResize) {
+                if (_config.ReportResize)
                     CheckWindowResized();
-                }
 
                 ProcessRequests();
             }
@@ -327,28 +329,25 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
             catch (Exception e) {
                 LOGGER.Error($"Linux input interceptor error: {e}");
             }
-        }
 
         _isStopped = true;
         OnStopped.Invoke();
     }
 
     private void CheckWindowResized() {
-        if (LinuxTerminal.TryGetWindowSize(out var newSize)) {
+        if (LinuxTerminal.TryGetWindowSize(out var newSize))
             if (newSize != _lastSize) {
                 _lastSize = newSize;
                 Resize?.Invoke(new ResizeEventArgs(newSize));
             }
-        }
     }
 
     private void OnWindowResized() {
-        if (_config.ReportResize && LinuxTerminal.TryGetWindowSize(out var newSize)) {
+        if (_config.ReportResize && LinuxTerminal.TryGetWindowSize(out var newSize))
             if (newSize != _lastSize) {
                 _lastSize = newSize;
                 Resize?.Invoke(new ResizeEventArgs(newSize));
             }
-        }
     }
 
     private void ProcessInput(AnsiRecord? record) {
@@ -375,11 +374,11 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
     }
 
     private void ProcessRequests() {
-        Queue<VTQuery>? currentRequests = null;
+        Queue<QueuedVTRequest>? currentRequests = null;
 
         lock (_queueLock) {
             if (_requestQueue.Count != 0) {
-                currentRequests = new Queue<VTQuery>(_requestQueue);
+                currentRequests = new Queue<QueuedVTRequest>(_requestQueue);
                 _requestQueue.Clear();
             }
         }
@@ -387,26 +386,33 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
         if (currentRequests == null)
             return;
 
-        var failed = new List<VTQuery>();
+        var retried = new List<QueuedVTRequest>();
 
-        foreach (var request in currentRequests) {
-            NKConsole.Write(request.GetEscSeq());
-            var parserResult = _parser.Parse(in request, out var response);
+        foreach (var item in currentRequests) {
+            NKConsole.Write(item.Query.GetEscSeq());
+            var query = item.Query;
+            var parserResult = _parser.Parse(in query, out var response);
 
             LOGGER.Debug(parserResult);
 
-            if (parserResult == AnsiParser.ParserResult.SUCCESS)
+            if (parserResult == AnsiParser.ParserResult.SUCCESS) {
                 VTQuery?.Invoke(response!.Value);
-            else
-                failed.Add(request);
+            }
+            else if (item.Attempts < Config.VTRequestMaxRetries) {
+                retried.Add(new QueuedVTRequest(item.Query, item.Attempts + 1));
+            }
+            else {
+                LOGGER.Warn($"VTQuery {item.Query.Type} failed with {parserResult} after {item.Attempts + 1} attempts.");
+                VTQueryTimeout?.Invoke(item.Query, parserResult);
+            }
         }
 
-        if (failed.Count == 0)
+        if (retried.Count == 0)
             return;
 
         lock (_queueLock) {
-            foreach (var f in failed)
-                _requestQueue.Enqueue(f);
+            foreach (var r in retried)
+                _requestQueue.Enqueue(r);
         }
     }
 
@@ -427,8 +433,8 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
         Stop();
 
         if (!_isStopped) {
-            var    waitStop = new ManualResetEventSlim(false);
-            var handler  = () => waitStop.Set();
+            var waitStop = new ManualResetEventSlim(false);
+            var handler  = waitStop.Set;
             OnStopped += handler;
 
             _input.WakeUp();
@@ -440,7 +446,6 @@ public sealed class LinuxInputDriver : IInputDriver<LinuxInputDriverConfig> {
         _terminal.Dispose();
 
         _disposed = true;
-        GC.SuppressFinalize(this);
     }
 }
 

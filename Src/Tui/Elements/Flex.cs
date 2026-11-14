@@ -54,42 +54,23 @@ public class Flex : IElement {
             Sizing = sizing;
     }
 
-    public static Flex Row(params IElement[] children) {
-        return new Flex(children) { Direction = FlexDirection.ROW };
-    }
+    public static Flex Row(params IElement[] children) => new(children) { Direction = FlexDirection.ROW };
 
-    public static Flex Column(params IElement[] children) {
-        return new Flex(children) { Direction = FlexDirection.COLUMN };
-    }
+    public static Flex Column(params IElement[] children) => new(children) { Direction = FlexDirection.COLUMN };
 
-    public static Flex Row(Bindable<Sizing> sizing, params IElement[] children) {
-        return new Flex(children) { Direction = FlexDirection.ROW, Sizing = sizing };
-    }
+    public static Flex Row(Bindable<Sizing> sizing, params IElement[] children) => new(children) { Direction = FlexDirection.ROW, Sizing = sizing };
 
-    public static Flex Column(Bindable<Sizing> sizing, params IElement[] children) {
-        return new Flex(children) { Direction = FlexDirection.COLUMN, Sizing = sizing };
-    }
+    public static Flex Column(Bindable<Sizing> sizing, params IElement[] children) => new(children) { Direction = FlexDirection.COLUMN, Sizing = sizing };
 
-    public static Flex Row(Sizing sizing, params IElement[] children) {
-        return new Flex(children) { Direction = FlexDirection.ROW, Sizing = sizing };
-    }
+    public static Flex Row(Sizing sizing, params IElement[] children) => new(children) { Direction = FlexDirection.ROW, Sizing = sizing };
 
-    public static Flex Column(Sizing sizing, params IElement[] children) {
-        return new Flex(children) { Direction = FlexDirection.COLUMN, Sizing = sizing };
-    }
+    public static Flex Column(Sizing sizing, params IElement[] children) => new(children) { Direction = FlexDirection.COLUMN, Sizing = sizing };
 
-    public static FlexItem Item(
-        IElement   child,
-        int        grow      = 0,
-        Dimension? basis     = null,
-        FlexAlign? alignSelf = null
-    ) {
-        return new FlexItem(child, grow, basis, alignSelf);
-    }
+    public static FlexItem Item(IElement child, int grow = 0, Dimension? basis = null, FlexAlign? alignSelf = null) => new(child, grow, basis, alignSelf);
 
     public Size2D Measure(LayoutContext context) {
-        var margin  = Margin.AsT.Resolve(context, ungrown: true);
-        var padding = Padding.AsT.Resolve(context, ungrown: true);
+        var margin  = Margin.AsT.Resolve(context, true);
+        var padding = Padding.AsT.Resolve(context, true);
 
         var overheadX = margin.Horizontal + padding.Horizontal;
         var overheadY = margin.Vertical   + padding.Vertical;
@@ -98,9 +79,9 @@ public class Flex : IElement {
 
         if (children is null || children.Count == 0) {
             var s = Sizing.AsT;
-            if (s != default) {
-                return s.ToSize(context, new Size2D(overheadX, overheadY), ungrown: false);
-            }
+
+            if (s != default)
+                return s.ToSize(context, new Size2D(overheadX, overheadY), false);
 
             return Size2D.Zero;
         }
@@ -121,15 +102,15 @@ public class Flex : IElement {
             Math.Max(0, availableParent.Y - overheadY)
         );
 
-        var  dir   = Direction.AsT;
-        bool isRow = dir is FlexDirection.ROW or FlexDirection.ROW_REVERSE;
-        int  gap   = Gap.AsT;
+        var dir   = Direction.AsT;
+        var isRow = dir is FlexDirection.ROW or FlexDirection.ROW_REVERSE;
+        var gap   = Gap.AsT;
 
-        int totalMain = 0;
-        int maxCross  = 0;
-        int count     = children.Count;
+        var totalMain = 0;
+        var maxCross  = 0;
+        var count     = children.Count;
 
-        for (int i = 0; i < count; i++) {
+        for (var i = 0; i < count; i++) {
             var child = children[i];
 
             if (child is null)
@@ -138,7 +119,7 @@ public class Flex : IElement {
             Size2D childDesired;
 
             if (child is FlexItem { Basis.AsT: { } basis }) {
-                int basisVal = basis.Resolve(
+                var basisVal = basis.Resolve(
                     isRow ? available.X : available.Y,
                     context.Screen,
                     ungrown: true
@@ -158,8 +139,8 @@ public class Flex : IElement {
                 childDesired = child.Measure(new LayoutContext(available, context.Screen));
             }
 
-            int childMain  = isRow ? childDesired.X : childDesired.Y;
-            int childCross = isRow ? childDesired.Y : childDesired.X;
+            var childMain  = isRow ? childDesired.X : childDesired.Y;
+            var childCross = isRow ? childDesired.Y : childDesired.X;
 
             totalMain += childMain;
 
@@ -167,17 +148,15 @@ public class Flex : IElement {
                 maxCross = childCross;
         }
 
-        if (count > 1) {
+        if (count > 1)
             totalMain += (count - 1) * gap;
-        }
 
         var naturalSize = isRow
             ? new Size2D(totalMain + overheadX, maxCross  + overheadY)
             : new Size2D(maxCross  + overheadX, totalMain + overheadY);
 
-        if (sizing != default) {
-            return sizing.ToSize(context, naturalSize, ungrown: false);
-        }
+        if (sizing != default)
+            return sizing.ToSize(context, naturalSize, false);
 
         return naturalSize;
     }
@@ -192,9 +171,8 @@ public class Flex : IElement {
         var actualParent  = parent;
         var sizing        = Sizing.AsT;
 
-        if (sizing != default) {
-            actualParent = sizing.ToSize(layoutContext, parent, ungrown: false);
-        }
+        if (sizing != default)
+            actualParent = sizing.ToSize(layoutContext, parent, false);
 
         var margin  = Margin.AsT.Resolve(layoutContext);
         var padding = Padding.AsT.Resolve(layoutContext);
@@ -209,23 +187,23 @@ public class Flex : IElement {
         if (contentSize.X <= 0 || contentSize.Y <= 0)
             return;
 
-        var  dir       = Direction.AsT;
-        bool isRow     = dir is FlexDirection.ROW or FlexDirection.ROW_REVERSE;
-        bool isReverse = dir is FlexDirection.ROW_REVERSE or FlexDirection.COLUMN_REVERSE;
+        var dir       = Direction.AsT;
+        var isRow     = dir is FlexDirection.ROW or FlexDirection.ROW_REVERSE;
+        var isReverse = dir is FlexDirection.ROW_REVERSE or FlexDirection.COLUMN_REVERSE;
 
-        int availableMain  = isRow ? contentSize.X : contentSize.Y;
-        int availableCross = isRow ? contentSize.Y : contentSize.X;
-        int gap            = Gap.AsT;
-        int count          = children.Count;
+        var availableMain  = isRow ? contentSize.X : contentSize.Y;
+        var availableCross = isRow ? contentSize.Y : contentSize.X;
+        var gap            = Gap.AsT;
+        var count          = children.Count;
 
         var items = new (IElement Element, int Grow, Size2D Desired, int BaseMain, FlexAlign Align)[count];
 
-        int totalGrow   = 0;
-        int sumBaseMain = 0;
+        var totalGrow   = 0;
+        var sumBaseMain = 0;
 
-        for (int i = 0; i < count; i++) {
+        for (var i = 0; i < count; i++) {
             var        child = children[i];
-            int        grow  = 0;
+            var        grow  = 0;
             var        align = AlignItems.AsT;
             Dimension? basis = null;
 
@@ -240,30 +218,28 @@ public class Flex : IElement {
 
             int baseMain;
 
-            if (basis.HasValue) {
+            if (basis.HasValue)
                 baseMain = basis.Value.Resolve(availableMain, context.Size, ungrown: true);
-            }
-            else {
+            else
                 baseMain = isRow ? desired.X : desired.Y;
-            }
 
             items[i]    =  (child, grow, desired, baseMain, align);
             totalGrow   += grow;
             sumBaseMain += baseMain;
         }
 
-        int totalGaps     = count > 1 ? (count        - 1) * gap : 0;
-        int remainingMain = Math.Max(0, availableMain - sumBaseMain - totalGaps);
+        var totalGaps     = count > 1 ? (count        - 1) * gap : 0;
+        var remainingMain = Math.Max(0, availableMain - sumBaseMain - totalGaps);
 
         var allocatedMain      = new int[count];
         var allocatedCross     = new int[count];
-        int totalAllocatedMain = 0;
+        var totalAllocatedMain = 0;
 
-        for (int i = 0; i < count; i++) {
-            int mainSize = items[i].BaseMain;
+        for (var i = 0; i < count; i++) {
+            var mainSize = items[i].BaseMain;
 
             if (items[i].Grow > 0 && totalGrow > 0 && remainingMain > 0) {
-                int flexShare = (int)MathF.Round((float)remainingMain * items[i].Grow / totalGrow);
+                var flexShare = (int)MathF.Round((float)remainingMain * items[i].Grow / totalGrow);
                 mainSize += flexShare;
             }
 
@@ -274,18 +250,18 @@ public class Flex : IElement {
                 allocatedCross[i] = availableCross;
             }
             else {
-                int childCross = isRow ? items[i].Desired.Y : items[i].Desired.X;
+                var childCross = isRow ? items[i].Desired.Y : items[i].Desired.X;
                 allocatedCross[i] = Math.Min(availableCross, childCross);
             }
         }
 
-        int freeSpace    = Math.Max(0, availableMain - totalAllocatedMain - totalGaps);
-        int startOffset  = 0;
-        int effectiveGap = gap;
+        var freeSpace    = Math.Max(0, availableMain - totalAllocatedMain - totalGaps);
+        var startOffset  = 0;
+        var effectiveGap = gap;
 
         var justify = JustifyContent.AsT;
 
-        if (freeSpace > 0 && totalGrow == 0) {
+        if (freeSpace > 0 && totalGrow == 0)
             switch (justify) {
                 case NeoKolors.Tui.Core.JustifyContent.START:  startOffset = 0; break;
                 case NeoKolors.Tui.Core.JustifyContent.END:    startOffset = freeSpace; break;
@@ -293,15 +269,14 @@ public class Flex : IElement {
                 case NeoKolors.Tui.Core.JustifyContent.SPACE_BETWEEN: {
                     startOffset = 0;
 
-                    if (count > 1) {
+                    if (count > 1)
                         effectiveGap = gap + freeSpace / (count - 1);
-                    }
 
                     break;
                 }
                 case NeoKolors.Tui.Core.JustifyContent.SPACE_AROUND: {
                     if (count > 0) {
-                        int unit = freeSpace / count;
+                        var unit = freeSpace / count;
                         startOffset  = unit / 2;
                         effectiveGap = gap + unit;
                     }
@@ -310,7 +285,7 @@ public class Flex : IElement {
                 }
                 case NeoKolors.Tui.Core.JustifyContent.SPACE_EVENLY: {
                     if (count > 0) {
-                        int unit = freeSpace / (count + 1);
+                        var unit = freeSpace / (count + 1);
                         startOffset  = unit;
                         effectiveGap = gap + unit;
                     }
@@ -319,17 +294,16 @@ public class Flex : IElement {
                 }
                 default: throw new ArgumentOutOfRangeException(nameof(justify));
             }
-        }
 
-        int currentMain = startOffset;
+        var currentMain = startOffset;
 
-        for (int step = 0; step < count; step++) {
-            int i = isReverse ? (count - 1 - step) : step;
+        for (var step = 0; step < count; step++) {
+            var i = isReverse ? count - 1 - step : step;
 
-            int mainSize  = allocatedMain[i];
-            int crossSize = allocatedCross[i];
+            var mainSize  = allocatedMain[i];
+            var crossSize = allocatedCross[i];
 
-            int crossOffset = items[i].Align switch {
+            var crossOffset = items[i].Align switch {
                 FlexAlign.END    => Math.Max(0, availableCross - crossSize),
                 FlexAlign.CENTER => Math.Max(0, availableCross - crossSize) / 2,
                 _                => 0
@@ -346,8 +320,8 @@ public class Flex : IElement {
             var childGlobalOffset = contentOrigin + childRelativePos;
 
             using (context.PushScope(
-                    offset: childGlobalOffset,
-                    clip: new Rect2D(Point2D.Zero,        childSize),
+                    childGlobalOffset,
+                    new Rect2D(Point2D.Zero,              childSize),
                     contextArea: new Rect2D(Point2D.Zero, childSize)
                 )) {
                 items[i].Element.Render(context, childSize);
@@ -380,21 +354,15 @@ public class FlexBox : Flex {
         Sizing = sizing;
     }
 
-    public static new FlexBox Row(params IElement[] children) =>
-        new FlexBox(children) { Direction = FlexDirection.ROW };
+    public new static FlexBox Row(params IElement[] children) => new(children) { Direction = FlexDirection.ROW };
 
-    public static new FlexBox Column(params IElement[] children) =>
-        new FlexBox(children) { Direction = FlexDirection.COLUMN };
+    public new static FlexBox Column(params IElement[] children) => new(children) { Direction = FlexDirection.COLUMN };
 
-    public static new FlexBox Row(Bindable<Sizing> sizing, params IElement[] children) =>
-        new FlexBox(sizing, children) { Direction = FlexDirection.ROW };
+    public new static FlexBox Row(Bindable<Sizing> sizing, params IElement[] children) => new(sizing, children) { Direction = FlexDirection.ROW };
 
-    public static new FlexBox Column(Bindable<Sizing> sizing, params IElement[] children) =>
-        new FlexBox(sizing, children) { Direction = FlexDirection.COLUMN };
+    public new static FlexBox Column(Bindable<Sizing> sizing, params IElement[] children) => new(sizing, children) { Direction = FlexDirection.COLUMN };
 
-    public static new FlexBox Row(Sizing sizing, params IElement[] children) =>
-        new FlexBox(sizing, children) { Direction = FlexDirection.ROW };
+    public new static FlexBox Row(Sizing sizing, params IElement[] children) => new(sizing, children) { Direction = FlexDirection.ROW };
 
-    public static new FlexBox Column(Sizing sizing, params IElement[] children) =>
-        new FlexBox(sizing, children) { Direction = FlexDirection.COLUMN };
+    public new static FlexBox Column(Sizing sizing, params IElement[] children) => new(sizing, children) { Direction = FlexDirection.COLUMN };
 }

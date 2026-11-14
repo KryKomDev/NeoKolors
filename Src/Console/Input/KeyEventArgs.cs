@@ -8,8 +8,9 @@ using NeoKolors.Extensions;
 namespace NeoKolors.Console;
 
 /// <summary>
-/// Represents information about a keyboard event, including the pressed key, associated character,
-/// and any active modifiers.
+///     Represents information about a keyboard event, including the pressed key, associated
+///     character,
+///     and any active modifiers.
 /// </summary>
 public readonly record struct KeyEventArgs {
     public KeyModifiers Modifiers { get; init; }
@@ -25,16 +26,16 @@ public readonly record struct KeyEventArgs {
     }
 
     public KeyEventArgs(ConsoleKey key, ConsoleModifiers modifiers, char c) {
-        Modifiers = KeyModifiers.NONE 
-            | (modifiers.HasAlt   ? KeyModifiers.LEFT_ALT  : KeyModifiers.NONE)
-            | (modifiers.HasShift ? KeyModifiers.SHIFT     : KeyModifiers.NONE)
-            | (modifiers.HasCtrl  ? KeyModifiers.LEFT_CTRL : KeyModifiers.NONE);
-        
+        Modifiers = KeyModifiers.NONE
+            | (modifiers.HasAlt ? KeyModifiers.LEFT_ALT : KeyModifiers.NONE)
+            | (modifiers.HasShift ? KeyModifiers.SHIFT : KeyModifiers.NONE)
+            | (modifiers.HasCtrl ? KeyModifiers.LEFT_CTRL : KeyModifiers.NONE);
+
         Key  = (KeyCode)key;
         Char = c;
         Down = true;
     }
-    
+
     public KeyEventArgs(ConsoleKeyInfo keyInfo) : this(keyInfo.Key, keyInfo.Modifiers, keyInfo.KeyChar) { }
 
     internal KeyEventArgs(WinImports.WinKeyEvent keyInfo) {
@@ -45,7 +46,6 @@ public readonly record struct KeyEventArgs {
     }
 
     public bool Up => !Down;
-    
-    public override string ToString() =>
-        $"{(Modifiers != KeyModifiers.NONE ? $"{Modifiers.ToString()} + " : "")}{Key} -> '{Char}'";
+
+    public override string ToString() => $"{(Modifiers != KeyModifiers.NONE ? $"{Modifiers.ToString()} + " : "")}{Key} -> '{Char}'";
 }

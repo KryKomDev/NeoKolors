@@ -4,8 +4,8 @@ public class SpanExtensionsTests {
 
     [Fact]
     public void Concat_ReadOnlySpan_JoinsCorrectly() {
-        ReadOnlySpan<char> first = "Hello".AsSpan();
-        ReadOnlySpan<char> second = " World".AsSpan();
+        var first  = "Hello".AsSpan();
+        var second = " World".AsSpan();
 
         var result = first.Concat(second);
 
@@ -14,8 +14,8 @@ public class SpanExtensionsTests {
 
     [Fact]
     public void Concat_String_JoinsCorrectly() {
-        string first = "Hello";
-        ReadOnlySpan<char> second = " World".AsSpan();
+        var first  = "Hello";
+        var second = " World".AsSpan();
 
         var result = first.Concat(second);
 

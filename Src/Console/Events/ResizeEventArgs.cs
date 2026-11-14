@@ -6,14 +6,14 @@ using Metriks;
 namespace NeoKolors.Console;
 
 public class ResizeEventArgs {
-    public int Width { get; }
+    public int Width  { get; }
     public int Height { get; }
-    
+
     public ResizeEventArgs(Size2D size) {
         Width  = size.X;
         Height = size.Y;
     }
-    
+
     public ResizeEventArgs(int width, int height) {
         Width  = width;
         Height = height;

@@ -8,10 +8,10 @@ public class TableAlignmentTests {
     [Fact]
     public void Table_DefaultAlignment_IsLeftAligned() {
         var table = Table.FromText(
-            headers: ["Col"],
-            rows: [["Hi"]],
-            style: NKTableStyle.GetAscii(),
-            columnWidths: [Dimension.Chars(10)]
+            ["Col"],
+            [["Hi"]],
+            NKTableStyle.GetAscii(),
+            [Dimension.Chars(10)]
         );
 
         var context = new LayoutContext(new Size2D(30, 10), new Size2D(30, 10));
@@ -33,11 +33,11 @@ public class TableAlignmentTests {
     [Fact]
     public void Table_RightAlignedColumn_AlignsTextFlushToRightPadding() {
         var table = Table.FromText(
-            headers: ["Price"],
-            rows: [["$5"]],
-            style: NKTableStyle.GetAscii(),
-            columnWidths: [Dimension.Chars(10)],
-            columnAlignments: [HorizontalAlign.RIGHT]
+            ["Price"],
+            [["$5"]],
+            NKTableStyle.GetAscii(),
+            [Dimension.Chars(10)],
+            [HorizontalAlign.RIGHT]
         );
 
         var context = new LayoutContext(new Size2D(30, 10), new Size2D(30, 10));
@@ -68,11 +68,11 @@ public class TableAlignmentTests {
     [Fact]
     public void Table_CenterAlignedColumn_CentersTextWithinColumn() {
         var table = Table.FromText(
-            headers: ["Status"],
-            rows: [["OK"]],
-            style: NKTableStyle.GetAscii(),
-            columnWidths: [Dimension.Chars(10)],
-            columnAlignments: [HorizontalAlign.CENTER]
+            ["Status"],
+            [["OK"]],
+            NKTableStyle.GetAscii(),
+            [Dimension.Chars(10)],
+            [HorizontalAlign.CENTER]
         );
 
         var context = new LayoutContext(new Size2D(30, 10), new Size2D(30, 10));
@@ -94,11 +94,11 @@ public class TableAlignmentTests {
     [Fact]
     public void Table_MixedColumnAlignments_AlignsEachColumnIndependently() {
         var table = Table.FromText(
-            headers: ["Name", "Qty", "Active"],
-            rows: [["Item", "42", "Yes"]],
-            style: NKTableStyle.GetAscii(),
-            columnWidths: [Dimension.Chars(8), Dimension.Chars(8), Dimension.Chars(8)],
-            columnAlignments: [HorizontalAlign.LEFT, HorizontalAlign.RIGHT, HorizontalAlign.CENTER]
+            ["Name", "Qty", "Active"],
+            [["Item", "42", "Yes"]],
+            NKTableStyle.GetAscii(),
+            [Dimension.Chars(8), Dimension.Chars(8), Dimension.Chars(8)],
+            [HorizontalAlign.LEFT, HorizontalAlign.RIGHT, HorizontalAlign.CENTER]
         );
 
         var context = new LayoutContext(new Size2D(50, 10), new Size2D(50, 10));
@@ -137,11 +137,11 @@ public class TableAlignmentTests {
     public void Table_HeaderAlignment_InheritsColumnAlignment_UnlessOverridden() {
         // Table with column 0 right-aligned, but header overridden to center
         var table = Table.FromText(
-            headers: ["Price"],
-            rows: [["100"]],
-            style: NKTableStyle.GetAscii(),
-            columnWidths: [Dimension.Chars(12)],
-            columnAlignments: [HorizontalAlign.RIGHT],
+            ["Price"],
+            [["100"]],
+            NKTableStyle.GetAscii(),
+            [Dimension.Chars(12)],
+            [HorizontalAlign.RIGHT],
             headerAlignments: [HorizontalAlign.CENTER]
         );
 
@@ -177,9 +177,9 @@ public class TableAlignmentTests {
         IReadOnlyList2D<IElement> roData = data;
 
         var table = new Table(
-            headers: null,
-            data: roData,
-            style: NKTableStyle.GetAscii(),
+            null,
+            roData,
+            NKTableStyle.GetAscii(),
             columnVerticalAlignments: [VerticalAlign.TOP, VerticalAlign.BOTTOM]
         );
 
@@ -207,16 +207,16 @@ public class TableAlignmentTests {
     public void Table_CustomElements_AlignCorrectly() {
         // Button inside right-aligned column
         var button = Button.FromText("OK", borderStyle: NKBorderStyle.GetAscii());
-        var data = new List2D<IElement>(1, 1);
+        var data   = new List2D<IElement>(1, 1);
         data.Resize(1, 1);
         data[0, 0] = button;
 
         var table = new Table(
-            headers: null,
-            data: data,
-            style: NKTableStyle.GetAscii(),
-            columnWidths: [Dimension.Chars(12)],
-            columnAlignments: [HorizontalAlign.RIGHT]
+            null,
+            data,
+            NKTableStyle.GetAscii(),
+            [Dimension.Chars(12)],
+            [HorizontalAlign.RIGHT]
         );
 
         var context = new LayoutContext(new Size2D(30, 10), new Size2D(30, 10));
@@ -241,7 +241,7 @@ public class TableAlignmentTests {
         var alignments = new Signal<IReadOnlyList<HorizontalAlign>?>([HorizontalAlign.LEFT]);
 
         var table = new Table(
-            data: new Signal<IReadOnlyList2D<IElement>>(
+            new Signal<IReadOnlyList2D<IElement>>(
                 new List2D<IElement>(new IElement[,] { { new Text(new AnsiString("X")) } })
             ),
             style: NKTableStyle.GetAscii(),
@@ -265,6 +265,7 @@ public class TableAlignmentTests {
         using (var canvas = new NKCharCanvas(size.X, size.Y)) {
             var rc = new RenderContext(canvas);
             table.Render(rc, size);
+
             // Box width 6, padded width 4. 'X' (len 1) offset = 4 - 1 = 3 -> x = 2 + 3 = 5.
             Assert.Equal('X', canvas.Data[5, 1].Char);
         }

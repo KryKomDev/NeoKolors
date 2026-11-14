@@ -4,31 +4,28 @@
 namespace NeoKolors.Settings.Builder;
 
 public readonly struct SettingsMethodGroupInfo :
-    ISettingsElementInfo<SettingsMethodGroup>, 
-    IEquatable<SettingsMethodGroupInfo> 
-{
-    public string Name { get; }
-    public SettingsMethodGroup Value { get; }
-    object? ISettingsElementInfo.Value => Value;
-    public string? Description { get; }
-    
+    ISettingsElementInfo<SettingsMethodGroup>,
+    IEquatable<SettingsMethodGroupInfo> {
+    public string                Name        { get; }
+    public SettingsMethodGroup   Value       { get; }
+    object? ISettingsElementInfo.Value       => Value;
+    public string?               Description { get; }
+
     public SettingsMethodGroupInfo(string name, SettingsMethodGroup value, string? description = null) {
-        Name = name;
-        Value = value;
+        Name        = name;
+        Value       = value;
         Description = description;
     }
 
     public override int GetHashCode() => Name.GetHashCode();
 
-    public bool Equals(SettingsMethodGroupInfo other) =>
-        Name == other.Name && Value.Equals(other.Value) && Description == other.Description;
-    
-    public override bool Equals(object? obj) => 
-        obj is SettingsMethodGroupInfo other && Equals(other);
+    public bool Equals(SettingsMethodGroupInfo other) => Name == other.Name && Value.Equals(other.Value) && Description == other.Description;
+
+    public override bool Equals(object? obj) => obj is SettingsMethodGroupInfo other && Equals(other);
 
     public static bool operator ==(SettingsMethodGroupInfo left, SettingsMethodGroupInfo right) => left.Equals(right);
     public static bool operator !=(SettingsMethodGroupInfo left, SettingsMethodGroupInfo right) => !left.Equals(right);
-    
+
     public string ToXsd() =>
         $"""
          <xsd:element name="{Name}">

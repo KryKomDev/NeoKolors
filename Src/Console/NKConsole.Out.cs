@@ -18,372 +18,345 @@ namespace NeoKolors.Console;
 public static partial class NKConsole {
 
     #region OUTPUT DRIVER DELEGATING METHODS
-    
+
     /// <summary>
-    /// Writes the specified span of characters to the output.
+    ///     Writes the specified span of characters to the output.
     /// </summary>
     /// <param name="value">The span of characters to write.</param>
     public static void Write(ReadOnlySpan<char> value) => OutputDriver.Write(value);
 
-    
+
     /// <summary>
-    /// Writes the specified string value to the output.
+    ///     Writes the specified string value to the output.
     /// </summary>
     /// <param name="value">The string to write.</param>
     public static void Write(string value) => OutputDriver.Write(value);
 
 
     /// <summary>
-    /// Writes the specified ANSI string to the output.
+    ///     Writes the specified ANSI string to the output.
     /// </summary>
     /// <param name="value">The ANSI string to write to the console output.</param>
     public static void Write(AnsiString value) => OutputDriver.Write(value.ToString());
-    
+
 
     /// <summary>
-    /// Writes the specified formatted string along with its arguments to the output.
+    ///     Writes the specified formatted string along with its arguments to the output.
     /// </summary>
     /// <param name="format">The composite format string.</param>
     /// <param name="args">An array of objects to write using the format string.</param>
-    public static void Write([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object[] args) => 
-        OutputDriver.Write(format, args);
-    
+    public static void Write([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object[] args) => OutputDriver.Write(format, args);
+
     /// <summary>
-    /// Writes a newline to the output.
+    ///     Writes a newline to the output.
     /// </summary>
     public static void WriteLine() => OutputDriver.Write("\n");
-    
+
     /// <summary>
-    /// Writes the specified span of characters followed by a new line to the output.
+    ///     Writes the specified span of characters followed by a new line to the output.
     /// </summary>
     /// <param name="value">The span of characters to write followed by a new line.</param>
     public static void WriteLine(ReadOnlySpan<char> value) => OutputDriver.WriteLine(value);
-    
-    
+
+
     /// <summary>
-    /// Writes the specified string value followed by a new line to the output.
+    ///     Writes the specified string value followed by a new line to the output.
     /// </summary>
     /// <param name="value">The string to write followed by a new line.</param>
     public static void WriteLine(string value) => OutputDriver.WriteLine(value);
 
 
     /// <summary>
-    /// Writes the specified ANSI string to the output and a new line.
+    ///     Writes the specified ANSI string to the output and a new line.
     /// </summary>
     /// <param name="value">The ANSI string to write to the console output.</param>
     public static void WriteLine(AnsiString value) => OutputDriver.WriteLine(value.ToString());
-    
-    
+
+
     /// <summary>
-    /// Writes the specified string value followed by a new line to the output.
+    ///     Writes the specified string value followed by a new line to the output.
     /// </summary>
     /// <param name="format">The composite format string.</param>
     /// <param name="args">An array of objects to write using the format string.</param>
-    public static void WriteLine([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args) => 
-        OutputDriver.WriteLine(format, args);
+    public static void WriteLine([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args) => OutputDriver.WriteLine(format, args);
 
-    
+
     /// <summary>
-    /// Writes the specified object value followed by a new line to the output.
+    ///     Writes the specified object value followed by a new line to the output.
     /// </summary>
-    /// <param name="value">The object to write followed by a new line.
-    /// If the value is null, an empty string is written.</param>
+    /// <param name="value">
+    ///     The object to write followed by a new line.
+    ///     If the value is null, an empty string is written.
+    /// </param>
     public static void WriteLine(object? value) => OutputDriver.WriteLine(value);
-    
+
     #endregion
-    
-    
+
+
     /// <summary>
-    /// prints a colored string in the console without a newline
+    ///     prints a colored string in the console without a newline
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="hex">hexadecimal value of the color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Write(string s, int hex) => 
-        OutputDriver.Write(s.AddColor(hex));
+    public static void Write(string s, int hex) => OutputDriver.Write(s.AddColor(hex));
 
-    
+
     /// <summary>
-    /// prints a colored string in the console without a newline
+    ///     prints a colored string in the console without a newline
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="r">red value of the color</param>
     /// <param name="g">green value of the color</param>
     /// <param name="b">blue value of the color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Write(string s, byte r, byte g, byte b) => 
-        OutputDriver.Write(s.AddColor(r, g, b));
-    
-    
+    public static void Write(string s, byte r, byte g, byte b) => OutputDriver.Write(s.AddColor(r, g, b));
+
+
     /// <summary>
-    /// prints a string colored by the <see cref="System.ConsoleColor"/> value
+    ///     prints a string colored by the <see cref="System.ConsoleColor" /> value
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Write(string s, System.Drawing.Color c) =>
-        OutputDriver.Write(s.AddColor(c));
+    public static void Write(string s, System.Drawing.Color c) => OutputDriver.Write(s.AddColor(c));
 
-    
+
     /// <summary>
-    /// prints a string colored by the <see cref="System.ConsoleColor"/> value
+    ///     prints a string colored by the <see cref="System.ConsoleColor" /> value
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Write(string s, ConsoleColor c) => 
-        OutputDriver.Write(s.AddColor(c));
+    public static void Write(string s, ConsoleColor c) => OutputDriver.Write(s.AddColor(c));
 
-    
+
     /// <summary>
-    /// prints a string colored by the <see cref="NKColor"/>
+    ///     prints a string colored by the <see cref="NKColor" />
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Write(string s, NKColor c) => 
-        OutputDriver.Write(s.AddColor(c));
+    public static void Write(string s, NKColor c) => OutputDriver.Write(s.AddColor(c));
 
-    
+
     /// <summary>
-    /// prints a string colored by the universal <see cref="NKColor"/>
+    ///     prints a string colored by the universal <see cref="NKColor" />
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="t">style</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Write(string s, NKTextStyles t) => 
-        OutputDriver.Write(s.AddStyle(t));
-    
+    public static void Write(string s, NKTextStyles t) => OutputDriver.Write(s.AddStyle(t));
+
 
     /// <summary>
-    /// Writes a string to the console with the specified color applied.
+    ///     Writes a string to the console with the specified color applied.
     /// </summary>
     /// <param name="s">The string to write to the console.</param>
     /// <param name="colors">The colors to be applied to the string.</param>
     [StringFormatMethod(nameof(s))]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteF(string s, params NKColor[] colors) =>
-        OutputDriver.Write(s, colors.Cast<object?>().ToArray());
+    public static void WriteF(string s, params NKColor[] colors) => OutputDriver.Write(s, colors.Cast<object?>().ToArray());
 
 
     // --- --- let there begin WriteLine implementations --- ---
-    
+
     /// <summary>
-    /// prints a colored string in the console with a newline
+    ///     prints a colored string in the console with a newline
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="hex">hexadecimal value of the color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(string s, int hex) => 
-        OutputDriver.WriteLine(s.AddColor(hex));
+    public static void WriteLine(string s, int hex) => OutputDriver.WriteLine(s.AddColor(hex));
 
-    
+
     /// <summary>
-    /// prints a colored string in the console with a newline
+    ///     prints a colored string in the console with a newline
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="r">red value of the color</param>
     /// <param name="g">green value of the color</param>
     /// <param name="b">blue value of the color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(string s, byte r, byte g, byte b) =>
-        OutputDriver.WriteLine(s.AddColor(r, g, b));
-    
-    
+    public static void WriteLine(string s, byte r, byte g, byte b) => OutputDriver.WriteLine(s.AddColor(r, g, b));
+
+
     /// <summary>
-    /// prints a string colored by the <see cref="ConsoleColor"/> value
+    ///     prints a string colored by the <see cref="ConsoleColor" /> value
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(string s, ConsoleColor c) => 
-        OutputDriver.WriteLine(s.AddColor(c));
-    
-    
+    public static void WriteLine(string s, ConsoleColor c) => OutputDriver.WriteLine(s.AddColor(c));
+
+
     /// <summary>
-    /// prints a string colored by the <see cref="System.Drawing.Color"/>
+    ///     prints a string colored by the <see cref="System.Drawing.Color" />
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(string s, System.Drawing.Color c) => 
-        OutputDriver.WriteLine(s.AddColor(c));
-    
-    
+    public static void WriteLine(string s, System.Drawing.Color c) => OutputDriver.WriteLine(s.AddColor(c));
+
+
     /// <summary>
-    /// prints a string colored by the universal <see cref="NKColor"/>
+    ///     prints a string colored by the universal <see cref="NKColor" />
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(string s, NKColor c) => 
-        OutputDriver.WriteLine(s.AddColor(c));
-    
+    public static void WriteLine(string s, NKColor c) => OutputDriver.WriteLine(s.AddColor(c));
+
     /// <summary>
-    /// prints a string colored by the universal <see cref="NKColor"/>
+    ///     prints a string colored by the universal <see cref="NKColor" />
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="t">style</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(string s, NKTextStyles t) => 
-        OutputDriver.WriteLine(s.AddStyle(t));
+    public static void WriteLine(string s, NKTextStyles t) => OutputDriver.WriteLine(s.AddStyle(t));
 
 
     /// <summary>
-    /// prints a string with its background colored using string symbols
+    ///     prints a string with its background colored using string symbols
     /// </summary>
     /// <param name="s">source string</param>
     /// <param name="colors">
-    /// tuple of symbol string and color,
-    /// with which will the symbol be replaced,
-    /// if a color is -1, the colors will be reset
+    ///     tuple of symbol string and color,
+    ///     with which will the symbol be replaced,
+    ///     if a color is -1, the colors will be reset
     /// </param>
     [StringFormatMethod(nameof(s))]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLineF(string s, params NKColor[] colors) => 
-        OutputDriver.WriteLine(s, colors.Cast<object?>().ToArray());
+    public static void WriteLineF(string s, params NKColor[] colors) => OutputDriver.WriteLine(s, colors.Cast<object?>().ToArray());
 
-    
+
     /// <summary>
-    /// prints a string with a colored background in the console without a newline
+    ///     prints a string with a colored background in the console without a newline
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="hex">hexadecimal value of the color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteB(string s, int hex) => 
-        OutputDriver.Write(s.AddColorB(hex));
+    public static void WriteB(string s, int hex) => OutputDriver.Write(s.AddColorB(hex));
 
-    
+
     /// <summary>
-    /// prints a string with a colored background in the console without a newline
+    ///     prints a string with a colored background in the console without a newline
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="r">red value of the color</param>
     /// <param name="g">green value of the color</param>
     /// <param name="b">blue value of the color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteB(string s, byte r, byte g, byte b) => 
-        OutputDriver.Write(s.AddColorB(r, g, b));
+    public static void WriteB(string s, byte r, byte g, byte b) => OutputDriver.Write(s.AddColorB(r, g, b));
 
-    
+
     /// <summary>
-    /// prints a string with the background colored by the <see cref="ConsoleColor"/> value
+    ///     prints a string with the background colored by the <see cref="ConsoleColor" /> value
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteB(string s, ConsoleColor c) => 
-        OutputDriver.Write(s.AddColorB(c));
-    
-    
+    public static void WriteB(string s, ConsoleColor c) => OutputDriver.Write(s.AddColorB(c));
+
+
     /// <summary>
-    /// prints a string with the background colored by the <see cref="System.Drawing.Color"/>
+    ///     prints a string with the background colored by the <see cref="System.Drawing.Color" />
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteB(string s, System.Drawing.Color c) => 
-        OutputDriver.Write(s.AddColorB(c));
-    
-    
+    public static void WriteB(string s, System.Drawing.Color c) => OutputDriver.Write(s.AddColorB(c));
+
+
     /// <summary>
-    /// prints a string with the background colored by the universal <see cref="NKColor"/>
+    ///     prints a string with the background colored by the universal <see cref="NKColor" />
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteB(string s, NKColor c) => 
-        OutputDriver.Write(s.AddColorB(c));
-    
-    
+    public static void WriteB(string s, NKColor c) => OutputDriver.Write(s.AddColorB(c));
+
+
     /// <summary>
-    /// Writes a formatted string with specified colors to the console.
+    ///     Writes a formatted string with specified colors to the console.
     /// </summary>
     /// <param name="s">The string to format and write.</param>
     /// <param name="colors">An array of colors to format the string with.</param>
     [StringFormatMethod(nameof(s))]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public static void WriteBF(string s, params NKColor[] colors) =>
-        OutputDriver.Write(s, colors.Cast<object?>().ToArray());
+    public static void WriteBF(string s, params NKColor[] colors) => OutputDriver.Write(s, colors.Cast<object?>().ToArray());
 
 
     /// <summary>
-    /// prints a string with a colored background in the console with a newline
+    ///     prints a string with a colored background in the console with a newline
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="hex">hexadecimal value of the color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLineB(string s, int hex) => 
-        OutputDriver.WriteLine(s.AddColor(hex));
-    
-    
+    public static void WriteLineB(string s, int hex) => OutputDriver.WriteLine(s.AddColor(hex));
+
+
     /// <summary>
-    /// prints a string with a colored background in the console with a newline
+    ///     prints a string with a colored background in the console with a newline
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="r">red value of the color</param>
     /// <param name="g">green value of the color</param>
     /// <param name="b">blue value of the color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLineB(string s, byte r, byte g, byte b) => 
-        OutputDriver.WriteLine(s.AddColorB(r, g, b));
-    
-    
+    public static void WriteLineB(string s, byte r, byte g, byte b) => OutputDriver.WriteLine(s.AddColorB(r, g, b));
+
+
     /// <summary>
-    /// prints a string with the background colored by the <see cref="ConsoleColor"/> value
+    ///     prints a string with the background colored by the <see cref="ConsoleColor" /> value
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLineB(string s, ConsoleColor c) =>
-        OutputDriver.WriteLine(s.AddColorB(c));
+    public static void WriteLineB(string s, ConsoleColor c) => OutputDriver.WriteLine(s.AddColorB(c));
 
-    
+
     /// <summary>
-    /// prints a string with the background colored by the <see cref="System.Drawing.Color"/>
+    ///     prints a string with the background colored by the <see cref="System.Drawing.Color" />
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLineB(string s, System.Drawing.Color c) => 
-        OutputDriver.WriteLine(s.AddColorB(c));
+    public static void WriteLineB(string s, System.Drawing.Color c) => OutputDriver.WriteLine(s.AddColorB(c));
 
-    
+
     /// <summary>
-    /// prints a string with the background colored by the universal <see cref="NKColor"/>
+    ///     prints a string with the background colored by the universal <see cref="NKColor" />
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="c">color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLineB(string s, NKColor c) => 
-        OutputDriver.WriteLine(s.AddColorB(c));
+    public static void WriteLineB(string s, NKColor c) => OutputDriver.WriteLine(s.AddColorB(c));
 
 
     /// <summary>
-    /// Writes a formatted string with specified colors to the console, followed by a newline.
+    ///     Writes a formatted string with specified colors to the console, followed by a newline.
     /// </summary>
     /// <param name="s">The string to format and write.</param>
     /// <param name="colors">An array of colors to format the string with.</param>
     [StringFormatMethod(nameof(s))]
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [SuppressMessage("ReSharper", "InconsistentNaming")]
-    public static void WriteLineBF(string s, params NKColor[] colors) =>
-        OutputDriver.WriteLine(s, colors.Cast<object?>().ToArray());
+    public static void WriteLineBF(string s, params NKColor[] colors) => OutputDriver.WriteLine(s, colors.Cast<object?>().ToArray());
 
 
     /// <summary>
-    /// prints a colored string with a colored background  
+    ///     prints a colored string with a colored background
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="text">text color</param>
     /// <param name="background">background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Write(string s, int text, int background) =>
-        OutputDriver.Write(s.AddColor(text).AddColorB(background));
+    public static void Write(string s, int text, int background) => OutputDriver.Write(s.AddColor(text).AddColorB(background));
 
     /// <summary>
-    /// prints a colored string with a colored background  
+    ///     prints a colored string with a colored background
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="tr">red value of text color</param>
@@ -393,54 +366,49 @@ public static partial class NKConsole {
     /// <param name="bg">green value of background color</param>
     /// <param name="bb">blue value of background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Write(string s, byte tr, byte tg, byte tb, byte br, byte bg, byte bb) =>
-        OutputDriver.Write(s.AddColor(tr, tg, tb).AddColorB(br, bg, bb));
-    
+    public static void Write(string s, byte tr, byte tg, byte tb, byte br, byte bg, byte bb) => OutputDriver.Write(s.AddColor(tr, tg, tb).AddColorB(br, bg, bb));
+
     /// <summary>
-    /// prints a colored string with a colored background  
+    ///     prints a colored string with a colored background
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="text">text color</param>
     /// <param name="background">background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Write(string s, int text, ConsoleColor background)  =>
-        OutputDriver.Write(s.AddColor(text).AddColorB(background));
-    
-    
-    /// <summary>
-    /// prints a colored string with a colored background  
-    /// </summary>
-    /// <param name="s">string to print</param>
-    /// <param name="text">text color</param>
-    /// <param name="background">background color</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Write(string s, System.Drawing.Color text, System.Drawing.Color background)  =>
-        OutputDriver.Write(s.AddColor(text).AddColorB(background));
+    public static void Write(string s, int text, ConsoleColor background) => OutputDriver.Write(s.AddColor(text).AddColorB(background));
 
 
     /// <summary>
-    /// prints a colored string with a colored background  
+    ///     prints a colored string with a colored background
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="text">text color</param>
     /// <param name="background">background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Write(string s, NKColor text, NKColor background)  =>
-        OutputDriver.Write(s.AddColor(text).AddColorB(background));
-    
-    
-    /// <summary>
-    /// prints a colored string with a colored background  
-    /// </summary>
-    /// <param name="s">string to print</param>
-    /// <param name="text">text color</param>
-    /// <param name="background">background color</param>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(string s, int text, int background) =>
-        OutputDriver.WriteLine(s.AddColor(text).AddColorB(background));
+    public static void Write(string s, System.Drawing.Color text, System.Drawing.Color background) => OutputDriver.Write(s.AddColor(text).AddColorB(background));
+
 
     /// <summary>
-    /// prints a colored string with a colored background  
+    ///     prints a colored string with a colored background
+    /// </summary>
+    /// <param name="s">string to print</param>
+    /// <param name="text">text color</param>
+    /// <param name="background">background color</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void Write(string s, NKColor text, NKColor background) => OutputDriver.Write(s.AddColor(text).AddColorB(background));
+
+
+    /// <summary>
+    ///     prints a colored string with a colored background
+    /// </summary>
+    /// <param name="s">string to print</param>
+    /// <param name="text">text color</param>
+    /// <param name="background">background color</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void WriteLine(string s, int text, int background) => OutputDriver.WriteLine(s.AddColor(text).AddColorB(background));
+
+    /// <summary>
+    ///     prints a colored string with a colored background
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="tr">red value of text color</param>
@@ -450,627 +418,104 @@ public static partial class NKConsole {
     /// <param name="bg">green value of background color</param>
     /// <param name="bb">blue value of background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(string s, byte tr, byte tg, byte tb, byte br, byte bg, byte bb) =>
-        OutputDriver.WriteLine(s.AddColor(tr, tg, tb).AddColorB(br, bg, bb));
-    
+    public static void WriteLine(string s, byte tr, byte tg, byte tb, byte br, byte bg, byte bb) => OutputDriver.WriteLine(s.AddColor(tr, tg, tb).AddColorB(br, bg, bb));
+
     /// <summary>
-    /// prints a colored string with a colored background  
+    ///     prints a colored string with a colored background
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="text">text color</param>
     /// <param name="background">background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(string s, int text, ConsoleColor background)  =>
-        OutputDriver.WriteLine(s.AddColor(text).AddColorB(background));
-    
-    
+    public static void WriteLine(string s, int text, ConsoleColor background) => OutputDriver.WriteLine(s.AddColor(text).AddColorB(background));
+
+
     /// <summary>
-    /// prints a colored string with a colored background  
+    ///     prints a colored string with a colored background
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="text">text color</param>
     /// <param name="background">background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(string s, System.Drawing.Color text, System.Drawing.Color background)  =>
-        OutputDriver.WriteLine(s.AddColor(text).AddColorB(background));
+    public static void WriteLine(string s, System.Drawing.Color text, System.Drawing.Color background) => OutputDriver.WriteLine(s.AddColor(text).AddColorB(background));
 
 
     /// <summary>
-    /// prints a colored string with a colored background  
+    ///     prints a colored string with a colored background
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="text">text color</param>
     /// <param name="background">background color</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(string s, NKColor text, NKColor background)  =>
-        OutputDriver.WriteLine(s.AddColor(text).AddColorB(background));
+    public static void WriteLine(string s, NKColor text, NKColor background) => OutputDriver.WriteLine(s.AddColor(text).AddColorB(background));
 
 
     /// <summary>
-    /// prints a string with the applied style
+    ///     prints a string with the applied style
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="st">style to be applied</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Write(string s, NKStyle st) =>
-        OutputDriver.Write(s.AddStyle(st));
-    
-    
+    public static void Write(string s, NKStyle st) => OutputDriver.Write(s.AddStyle(st));
+
+
     /// <summary>
-    /// prints a string with the applied style
+    ///     prints a string with the applied style
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="st">style to be applied</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(string s, NKStyle st) =>
-        OutputDriver.WriteLine(s.AddStyle(st));
-    
-    
+    public static void WriteLine(string s, NKStyle st) => OutputDriver.WriteLine(s.AddStyle(st));
+
+
     /// <summary>
-    /// prints a string with the applied style
+    ///     prints a string with the applied style
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="st">style to be applied</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void Write(char s, NKStyle st) =>
-        OutputDriver.Write(s.AddStyle(st));
-    
-    
+    public static void Write(char s, NKStyle st) => OutputDriver.Write(s.AddStyle(st));
+
+
     /// <summary>
-    /// prints a string with the applied style
+    ///     prints a string with the applied style
     /// </summary>
     /// <param name="s">string to print</param>
     /// <param name="st">style to be applied</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void WriteLine(char s, NKStyle st) =>
-        OutputDriver.WriteLine(s.AddStyle(st));
+    public static void WriteLine(char s, NKStyle st) => OutputDriver.WriteLine(s.AddStyle(st));
     
-    
-    /// <summary>
-    /// Writes a formatted table to the console based on the provided header, data, and row selector.
-    /// </summary>
-    /// <param name="header">The collection of header strings for the table columns.</param>
-    /// <param name="data">The collection of data items to populate the table rows.</param>
-    /// <param name="rowSelector">
-    /// A function that maps each data item to an array of strings representing the table row values.
-    /// </param>
-    /// <param name="style">The style of the printed table.</param>
-    /// <typeparam name="T">The type of the data items in the collection.</typeparam>
-    /// <exception cref="ArgumentException">
-    /// Thrown when the length of any row data does not match the length of the header.
-    /// </exception>
-    public static void WriteTable<T>(
-        IEnumerable<string> header, 
-        IEnumerable<T> data, 
-        Func<T, string[]> rowSelector,
-        NKTableStyle style = NKTableStyle.ASCII) 
-    {
-        var headerArr = header as string[] ?? header.ToArray();
-        int cols = headerArr.Length;
-
-        string[][] rows = data.Select(rowSelector).ToArray();
-        
-        WriteTable(headerArr, rows, style);
-    }
-
 
     /// <summary>
-    /// Writes a tabular representation of the provided data to the console.
-    /// </summary>
-    /// <typeparam name="T">The type of the data elements to be displayed in the table.</typeparam>
-    /// <param name="header">
-    /// A collection of strings representing the column headers for the table.
-    /// </param>
-    /// <param name="data">
-    /// A collection of collections, where each inner collection represents a row of data in the table.
-    /// </param>
-    /// <param name="stringifier">
-    /// An optional function to convert elements of type T to their string representation. If not provided, elements'
-    /// ToString() method will be used. Throws a NoNullAllowedException if any element is null and no stringifier
-    /// is provided.
-    /// </param>
-    /// <param name="style">The style of the printed table.</param>
-    /// <exception cref="NoNullAllowedException">
-    /// Thrown when a null element is encountered in the data and no stringifier function is provided.
-    /// </exception>
-    /// <exception cref="ArgumentException">
-    /// Thrown when the length of any row in the data does not match the length of the header.
-    /// </exception>
-    public static void WriteTable<T>(
-        IEnumerable<string> header, 
-        IEnumerable<IEnumerable<T>> data,
-        Func<T, string>? stringifier = null, 
-        NKTableStyle style = NKTableStyle.ASCII) 
-    {
-        stringifier ??= t => {
-            if (t is null)
-                throw new NoNullAllowedException("Cannot convert null element to string");
-            var s = t.ToString();
-            if (s is null)
-                throw new NoNullAllowedException("ToString returned null");
-            return s;
-        };
-
-        var headerArr = header as string[] ?? header.ToArray();
-
-        string[][] rows = data.Select(t => t.Select(stringifier).ToArray()).ToArray();
-        
-        WriteTable(headerArr, rows, style);
-    }
-
-
-    /// <summary>
-    /// Writes a table to the console with the provided headers and rows.
-    /// </summary>
-    /// <param name="header">An array of header names for the table columns.</param>
-    /// <param name="rows">
-    /// A jagged array representing the rows of the table, with each inner array corresponding to a row of data.
-    /// </param>
-    /// <param name="style">The style of the printed table.</param>
-    /// <exception cref="ArgumentException">
-    /// Thrown when the length of a row does not match the length of the headers.
-    /// </exception>
-    public static void WriteTable(string[] header, string[][] rows, NKTableStyle style = NKTableStyle.ASCII) {
-        var cols = header.Length;
-
-        // check if any row is invalid size
-        if (rows.Any(r => r.Length != cols))
-            throw new ArgumentException("Row length does not match header length");
-        
-        int[] maxWidths = new int[cols];
-
-        // compute max width for header
-        for (int i = 0; i < cols; i++) 
-            maxWidths[i] = header[i].Length;
-
-        // compute max width for data
-        for (int i0 = 0; i0 < rows.Length; i0++) {
-            for (int i1 = 0; i1 < cols; i1++) {
-                maxWidths[i1] = Math.Max(maxWidths[i1], rows[i0][i1].GetPlainLength());
-            }
-        }
-
-        char vSeparator = style switch {
-            NKTableStyle.BORDERLESS => ' ',
-            NKTableStyle.ASCII => '|',
-            NKTableStyle.NORMAL => '│',
-            _ => throw new ArgumentOutOfRangeException(nameof(style), style, null)
-        };
-
-        // print header
-        for (int i = 0; i < cols; i++) 
-            OutputDriver.Write($"{vSeparator} {header[i].AddStyle(NKTextStyles.BOLD).VisiblePadRight(maxWidths[i])} ");
-        OutputDriver.WriteLine(vSeparator);
-
-        // print separator
-        switch (style) {
-            case NKTableStyle.BORDERLESS:
-                for (int i = 0; i < cols; i++) 
-                    OutputDriver.Write($"  {new string('─', header[i].Length).VisiblePadRight(maxWidths[i])} ");
-                OutputDriver.WriteLine();
-                break;
-            case NKTableStyle.ASCII:
-                for (int i = 0; i < cols; i++) 
-                    OutputDriver.Write($"{vSeparator}{new string('-', maxWidths[i] + 2)}");
-                OutputDriver.WriteLine(vSeparator);
-                break;
-            case NKTableStyle.NORMAL:
-                OutputDriver.Write('├');
-                for (int i = 0; i < cols; i++) 
-                    OutputDriver.Write((i == 0 ? "" : "┼") + new string('─', maxWidths[i] + 2));
-                OutputDriver.WriteLine("┤");
-                break;
-            default:
-                throw new ArgumentOutOfRangeException(nameof(style), style, null);
-        }
-        
-        // print data
-        for (int i = 0; i < rows.Length; i++) {
-            for (int j = 0; j < cols; j++) {
-                OutputDriver.Write($"{vSeparator} {rows[i][j].VisiblePadRight(maxWidths[j])} ");
-            }
-            
-            OutputDriver.WriteLine(vSeparator);
-        }
-    }
-
-
-    /// <summary>
-    /// Writes a formatted table to the console, with a specified header and rows.
-    /// </summary>
-    /// <param name="header">An array of strings representing the header of the table.</param>
-    /// <param name="rows">
-    /// A two-dimensional array of strings representing the rows of the table, converted to a jagged array.
-    /// </param>
-    /// <param name="style">The style of the printed table.</param>
-    public static void WriteTable(string[] header, string[,] rows, NKTableStyle style = NKTableStyle.ASCII) => 
-        WriteTable(header, Extensions.Enumerable.ToJagged(rows), style);
-
-
-    /// <summary>
-    /// Writes a formatted table to the console using the specified header and data.
-    /// </summary>
-    /// <param name="header">An array of column headers for the table.</param>
-    /// <param name="data">An array of data items to populate the table rows.</param>
-    /// <param name="style">The style of the printed table.</param>
-    /// <typeparam name="T">The type of the data items.</typeparam>
-    public static void WriteTable<T>(string[] header, NKTableStyle style = NKTableStyle.ASCII, params T[] data) {
-        var t = typeof(T);
-        int cols = header.Length;
-        
-        // get properties that match the header
-        var props = t.GetProperties().Where(p => header.AsEnumerable().Contains(p.Name)).ToArray();
-        
-        // check if all properties were found
-        if (props.Length != cols) 
-            throw new ArgumentException("Some properties from header are not valid.");
-        
-        string[][] rows = new string[data.Length][];
-
-        // get values for each property
-        for (int i = 0; i < data.Length; i++) {
-            rows[i] = new string[cols];
-
-            for (int j = 0; j < props.Length; j++) {
-                var m = props[j].GetMethod;
-
-                if (m is null) {
-                    rows[i][j] = "null";
-                    continue;
-                }
-                
-                var o = m.Invoke(data[i], null);
-
-                if (o is null) {
-                    rows[i][j] = "null";
-                    continue;
-                }
-                
-                rows[i][j] = o.ToString() ?? "null";
-            }
-        }
-        
-        WriteTable(header, rows, style);
-    }
-
-    /// <summary>
-    /// Automatically collects all properties of type <typeparamref name="T"/> from a type specified by <typeparamref name="TSource"/>
-    /// and lists their values in a table.
-    /// </summary>
-    /// <param name="header">Properties of <typeparamref name="T"/> to be listed in the table</param>
-    /// <param name="displayName">Whether to add a column for the names of the properties.</param>
-    /// <param name="style">The style of the table</param>
-    /// <typeparam name="T">The type of a single row item</typeparam>
-    /// <typeparam name="TSource">The type to collect the properties from</typeparam>
-    public static void WriteTable<TSource, T>(
-        string[] header, 
-        bool displayName = true, 
-        NKTableStyle style = NKTableStyle.ASCII)
-    {
-        WriteTable<T>(typeof(TSource), header, displayName, style);
-    }
-
-    /// <summary>
-    /// Automatically collects all properties of type <typeparamref name="TTarget"/> from a type specified by <paramref name="source"/>
-    /// and lists their values in a table.
-    /// </summary>
-    /// <param name="source">The type to collect the properties from</param>
-    /// <param name="header">Properties of <typeparamref name="TTarget"/> to be listed in the table</param>
-    /// <param name="displayName">Whether to add a column for the names of the properties.</param>
-    /// <param name="style">The style of the table</param>
-    /// <typeparam name="TTarget">The type of a single row item</typeparam>
-    public static void WriteTable<TTarget>(
-        Type source,
-        string[] header, 
-        bool displayName = true, 
-        NKTableStyle style = NKTableStyle.ASCII)
-    {
-        var t = typeof(TTarget);
-        
-        // load static properties
-        var fields = source.GetProperties();
-        Dictionary<string, TTarget> objects = new();
-        
-        foreach (var field in fields) {
-            if (field.PropertyType != t) continue;
-            
-            var palette = field.CanRead ? field.GetValue(null) : null;
-            if (palette is not TTarget p) continue;
-                
-            objects.Add(field.Name, p);
-        }
-        
-        int cols = header.Length;
-        
-        // get properties that match the header
-        var props = t.GetProperties().Where(p => header.AsEnumerable().Contains(p.Name)).ToArray();
-        
-        // check if all properties were found
-        if (props.Length != cols) 
-            throw new ArgumentException("Some properties from header are not valid.");
-        
-        string[][] rows = new string[objects.Count][];
-
-        // get values for each property
-        for (int i = 0; i < objects.Count; i++) {
-            rows[i] = new string[cols + 1];
-            rows[i][0] = objects.ElementAt(i).Key;
-            
-            for (int j = 1; j < props.Length + 1; j++) {
-                var m = props[j - 1].GetMethod;
-
-                if (m is null) {
-                    rows[i][j] = "null";
-                    continue;
-                }
-                
-                var o = m.Invoke(objects.ElementAt(i).Value, null);
-
-                if (o is null) {
-                    rows[i][j] = "null";
-                    continue;
-                }
-                
-                rows[i][j] = o.ToString() ?? "null";
-            }
-        }
-
-        var h = header.ToList();
-        if (displayName) h.Insert(0, "Name");
-        
-        WriteTable(h.ToArray(), rows, style);
-    }
-
-    public readonly record struct TableStyle {
-        public char VLineChar { get; init; }
-        public char HLineChar { get; init; }
-        public char RightTChar { get; init; }
-        public char LeftTChar { get; init; }
-        public char CrossChar { get; init; }
-        public NKStyle HeaderTextStyle { get; init; }
-        public NKStyle DataTextStyle { get; init; }
-        public NKStyle VLineStyle { get; init; }
-        public NKStyle HLineStyle { get; init; }
-        public NKStyle RightTLineStyle { get; init; }
-        public NKStyle LeftTLineStyle { get; init; }
-        public NKStyle CrossTLineStyle { get; init; }
-        public bool DisableHeaderLine { get; init; }
-        public bool DisableBorderLines { get; init; }
-
-        public TableStyle(
-            char vLineChar,
-            char hLineChar,
-            char rightTChar,
-            char leftTChar,
-            char crossChar,
-            NKStyle headerTextStyle = default,
-            NKStyle dataTextStyle = default,
-            NKStyle vLineStyle = default,
-            NKStyle hLineStyle = default,
-            NKStyle rightTLineStyle = default,
-            NKStyle leftTLineStyle = default,
-            NKStyle crossTLineStyle = default,
-            bool disableHeaderLine = default,
-            bool disableBorderLines = default) 
-        {
-            VLineChar = vLineChar;
-            HLineChar = hLineChar;
-            RightTChar = rightTChar;
-            LeftTChar = leftTChar;
-            CrossChar = crossChar;
-            HeaderTextStyle = headerTextStyle;
-            DataTextStyle = dataTextStyle;
-            VLineStyle = vLineStyle;
-            HLineStyle = hLineStyle;
-            RightTLineStyle = rightTLineStyle;
-            LeftTLineStyle = leftTLineStyle;
-            CrossTLineStyle = crossTLineStyle;
-            DisableHeaderLine = disableHeaderLine;
-            DisableBorderLines = disableBorderLines;
-        }
-
-        public static TableStyle Ascii(
-            NKStyle headerTextStyle = default,
-            NKStyle dataTextStyle = default,
-            NKStyle vLineStyle = default,
-            NKStyle hLineStyle = default,
-            NKStyle rightTLineStyle = default,
-            NKStyle leftTLineStyle = default,
-            NKStyle crossTLineStyle = default,
-            bool disableHeaderLine = default,
-            bool disableBorderLines = default) 
-        {
-            return new TableStyle(
-                '|',
-                '-',
-                '|',
-                '|',
-                '+',
-                headerTextStyle,
-                dataTextStyle,
-                vLineStyle,
-                hLineStyle,
-                rightTLineStyle,
-                leftTLineStyle,
-                crossTLineStyle,
-                disableHeaderLine,
-                disableBorderLines
-            );
-        }
-        
-        public static TableStyle Normal(
-            NKStyle headerTextStyle = default,
-            NKStyle dataTextStyle = default,
-            NKStyle vLineStyle = default,
-            NKStyle hLineStyle = default,
-            NKStyle rightTLineStyle = default,
-            NKStyle leftTLineStyle = default,
-            NKStyle crossTLineStyle = default,
-            bool disableHeaderLine = default,
-            bool disableBorderLines = default) 
-        {
-            return new TableStyle(
-                '│',
-                '─',
-                '┤',
-                '├',
-                '┼',
-                headerTextStyle,
-                dataTextStyle,
-                vLineStyle,
-                hLineStyle,
-                rightTLineStyle,
-                leftTLineStyle,
-                crossTLineStyle,
-                disableHeaderLine,
-                disableBorderLines
-            );
-        }
-        
-        public static TableStyle Normal_DoubleHeaderLine(
-            NKStyle headerTextStyle = default,
-            NKStyle dataTextStyle = default,
-            NKStyle vLineStyle = default,
-            NKStyle hLineStyle = default,
-            NKStyle rightTLineStyle = default,
-            NKStyle leftTLineStyle = default,
-            NKStyle crossTLineStyle = default,
-            bool disableHeaderLine = default,
-            bool disableBorderLines = default) 
-        {
-            return new TableStyle(
-                '│',
-                '═',
-                '╡',
-                '╞',
-                '╪',
-                headerTextStyle,
-                dataTextStyle,
-                vLineStyle,
-                hLineStyle,
-                rightTLineStyle,
-                leftTLineStyle,
-                crossTLineStyle,
-                disableHeaderLine,
-                disableBorderLines
-            );
-        }
-        
-        public static TableStyle Borderless(
-            NKStyle headerTextStyle = default,
-            NKStyle dataTextStyle = default,
-            NKStyle vLineStyle = default,
-            NKStyle hLineStyle = default,
-            NKStyle rightTLineStyle = default,
-            NKStyle leftTLineStyle = default,
-            NKStyle crossTLineStyle = default,
-            bool disableHeaderLine = default,
-            bool disableBorderLines = default) 
-        {
-            return new TableStyle(
-                ' ',
-                ' ',
-                ' ',
-                ' ',
-                ' ',
-                headerTextStyle,
-                dataTextStyle,
-                vLineStyle,
-                hLineStyle,
-                rightTLineStyle,
-                leftTLineStyle,
-                crossTLineStyle,
-                disableHeaderLine,
-                disableBorderLines
-            );
-        }
-    }
-
-    public static void WriteTable<T>(AnsiString[] header, T[,] data, TableStyle style) {
-        if (header.Length != data.GetLen1()) {
-            throw new ArgumentException("Header and data lengths do not match.");
-        }
-        
-        var sData = new string[data.GetLen0(), data.GetLen1()];
-
-        for (int r = 0; r < data.GetLen0(); r++) {
-            for (int c = 0; c < data.GetLen1(); c++) {
-                sData[r, c] = data[r, c]?.ToString() ?? "";
-            }
-        }
-        
-        WriteTable(header, sData, style);
-    }
-
-    public static void WriteTable(AnsiString[] header, string[,] data, TableStyle style) {
-        if (header.Length != data.GetLen1()) {
-            throw new ArgumentException("Header and data lengths do not match.");
-        }
-        
-        var widths = new int[header.Length];
-
-        for (int c = 0; c < header.Length; c++) {
-            widths[c] = header[c]?.Length ?? 0;
-
-            for (int r = 0; r < data.Len0; r++) {
-                widths[c] = Math.Max(widths[c], data[r, c]?.PlainLength ?? 0);
-            }
-
-            widths[c] += 2;
-        }
-        
-        WriteRow(header, widths, true, style);
-    }
-
-    private static void WriteRow(AnsiString[] row, int[] widths, bool isHeader, TableStyle style) {
-        var sb = new StringBuilder();
-
-        if (!style.DisableBorderLines)
-            sb.Append(style.VLineChar.AddStyle(style.VLineStyle));
-
-        for (int i = 0; i < row.Length; i++) {
-            sb.Append(' ');
-            sb.Append(row[i].PadRight(widths[i]).AddStyle(style.HeaderTextStyle));
-            sb.Append(' ');
-            
-            if (i != row.Length - 1 || !style.DisableBorderLines) {
-                sb.Append(style.VLineChar.AddStyle(style.VLineStyle));
-            }
-        }
-        
-        Write(sb.ToString());
-    }
-    
-    /// <summary>
-    /// Moves the cursor to the specified position relatively to the current position.
+    ///     Moves the cursor to the specified position relatively to the current position.
     /// </summary>
     /// <param name="x">x offset from the current position</param>
     /// <param name="y">y offset from the current position</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void MoveCursor(int x, int y) =>
-        Stdio.SetCursorPosition(Stdio.CursorLeft + x, Stdio.CursorTop + y);
-    
-    
+    public static void MoveCursor(int x, int y) => Stdio.SetCursorPosition(Stdio.CursorLeft + x, Stdio.CursorTop + y);
+
+
     /// <summary>
-    /// Moves the console cursor to a specified position based on the provided indices.
+    ///     Moves the console cursor to a specified position based on the provided indices.
     /// </summary>
     /// <param name="x">
-    /// The horizontal offset of the cursor.
-    /// Can be relative (from-start index) or absolute (from-end index).
+    ///     The horizontal offset of the cursor.
+    ///     Can be relative (from-start index) or absolute (from-end index).
     /// </param>
     /// <param name="y">
-    /// The vertical offset of the cursor.
-    /// Can be relative (from-start index) or absolute (from-end index).
+    ///     The vertical offset of the cursor.
+    ///     Can be relative (from-start index) or absolute (from-end index).
     /// </param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     [SuppressMessage("ReSharper", "InvokeAsExtensionMethod")]
-    public static void MoveCursor(Index x, Index y) => 
+    public static void MoveCursor(Index x, Index y) =>
         Stdio.SetCursorPosition(
-            Math.Clamp(x.IsFromEnd ? x.Value : Stdio.CursorLeft + x.Value, 0, Stdio.BufferWidth - 1),
-            Math.Clamp(y.IsFromEnd ? y.Value : Stdio.CursorTop + y.Value, 0, Stdio.BufferHeight - 1));
-    
+            Math.Clamp(x.IsFromEnd ? x.Value : Stdio.CursorLeft + x.Value, 0, Stdio.BufferWidth  - 1),
+            Math.Clamp(y.IsFromEnd ? y.Value : Stdio.CursorTop  + y.Value, 0, Stdio.BufferHeight - 1)
+        );
+
     /// <summary>
-    /// Sets the cursor position in the console window.
+    ///     Sets the cursor position in the console window.
     /// </summary>
     /// <param name="x">The horizontal position of the cursor, represented as an Index.</param>
     /// <param name="y">The vertical position of the cursor, represented as an Index.</param>
@@ -1078,59 +523,72 @@ public static partial class NKConsole {
     [SuppressMessage("ReSharper", "InvokeAsExtensionMethod")]
     public static void SetCursorPosition(Index x, Index y) =>
         Stdio.SetCursorPosition(
-            Math.Clamp(x.IsFromEnd ? Stdio.BufferWidth - x.Value : x.Value, 0, Stdio.BufferWidth - 1),
-            Math.Clamp(y.IsFromEnd ? Stdio.BufferHeight - y.Value : y.Value, 0, Stdio.BufferHeight - 1));
+            Math.Clamp(x.IsFromEnd ? Stdio.BufferWidth  - x.Value : x.Value, 0, Stdio.BufferWidth  - 1),
+            Math.Clamp(y.IsFromEnd ? Stdio.BufferHeight - y.Value : y.Value, 0, Stdio.BufferHeight - 1)
+        );
 
 
     // ===================================================================================== //
     //                              ---  GRAPHICS WRITING  ---                               //
     // ===================================================================================== //
-    
-    
+
+
     // TODO: use SKBitmap or SKImage?
-    
+
     public static void WriteImage(SKImage image, Point2D offset, Size2D charSize, SKSamplingOptions samplingOptions) {
         throw new NotImplementedException();
     }
-    
+
     public static void WriteImage(SKBitmap image, Point2D offset, Size2D charSize, SKSamplingOptions samplingOptions) {
         throw new NotImplementedException();
     }
-    
+
     #region SIXEL
-    
+
     /// <summary>
-    /// Writes the given image to the console in the Sixel graphics format.
+    ///     Writes the given image to the console in the Sixel graphics format.
     /// </summary>
-    /// <param name="image">The bitmap image to be converted and written to the console in Sixel format.</param>
+    /// <param name="image">
+    ///     The bitmap image to be converted and written to the console in Sixel
+    ///     format.
+    /// </param>
     public static void WriteSixel(SKBitmap image) => OutputDriver.Write(image.ToSixel());
 
     /// <summary>
-    /// Renders a bitmap image in sixel format to the console output at the specified position.
+    ///     Renders a bitmap image in sixel format to the console output at the specified position.
     /// </summary>
     /// <param name="image">The bitmap image to render.</param>
     /// <param name="x">The x-coordinate of the starting position.</param>
     /// <param name="y">The y-coordinate of the starting position.</param>
     public static void WriteSixel(SKBitmap image, int x, int y) {
-        if (x < 0 || y < 0) return;
+        if (x < 0 || y < 0)
+            return;
+
         WriteSixel(image, ^x, ^y);
     }
 
     /// <summary>
-    /// Renders a given bitmap image as a sixel graphic at a specified position in the console.
+    ///     Renders a given bitmap image as a sixel graphic at a specified position in the console.
     /// </summary>
     /// <param name="image">The bitmap image to be converted and displayed as sixel graphics.</param>
-    /// <param name="x">The horizontal position in the console buffer where the sixel graphic will be rendered.</param>
-    /// <param name="y">The vertical position in the console buffer where the sixel graphic will be rendered.</param>
+    /// <param name="x">
+    ///     The horizontal position in the console buffer where the sixel graphic will
+    ///     be rendered.
+    /// </param>
+    /// <param name="y">
+    ///     The vertical position in the console buffer where the sixel graphic will be
+    ///     rendered.
+    /// </param>
     public static void WriteSixel(SKBitmap image, Index x, Index y) {
         SaveCursor();
         MoveCursor(x, y);
         OutputDriver.Write(image.ToSixel());
         RestoreCursor();
     }
-    
+
     /// <summary>
-    /// Renders an SKBitmap image using the Sixel protocol at a specified position and size in the console.
+    ///     Renders an SKBitmap image using the Sixel protocol at a specified position and size in
+    ///     the console.
     /// </summary>
     /// <param name="image">The SKBitmap image to render.</param>
     /// <param name="x">The horizontal position (in columns) of the image's starting point.</param>
@@ -1140,36 +598,52 @@ public static partial class NKConsole {
     /// <param name="sampling">The SKSamplingOptions to apply for scaling the image, if specified.</param>
     public static void WriteSixel(
         SKBitmap           image,
-        int x,     int     y,
-        int width, int     height,
-        SKSamplingOptions? sampling = null)
-            => WriteSixel(image, x < 0 ? 0 : ^x, y < 0 ? 0 : ^y, width, height, sampling);
+        int                x,
+        int                y,
+        int                width,
+        int                height,
+        SKSamplingOptions? sampling = null
+    ) =>
+        WriteSixel(image, x < 0 ? 0 : ^x, y < 0 ? 0 : ^y, width, height, sampling);
 
     /// <summary>
-    /// Renders a given image as a sixel graphic at the specified position in the console.
+    ///     Renders a given image as a sixel graphic at the specified position in the console.
     /// </summary>
     /// <param name="image">The bitmap image to render as a sixel graphic.</param>
-    /// <param name="x">The horizontal position in the console to render the image. Supports relative or absolute indexing.</param>
-    /// <param name="y">The vertical position in the console to render the image. Supports relative or absolute indexing.</param>
+    /// <param name="x">
+    ///     The horizontal position in the console to render the image. Supports
+    ///     relative or absolute indexing.
+    /// </param>
+    /// <param name="y">
+    ///     The vertical position in the console to render the image. Supports relative
+    ///     or absolute indexing.
+    /// </param>
     /// <param name="width">The desired width for the rendered image in pixels.</param>
     /// <param name="height">The desired height for the rendered image in pixels.</param>
-    /// <param name="sampling">Optional sampling options for scaling the image. Defaults to <see cref="SKSamplingOptions.Default"/> if not provided.</param>
+    /// <param name="sampling">
+    ///     Optional sampling options for scaling the image. Defaults to
+    ///     <see cref="SKSamplingOptions.Default" /> if not provided.
+    /// </param>
     public static void WriteSixel(
         SKBitmap           image,
-        Index x,     Index y,
-        int   width, int   height,
-        SKSamplingOptions? sampling = null) 
-    {
-        if (width <= 0 || height <= 0) return;
-        
+        Index              x,
+        Index              y,
+        int                width,
+        int                height,
+        SKSamplingOptions? sampling = null
+    ) {
+        if (width <= 0 || height <= 0)
+            return;
+
         var bmp = new SKBitmap(width, height);
         image.ScalePixels(bmp, sampling ?? SKSamplingOptions.Default);
-        
+
         SaveCursor();
         MoveCursor(x, y);
         OutputDriver.Write(bmp.ToSixel());
         RestoreCursor();
     }
-    
+
     #endregion
+
 }

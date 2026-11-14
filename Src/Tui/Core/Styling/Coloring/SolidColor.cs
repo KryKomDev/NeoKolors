@@ -8,7 +8,9 @@ namespace NeoKolors.Tui.Core;
 public class SolidColor : IColoringStrategy {
     private readonly NKColor _color;
 
-    public SolidColor(NKColor color) => _color = color;
+    public SolidColor(NKColor color) {
+        _color = color;
+    }
 
     public NKColor GetColor(int x, int y, int width, int height) => _color;
 }

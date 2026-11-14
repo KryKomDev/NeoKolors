@@ -105,7 +105,7 @@ public class Render2DPipeline {
     /// <returns><c>true</c> if found and removed; otherwise <c>false</c>.</returns>
     public bool RemoveStage(string name) {
         lock (_syncRoot) {
-            int index = _stages.FindIndex(s => string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase));
+            var index = _stages.FindIndex(s => string.Equals(s.Name, name, StringComparison.OrdinalIgnoreCase));
 
             if (index >= 0) {
                 _stages.RemoveAt(index);
@@ -122,12 +122,11 @@ public class Render2DPipeline {
     /// </summary>
     public void Execute(Game2DRenderContext context) {
         lock (_syncRoot) {
-            for (int i = 0; i < _stages.Count; i++) {
+            for (var i = 0; i < _stages.Count; i++) {
                 var stage = _stages[i];
 
-                if (stage.IsEnabled) {
+                if (stage.IsEnabled)
                     stage.Render(context);
-                }
             }
         }
     }
@@ -144,7 +143,7 @@ public class Render2DPipeline {
     private void SortStages() {
         _stages.Sort(
             (a, b) => {
-                int layerComparison = a.Layer.CompareTo(b.Layer);
+                var layerComparison = a.Layer.CompareTo(b.Layer);
 
                 return layerComparison != 0 ? layerComparison : a.OrderWithinLayer.CompareTo(b.OrderWithinLayer);
             }

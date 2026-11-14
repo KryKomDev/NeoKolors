@@ -4,9 +4,9 @@
 namespace NeoKolors.Common;
 
 public static class NKColorExtensions {
-    
+
     extension(int value) {
-        public NKColor Rgb => new(value); 
+        public NKColor Rgb => new(value);
     }
 
     extension(uint value) {

@@ -8,12 +8,12 @@
 namespace NeoKolors.Console;
 
 /// <summary>
-/// Native Linux output driver writing directly to STDOUT using POSIX libc write() syscalls
-/// for maximum frame throughput and zero managed stream buffering overhead.
+///     Native Linux output driver writing directly to STDOUT using POSIX libc write() syscalls
+///     for maximum frame throughput and zero managed stream buffering overhead.
 /// </summary>
 public class LinuxOutputDriver : IOutputDriver {
-    private bool _disposed;
-    private readonly LockObject _lock = new();
+    private          bool        _disposed;
+    private readonly LockObject  _lock = new();
     private readonly LinuxOutput _output;
 
     public LinuxOutputDriver() {

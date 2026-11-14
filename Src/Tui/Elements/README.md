@@ -2,23 +2,25 @@
 
 [![Build & Test](https://img.shields.io/github/actions/workflow/status/KryKomDev/NeoKolors/ci.yml?branch=main&style=for-the-badge&label=Build%20%26%20Test&labelColor=%232a313c)](https://github.com/KryKomDev/NeoKolors/actions/workflows/ci.yml) [![NuGet Version](https://img.shields.io/nuget/v/NeoKolors.Tui.Elements?style=for-the-badge&labelColor=%232a313c&color=%23e051c6)](https://www.nuget.org/packages/NeoKolors.Tui.Elements) [![NuGet Downloads](https://img.shields.io/nuget/dt/NeoKolors.Tui.Elements?style=for-the-badge&labelColor=%232a313c&color=%23d69a00)](https://www.nuget.org/packages/NeoKolors.Tui.Elements) [![License](https://img.shields.io/github/license/KryKomDev/NeoKolors?style=for-the-badge&labelColor=%232a313c&color=%2358a6ff)](https://github.com/KryKomDev/NeoKolors/blob/main/LICENSE)
 
-`NeoKolors.Tui.Elements` provides the declarative, component-driven UI element tree for the NeoKolors TUI framework. It includes flexible layout panels, bordered frames, interactive buttons, tabular data grids, lists, styled text blocks, and mouse event dispatching.
+`NeoKolors.Tui.Elements` provides the declarative, component-driven UI element tree for the
+NeoKolors TUI framework. It includes flexible layout panels, bordered frames, interactive buttons,
+tabular data grids, lists, styled text blocks, and mouse event dispatching.
 
 ---
 
 ## Component Suite
 
-| Component | Class | Description |
-| :--- | :--- | :--- |
-| **`Flex`** | [`Flex` | Web-inspired flexbox layout container supporting row/column directions, justify content, cross-axis alignment, wrapping, and item gap spacing. |
-| **`Grid`** | [`Grid` | 2D tabular layout supporting row/column definitions, column/row spanning, and proportional (star), auto, and fixed sizing. |
-| **`Border`** | [`Border` | Framing container providing stylized box outlines (`NKBorderStyle`), padding, margin, title labels, and background colors. |
-| **`Button`** | [`Button` | Interactive command button supporting hover and pressed visual states, custom child content, and click event delegates. |
-| **`Table`** | [`Table` | Rich tabular data visualizer with column definitions, cell formatting, headers, and borders. |
-| **`List`** | [`List` | Structured list view supporting bullet/numbered list point generators and selectable items. |
-| **`Text`** | [`Text` | High-performance text element supporting plain and ANSI strings, word wrapping, alignment, and trimming. |
-| **`MouseRegion`** | [`MouseRegion` | Spatial interaction boundary registered in a `HitMap` to intercept mouse clicks, movements, and scroll events. |
-| **`ElementsMouseDispatcher`** | [`ElementsMouseDispatcher` | Dispatches incoming terminal mouse events to the corresponding registered element callbacks. |
+| Component                     | Class                      | Description                                                                                                                                    |
+|:------------------------------|:---------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------|
+| **`Flex`**                    | [`Flex`                    | Web-inspired flexbox layout container supporting row/column directions, justify content, cross-axis alignment, wrapping, and item gap spacing. |
+| **`Grid`**                    | [`Grid`                    | 2D tabular layout supporting row/column definitions, column/row spanning, and proportional (star), auto, and fixed sizing.                     |
+| **`Border`**                  | [`Border`                  | Framing container providing stylized box outlines (`NKBorderStyle`), padding, margin, title labels, and background colors.                     |
+| **`Button`**                  | [`Button`                  | Interactive command button supporting hover and pressed visual states, custom child content, and click event delegates.                        |
+| **`Table`**                   | [`Table`                   | Rich tabular data visualizer with column definitions, cell formatting, headers, and borders.                                                   |
+| **`List`**                    | [`List`                    | Structured list view supporting bullet/numbered list point generators and selectable items.                                                    |
+| **`Text`**                    | [`Text`                    | High-performance text element supporting plain and ANSI strings, word wrapping, alignment, and trimming.                                       |
+| **`MouseRegion`**             | [`MouseRegion`             | Spatial interaction boundary registered in a `HitMap` to intercept mouse clicks, movements, and scroll events.                                 |
+| **`ElementsMouseDispatcher`** | [`ElementsMouseDispatcher` | Dispatches incoming terminal mouse events to the corresponding registered element callbacks.                                                   |
 
 ---
 
@@ -67,7 +69,8 @@ var box = new Border(innerContent) {
 
 ### 3. Interactive Buttons (`Button`)
 
-`Button` triggers click callbacks and transitions visual styles when the mouse cursor hovers over it:
+`Button` triggers click callbacks and transitions visual styles when the mouse cursor hovers over
+it:
 
 ```csharp
 using NeoKolors.Common;
@@ -104,7 +107,9 @@ table.AddRow("2180", "terminal", "0.2%");
 
 ### 5. Mouse Dispatching (`ElementsMouseDispatcher`)
 
-When rendering an element tree using `NKAppView`, elements automatically register their screen coordinates in the view's `HitMap`. Use `ElementsMouseDispatcher` to forward mouse events from `NKConsole`:
+When rendering an element tree using `NKAppView`, elements automatically register their screen
+coordinates in the view's `HitMap`. Use `ElementsMouseDispatcher` to forward mouse events from
+`NKConsole`:
 
 ```csharp
 var hitMap = new HitMap();

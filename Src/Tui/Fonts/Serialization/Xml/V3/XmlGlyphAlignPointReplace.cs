@@ -11,7 +11,8 @@ using static NeoKolors.Tui.Fonts.Xml.V3.XmlGlyphAlignPointReplaceType;
 namespace NeoKolors.Tui.Fonts.Xml.V3;
 
 /// <summary>
-/// Defines how the characters interpreted as align-points in the glyph file should be erased or replaced.
+///     Defines how the characters interpreted as align-points in the glyph file should be
+///     erased or replaced.
 /// </summary>
 public readonly struct XmlGlyphAlignPointReplace {
 
@@ -39,8 +40,8 @@ public readonly struct XmlGlyphAlignPointReplace {
         HashSet<char>?                customForg        = null,
         HashSet<char>?                customBckg        = null,
         Dictionary<char, char>?       customPairs       = null,
-        char?                         singleReplacement = null) 
-    {
+        char?                         singleReplacement = null
+    ) {
         _default           = @default;
         _customNone        = customNone  ?? [];
         _customForg        = customForg  ?? [];
@@ -57,11 +58,13 @@ public readonly struct XmlGlyphAlignPointReplace {
         _customPairs       = [];
         _singleReplacement = null;
     }
-    
+
     public XmlGlyphAlignPointReplace(bool isForg) : this(isForg ? FORG : BCKG) { }
 
     public static XmlGlyphAlignPointReplace? Parse(string value) {
-        if (TryParse(value, out var output)) return output;
+        if (TryParse(value, out var output))
+            return output;
+
         return null;
     }
 
@@ -69,6 +72,7 @@ public readonly struct XmlGlyphAlignPointReplace {
         if (string.IsNullOrEmpty(value)) {
             NKFontSerializer.LOGGER.Error("The value for AlignPointReplace is empty or null.");
             output = null;
+
             return false;
         }
 
@@ -92,12 +96,16 @@ public readonly struct XmlGlyphAlignPointReplace {
 
                 if (defaultType != UNSPECIFIED) {
                     NKFontSerializer.LOGGER.Error(
-                        "The value for AlignPointReplace cannot contain multiple of 'forg', 'bckg' and 'none' without specified characters.");
+                        "The value for AlignPointReplace cannot contain multiple of 'forg', 'bckg' and 'none' without specified characters."
+                    );
+
                     output = null;
+
                     return false;
                 }
 
                 defaultType = type;
+
                 continue;
             }
 
@@ -105,10 +113,11 @@ public readonly struct XmlGlyphAlignPointReplace {
                 var content = ExtractQuotedContent(p["forg:".Length.Index..].Trim());
 
                 if (content == null) {
-                    output = null; 
+                    output = null;
+
                     return false;
                 }
-                
+
                 customForg.AddRange(content.Unescape());
             }
             else if (p.StartsWith("bckg:")) {
@@ -116,9 +125,10 @@ public readonly struct XmlGlyphAlignPointReplace {
 
                 if (content == null) {
                     output = null;
+
                     return false;
                 }
-                
+
                 customBckg.AddRange(content.Unescape());
             }
             else if (p.StartsWith("none:")) {
@@ -126,45 +136,50 @@ public readonly struct XmlGlyphAlignPointReplace {
 
                 if (content == null) {
                     output = null;
+
                     return false;
                 }
-                
+
                 customNone.AddRange(content.Unescape());
             }
             else if (p.StartsWith("custom:")) {
                 var content = p["custom:".Length.Index..].Trim();
                 var quotes  = SplitByQuotes(content);
-                
+
                 if (quotes.Count < 2 || quotes.Count % 2 != 0) {
                     NKFontSerializer.LOGGER.Error($"Invalid format for custom replacement: '{p}'.");
                     output = null;
+
                     return false;
                 }
 
-                for (int i = 0; i < quotes.Count; i += 2) {
+                for (var i = 0; i < quotes.Count; i += 2) {
                     var replaced    = quotes[i].Unescape();
                     var replacement = quotes[i + 1].Unescape();
 
                     if (replaced.Length != replacement.Length) {
                         NKFontSerializer.LOGGER.Error(
-                            $"Mismatch in replacement character counts: '{quotes[i]}' and '{quotes[i + 1]}'.");
+                            $"Mismatch in replacement character counts: '{quotes[i]}' and '{quotes[i + 1]}'."
+                        );
+
                         output = null;
+
                         return false;
                     }
 
-                    for (int j = 0; j < replaced.Length; j++) {
+                    for (var j = 0; j < replaced.Length; j++)
                         customPairs.Add((replaced[j], replacement[j]));
-                    }
                 }
             }
             else {
                 // Try as single character replacement
                 var unescaped = p.Unescape();
-                
+
                 if (unescaped.Length == 1) {
                     if (singleReplacement.HasValue) {
                         NKFontSerializer.LOGGER.Error("Multiple single character replacements are not allowed.");
                         output = null;
+
                         return false;
                     }
 
@@ -173,6 +188,7 @@ public readonly struct XmlGlyphAlignPointReplace {
                 else {
                     NKFontSerializer.LOGGER.Error($"Unknown value for AlignPointReplace: '{p}'.");
                     output = null;
+
                     return false;
                 }
             }
@@ -186,69 +202,75 @@ public readonly struct XmlGlyphAlignPointReplace {
             customPairs.ToDictionary(tuple => tuple.Item1, tuple => tuple.Item2),
             singleReplacement
         );
-        
+
         return true;
     }
 
     private static List<string> SplitByComma(string input) {
         List<string> parts    = [];
-        bool         inQuotes = false;
-        bool         escaped  = false;
-        int          start    = 0;
+        var          inQuotes = false;
+        var          escaped  = false;
+        var          start    = 0;
 
-        for (int i = 0; i < input.Length; i++) {
+        for (var i = 0; i < input.Length; i++) {
             if (escaped) {
                 escaped = false;
+
                 continue;
             }
 
             switch (input[i]) {
                 case '\\': {
                     escaped = true;
+
                     continue;
                 }
                 case '\'': {
                     inQuotes = !inQuotes;
+
                     break;
                 }
                 case ',' when !inQuotes: {
                     parts.Add(input.Substring(start, i - start));
                     start = i + 1;
+
                     break;
                 }
             }
         }
 
         parts.Add(input[start.Index..]);
+
         return parts;
     }
 
     private static List<string> SplitByQuotes(string input) {
         List<string> parts    = [];
-        bool         inQuotes = false;
-        bool         escaped  = false;
-        int          start    = 0;
+        var          inQuotes = false;
+        var          escaped  = false;
+        var          start    = 0;
 
-        for (int i = 0; i < input.Length; i++) {
+        for (var i = 0; i < input.Length; i++) {
             if (escaped) {
                 escaped = false;
+
                 continue;
             }
 
             switch (input[i]) {
                 case '\\': {
                     escaped = true;
+
                     continue;
                 }
                 case '\'': {
-                    if (inQuotes) {
+                    if (inQuotes)
                         parts.Add(input.Substring(start, i - start));
-                    }
-                    else {
+                    else
                         start = i + 1;
-                    }
 
                     inQuotes = !inQuotes;
+
                     break;
                 }
             }
@@ -262,7 +284,8 @@ public readonly struct XmlGlyphAlignPointReplace {
             return input.Substring(1, input.Length - 2);
 
         NKFontSerializer.LOGGER.Error(
-            $"Invalid format for custom replace value: '{input}'. It must be enclosed in single quotes.");
+            $"Invalid format for custom replace value: '{input}'. It must be enclosed in single quotes."
+        );
 
         return null;
     }
@@ -270,53 +293,76 @@ public readonly struct XmlGlyphAlignPointReplace {
     public override string ToString() {
         var sb = new StringBuilder();
 
-        if (_singleReplacement.HasValue) {
+        if (_singleReplacement.HasValue)
             sb.Append(char.ToStringEsc(_singleReplacement.Value));
-        }
 
         if (_customPairs.Count > 0) {
-            if (sb.Length > 0) sb.Append(", ");
+            if (sb.Length > 0)
+                sb.Append(", ");
 
             sb.Append("custom: '");
-            foreach (var pair in _customPairs) sb.Append(char.ToStringEsc(pair.Key));
+
+            foreach (var pair in _customPairs)
+                sb.Append(char.ToStringEsc(pair.Key));
+
             sb.Append("' '");
-            foreach (var pair in _customPairs) sb.Append(char.ToStringEsc(pair.Value));
+
+            foreach (var pair in _customPairs)
+                sb.Append(char.ToStringEsc(pair.Value));
+
             sb.Append('\'');
         }
 
         if (_customForg.Count > 0) {
-            if (sb.Length > 0) sb.Append(", ");
+            if (sb.Length > 0)
+                sb.Append(", ");
+
             sb.Append("forg: '");
-            foreach (var c in _customForg) sb.Append(char.ToStringEsc(c));
+
+            foreach (var c in _customForg)
+                sb.Append(char.ToStringEsc(c));
+
             sb.Append('\'');
         }
 
         if (_customBckg.Count > 0) {
-            if (sb.Length > 0) sb.Append(", ");
+            if (sb.Length > 0)
+                sb.Append(", ");
+
             sb.Append("bckg: '");
-            foreach (var c in _customBckg) sb.Append(char.ToStringEsc(c));
+
+            foreach (var c in _customBckg)
+                sb.Append(char.ToStringEsc(c));
+
             sb.Append('\'');
         }
 
         if (_customNone.Count > 0) {
-            if (sb.Length > 0) sb.Append(", ");
+            if (sb.Length > 0)
+                sb.Append(", ");
+
             sb.Append("none: '");
-            foreach (var c in _customNone) sb.Append(char.ToStringEsc(c));
+
+            foreach (var c in _customNone)
+                sb.Append(char.ToStringEsc(c));
+
             sb.Append('\'');
         }
 
-        if (_default == UNSPECIFIED) 
+        if (_default == UNSPECIFIED)
             return sb.ToString();
 
-        if (sb.Length > 0) 
+        if (sb.Length > 0)
             sb.Append(", ");
-        
-        sb.Append(_default switch {
-            FORG => "forg",
-            BCKG => "bckg",
-            NONE => "none",
-            _    => ""
-        });
+
+        sb.Append(
+            _default switch {
+                FORG => "forg",
+                BCKG => "bckg",
+                NONE => "none",
+                _    => ""
+            }
+        );
 
         return sb.ToString();
     }

@@ -6,6 +6,6 @@
 namespace NeoKolors.Tui.Fonts.Xml.V3;
 
 /// <summary>
-/// Represents the XML serialization format for a glyph used in NeoKolors TUI font system.
+///     Represents the XML serialization format for a glyph used in NeoKolors TUI font system.
 /// </summary>
 public class XmlGlyphDef;

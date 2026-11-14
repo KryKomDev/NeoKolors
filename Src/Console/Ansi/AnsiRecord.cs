@@ -15,20 +15,20 @@ public enum AnsiRecordType : byte {
     MOUSE,
     FOCUS,
     PASTE,
-    VT_QUERY,
+    VT_QUERY
 }
 
 /// <summary>
-/// Represents a generic record in the ANSI console input/output system.
+///     Represents a generic record in the ANSI console input/output system.
 /// </summary>
 /// <remarks>
-/// This structure encapsulates various types of ANSI input records,
-/// which may represent different event or data types like mouse events, focus changes,
-/// text paste operations, or VT queries.
-/// The type of the record is determined by the <see cref="Type"/> property, and
-/// only the corresponding data accessors are valid for a specific type. For example,
-/// if the type is <see cref="AnsiRecordType.MOUSE"/>, the <see cref="Mouse"/> property
-/// can be accessed to retrieve the mouse event details.
+///     This structure encapsulates various types of ANSI input records,
+///     which may represent different event or data types like mouse events, focus changes,
+///     text paste operations, or VT queries.
+///     The type of the record is determined by the <see cref="Type" /> property, and
+///     only the corresponding data accessors are valid for a specific type. For example,
+///     if the type is <see cref="AnsiRecordType.MOUSE" />, the <see cref="Mouse" /> property
+///     can be accessed to retrieve the mouse event details.
 /// </remarks>
 [StructLayout(LayoutKind.Explicit)]
 [SuppressMessage("ReSharper", "ReplaceWithFieldKeyword")]
@@ -47,32 +47,32 @@ public readonly struct AnsiRecord {
     private string GetPastedString() => Marshal.PtrToStringAnsi(_paste) ?? throw new InvalidOperationException();
 
     public AnsiRecordType Type => _type;
-    
+
     public KeyEventArgs Key =>
         _type == AnsiRecordType.KEY
             ? _key
             : throw new InvalidOperationException();
-    
+
     public MouseEventArgs Mouse =>
-        _type == AnsiRecordType.MOUSE 
-            ? _mouse 
+        _type == AnsiRecordType.MOUSE
+            ? _mouse
             : throw new InvalidOperationException();
-    
+
     public bool HasFocus =>
         _type == AnsiRecordType.FOCUS
             ? _focus
             : throw new InvalidOperationException();
-    
-    public string Pasted => 
+
+    public string Pasted =>
         _type == AnsiRecordType.PASTE
             ? GetPastedString()
             : throw new InvalidOperationException();
-    
-    public VTQuery Query => 
+
+    public VTQuery Query =>
         _type == AnsiRecordType.VT_QUERY
             ? _query
             : throw new InvalidOperationException();
-    
+
     private AnsiRecord(AnsiRecordType type) {
         _type = type;
     }
@@ -81,7 +81,7 @@ public readonly struct AnsiRecord {
         _type = AnsiRecordType.KEY;
         _key  = key;
     }
-    
+
     public AnsiRecord(MouseEventArgs mouse) {
         _type  = AnsiRecordType.MOUSE;
         _mouse = mouse;
@@ -103,19 +103,22 @@ public readonly struct AnsiRecord {
     }
 
     /// <summary>
-    /// Represents an empty or undefined ANSI record.
+    ///     Represents an empty or undefined ANSI record.
     /// </summary>
     /// <remarks>
-    /// This property is used to define a default or neutral state for an <see cref="AnsiRecord"/>.
-    /// It indicates that no specific data or event is associated with the record.
-    /// Accessing properties of this record without checking the <see cref="Type"/> will typically result
-    /// in an exception. To effectively use the <see cref="None"/> property, ensure that the
-    /// <see cref="Type"/> is explicitly validated before attempting to access additional details.
+    ///     This property is used to define a default or neutral state for an
+    ///     <see cref="AnsiRecord" />.
+    ///     It indicates that no specific data or event is associated with the record.
+    ///     Accessing properties of this record without checking the <see cref="Type" /> will
+    ///     typically result
+    ///     in an exception. To effectively use the <see cref="None" /> property, ensure that the
+    ///     <see cref="Type" /> is explicitly validated before attempting to access additional
+    ///     details.
     /// </remarks>
     public static AnsiRecord None { get; } = new(AnsiRecordType.NONE);
 
     private const int MAX_MSG_LEN = 10;
-    
+
     public override string ToString() {
         return _type switch {
             AnsiRecordType.NONE     => "None",

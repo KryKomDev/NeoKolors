@@ -8,7 +8,7 @@ using NeoKolors.Common;
 namespace NeoKolors.Console;
 
 /// <summary>
-/// Formats unhandled exceptions and exception objects into stylized console strings.
+///     Formats unhandled exceptions and exception objects into stylized console strings.
 /// </summary>
 public static partial class ExceptionFormatter {
 
@@ -246,12 +246,13 @@ public static partial class ExceptionFormatter {
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether exception output is redirected to a log.
+    ///     Gets or sets a value indicating whether exception output is redirected to a log.
     /// </summary>
     public static bool RedirectToLog { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets a value indicating whether unhandled exceptions are formatted for better readability.
+    ///     Gets or sets a value indicating whether unhandled exceptions are formatted for better
+    ///     readability.
     /// </summary>
     public static bool FormatUnhandled { get; set; } = true;
 }

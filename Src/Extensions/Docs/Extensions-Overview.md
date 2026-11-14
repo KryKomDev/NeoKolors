@@ -1,15 +1,20 @@
 # NeoKolors Extensions Overview
 
-The `NeoKolors.Extensions` library provides high-performance utility extension methods on top of standard .NET types. These extensions are heavily optimized for string manipulation, case conversion, keyboard-to-action bindings, and spatial calculations.
+The `NeoKolors.Extensions` library provides high-performance utility extension methods on top of
+standard .NET types. These extensions are heavily optimized for string manipulation, case
+conversion, keyboard-to-action bindings, and spatial calculations.
 
 ---
 
 ## 1. String & ANSI Extensions
 
-String manipulation is crucial in text user interfaces (TUI) where ANSI colors and formatting must not break character position alignments.
+String manipulation is crucial in text user interfaces (TUI) where ANSI colors and formatting must
+not break character position alignments.
 
 ### 1.1 Word Wrapping with `Chop`
-The `Chop` extension wraps long paragraphs of text into lines of a maximum length while preserving word boundaries.
+
+The `Chop` extension wraps long paragraphs of text into lines of a maximum length while preserving
+word boundaries.
 
 ```csharp
 using NeoKolors.Extensions;
@@ -20,7 +25,10 @@ string[] wrappedLines = text.Chop(maxLineLength: 20);
 ```
 
 ### 1.2 Measuring Plain Length
-When strings contain ANSI escape sequences (e.g. `\u001b[31;1mHello\u001b[0m`), calling `Length` returns the code sequence characters along with the visible ones. The `GetPlainLength` method strips away formatting sequences to return the actual visible string length.
+
+When strings contain ANSI escape sequences (e.g. `\u001b[31;1mHello\u001b[0m`), calling `Length`
+returns the code sequence characters along with the visible ones. The `GetPlainLength` method strips
+away formatting sequences to return the actual visible string length.
 
 ```csharp
 using NeoKolors.Extensions;
@@ -33,7 +41,9 @@ int visualLength = styledString.GetPlainLength(); // Returns 7
 
 ## 2. Naming Case Conversions
 
-The library provides case transformation helpers using the **[UniversalNamingConvertor](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Extensions/UniversalNamingConvertor.cs)** class.
+The library provides case transformation helpers using the
+**[UniversalNamingConvertor](file:///C:/Users/krystof/Desktop/projects/Libs/NeoKolors/Src/Extensions/UniversalNamingConvertor.cs)**
+class.
 
 ### 2.1 Supported Cases (`NamingCase`)
 
@@ -45,6 +55,7 @@ The library provides case transformation helpers using the **[UniversalNamingCon
 * `TRAIN`: `MY-VARIABLE-NAME`
 
 ### 2.2 Usage
+
 ```csharp
 using NeoKolors.Extensions;
 
@@ -62,6 +73,7 @@ string kebab = original.ToCase(NamingCase.KEBAB); // "user-profile-data"
 ## 3. Keyboard & Collection Extensions
 
 ### 3.1 `ConsoleKeyInfo` Mapping Helpers
+
 Simplify keyboard input handling inside TUI update loops by inspecting key states:
 
 ```csharp
@@ -76,7 +88,9 @@ if (keyInfo.IsCtrl(ConsoleKey.C)) {
 ```
 
 ### 3.2 Collection Grid Translations
-Provides extensions for two-dimensional structures, facilitating viewport and coordinates mapping on the TUI canvas:
+
+Provides extensions for two-dimensional structures, facilitating viewport and coordinates mapping on
+the TUI canvas:
 
 ```csharp
 using NeoKolors.Extensions;

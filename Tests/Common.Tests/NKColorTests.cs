@@ -22,14 +22,14 @@ public class NKColorTests {
         Assert.True(color.IsPalette);
         Assert.False(color.IsDefault || color.IsInherit || color.IsRgb);
     }
-    
+
     [Fact]
     public void Inherit_ShouldInitializeCorrectly() {
         var color = NKColor.Inherit;
         Assert.True(color.IsInherit);
         Assert.False(color.IsDefault || color.IsRgb || color.IsPalette);
     }
-    
+
     [Fact]
     public void Default_ShouldInitializeCorrectly() {
         var color = NKColor.Default;
@@ -54,33 +54,45 @@ public class NKColorTests {
     [Fact]
     public void ImplicitConversion_ToConsoleColor_ShouldThrowException() {
         NKColor color = 0x654321;
-        Assert.Throws<InvalidColorCastException>(() => {
-            NKConsoleColor unused = color;
-        });
+
+        Assert.Throws<InvalidColorCastException>(
+            () => {
+                NKConsoleColor unused = color;
+            }
+        );
     }
 
     [Fact]
     public void ImplicitConversion_DefaultToConsoleColor_ShouldThrowException() {
-        NKColor color = NKColor.Default;
-        Assert.Throws<InvalidColorCastException>(() => {
-            NKConsoleColor unused = color;
-        });
+        var color = NKColor.Default;
+
+        Assert.Throws<InvalidColorCastException>(
+            () => {
+                NKConsoleColor unused = color;
+            }
+        );
     }
 
     [Fact]
     public void ImplicitConversion_InheritToConsoleColor_ShouldThrowException() {
-        NKColor color = NKColor.Inherit;
-        Assert.Throws<InvalidColorCastException>(() => {
-            NKConsoleColor unused = color;
-        });
+        var color = NKColor.Inherit;
+
+        Assert.Throws<InvalidColorCastException>(
+            () => {
+                NKConsoleColor unused = color;
+            }
+        );
     }
 
     [Fact]
     public void ImplicitConversion_ToInt_ShouldThrowException() {
         NKColor color = NKConsoleColor.GREEN;
-        Assert.Throws<InvalidColorCastException>(() => {
-            uint unused = color;
-        });
+
+        Assert.Throws<InvalidColorCastException>(
+            () => {
+                uint unused = color;
+            }
+        );
     }
 
     [Fact]
@@ -96,52 +108,56 @@ public class NKColorTests {
     [Fact]
     public void Match_ShouldExecuteCorrectFunc() {
         var rgb = new NKColor(0x112233);
+
         var res = rgb.Match(
             _ => "default",
             i => $"rgb {i:x6}",
             _ => "palette",
             _ => "inherit"
         );
+
         Assert.Equal("rgb 112233", res);
 
         var pal = new NKColor(NKConsoleColor.BLUE);
+
         res = pal.Match(
             _ => "default",
             _ => "rgb",
             c => $"palette {c}",
             _ => "inherit"
         );
+
         Assert.Equal("palette BLUE", res);
     }
 
     [Fact]
     public void GetInverse_ShouldReturnInvertedColor() {
-        var c = NKColor.FromRgb(255, 0, 100);
+        var c   = NKColor.FromRgb(255, 0, 100);
         var inv = c.GetInverse();
         Assert.Equal(NKColor.FromRgb(0, 255, 155), inv);
 
-        var pal = new NKColor(NKConsoleColor.RED); // 9
-        var invPal = pal.GetInverse(); // (9+8)%16 = 1
+        var pal    = new NKColor(NKConsoleColor.RED); // 9
+        var invPal = pal.GetInverse();                // (9+8)%16 = 1
         Assert.Equal(NKConsoleColor.DARK_RED, invPal.AsPalette);
     }
 
     [Fact]
     public void ToString_WithFormats_ShouldReturnExpectedStrings() {
         var c = NKColor.FromRgb(0x123456);
-        Assert.Equal("123456", c.ToString("P"));
+        Assert.Equal("123456",            c.ToString("P"));
         Assert.Equal("\e[38;2;18;52;86m", c.ToString("T"));
         Assert.Equal("\e[48;2;18;52;86m", c.ToString("B"));
 
         var pal = new NKColor(NKConsoleColor.RED);
-        Assert.Equal("RED", pal.ToString("P"));
+        Assert.Equal("RED",        pal.ToString("P"));
         Assert.Equal("\e[38;5;9m", pal.ToString("T"));
     }
 
     [Fact]
     public void Parse_ShouldParseValidStrings() {
-        Assert.Equal(NKColor.FromRgb(0x123456), NKColor.Parse("#123456"));
-        Assert.Equal(NKColor.Default, NKColor.Parse("Default"));
-        Assert.Equal(NKColor.Inherit, NKColor.Parse("Inherit"));
+        Assert.Equal(NKColor.FromRgb(0x123456),        NKColor.Parse("#123456"));
+        Assert.Equal(NKColor.Default,                  NKColor.Parse("Default"));
+        Assert.Equal(NKColor.Inherit,                  NKColor.Parse("Inherit"));
         Assert.Equal(new NKColor(NKConsoleColor.BLUE), NKColor.Parse("BLUE"));
     }
 
@@ -155,7 +171,7 @@ public class NKColorTests {
 
     [Fact]
     public void Match_ActionOverload_ExecutesCorrectBranch() {
-        int branch = 0;
+        var branch = 0;
 
         NKColor.Default.Match(
             _ => branch = 1,
@@ -163,6 +179,7 @@ public class NKColorTests {
             _ => branch = 3,
             _ => branch = 4
         );
+
         Assert.Equal(1, branch);
 
         NKColor.FromRgb(10, 20, 30).Match(
@@ -171,6 +188,7 @@ public class NKColorTests {
             _ => branch = 3,
             _ => branch = 4
         );
+
         Assert.Equal(2, branch);
 
         new NKColor(NKConsoleColor.CYAN).Match(
@@ -179,6 +197,7 @@ public class NKColorTests {
             _ => branch = 3,
             _ => branch = 4
         );
+
         Assert.Equal(3, branch);
 
         NKColor.Inherit.Match(
@@ -187,12 +206,13 @@ public class NKColorTests {
             _ => branch = 3,
             _ => branch = 4
         );
+
         Assert.Equal(4, branch);
     }
 
     [Fact]
     public void Lerp_ValidRgbColors_InterpolatesCorrectly() {
-        var start = NKColor.FromRgb(0, 0, 0);
+        var start = NKColor.FromRgb(0,   0,   0);
         var end   = NKColor.FromRgb(100, 200, 50);
 
         var mid = NKColor.Lerp(start, end, 0.5f);
@@ -216,7 +236,7 @@ public class NKColorTests {
     [Fact]
     public void GetMultiStopColor_InterpolatesAcrossSegments() {
         var colors = new[] {
-            NKColor.FromRgb(0, 0, 0),
+            NKColor.FromRgb(0,   0,   0),
             NKColor.FromRgb(100, 100, 100),
             NKColor.FromRgb(200, 200, 200)
         };
@@ -226,8 +246,8 @@ public class NKColorTests {
         Assert.Equal(colors[2], NKColor.GetMultiStopColor(colors, 1f));
 
         // Edge cases: empty array and single element
-        Assert.Equal(NKColor.Default, NKColor.GetMultiStopColor([], 0.5f));
-        Assert.Equal(colors[0], NKColor.GetMultiStopColor([colors[0]], 0.5f));
+        Assert.Equal(NKColor.Default, NKColor.GetMultiStopColor([],          0.5f));
+        Assert.Equal(colors[0],       NKColor.GetMultiStopColor([colors[0]], 0.5f));
     }
 
     [Fact]
@@ -261,23 +281,23 @@ public class NKColorTests {
         Assert.Equal("\e[58;5;9m", pal.ToString("U"));
 
         Assert.Equal(EscapeCodes.UNDERLINE_COLOR_RESET, NKColor.Default.Underline);
-        Assert.Equal("Inherit", NKColor.Inherit.Underline);
+        Assert.Equal("Inherit",                         NKColor.Inherit.Underline);
     }
 
     [Fact]
     public void NKColorExtensions_ConvertsValuesCorrectly() {
-        int intVal = 0x123456;
-        NKColor c1 = intVal.Rgb;
+        var intVal = 0x123456;
+        var c1     = intVal.Rgb;
         Assert.True(c1.IsRgb);
         Assert.Equal(0x123456u, c1.AsRgb);
 
-        uint uintVal = 0x654321u;
-        NKColor c2 = uintVal.Rgb;
+        var uintVal = 0x654321u;
+        var c2      = uintVal.Rgb;
         Assert.True(c2.IsRgb);
         Assert.Equal(0x654321u, c2.AsRgb);
 
-        NKConsoleColor palVal = NKConsoleColor.CYAN;
-        NKColor c3 = palVal.NK;
+        var palVal = NKConsoleColor.CYAN;
+        var c3     = palVal.NK;
         Assert.True(c3.IsPalette);
         Assert.Equal(NKConsoleColor.CYAN, c3.AsPalette);
     }
@@ -287,14 +307,14 @@ public class NKColorTests {
     [InlineData(0)]
     [InlineData(0xffffff)]
     public void Protobuf_Serialization_Rgb_Roundtrip(int rgb) {
-        var original = new NKColor(rgb);
-        using var ms = new MemoryStream();
+        var       original = new NKColor(rgb);
+        using var ms       = new MemoryStream();
         ProtoBuf.Serializer.Serialize(ms, original);
         ms.Position = 0;
         var deserialized = ProtoBuf.Serializer.Deserialize<NKColor>(ms);
 
-        Assert.Equal(original, deserialized);
-        Assert.Equal(original.Type, deserialized.Type);
+        Assert.Equal(original,       deserialized);
+        Assert.Equal(original.Type,  deserialized.Type);
         Assert.Equal(original.AsRgb, deserialized.AsRgb);
     }
 
@@ -306,7 +326,7 @@ public class NKColorTests {
             ms.Position = 0;
             var deserialized = ProtoBuf.Serializer.Deserialize<NKColor>(ms);
 
-            Assert.Equal(original, deserialized);
+            Assert.Equal(original,      deserialized);
             Assert.Equal(original.Type, deserialized.Type);
         }
     }

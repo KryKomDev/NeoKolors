@@ -7,8 +7,8 @@ namespace NeoKolors.Tui.Lifecycle.Tests;
 
 public class AppLifecycleTests {
     private sealed class MockAppView : IAppView {
-        public bool IsDirty { get; private set; } = true;
-        public int RenderCount { get; private set; }
+        public bool IsDirty     { get; private set; } = true;
+        public int  RenderCount { get; private set; }
 
         public void Invalidate() => IsDirty = true;
         public void ResetDirty() => IsDirty = false;
@@ -55,37 +55,36 @@ public class AppLifecycleTests {
 
         // Attach cancel handler
         host.CloseRequested += (_, args) => {
-            if (args.Reason == CloseReason.USER_REQUEST) {
+            if (args.Reason == CloseReason.USER_REQUEST)
                 args.Cancel = true;
-            }
         };
 
-        bool accepted = host.RequestClose(reason: CloseReason.USER_REQUEST);
+        var accepted = host.RequestClose(CloseReason.USER_REQUEST);
         Assert.False(accepted);
         Assert.True(host.IsRunning);
 
         // System shutdown is not cancelled
-        accepted = host.RequestClose(reason: CloseReason.SYSTEM_SHUTDOWN);
+        accepted = host.RequestClose(CloseReason.SYSTEM_SHUTDOWN);
         Assert.True(accepted);
         Assert.False(host.IsRunning);
     }
 
     [Fact]
     public void LazyAppLoopStrategy_RendersWhenDirtyAndWoken() {
-        var host = new AppLifecycleHost();
-        var view = new MockAppView();
+        var       host     = new AppLifecycleHost();
+        var       view     = new MockAppView();
         using var strategy = new LazyAppLoopStrategy();
 
         host.Start();
 
-        using var cts = new CancellationTokenSource();
-        var thread = new Thread(() => strategy.Run(host, view, cts.Token));
+        using var cts    = new CancellationTokenSource();
+        var       thread = new Thread(() => strategy.Run(host, view, cts.Token));
         thread.Start();
 
         // Initial render occurred
         Thread.Sleep(50);
         Assert.True(view.RenderCount >= 1);
-        int initialCount = view.RenderCount;
+        var initialCount = view.RenderCount;
 
         // Invalidate view and signal wakeup
         view.Invalidate();

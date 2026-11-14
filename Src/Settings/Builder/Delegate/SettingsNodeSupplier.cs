@@ -4,4 +4,5 @@
 namespace NeoKolors.Settings.Builder;
 
 public delegate ISettingsNode<TResult> SettingsNodeSupplier<TResult>(ISettingsNode<TResult> node);
+
 public delegate ISettingsNode SettingsNodeSupplier(ISettingsNode node);

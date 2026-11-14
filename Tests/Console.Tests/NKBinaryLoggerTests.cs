@@ -8,14 +8,14 @@ public class NKBinaryLoggerTests {
     [Fact]
     public void SerializeDeserialize_StringMessage_RestoresAllFields() {
         // Arrange
-        AnsiString ansiMsg = new AnsiString("Hello Binary Log").SetFColor(NKConsoleColor.RED, 0, 5);
+        var ansiMsg = new AnsiString("Hello Binary Log").SetFColor(NKConsoleColor.RED, 0, 5);
 
         var original = new NKLogRecord(
-            timestamp: DateTime.SpecifyKind(new DateTime(2026, 7, 19, 12, 0, 0), DateTimeKind.Utc),
-            level: NKLogLevel.INFORMATION,
-            message: ansiMsg,
-            eventId: new EventId(42, "TestEvent"),
-            source: new AnsiString("TestRunner")
+            DateTime.SpecifyKind(new DateTime(2026, 7, 19, 12, 0, 0), DateTimeKind.Utc),
+            NKLogLevel.INFORMATION,
+            ansiMsg,
+            new EventId(42, "TestEvent"),
+            new AnsiString("TestRunner")
         );
 
         using var ms = new MemoryStream();
@@ -49,11 +49,11 @@ public class NKBinaryLoggerTests {
         }
 
         var original = new NKLogRecord(
-            timestamp: DateTime.UtcNow,
-            level: NKLogLevel.ERROR,
-            message: innerEx,
-            eventId: null,
-            source: new AnsiString("CrashSource")
+            DateTime.UtcNow,
+            NKLogLevel.ERROR,
+            innerEx,
+            null,
+            new AnsiString("CrashSource")
         );
 
         using var ms = new MemoryStream();

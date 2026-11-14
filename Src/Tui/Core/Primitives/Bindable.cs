@@ -12,22 +12,26 @@ public readonly union Bindable<T>(T, Func<T>, Signal<T>) {
             _                => default!
         };
     }
-    
+
     public T AsT => Get();
 
     public bool TrySet(T value) {
         if (Value is Signal<T> signal) {
             signal.Value = value;
+
             return true;
         }
+
         return false;
     }
 
     public void Set(T value) {
-        if (Value is Signal<T> signal) {
+        if (Value is Signal<T> signal)
             signal.Value = value;
-        }
     }
-    
+
     public static implicit operator T(Bindable<T> bindable) => bindable.Get();
+    public static implicit operator Bindable<T>(T value) => new(value);
+    public static implicit operator Bindable<T>(Signal<T> signal) => new(signal);
+    public static implicit operator Bindable<T>(Func<T> factory) => new(factory);
 }

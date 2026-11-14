@@ -7,13 +7,13 @@ using String = NeoKolors.Extensions.String;
 namespace NeoKolors.Settings.Builder;
 
 public readonly struct SettingsMethodOptionInfo {
-    public string Name { get; }
-    public SettingsMethodOption Option { get; }
-    public string? Description { get; }
-    
+    public string               Name        { get; }
+    public SettingsMethodOption Option      { get; }
+    public string?              Description { get; }
+
     public SettingsMethodOptionInfo(string name, SettingsMethodOption option, string? description = null) {
-        Name = name;
-        Option = option;
+        Name        = name;
+        Option      = option;
         Description = description;
     }
 

@@ -1,17 +1,25 @@
 # 3D Game Lifecycle Architecture Plan
 
-This document outlines the architecture, execution pipeline, and component specifications for the **NeoKolors.Tui.Lifecycle.Game3D** subproject when it is implemented.
+This document outlines the architecture, execution pipeline, and component specifications for the
+**NeoKolors.Tui.Lifecycle.Game3D** subproject when it is implemented.
 
 ---
 
 ## 1. Architectural Overview
 
-Unlike 2D games, which primarily operate on flat coordinate spaces and layered sprite sorting, a 3D game engine lifecycle must orchestrate:
-- **Hierarchical Transform Propagation**: Scene graphs where parent matrix transformations cascade into child local-to-world matrices.
-- **Decoupled Simulation Steps**: High-frequency deterministic physics ticks (rigidbodies, joints, colliders, raycasts) alongside variable frame-rate rendering.
-- **Spatial Partitioning & Culling**: Hierarchical bounding volume trees (BVH, Octrees) used to perform frustum culling and Level of Detail (LOD) selection before GPU submission.
-- **Multi-Pass Graphics Pipeline**: Strict sequencing of shadow mapping, depth pre-passes, opaque geometry, transparent sorting, screen-space post-processing, and HUD composition.
-- **GPU Resource Management**: Asynchronous asset streaming, buffer lifecycle (vertex/index buffers, uniform buffers), and render target binding.
+Unlike 2D games, which primarily operate on flat coordinate spaces and layered sprite sorting, a 3D
+game engine lifecycle must orchestrate:
+
+- **Hierarchical Transform Propagation**: Scene graphs where parent matrix transformations cascade
+  into child local-to-world matrices.
+- **Decoupled Simulation Steps**: High-frequency deterministic physics ticks (rigidbodies, joints,
+  colliders, raycasts) alongside variable frame-rate rendering.
+- **Spatial Partitioning & Culling**: Hierarchical bounding volume trees (BVH, Octrees) used to
+  perform frustum culling and Level of Detail (LOD) selection before GPU submission.
+- **Multi-Pass Graphics Pipeline**: Strict sequencing of shadow mapping, depth pre-passes, opaque
+  geometry, transparent sorting, screen-space post-processing, and HUD composition.
+- **GPU Resource Management**: Asynchronous asset streaming, buffer lifecycle (vertex/index buffers,
+  uniform buffers), and render target binding.
 
 ---
 
@@ -49,28 +57,31 @@ sequenceDiagram
 The 3D pipeline executes through discrete, pluggable render passes:
 
 1. **`ShadowPass`**:
-   - Computes directional light Cascaded Shadow Maps (CSM), omnidirectional point light cubemaps, and spot light matrices.
-   - Renders shadow caster geometry to shadow map depth buffers.
+    - Computes directional light Cascaded Shadow Maps (CSM), omnidirectional point light cubemaps,
+      and spot light matrices.
+    - Renders shadow caster geometry to shadow map depth buffers.
 2. **`DepthPrePass` (Early-Z)**:
-   - Renders depth-only for solid geometry to populate the Z-buffer.
-   - Eliminates redundant pixel shader invocations on occluded geometry during lighting passes.
+    - Renders depth-only for solid geometry to populate the Z-buffer.
+    - Eliminates redundant pixel shader invocations on occluded geometry during lighting passes.
 3. **`OpaqueGeometryPass`**:
-   - Renders solid meshes sorted front-to-back to maximize depth test rejections.
-   - Computes material shading (PBR: albedo, roughness, metallic, normal mapping, ambient occlusion).
+    - Renders solid meshes sorted front-to-back to maximize depth test rejections.
+    - Computes material shading (PBR: albedo, roughness, metallic, normal mapping, ambient
+      occlusion).
 4. **`TransparentPass`**:
-   - Sorts translucent primitives (glass, fluids, particle emitters) back-to-front relative to camera depth.
-   - Performs alpha blending with depth write disabled.
+    - Sorts translucent primitives (glass, fluids, particle emitters) back-to-front relative to
+      camera depth.
+    - Performs alpha blending with depth write disabled.
 5. **`PostProcessingPass`**:
-   - Full-screen quad or compute passes applying screen-space effects:
-     - Screen Space Ambient Occlusion (SSAO)
-     - High Dynamic Range (HDR) Bloom & Tone Mapping (ACES / Reinhard)
-     - Temporal Anti-Aliasing (TAA) or FXAA
-     - Depth of Field & Motion Blur
-     - Color Grading LUTs
+    - Full-screen quad or compute passes applying screen-space effects:
+        - Screen Space Ambient Occlusion (SSAO)
+        - High Dynamic Range (HDR) Bloom & Tone Mapping (ACES / Reinhard)
+        - Temporal Anti-Aliasing (TAA) or FXAA
+        - Depth of Field & Motion Blur
+        - Color Grading LUTs
 6. **`DebugAndGizmoPass`**:
-   - Renders debug wireframes, bounding boxes, physics colliders, and light icons.
+    - Renders debug wireframes, bounding boxes, physics colliders, and light icons.
 7. **`HudOverlayPass`**:
-   - Projects 2D UI elements, crosshairs, and text over the final composited 3D frame.
+    - Projects 2D UI elements, crosshairs, and text over the final composited 3D frame.
 
 ---
 

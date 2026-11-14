@@ -4,11 +4,14 @@
 namespace NeoKolors.Common;
 
 public static class AnsiStringExtensions {
-    
+
     public static AnsiString ToAnsiString(this object o) {
         var s = o?.ToString();
 
         return s != null ? new AnsiString(s) : AnsiString.Empty;
     }
 
+    extension(string s) {
+        public AnsiString Ansi => new(s);
+    }
 }

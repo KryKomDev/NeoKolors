@@ -6,19 +6,19 @@
 namespace NeoKolors.Settings.Tests;
 
 public class IntegerArgumentTests {
-    
+
     [Fact]
     public void Set_ShouldWorkProperly() {
         var a = new IntegerArgument();
-        
+
         // try with double
         a.Set(1);
         Assert.Equal(1, a.Value);
-        
+
         // try with string
         a.Set("4");
         Assert.Equal(4, a.Value);
-        
+
         // try with another argument
         var b = new IntegerArgument();
         b.Set(7);
@@ -34,7 +34,7 @@ public class IntegerArgumentTests {
 
     [Fact]
     public void Set_ShouldThrowException_ForOutOfRangeValue() {
-        var a = new IntegerArgument(min: 0, max: 10);
+        var a = new IntegerArgument(0, 10);
         Assert.Throws<InvalidArgumentInputException>(() => a.Set(-1));
         Assert.Throws<InvalidArgumentInputException>(() => a.Set(11));
     }
@@ -53,9 +53,9 @@ public class IntegerArgumentTests {
     public void Equal_ShouldWorkProperly() {
         var a = new IntegerArgument();
         var b = new IntegerArgument(defaultValue: 1);
-        
+
         Assert.False(a.Equals(b));
-        
+
         b.Set(0);
         Assert.False(a.Equals(b));
 
@@ -65,19 +65,19 @@ public class IntegerArgumentTests {
 }
 
 public class UIntegerArgumentTests {
-    
+
     [Fact]
     public void Set_ShouldWorkProperly() {
         var a = new UIntegerArgument();
-        
+
         // try with double
         a.Set(1u);
         Assert.Equal(1u, a.Value);
-        
+
         // try with string
         a.Set("4");
         Assert.Equal(4u, a.Value);
-        
+
         // try with another argument
         var b = new UIntegerArgument();
         b.Set(7u);
@@ -113,9 +113,9 @@ public class UIntegerArgumentTests {
     public void Equal_ShouldWorkProperly() {
         var a = new UIntegerArgument();
         var b = new UIntegerArgument(defaultValue: 1u);
-        
+
         Assert.False(a.Equals(b));
-        
+
         b.Set(0u);
         Assert.False(a.Equals(b));
 

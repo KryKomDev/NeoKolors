@@ -11,44 +11,38 @@ using static NeoKolors.Common.NKConsoleColor;
 namespace NeoKolors.Common;
 
 /// <summary>
-/// contains methods that convert between color formats (<see cref="SKColor"/>, <see cref="NKColor"/>, ARGB, HSV, IntArgb)
+///     contains methods that convert between color formats (<see cref="SKColor" />,
+///     <see cref="NKColor" />, ARGB, HSV, IntArgb)
 /// </summary>
 public static class ColorFormat {
-    public static SKColor ColorToSkia(this System.Drawing.Color c) {
-        return new SKColor(c.R, c.G, c.B);
-    }
+    public static SKColor ColorToSkia(this System.Drawing.Color c) => new(c.R, c.G, c.B);
 
-    public static System.Drawing.Color SkiaToColor(this SKColor c) {
-        return System.Drawing.Color.FromArgb(c.Alpha, c.Red, c.Green, c.Blue);
-    }
+    public static System.Drawing.Color SkiaToColor(this SKColor c) => System.Drawing.Color.FromArgb(c.Alpha, c.Red, c.Green, c.Blue);
 
     /// <summary>
-    /// converts a color stored in an int to SKColor
+    ///     converts a color stored in an int to SKColor
     /// </summary>
     /// <param name="c">source int color</param>
     /// <param name="autoAlpha">if true, automatically sets alpha to 255</param>
-    public static SKColor IntToSkia(this int c, bool autoAlpha = true) {
-        return new SKColor(
+    public static SKColor IntToSkia(this int c, bool autoAlpha = true) =>
+        new(
             (byte)(c >> 16),
             (byte)(c >> 8),
             (byte)c,
             (byte)(autoAlpha ? 255 : (byte)(c >> 24))
         );
-    }
 
-    public static int SkiaToInt(this SKColor c) {
-        return c.Alpha << 24 | c.Red << 16 | c.Green << 8 | c.Blue;
-    }
+    public static int SkiaToInt(this SKColor c) => (c.Alpha << 24) | (c.Red << 16) | (c.Green << 8) | c.Blue;
 
     public static SKColor HsvToSkia(double hue, double saturation, double value) {
-        int    hi = Convert.ToInt32(Floor(hue / 60)) % 6;
-        double f  = hue / 60 - Floor(hue / 60);
+        var hi = Convert.ToInt32(Floor(hue / 60)) % 6;
+        var f  = hue / 60 - Floor(hue / 60);
 
         value *= 255;
-        byte v = Convert.ToByte(value);
-        byte p = Convert.ToByte(value * (1 - saturation));
-        byte q = Convert.ToByte(value * (1 - f       * saturation));
-        byte t = Convert.ToByte(value * (1 - (1 - f) * saturation));
+        var v = Convert.ToByte(value);
+        var p = Convert.ToByte(value * (1 - saturation));
+        var q = Convert.ToByte(value * (1 - f       * saturation));
+        var t = Convert.ToByte(value * (1 - (1 - f) * saturation));
 
         return hi switch {
             0 => new SKColor(v, t, p),
@@ -70,12 +64,12 @@ public static class ColorFormat {
     }
 
     /// <summary>
-    /// converts a color stored in an int to SKColor
+    ///     converts a color stored in an int to SKColor
     /// </summary>
     /// <param name="c">source int color</param>
     /// <param name="autoAlpha">if true automatically sets alpha to 255</param>
-    public static System.Drawing.Color IntToColor(this int c, bool autoAlpha = true) {
-        return System.Drawing.Color.FromArgb(
+    public static System.Drawing.Color IntToColor(this int c, bool autoAlpha = true) =>
+        System.Drawing.Color.FromArgb(
             (byte)(autoAlpha
                 ? 255
                 : (byte)(c >> 24)
@@ -84,14 +78,11 @@ public static class ColorFormat {
             (byte)(c >> 8),
             (byte)c
         );
-    }
 
-    public static int ColorToInt(this System.Drawing.Color c) {
-        return c.A << 24 | c.R << 16 | c.G << 8 | c.B;
-    }
+    public static int ColorToInt(this System.Drawing.Color c) => (c.A << 24) | (c.R << 16) | (c.G << 8) | c.B;
 
     /// <summary>
-    /// returns the hue, saturation and value of the supplied color 
+    ///     returns the hue, saturation and value of the supplied color
     /// </summary>
     public static void ColorToHsv(
         this System.Drawing.Color color,
@@ -108,26 +99,26 @@ public static class ColorFormat {
     }
 
     /// <summary>
-    /// returns the hue, saturation and value of the supplied color 
+    ///     returns the hue, saturation and value of the supplied color
     /// </summary>
     public static (double h, double s, double v) ColorToHsv(this System.Drawing.Color color) {
-        ColorToHsv(color, out double h, out double s, out double v);
+        ColorToHsv(color, out var h, out var s, out var v);
 
         return (h, s, v);
     }
 
     /// <summary>
-    /// creates an instance of <see cref="NKColor"/> from the hsv values
+    ///     creates an instance of <see cref="NKColor" /> from the hsv values
     /// </summary>
     public static System.Drawing.Color HsvToColor(double hue, double saturation, double value) {
-        int    hi = Convert.ToInt32(Floor(hue / 60)) % 6;
-        double f  = hue / 60 - Floor(hue / 60);
+        var hi = Convert.ToInt32(Floor(hue / 60)) % 6;
+        var f  = hue / 60 - Floor(hue / 60);
 
         value *= 255;
-        int v = Convert.ToInt32(value);
-        int p = Convert.ToInt32(value * (1 - saturation));
-        int q = Convert.ToInt32(value * (1 - f       * saturation));
-        int t = Convert.ToInt32(value * (1 - (1 - f) * saturation));
+        var v = Convert.ToInt32(value);
+        var p = Convert.ToInt32(value * (1 - saturation));
+        var q = Convert.ToInt32(value * (1 - f       * saturation));
+        var t = Convert.ToInt32(value * (1 - (1 - f) * saturation));
 
         return hi switch {
             0 => System.Drawing.Color.FromArgb(v, t, p),
@@ -140,24 +131,23 @@ public static class ColorFormat {
     }
 
     /// <summary>
-    /// turns hsv values into an rgb int
+    ///     turns hsv values into an rgb int
     /// </summary>
     public static int HsvToInt(float h, float s, float v) {
         var c = HsvToColor(h, s, v);
 
-        return c.R << 16 | c.G << 8 | c.B;
+        return (c.R << 16) | (c.G << 8) | c.B;
     }
 
     public static void IntToHsv(this int c, out double h, out double s, out double v) {
         IntToColor(c).ColorToHsv(out h, out s, out v);
     }
 
-    public static (double h, double s, double v) IntToHsv(this int c) {
-        return IntToColor(c).ColorToHsv();
-    }
+    public static (double h, double s, double v) IntToHsv(this int c) => IntToColor(c).ColorToHsv();
 
     /// <summary>
-    /// converts the basic <see cref="ConsoleColor"/> to the extended <see cref="NKConsoleColor"/>
+    ///     converts the basic <see cref="ConsoleColor" /> to the extended
+    ///     <see cref="NKConsoleColor" />
     /// </summary>
     /// <param name="color">the color to convert</param>
     public static NKConsoleColor SystemToNK(ConsoleColor color) {
@@ -183,11 +173,12 @@ public static class ColorFormat {
     }
 
     /// <summary>
-    /// converts the extended <see cref="NKConsoleColor"/> to the basic <see cref="ConsoleColor"/>
+    ///     converts the extended <see cref="NKConsoleColor" /> to the basic
+    ///     <see cref="ConsoleColor" />
     /// </summary>
     /// <param name="color">the color to convert</param>
     /// <exception cref="InvalidColorCastException">
-    /// the passed color is not included in the standard set of colors
+    ///     the passed color is not included in the standard set of colors
     /// </exception>
     public static ConsoleColor NKToSystem(NKConsoleColor color) {
         if ((byte)color >= 16)
@@ -214,7 +205,5 @@ public static class ColorFormat {
         };
     }
 
-    public static NKColor SkiaToNK(this SKColor color) {
-        return NKColor.FromRgb(color.Red, color.Green, color.Blue);
-    }
+    public static NKColor SkiaToNK(this SKColor color) => NKColor.FromRgb(color.Red, color.Green, color.Blue);
 }

@@ -23,18 +23,18 @@ public class NKFontBinarySerializerTests {
         Assert.NotNull(deserializedFont);
 
         // 4. Validate NKFontInfo metadata
-        Assert.Equal(originalFont.Info.Name, deserializedFont.Info.Name);
-        Assert.Equal(originalFont.Info.Ligatures, deserializedFont.Info.Ligatures);
-        Assert.Equal(originalFont.Info.Leading, deserializedFont.Info.Leading);
-        Assert.Equal(originalFont.Info.LetterSpacing, deserializedFont.Info.LetterSpacing);
-        Assert.Equal(originalFont.Info.WordSpacing, deserializedFont.Info.WordSpacing);
+        Assert.Equal(originalFont.Info.Name,           deserializedFont.Info.Name);
+        Assert.Equal(originalFont.Info.Ligatures,      deserializedFont.Info.Ligatures);
+        Assert.Equal(originalFont.Info.Leading,        deserializedFont.Info.Leading);
+        Assert.Equal(originalFont.Info.LetterSpacing,  deserializedFont.Info.LetterSpacing);
+        Assert.Equal(originalFont.Info.WordSpacing,    deserializedFont.Info.WordSpacing);
         Assert.Equal(originalFont.Info.ProportionType, deserializedFont.Info.ProportionType);
 
         if (originalFont.Info.ProportionType == FontProportionsInfo.ProportionType.MONOSPACED) {
-            Assert.Equal(originalFont.Info.FontPropoInfo.AsMono.GlyphWidth, deserializedFont.Info.FontPropoInfo.AsMono.GlyphWidth);
+            Assert.Equal(originalFont.Info.FontPropoInfo.AsMono.GlyphWidth,  deserializedFont.Info.FontPropoInfo.AsMono.GlyphWidth);
             Assert.Equal(originalFont.Info.FontPropoInfo.AsMono.GlyphHeight, deserializedFont.Info.FontPropoInfo.AsMono.GlyphHeight);
             Assert.Equal(originalFont.Info.FontPropoInfo.AsMono.AlignToGrid, deserializedFont.Info.FontPropoInfo.AsMono.AlignToGrid);
-        } 
+        }
         else {
             Assert.Equal(originalFont.Info.FontPropoInfo.AsVar.Kerning, deserializedFont.Info.FontPropoInfo.AsVar.Kerning);
         }
@@ -44,22 +44,21 @@ public class NKFontBinarySerializerTests {
 
         // 6. Visual and Rendering equivalence check
         // Render a complex string containing simple chars, spaces, ligatures, and diacritics
-        using var originalCanvas = new NKCharCanvas(80, 20);
+        using var originalCanvas     = new NKCharCanvas(80, 20);
         using var deserializedCanvas = new NKCharCanvas(80, 20);
 
         var testString = "A B c -> y ů Ů Á Ä Č Ď É Ě Ë Í Ï Ľ Ň Ó Ö Ř Š Ť Ú Ů Ü ý ÿ Ž!";
-        
+
         originalFont.DrawString(testString, originalCanvas);
         deserializedFont.DrawString(testString, deserializedCanvas);
 
-        for (int y = 0; y < originalCanvas.Height; y++) {
-            for (int x = 0; x < originalCanvas.Width; x++) {
-                var origCell = originalCanvas.Data[x, y];
-                var deserCell = deserializedCanvas.Data[x, y];
-                
-                Assert.Equal(origCell.Char, deserCell.Char);
-                Assert.Equal(origCell.Style, deserCell.Style);
-            }
+        for (var y = 0; y < originalCanvas.Height; y++)
+        for (var x = 0; x < originalCanvas.Width; x++) {
+            var origCell  = originalCanvas.Data[x, y];
+            var deserCell = deserializedCanvas.Data[x, y];
+
+            Assert.Equal(origCell.Char,  deserCell.Char);
+            Assert.Equal(origCell.Style, deserCell.Style);
         }
     }
 
@@ -87,16 +86,17 @@ public class NKFontBinarySerializerTests {
     public void SerializeAndDeserialize_WithMetadata_ShouldBePreserved() {
         var info = new NKFontInfo(
             "TestFont",
-            ligatures: true,
-            leading: 10,
-            letterSpacing: 1,
-            wordSpacing: 4,
-            variable: new NKFontVariableConfig(true),
-            author: "Alice",
-            licenseType: "Custom",
-            licenseFile: "LICENSE.txt",
-            licenseContent: "This is a custom license agreement."
+            true,
+            10,
+            1,
+            4,
+            new NKFontVariableConfig(true),
+            "Alice",
+            "Custom",
+            "LICENSE.txt",
+            "This is a custom license agreement."
         );
+
         var originalFont = new NKFont(info, new Dictionary<NKGlyphSymbol, NKGlyph>());
 
         using var memoryStream = new MemoryStream();
@@ -105,30 +105,30 @@ public class NKFontBinarySerializerTests {
 
         var deserializedFont = NKFontSerializer.DeserializeBinary(memoryStream);
         Assert.NotNull(deserializedFont);
-        Assert.Equal("TestFont", deserializedFont.Info.Name);
-        Assert.Equal("Alice", deserializedFont.Info.Author);
-        Assert.Equal("Custom", deserializedFont.Info.LicenseType);
-        Assert.Equal("LICENSE.txt", deserializedFont.Info.LicenseFile);
+        Assert.Equal("TestFont",                            deserializedFont.Info.Name);
+        Assert.Equal("Alice",                               deserializedFont.Info.Author);
+        Assert.Equal("Custom",                              deserializedFont.Info.LicenseType);
+        Assert.Equal("LICENSE.txt",                         deserializedFont.Info.LicenseFile);
         Assert.Equal("This is a custom license agreement.", deserializedFont.Info.LicenseContent);
     }
 
     [Fact]
     public void SerializeAndDeserialize_WithSourceFormatAndCustomMetadata_ShouldBePreserved() {
         var metadata = new Dictionary<string, string> {
-            ["Year"] = "1993",
+            ["Year"]     = "1993",
             ["Category"] = "Shadowed",
-            ["Website"] = "https://example.com"
+            ["Website"]  = "https://example.com"
         };
 
         var info = new NKFontInfo(
             "TestCustomMetaFont",
-            ligatures: false,
-            leading: 8,
-            letterSpacing: 2,
-            wordSpacing: 5,
-            variable: new NKFontVariableConfig(false),
-            author: "Glenn Chappell",
-            licenseType: "Attribution",
+            false,
+            8,
+            2,
+            5,
+            new NKFontVariableConfig(false),
+            "Glenn Chappell",
+            "Attribution",
             sourceFormat: "Figlet",
             metadata: metadata
         );
@@ -141,12 +141,12 @@ public class NKFontBinarySerializerTests {
 
         var deserializedFont = NKFontSerializer.DeserializeBinary(memoryStream);
         Assert.NotNull(deserializedFont);
-        Assert.Equal("TestCustomMetaFont", deserializedFont.Info.Name);
-        Assert.Equal("Figlet", deserializedFont.Info.SourceFormat);
-        Assert.Equal("Glenn Chappell", deserializedFont.Info.Author);
-        Assert.Equal("Attribution", deserializedFont.Info.LicenseType);
-        Assert.Equal("1993", deserializedFont.Info.GetMetadata("Year"));
-        Assert.Equal("Shadowed", deserializedFont.Info.GetMetadata("category")); // case-insensitive check
+        Assert.Equal("TestCustomMetaFont",  deserializedFont.Info.Name);
+        Assert.Equal("Figlet",              deserializedFont.Info.SourceFormat);
+        Assert.Equal("Glenn Chappell",      deserializedFont.Info.Author);
+        Assert.Equal("Attribution",         deserializedFont.Info.LicenseType);
+        Assert.Equal("1993",                deserializedFont.Info.GetMetadata("Year"));
+        Assert.Equal("Shadowed",            deserializedFont.Info.GetMetadata("category")); // case-insensitive check
         Assert.Equal("https://example.com", deserializedFont.Info.GetMetadata("WEBSITE"));
     }
 }

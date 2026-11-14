@@ -8,7 +8,7 @@ using HasFlagExtension;
 namespace NeoKolors.Console;
 
 /// <summary>
-/// determines what logging messages will be printed
+///     determines what logging messages will be printed
 /// </summary>
 [Flags]
 [HasFlagPrefix("Log")]

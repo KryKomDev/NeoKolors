@@ -12,23 +12,23 @@ public class ExceptionFormatterTests {
         var color = NKConsoleColor.BLUE;
 
         // Act
-        ExceptionFormatter.ShowHighlight = false;
-        ExceptionFormatter.HighlightColor = color;
-        ExceptionFormatter.MessageStyle = style;
-        ExceptionFormatter.ExceptionTypeStyle = style;
+        ExceptionFormatter.ShowHighlight           = false;
+        ExceptionFormatter.HighlightColor          = color;
+        ExceptionFormatter.MessageStyle            = style;
+        ExceptionFormatter.ExceptionTypeStyle      = style;
         ExceptionFormatter.ExceptionNamespaceStyle = style;
-        ExceptionFormatter.FileNameStyle = style;
-        ExceptionFormatter.PathStyle = style;
-        ExceptionFormatter.MethodStyle = style;
-        ExceptionFormatter.MethodSourceStyle = style;
-        ExceptionFormatter.MethodArgumentsStyle = style;
-        ExceptionFormatter.LineNumberStyle = style;
-        ExceptionFormatter.HelpLinkStyle = style;
+        ExceptionFormatter.FileNameStyle           = style;
+        ExceptionFormatter.PathStyle               = style;
+        ExceptionFormatter.MethodStyle             = style;
+        ExceptionFormatter.MethodSourceStyle       = style;
+        ExceptionFormatter.MethodArgumentsStyle    = style;
+        ExceptionFormatter.LineNumberStyle         = style;
+        ExceptionFormatter.HelpLinkStyle           = style;
 
         // Assert
         Assert.False(ExceptionFormatter.Config.ShowHighlight);
         Assert.Equal((NKColor)color, ExceptionFormatter.Config.HighlightColor);
-        
+
         Assert.Equal(style, ExceptionFormatter.Config.MessageStyle);
         Assert.Equal(style, ExceptionFormatter.Config.ExceptionTypeStyle);
         Assert.Equal(style, ExceptionFormatter.Config.ExceptionNamespaceStyle);
@@ -39,11 +39,11 @@ public class ExceptionFormatterTests {
         Assert.Equal(style, ExceptionFormatter.Config.MethodArgumentsStyle);
         Assert.Equal(style, ExceptionFormatter.Config.LineNumberStyle);
         Assert.Equal(style, ExceptionFormatter.Config.HelpLinkStyle);
-        
+
         // Check reading back
         Assert.False(ExceptionFormatter.ShowHighlight);
         Assert.Equal((NKColor)color, ExceptionFormatter.HighlightColor);
-        Assert.Equal(style, ExceptionFormatter.MessageStyle);
+        Assert.Equal(style,          ExceptionFormatter.MessageStyle);
 
         // Reset default config for subsequent tests
         ExceptionFormatter.Config = ExceptionFormat.Default;
@@ -54,15 +54,15 @@ public class ExceptionFormatterTests {
         // Arrange
         ExceptionFormatter.Config = ExceptionFormat.Default;
         var message = "Test Message";
-        var ex = new Exception(message);
+        var ex      = new Exception(message);
 
         // Act
         var result = ExceptionFormatter.Format(ex).ToString();
 
         // Assert
-        Assert.Contains(message, result);
+        Assert.Contains(message,           result);
         Assert.Contains(nameof(Exception), result); // Type name
-        Assert.Contains("System", result); // Namespace
+        Assert.Contains("System",          result); // Namespace
     }
 
     [Fact]
@@ -77,7 +77,7 @@ public class ExceptionFormatterTests {
         // Assert
         Assert.Contains("▍ ", result);
     }
-    
+
     [Fact]
     public void Format_WithoutHighlight_NoPrefix() {
         // Arrange
@@ -98,7 +98,7 @@ public class ExceptionFormatterTests {
         // Act & Assert
         ExceptionFormatter.RedirectToLog = false;
         Assert.False(ExceptionFormatter.RedirectToLog);
-        
+
         ExceptionFormatter.RedirectToLog = true;
         Assert.True(ExceptionFormatter.RedirectToLog);
     }
@@ -107,6 +107,7 @@ public class ExceptionFormatterTests {
     public void Format_WithHelpLink_ContainsLink() {
         // Arrange
         ExceptionFormatter.ShowHighlight = false;
+
         var ex = new Exception("Test") {
             HelpLink = "http://example.com"
         };
@@ -115,7 +116,7 @@ public class ExceptionFormatterTests {
         var result = ExceptionFormatter.Format(ex).ToString();
 
         // Assert
-        Assert.Contains("http://example.com", result);
+        Assert.Contains("http://example.com",                              result);
         Assert.Contains("For more information about this exception, see:", result);
 
         ExceptionFormatter.Config = ExceptionFormat.Default;
@@ -126,9 +127,11 @@ public class ExceptionFormatterTests {
         // Arrange
         ExceptionFormatter.ShowHighlight = false;
         Exception? ex = null;
+
         try {
             ThrowException();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             ex = e;
         }
 
@@ -136,7 +139,7 @@ public class ExceptionFormatterTests {
         var result = ExceptionFormatter.Format(ex!).ToString();
 
         // Assert
-        Assert.Contains("ThrowException", result);
+        Assert.Contains("ThrowException",              result);
         Assert.Contains("Format_WithStackTrace_Works", result);
 
         ExceptionFormatter.Config = ExceptionFormat.Default;
@@ -147,9 +150,11 @@ public class ExceptionFormatterTests {
         // Arrange
         ExceptionFormatter.Config = ExceptionFormat.Default;
         Exception? ex = null;
+
         try {
             _ = int.Parse("not a number");
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             ex = e;
         }
 
@@ -164,6 +169,7 @@ public class ExceptionFormatterTests {
         var config = new ExceptionFormat {
             BorderStyle = ExceptionBorderStyle.BOX
         };
+
         var ex = new Exception("Box test");
 
         // Act
@@ -172,7 +178,7 @@ public class ExceptionFormatterTests {
         // Assert
         Assert.Contains("╭─", result);
         Assert.Contains("╰─", result);
-        Assert.Contains("│", result);
+        Assert.Contains("│",  result);
     }
 
     [Fact]
@@ -185,8 +191,8 @@ public class ExceptionFormatterTests {
         var result = ExceptionFormatter.Format(outer).ToString();
 
         // Assert
-        Assert.Contains("Outer error", result);
-        Assert.Contains("Inner error", result);
+        Assert.Contains("Outer error",      result);
+        Assert.Contains("Inner error",      result);
         Assert.Contains("Inner Exception:", result);
     }
 
@@ -200,15 +206,15 @@ public class ExceptionFormatterTests {
         var result = ExceptionFormatter.Format(ex).ToString();
 
         // Assert
-        Assert.Contains("Data:", result);
-        Assert.Contains("UserKey", result);
+        Assert.Contains("Data:",       result);
+        Assert.Contains("UserKey",     result);
         Assert.Contains("CustomValue", result);
     }
 
     [Fact]
     public void Format_Presets_ApplyExpectedConfigurations() {
         // Minimal preset
-        var minimalEx = new Exception("Minimal test");
+        var minimalEx     = new Exception("Minimal test");
         var minimalResult = ExceptionFormatter.Format(minimalEx, ExceptionFormat.Minimal).ToString();
         Assert.DoesNotContain("▍ ", minimalResult);
         Assert.Contains("Minimal test", minimalResult);
@@ -222,14 +228,16 @@ public class ExceptionFormatterTests {
     public void Format_PathTransformer_TransformsFilePath() {
         // Arrange
         Exception? ex = null;
+
         try {
             ThrowException();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             ex = e;
         }
 
         var config = new ExceptionFormat {
-            ShowHighlight = false,
+            ShowHighlight   = false,
             PathTransformer = p => "[TRANSFORMED]/" + Path.GetFileName(p)
         };
 
@@ -244,15 +252,17 @@ public class ExceptionFormatterTests {
     public void Format_SourceSnippet_LeftGutterAlignedCorrectly() {
         // Arrange
         Exception? ex = null;
+
         try {
             ThrowException();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             ex = e;
         }
 
         var config = new ExceptionFormat {
-            ShowHighlight = false,
-            ShowSourceSnippet = true,
+            ShowHighlight             = false,
+            ShowSourceSnippet         = true,
             SourceSnippetContextLines = 1
         };
 
@@ -261,8 +271,8 @@ public class ExceptionFormatterTests {
 
         // Assert
         Assert.Contains("┌─", result);
-        Assert.Contains("│", result);
-        Assert.Contains("➔", result);
+        Assert.Contains("│",  result);
+        Assert.Contains("➔",  result);
     }
 
     [Fact]
@@ -274,7 +284,7 @@ public class ExceptionFormatterTests {
         };
 
         Assert.Equal((NKColor)NKConsoleColor.YELLOW, config.MethodParamTypeStyle.FColor);
-        Assert.Equal((NKColor)NKConsoleColor.CYAN, config.MethodParamNameStyle.FColor);
+        Assert.Equal((NKColor)NKConsoleColor.CYAN,   config.MethodParamNameStyle.FColor);
 
         // Check top-level delegation
         ExceptionFormatter.MethodParamTypeStyle = new NKStyle(NKConsoleColor.GREEN);
@@ -287,33 +297,35 @@ public class ExceptionFormatterTests {
     public void Format_ShowFilePathAndShowMethodNamespace_TogglesVisibility() {
         // Arrange
         Exception? ex = null;
+
         try {
             ThrowException();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             ex = e;
         }
 
         var hideConfig = new ExceptionFormat {
-            ShowHighlight = false,
-            ShowSourceSnippet = false,
-            ShowFilePath = false,
+            ShowHighlight       = false,
+            ShowSourceSnippet   = false,
+            ShowFilePath        = false,
             ShowMethodNamespace = false
         };
 
         // Act
-        AnsiString formatted = ExceptionFormatter.Format(ex!, hideConfig);
-        string result = formatted.ToString();
+        var formatted = ExceptionFormatter.Format(ex!, hideConfig);
+        var result    = formatted.ToString();
 
         // Assert
         Assert.DoesNotContain("NeoKolors.Console.Tests.", result);
-        Assert.Contains("ExceptionFormatterTests", result);
-        Assert.Contains("ThrowException", result);
+        Assert.Contains("ExceptionFormatterTests",    result);
+        Assert.Contains("ThrowException",             result);
         Assert.Contains("ExceptionFormatterTests.cs", result);
         Assert.DoesNotContain(@"Tests\Console.Tests", result);
         Assert.DoesNotContain(@"Tests/Console.Tests", result);
-        
+
         // Check single line format: method signature directly followed by "in filename:line"
-        string plainResult = formatted.Plain;
+        var plainResult = formatted.Plain;
         Assert.Contains("ThrowException() in ExceptionFormatterTests.cs:line", plainResult);
     }
 
@@ -321,27 +333,29 @@ public class ExceptionFormatterTests {
     public void Format_StackTraceIndent_AdjustsIndentationSpaces() {
         // Arrange
         Exception? ex = null;
+
         try {
             ThrowException();
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             ex = e;
         }
 
         var config = new ExceptionFormat {
-            ShowHighlight = false,
-            ShowSourceSnippet = true,
+            ShowHighlight             = false,
+            ShowSourceSnippet         = true,
             SourceSnippetContextLines = 1,
-            StackTraceIndent = 6
+            StackTraceIndent          = 6
         };
 
         // Act
         var result = ExceptionFormatter.Format(ex!, config).Plain;
 
         // Assert
-        Assert.Contains("      at ", result);
+        Assert.Contains("      at ",   result);
         Assert.Contains("        in ", result);
-        Assert.Contains("┌─", result);
-        Assert.Contains("      ", result); // 6 leading spaces in snippet line
+        Assert.Contains("┌─",          result);
+        Assert.Contains("      ",      result); // 6 leading spaces in snippet line
 
         // Check top-level delegation
         ExceptionFormatter.StackTraceIndent = 1;

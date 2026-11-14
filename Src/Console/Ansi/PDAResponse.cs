@@ -8,15 +8,15 @@ using static NeoKolors.Console.Ansi.VTType;
 namespace NeoKolors.Console.Ansi;
 
 /// <summary>
-/// Represents a response for Primary Device Attributes (PDA) within
-/// the NeoKolors ANSI Console framework. The PDAResponse struct encapsulates
-/// details about the terminal's VT type and its supported capabilities.
+///     Represents a response for Primary Device Attributes (PDA) within
+///     the NeoKolors ANSI Console framework. The PDAResponse struct encapsulates
+///     details about the terminal's VT type and its supported capabilities.
 /// </summary>
 public readonly struct PDAResponse {
-    
+
     public VTType          Type         { get; }
     public VTCapabilities? Capabilities { get; }
-    
+
     public PDAResponse(VTType type, VTCapabilities? capabilities = null) {
         Type         = type;
         Capabilities = capabilities;
@@ -24,30 +24,35 @@ public readonly struct PDAResponse {
 
     public PDAResponse(int type, int[]? capabilities = null) {
         Type = GetVTType(
-            type, 
-            capabilities is { Length: > 0 } 
-                ? capabilities[0] 
+            type,
+            capabilities is { Length: > 0 }
+                ? capabilities[0]
                 : null
         );
-        
-        Capabilities = capabilities != null 
-            ? GetVTCapabilities(capabilities) 
+
+        Capabilities = capabilities != null
+            ? GetVTCapabilities(capabilities)
             : null;
     }
 
-    public override string ToString() => 
-        $"Primary DA {{ Type: {Type}, Capabilities: {Capabilities?.ToString() ?? "N/A"} }}";
+    public override string ToString() => $"Primary DA {{ Type: {Type}, Capabilities: {Capabilities?.ToString() ?? "N/A"} }}";
 
     /// <summary>
-    /// Determines the specific VT (Video Terminal) type based on the provided main type and optional subtype.
-    /// This method maps specific combinations of type and subtype to their corresponding VTType enumeration values.
+    ///     Determines the specific VT (Video Terminal) type based on the provided main type and
+    ///     optional subtype.
+    ///     This method maps specific combinations of type and subtype to their corresponding
+    ///     VTType enumeration values.
     /// </summary>
     /// <param name="type">An integer representing the main type of the Video Terminal.</param>
-    /// <param name="subtype">An optional integer representing the subtype of the Video Terminal. Can be null if no
-    /// subtype is applicable.</param>
-    /// <returns>A <see cref="VTType"/> value corresponding to the given type and subtype.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when the provided type does not correspond to any
-    /// supported VTType.</exception>
+    /// <param name="subtype">
+    ///     An optional integer representing the subtype of the Video Terminal. Can be null if no
+    ///     subtype is applicable.
+    /// </param>
+    /// <returns>A <see cref="VTType" /> value corresponding to the given type and subtype.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">
+    ///     Thrown when the provided type does not correspond to any
+    ///     supported VTType.
+    /// </exception>
     public static VTType GetVTType(int type, int? subtype) {
         return type switch {
             1 when subtype == 2 => VT100,
@@ -66,19 +71,23 @@ public readonly struct PDAResponse {
     }
 
     /// <summary>
-    /// Retrieves the combined Virtual Terminal (VT) capabilities from an array of individual capabilities.
-    /// Each capability in the array is processed and aggregated to form the final set of VT capabilities.
+    ///     Retrieves the combined Virtual Terminal (VT) capabilities from an array of individual
+    ///     capabilities.
+    ///     Each capability in the array is processed and aggregated to form the final set of VT
+    ///     capabilities.
     /// </summary>
     /// <param name="capabilities">An array representing individual VT capabilities as integers.</param>
-    /// <returns>A <see cref="VTCapabilities"/> value representing the aggregated capabilities derived from
-    /// the input array.</returns>
+    /// <returns>
+    ///     A <see cref="VTCapabilities" /> value representing the aggregated capabilities derived
+    ///     from
+    ///     the input array.
+    /// </returns>
     public static VTCapabilities GetVTCapabilities(int[] capabilities) {
         var result = VTCapabilities.NONE;
 
-        for (int i = 0; i < capabilities.Length; i++) {
+        for (var i = 0; i < capabilities.Length; i++)
             result |= GetVTCapability(capabilities[i]);
-        }
-        
+
         return result;
     }
 
@@ -100,5 +109,5 @@ public readonly struct PDAResponse {
             29 => VTCapabilities.ANSI_TEXT_LOCATOR,
             _  => throw new ArgumentOutOfRangeException(nameof(capability), capability, null)
         };
-    } 
+    }
 }

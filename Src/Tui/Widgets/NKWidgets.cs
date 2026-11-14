@@ -11,16 +11,21 @@ using NeoKolors.Tui.Lifecycle.Inline;
 namespace NeoKolors.Tui.Widgets;
 
 /// <summary>
-/// Convenient entry points and helper methods for rendering inline terminal widgets and live elements.
+///     Convenient entry points and helper methods for rendering inline terminal widgets and
+///     live elements.
 /// </summary>
 public static class NKWidgets {
     /// <summary>
-    /// Executes an asynchronous operation while rendering an animated inline spinner and status message.
+    ///     Executes an asynchronous operation while rendering an animated inline spinner and
+    ///     status message.
     /// </summary>
     /// <param name="initialText">The initial message displayed beside the spinner.</param>
     /// <param name="action">The asynchronous workload to execute.</param>
     /// <param name="spinnerStyle">Optional custom spinner frame preset.</param>
-    /// <param name="persistOnExit">Whether to preserve the final status line on console upon completion.</param>
+    /// <param name="persistOnExit">
+    ///     Whether to preserve the final status line on console upon
+    ///     completion.
+    /// </param>
     /// <param name="cancellationToken">An optional cancellation token.</param>
     public static async Task StatusAsync(
         string                    initialText,
@@ -59,7 +64,8 @@ public static class NKWidgets {
     }
 
     /// <summary>
-    /// Executes a synchronous operation while rendering an animated inline spinner and status message.
+    ///     Executes a synchronous operation while rendering an animated inline spinner and status
+    ///     message.
     /// </summary>
     public static void Status(
         string                initialText,
@@ -82,11 +88,15 @@ public static class NKWidgets {
     }
 
     /// <summary>
-    /// Executes an asynchronous operation while rendering an inline progress bar and descriptive title.
+    ///     Executes an asynchronous operation while rendering an inline progress bar and
+    ///     descriptive title.
     /// </summary>
     /// <param name="title">The title text displayed above or beside the progress bar.</param>
     /// <param name="action">The asynchronous workload to execute.</param>
-    /// <param name="persistOnExit">Whether to preserve the progress bar on console upon completion.</param>
+    /// <param name="persistOnExit">
+    ///     Whether to preserve the progress bar on console upon
+    ///     completion.
+    /// </param>
     /// <param name="cancellationToken">An optional cancellation token.</param>
     public static async Task ProgressAsync(
         string                      title,
@@ -119,7 +129,8 @@ public static class NKWidgets {
     }
 
     /// <summary>
-    /// Executes a synchronous operation while rendering an inline progress bar and descriptive title.
+    ///     Executes a synchronous operation while rendering an inline progress bar and descriptive
+    ///     title.
     /// </summary>
     public static void Progress(
         string                  title,
@@ -140,12 +151,19 @@ public static class NKWidgets {
     }
 
     /// <summary>
-    /// Executes an asynchronous operation while continuously rendering an arbitrary declarative UI element hierarchy inline.
+    ///     Executes an asynchronous operation while continuously rendering an arbitrary
+    ///     declarative UI element hierarchy inline.
     /// </summary>
-    /// <param name="root">The root visual element (e.g. composed of Flex, Grid, Border, Table, Text, or custom widgets).</param>
+    /// <param name="root">
+    ///     The root visual element (e.g. composed of Flex, Grid, Border, Table,
+    ///     Text, or custom widgets).
+    /// </param>
     /// <param name="action">The workload to execute while the UI is live.</param>
     /// <param name="fps">Target frame rate for redrawing.</param>
-    /// <param name="persistOnExit">Whether the rendered UI remains visible on the console after exit.</param>
+    /// <param name="persistOnExit">
+    ///     Whether the rendered UI remains visible on the console after
+    ///     exit.
+    /// </param>
     /// <param name="cancellationToken">An optional cancellation token.</param>
     public static async Task LiveAsync(
         IElement                  root,
@@ -166,7 +184,8 @@ public static class NKWidgets {
     }
 
     /// <summary>
-    /// Executes a synchronous operation while continuously rendering an arbitrary declarative UI element hierarchy inline.
+    ///     Executes a synchronous operation while continuously rendering an arbitrary declarative
+    ///     UI element hierarchy inline.
     /// </summary>
     public static void Live(
         IElement              root,
@@ -189,7 +208,8 @@ public static class NKWidgets {
     }
 
     /// <summary>
-    /// Renders an arbitrary declarative UI element hierarchy once directly to the console inline stream.
+    ///     Renders an arbitrary declarative UI element hierarchy once directly to the console
+    ///     inline stream.
     /// </summary>
     /// <param name="root">The root visual element to render.</param>
     public static void Render(IElement root) {
@@ -206,9 +226,10 @@ public static class NKWidgets {
         root.Render(renderCtx, screen.Size);
 
         NKConsole.OutputDriver.Write(EscapeCodes.GetDecRst(EscapeCodes.DecMode.AUTOWRAP));
+
         try {
             screen.Render();
-            screen.Finish(persist: true);
+            screen.Finish(true);
         }
         finally {
             NKConsole.OutputDriver.Write(EscapeCodes.GetDecSet(EscapeCodes.DecMode.AUTOWRAP));

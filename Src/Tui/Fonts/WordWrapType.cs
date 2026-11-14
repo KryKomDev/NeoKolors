@@ -6,5 +6,5 @@ namespace NeoKolors.Tui.Fonts;
 public enum WordWrapType {
     NONE,
     HARD,
-    WORD,
+    WORD
 }

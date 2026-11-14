@@ -21,8 +21,8 @@ public class ComplexElementsTests {
         var item2 = new Text(new AnsiString("Second")); // Length = 6, Height = 1
 
         var list = new ElementList(
-            items: new Element[] { item1, item2 },
-            pointGenerator: ListPoints.Bullet, // "•" (len 1)
+            new Element[] { item1, item2 },
+            ListPoints.Bullet, // "•" (len 1)
             pointGap: 1,
             gap: 1
         );
@@ -56,11 +56,11 @@ public class ComplexElementsTests {
         var context = new LayoutContext(new Size2D(100, 50), screen);
 
         var item1 = new Text(new AnsiString("Alpha"));
-        var item2 = ElementList.Item(new Text(new AnsiString("Beta")), point: new AnsiString("->"));
+        var item2 = ElementList.Item(new Text(new AnsiString("Beta")), new AnsiString("->"));
 
         var list = new ElementList(
-            items: new Element[] { item1, item2 },
-            pointGenerator: ListPoints.NumberDot, // "1." (len 2)
+            new Element[] { item1, item2 },
+            ListPoints.NumberDot, // "1." (len 2)
             pointGap: 1
         );
 
@@ -94,20 +94,20 @@ public class ComplexElementsTests {
         var screen  = new Size2D(100, 50);
         var context = new LayoutContext(new Size2D(50, 20), screen);
 
-        var cell1        = ElementGrid.Cell(new Text(new AnsiString("FixedCol")), row: 0, column: 0);
-        var cell2        = ElementGrid.Cell(new Text(new AnsiString("GrowCol")),  row: 0, column: 1);
-        var cellSpanning = ElementGrid.Cell(new Text(new AnsiString("Span")),     row: 1, column: 0, columnSpan: 2);
+        var cell1        = ElementGrid.Cell(new Text(new AnsiString("FixedCol")), 0, 0);
+        var cell2        = ElementGrid.Cell(new Text(new AnsiString("GrowCol")),  0, 1);
+        var cellSpanning = ElementGrid.Cell(new Text(new AnsiString("Span")),     1, 0, columnSpan: 2);
 
         var grid = new ElementGrid(
-            columns: [
+            [
                 CoreDimension.Chars(12),
-                CoreDimension.Fr(1, minChars: 5, maxChars: 30)
+                CoreDimension.Fr(1, 5, 30)
             ],
-            rows: [
+            [
                 CoreDimension.Chars(1),
                 CoreDimension.Chars(1)
             ],
-            children: [cell1, cell2, cellSpanning]
+            [cell1, cell2, cellSpanning]
         );
 
         var measured = grid.Measure(context);
@@ -139,13 +139,13 @@ public class ComplexElementsTests {
         var screen  = new Size2D(100, 50);
         var context = new LayoutContext(new Size2D(100, 50), screen);
 
-        var c1 = ElementGrid.Cell(new Text(new AnsiString("A")), row: 0, column: 0);
-        var c2 = ElementGrid.Cell(new Text(new AnsiString("B")), row: 0, column: 1);
+        var c1 = ElementGrid.Cell(new Text(new AnsiString("A")), 0, 0);
+        var c2 = ElementGrid.Cell(new Text(new AnsiString("B")), 0, 1);
 
         var grid = new ElementGrid(
-            children: new[] { c1, c2 },
-            columns: new[] { CoreDimension.Chars(5), CoreDimension.Chars(5) },
-            rows: new[] { CoreDimension.Chars(2) },
+            new[] { c1, c2 },
+            new[] { CoreDimension.Chars(5), CoreDimension.Chars(5) },
+            new[] { CoreDimension.Chars(2) },
             columnGap: 2,
             rowGap: 1,
             padding: new CoreSpacing(CoreDimension.Chars(1))
@@ -193,22 +193,20 @@ public class ComplexElementsTests {
         table.Render(renderContext, size);
 
         // Verify that canvas has content rendered
-        bool foundAlice = false;
+        var foundAlice = false;
 
-        for (int y = 0; y < canvas.Height; y++) {
-            for (int x = 0; x < canvas.Width - 4; x++) {
-                if (canvas.Data[x + 0, y].Char == 'A' &&
-                    canvas.Data[x + 1, y].Char == 'l' &&
-                    canvas.Data[x + 2, y].Char == 'i' &&
-                    canvas.Data[x + 3, y].Char == 'c' &&
-                    canvas.Data[x + 4, y].Char == 'e'
-                ) {
-                    foundAlice = true;
+        for (var y = 0; y < canvas.Height; y++)
+        for (var x = 0; x < canvas.Width - 4; x++)
+            if (canvas.Data[x + 0, y].Char == 'A' &&
+                canvas.Data[x + 1, y].Char == 'l' &&
+                canvas.Data[x + 2, y].Char == 'i' &&
+                canvas.Data[x + 3, y].Char == 'c' &&
+                canvas.Data[x + 4, y].Char == 'e'
+            ) {
+                foundAlice = true;
 
-                    break;
-                }
+                break;
             }
-        }
 
         Assert.True(foundAlice, "Expected 'Alice' to be rendered inside the table canvas.");
     }
@@ -225,8 +223,8 @@ public class ComplexElementsTests {
         IReadOnlyList2D<Element> roData = data;
 
         var table = new ElementTable(
-            headers: [new Text(new AnsiString("ColA")), new Text(new AnsiString("ColB"))],
-            data: roData
+            [new Text(new AnsiString("ColA")), new Text(new AnsiString("ColB"))],
+            roData
         );
 
         var screen  = new Size2D(100, 50);
@@ -241,23 +239,20 @@ public class ComplexElementsTests {
         table.Render(renderContext, size);
 
         // Verify that canvas has content rendered for header and cells
-        bool foundColA = false;
-        bool foundB2   = false;
+        var foundColA = false;
+        var foundB2   = false;
 
-        for (int y = 0; y < canvas.Height; y++) {
-            for (int x = 0; x < canvas.Width - 3; x++) {
-                if (canvas.Data[x, y].Char     == 'C' &&
-                    canvas.Data[x + 1, y].Char == 'o' &&
-                    canvas.Data[x + 2, y].Char == 'l' &&
-                    canvas.Data[x + 3, y].Char == 'A') {
-                    foundColA = true;
-                }
+        for (var y = 0; y < canvas.Height; y++)
+        for (var x = 0; x < canvas.Width - 3; x++) {
+            if (canvas.Data[x, y].Char     == 'C' &&
+                canvas.Data[x + 1, y].Char == 'o' &&
+                canvas.Data[x + 2, y].Char == 'l' &&
+                canvas.Data[x + 3, y].Char == 'A')
+                foundColA = true;
 
-                if (canvas.Data[x, y].Char     == 'B' &&
-                    canvas.Data[x + 1, y].Char == '2') {
-                    foundB2 = true;
-                }
-            }
+            if (canvas.Data[x, y].Char     == 'B' &&
+                canvas.Data[x + 1, y].Char == '2')
+                foundB2 = true;
         }
 
         Assert.True(foundColA, "Expected 'ColA' header to be rendered.");

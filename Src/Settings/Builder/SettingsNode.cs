@@ -7,80 +7,88 @@ using NeoKolors.Settings.Argument;
 namespace NeoKolors.Settings.Builder;
 
 public class SettingsNode<TResult> : ISettingsNode<TResult> {
-    
+
     // private fields
-    private SettingsResultConstructor<TResult>? _resultConstructor;
-    private readonly SettingsElementCollection _elements = new();
+    private          SettingsResultConstructor<TResult>? _resultConstructor;
+    private readonly SettingsElementCollection           _elements = new();
 
     /// <summary>
-    /// Gets an array of <see cref="ISettingsElementInfo"/> objects representing the elements
-    /// within the current settings node.
+    ///     Gets an array of <see cref="ISettingsElementInfo" /> objects representing the elements
+    ///     within the current settings node.
     /// </summary>
     /// <remarks>
-    /// Each element in the collection is defined by a name and its associated metadata,
-    /// such as argument or method group information. This property provides a snapshot
-    /// of the elements available in the settings node at the time of access.
+    ///     Each element in the collection is defined by a name and its associated metadata,
+    ///     such as argument or method group information. This property provides a snapshot
+    ///     of the elements available in the settings node at the time of access.
     /// </remarks>
     public ISettingsElementInfo[] Elements => _elements.Elements;
 
     /// <summary>
-    /// Represents a settings node builder that organizes settings elements and
-    /// allows the configuration of settings such as arguments, groups, and result constructors.
+    ///     Represents a settings node builder that organizes settings elements and
+    ///     allows the configuration of settings such as arguments, groups, and result
+    ///     constructors.
     /// </summary>
-    public SettingsNode(SettingsNodeSupplier<TResult> supplier) => 
+    public SettingsNode(SettingsNodeSupplier<TResult> supplier) {
         supplier(this);
+    }
 
     public SettingsNode() { }
-    
+
     public ISettingsNode<TResult> Argument(string name, IArgument argument) {
         _elements.Argument(name, argument);
+
         return this;
     }
 
     public ISettingsNode<TResult> Group(string name, SettingsMethodGroupSupplier group) {
         _elements.Group(name, group);
+
         return this;
     }
 
     public ISettingsNode<TResult> Constructs(SettingsResultConstructor<TResult> resultConstructor) {
         _resultConstructor = resultConstructor;
+
         return this;
     }
 
     public ISettingsNode Constructs(SettingsResultConstructor resultConstructor) {
         _resultConstructor = (in context) => {
             var res = resultConstructor(context);
+
             if (res is TResult result)
                 return result;
+
             throw SettingsExecutionException.InvalidResultType();
         };
-        
+
         return this;
     }
-    
+
     public Context Parse() {
         Context context = [];
 
-        foreach (var e in _elements) {
+        foreach (var e in _elements)
             if (e is ArgumentInfo a)
                 context.Add(a.Name, a.Value);
             else if (e is SettingsMethodGroupInfo g)
                 g.Value.MergeTo(context);
             else
                 throw SettingsExecutionException.UnknownSettingsElement(e.Name);
-        }
-        
+
         return context;
     }
 
     public TResult Execute(Context context) {
-        if (_resultConstructor is null) 
+        if (_resultConstructor is null)
             throw SettingsExecutionException.NoResultConstructor();
+
         return _resultConstructor(context);
     }
 
     public TResult Execute() {
         var c = Parse();
+
         return Execute(c);
     }
 
@@ -89,10 +97,10 @@ public class SettingsNode<TResult> : ISettingsNode<TResult> {
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     object? ISettingsNode.Execute(Context context) => Execute(context);
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     ISettingsNode ISettingsNode.Group(string name, SettingsMethodGroupSupplier group) => Group(name, group);
-    
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     ISettingsNode ISettingsNode.Argument(string name, IArgument argument) => Argument(name, argument);
 }

@@ -12,7 +12,7 @@ using static NeoKolors.Common.NKTextStyles;
 namespace NeoKolors.Common;
 
 /// <summary>
-/// contains information about console styles (bg / fg color, bold, italic, etc.)
+///     contains information about console styles (bg / fg color, bold, italic, etc.)
 /// </summary>
 [ProtoContract(Surrogate = typeof(NKStyleSurrogate))]
 [StructLayout(LayoutKind.Explicit, Size = sizeof(ulong) * 2)]
@@ -30,17 +30,17 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
     [FieldOffset(10)] private readonly NKUnderlineStyle _underlineStyle;
 
     /// <summary>
-    /// The actual compressed style (lower 64 bits)
+    ///     The actual compressed style (lower 64 bits)
     /// </summary>
     public ulong Raw0 => _raw0;
 
     /// <summary>
-    /// Additional style data (upper 64 bits)
+    ///     Additional style data (upper 64 bits)
     /// </summary>
     public ulong Raw1 => _raw1;
 
     /// <summary>
-    /// represents the color of the text
+    ///     represents the color of the text
     /// </summary>
     public NKColor FColor {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -50,7 +50,7 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
     }
 
     /// <summary>
-    /// represents the background color
+    ///     represents the background color
     /// </summary>
     public NKColor BColor {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -67,7 +67,7 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
     }
 
     /// <summary>
-    /// bitmap of the individual text styles (see <see cref="NKTextStyles"/>)
+    ///     bitmap of the individual text styles (see <see cref="NKTextStyles" />)
     /// </summary>
     public NKTextStyles Styles {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -77,7 +77,7 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
     }
 
     /// <summary>
-    /// Text style mode flags reserved for style modifier behavior
+    ///     Text style mode flags reserved for style modifier behavior
     /// </summary>
     public NKTextStyles InheritedStyles {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -94,7 +94,7 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
     }
 
     /// <summary>
-    /// returns whether the text color is in palette mode or custom mode
+    ///     returns whether the text color is in palette mode or custom mode
     /// </summary>
     public bool IsFColorCustom {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -102,7 +102,7 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
     }
 
     /// <summary>
-    /// returns whether the background color is in palette mode or custom mode
+    ///     returns whether the background color is in palette mode or custom mode
     /// </summary>
     public bool IsBColorCustom {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -110,7 +110,7 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
     }
 
     /// <summary>
-    /// returns whether the text color is the default color
+    ///     returns whether the text color is the default color
     /// </summary>
     public bool IsFColorDefault {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -118,7 +118,7 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
     }
 
     /// <summary>
-    /// returns whether the background color is the default color
+    ///     returns whether the background color is the default color
     /// </summary>
     public bool IsBColorDefault {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -126,7 +126,7 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
     }
 
     /// <summary>
-    /// returns whether the text color should be inherited
+    ///     returns whether the text color should be inherited
     /// </summary>
     public bool IsFColorInherit {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -134,7 +134,7 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
     }
 
     /// <summary>
-    /// returns whether the background color should be inherited
+    ///     returns whether the background color should be inherited
     /// </summary>
     public bool IsBColorInherit {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -142,7 +142,7 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
     }
 
     /// <summary>
-    /// returns whether the text color is a console color
+    ///     returns whether the text color is a console color
     /// </summary>
     public bool IsFColorConsole {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -150,7 +150,7 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
     }
 
     /// <summary>
-    /// returns whether the background color is a console color
+    ///     returns whether the background color is a console color
     /// </summary>
     public bool IsBColorConsole {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -196,15 +196,17 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
     public NKTextStyles GetStyles() => _styleData;
 
     /// <summary>
-    /// Creates a new <see cref="NKStyle"/> instance by applying the specified style properties
-    /// from the given <paramref name="other"/> instance.
+    ///     Creates a new <see cref="NKStyle" /> instance by applying the specified style
+    ///     properties
+    ///     from the given <paramref name="other" /> instance.
     /// </summary>
     /// <param name="other">
-    /// An instance of <see cref="NKStyle"/> containing the style properties to apply.
+    ///     An instance of <see cref="NKStyle" /> containing the style properties to apply.
     /// </param>
     /// <return>
-    /// A new <see cref="NKStyle"/> instance with properties combined from the current instance 
-    /// and the <paramref name="other"/> instance.
+    ///     A new <see cref="NKStyle" /> instance with properties combined from the current
+    ///     instance
+    ///     and the <paramref name="other" /> instance.
     /// </return>
     [Pure]
     public NKStyle With(NKStyle other) {
@@ -217,79 +219,80 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
     }
 
     /// <summary>
-    /// Creates a new <see cref="NKStyle"/> instance with the specified foreground color
-    /// applied, provided the given color is not marked as inherited.
+    ///     Creates a new <see cref="NKStyle" /> instance with the specified foreground color
+    ///     applied, provided the given color is not marked as inherited.
     /// </summary>
     /// <param name="color">
-    /// An instance of <see cref="NKColor"/> representing the foreground color to apply.
-    /// If the color is marked as inherited, the current instance is returned unchanged.
+    ///     An instance of <see cref="NKColor" /> representing the foreground color to apply.
+    ///     If the color is marked as inherited, the current instance is returned unchanged.
     /// </param>
     /// <returns>
-    /// A new <see cref="NKStyle"/> instance with the foreground color set to the specified
-    /// <paramref name="color"/>, or the current instance if the color is marked as inherited.
+    ///     A new <see cref="NKStyle" /> instance with the foreground color set to the specified
+    ///     <paramref name="color" />, or the current instance if the color is marked as inherited.
     /// </returns>
     [Pure]
-    public NKStyle WithFColor(NKColor color) {
-        return !color.IsInherit
+    public NKStyle WithFColor(NKColor color) =>
+        !color.IsInherit
             ? this with { FColor = color }
             : this;
-    }
 
     /// <summary>
-    /// Returns a new <see cref="NKStyle"/> instance with the specified background color applied.
+    ///     Returns a new <see cref="NKStyle" /> instance with the specified background color
+    ///     applied.
     /// </summary>
     /// <param name="color">
-    /// The <see cref="NKColor"/> to set as the background color. If the color is marked as inherited (<see cref="NKColor.IsInherit"/>),
-    /// the current instance is returned unchanged.
+    ///     The <see cref="NKColor" /> to set as the background color. If the color is marked as
+    ///     inherited (<see cref="NKColor.IsInherit" />),
+    ///     the current instance is returned unchanged.
     /// </param>
     /// <returns>
-    /// A new <see cref="NKStyle"/> instance with the background color updated to the specified <paramref name="color"/>,
-    /// or the current instance if the color is marked as inherited.
+    ///     A new <see cref="NKStyle" /> instance with the background color updated to the
+    ///     specified <paramref name="color" />,
+    ///     or the current instance if the color is marked as inherited.
     /// </returns>
     [Pure]
-    public NKStyle WithBColor(NKColor color) {
-        return !color.IsInherit
+    public NKStyle WithBColor(NKColor color) =>
+        !color.IsInherit
             ? this with { BColor = color }
             : this;
-    }
 
     /// <summary>
-    /// Creates a new <see cref="NKStyle"/> instance by applying the specified style properties
-    /// from the given <paramref name="styles"/> parameter, while also inheriting styles based
-    /// on the <paramref name="inheritedStyles"/> parameter.
+    ///     Creates a new <see cref="NKStyle" /> instance by applying the specified style
+    ///     properties
+    ///     from the given <paramref name="styles" /> parameter, while also inheriting styles based
+    ///     on the <paramref name="inheritedStyles" /> parameter.
     /// </summary>
     /// <param name="styles">
-    /// An instance of <see cref="NKTextStyles"/> containing the styles to apply to the new <see cref="NKStyle"/> instance.
+    ///     An instance of <see cref="NKTextStyles" /> containing the styles to apply to the new
+    ///     <see cref="NKStyle" /> instance.
     /// </param>
     /// <param name="inheritedStyles">
-    /// An optional instance of <see cref="NKTextStyles"/> containing the styles to inherit. By default, no styles are inherited.
+    ///     An optional instance of <see cref="NKTextStyles" /> containing the styles to inherit.
+    ///     By default, no styles are inherited.
     /// </param>
     /// <returns>
-    /// A new <see cref="NKStyle"/> instance with the specified styles applied, combined
-    /// with styles inherited from the <paramref name="inheritedStyles"/> parameter.
+    ///     A new <see cref="NKStyle" /> instance with the specified styles applied, combined
+    ///     with styles inherited from the <paramref name="inheritedStyles" /> parameter.
     /// </returns>
     [Pure]
-    public NKStyle WithStyles(NKTextStyles styles, NKTextStyles inheritedStyles = NONE) {
-        return this with {
+    public NKStyle WithStyles(NKTextStyles styles, NKTextStyles inheritedStyles = NONE) =>
+        this with {
             Styles = (styles & ~inheritedStyles) | (_styleData & inheritedStyles)
         };
-    }
 
     /// <summary>
-    /// Creates a new <see cref="NKStyle"/> instance by applying the specified underline style
-    /// from the given <paramref name="underline"/> instance.
+    ///     Creates a new <see cref="NKStyle" /> instance by applying the specified underline style
+    ///     from the given <paramref name="underline" /> instance.
     /// </summary>
     /// <param name="underline">
-    /// An instance of <see cref="NKUnderlineStyle"/> containing the underline style to apply.
+    ///     An instance of <see cref="NKUnderlineStyle" /> containing the underline style to apply.
     /// </param>
     /// <return>
-    /// A new <see cref="NKStyle"/> instance with the updated underline style based on the
-    /// specified <paramref name="underline"/>.
+    ///     A new <see cref="NKStyle" /> instance with the updated underline style based on the
+    ///     specified <paramref name="underline" />.
     /// </return>
     [Pure]
-    public NKStyle WithUnderline(NKUnderlineStyle underline) {
-        return this with { Underline = Underline.With(underline) };
-    }
+    public NKStyle WithUnderline(NKUnderlineStyle underline) => this with { Underline = Underline.With(underline) };
 
     private string ToDbgString() => $"FColor: {FColor:p}, BColor: {BColor:p}{StylesToString()}";
 
@@ -342,26 +345,24 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
     public          bool Equals(NKStyle other) => _raw0 == other._raw0 && _raw1 == other._raw1;
     public override int  GetHashCode()         => HashCode.Combine(_raw0, _raw1);
 
-    public static NKStyle operator <<(NKStyle overriden, NKStyle overrider) {
-        return overriden.With(overrider);
-    }
+    public static NKStyle operator <<(NKStyle overriden, NKStyle overrider) => overriden.With(overrider);
 
     public static NKStyle Default { get; } =
         new(
-            textColor: NKColor.Default,
-            backgroundColor: NKColor.Default,
-            styles: NONE,
-            inheritedStyles: NONE,
-            underlineStyle: NKUnderlineStyle.Default
+            NKColor.Default,
+            NKColor.Default,
+            NONE,
+            NONE,
+            NKUnderlineStyle.Default
         );
 
     public static NKStyle Inherit { get; } =
         new(
-            textColor: NKColor.Inherit,
-            backgroundColor: NKColor.Inherit,
-            styles: NONE,
-            inheritedStyles: ALL,
-            underlineStyle: NKUnderlineStyle.Inherit
+            NKColor.Inherit,
+            NKColor.Inherit,
+            NONE,
+            ALL,
+            NKUnderlineStyle.Inherit
         );
 
     [JBPure]
@@ -379,9 +380,8 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
 
         NKUnderlineType.AppendEscSeq(sb, prev.Underline.Type, next.Underline.Type, false);
 
-        if (sb[^1] != ';') {
+        if (sb[^1] != ';')
             return string.Empty;
-        }
 
         sb.Remove(sb.Length - 1, 1);
         sb.Append('m');
@@ -390,21 +390,21 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
     }
 
     /// <summary>
-    /// Generates the escape sequence for applying the specified <paramref name="style"/>
-    /// to text output in a terminal, optionally forcing the generation of the sequence
-    /// regardless of inheritable properties.
+    ///     Generates the escape sequence for applying the specified <paramref name="style" />
+    ///     to text output in a terminal, optionally forcing the generation of the sequence
+    ///     regardless of inheritable properties.
     /// </summary>
     /// <param name="style">
-    /// The <see cref="NKStyle"/> instance representing the formatting and color properties
-    /// to be applied.
+    ///     The <see cref="NKStyle" /> instance representing the formatting and color properties
+    ///     to be applied.
     /// </param>
     /// <param name="force">
-    /// A boolean value indicating whether to force the generation of the escape sequence,
-    /// overriding inherited properties if <c>true</c>.
+    ///     A boolean value indicating whether to force the generation of the escape sequence,
+    ///     overriding inherited properties if <c>true</c>.
     /// </param>
     /// <returns>
-    /// A <see cref="string"/> containing the terminal escape sequence to apply the specified
-    /// formatting and color properties.
+    ///     A <see cref="string" /> containing the terminal escape sequence to apply the specified
+    ///     formatting and color properties.
     /// </returns>
     [Pure]
     public static string GetEscSeq(NKStyle style, bool force = false) {
@@ -420,9 +420,8 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
 
         NKUnderlineType.AppendEscSeq(sb, style.Underline.Type, false);
 
-        if (sb[^1] != ';') {
+        if (sb[^1] != ';')
             return string.Empty;
-        }
 
         sb.Remove(sb.Length - 1, 1);
         sb.Append('m');
@@ -487,9 +486,8 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
             }
         }
 
-        if (textStyles != NONE) {
+        if (textStyles != NONE)
             t = textStyles;
-        }
 
         result = new NKStyle(f, b, t);
 
@@ -517,18 +515,16 @@ public readonly record struct NKStyle : IFormattable, IParsable<NKStyle> {
         }
 
         val = val.Trim();
-        string normalized = val.StartsWith('#') ? val : val.Replace('-', '_');
+        var normalized = val.StartsWith('#') ? val : val.Replace('-', '_');
 
-        if (NKColor.TryParse(normalized, null, out color)) {
+        if (NKColor.TryParse(normalized, null, out color))
             return true;
-        }
 
         if (!normalized.StartsWith('#')                               &&
             normalized.Length > 0                                     &&
             normalized.All(c => "0123456789abcdefABCDEF".Contains(c)) &&
-            NKColor.TryParse("#" + normalized, null, out color)) {
+            NKColor.TryParse("#" + normalized, null, out color))
             return true;
-        }
 
         color = default;
 
@@ -564,6 +560,6 @@ public struct NKStyleSurrogate {
     [ProtoMember(1)] public ulong Raw0 { get; set; }
     [ProtoMember(2)] public ulong Raw1 { get; set; }
 
-    public static implicit operator NKStyleSurrogate(NKStyle style) => new() { Raw0 = style.Raw0, Raw1 = style.Raw1 };
+    public static implicit operator NKStyleSurrogate(NKStyle style)     => new() { Raw0 = style.Raw0, Raw1 = style.Raw1 };
     public static implicit operator NKStyle(NKStyleSurrogate surrogate) => new(surrogate.Raw0, surrogate.Raw1);
 }

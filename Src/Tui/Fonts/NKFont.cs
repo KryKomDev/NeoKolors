@@ -26,44 +26,47 @@ public class NKFont : IAsciiFont {
     #region Static
 
     /// <summary>
-    /// Represents the default glyph used when an unknown symbol is encountered.
-    /// This glyph is typically a fallback representation, defaulting to a single
-    /// character '?' displayed within the font system.
+    ///     Represents the default glyph used when an unknown symbol is encountered.
+    ///     This glyph is typically a fallback representation, defaulting to a single
+    ///     character '?' displayed within the font system.
     /// </summary>
     private static readonly NKGlyph DEFAULT_UNKNOWN_SYMBOL_GLYPH = new(new[,] { { GlyphCell.Char('?') } }, 0);
 
     /// <summary>
-    /// Represents a static logger instance used to log diagnostic and runtime information
-    /// related to the <see cref="NKFont"/> class. Provides functionalities for various logging
-    /// levels, including critical and error logs, to aid in debugging and application monitoring.
+    ///     Represents a static logger instance used to log diagnostic and runtime information
+    ///     related to the <see cref="NKFont" /> class. Provides functionalities for various
+    ///     logging
+    ///     levels, including critical and error logs, to aid in debugging and application
+    ///     monitoring.
     /// </summary>
     private static readonly NKLogger LOGGER = NKDebug.GetLogger<NKFont>();
 
     #endregion
 
     /// <summary>
-    /// Holds the font information and settings for the current font instance.
-    /// Provides details such as font name, ligature support, leading, and letter spacing.
+    ///     Holds the font information and settings for the current font instance.
+    ///     Provides details such as font name, ligature support, leading, and letter spacing.
     /// </summary>
     private readonly NKFontInfo _fontInfo;
 
     /// <summary>
-    /// Stores a collection of glyphs mapped by their corresponding symbols.
-    /// Used to represent the visual representations of characters, ligatures, or symbols
-    /// within the context of the font's design.
+    ///     Stores a collection of glyphs mapped by their corresponding symbols.
+    ///     Used to represent the visual representations of characters, ligatures, or symbols
+    ///     within the context of the font's design.
     /// </summary>
     private readonly Dictionary<NKGlyphSymbol, NKGlyph> _glyphs;
 
     /// <summary>
-    /// Defines the maximum allowed length for ligatures in the font.
-    /// Ligatures are sequences of characters that are combined into a single glyph
-    /// for rendering purposes, and this value limits their length to ensure efficient processing.
+    ///     Defines the maximum allowed length for ligatures in the font.
+    ///     Ligatures are sequences of characters that are combined into a single glyph
+    ///     for rendering purposes, and this value limits their length to ensure efficient
+    ///     processing.
     /// </summary>
     private readonly int _maxLigatureLength;
 
     /// <summary>
-    /// Stores a collection of available ligature strings in the font.
-    /// Used for efficient ligature detection during string tokenization.
+    ///     Stores a collection of available ligature strings in the font.
+    ///     Used for efficient ligature detection during string tokenization.
     /// </summary>
     private readonly HashSet<string> _ligatureStrings;
 
@@ -78,21 +81,21 @@ public class NKFont : IAsciiFont {
     }
 
     /// <summary>
-    /// Stores the glyph representation for strikethrough styling in the font.
-    /// This glyph is used to render strikethrough effects on text elements.
+    ///     Stores the glyph representation for strikethrough styling in the font.
+    ///     This glyph is used to render strikethrough effects on text elements.
     /// </summary>
     private readonly EffectGlyphInfo? _strikethrough;
 
     /// <summary>
-    /// Stores the glyph representation for underlining text in the font.
-    /// This glyph defines how underlines are rendered within the text-based
-    /// user interface, adhering to the font's design principles and style.
+    ///     Stores the glyph representation for underlining text in the font.
+    ///     This glyph defines how underlines are rendered within the text-based
+    ///     user interface, adhering to the font's design principles and style.
     /// </summary>
     private readonly EffectGlyphInfo? _underline;
 
     /// <summary>
-    /// Stores the glyph that should be used in place of unknown or unsupported symbols.
-    /// Provides a fallback representation for symbols that cannot be rendered by the font.
+    ///     Stores the glyph that should be used in place of unknown or unsupported symbols.
+    ///     Provides a fallback representation for symbols that cannot be rendered by the font.
     /// </summary>
     private readonly NKGlyph _unknownSymbolGlyph;
 
@@ -105,8 +108,9 @@ public class NKFont : IAsciiFont {
     #region Public Fields
 
     /// <summary>
-    /// Provides access to the font information associated with the current font instance.
-    /// Encapsulates details such as the font name, ligature support, leading, and letter spacing.
+    ///     Provides access to the font information associated with the current font instance.
+    ///     Encapsulates details such as the font name, ligature support, leading, and letter
+    ///     spacing.
     /// </summary>
     public NKFontInfo Info {
         get => _fontInfo;
@@ -114,52 +118,54 @@ public class NKFont : IAsciiFont {
     }
 
     /// <summary>
-    /// Gets the name of the font as defined in the associated font information.
-    /// Provides a textual identifier for the font instance.
+    ///     Gets the name of the font as defined in the associated font information.
+    ///     Provides a textual identifier for the font instance.
     /// </summary>
     public string Name => _fontInfo.Name;
 
     /// <summary>
-    /// Provides a collection of glyph mappings, where each glyph is associated with a specific symbol.
-    /// This property represents the immutable dictionary of symbols to their corresponding glyphs,
-    /// offering a way to retrieve the graphical representation of characters in the font.
+    ///     Provides a collection of glyph mappings, where each glyph is associated with a specific
+    ///     symbol.
+    ///     This property represents the immutable dictionary of symbols to their corresponding
+    ///     glyphs,
+    ///     offering a way to retrieve the graphical representation of characters in the font.
     /// </summary>
     public ImmutableDictionary<NKGlyphSymbol, NKGlyph> Glyphs => _glyphs.ToImmutableDictionary();
 
     /// <summary>
-    /// Gets the glyph used as a fallback when an unrecognized or unsupported
-    /// symbol is encountered. This glyph substitutes missing or unknown
-    /// characters, ensuring continuity in rendering text.
+    ///     Gets the glyph used as a fallback when an unrecognized or unsupported
+    ///     symbol is encountered. This glyph substitutes missing or unknown
+    ///     characters, ensuring continuity in rendering text.
     /// </summary>
     public NKGlyph UnknownSymbolGlyph => _unknownSymbolGlyph;
 
     /// <summary>
-    /// Represents the glyph used for rendering strikethrough effects in text.
-    /// This glyph is used to draw a horizontal line through characters,
-    /// typically indicating deleted or irrelevant information. If no glyph is
-    /// assigned, the strikethrough effect may not be rendered.
+    ///     Represents the glyph used for rendering strikethrough effects in text.
+    ///     This glyph is used to draw a horizontal line through characters,
+    ///     typically indicating deleted or irrelevant information. If no glyph is
+    ///     assigned, the strikethrough effect may not be rendered.
     /// </summary>
     public NKGlyph? StrikethroughGlyph => _strikethrough?.Glyph;
 
     /// <summary>
-    /// Indicates whether the strikethrough effect is rendered above the letters.
-    /// If no specific value is set, this property defaults to true, meaning the
-    /// strikethrough will be placed above the letters by default.
+    ///     Indicates whether the strikethrough effect is rendered above the letters.
+    ///     If no specific value is set, this property defaults to true, meaning the
+    ///     strikethrough will be placed above the letters by default.
     /// </summary>
     public bool RenderStrikethroughAboveLetters => _strikethrough?.RenderAboveLetters ?? true;
 
     /// <summary>
-    /// Represents the glyph used to render an underline effect within the font system.
-    /// This glyph is typically used to draw a visual line beneath text characters and
-    /// may vary based on font settings or design specifications.
+    ///     Represents the glyph used to render an underline effect within the font system.
+    ///     This glyph is typically used to draw a visual line beneath text characters and
+    ///     may vary based on font settings or design specifications.
     /// </summary>
     public NKGlyph? UnderlineGlyph => _underline?.Glyph;
 
     /// <summary>
-    /// Determines whether the underline is rendered above letters
-    /// in the text layout when using this font.
-    /// When set to true, the underline will be positioned above the glyphs,
-    /// otherwise, it will appear below them.
+    ///     Determines whether the underline is rendered above letters
+    ///     in the text layout when using this font.
+    ///     When set to true, the underline will be positioned above the glyphs,
+    ///     otherwise, it will appear below them.
     /// </summary>
     public bool RenderUnderlineAboveLetters => _underline?.RenderAboveLetters ?? true;
 
@@ -171,9 +177,9 @@ public class NKFont : IAsciiFont {
     #region Constructors
 
     /// <summary>
-    /// Represents a font used in the NeoKolors text-based UI framework.
-    /// Provides functionality for rendering strings and glyphs onto a canvas,
-    /// as well as for calculating text dimensions and handling font-specific behaviors.
+    ///     Represents a font used in the NeoKolors text-based UI framework.
+    ///     Provides functionality for rendering strings and glyphs onto a canvas,
+    ///     as well as for calculating text dimensions and handling font-specific behaviors.
     /// </summary>
     public NKFont(
         NKFontInfo                         info,
@@ -346,8 +352,8 @@ public class NKFont : IAsciiFont {
         TextRenderingOptions options,
         int                  z = 0
     ) {
-        bool allowLigatures = options.Spacing?.Ligatures ?? _fontInfo.Ligatures;
-        var  tokens         = Tokenize(str, allowLigatures);
+        var allowLigatures = options.Spacing?.Ligatures ?? _fontInfo.Ligatures;
+        var tokens         = Tokenize(str, allowLigatures);
 
         if (tokens.Length == 0)
             return;
@@ -355,10 +361,10 @@ public class NKFont : IAsciiFont {
         var wordWrap  = options.WordWrap;
         var wrapWidth = bounds.Size.X;
 
-        int cs = options.Spacing?.LetterSpacing ?? _fontInfo.LetterSpacing;
-        int ws = options.Spacing?.WordSpacing   ?? _fontInfo.WordSpacing;
+        var cs = options.Spacing?.LetterSpacing ?? _fontInfo.LetterSpacing;
+        var ws = options.Spacing?.WordSpacing   ?? _fontInfo.WordSpacing;
 
-        int effectiveLeading = options.Spacing is { Leading: > 0 }
+        var effectiveLeading = options.Spacing is { Leading: > 0 }
             ? options.Spacing.Leading
             : _fontInfo.Leading;
 
@@ -367,13 +373,10 @@ public class NKFont : IAsciiFont {
         if (lines.Length == 0)
             return;
 
-        if (options.JustifyText && wrapWidth > 0) {
-            for (int i = 0; i < lines.Length; i++) {
-                if (lines[i].WasWrapped || (lines.Length == 1 && options.JustifyText)) {
+        if (options.JustifyText && wrapWidth > 0)
+            for (var i = 0; i < lines.Length; i++)
+                if (lines[i].WasWrapped || (lines.Length == 1 && options.JustifyText))
                     lines[i] = JustifyLine(lines[i], wrapWidth);
-                }
-            }
-        }
 
         MeasureVisualSpan(lines, out _, out _, out var minY, out var maxY, out var hasPixels, effectiveLeading);
 
@@ -524,15 +527,12 @@ public class NKFont : IAsciiFont {
 
                         char charToDraw;
 
-                        if (cellChar != null) {
+                        if (cellChar != null)
                             charToDraw = cellChar.Value;
-                        }
-                        else if (drawer is ICharCanvas canvas && canvas.Data[cx, cy].Char is var existing && existing != ' ' && existing != '\0') {
+                        else if (drawer is ICharCanvas canvas && canvas.Data[cx, cy].Char is var existing && existing != ' ' && existing != '\0')
                             charToDraw = existing;
-                        }
-                        else {
+                        else
                             charToDraw = ' ';
-                        }
 
                         if (options.Coloring != null) {
                             var relX = Math.Clamp(cx - bounds.LowerX, 0, Math.Max(0, bounds.Size.X - 1));
@@ -604,17 +604,11 @@ public class NKFont : IAsciiFont {
 
     #region Measuring Implementation
 
-    public Size2D GetMinSize(string str) {
-        return GetMinSize(new AnsiString(str));
-    }
+    public Size2D GetMinSize(string str) => GetMinSize(new AnsiString(str));
 
-    public Size2D GetSize(string str) {
-        return GetSize(str, int.MaxValue);
-    }
+    public Size2D GetSize(string str) => GetSize(str, int.MaxValue);
 
-    public Size2D GetSize(string str, int maxWidth) {
-        return GetSize(new AnsiString(str), maxWidth);
-    }
+    public Size2D GetSize(string str, int maxWidth) => GetSize(new AnsiString(str), maxWidth);
 
     public Size2D GetMinSize(AnsiString str) {
         var tokens = Tokenize(str);
@@ -628,41 +622,34 @@ public class NKFont : IAsciiFont {
         return GetSize(tokens, maxWordWidth);
     }
 
-    public Size2D GetSize(AnsiString str) {
-        return GetSize(str, int.MaxValue);
-    }
+    public Size2D GetSize(AnsiString str) => GetSize(str, int.MaxValue);
 
-    public Size2D GetSize(AnsiString str, int maxWidth) {
-        return GetSize(Tokenize(str), maxWidth);
-    }
+    public Size2D GetSize(AnsiString str, int maxWidth) => GetSize(Tokenize(str), maxWidth);
 
     public Size2D GetSize(AnsiString str, TextRenderingOptions options, int? maxWidth = null) {
-        bool allowLigatures = options.Spacing?.Ligatures ?? _fontInfo.Ligatures;
-        var  tokens         = Tokenize(str, allowLigatures);
+        var allowLigatures = options.Spacing?.Ligatures ?? _fontInfo.Ligatures;
+        var tokens         = Tokenize(str, allowLigatures);
 
         if (tokens.Length == 0)
             return Size2D.Zero;
 
-        int cs = options.Spacing?.LetterSpacing ?? _fontInfo.LetterSpacing;
-        int ws = options.Spacing?.WordSpacing   ?? _fontInfo.WordSpacing;
+        var cs = options.Spacing?.LetterSpacing ?? _fontInfo.LetterSpacing;
+        var ws = options.Spacing?.WordSpacing   ?? _fontInfo.WordSpacing;
 
-        int effectiveLeading = options.Spacing is { Leading: > 0 }
+        var effectiveLeading = options.Spacing is { Leading: > 0 }
             ? options.Spacing.Leading
             : _fontInfo.Leading;
 
-        int effectiveMaxWidth = maxWidth ?? int.MaxValue;
+        var effectiveMaxWidth = maxWidth ?? int.MaxValue;
         var lines             = ComputeLines(tokens, effectiveMaxWidth, options.WordWrap, cs, ws, options.Proportions);
 
         if (lines.Length == 0)
             return Size2D.Zero;
 
-        if (options.JustifyText && effectiveMaxWidth < int.MaxValue) {
-            for (int i = 0; i < lines.Length; i++) {
-                if (lines[i].WasWrapped || (lines.Length == 1 && options.JustifyText)) {
+        if (options.JustifyText && effectiveMaxWidth < int.MaxValue)
+            for (var i = 0; i < lines.Length; i++)
+                if (lines[i].WasWrapped || (lines.Length == 1 && options.JustifyText))
                     lines[i] = JustifyLine(lines[i], effectiveMaxWidth);
-                }
-            }
-        }
 
         var maxLineWidth = 0;
 
@@ -726,7 +713,7 @@ public class NKFont : IAsciiFont {
         out bool           hasPixels,
         int?               leading = null
     ) {
-        int effLeading     = leading ?? _fontInfo.Leading;
+        var effLeading     = leading ?? _fontInfo.Leading;
         var localMinX      = int.MaxValue;
         var localMaxX      = int.MinValue;
         var localMinY      = int.MaxValue;
@@ -738,9 +725,8 @@ public class NKFont : IAsciiFont {
             var lineBaseline = i * effLeading + _fontBaseline - 1;
             var x            = 0;
 
-            for (var j = 0; j < line.Tokens.Length; j++) {
+            for (var j = 0; j < line.Tokens.Length; j++)
                 x = RenderGlyphsWithStyles(line, j, x, lineBaseline);
-            }
         }
 
         minX      = localMinX;
@@ -752,7 +738,7 @@ public class NKFont : IAsciiFont {
         return;
 
         void ProcessGlyphCells(NKGlyph g, int startX, int startY, bool isEffect = false, int effectWidth = 0) {
-            if (isEffect) {
+            if (isEffect)
                 for (var dx = 0; dx < effectWidth; dx++) {
                     var cx  = startX + dx;
                     var col = dx % g.Width;
@@ -771,8 +757,7 @@ public class NKFont : IAsciiFont {
                         localHasPixels = true;
                     }
                 }
-            }
-            else {
+            else
                 for (var gx = 0; gx < g.Width; gx++) {
                     var cx = startX + gx;
 
@@ -790,7 +775,6 @@ public class NKFont : IAsciiFont {
                         localHasPixels = true;
                     }
                 }
-            }
         }
 
         int RenderGlyphsWithStyles(RenderedLineInfo line, int j, int x, int lineBaseline) {
@@ -897,14 +881,12 @@ public class NKFont : IAsciiFont {
 
                     break;
                 case SPACE: {
-                    if (lg is null) {
+                    if (lg is null)
                         leadingSpace += t.Length * _fontInfo.WordSpacing;
-                    }
-                    else {
+                    else
                         sp = _fontInfo.ProportionType == MONOSPACED
                             ? cs + t.Length * _fontInfo.WordSpacing
                             : t.Length * _fontInfo.WordSpacing;
-                    }
                 }
 
                     break;
@@ -928,8 +910,8 @@ public class NKFont : IAsciiFont {
         int?                 wordSpacing   = null,
         FontProportionsInfo? proportions   = null
     ) {
-        int cs        = letterSpacing ?? _fontInfo.LetterSpacing;
-        int ws        = wordSpacing   ?? _fontInfo.WordSpacing;
+        var cs        = letterSpacing ?? _fontInfo.LetterSpacing;
+        var ws        = wordSpacing   ?? _fontInfo.WordSpacing;
         var propoInfo = proportions   ?? _fontInfo.FontPropoInfo;
         var propType  = propoInfo.Type;
 
@@ -947,8 +929,8 @@ public class NKFont : IAsciiFont {
         int                              maxWidth,
         Func<NKGlyph, NKGlyph, int, int> getOffset,
         WordWrapType                     wordWrap
-    ) {
-        return ComputeLines(
+    ) =>
+        ComputeLines(
             tokens,
             maxWidth,
             getOffset,
@@ -957,7 +939,6 @@ public class NKFont : IAsciiFont {
             _fontInfo.WordSpacing,
             _fontInfo.ProportionType
         );
-    }
 
     private RenderedLineInfo[] ComputeLines(
         Token[]                          tokens,
@@ -1071,7 +1052,7 @@ public class NKFont : IAsciiFont {
                             currentWidth,
                             tokens.InRange(lineStart, i).ToArray(),
                             offsets.InRange(lineStart, i).ToArray(),
-                            wasWrapped: false
+                            false
                         )
                     );
 
@@ -1097,7 +1078,7 @@ public class NKFont : IAsciiFont {
                             lastSpaceWidth,
                             tokens.InRange(lineStart, j).ToArray(),
                             offsets.InRange(lineStart, j).ToArray(),
-                            wasWrapped: true
+                            true
                         )
                     );
 
@@ -1110,7 +1091,7 @@ public class NKFont : IAsciiFont {
                             currentWidth,
                             [tokens[i]],
                             [offsets[i]],
-                            wasWrapped: true
+                            true
                         )
                     );
 
@@ -1122,7 +1103,7 @@ public class NKFont : IAsciiFont {
                             lastWidth,
                             tokens.InRange(lineStart, i).ToArray(),
                             offsets.InRange(lineStart, i).ToArray(),
-                            wasWrapped: true
+                            true
                         )
                     );
 
@@ -1149,7 +1130,7 @@ public class NKFont : IAsciiFont {
                     currentOffset + widths[tokens.Length - 1],
                     tokens.Skip(lineStart).ToArray(),
                     offsets.Skip(lineStart).ToArray(),
-                    wasWrapped: false
+                    false
                 )
             );
 
@@ -1160,13 +1141,9 @@ public class NKFont : IAsciiFont {
 
     #region Kerning
 
-    private RenderedLineInfo[] ComputeLines_Kerning(Token[] tokens, int maxWidth, WordWrapType wordWrap) {
-        return ComputeLines_Kerning(tokens, maxWidth, wordWrap, _fontInfo.LetterSpacing, _fontInfo.WordSpacing);
-    }
+    private RenderedLineInfo[] ComputeLines_Kerning(Token[] tokens, int maxWidth, WordWrapType wordWrap) => ComputeLines_Kerning(tokens, maxWidth, wordWrap, _fontInfo.LetterSpacing, _fontInfo.WordSpacing);
 
-    private RenderedLineInfo[] ComputeLines_Kerning(Token[] tokens, int maxWidth, WordWrapType wordWrap, int cs, int ws) {
-        return ComputeLines(tokens, maxWidth, GetGlyphOffset_Kerning, wordWrap, cs, ws, VARIABLE | KERNING);
-    }
+    private RenderedLineInfo[] ComputeLines_Kerning(Token[] tokens, int maxWidth, WordWrapType wordWrap, int cs, int ws) => ComputeLines(tokens, maxWidth, GetGlyphOffset_Kerning, wordWrap, cs, ws, VARIABLE | KERNING);
 
     private static int GetGlyphOffset_Kerning(NKGlyph left, NKGlyph right, int spacing) {
         var closest  = int.MaxValue;
@@ -1243,18 +1220,12 @@ public class NKFont : IAsciiFont {
 
     #region Variable
 
-    private RenderedLineInfo[] ComputeLines_Variable(Token[] tokens, int maxWidth, WordWrapType wordWrap) {
-        return ComputeLines_Variable(tokens, maxWidth, wordWrap, _fontInfo.LetterSpacing, _fontInfo.WordSpacing);
-    }
+    private RenderedLineInfo[] ComputeLines_Variable(Token[] tokens, int maxWidth, WordWrapType wordWrap) => ComputeLines_Variable(tokens, maxWidth, wordWrap, _fontInfo.LetterSpacing, _fontInfo.WordSpacing);
 
-    private RenderedLineInfo[] ComputeLines_Variable(Token[] tokens, int maxWidth, WordWrapType wordWrap, int cs, int ws) {
-        return ComputeLines(tokens, maxWidth, GetGlyphOffset_Variable, wordWrap, cs, ws, VARIABLE);
-    }
+    private RenderedLineInfo[] ComputeLines_Variable(Token[] tokens, int maxWidth, WordWrapType wordWrap, int cs, int ws) => ComputeLines(tokens, maxWidth, GetGlyphOffset_Variable, wordWrap, cs, ws, VARIABLE);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static int GetGlyphOffset_Variable(NKGlyph left, NKGlyph _, int spacing) {
-        return left.Width + spacing + 1;
-    }
+    private static int GetGlyphOffset_Variable(NKGlyph left, NKGlyph _, int spacing) => left.Width + spacing + 1;
 
     #endregion
 
@@ -1262,8 +1233,8 @@ public class NKFont : IAsciiFont {
 
     #region Mono
 
-    private RenderedLineInfo[] ComputeLines_Mono(Token[] tokens, int maxWidth, WordWrapType wordWrap) {
-        return ComputeLines_Mono(
+    private RenderedLineInfo[] ComputeLines_Mono(Token[] tokens, int maxWidth, WordWrapType wordWrap) =>
+        ComputeLines_Mono(
             tokens,
             maxWidth,
             wordWrap,
@@ -1271,7 +1242,6 @@ public class NKFont : IAsciiFont {
             _fontInfo.WordSpacing,
             _fontInfo.FontPropoInfo
         );
-    }
 
     private RenderedLineInfo[] ComputeLines_Mono(
         Token[]              tokens,
@@ -1283,11 +1253,13 @@ public class NKFont : IAsciiFont {
     ) {
         var info = propoInfo ?? _fontInfo.FontPropoInfo;
 
-        int glyphWidth = info.Type.GetIsMonospaced() && info.AsMono.GlyphWidth > 0
+        var glyphWidth = info.Type.GetIsMonospaced() && info.AsMono.GlyphWidth > 0
             ? info.AsMono.GlyphWidth
             : _fontInfo.ProportionType.GetIsMonospaced()
                 ? _fontInfo.FontPropoInfo.AsMono.GlyphWidth
-                : _glyphs.Count > 0 ? _glyphs.Values.Max(g => g.Width) : 8;
+                : _glyphs.Count > 0
+                    ? _glyphs.Values.Max(g => g.Width)
+                    : 8;
 
         return ComputeLines(
             tokens,
@@ -1302,9 +1274,11 @@ public class NKFont : IAsciiFont {
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private int GetGlyphOffset_Mono(NKGlyph _0, NKGlyph _1, int spacing) {
-        int glyphWidth = _fontInfo.ProportionType.GetIsMonospaced()
+        var glyphWidth = _fontInfo.ProportionType.GetIsMonospaced()
             ? _fontInfo.FontPropoInfo.AsMono.GlyphWidth
-            : (_glyphs.Count > 0 ? _glyphs.Values.Max(g => g.Width) : 8);
+            : _glyphs.Count > 0
+                ? _glyphs.Values.Max(g => g.Width)
+                : 8;
 
         return glyphWidth + spacing + 1;
     }
@@ -1317,24 +1291,22 @@ public class NKFont : IAsciiFont {
 
         List<int> gapIndices = [];
 
-        for (int j = 1; j < line.Tokens.Length; j++) {
-            if (line.Tokens[j].Type != SPACE && line.Tokens[j - 1].Type == SPACE) {
+        for (var j = 1; j < line.Tokens.Length; j++)
+            if (line.Tokens[j].Type != SPACE && line.Tokens[j - 1].Type == SPACE)
                 gapIndices.Add(j);
-            }
-        }
 
         if (gapIndices.Count == 0)
             return line;
 
-        int extraSpace = targetWidth - line.Width;
-        int baseExtra  = extraSpace / gapIndices.Count;
-        int remainder  = extraSpace % gapIndices.Count;
+        var extraSpace = targetWidth - line.Width;
+        var baseExtra  = extraSpace / gapIndices.Count;
+        var remainder  = extraSpace % gapIndices.Count;
 
         var newOffsets = (int[])line.Offsets.Clone();
 
-        for (int k = 0; k < gapIndices.Count; k++) {
-            int idx = gapIndices[k];
-            int add = baseExtra + (k < remainder ? 1 : 0);
+        for (var k = 0; k < gapIndices.Count; k++) {
+            var idx = gapIndices[k];
+            var add = baseExtra + (k < remainder ? 1 : 0);
             newOffsets[idx] += add;
         }
 
@@ -1354,7 +1326,7 @@ public class NKFont : IAsciiFont {
             WasWrapped = wasWrapped;
         }
 
-        public RenderedLineInfo(int width, Token[] tokens) : this(width, tokens, null, wasWrapped: false) { }
+        public RenderedLineInfo(int width, Token[] tokens) : this(width, tokens, null, false) { }
     }
 
     private NKGlyph GetGlyphFromToken(Token token) {
@@ -1372,13 +1344,16 @@ public class NKFont : IAsciiFont {
     #region Helper Methods
 
     /// <summary>
-    /// Resolves a text string to a glyph symbol, prioritizing an exact style match
-    /// and falling back to the closest matching style if an exact match is not found.
+    ///     Resolves a text string to a glyph symbol, prioritizing an exact style match
+    ///     and falling back to the closest matching style if an exact match is not found.
     /// </summary>
     /// <param name="text">The text value of the symbol to resolve.</param>
     /// <param name="style">The desired style for the symbol.</param>
     /// <param name="isLigature">Specifies whether the symbol is a ligature.</param>
-    /// <returns>The resolved <see cref="NKGlyphSymbol"/>, or <c>null</c> if no matching symbol is found.</returns>
+    /// <returns>
+    ///     The resolved <see cref="NKGlyphSymbol" />, or <c>null</c> if no matching symbol is
+    ///     found.
+    /// </returns>
     private NKGlyphSymbol? ResolveSymbol(string text, NKStyle style, bool isLigature) {
         // 1. Exact match
         var exactSymbol = isLigature
@@ -1415,7 +1390,7 @@ public class NKFont : IAsciiFont {
     }
 
     /// <summary>
-    /// Calculates a similarity score between two styles to determine the best match.
+    ///     Calculates a similarity score between two styles to determine the best match.
     /// </summary>
     private static int CalculateStyleMatchScore(NKStyle target, NKStyle candidate) {
         var xor = ~(target.Styles ^ candidate.Styles);
@@ -1544,17 +1519,11 @@ public class NKFont : IAsciiFont {
         public static Token Invalid { get; } = new(INVALID, null, default, 0);
         public static Token Newline { get; } = new(NEWLINE, null, default, 0);
 
-        public static Token Letter(NKGlyphSymbol symbol, NKStyle style) {
-            return new Token(LETTER, symbol, style, 1);
-        }
+        public static Token Letter(NKGlyphSymbol symbol, NKStyle style) => new(LETTER, symbol, style, 1);
 
-        public static Token Ligature(NKGlyphSymbol symbol, NKStyle style) {
-            return new Token(LIGATURE, symbol, style, symbol.LigatureLength);
-        }
+        public static Token Ligature(NKGlyphSymbol symbol, NKStyle style) => new(LIGATURE, symbol, style, symbol.LigatureLength);
 
-        public static Token Space(int length, NKStyle style) {
-            return new Token(SPACE, null, style, length);
-        }
+        public static Token Space(int length, NKStyle style) => new(SPACE, null, style, length);
     }
 
     public enum TokenType {

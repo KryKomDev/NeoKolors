@@ -40,29 +40,29 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
 
     private void ForceRenderImages() {
         _screenProfiler.Start_Screen_RenderImage();
-       
-        for (int i = 0; i < _images.Count; i++) {
+
+        for (var i = 0; i < _images.Count; i++) {
             var img = _images[i];
 
             NKConsole.WriteImage(img.Image, img.Position, img.Size, img.SamplingOptions);
         }
 
         _prevImages = [.. _images];
-        
+
         _screenProfiler.Stop_Screen_RenderImage();
     }
-    
+
     private void RenderImages() {
         throw new NotImplementedException();
-        
+
         // _screenProfiler.Start_Screen_RenderImage();
         //
         // _screenProfiler.Stop_Screen_RenderImage();
     }
 
-    private void ForceRenderChars() => RenderCharsInternal(force: true);
+    private void ForceRenderChars() => RenderCharsInternal(true);
 
-    private void RenderChars() => RenderCharsInternal(force: false);
+    private void RenderChars() => RenderCharsInternal(false);
 
     private void RenderCharsInternal(bool force) {
         _screenProfiler.Start_Screen_RenderChars();
@@ -81,17 +81,18 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
 
         _sb.Clear();
         var prevStyle = NKStyle.Default;
-        var ys = _data.YSize;
-        var xs = _data.XSize;
+        var ys        = _data.YSize;
+        var xs        = _data.XSize;
 
-        for (int y = 0; y < ys; y++) {
+        for (var y = 0; y < ys; y++) {
             var isBehind = true;
 
-            for (int x = 0; x < xs; x++) {
+            for (var x = 0; x < xs; x++) {
                 var cell = _data[x, y];
 
                 if (!force && cell == _prevData[x, y]) {
                     isBehind = true;
+
                     continue;
                 }
 
@@ -111,9 +112,8 @@ public class NKCharScreen : NKCharCanvas, ICharScreen {
         }
 
         if (_sb.Length > 0) {
-            if (prevStyle != NKStyle.Default) {
+            if (prevStyle != NKStyle.Default)
                 _sb.Append("\e[0m");
-            }
 
             NKConsole.Write(_sb.ToString());
         }

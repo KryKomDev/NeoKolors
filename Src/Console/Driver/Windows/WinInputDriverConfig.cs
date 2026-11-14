@@ -1,30 +1,34 @@
-﻿//
+//
 // NeoKolors
 // Copyright (c) 2026 KryKom
 //
 
 namespace NeoKolors.Console;
 
-public class WinInputDriverConfig : InputDriverConfig {
-    
-    public TimeSpan RefreshInterval  { get; }
-    public TimeSpan VTRequestTimeout { get; }
-    public bool     CtrlCForceQuits  { get; }
-    
+/// <summary>
+///     Represents configuration options for the Windows input driver.
+/// </summary>
+public sealed record WinInputDriverConfig : InputDriverConfig {
+
+    public WinInputDriverConfig() {
+        MouseReportLevel = ReportedMouseEvents.ALL;
+    }
+
     public WinInputDriverConfig(
-        bool                reportFocus      = true,
-        ReportedMouseEvents mouseConfig      = ReportedMouseEvents.ALL,
-        bool                reportResize     = true,
-        TimeSpan?           refreshInterval  = null,
-        TimeSpan?           vtRequestTimeout = null,
-        bool                ctrlCForceQuits  = true
+        bool                reportFocus         = true,
+        ReportedMouseEvents mouseConfig         = ReportedMouseEvents.ALL,
+        bool                reportResize        = true,
+        TimeSpan?           refreshInterval     = null,
+        TimeSpan?           vtRequestTimeout    = null,
+        bool                ctrlCForceQuits     = true,
+        int                 vtRequestMaxRetries = 1
     ) : base(
         reportFocus,
         mouseConfig,
-        reportResize
-    ) {
-        RefreshInterval  = refreshInterval  ?? TimeSpan.FromMilliseconds(10);
-        VTRequestTimeout = vtRequestTimeout ?? TimeSpan.FromMilliseconds(100);
-        CtrlCForceQuits  = ctrlCForceQuits;
-    }
+        reportResize,
+        vtRequestTimeout,
+        vtRequestMaxRetries,
+        ctrlCForceQuits: ctrlCForceQuits,
+        refreshInterval: refreshInterval
+    ) { }
 }

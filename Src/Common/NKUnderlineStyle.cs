@@ -6,11 +6,12 @@ using System.Text;
 namespace NeoKolors.Common;
 
 /// <summary>
-/// Represents an underline style with customizable color and type for text styling.
+///     Represents an underline style with customizable color and type for text styling.
 /// </summary>
 /// <remarks>
-/// This structure encapsulates properties for both the color and the style of the underline,
-/// allowing fine-grained control over the appearance of underlined text.
+///     This structure encapsulates properties for both the color and the style of the
+///     underline,
+///     allowing fine-grained control over the appearance of underlined text.
 /// </remarks>
 [StructLayout(LayoutKind.Explicit, Size = 4)]
 public readonly record struct NKUnderlineStyle {
@@ -26,7 +27,7 @@ public readonly record struct NKUnderlineStyle {
         get => NKColor.FromRaw(_color & COLOR_MASK);
         init {
             var raw = value.GetRaw() & COLOR_MASK;
-            _color = (_color & ~COLOR_MASK) | raw;
+            _color = (_color         & ~COLOR_MASK) | raw;
         }
     }
 
@@ -37,28 +38,29 @@ public readonly record struct NKUnderlineStyle {
 
     public bool InheritType {
         get => (_flags & INHERIT_TYPE_MASK) != 0;
-        init => _flags = (byte)(value ? (_flags | INHERIT_TYPE_MASK) : (_flags & ~INHERIT_TYPE_MASK));
+        init => _flags = (byte)(value ? _flags | INHERIT_TYPE_MASK : _flags & ~INHERIT_TYPE_MASK);
     }
 
     public static NKUnderlineStyle Default { get; } =
         new(
             NKColor.Default,
             NKUnderlineType.NORMAL,
-            inheritType: false
+            false
         );
-    
+
     public static NKUnderlineStyle Inherit { get; } =
         new(
             NKColor.Inherit,
             NKUnderlineType.NORMAL,
-            inheritType: true
+            true
         );
 
     public NKUnderlineStyle(NKColor color, NKUnderlineType flags, bool inheritType = false) {
         _color = color.GetRaw() & COLOR_MASK;
-        _flags = (byte)((_flags & ~(UNDERLINE_TYPE_MASK | INHERIT_TYPE_MASK)) 
-                      | (((byte)flags << 2) & UNDERLINE_TYPE_MASK)
-                      | (inheritType ? INHERIT_TYPE_MASK : 0));
+
+        _flags = (byte)((_flags   & ~(UNDERLINE_TYPE_MASK | INHERIT_TYPE_MASK))
+            | (((byte)flags << 2) & UNDERLINE_TYPE_MASK)
+            | (inheritType ? INHERIT_TYPE_MASK : 0));
     }
 
     public string GetEscSeq() {
@@ -75,17 +77,17 @@ public readonly record struct NKUnderlineStyle {
     public NKUnderlineStyle With(NKUnderlineStyle other) {
         var u = other.Color.IsInherit ? Color : other.Color;
         var t = other.InheritType ? Type : other.Type;
-        
+
         return new NKUnderlineStyle(u, t, other.InheritType);
     }
 
     public override string ToString() {
         var sb = new StringBuilder();
-        
+
         sb.Append("NKUnderlineStyle { ");
         PrintMembers(sb);
         sb.Append(" }");
-        
+
         return sb.ToString();
     }
 
@@ -94,7 +96,7 @@ public readonly record struct NKUnderlineStyle {
         Color.AppendMembers(builder);
         builder.Append(", Type = ");
         builder.Append(Type);
-        
+
         return true;
     }
 }

@@ -13,5 +13,5 @@
             <xsd:elementOld name="Div"/>
         </xsd:choice>
     </xsd:group>
-    
+
 </xsd:schema>

@@ -12,19 +12,18 @@ namespace NeoKolors.Console;
 public static partial class ExceptionFormatter {
 
     /// <summary>
-    /// If added to <c>AppDomain.CurrentDomain.UnhandledException</c>, makes all unhandled exceptions formatted.
+    ///     If added to <c>AppDomain.CurrentDomain.UnhandledException</c>, makes all unhandled
+    ///     exceptions formatted.
     /// </summary>
     internal static void WriteUnhandled(object? sender, UnhandledExceptionEventArgs args) {
         if (RedirectToLog) {
-            if (args.ExceptionObject is Exception e1) {
+            if (args.ExceptionObject is Exception e1)
                 NKDebug.Crit(
                     $"{e1.GetType().Name}: {e1.Message}\n" +
                     $"   Stack Trace:\n{e1.StackTrace?.Replace("   ", "      ")}"
                 );
-            }
-            else {
+            else
                 NKDebug.Crit($"An unhandled exception occured.{(args.IsTerminating ? " Terminating..." : "")}");
-            }
         }
 
         if (!FormatUnhandled || args.ExceptionObject is not Exception e0)
@@ -32,26 +31,23 @@ public static partial class ExceptionFormatter {
 
         Stdio.Write(Format(e0).ToString());
 
-        if (Environment.OSVersion.Platform == PlatformID.Win32NT) {
+        if (Environment.OSVersion.Platform == PlatformID.Win32NT)
             WinExceptionSuppressor.Mute();
-        }
-        else {
+        else
             Stdio.SetError(TextWriter.Null);
-        }
 
         if (args.IsTerminating)
             Environment.Exit(args.ExceptionObject is Exception e ? e.HResult : 1);
     }
 
     /// <summary>
-    /// Formats an exception using the global configuration.
+    ///     Formats an exception using the global configuration.
     /// </summary>
-    public static AnsiString Format(Exception e) {
-        return Format(e, Config);
-    }
+    public static AnsiString Format(Exception e) => Format(e, Config);
 
     /// <summary>
-    /// Formats an exception into a stylized <see cref="AnsiString"/> using the specified <see cref="ExceptionFormat"/>.
+    ///     Formats an exception into a stylized <see cref="AnsiString" /> using the specified
+    ///     <see cref="ExceptionFormat" />.
     /// </summary>
     public static AnsiString Format(Exception e, ExceptionFormat? format) {
         ArgumentNullException.ThrowIfNull(e);
@@ -59,7 +55,7 @@ public static partial class ExceptionFormatter {
         format ??= Config;
 
         var sb = new AnsiStringBuilder();
-        FormatSingleException(sb, e, format, depth: 0);
+        FormatSingleException(sb, e, format, 0);
 
         var rawOutput = sb.ToAnsiString();
 
@@ -67,22 +63,20 @@ public static partial class ExceptionFormatter {
     }
 
     /// <summary>
-    /// Formats an exception and prints it directly to standard output.
+    ///     Formats an exception and prints it directly to standard output.
     /// </summary>
     public static void Print(Exception e, ExceptionFormat? format = null) {
         NKConsole.Write(Format(e, format).ToString());
     }
 
     /// <summary>
-    /// Formats an exception and returns a plain string containing ANSI control sequences.
+    ///     Formats an exception and returns a plain string containing ANSI control sequences.
     /// </summary>
-    public static string FormatToString(Exception e, ExceptionFormat? format = null) {
-        return Format(e, format).ToString();
-    }
+    public static string FormatToString(Exception e, ExceptionFormat? format = null) => Format(e, format).ToString();
 
     private static void FormatSingleException(AnsiStringBuilder sb, Exception e, ExceptionFormat format, int depth) {
         while (true) {
-            string indent = depth > 0 ? new string(' ', depth * 2) : string.Empty;
+            var indent = depth > 0 ? new string(' ', depth * 2) : string.Empty;
 
             if (depth > 0) {
                 sb.Append(indent);
@@ -91,7 +85,7 @@ public static partial class ExceptionFormatter {
 
             // Header (Namespace + TypeName + Message + HResult)
             if (format.ShowExceptionNamespace) {
-                string? ns = e.GetType().Namespace;
+                var ns = e.GetType().Namespace;
 
                 if (!string.IsNullOrEmpty(ns)) {
                     sb.Append(indent);
@@ -112,9 +106,8 @@ public static partial class ExceptionFormatter {
                 sb.Append(e.Message, format.MessageStyle);
             }
 
-            if (format.ShowHResult && e.HResult != 0) {
+            if (format.ShowHResult && e.HResult != 0)
                 sb.Append($" [0x{e.HResult:X8}]", format.HResultStyle);
-            }
 
             sb.AppendLine();
 
@@ -141,10 +134,10 @@ public static partial class ExceptionFormatter {
 
             // Stack Trace
             if (format.ShowStackTrace && !string.IsNullOrEmpty(e.StackTrace)) {
-                string[] rawLines        = e.StackTrace.Split(["\r\n", "\r", "\n"], StringSplitOptions.RemoveEmptyEntries);
-                int      framesProcessed = 0;
+                var rawLines        = e.StackTrace.Split(["\r\n", "\r", "\n"], StringSplitOptions.RemoveEmptyEntries);
+                var framesProcessed = 0;
 
-                foreach (string rawLine in rawLines) {
+                foreach (var rawLine in rawLines) {
                     var frame = ParsedStackFrame.Parse(rawLine);
 
                     // Frame filtering
@@ -157,9 +150,8 @@ public static partial class ExceptionFormatter {
                     FormatSingleFrame(sb, frame, format, indent);
                     framesProcessed++;
 
-                    if (format.MaxStackTraceDepth > 0 && framesProcessed >= format.MaxStackTraceDepth) {
+                    if (format.MaxStackTraceDepth > 0 && framesProcessed >= format.MaxStackTraceDepth)
                         break;
-                    }
                 }
             }
 
@@ -168,9 +160,8 @@ public static partial class ExceptionFormatter {
                 return;
 
             if (e is AggregateException { InnerExceptions.Count: > 0 } aggEx) {
-                foreach (var inner in aggEx.InnerExceptions) {
+                foreach (var inner in aggEx.InnerExceptions)
                     FormatSingleException(sb, inner, format, depth + 1);
-                }
             }
             else if (e.InnerException != null) {
                 e     =  e.InnerException;
@@ -192,21 +183,20 @@ public static partial class ExceptionFormatter {
         var mStyle       = format.DimSystemFrames && frame.IsSystemFrame ? dimStyle : format.MethodStyle;
         var mArgsStyle   = format.DimSystemFrames && frame.IsSystemFrame ? dimStyle : format.MethodArgumentsStyle;
 
-        string atPrefix = new string(' ', Math.Max(0, format.StackTraceIndent))     + "at ";
-        string inPrefix = new string(' ', Math.Max(0, format.StackTraceIndent + 2)) + "in ";
+        var atPrefix = new string(' ', Math.Max(0, format.StackTraceIndent))     + "at ";
+        var inPrefix = new string(' ', Math.Max(0, format.StackTraceIndent + 2)) + "in ";
 
         sb.Append(indent);
         sb.Append(atPrefix, dimStyle);
 
         if (!string.IsNullOrEmpty(frame.DeclaringType)) {
-            string declaringTypeToDisplay = frame.DeclaringType;
+            var declaringTypeToDisplay = frame.DeclaringType;
 
             if (!format.ShowMethodNamespace) {
-                int lastDot = declaringTypeToDisplay.LastIndexOf('.');
+                var lastDot = declaringTypeToDisplay.LastIndexOf('.');
 
-                if (lastDot != -1) {
+                if (lastDot != -1)
                     declaringTypeToDisplay = declaringTypeToDisplay.Substring(lastDot + 1);
-                }
             }
 
             sb.Append(declaringTypeToDisplay + ".", mSourceStyle);
@@ -217,7 +207,7 @@ public static partial class ExceptionFormatter {
         FormatParameters(sb, frame.Parameters, format, frame.IsSystemFrame);
 
         if (frame.HasSourceInfo) {
-            bool isCompactSingleLine = format is { ShowMethodNamespace: false, ShowFilePath: false };
+            var isCompactSingleLine = format is { ShowMethodNamespace: false, ShowFilePath: false };
 
             if (isCompactSingleLine) {
                 sb.Append(" in ", dimStyle);
@@ -228,23 +218,20 @@ public static partial class ExceptionFormatter {
                 sb.Append(inPrefix, dimStyle);
             }
 
-            string displayPath = frame.FilePath!;
+            var displayPath = frame.FilePath!;
 
-            if (!format.ShowFilePath) {
+            if (!format.ShowFilePath)
                 displayPath = Path.GetFileName(displayPath);
-            }
-            else if (format.PathTransformer != null) {
+            else if (format.PathTransformer != null)
                 displayPath = format.PathTransformer(displayPath);
-            }
-            else {
+            else
                 displayPath = format.PathFormat switch {
                     PathFormatMode.FILE_NAME_ONLY => Path.GetFileName(displayPath),
                     PathFormatMode.RELATIVE_PATH  => GetRelativePath(displayPath),
                     _                             => displayPath
                 };
-            }
 
-            int lastSlash = Math.Max(displayPath.LastIndexOf('/'), displayPath.LastIndexOf('\\'));
+            var lastSlash = Math.Max(displayPath.LastIndexOf('/'), displayPath.LastIndexOf('\\'));
 
             if (lastSlash != -1) {
                 sb.Append(displayPath.Substring(0, lastSlash + 1), format.PathStyle);
@@ -258,11 +245,10 @@ public static partial class ExceptionFormatter {
             sb.Append(frame.LineNumber.ToString(), format.LineNumberStyle);
 
             if (format.ShowSourceSnippet) {
-                string? sourceFilePath = TryResolveSourceFilePath(frame.FilePath);
+                var sourceFilePath = TryResolveSourceFilePath(frame.FilePath);
 
-                if (sourceFilePath != null) {
+                if (sourceFilePath != null)
                     AppendSourceSnippet(sb, sourceFilePath, displayPath, frame.LineNumber, format, indent);
-                }
             }
         }
 
@@ -275,11 +261,10 @@ public static partial class ExceptionFormatter {
         var pTypeStyle  = format.DimSystemFrames && isSystemFrame ? dimStyle : format.MethodParamTypeStyle;
         var pNameStyle  = format.DimSystemFrames && isSystemFrame ? dimStyle : format.MethodParamNameStyle;
 
-        if (string.IsNullOrEmpty(rawParameters)) {
+        if (string.IsNullOrEmpty(rawParameters))
             return;
-        }
 
-        string trimmed = rawParameters.Trim();
+        var trimmed = rawParameters.Trim();
 
         if (!trimmed.StartsWith("(") || !trimmed.EndsWith(")")) {
             sb.Append(rawParameters, pPunctStyle);
@@ -287,24 +272,23 @@ public static partial class ExceptionFormatter {
             return;
         }
 
-        string content = trimmed.Substring(1, trimmed.Length - 2).Trim();
+        var content = trimmed.Substring(1, trimmed.Length - 2).Trim();
 
         sb.Append("(", pPunctStyle);
 
         if (!string.IsNullOrEmpty(content)) {
-            string[] paramsList = SplitParameters(content);
+            var paramsList = SplitParameters(content);
 
-            for (int i = 0; i < paramsList.Length; i++) {
-                if (i > 0) {
+            for (var i = 0; i < paramsList.Length; i++) {
+                if (i > 0)
                     sb.Append(", ", pPunctStyle);
-                }
 
-                string paramToken = paramsList[i].Trim();
-                int    lastSpace  = paramToken.LastIndexOf(' ');
+                var paramToken = paramsList[i].Trim();
+                var lastSpace  = paramToken.LastIndexOf(' ');
 
                 if (lastSpace != -1) {
-                    string typePart = paramToken.Substring(0, lastSpace);
-                    string namePart = paramToken.Substring(lastSpace + 1);
+                    var typePart = paramToken.Substring(0, lastSpace);
+                    var namePart = paramToken.Substring(lastSpace + 1);
 
                     sb.Append(typePart, pTypeStyle);
                     sb.Append(" ",      pPunctStyle);
@@ -321,11 +305,11 @@ public static partial class ExceptionFormatter {
 
     private static string[] SplitParameters(string content) {
         var list      = new List<string>();
-        int depth     = 0;
-        int lastStart = 0;
+        var depth     = 0;
+        var lastStart = 0;
 
-        for (int i = 0; i < content.Length; i++) {
-            char c = content[i];
+        for (var i = 0; i < content.Length; i++) {
+            var c = content[i];
 
             switch (c) {
                 case '<' or '[' or '(': depth++; break;
@@ -339,42 +323,40 @@ public static partial class ExceptionFormatter {
             }
         }
 
-        if (lastStart < content.Length) {
+        if (lastStart < content.Length)
             list.Add(content[lastStart..]);
-        }
 
         return list.ToArray();
     }
 
     private static void AppendSourceSnippet(AnsiStringBuilder sb, string sourceFilePath, string displayPath, int targetLineNumber, ExceptionFormat format, string indent) {
         try {
-            string[] lines       = File.ReadAllLines(sourceFilePath);
-            int      targetIndex = targetLineNumber - 1;
+            var lines       = File.ReadAllLines(sourceFilePath);
+            var targetIndex = targetLineNumber - 1;
 
             if (targetIndex < 0 || targetIndex >= lines.Length)
                 return;
 
             var dimStyle        = new NKStyle(DARK_GRAY);
-            int context         = Math.Max(0, format.SourceSnippetContextLines);
-            int start           = Math.Max(0, targetIndex - context);
-            int end             = Math.Min(lines.Length   - 1, targetIndex + context);
-            int maxLineNumWidth = (end + 1).ToString().Length;
+            var context         = Math.Max(0, format.SourceSnippetContextLines);
+            var start           = Math.Max(0, targetIndex - context);
+            var end             = Math.Min(lines.Length   - 1, targetIndex + context);
+            var maxLineNumWidth = (end + 1).ToString().Length;
 
-            string snippetIndent = new string(' ', Math.Max(0, format.StackTraceIndent));
-            string headerSpaces  = new string(' ', Math.Max(0, format.StackTraceIndent) + maxLineNumWidth + 1);
+            var snippetIndent = new string(' ', Math.Max(0, format.StackTraceIndent));
+            var headerSpaces  = new string(' ', Math.Max(0, format.StackTraceIndent) + maxLineNumWidth + 1);
 
-            string pointerStr = format.SourceSnippetPointer.EndsWith(" ")
+            var pointerStr = format.SourceSnippetPointer.EndsWith(" ")
                 ? format.SourceSnippetPointer
                 : format.SourceSnippetPointer + " ";
 
-            string targetSep    = " " + pointerStr;
-            string nonTargetSep = " │ ";
+            var targetSep    = " " + pointerStr;
+            var nonTargetSep = " │ ";
 
-            if (targetSep.Length > nonTargetSep.Length) {
+            if (targetSep.Length > nonTargetSep.Length)
                 nonTargetSep = " │" + new string(' ', targetSep.Length - 2);
-            }
 
-            string displayFilePath = format.ShowFilePath ? displayPath : Path.GetFileName(displayPath);
+            var displayFilePath = format.ShowFilePath ? displayPath : Path.GetFileName(displayPath);
             sb.AppendLine();
             sb.AppendLine();
             sb.Append(indent);
@@ -384,9 +366,9 @@ public static partial class ExceptionFormatter {
             sb.Append(":",             dimStyle);
             sb.AppendLine(targetLineNumber.ToString(), format.LineNumberStyle);
 
-            for (int i = start; i <= end; i++) {
-                bool   isTarget   = i == targetIndex;
-                string lineNumStr = (i + 1).ToString().PadLeft(maxLineNumWidth);
+            for (var i = start; i <= end; i++) {
+                var isTarget   = i == targetIndex;
+                var lineNumStr = (i + 1).ToString().PadLeft(maxLineNumWidth);
 
                 sb.Append(indent);
                 sb.Append(snippetIndent);
@@ -408,47 +390,42 @@ public static partial class ExceptionFormatter {
     }
 
     private static string? TryResolveSourceFilePath(string? rawPath) {
-        if (string.IsNullOrWhiteSpace(rawPath)) {
+        if (string.IsNullOrWhiteSpace(rawPath))
             return null;
-        }
 
         try {
-            if (File.Exists(rawPath)) {
+            if (File.Exists(rawPath))
                 return rawPath;
-            }
 
-            string relativePath = rawPath;
+            var relativePath = rawPath;
 
             // Handle SourceLink deterministic paths (e.g. /_/path/to/file or /_1/path/to/file)
             if (rawPath.StartsWith("/_") || rawPath.StartsWith("\\_")) {
-                int nextSep = rawPath.IndexOfAny(['/', '\\'], 2);
+                var nextSep = rawPath.IndexOfAny(['/', '\\'], 2);
                 relativePath = nextSep != -1 ? rawPath.Substring(nextSep + 1) : rawPath.TrimStart('/', '\\');
             }
             else if (rawPath.StartsWith('/') || rawPath.StartsWith('\\')) {
                 relativePath = rawPath.TrimStart('/', '\\');
             }
 
-            string normalizedRel = relativePath.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
+            var normalizedRel = relativePath.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
 
-            if (File.Exists(normalizedRel)) {
+            if (File.Exists(normalizedRel))
                 return Path.GetFullPath(normalizedRel);
-            }
 
             var baseDirs = new[] { Directory.GetCurrentDirectory(), AppContext.BaseDirectory };
 
             foreach (var baseDir in baseDirs) {
-                if (string.IsNullOrEmpty(baseDir)) {
+                if (string.IsNullOrEmpty(baseDir))
                     continue;
-                }
 
                 var dir = new DirectoryInfo(baseDir);
 
-                for (int depth = 0; depth < 10 && dir != null; depth++, dir = dir.Parent) {
-                    string candidate = Path.Combine(dir.FullName, normalizedRel);
+                for (var depth = 0; depth < 10 && dir != null; depth++, dir = dir.Parent) {
+                    var candidate = Path.Combine(dir.FullName, normalizedRel);
 
-                    if (File.Exists(candidate)) {
+                    if (File.Exists(candidate))
                         return candidate;
-                    }
                 }
             }
         }
@@ -460,28 +437,24 @@ public static partial class ExceptionFormatter {
     }
 
     private static AnsiString ApplyBorder(AnsiString rawOutput, ExceptionFormat format) {
-        if (!format.ShowHighlight || format.BorderStyle == ExceptionBorderStyle.NONE) {
+        if (!format.ShowHighlight || format.BorderStyle == ExceptionBorderStyle.NONE)
             return rawOutput;
-        }
 
         var rawLines     = rawOutput.Split('\n');
         var cleanedLines = new List<AnsiString>();
 
-        foreach (var line in rawLines) {
+        foreach (var line in rawLines)
             cleanedLines.Add(line.TrimEnd('\r'));
-        }
 
-        while (cleanedLines.Count > 0 && cleanedLines[^1].Length == 0) {
+        while (cleanedLines.Count > 0 && cleanedLines[^1].Length == 0)
             cleanedLines.RemoveAt(cleanedLines.Count - 1);
-        }
 
         if (format.BorderStyle == ExceptionBorderStyle.BOX) {
-            int maxLen = 0;
+            var maxLen = 0;
 
-            foreach (var l in cleanedLines) {
+            foreach (var l in cleanedLines)
                 if (l.Length > maxLen)
                     maxLen = l.Length;
-            }
 
             maxLen = Math.Max(maxLen, 30);
 
@@ -493,7 +466,7 @@ public static partial class ExceptionFormatter {
             sb.AppendLine(new string('─', Math.Max(0, maxLen - 8)) + "╮", borderStyle);
 
             foreach (var l in cleanedLines) {
-                int pad = Math.Max(0, maxLen - l.Length);
+                var pad = Math.Max(0, maxLen - l.Length);
 
                 sb.Append("│ ", borderStyle);
                 sb.Append(l);
@@ -521,20 +494,19 @@ public static partial class ExceptionFormatter {
 
     private static string GetRelativePath(string fullPath) {
         try {
-            string currentDir = Directory.GetCurrentDirectory();
+            var currentDir = Directory.GetCurrentDirectory();
 
             if (fullPath.StartsWith(currentDir, StringComparison.OrdinalIgnoreCase)) {
-                string rel = fullPath[currentDir.Length..].TrimStart('/', '\\');
+                var rel = fullPath[currentDir.Length..].TrimStart('/', '\\');
 
                 return string.IsNullOrEmpty(rel) ? fullPath : rel;
             }
 
             if (fullPath.StartsWith("/_") || fullPath.StartsWith("\\_")) {
-                int nextSep = fullPath.IndexOfAny(['/', '\\'], 2);
+                var nextSep = fullPath.IndexOfAny(['/', '\\'], 2);
 
-                if (nextSep != -1) {
+                if (nextSep != -1)
                     return fullPath[(nextSep + 1)..];
-                }
             }
         }
         catch {

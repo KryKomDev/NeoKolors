@@ -26,48 +26,49 @@ public class MiscExtensionsTests {
 
     [Fact]
     public void SafeSubstring_HandlesBoundaries() {
-        string s = "Hello";
-        Assert.Equal("He", s.SafeSubstring(0, 2));
-        Assert.Equal("llo", s.SafeSubstring(2, 10));
-        Assert.Equal("", s.SafeSubstring(10, 2));
+        var s = "Hello";
+        Assert.Equal("He",    s.SafeSubstring(0,  2));
+        Assert.Equal("llo",   s.SafeSubstring(2,  10));
+        Assert.Equal("",      s.SafeSubstring(10, 2));
         Assert.Equal("Hello", s.SafeSubstring(-1, 10));
     }
 
     [Fact]
     public void SubstringUntil_ReturnsCorrectPortion() {
-        string s = "user@domain.com";
-        Assert.Equal("user", s.SubstringUntil('@'));
+        var s = "user@domain.com";
+        Assert.Equal("user",            s.SubstringUntil('@'));
         Assert.Equal("user@domain.com", s.SubstringUntil(':'));
     }
 
     [Fact]
     public void SubstringAfter_ReturnsCorrectPortion() {
-        string s = "user@domain.com";
-        Assert.Equal("@domain.com", s.SubstringAfter('@'));
+        var s = "user@domain.com";
+        Assert.Equal("@domain.com",     s.SubstringAfter('@'));
         Assert.Equal("user@domain.com", s.SubstringAfter(':'));
     }
 
     [Fact]
     public void SubstringBetween_ReturnsCorrectPortion() {
-        string s = "prefix[content]suffix";
-        Assert.Equal("[content]", s.SubstringBetween('[', ']'));
-        Assert.Equal("content", s.SubstringBetween('[', ']', true, true));
+        var s = "prefix[content]suffix";
+        Assert.Equal("[content]",             s.SubstringBetween('[', ']'));
+        Assert.Equal("content",               s.SubstringBetween('[', ']', true, true));
         Assert.Equal("prefix[content]suffix", s.SubstringBetween('{', '}')); // Returns original if not found
     }
 
     [Fact]
     public void Trim_ShortensStringCorrectly() {
-        string s = "Hello World";
-        Assert.Equal("Hello", s.Trim(5));
+        var s = "Hello World";
+        Assert.Equal("Hello",       s.Trim(5));
         Assert.Equal("Hello World", s.Trim(20));
         Assert.Throws<ArgumentOutOfRangeException>(() => s.Trim(-1));
     }
 
     [Fact]
     public void Shrink_ShortensFromMiddle() {
-        string s = "1234567890";
+        var s = "1234567890";
+
         // length 5: hl = 2. s[..3] + "…" + s[^2..] => "123" + "…" + "90" = "123…90"
-        Assert.Equal("123…90", s.Shrink(5));
+        Assert.Equal("123…90",     s.Shrink(5));
         Assert.Equal("1234567890", s.Shrink(10));
     }
 
@@ -111,11 +112,11 @@ public class MiscExtensionsTests {
 
     [Fact]
     public void PadLinesLeft_PadsCorrectly() {
-        string s = "line1\nline2\nline3";
-        string padded = s.PadLinesLeft(2);
+        var s      = "line1\nline2\nline3";
+        var padded = s.PadLinesLeft(2);
         Assert.Equal("line1\n  line2\n  line3", padded);
 
-        string paddedFirst = s.PadLinesLeft(2, true);
+        var paddedFirst = s.PadLinesLeft(2, true);
         Assert.Equal("  line1\n  line2\n  line3", paddedFirst);
     }
 
@@ -126,10 +127,11 @@ public class MiscExtensionsTests {
     [Fact]
     public void StringBuilder_AppendIf_Works() {
         var sb = new StringBuilder();
-        sb.AppendIf(true, "yes");
+        sb.AppendIf(true,  "yes");
         sb.AppendIf(false, "no");
         Assert.Equal("yes", sb.ToString());
     }
 
     #endregion
+
 }

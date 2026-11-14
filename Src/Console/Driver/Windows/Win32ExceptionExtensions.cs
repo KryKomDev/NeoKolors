@@ -10,10 +10,10 @@ namespace NeoKolors.Console;
 
 internal static class Win32ExceptionExtensions {
     extension(Win32Exception) {
-        
+
         [DoesNotReturn]
         public static void Throw(uint errorCode) {
-            throw new Win32Exception(unchecked((int)errorCode));    
+            throw new Win32Exception(unchecked((int)errorCode));
         }
 
         [DoesNotReturn]

@@ -4,7 +4,8 @@
 namespace NeoKolors.Tui.Core;
 
 /// <summary>
-/// A disposable scope handle that restores the previous <see cref="RenderContext"/> state upon disposal.
+///     A disposable scope handle that restores the previous <see cref="RenderContext" /> state
+///     upon disposal.
 /// </summary>
 public readonly struct RenderScope : IDisposable {
     private readonly RenderContext _context;
@@ -16,11 +17,10 @@ public readonly struct RenderScope : IDisposable {
     }
 
     /// <summary>
-    /// Restores the render context to the state saved when this scope was created.
+    ///     Restores the render context to the state saved when this scope was created.
     /// </summary>
     public void Dispose() {
-        if (_context != null && _context.StateDepth >= _expectedDepth) {
+        if (_context != null && _context.StateDepth >= _expectedDepth)
             _context.RestoreToDepth(_expectedDepth - 1);
-        }
     }
 }

@@ -9,11 +9,11 @@ using static NeoKolors.Console.WinImports;
 namespace NeoKolors.Console;
 
 /// <summary>
-/// Represents a Windows-specific implementation for managing standard output
-/// with capabilities for configuring and handling virtual terminal modes.
+///     Represents a Windows-specific implementation for managing standard output
+///     with capabilities for configuring and handling virtual terminal modes.
 /// </summary>
 public class WindowsOutput : IDisposable {
-    
+
     private static readonly NKLogger LOGGER = NKDebug.GetLogger<WindowsOutput>();
 
     private          bool          _disposed = false;
@@ -27,10 +27,14 @@ public class WindowsOutput : IDisposable {
         switch (_handle) {
             case -1: {
                 Win32Exception.Throw(GetLastError());
-            } return;
+            }
+
+                return;
             case 0: {
                 LOGGER.Crit("No associated stdin handle available.");
-            } return;
+            }
+
+                return;
         }
 
         // store the original VT modes to be restored on this instance disposal
@@ -43,38 +47,37 @@ public class WindowsOutput : IDisposable {
 
         const WinVtOutModes disabled = 0
             | WinVtOutModes.ENABLE_WRAP_AT_EOL_OUTPUT;
-        
+
         // configure VT the modes
         var modes = (_originalModes | enabled) & ~disabled;
-        
+
         // set the VT modes
         if (!SetStdOutMode(_handle, modes))
             Win32Exception.ThrowLast();
     }
 
     /// <summary>
-    /// Writes the specified text to the console output using the configured handle.
+    ///     Writes the specified text to the console output using the configured handle.
     /// </summary>
     /// <param name="text">The text to be written to the console output.</param>
     public void Write(ReadOnlySpan<char> text) {
-
         if (!WriteConsole(_handle, text, out var written))
             Win32Exception.ThrowLast();
 
         var totalWritten = written;
-        
+
         while (totalWritten < text.Length) {
             if (!WriteConsole(_handle, text[unchecked((int)totalWritten)..], out written))
                 Win32Exception.ThrowLast();
-            
+
             totalWritten += written;
         }
     }
-    
+
     public void Dispose() {
-        if (_disposed) 
+        if (_disposed)
             return;
-        
+
         _disposed = true;
         SetStdOutMode(_handle, _originalModes);
     }

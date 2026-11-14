@@ -26,8 +26,8 @@
     <ItemGroup>
         <ProjectReference Include="../Core/NeoKolors.Tui.Lifecycle.Core.csproj"/>
         <ProjectReference Include="../../../Common/NeoKolors.Common.csproj"/>
-        <ProjectReference Include="..\..\Core\NeoKolors.Tui.Core.csproj" />
-        <ProjectReference Include="..\..\Elements\NeoKolors.Tui.Elements.csproj" />
+        <ProjectReference Include="..\..\Core\NeoKolors.Tui.Core.csproj"/>
+        <ProjectReference Include="..\..\Elements\NeoKolors.Tui.Elements.csproj"/>
     </ItemGroup>
 
 </Project>

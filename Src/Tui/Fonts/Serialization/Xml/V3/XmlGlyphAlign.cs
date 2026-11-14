@@ -11,10 +11,10 @@ namespace NeoKolors.Tui.Fonts.Xml.V3;
 
 [StructLayout(LayoutKind.Explicit)]
 public readonly struct XmlGlyphAlign {
-    
+
     [field: FieldOffset(0)] public bool IsDirection { get; }
-    [field: FieldOffset(1)] public char Char => IsDirection ? throw new IOp() : field;
-    [field: FieldOffset(1)] public Drct Direction => !IsDirection ? throw new IOp() : field;
+    [field: FieldOffset(1)] public char Char        => IsDirection ? throw new IOp() : field;
+    [field: FieldOffset(1)] public Drct Direction   => !IsDirection ? throw new IOp() : field;
 
     public bool IsChar => !IsDirection;
 
@@ -32,6 +32,7 @@ public readonly struct XmlGlyphAlign {
         if (string.IsNullOrEmpty(s)) {
             NKFontSerializer.LOGGER.Error("The value for Align is empty or null.");
             output = null;
+
             return false;
         }
 
@@ -39,21 +40,25 @@ public readonly struct XmlGlyphAlign {
             if (s.Length != 9) {
                 NKFontSerializer.LOGGER.Error($"The value '{s}' is not valid for Align.");
                 output = null;
+
                 return false;
             }
 
             output = new XmlGlyphAlign(s[8]);
+
             return true;
         }
 
         try {
             var d = Enum.Parse<Drct>(s.ToUpperInvariant().Replace('-', '_'));
             output = new XmlGlyphAlign(d);
+
             return true;
         }
         catch (Exception) {
             NKFontSerializer.LOGGER.Error($"The value '{s}' is not valid for Align.");
             output = null;
+
             return false;
         }
     }

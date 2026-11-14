@@ -12,43 +12,46 @@ using NeoKolors.Tui.Lifecycle.Core;
 namespace NeoKolors.Tui.Lifecycle.Inline;
 
 /// <summary>
-/// A specialized lifecycle host that coordinates running and rendering inline widgets and element hierarchies
-/// in the standard console stream.
+///     A specialized lifecycle host that coordinates running and rendering inline widgets and
+///     element hierarchies
+///     in the standard console stream.
 /// </summary>
 public class InlineLifecycleHost : LifecycleController {
     private readonly SemaphoreSlim            _wakeSignal = new(0, 1);
     private readonly object                   _hostLock   = new();
     private          CancellationTokenSource? _sessionCts;
     private          IInlineScreen?           _screen;
-    private volatile bool                     _isDirty    = true;
+    private volatile bool                     _isDirty = true;
 
     /// <summary>
-    /// Gets or sets the target frames per second for the background rendering loop.
-    /// Default is 20 FPS.
+    ///     Gets or sets the target frames per second for the background rendering loop.
+    ///     Default is 20 FPS.
     /// </summary>
     public int TargetFps { get; set; } = 20;
 
     /// <summary>
-    /// Gets or sets whether the cursor should automatically be hidden while the widget runs.
-    /// Default is <c>true</c>.
+    ///     Gets or sets whether the cursor should automatically be hidden while the widget runs.
+    ///     Default is <c>true</c>.
     /// </summary>
     public bool AutoHideCursor { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets whether terminal autowrap should temporarily be disabled to avoid layout overflow.
-    /// Default is <c>true</c>.
+    ///     Gets or sets whether terminal autowrap should temporarily be disabled to avoid layout
+    ///     overflow.
+    ///     Default is <c>true</c>.
     /// </summary>
     public bool DisableAutoWrap { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets whether the widget remains rendered on the console after execution finishes.
-    /// Default is <c>true</c>.
+    ///     Gets or sets whether the widget remains rendered on the console after execution
+    ///     finishes.
+    ///     Default is <c>true</c>.
     /// </summary>
     public bool PersistOnExit { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the screen presenter used to render frames.
-    /// If null, a default <see cref="NKInlineScreen"/> is allocated automatically.
+    ///     Gets or sets the screen presenter used to render frames.
+    ///     If null, a default <see cref="NKInlineScreen" /> is allocated automatically.
     /// </summary>
     public IInlineScreen? Screen {
         get => _screen;
@@ -56,15 +59,17 @@ public class InlineLifecycleHost : LifecycleController {
     }
 
     /// <summary>
-    /// Occurs on every frame tick before layout measurement and rendering occurs.
+    ///     Occurs on every frame tick before layout measurement and rendering occurs.
     /// </summary>
     public event Action<TimeSpan>? Tick;
 
     /// <summary>
-    /// Requests an immediate frame redraw without waiting for the next periodic timer interval.
+    ///     Requests an immediate frame redraw without waiting for the next periodic timer
+    ///     interval.
     /// </summary>
     public void Invalidate() {
         _isDirty = true;
+
         if (_wakeSignal.CurrentCount == 0) {
             try {
                 _wakeSignal.Release();
@@ -76,7 +81,7 @@ public class InlineLifecycleHost : LifecycleController {
     }
 
     /// <summary>
-    /// Requests the inline session to exit gracefully.
+    ///     Requests the inline session to exit gracefully.
     /// </summary>
     public void RequestExit() {
         lock (_hostLock) {
@@ -85,7 +90,8 @@ public class InlineLifecycleHost : LifecycleController {
     }
 
     /// <summary>
-    /// Executes the specified asynchronous workload while continuously rendering the visual element hierarchy inline.
+    ///     Executes the specified asynchronous workload while continuously rendering the visual
+    ///     element hierarchy inline.
     /// </summary>
     /// <param name="root">The root visual element to render.</param>
     /// <param name="action">The asynchronous workload to execute.</param>
@@ -205,7 +211,8 @@ public class InlineLifecycleHost : LifecycleController {
     }
 
     /// <summary>
-    /// Executes the specified synchronous workload while continuously rendering the visual element hierarchy inline.
+    ///     Executes the specified synchronous workload while continuously rendering the visual
+    ///     element hierarchy inline.
     /// </summary>
     /// <param name="root">The root visual element to render.</param>
     /// <param name="action">The synchronous workload to execute.</param>
